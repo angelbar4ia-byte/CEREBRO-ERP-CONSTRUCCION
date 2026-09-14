@@ -1,0 +1,177 @@
+# PRUEBA DE FLUJO — LOS SIETE PROTOTIPOS
+
+```
+órgano:     memoria episódica — prueba de sistema
+capa:       III — Historia
+pregunta:   ¿el camino paramétrico aguanta sobre el catálogo real?
+tiempo:     fue así
+corte:      2026-09-13
+verificado: 6 etapas · 3 pasan · 3 se rompen
+```
+
+> **Tercera prueba (B-42).** Las otras dos siguen **una obra**. Ésta sigue **el
+> conjunto**: los siete prototipos, $16,460,623.50, de 172 a 300 m².
+>
+> Es el camino que ninguna prueba de una sola obra puede recorrer, porque el
+> paramétrico sólo existe cuando hay varios casos que comparar.
+
+---
+
+# El recorrido
+
+| # | Etapa | Resultado |
+|---|---|---|
+| 1 | Paramétrico global | ⛔ **Se rompe — y era esperado** |
+| 2 | Paramétrico por subcapítulo | ⚠️ **Pasa en 3 de 6** |
+| 3 | La cohorte como explicación | ✅ Pasa — el mejor resultado |
+| 4 | La dispersión como diagnóstico | ✅ Pasa |
+| 5 | El parámetro propio | ⛔ **Sin probar: no hay los datos** |
+| 6 | Extracción y generación | ⛔ No existe |
+
+---
+
+## 1 · Paramétrico global — ⛔ se rompe
+
+```
+$8,717/m²  ───────────────────────────  $11,841/m²
+                 36% de variación
+```
+
+**Un solo número por m² para toda la casa no sirve.** Sobre 172 m², ese rango son
+$537,000 de diferencia: más que decidir a ojo.
+
+> No es un fallo del método: es el resultado que hacía falta para descartar la
+> solución fácil. **Si no se mide, alguien la implementa.**
+
+---
+
+## 2 · Por subcapítulo — ⚠️ pasa en la mitad
+
+| Subcapítulo | $/m² | Dispersión | ¿Usable? |
+|---|---|---|---|
+| Acabados | 911 | **5%** | ✅ |
+| Planta alta | 1,371 | 10% | ✅ |
+| Carpintería | 1,063 | 11% | ✅ al límite |
+| Cancelería | 405 | 20% | ⚠️ |
+| Cimentación | 931 | 23% | ⚠️ |
+| Herrería | 116 | **38%** | ⛔ |
+
+Bajar un nivel de agregación mejora mucho, **pero no arregla todo**. Y el patrón
+tiene sentido físico: lo que se mide por superficie funciona; lo que se cuenta por
+pieza o depende del diseño, no.
+
+---
+
+## 3 · La cohorte — ✅ el mejor resultado de las tres pruebas
+
+La cimentación parecía irregular con 23%. Separando por número de plantas:
+
+```
+1 planta    Zafiro 1,039   Rubí 1,012   Jade 1,053           → CV  2%
+2 plantas   ZafPlus 660  Diam− 1,090  Diam+ 1,085  Oro 577   → CV 32%
+                                                     juntos  → CV 23%
+```
+
+**En una planta la cimentación por m² es prácticamente idéntica: 2%.** Lo que la
+rompía no era el dato: era mezclar dos poblaciones distintas.
+
+> En dos plantas el m² construido ya no es proporcional a la superficie de desplante.
+> El dato siempre fue bueno; la pregunta estaba mal hecha.
+
+**Esto valida la decisión M-2 con evidencia**: la cohorte no es burocracia, es lo que
+convierte un 23% inservible en un 2% utilizable.
+
+Y deja ver algo más: los de dos plantas siguen en 32% **incluso separados**. La
+cohorte «dos plantas» no basta — hay otra variable adentro. Zafiro Plus a 660 y Oro a
+577 contra los dos Diamante en 1,085-1,090 es demasiada distancia para llamarlo
+dispersión.
+
+**Y al recalcularlo, la explicación de las plantas se cayó.**
+
+| Grupo | Prototipos | $/m² | CV |
+|---|---|---|---|
+| **A** | Zafiro 1.0, Rubí, Jade, **Diamante −, Diamante +** | 1,056 | **2.8%** |
+| **B** | Zafiro Plus, Oro 4.01 | 618 | 6.7% |
+
+**Los dos Diamante tienen planta alta y se comportan como los de una planta.** Cinco
+de siete comparten tasa; los dos que se salen están **1.71× por debajo** — eso no es
+dispersión, es otra población.
+
+> **Hallazgo doble.** Uno de dominio: la cohorte de cimentación no es el número de
+> plantas, y qué es sigue sin saberse (**B-52**). Y uno de método: **una partición que
+> mejora el número no queda probada por mejorarlo.** El 32% que quedaba en el otro
+> subgrupo era la señal de que faltaba explicación, y se leyó como ruido.
+
+---
+
+## 4 · La dispersión como diagnóstico — ✅
+
+Funciona tal como se decidió en M-3: **la dispersión alta no avisa sobre el número,
+dice que el parámetro está mal elegido.**
+
+| Dispersión | Qué significa de verdad |
+|---|---|
+| Acabados 5% | El m² **es** el parámetro correcto |
+| Cimentación 23% | La cohorte está mal armada — se arregla separando |
+| Herrería 38% | El m² **no es** el parámetro. Es otra cosa |
+
+**Tres diagnósticos distintos con el mismo síntoma.** Si la dispersión sólo se
+mostrara como aviso, los tres se verían igual.
+
+---
+
+## 5 · El parámetro propio — ⛔ no se puede probar
+
+Está decidido que cimentación escala con desplante e instalaciones con salidas
+(D-98). **Pero no hay datos para comprobarlo:** el catálogo trae m² construidos, no
+superficie de desplante ni número de salidas.
+
+| Para probar | Hace falta |
+|---|---|
+| Cimentación por desplante | Superficie de desplante por prototipo |
+| Instalaciones por salidas | Conteo de salidas por prototipo |
+| Herrería por su parámetro | Saber cuál es — **ni eso está decidido** |
+
+> **Hallazgo: se decidió que cada ensamble lleva parámetro propio, y no existe dónde
+> guardarlo ni de dónde sacarlo.** Es el contrato de lo declarado otra vez: el
+> concepto se usó sin darle casa. **B-53.**
+
+Y cierra un círculo con la prueba de ALAMO 18: **el cuantificador es el que produciría
+esos parámetros.** Sin él, el paramétrico está limitado a lo que el catálogo ya trae.
+
+---
+
+## 6 · Extracción y generación — ⛔
+
+No existen. Las dos direcciones están diseñadas (§5.8) y ninguna construida.
+
+---
+
+# Resultado
+
+**Tres pasan, tres se rompen**, y las tres roturas son de un tipo distinto al de las
+otras pruebas:
+
+| Prueba | Modo de fallo |
+|---|---|
+| ALAMO 18 | **Falta el dato** — las salidas de almacén |
+| Zafiro 1.0 | **El dato está sucio** — unidades sin normalizar |
+| Siete prototipos | **El dato existe pero no es el que hace falta** — m² construidos donde se necesita desplante |
+
+> Tres modos de fallo distintos, y ninguno se arregla igual. Eso por sí solo
+> justificaba correr las tres.
+
+## Lo que validó
+
+- **La cohorte convierte un 23% inservible en un 2% utilizable.** Es la evidencia más
+  fuerte de todo el paramétrico y sale de datos reales.
+- La dispersión distingue tres problemas distintos con el mismo síntoma.
+- El paramétrico global se descartó **con medición**, no por intuición.
+
+## Lo que encontró
+
+| # | Hallazgo | Dónde quedó |
+|---|---|---|
+| 1 | La cohorte de dos plantas esconde una segunda variable | B-52 |
+| 2 | El parámetro propio no tiene dónde guardarse ni de dónde salir | B-53 |
+| 3 | Sin cuantificador, el paramétrico se limita a lo que el catálogo trae | Refuerza C-1 |
