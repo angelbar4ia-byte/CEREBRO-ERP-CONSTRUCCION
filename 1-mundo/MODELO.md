@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
-corte:      2026-09-10
+corte:      2026-09-15
 verificado: Aprobado · 6 hallazgos resueltos
 ```
 
@@ -307,6 +307,7 @@ técnica**, no como error.
 | Estimaciones, contratos, almacén | P-18, P-19 — sin definir |
 | Roles y permisos | P-21 — sin definir |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
+| Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso. Mismo criterio que el `OID` de OPUS: no se carga un campo muerto «por si acaso». M-13 |
 
 ---
 

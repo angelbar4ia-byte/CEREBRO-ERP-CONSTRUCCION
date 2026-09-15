@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué falta?
 tiempo:     vamos aquí
-corte:      2026-09-09
+corte:      2026-09-15
 verificado: 38 de decisión · 14 de datos · 25 módulos
 ```
 
@@ -74,7 +74,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | M-14 | El alcance vive dentro de la descripción | 395 de 461 con *«Incluye:»*, en 36 variantes | Catálogo de textos de alcance |
 | M-15 | Duplicados exactos de concepto | 22 casos: `ISN-02001`≡`ISN-02005`, `CAN-01001`≡`CAN-01011` | Tabla de equivalencia. **Sin fusionar claves** |
 | M-16 | Mismo concepto en dos familias | `CAR-01030` ≡ `ICA-01030`, texto idéntico | Igual que M-15 |
-| M-13 | Moneda extranjera declarada y muerta | `Costo base M. E.` en cero en los 387 | Modelarla de verdad, o quitarla |
+| ✅ M-13 | ~~Moneda extranjera declarada y muerta~~ | `Costo base M. E.` en cero en los 387 | **Resuelto: no se modela.** Mismo criterio que el `OID` de OPUS. `MODELO.md` §6, D-186 |
 | M-17 | Precio inconsistente entre presentaciones | `ELE-00044` en PZ a $580 y `ELE-00046`, misma descripción, en M a $29 | Verificar cuál es el correcto |
 | M-18 | Mismo material en dos familias y presentaciones | Pija lámina: `COM-00200` en CJ a $8.96, `ELE-00048` en PZ a $0.50 | Igual |
 
@@ -88,15 +88,15 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-02 | **La clase `Acarreo` no tiene renglones** | ¿No se costea, o va escondido en otros destajos? |
 | P-03 | **Frontera `Flete` contra `Acarreo`** | ¿Traer a la obra contra mover dentro? |
 | P-04 | **`Flete` se usa como apartado** | Tablas y prueba hidráulica están ahí para aislarlos. Recomendación: que el apartado sea un campo, no una categoría |
-| P-05 | **`%MO`: unidad o campo** | Hoy es unidad, y viene escrita de tres formas: `%mo`, `%MO`, `(%)mo` |
-| P-06 | Precisión de cantidades | Hasta 6 decimales en 299 filas. Definir por tipo de unidad |
+| ✅ P-05 | ~~`%MO`: unidad o campo~~ | **Resuelto.** Se queda como unidad (`MEMORIA.md` §2). Forma canónica: `%MO` — mayúsculas, sin paréntesis; las otras dos se normalizan al cargar, igual que la unidad del presupuesto (D-146). D-184 |
+| ✅ P-06 | ~~Precisión de cantidades~~ | **Resuelto: no hace falta definir por unidad.** `cantidad` es `NUMERIC` sin precisión ni escala fijas — se guarda lo que llegó, igual que ya pedía erp-construccion.md §9 para el arrastre de Excel. D-185 |
 | P-07 | Histórico de precios | Un solo precio vigente. Sin versionado no hay presupuestos comparables entre periodos |
 | P-08 | Antigüedad dispar de precios | Materiales de julio 2026; mano de obra desde enero 2023 |
 | P-09 | 4 conceptos sin costear | `IGAS-02131`, `IGAS-02132`, `ISN-02061`, `ACC-00003` |
 | P-10 | Agrupadores sin costear | `ACA-00021 Cubiertas cocina` y `NIV-00015 Consumibles`, en cero en los 7 prototipos |
-| P-11 | Corregir el prefijo `AUX-` | Vía clonar y sustituir. Diseño en `IDEAS.md` §6 del conocimiento |
-| P-12 | ¿La subfamilia es obligatoria? | Se llenaron las 171 que faltaban. Falta decidir si el campo lo exige |
-| P-13 | **Identidad compartida** | Definido el criterio en `LENGUAJE.md`. Falta **decidir la forma de conexión de cada ERP** |
+| 🔧 P-11 | **Corregir el prefijo `AUX-`** | **Diseño completo en `IDEAS.md` §6**: clonar y sustituir, con el viaje de vuelta resuelto por homologación (`CONOCIMIENTO.md` §16.2). No queda decisión — falta ejecutarlo sobre las 79 claves reales |
+| ✅ P-12 | ~~¿La subfamilia es obligatoria?~~ | **No.** `subfamilia_id` es nullable — resuelto en `MODELO.md` §1 y en B-51/D-149. Este renglón quedó sin sincronizar cuando eso se cerró; D-183 |
+| ✅ P-13 | ~~**Identidad compartida**~~ | **El mecanismo y el único caso conocido ya están decididos:** D-41 (contar referencias vivas) y `LENGUAJE.md`, «El ERP externo → B · correspondencia». Lo que falta no es la forma: es llenar el resto de su ficha de mapeo |
 | P-14 | **Columnas de Cabeceras, Materiales y Operaciones** | Los tres reportes que consume el ERP externo, más el formato de los cuatro catálogos que se volvieron salida |
 | P-15 | ¿Hace falta un agente traductor? | El migrador trae OPUS a este sistema; no vuelve bilingüe a un tercero |
 | P-16 | Declarar el dialecto del árbol de ingeniería | *No prioritario.* Sus cantidades vienen multiplicadas por el volumen y su PU congelado |
@@ -166,11 +166,11 @@ Sus problemas siguen sin confirmar: multivalor aplanado (`TIPO 1/2`,
 Lo de abajo habilita lo de arriba:
 
 ```
-1. Clasificación del concepto (P-01)       ← el eslabón sin clasificar
-2. Equivalencias de concepto (M-15, M-16)  ← los 10 grupos con el mismo núcleo
-3. Estimaciones (P-18)                     ← donde el dinero se vuelve real
-4. Alcance como catálogo (M-14)            ← el «Incluye:» en 408 de 470
-5. Histórico de precios (P-07, P-08)
+✅ Cerrado: clasificación del concepto (P-01) — 92% deriva del trabajo que usa
+1. Equivalencias de concepto (M-15, M-16)  ← los 10 grupos con el mismo núcleo
+2. Estimaciones (P-18)                     ← donde el dinero se vuelve real
+3. Alcance como catálogo (M-14)            ← el «Incluye:» en 408 de 470
+4. Histórico de precios (P-07, P-08)
 
 ✅ Cerrado: normalización de unidades y ortografía en todos los catálogos.
 ```
@@ -191,8 +191,8 @@ puede escribir de lo que primero hay que definir.
 
 | # | Módulo | Qué hace | Reglas | Depende de |
 |---|---|---|---|---|
-| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ⏸️ Lo propone el arquitecto y se aprueba | — |
-| B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ Definidas y verificadas | B-01 |
+| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 6 hallazgos resueltos | — |
+| B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ **Escrito y probado** — `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182) | B-01 |
 | B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas | B-01 |
 | B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas | B-02, B-03 |
 | B-05 | **`presupuesto`** | Árbol, WBS, cantidades, estados | ✅ Definidas | B-02, B-04 |
@@ -282,8 +282,8 @@ puede escribir de lo que primero hay que definir.
 
 ### Lo que se puede empezar hoy
 
-**B-01 es el único bloqueo real.** Con el modelo de datos aprobado, B-02 a B-07 y
-B-10 a B-12 tienen sus reglas escritas y verificadas: **se pueden construir sin
-esperar ninguna decisión.**
+**B-01 ya no bloquea: está aprobado.** B-02, su núcleo, ya tiene código y pruebas
+en `backend/core/`. B-03 a B-07 y B-10 a B-12 siguen con sus reglas escritas y
+verificadas: **se pueden construir sin esperar ninguna decisión.**
 
 Lo demás espera a que se definan P-14, P-18, P-19, P-20 y P-21.
