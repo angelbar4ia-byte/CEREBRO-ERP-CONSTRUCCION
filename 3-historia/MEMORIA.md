@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 206 decisiones · 12 descartes · 8 correcciones
+verificado: 210 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -280,6 +280,10 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-204 | **R-1: cinco roles de obra** — Residente, Supervisor, Costos, Cotizador, Control | Borrador de P-21, aprobado con el usuario. Queda pendiente cerrar el módulo completo |
 | D-205 | **R-2: el rol es una combinación de funciones atómicas, no un bloque cerrado** | Permite variar una asignación sin tocar el catálogo de funciones — mismo principio que separar `categoria` de `clase` en D-187/D-188 |
 | D-206 | **R-3: catorce funciones mínimas para el menú de herramientas** — `trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes` | Ninguna inventada: ya estaban implícitas en D-30, D-114, `CONOCIMIENTO.md` §2.2, `CONOCIMIENTO.md` §13.2, `CONOCIMIENTO.md` §13.4, `CONOCIMIENTO.md` §13.6, D-32/D-44, D-192, P-01 e `INVARIANTES.md` §8. Faltan dos preguntas antes de cerrar P-21: tope por monto en `comprometer_gasto`, y si los roles son disjuntos en funciones |
+| D-207 | **El cuantificador y el paramétrico comparten la misma fuente de cantidad, sin mecanismo nuevo** | Si el cuantificador encuentra algo que no existe en el árbol, crea concepto o nivel (`MODELO.md` §1b) y dispara versión nueva (`CONOCIMIENTO.md` §2.2) — las dos piezas ya existían, nadie las había conectado en un mismo flujo |
+| D-208 | **`heredada` confirmado: un paramétrico nace con las cantidades de su presupuesto de referencia**, no las mide | Cierra la duda sobre un valor de `modo_cantidad` que estaba desde la primera versión del modelo sin caso escrito |
+| D-209 | **Nuevo valor `cargada` en `modo_cantidad`** — la cantidad viene de una ingeniería ya importada, distinta de `heredada` (copiada al crear el paramétrico) y de `medida` (trazada por el cuantificador) | `CONOCIMIENTO.md` §11.9, reversión por destajo. `cargada` y `medida` que coinciden se validan mutuamente (`METODO.md` §1.4) — mismo principio que `identidad_dudosa` (D-193). `MODELO.md` §1, hallazgo 12 |
+| D-210 | **Inventario de dieciocho funciones para el cuantificador**, básicas y especializadas, solo enlistadas en `IDEAS.md` §2 — ninguna diseñada todavía | Volumen y peso son las más urgentes: `M3` y `KG` ya son unidades canónicas, y el concreto de `CASO-TRABAJADO.md` se mide en `M3` |
 
 ---
 

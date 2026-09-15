@@ -87,8 +87,8 @@ enseñan.
 
 > **El mecanismo (trazo → medida → cantidad) ya no es idea: tiene tabla aprobada**
 > en `MODELO.md` §1b (hallazgo 11, 2026-09-15). Lo que sigue siendo idea sin
-> diseñar es solo la aspiración al final de esta sección — un agente que trace
-> solo.
+> diseñar es la lista de funciones de abajo y la aspiración al final de esta
+> sección — un agente que trace solo.
 
 Crear el presupuesto **trazando sobre el plano**, al estilo de PlanSwift o
 Navisworks.
@@ -149,6 +149,48 @@ No hay «cuantificador de PU», «paramétrico» ni «alzado».
 
 Así **el mismo polígono alimenta los tres a la vez**, y cada uno toma lo que le
 sirve. La mezcla por renglón sale sola, sin declararla en ningún lado.
+
+### Inventario de funciones — solo enlistadas, sin diseñar
+
+`ENLACE_CUANTIFICACION.medida` hoy cubre cuatro casos (`area · perimetro ·
+longitud · conteo`). El usuario pidió enlistar todo lo que hace falta, básicas
+primero, antes de especializar — **esto es inventario, no schema**: ninguna de
+estas entró todavía a `MODELO.md`.
+
+**Primitivas de dibujo** — lo que se traza:
+
+1. Punto
+2. Línea (segmento)
+3. Polilínea (cadena abierta)
+4. Polígono (cadena cerrada)
+5. Círculo / arco
+
+**Medidas directas de esas primitivas:**
+
+6. Longitud
+7. Área
+8. Perímetro
+9. Conteo
+10. Radio / diámetro
+
+**Especializadas** — compuestas sobre las anteriores, todas con un caso real que
+las pide:
+
+11. **Volumen** — `M3` ya es unidad canónica; el concreto de `CASO-TRABAJADO.md`
+    se mide así. Es la más urgente de las ocho: sin ella, el cuantificador no
+    alimenta ni el ejemplo que el cerebro ya usa de referencia
+12. **Peso desde longitud** — acero de refuerzo, se mide en `KG`, no se traza
+    directo: longitud × tabla de peso lineal por diámetro
+13. **Área neta con descuento de aberturas** — muros menos puertas y ventanas
+14. **Desarrollo de superficie inclinada** — techos, rampas, escaleras; la
+    proyección plana subestima
+15. **Cómputo paramétrico por fórmula** — cantidad = f(variables). Reusa el
+    módulo paramétrico existente (D-15), no crea uno nuevo
+16. **Conteo por patrón o símbolo** — bloques repetidos: contactos, luminarias,
+    columnas
+17. **Cubicación con taludes** — secciones trapezoidales de movimiento de tierras
+18. **Ejes y niveles** — referenciar la medida a la rejilla estructural; cruza
+    con `FRENTE` (`MODELO.md` §2), hoy sin uso operativo
 
 ### Aspiración, no diseño: un agente interno que trace solo
 

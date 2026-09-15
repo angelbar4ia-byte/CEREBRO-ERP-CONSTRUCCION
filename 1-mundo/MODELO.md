@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 11 hallazgos resueltos
+verificado: Aprobado · 12 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -51,7 +51,8 @@ NODO
   descripcion        texto                                           firme
   unidad_id          FK Unidad, obligatoria                          firme
   cantidad           NUMERIC — puede ser negativa                    firme (58 casos verificados)
-  modo_cantidad      enum: medida · estimada · capturada · heredada  firme
+  modo_cantidad      enum: medida · estimada · capturada · heredada ·
+                      cargada                                        firme — nuevo, ver hallazgo 12
   categoria          enum: material · mano_de_obra · herramienta ·
                       equipo · auxiliar · flete · trabajo · concepto firme
   familia_id         FK Familia                                      firme
@@ -71,6 +72,34 @@ NODO
 podía distinguir de `Destajo` o `Subcontrato` en el dato). `revisar` cierra P-04.
 Los dos con evidencia y aprobación explícita — no repiten el error de agregar un
 campo sin marcarlo. Detalle en hallazgos 7 y 9, al final de este archivo.
+
+### ⚠ HALLAZGO 12 — `modo_cantidad` tenía cuatro valores sin conectar a un caso
+
+`medida · estimada · capturada · heredada` estaban desde la primera versión, pero
+ninguno tenía escrito **para qué caso concreto servía cada uno** — en particular
+`heredada`, que nunca se explicó. Al conectar el cuantificador con el paramétrico
+aparecieron los casos reales, y faltaba uno: de dónde sale la cantidad cuando
+**ya viene de una ingeniería cargada**, no de un plano ni de una captura a mano.
+
+**El ciclo de vida completo de una cantidad, con evidencia:**
+
+| `modo_cantidad` | De dónde sale | Caso |
+|---|---|---|
+| `capturada` | Alguien la tipeó | Presupuesto capturado a mano, sin ingeniería ni trazo |
+| `cargada` | **Nuevo.** Vino de una ingeniería importada (`CONOCIMIENTO.md` §11.9, reversión por destajo) | La cantidad real de esa obra, ya reconstruida al importar |
+| `heredada` | Se copió de un presupuesto de referencia al **crear** un paramétrico | El paramétrico nace con las cantidades del presupuesto base — no las mide, las hereda |
+| `medida` | La produjo el cuantificador (`MODELO.md` §1b) | Se trazó sobre un plano — de esta obra en particular |
+
+**Cómo se conectan, en el orden real:** un paramétrico se diseña a partir de un
+presupuesto ya diseñado (`heredada`). Al aplicarse a una obra nueva, sus cantidades
+pueden venir de una ingeniería que ya se cargó (`cargada`) — y el cuantificador
+puede comprobarlas después, trazando sobre el plano de esa misma obra
+(`medida`). **Dos fuentes independientes —lo cargado y lo trazado— que coinciden
+se validan mutuamente** (`METODO.md` §1.4), igual que ya pasó con `identidad_dudosa`
+(D-193).
+
+> Esto no cambia nada de lo ya aprobado: los cuatro valores originales seguían
+> firmes. Solo faltaba escribir para qué servía cada uno, y agregar el que faltaba.
 
 ### ⚠ HALLAZGO 1 — `reporta_a` es redundante si `categoria` ya está
 
@@ -481,6 +510,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | 9 | `Flete` se usaba como apartado para insumos no clasificables | Campo `revisar` (boolean) en `NODO`, en vez de abusar de la categoría | ✅ |
 | 10 | La alerta no tenía dónde vivir, y se perdía al cerrar la sesión que la detectaba | Tabla `ALERTA`, peldaño de abajo de `PROPUESTA`, con `veces_vista` para saber si reaparece | ✅ |
 | 11 | `NODO.modo_cantidad = medida` no tenía mecanismo que lo alimentara | Tablas `TRAZO` y `ENLACE_CUANTIFICACION` — el trazo es evidencia, el enlace tipa qué mide y con qué factor | ✅ |
+| 12 | `modo_cantidad` no tenía sus casos escritos, y faltaba uno (ingeniería cargada) | Ciclo de vida completo con evidencia; quinto valor `cargada`, verificable contra `medida` | ✅ |
 
 **Los seis primeros hallazgos fueron revisados y aprobados el 2026-09-10**, con dos
 ajustes sobre la propuesta original:
@@ -492,9 +522,9 @@ ajustes sobre la propuesta original:
 
 Los hallazgos 1, 4, 5 y 6 quedan tal como se propusieron.
 
-**Los hallazgos 7 a 11 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
+**Los hallazgos 7 a 12 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
 P-25, P-29, P-30 y B-19 en una sesión de trabajo con el usuario — no en la revisión
-original del 09-10. Los cinco aprobados en la misma conversación que los originó.
+original del 09-10. Los seis aprobados en la misma conversación que los originó.
 
 > **Este modelo puede pasar a la siguiente fase**: tipos de columna concretos,
 > índices, y el motor de cálculo como funciones sobre este schema. Eso no se hace

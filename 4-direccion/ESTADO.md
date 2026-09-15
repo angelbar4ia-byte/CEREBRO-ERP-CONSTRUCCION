@@ -96,10 +96,10 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 |---|---|
 | **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
-| **Modelo de datos** | `MODELO.md` aprobado, con 11 hallazgos resueltos |
+| **Modelo de datos** | `MODELO.md` aprobado, con 12 hallazgos resueltos |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 206 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 210 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -136,7 +136,7 @@ al usuario si hace falta, este archivo no lo guarda).
 | 1 | **Revisar y mergear el PR abierto** | [PR #1](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1) — motor de cálculo + los 21 pendientes de arriba |
 | 2 | **Módulos grandes sin diseñar**: histórico de precios, estimaciones, almacén, roles y permisos | P-07/P-08 · P-18 · P-19 · P-21 — ninguno tiene decisiones tomadas todavía, a diferencia de factorizador/CPM/cuantificador |
 | 3 | **`IDEAS.md` §7 — Sustitución de insumo dentro de una matriz** | Séptima operación de rediseño, propuesta pero sin que el arquitecto la revise |
-| 4 | **Cerrar el cuantificador**: tipo de columna para geometría, y gobierno por obra | `MODELO.md` §1b deja las dos abiertas a propósito · B-45 (quién traza, si hace falta aprobar) sigue sin dónde vivir |
+| 4 | **Cerrar el cuantificador**: diseñar las 18 funciones enlistadas, tipo de columna para geometría, y gobierno por obra | `IDEAS.md` §2 tiene el inventario (básicas + especializadas, volumen y peso son las urgentes) · `MODELO.md` §1b deja el tipo de columna abierto a propósito · B-45 (quién traza, si hace falta aprobar) sigue sin dónde vivir |
 | 5 | **Persistencia del motor de cálculo** | `backend/core/` es solo dominio — Django/Postgres, el resto del schema de `MODELO.md`, y las demás piezas de B-03 a B-07 |
 | 6 | **Clasificar a mano el 8% de conceptos** sin derivación — ⛔ bloqueado: falta el dato | El 92% sale del trabajo que usa. No confundir con el otro 92%: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
 | 7 | **Salidas de almacén de ALAMO 18** — ⛔ bloqueado: falta el dato | Cierra el triángulo prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12 |
