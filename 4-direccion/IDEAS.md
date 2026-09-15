@@ -150,47 +150,98 @@ No hay «cuantificador de PU», «paramétrico» ni «alzado».
 Así **el mismo polígono alimenta los tres a la vez**, y cada uno toma lo que le
 sirve. La mezcla por renglón sale sola, sin declararla en ningún lado.
 
-### Inventario de funciones — solo enlistadas, sin diseñar
+### Inventario de funciones, por tipo de herramienta — solo enlistadas, sin diseñar
 
 `ENLACE_CUANTIFICACION.medida` hoy cubre cuatro casos (`area · perimetro ·
-longitud · conteo`). El usuario pidió enlistar todo lo que hace falta, básicas
-primero, antes de especializar — **esto es inventario, no schema**: ninguna de
-estas entró todavía a `MODELO.md`.
+longitud · conteo`). El usuario pidió enlistar todo lo que hace falta —
+ampliado con un lote de funciones de PostGIS, ya con nombre real y caso de uso
+de construcción— y clasificarlo por **tipo de herramienta**, no como lista
+plana. **Esto sigue siendo inventario, no schema**: nada de esto entró todavía
+a `MODELO.md`.
 
-**Primitivas de dibujo** — lo que se traza:
+**A · Escalas y mediciones** — antes de medir cualquier cosa, hay que saber a
+qué corresponde una unidad del dibujo:
 
-1. Punto
-2. Línea (segmento)
-3. Polilínea (cadena abierta)
-4. Polígono (cadena cerrada)
-5. Círculo / arco
+1. Calibración de escala — el factor dibujo→real, por plano y por versión
+2. Unidades nativas del plano (DWG/PDF/IFC) contra unidades reales
 
-**Medidas directas de esas primitivas:**
+**B · Limpieza y corrección de planos** — un trazo importado casi nunca es
+válido de entrada; PostGIS lo resuelve antes de medir:
 
-6. Longitud
-7. Área
-8. Perímetro
-9. Conteo
-10. Radio / diámetro
+3. Reparar geometría rota — `ST_MakeValid`: un polígono cuyos bordes se cruzan
+   a sí mismos, típico al importar DXF
+4. Cerrar vértices casi-coincidentes — `ST_SnapToGrid`: un muro que "casi"
+   cierra por una fracción de milímetro
+5. Simplificar sin deformar — `ST_SimplifyPreserveTopology`: menos puntos
+   redundantes, mismo contorno, renderiza más rápido
 
-**Especializadas** — compuestas sobre las anteriores, todas con un caso real que
-las pide:
+**C · Primitivas de dibujo** — lo que se traza:
 
-11. **Volumen** — `M3` ya es unidad canónica; el concreto de `CASO-TRABAJADO.md`
-    se mide así. Es la más urgente de las ocho: sin ella, el cuantificador no
-    alimenta ni el ejemplo que el cerebro ya usa de referencia
-12. **Peso desde longitud** — acero de refuerzo, se mide en `KG`, no se traza
-    directo: longitud × tabla de peso lineal por diámetro
-13. **Área neta con descuento de aberturas** — muros menos puertas y ventanas
-14. **Desarrollo de superficie inclinada** — techos, rampas, escaleras; la
+6. Punto
+7. Línea (segmento)
+8. Polilínea (cadena abierta)
+9. Polígono (cadena cerrada)
+10. Círculo / arco
+
+**D · Medidas directas** de esas primitivas:
+
+11. Longitud
+12. Área
+13. Perímetro
+14. Conteo
+15. Radio / diámetro
+
+**E · Cuantificación por cruce de capas** — cruzar dos trazos entre sí, no solo
+medir uno:
+
+16. Intersección entre capas — `ST_Intersection`: losas × área de pintura
+    epóxica = m² exactos de aplicación
+17. Resta entre geometrías — `ST_Difference`: losa menos los huecos de ductos
+    = área neta real de vaciado. Es la forma concreta de "área neta con
+    descuento de aberturas"
+18. Zona de influencia — `ST_Buffer`: eje de tubería + diámetro = volumen real
+    de excavación. Es la forma concreta de "volumen" para elementos lineales
+
+**F · Agrupación y estructura:**
+
+19. Fusión de polígonos — `ST_Union`: los cuartos de un departamento → área
+    habitable total
+20. Centro geométrico — `ST_Centroid`: para colocar la etiqueta de área en el
+    medio del cuarto
+
+**G · Relación espacial** — cómo interactúan los elementos entre sí:
+
+21. Proximidad — `ST_DWithin`: distancia mínima normativa entre contactos y
+    salidas de agua
+22. Adyacencia — `ST_Touches`: qué muros colindan con el exterior, para
+    impermeabilización o aislamiento térmico
+
+**H · Especializadas de dominio** — sin una función PostGIS de una sola línea,
+necesitan una regla propia de construcción:
+
+23. **Volumen** — general, sólido 3D o área × espesor. `M3` ya es unidad
+    canónica; el concreto de `CASO-TRABAJADO.md` se mide así. Es la más
+    urgente: sin ella, el cuantificador no alimenta ni el ejemplo que el
+    cerebro ya usa de referencia
+24. **Peso desde longitud** — acero de refuerzo, se mide en `KG`: longitud ×
+    tabla de peso lineal por diámetro
+25. **Desarrollo de superficie inclinada** — techos, rampas, escaleras; la
     proyección plana subestima
-15. **Cómputo paramétrico por fórmula** — cantidad = f(variables). Reusa el
+26. **Cómputo paramétrico por fórmula** — cantidad = f(variables). Reusa el
     módulo paramétrico existente (D-15), no crea uno nuevo
-16. **Conteo por patrón o símbolo** — bloques repetidos: contactos, luminarias,
+27. **Conteo por patrón o símbolo** — bloques repetidos: contactos, luminarias,
     columnas
-17. **Cubicación con taludes** — secciones trapezoidales de movimiento de tierras
-18. **Ejes y niveles** — referenciar la medida a la rejilla estructural; cruza
+28. **Cubicación con taludes** — secciones trapezoidales de movimiento de
+    tierras
+29. **Ejes y niveles** — referenciar la medida a la rejilla estructural; cruza
     con `FRENTE` (`MODELO.md` §2), hoy sin uso operativo
+
+> **Que la mitad de esta lista tenga nombre real de PostGIS (`ST_*`) es
+> evidencia fuerte para la pregunta que `MODELO.md` §1b dejó abierta a
+> propósito** —cómo se guarda la geometría—: un tipo espacial de Postgres,
+> no GeoJSON ni WKT sueltos. No lo cierro solo: es infraestructura (hay que
+> habilitar la extensión PostGIS donde corra la base), y esa decisión la
+> tiene que confirmar el usuario, no quedar implícita en una lista.
 
 ### Aspiración, no diseño: un agente interno que trace solo
 

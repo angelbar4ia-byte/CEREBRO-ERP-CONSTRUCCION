@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 210 decisiones · 12 descartes · 8 correcciones
+verificado: 212 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -284,6 +284,8 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-208 | **`heredada` confirmado: un paramétrico nace con las cantidades de su presupuesto de referencia**, no las mide | Cierra la duda sobre un valor de `modo_cantidad` que estaba desde la primera versión del modelo sin caso escrito |
 | D-209 | **Nuevo valor `cargada` en `modo_cantidad`** — la cantidad viene de una ingeniería ya importada, distinta de `heredada` (copiada al crear el paramétrico) y de `medida` (trazada por el cuantificador) | `CONOCIMIENTO.md` §11.9, reversión por destajo. `cargada` y `medida` que coinciden se validan mutuamente (`METODO.md` §1.4) — mismo principio que `identidad_dudosa` (D-193). `MODELO.md` §1, hallazgo 12 |
 | D-210 | **Inventario de dieciocho funciones para el cuantificador**, básicas y especializadas, solo enlistadas en `IDEAS.md` §2 — ninguna diseñada todavía | Volumen y peso son las más urgentes: `M3` y `KG` ya son unidades canónicas, y el concreto de `CASO-TRABAJADO.md` se mide en `M3` |
+| D-211 | **El inventario crece a 29 y se reorganiza en ocho tipos de herramienta** — escalas y mediciones, limpieza de planos, primitivas, medidas directas, cruce de capas, agrupación, relación espacial, especializadas de dominio | El usuario aportó funciones reales de PostGIS (`ST_MakeValid`, `ST_SnapToGrid`, `ST_SimplifyPreserveTopology`, `ST_Intersection`, `ST_Difference`, `ST_Buffer`, `ST_Union`, `ST_Centroid`, `ST_DWithin`, `ST_Touches`) que formalizan varias de las especializadas ya anotadas. Sigue siendo inventario, no schema — `IDEAS.md` §2 |
+| D-212 | **Media lista con nombre real de PostGIS es evidencia fuerte a favor de un tipo espacial de Postgres para la geometría** | Responde en parte lo que `MODELO.md` §1b deja abierto a propósito. No se cierra solo con esto: es infraestructura —la extensión PostGIS tiene que estar habilitada donde corra la base—, y esa decisión la confirma el usuario, no queda implícita en una lista |
 
 ---
 
