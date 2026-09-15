@@ -68,10 +68,10 @@ analizados y sus hallazgos escritos.
 |---|---|
 | **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
-| **Modelo de datos** | `MODELO.md` aprobado, con 6 hallazgos resueltos |
+| **Modelo de datos** | `MODELO.md` aprobado, con 9 hallazgos resueltos |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 186 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 191 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -101,7 +101,7 @@ analizados y sus hallazgos escritos.
 | 3 | ~~**Las 16 decisiones de los cuatro módulos**~~ ✅ cerradas · quedan P-5, B-40, B-45 | Factorizador primero: el más barato y el que más desbloquea |
 | 4 | 🔶 **Pasar `MODELO.md` a implementación** — en curso: motor de cálculo escrito y probado en `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182). Falta la persistencia (Django/Postgres) y el resto del schema | Tipos, índices, motor de cálculo. Trabajo del constructor |
 | 5 | **Clasificar a mano el 8% de conceptos** sin derivación | El 92% sale del trabajo que usa. **No confundir con el otro 92%**: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
-| 6 | 🔶 Los demás pendientes — en curso: P-05, P-06, P-12, P-13 cerrados hoy; P-11 pasó a accionable (D-183 a D-185) | `PENDIENTES-MEJORAS.md` — 38 de decisión, 14 de datos, 25 módulos |
+| 6 | 🔶 Los demás pendientes — en curso: P-02, P-03, P-04, P-05, P-06, P-12, P-13, P-25, M-13 cerrados; P-11 pasó a accionable (D-183 a D-191, todas revisadas y aprobadas con el usuario) | `PENDIENTES-MEJORAS.md` — 38 de decisión, 14 de datos, 25 módulos |
 | 7 | Las ideas del modelo | `IDEAS.md` — seis, sin diseñar |
 
 ---

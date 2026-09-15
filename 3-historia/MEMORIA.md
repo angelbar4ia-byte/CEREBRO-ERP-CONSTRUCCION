@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 186 decisiones · 12 descartes · 8 correcciones
+verificado: 191 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -252,6 +252,19 @@ constructor."* Viven en `backend/core/`, probadas contra `CASO-TRABAJADO.md`.
 | D-184 | **`%MO` se normaliza a esa forma exacta al cargar** — mayúsculas, sin paréntesis | Cierra P-05: que se queda como unidad ya estaba decidido (`MEMORIA.md` §2); faltaba solo la forma canónica entre las tres que trae OPUS. Mismo mecanismo que D-146 |
 | D-185 | **`cantidad` se guarda como `NUMERIC` sin precisión ni escala fijas** | Cierra P-06: no hace falta una regla por tipo de unidad. Se guarda lo que llegó, consistente con erp-construccion.md §9 y con D-180 (la cantidad nunca se redondea) |
 | D-186 | **La moneda extranjera (`Costo base M. E.`) no se modela hoy, pero no se descarta** | Cierra M-13: cero en los 387 materiales, sin evidencia de uso. Distinto del `OID` de OPUS —que no vuelve nunca—: si en algún momento hace falta convertir a moneda extranjera, ahí se modela. Anotado en `MODELO.md` §6 |
+
+## Modelo — enmiendas post-aprobación
+
+Revisadas y aprobadas con el usuario el 2026-09-15, no en la revisión original del
+modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
+
+| # | Decisión | Por qué |
+|---|---|---|
+| D-187 | **La frontera `Flete`/`Acarreo` es el límite de la obra, no la dirección** | `Flete` cruza —de fuera hacia adentro, o de adentro hacia afuera—; `Acarreo` se queda dentro. Explica por qué `Acarreo` aparecía sin renglones: el transporte, cruce el límite en cualquier dirección, se registra como `Flete`. Cierra P-02 y P-03 |
+| D-188 | **Las clases de `Trabajos` no son una lista cerrada** | Hoy `Destajo`, `Acarreo` y `Subcontrato`; pueden crecer —`Contrato`, `Permuta`, `Renta`—. Se modela `CLASE_TRABAJO` como tabla abierta, no `ENUM` de Postgres, que es caro de ampliar |
+| D-189 | **Nuevo campo `revisar` (boolean) en `NODO`** | Insumo apartado sin clasificar bien, en vez de abusar de una categoría —el caso de `Tablas` y los materiales de prueba hidráulica marcados como `Flete`—. También sirve como bandera al revisar insumos para un cambio masivo. Cierra P-04 |
+| D-190 | **Un presupuesto incompleto por partes se carga igual, nunca bloquea, y avisa con alerta no bloqueante** | D-30 (registrar nunca se bloquea) y D-71 (la escalera de alerta). Cierra P-25 en su parte de política |
+| D-191 | **Nueva tabla `ESTADO_CARGA`, por nodo estructural** | `estado` incompleto/completo y `porcentaje_cargado` como caché con fecha, recalculado cada vez que entra una parte nueva. Mismo patrón que `ESTADO_CONGELAMIENTO` (D-25). Cierra P-25 en su parte de mecanismo |
 
 ---
 

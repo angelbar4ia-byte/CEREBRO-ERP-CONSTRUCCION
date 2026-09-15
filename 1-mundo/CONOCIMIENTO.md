@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-12
+corte:      2026-09-15
 verificado: 16 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -1477,7 +1477,7 @@ Dos cosas a notar:
 - **Herramienta y Equipo van separados.** En los árboles antiguos todo estaba
   metido como material (`EQU`).
 - **Fletes es un catálogo propio**, y explica el `Acarreo` sin renglones que
-  apareció en trabajos (`CATALOGOS.md` §3).
+  apareció en trabajos (`CATALOGOS.md` §6).
 
 ### `Trabajos` también se llama `Contrato`
 
@@ -1485,6 +1485,24 @@ OPUS lo nombra de las dos formas según el reporte. **Es el mismo catálogo**, y
 cargador debe aceptar ambos nombres (§2.4).
 
 Tiene **tres clases**: `Destajo` · `Acarreo` · `Subcontrato`.
+
+### `Flete` contra la clase `Acarreo` — resuelto (P-02/P-03)
+
+La frontera es **el límite de la obra, no la dirección**:
+
+| | Cruza el límite de la obra | Paga |
+|---|---|---|
+| **`Flete`** | Sí — de fuera hacia adentro, o de adentro hacia afuera | El transporte, como **categoría de insumo**: se compra |
+| **`Acarreo`** | No — se queda dentro de la obra | Mover material ya en la obra, como **clase de `Trabajos`**: se paga por hacerlo |
+
+Son de naturaleza distinta —insumo contra trabajo— y por eso `Acarreo` aparece sin
+renglones: el transporte, cruce el límite en cualquier dirección, se registra como
+`Flete`.
+
+> **Las clases de `Trabajos` no son una lista cerrada.** Hoy son `Destajo`,
+> `Acarreo` y `Subcontrato`; pueden crecer —`Contrato`, `Permuta`, `Renta`— sin que
+> eso cambie esta frontera. Por eso `MODELO.md` la modela como tabla abierta, no
+> como `ENUM` (`MODELO.md` §2, hallazgo 7).
 
 ## 10.3 La categoría sí se puede cambiar
 

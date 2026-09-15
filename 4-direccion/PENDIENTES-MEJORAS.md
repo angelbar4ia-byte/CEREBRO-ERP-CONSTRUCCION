@@ -85,9 +85,9 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | # | Tema | Por qué está detenido |
 |---|---|---|
 | ✅ P-01 | ~~El concepto no tiene clasificación~~ | **Confirmado con OPUS: no se importa, se deriva.** 92% desde el trabajo que usa; 8% requiere clasificación manual, como se hizo con trabajos |
-| P-02 | **La clase `Acarreo` no tiene renglones** | ¿No se costea, o va escondido en otros destajos? |
-| P-03 | **Frontera `Flete` contra `Acarreo`** | ¿Traer a la obra contra mover dentro? |
-| P-04 | **`Flete` se usa como apartado** | Tablas y prueba hidráulica están ahí para aislarlos. Recomendación: que el apartado sea un campo, no una categoría |
+| ✅ P-02 | ~~La clase `Acarreo` no tiene renglones~~ | **Resuelto: no falta, está bien.** El transporte que sería `Acarreo` se registra como `Flete` — la clase queda vacía porque el catálogo de Fletes ya lo cubre. D-187 |
+| ✅ P-03 | ~~Frontera `Flete` contra `Acarreo`~~ | **Resuelto: el límite de la obra, no la dirección.** `Flete` la cruza —en cualquier sentido—; `Acarreo` se queda dentro. `CONOCIMIENTO.md` §10.2, D-187 |
+| ✅ P-04 | ~~`Flete` se usa como apartado~~ | **Resuelto.** Campo `revisar` (boolean) en `NODO` — `MODELO.md` §1, hallazgo 9, D-189 |
 | ✅ P-05 | ~~`%MO`: unidad o campo~~ | **Resuelto.** Se queda como unidad (`MEMORIA.md` §2). Forma canónica: `%MO` — mayúsculas, sin paréntesis; las otras dos se normalizan al cargar, igual que la unidad del presupuesto (D-146). D-184 |
 | ✅ P-06 | ~~Precisión de cantidades~~ | **Resuelto: no hace falta definir por unidad.** `cantidad` es `NUMERIC` sin precisión ni escala fijas — se guarda lo que llegó, igual que ya pedía erp-construccion.md §9 para el arrastre de Excel. D-185 |
 | P-07 | Histórico de precios | Un solo precio vigente. Sin versionado no hay presupuestos comparables entre periodos |
@@ -108,7 +108,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-22 | **Autoría de matrices y compuestos** | Cómo se arma una explosión desde cero. Ideas en `IDEAS.md` §1 y `IDEAS.md` §4 del conocimiento |
 | P-23 | **Ruta crítica** | El Gantt calcula duración pero **no hay precedencias**. Propuesta escrita en `PROPUESTA-CUATRO-MODULOS.md` |
 | ~~P-24~~ | **16 decisiones de los cuatro módulos** | ✅ **Las 16 cerradas** (D-86 a D-113). Aparecieron tres piezas nuevas: P-5, B-40, B-45 |
-| 🔶 P-25 | **El presupuesto llega por partes** | **Dos de tres contestadas** con los 11 archivos de ALAMO 18 (`CONOCIMIENTO.md` §11.8): **se suman** —no comparten nivel ni etapa— y el sistema **sabe si está completo** comparando contra el presupuesto. **Falta:** qué hacer cuando falta una parte |
+| ✅ P-25 | ~~El presupuesto llega por partes~~ | **Resuelto, las tres.** Se suman; el sistema sabe si está completo comparando contra el presupuesto; y cuando falta una parte, **carga igual y avisa** — nunca bloquea (D-30) — con `ESTADO_CARGA` llevando el `%` como caché que se actualiza con cada carga (`MODELO.md` §3, hallazgo 8). D-190, D-191 |
 | P-26 | **Cuatro estructuras distintas de ingeniería** | Completa, suelta, con concepto y ajena (`CONOCIMIENTO.md` §11.8). El cargador debe reconocerlas **por los datos**, no por el nombre de columna |
 | P-31 | **Los archivos sueltos no dicen dónde van** | `AJU_PISOS` es una línea sin nivel ni etapa. **La estructura vive en el nombre del archivo.** ¿Se parsea el nombre, se pregunta, o se rechaza? |
 | P-32 | **Las 26 claves fuera de catálogo** | 7 existían en los catálogos viejos y se perdieron al migrar; 19 son nuevas. ¿Se dan de alta, se rechazan, o se cargan como pendientes? |
@@ -191,7 +191,7 @@ puede escribir de lo que primero hay que definir.
 
 | # | Módulo | Qué hace | Reglas | Depende de |
 |---|---|---|---|---|
-| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 6 hallazgos resueltos | — |
+| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 9 hallazgos resueltos | — |
 | B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ **Escrito y probado** — `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182) | B-01 |
 | B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas | B-01 |
 | B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas | B-02, B-03 |

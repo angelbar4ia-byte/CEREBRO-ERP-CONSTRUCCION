@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 6 hallazgos resueltos
+verificado: Aprobado · 9 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -55,13 +55,22 @@ NODO
   categoria          enum: material · mano_de_obra · herramienta ·
                       equipo · auxiliar · flete · trabajo · concepto firme
   familia_id         FK Familia                                      firme
-  subfamilia_id      FK Subfamilia (nullable)                        firme — pero P-12 abierta
+  subfamilia_id      FK Subfamilia (nullable)                        firme — nullable, resuelto (P-12)
+  clase_id           FK Clase_Trabajo (nullable)                     firme — nuevo, solo si categoria=trabajo (P-02/P-03)
+  revisar            boolean, default false                          firme — nuevo, insumo apartado sin clasificar bien (P-04)
   modo_precio        enum: calculado · declarado                     firme
   precio_declarado   NUMERIC, nullable                                firme — solo si modo_precio=declarado
   procedencia        enum: importado · manual · fusion · division ·
                       extraccion · composicion · clonacion            firme
   reporta_a          categoría a la que el compuesto suma su monto    firme (D-hallazgo, ver §1a)
 ```
+
+### Dos campos nuevos, agregados el 2026-09-15 — ver evidencia abajo
+
+`clase_id` cierra P-02/P-03 (`clase` no tenía dónde vivir: sin él, `Acarreo` no se
+podía distinguir de `Destajo` o `Subcontrato` en el dato). `revisar` cierra P-04.
+Los dos con evidencia y aprobación explícita — no repiten el error de agregar un
+campo sin marcarlo. Detalle en hallazgos 7 y 9, al final de este archivo.
 
 ### ⚠ HALLAZGO 1 — `reporta_a` es redundante si `categoria` ya está
 
@@ -187,6 +196,9 @@ SUBFAMILIA
 
 FRENTE
   id, nombre                                                            firme — hoy sin uso operativo, pendiente ligar a programa
+
+CLASE_TRABAJO
+  id, nombre        destajo · acarreo · subcontrato…                    firme — nuevo (P-02/P-03), ver hallazgo 7
 ```
 
 ### ⚠ HALLAZGO 5 — `Familia` no puede ser una sola tabla plana
@@ -202,6 +214,22 @@ con el mismo texto.
 
 **Se resuelve así:** `FAMILIA.categoria_id` es obligatorio y forma parte de la
 identidad — la unicidad es `(nombre, categoria_id)`, no `(nombre)` solo.
+
+### ⚠ HALLAZGO 7 — `Acarreo` no tenía dónde vivir en el dato
+
+`clase` está en el vocabulario del skill desde antes (`erp-construccion.md` §9b:
+destajo · subcontrato · acarreo), pero `NODO` nunca tuvo un campo para guardarla.
+Sin él, un trabajo `Acarreo` era indistinguible de un `Destajo` en el dato.
+
+**Se resuelve así:** `CLASE_TRABAJO` como tabla abierta, no un `ENUM` de Postgres
+—caro de ampliar—. **Las clases de `Trabajos` no son una lista cerrada:** hoy
+`Destajo`, `Acarreo` y `Subcontrato`; van a crecer —`Contrato`, `Permuta`,
+`Renta`— sin que eso pida una migración de tipo.
+
+La frontera que separa `Flete` (categoría de insumo, en `NODO.categoria`) de
+`Acarreo` (clase de trabajo, en `NODO.clase_id`) es **el límite de la obra, no la
+dirección**: `Flete` cruza —de fuera hacia adentro, o de adentro hacia afuera—;
+`Acarreo` se queda dentro. Evidencia completa en `CONOCIMIENTO.md` §10.2 (P-02/P-03).
 
 ---
 
@@ -227,6 +255,31 @@ diseño (`CONOCIMIENTO.md` §1.4).
 **Si `estado` fuera una columna de `PRESUPUESTO`**, contradice esa decisión de raíz.
 Se modela como tabla aparte, por nodo, y el presupuesto no tiene estado propio —
 solo se puede preguntar "¿qué % de sus nodos está contratado?".
+
+### ⚠ HALLAZGO 8 — falta una tercera pata de estado: cuánta ingeniería está cargada
+
+`ESTADO_CONGELAMIENTO` dice si un nodo está en diseño o contratado. No dice si **la
+ingeniería que lo sustenta ya llegó completa** — y el presupuesto llega por partes,
+a veces durante meses (`ALAMO 18`: abril a septiembre, `CONOCIMIENTO.md` §11.8). P-25.
+
+**Se resuelve así:** tabla aparte, mismo patrón que `ESTADO_CONGELAMIENTO` — por
+nodo estructural, no por presupuesto entero.
+
+```
+ESTADO_CARGA   (por nodo estructural, igual que ESTADO_CONGELAMIENTO)
+  nodo_id                 FK Nodo                                        firme
+  estado                  enum: incompleto · completo                    firme
+  porcentaje_cargado      caché — importe cargado / importe presupuestado.
+                           NUNCA fuente de verdad (§2: "nunca guardes el
+                           resultado como dato")                          firme
+  actualizado_en          cuándo se recalculó — cada vez que entra
+                           una parte nueva                                firme
+```
+
+**Una carga incompleta nunca bloquea** (D-30). Se carga lo que llegó, `estado`
+queda en `incompleto`, y dispara una alerta no bloqueante (D-71, la escalera de
+alerta) — no un error. `completo` se marca solo cuando `porcentaje_cargado` da
+100% contra el presupuesto vigente.
 
 ---
 
@@ -321,9 +374,12 @@ técnica**, no como error.
 | 4 | Dos reglas de porcentaje distintas (`%MO` vs. capas) | Campo explícito por regla, no genérico | ⏸️ |
 | 5 | `Familia` es ambigua entre categorías | Unicidad compuesta `(nombre, categoria_id)` | ⏸️ |
 | 6 | El estado es del nodo, no del presupuesto | Tabla aparte `ESTADO_CONGELAMIENTO` | ⏸️ |
+| 7 | `Acarreo` no tenía dónde guardarse en el dato | Tabla abierta `CLASE_TRABAJO`, no `ENUM` — las clases van a crecer | ✅ |
+| 8 | Falta saber cuánta ingeniería está cargada | Tabla aparte `ESTADO_CARGA`, por nodo, con caché de porcentaje | ✅ |
+| 9 | `Flete` se usaba como apartado para insumos no clasificables | Campo `revisar` (boolean) en `NODO`, en vez de abusar de la categoría | ✅ |
 
-**Los seis hallazgos fueron revisados y aprobados el 2026-09-10**, con dos ajustes
-sobre la propuesta original:
+**Los seis primeros hallazgos fueron revisados y aprobados el 2026-09-10**, con dos
+ajustes sobre la propuesta original:
 
 - Hallazgo 2 (código externo): en vez de un campo opaco, **se retira del modelo por
   completo**. No se agrega ni un campo provisional hasta resolver P-17.
@@ -331,6 +387,10 @@ sobre la propuesta original:
   decidida** hasta confirmar si OPUS ya trae la clasificación del concepto.
 
 Los hallazgos 1, 4, 5 y 6 quedan tal como se propusieron.
+
+**Los hallazgos 7, 8 y 9 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04
+y P-25 en una sesión de trabajo con el usuario — no en la revisión original del
+09-10. Los tres aprobados en la misma conversación que los originó.
 
 > **Este modelo puede pasar a la siguiente fase**: tipos de columna concretos,
 > índices, y el motor de cálculo como funciones sobre este schema. Eso no se hace
