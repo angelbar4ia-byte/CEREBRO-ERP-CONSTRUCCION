@@ -13,6 +13,10 @@ verificado: Punto de corte · sin bloqueos
 >
 > Corte: 2026-09-15
 
+> **Si te dicen «continuar con el roadmap» o «continuar con pendientes»: es acá.**
+> Este archivo es el punto de entrada — no un artifact publicado ni el historial de
+> chat, que una sesión nueva no puede leer solo. Seguí la sección **Cómo retomar**.
+
 ---
 
 ## Qué es esto
@@ -27,12 +31,24 @@ antes de escribirse.
 
 ## Cómo retomar
 
-**Los archivos no persisten entre sesiones.** Hay que volver a subirlos.
+**Esto ya es un repo de git real — no hace falta subir nada a mano.** Una sesión
+nueva de Claude Code lo tiene todo con solo abrir el repo.
 
-**Sube estos siete, en este orden:**
+**Primero, el estado de git — antes de leer un solo archivo de contenido:**
 
-**El cerebro está en carpetas por capa** — `1-mundo`, `2-operacion`,
-`3-historia`, `4-direccion`. Ver `INDICE.md`.
+```
+git branch --show-current           ← debería ser claude/serene-cannon-1g0zas
+git log --oneline -5                ← el último commit tiene que coincidir con
+                                       lo que este archivo describe como hecho
+```
+
+Y el estado del Pull Request — hay uno abierto:
+**https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1**
+Si sigue abierto, el trabajo de esta rama todavía no se mergeó a `main`. Seguí
+trabajando sobre la misma rama salvo que el usuario diga lo contrario.
+
+**Después, leer en este orden — el cerebro está en carpetas por capa**
+(`1-mundo`, `2-operacion`, `3-historia`, `4-direccion`; ver `INDICE.md`):
 
 ```
 1. ESTADO.md          ← este: dónde vamos
@@ -49,7 +65,7 @@ antes de escribirse.
 Los demás cuando se vayan a tocar: `erp-construccion.md`, `PRIORIDADES.md`,
 `PENDIENTES-MEJORAS.md`, `APRENDIZAJE.md`, `GLOSARIO-DOMINIO.md`,
 `DICCIONARIO-DATOS.md`, `CASO-TRABAJADO.md`, `PROPUESTA-CUATRO-MODULOS.md`,
-`agentes/`.
+`agentes/`, `backend/core/` (el motor de cálculo, con sus pruebas).
 
 > **Las cuatro capas** — Mundo · Operación · Historia · Dirección — y el bloque de
 > `órgano:` de cada encabezado están en `INDICE.md`.
@@ -59,6 +75,18 @@ analizados y sus hallazgos escritos.
 
 > **Antes de proponer cualquier cosa, leer `MEMORIA.md` §2.** Doce ideas razonables
 > ya se evaluaron y se rechazaron.
+
+> **Antes de decidir algo, no solo proponerlo: preguntar.** El usuario lo pidió
+> explícitamente — «el sistema propone, el humano aprueba» (D-32) es la regla de
+> siempre, pero se venía aplicando mal: una propuesta con evidencia se escribía
+> directo en vez de esperar la aprobación. Desde entonces, cada decisión de
+> `MODELO.md` se trajo como pregunta concreta antes de tocar el archivo.
+
+Correr el verificador **antes de tocar nada y después de cada commit**:
+```
+python3 2-operacion/verificar-cerebro.py .
+```
+Tiene que decir *"Todo cuadra"* en los dos momentos.
 
 ---
 
@@ -75,13 +103,15 @@ analizados y sus hallazgos escritos.
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
-| **Módulos** | 🆕 Las 16 decisiones de los cuatro cerradas · pendiente diseño formal |
+| **Módulos** | Las 16 decisiones de los cuatro cerradas · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
 | **Pruebas de flujo** | 🆕 Tres corridas: ALAMO 18, Zafiro 1.0, siete prototipos · 13 pasan, 8 se rompen, 5 sin dato |
 | **Invariantes** | 🆕 Las cifras de control, juntas · condición de paro |
 | **Capas** | 🆕 Cuatro: Mundo · Operación · Historia · Dirección |
 | **Escalabilidad** | 🆕 Contrato de módulo · ERP nuevo y ERP existente |
 | **Coherencia** | 🆕 `verificar-cerebro.py` — el cerebro se comprueba solo |
-| **Motor de cálculo** | 🆕 `backend/core/` — sin Django, puerto + adaptador en memoria. 11 pruebas contra `CASO-TRABAJADO.md`, D-178 a D-182 |
+| **Motor de cálculo** | `backend/core/` — sin Django, puerto + adaptador en memoria. 11 pruebas contra `CASO-TRABAJADO.md`, D-178 a D-182. **Falta la persistencia** (Django/Postgres) |
+| **La alerta** | Tabla `ALERTA` (`MODELO.md` §5a) — peldaño de abajo de `PROPUESTA`. Cierra B-32, P-29, P-30 |
+| **Cuantificación** | Tablas `TRAZO` y `ENLACE_CUANTIFICACION` (`MODELO.md` §1b) — cierra B-19. Falta tipo de columna para geometría y gobierno por obra (B-45) |
 | **Caso trabajado** | Un ejemplo de punta a punta con 12 reglas |
 | **Artefacto** | Rehecho con datos verificados: $1,842,430.31 vs $1,842,426.01 |
 | **Catálogos corregidos** | Conceptos, materiales, trabajos, mano de obra, fletes |
@@ -94,15 +124,24 @@ analizados y sus hallazgos escritos.
 
 ## Lo que sigue, en orden
 
+**Veintiún pendientes se cerraron el 2026-09-15** (P-02, P-03, P-04, P-05, P-06,
+P-11, P-12, P-13, P-19→B-19, P-23, P-25, P-29, P-30, M-13, M-15, M-16, B-01, B-02,
+B-31, B-32, y el auditor en `ESCALABILIDAD.md`) — todas revisadas y aprobadas con
+el usuario, con evidencia en `MEMORIA.md` D-178 a D-203. El detalle día por día
+está en la Hoja de Ruta (artifact publicado, fuera de este repo — pedile el link
+al usuario si hace falta, este archivo no lo guarda).
+
 | # | Qué | Dónde |
 |---|---|---|
-| 1 | ~~**Montos como `string` en la API**~~ ✅ D-53 ya estaba escrito en `erp-construccion.md` §9 — nada pendiente de aplicar hasta que exista un cliente generado (D-55) | Barato hoy, caro tras generar clientes |
-| 2 | **Salidas de almacén de ALAMO 18** — ⛔ bloqueado: falta el dato | Cierra el triángulo: prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12 |
-| 3 | ~~**Las 16 decisiones de los cuatro módulos**~~ ✅ cerradas · quedan P-5, B-40, B-45 | Factorizador primero: el más barato y el que más desbloquea |
-| 4 | 🔶 **Pasar `MODELO.md` a implementación** — en curso: motor de cálculo escrito y probado en `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182). Falta la persistencia (Django/Postgres) y el resto del schema | Tipos, índices, motor de cálculo. Trabajo del constructor |
-| 5 | **Clasificar a mano el 8% de conceptos** sin derivación | El 92% sale del trabajo que usa. **No confundir con el otro 92%**: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
-| 6 | 🔶 Los demás pendientes — en curso: P-02, P-03, P-04, P-05, P-06, P-12, P-13, P-25, M-13 cerrados; P-11 pasó a accionable (D-183 a D-191, todas revisadas y aprobadas con el usuario) | `PENDIENTES-MEJORAS.md` — 38 de decisión, 14 de datos, 25 módulos |
-| 7 | Las ideas del modelo | `IDEAS.md` — siete, sin diseñar |
+| 1 | **Revisar y mergear el PR abierto** | [PR #1](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1) — motor de cálculo + los 21 pendientes de arriba |
+| 2 | **Módulos grandes sin diseñar**: histórico de precios, estimaciones, almacén, roles y permisos | P-07/P-08 · P-18 · P-19 · P-21 — ninguno tiene decisiones tomadas todavía, a diferencia de factorizador/CPM/cuantificador |
+| 3 | **`IDEAS.md` §7 — Sustitución de insumo dentro de una matriz** | Séptima operación de rediseño, propuesta pero sin que el arquitecto la revise |
+| 4 | **Cerrar el cuantificador**: tipo de columna para geometría, y gobierno por obra | `MODELO.md` §1b deja las dos abiertas a propósito · B-45 (quién traza, si hace falta aprobar) sigue sin dónde vivir |
+| 5 | **Persistencia del motor de cálculo** | `backend/core/` es solo dominio — Django/Postgres, el resto del schema de `MODELO.md`, y las demás piezas de B-03 a B-07 |
+| 6 | **Clasificar a mano el 8% de conceptos** sin derivación — ⛔ bloqueado: falta el dato | El 92% sale del trabajo que usa. No confundir con el otro 92%: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
+| 7 | **Salidas de almacén de ALAMO 18** — ⛔ bloqueado: falta el dato | Cierra el triángulo prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12 |
+| 8 | El resto de `PENDIENTES-MEJORAS.md` — mayormente ⛔ bloqueado por los catálogos crudos de OPUS, que no están en este repo | M-14, M-17/18, P-09/10, P-26 a P-36 |
+| 9 | Las ideas sin tocar del modelo | `IDEAS.md` §1, §3, §4, §5, §6 — seis, sin diseñar |
 
 ---
 
@@ -112,12 +151,15 @@ analizados y sus hallazgos escritos.
 
 ## Lo único que bloquea
 
-**Nada.** `MODELO.md` está aprobado, y con él **once módulos tienen sus reglas
-escritas y verificadas**: motor de cálculo, catálogo, APU, presupuesto, importación,
-semilla, diccionario, rediseño, paramétrico, propuestas.
+**Nada para seguir construyendo lo ya aprobado.** `MODELO.md` está aprobado, y con
+él **trece módulos tienen sus reglas escritas y verificadas**: motor de cálculo,
+catálogo, APU, presupuesto, importación, semilla, diccionario, rediseño,
+paramétrico, propuestas, alerta, cuantificación, y las cuatro decisiones de
+factorizador y CPM listas para diseño formal.
 
-Los que esperan decisión están identificados: exportación (P-14), estimaciones
-(P-18), almacén (P-19), programa y CPM (P-20, P-23), permisos (P-21).
+Los que esperan decisión están identificados: exportación (P-14), histórico de
+precios (P-07/P-08), estimaciones (P-18), almacén (P-19), programa —más allá del
+CPM, ya resuelto— (P-20), permisos (P-21).
 
 ---
 
