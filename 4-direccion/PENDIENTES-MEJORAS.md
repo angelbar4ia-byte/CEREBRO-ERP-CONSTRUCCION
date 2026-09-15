@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué falta?
 tiempo:     vamos aquí
-corte:      2026-09-09
+corte:      2026-09-15
 verificado: 38 de decisión · 14 de datos · 25 módulos
 ```
 
@@ -72,9 +72,9 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ M-01 | ~~Acentos parten términos en dos~~ | 381 descripciones corregidas | **Resuelto** |
 | ✅ M-02 | ~~Erratas fijas~~ | `nescesario` ×32, `cosina` ×2 | **Resuelto** |
 | M-14 | El alcance vive dentro de la descripción | 395 de 461 con *«Incluye:»*, en 36 variantes | Catálogo de textos de alcance |
-| M-15 | Duplicados exactos de concepto | 22 casos: `ISN-02001`≡`ISN-02005`, `CAN-01001`≡`CAN-01011` | Tabla de equivalencia. **Sin fusionar claves** |
-| M-16 | Mismo concepto en dos familias | `CAR-01030` ≡ `ICA-01030`, texto idéntico | Igual que M-15 |
-| M-13 | Moneda extranjera declarada y muerta | `Costo base M. E.` en cero en los 387 | Modelarla de verdad, o quitarla |
+| ✅ M-15 | ~~Duplicados exactos de concepto~~ | 22 casos: `ISN-02001`≡`ISN-02005`, `CAN-01001`≡`CAN-01011` | **Resuelto: `EQUIVALENCIA` ya cubre esto**, `tipo=duplicado_exacto`, aprobada en `MODELO.md` §4 desde el 10 de septiembre. Sin fusionar claves. D-194 |
+| ✅ M-16 | ~~Mismo concepto en dos familias~~ | `CAR-01030` ≡ `ICA-01030`, texto idéntico | **Resuelto, igual que M-15.** D-194 |
+| ✅ M-13 | ~~Moneda extranjera declarada y muerta~~ | `Costo base M. E.` en cero en los 387 | **Resuelto: no se modela hoy.** Se retoma el día que haga falta convertir a moneda extranjera. `MODELO.md` §6, D-186 |
 | M-17 | Precio inconsistente entre presentaciones | `ELE-00044` en PZ a $580 y `ELE-00046`, misma descripción, en M a $29 | Verificar cuál es el correcto |
 | M-18 | Mismo material en dos familias y presentaciones | Pija lámina: `COM-00200` en CJ a $8.96, `ELE-00048` en PZ a $0.50 | Igual |
 
@@ -85,18 +85,18 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | # | Tema | Por qué está detenido |
 |---|---|---|
 | ✅ P-01 | ~~El concepto no tiene clasificación~~ | **Confirmado con OPUS: no se importa, se deriva.** 92% desde el trabajo que usa; 8% requiere clasificación manual, como se hizo con trabajos |
-| P-02 | **La clase `Acarreo` no tiene renglones** | ¿No se costea, o va escondido en otros destajos? |
-| P-03 | **Frontera `Flete` contra `Acarreo`** | ¿Traer a la obra contra mover dentro? |
-| P-04 | **`Flete` se usa como apartado** | Tablas y prueba hidráulica están ahí para aislarlos. Recomendación: que el apartado sea un campo, no una categoría |
-| P-05 | **`%MO`: unidad o campo** | Hoy es unidad, y viene escrita de tres formas: `%mo`, `%MO`, `(%)mo` |
-| P-06 | Precisión de cantidades | Hasta 6 decimales en 299 filas. Definir por tipo de unidad |
+| ✅ P-02 | ~~La clase `Acarreo` no tiene renglones~~ | **Resuelto: no falta, está bien.** El transporte que sería `Acarreo` se registra como `Flete` — la clase queda vacía porque el catálogo de Fletes ya lo cubre. D-187 |
+| ✅ P-03 | ~~Frontera `Flete` contra `Acarreo`~~ | **Resuelto: el límite de la obra, no la dirección.** `Flete` la cruza —en cualquier sentido—; `Acarreo` se queda dentro. `CONOCIMIENTO.md` §10.2, D-187 |
+| ✅ P-04 | ~~`Flete` se usa como apartado~~ | **Resuelto.** Campo `revisar` (boolean) en `NODO` — `MODELO.md` §1, hallazgo 9, D-189 |
+| ✅ P-05 | ~~`%MO`: unidad o campo~~ | **Resuelto.** Se queda como unidad (`MEMORIA.md` §2). Forma canónica: `%MO` — mayúsculas, sin paréntesis; las otras dos se normalizan al cargar, igual que la unidad del presupuesto (D-146). D-184 |
+| ✅ P-06 | ~~Precisión de cantidades~~ | **Resuelto: no hace falta definir por unidad.** `cantidad` es `NUMERIC` sin precisión ni escala fijas — se guarda lo que llegó, igual que ya pedía erp-construccion.md §9 para el arrastre de Excel. D-185 |
 | P-07 | Histórico de precios | Un solo precio vigente. Sin versionado no hay presupuestos comparables entre periodos |
 | P-08 | Antigüedad dispar de precios | Materiales de julio 2026; mano de obra desde enero 2023 |
 | P-09 | 4 conceptos sin costear | `IGAS-02131`, `IGAS-02132`, `ISN-02061`, `ACC-00003` |
 | P-10 | Agrupadores sin costear | `ACA-00021 Cubiertas cocina` y `NIV-00015 Consumibles`, en cero en los 7 prototipos |
-| P-11 | Corregir el prefijo `AUX-` | Vía clonar y sustituir. Diseño en `IDEAS.md` §6 del conocimiento |
-| P-12 | ¿La subfamilia es obligatoria? | Se llenaron las 171 que faltaban. Falta decidir si el campo lo exige |
-| P-13 | **Identidad compartida** | Definido el criterio en `LENGUAJE.md`. Falta **decidir la forma de conexión de cada ERP** |
+| 🔧 P-11 | **Corregir el prefijo `AUX-`** | **Diseño completo en `IDEAS.md` §6**: clonar y sustituir, con el viaje de vuelta resuelto por homologación (`CONOCIMIENTO.md` §16.2). No queda decisión — falta ejecutarlo sobre las 79 claves reales |
+| ✅ P-12 | ~~¿La subfamilia es obligatoria?~~ | **No.** `subfamilia_id` es nullable — resuelto en `MODELO.md` §1 y en B-51/D-149. Este renglón quedó sin sincronizar cuando eso se cerró; D-183 |
+| ✅ P-13 | ~~**Identidad compartida**~~ | **El mecanismo y el único caso conocido ya están decididos:** D-41 (contar referencias vivas) y `LENGUAJE.md`, «El ERP externo → B · correspondencia». Lo que falta no es la forma: es llenar el resto de su ficha de mapeo |
 | P-14 | **Columnas de Cabeceras, Materiales y Operaciones** | Los tres reportes que consume el ERP externo, más el formato de los cuatro catálogos que se volvieron salida |
 | P-15 | ¿Hace falta un agente traductor? | El migrador trae OPUS a este sistema; no vuelve bilingüe a un tercero |
 | P-16 | Declarar el dialecto del árbol de ingeniería | *No prioritario.* Sus cantidades vienen multiplicadas por el volumen y su PU congelado |
@@ -106,9 +106,9 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-20 | **Programación** | Actividades, asignaciones y avance. Está en el skill, sin asentar en el conocimiento |
 | P-21 | **Roles y permisos** | Quién captura causa, quién aprueba versión, quién autoriza cambio |
 | P-22 | **Autoría de matrices y compuestos** | Cómo se arma una explosión desde cero. Ideas en `IDEAS.md` §1 y `IDEAS.md` §4 del conocimiento |
-| P-23 | **Ruta crítica** | El Gantt calcula duración pero **no hay precedencias**. Propuesta escrita en `PROPUESTA-CUATRO-MODULOS.md` |
+| ✅ P-23 | ~~**Ruta crítica**~~ | **Resuelto: las 4 decisiones del CPM están cerradas** (D-90, D-99 a D-102, `PROPUESTA-CUATRO-MODULOS.md`). Lo único abierto de ese módulo es P-5, ya con su propio renglón. D-195 |
 | ~~P-24~~ | **16 decisiones de los cuatro módulos** | ✅ **Las 16 cerradas** (D-86 a D-113). Aparecieron tres piezas nuevas: P-5, B-40, B-45 |
-| 🔶 P-25 | **El presupuesto llega por partes** | **Dos de tres contestadas** con los 11 archivos de ALAMO 18 (`CONOCIMIENTO.md` §11.8): **se suman** —no comparten nivel ni etapa— y el sistema **sabe si está completo** comparando contra el presupuesto. **Falta:** qué hacer cuando falta una parte |
+| ✅ P-25 | ~~El presupuesto llega por partes~~ | **Resuelto, las tres.** Se suman; el sistema sabe si está completo comparando contra el presupuesto; y cuando falta una parte, **carga igual y avisa** — nunca bloquea (D-30) — con `ESTADO_CARGA` llevando el `%` como caché que se actualiza con cada carga (`MODELO.md` §3, hallazgo 8). D-190, D-191 |
 | P-26 | **Cuatro estructuras distintas de ingeniería** | Completa, suelta, con concepto y ajena (`CONOCIMIENTO.md` §11.8). El cargador debe reconocerlas **por los datos**, no por el nombre de columna |
 | P-31 | **Los archivos sueltos no dicen dónde van** | `AJU_PISOS` es una línea sin nivel ni etapa. **La estructura vive en el nombre del archivo.** ¿Se parsea el nombre, se pregunta, o se rechaza? |
 | P-32 | **Las 26 claves fuera de catálogo** | 7 existían en los catálogos viejos y se perdieron al migrar; 19 son nuevas. ¿Se dan de alta, se rechazan, o se cargan como pendientes? |
@@ -120,8 +120,8 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-38 | **Cargar salidas de almacén de ALAMO 18** | La tercera pata: prototipo vs. ingeniería (ya funciona) + ingeniería vs. **almacén** = desviación real de obra. Objetivo en `CONOCIMIENTO.md` §11.12 del conocimiento |
 | P-27 | **Cuál es el método de carga definitivo** | La carga por partes es un camino a explorar. Puede ser una mezcla de métodos o requerir confirmaciones (`CONOCIMIENTO.md` §11.4) |
 | ✅ P-28 | ~~Reversar la explosión por destajo~~ | **Probado** sobre ALAMO 18: **84%** de los destajos resuelve a un solo concepto al filtrar por prototipo, y las cantidades salen **enteras exactas** (`CONOCIMIENTO.md` §11.9) |
-| P-29 | **Auditoría prototipo contra ingeniería** | Mismo mecanismo de desviación, otro momento (`CONOCIMIENTO.md` §11.7). Falta definir **qué se hace cuando la diferencia no tiene causa declarada** |
-| P-30 | **La descripción puede mentir sobre el prototipo** | `ALAMO 18` dice Zafiro Plus y es Diamante. ¿Se corrige en origen, se detecta al cargar, o ambas? |
+| ✅ P-29 | ~~Auditoría prototipo contra ingeniería~~ | **Resuelto: sin causa declarada, alerta, nunca autocorrección.** Nueva tabla `ALERTA` (`MODELO.md` §5a). `CONOCIMIENTO.md` §11.7, D-192/D-193 |
+| ✅ P-30 | ~~La descripción puede mentir sobre el prototipo~~ | **Resuelto: detecta y propone, nunca corrige solo.** Dos métodos —contenido y razón de cantidades, umbral 20% parametrizable— que se validan mutuamente. `CONOCIMIENTO.md` §11.7, D-193 |
 
 ## D. Los catálogos de la generación anterior
 
@@ -166,11 +166,11 @@ Sus problemas siguen sin confirmar: multivalor aplanado (`TIPO 1/2`,
 Lo de abajo habilita lo de arriba:
 
 ```
-1. Clasificación del concepto (P-01)       ← el eslabón sin clasificar
-2. Equivalencias de concepto (M-15, M-16)  ← los 10 grupos con el mismo núcleo
-3. Estimaciones (P-18)                     ← donde el dinero se vuelve real
-4. Alcance como catálogo (M-14)            ← el «Incluye:» en 408 de 470
-5. Histórico de precios (P-07, P-08)
+✅ Cerrado: clasificación del concepto (P-01) — 92% deriva del trabajo que usa
+1. Equivalencias de concepto (M-15, M-16)  ← los 10 grupos con el mismo núcleo
+2. Estimaciones (P-18)                     ← donde el dinero se vuelve real
+3. Alcance como catálogo (M-14)            ← el «Incluye:» en 408 de 470
+4. Histórico de precios (P-07, P-08)
 
 ✅ Cerrado: normalización de unidades y ortografía en todos los catálogos.
 ```
@@ -191,8 +191,8 @@ puede escribir de lo que primero hay que definir.
 
 | # | Módulo | Qué hace | Reglas | Depende de |
 |---|---|---|---|---|
-| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ⏸️ Lo propone el arquitecto y se aprueba | — |
-| B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ Definidas y verificadas | B-01 |
+| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 10 hallazgos resueltos | — |
+| B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ **Escrito y probado** — `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182) | B-01 |
 | B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas | B-01 |
 | B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas | B-02, B-03 |
 | B-05 | **`presupuesto`** | Árbol, WBS, cantidades, estados | ✅ Definidas | B-02, B-04 |
@@ -231,8 +231,8 @@ puede escribir de lo que primero hay que definir.
 | B-19 | **Cuantificador gráfico** | Trazo → medida → cantidad, ligado al plano | 🔶 **Propuesta escrita** — `PROPUESTA-CUATRO-MODULOS.md` |
 | B-25 | **Factorizador de unidades** | Unidad base, presentaciones, mínimo de compra, conversión segura | ✅ **Sus 4 decisiones cerradas** (D-86 a D-92) — listo para que el arquitecto lo diseñe en `CONOCIMIENTO.md` |
 | B-20 | **Agente interno** `gravity-obra` | Orquestador + detectores angostos, una sola bandeja | 🔶 **Diseñado** en `gravity-obra.md`. Sigue en fase 2: sus herramientas *son* el modelo de datos |
-| B-31 | **Agente de Consulta** — el primero de los internos | Define la superficie de herramientas que reusan los otros tres | ⏸️ Depende de B-01 |
-| B-32 | **La alerta no tiene dónde vivir** | No es propuesta —sin `objeto` ni `propone`— y hoy se pierde al cerrarse. Sin persistirla no se sabe si la misma salió tres meses seguidos, que es cuando deja de ser aviso | ⏸️ Tabla junto a `PROPUESTA` |
+| 🔧 B-31 | **Agente de Consulta** — el primero de los internos | Define la superficie de herramientas que reusan los otros tres | Su bloqueo (B-01) ya está resuelto — sigue en fase 2 por D-06, no por falta de modelo |
+| ✅ B-32 | ~~La alerta no tiene dónde vivir~~ | No es propuesta —sin `objeto` ni `propone`— y hoy se pierde al cerrarse. Sin persistirla no se sabe si la misma salió tres meses seguidos, que es cuando deja de ser aviso | **Resuelto: tabla `ALERTA`**, `MODELO.md` §5a, D-192 |
 | B-33 | **La consulta no deja rastro** | El agente de Consulta no escribe nada por diseño. Se pierde qué se pregunta seguido, qué no supo responder y qué herramienta le faltó | ⏸️ Decidir si se registra y con qué retención |
 | B-34 | **Embeddings para el diccionario** | Si la detección semántica los usa, necesita `pgvector` en la misma base, y traer su propia regla: cuándo se recalculan al cambiar una descripción | ⏸️ Se decide al llegar al diccionario |
 | B-35 | **Dividir `CONOCIMIENTO.md`** | Tres archivos, cada uno numera desde 1 | ✅ Hecho: `CATALOGOS.md` (1,080) · `CONOCIMIENTO.md` (2,444) · `IDEAS.md` (355). Cada uno numera desde 1 |
@@ -282,8 +282,8 @@ puede escribir de lo que primero hay que definir.
 
 ### Lo que se puede empezar hoy
 
-**B-01 es el único bloqueo real.** Con el modelo de datos aprobado, B-02 a B-07 y
-B-10 a B-12 tienen sus reglas escritas y verificadas: **se pueden construir sin
-esperar ninguna decisión.**
+**B-01 ya no bloquea: está aprobado.** B-02, su núcleo, ya tiene código y pruebas
+en `backend/core/`. B-03 a B-07 y B-10 a B-12 siguen con sus reglas escritas y
+verificadas: **se pueden construir sin esperar ninguna decisión.**
 
 Lo demás espera a que se definan P-14, P-18, P-19, P-20 y P-21.

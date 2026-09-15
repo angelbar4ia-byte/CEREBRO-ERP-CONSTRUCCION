@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-12
+corte:      2026-09-15
 verificado: 16 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -1477,7 +1477,7 @@ Dos cosas a notar:
 - **Herramienta y Equipo van separados.** En los árboles antiguos todo estaba
   metido como material (`EQU`).
 - **Fletes es un catálogo propio**, y explica el `Acarreo` sin renglones que
-  apareció en trabajos (`CATALOGOS.md` §3).
+  apareció en trabajos (`CATALOGOS.md` §6).
 
 ### `Trabajos` también se llama `Contrato`
 
@@ -1485,6 +1485,24 @@ OPUS lo nombra de las dos formas según el reporte. **Es el mismo catálogo**, y
 cargador debe aceptar ambos nombres (§2.4).
 
 Tiene **tres clases**: `Destajo` · `Acarreo` · `Subcontrato`.
+
+### `Flete` contra la clase `Acarreo` — resuelto (P-02/P-03)
+
+La frontera es **el límite de la obra, no la dirección**:
+
+| | Cruza el límite de la obra | Paga |
+|---|---|---|
+| **`Flete`** | Sí — de fuera hacia adentro, o de adentro hacia afuera | El transporte, como **categoría de insumo**: se compra |
+| **`Acarreo`** | No — se queda dentro de la obra | Mover material ya en la obra, como **clase de `Trabajos`**: se paga por hacerlo |
+
+Son de naturaleza distinta —insumo contra trabajo— y por eso `Acarreo` aparece sin
+renglones: el transporte, cruce el límite en cualquier dirección, se registra como
+`Flete`.
+
+> **Las clases de `Trabajos` no son una lista cerrada.** Hoy son `Destajo`,
+> `Acarreo` y `Subcontrato`; pueden crecer —`Contrato`, `Permuta`, `Renta`— sin que
+> eso cambie esta frontera. Por eso `MODELO.md` la modela como tabla abierta, no
+> como `ENUM` (`MODELO.md` §2, hallazgo 7).
 
 ## 10.3 La categoría sí se puede cambiar
 
@@ -1879,6 +1897,40 @@ Los dos escenarios caen en causas ya definidas:
 
 **El prototipo es la plantilla; la ingeniería del lote es la instancia.** Mismo
 patrón que APU, ensamble, contrato y trazo.
+
+### Sin causa declarada, o con la identidad en duda: alerta, no autocorrección
+
+**El sistema nunca corrige solo.** Cuando detecta algo raro, lo marca — nunca
+cambia el dato por su cuenta. Mismo principio que D-145: corregir sin que quede
+declarado borra la evidencia de que algo cambió sin avisar.
+
+Dos disparadores distintos, la misma respuesta:
+
+**1 · Diferencia sin causa (P-29).** Es la «ausencia de causa» de arriba: no cae en
+ninguna de las seis causas de §13.6. Se marca como alerta. Alguien decide si es
+desviación real de obra, si faltaba declarar la causa, o si es un error de captura.
+
+**2 · Identidad dudosa por cantidades (P-30).** Comparar por contenido —qué trae la
+ingeniería, sin mirar la etiqueta— ya atrapó una descripción que mentía: `ALAMO 18`
+decía «Zafiro Plus», era Diamante (D-121, `PRUEBA-ZAFIRO-1.md`). Se formaliza así:
+
+```
+razón = total de la ingeniería cargada ÷ total del prototipo que dice la etiqueta
+```
+
+Verificado sobre `ALAMO 18`: las etapas que sí eran Diamante dieron razón 1.00 a
+1.03; ninguna se acercó a Zafiro Plus. **Si la razón se desvía más del umbral
+—20% por defecto, parámetro, no número fijo en el código—, la etiqueta queda en
+duda** y se marca como alerta, igual que el caso 1.
+
+> **Dos métodos independientes que coinciden se validan mutuamente** (`METODO.md`
+> §1.4): identificar por contenido (qué trae) y por cantidad (cuánto suma) miden
+> cosas distintas. Cuando los dos apuntan al mismo prototipo, la identidad queda
+> confirmada sin ambigüedad — y no hace falta un tercer criterio.
+
+**Ninguno de los dos se resuelve solo.** Quedan en `ALERTA` (`MODELO.md` §5a) hasta
+que alguien las mira — nunca se pierden al cerrar la sesión que las detectó, que es
+justo lo que le pasaba a toda alerta antes de esto (B-32).
 
 
 ## 11.8 Once archivos del mismo lote

@@ -5,8 +5,8 @@
 capa:       II — Operación
 pregunta:   ¿esto sigue cuadrando?
 tiempo:     tiene que dar esto
-corte:      2026-09-12
-derivado:   CONOCIMIENTO.md · ESTADO.md · SKILL.md · agentes/
+corte:      2026-09-15
+derivado:   CONOCIMIENTO.md · ESTADO.md · SKILL.md · agentes/ · backend/core/
 ```
 
 > **Las cifras contra las cuales se para.** Nada de aquí es nuevo: todo estaba
@@ -95,6 +95,10 @@ suciedad. **Un cargador que las rechace está mal el cargador, no el dato.**
 | Ningún compuesto se contiene a sí mismo | Cero ciclos, en cualquier capa | `constructor-erp.md` | Recursión infinita en el motor |
 | El dinero es `Decimal` de punta a punta | Ningún `float` intermedio | `erp-construccion.md` | Los centavos dejan de cuadrar y **nadie se entera hasta el total** |
 | Las dos lecturas conviven | Montos **se detienen** en el compuesto · explosión **llega al fondo** | `CONOCIMIENTO.md` §10.5 | El esquema solo soporta una; el diseño está mal |
+
+> Las cinco corren como test automático desde D-178: `backend/core/tests/test_motor_calculo.py`,
+> 11 pruebas contra `CASO-TRABAJADO.md`. Esta tabla sigue siendo la lista para lo que
+> el código todavía no cubre — persistencia, capas de sobrecosto, el resto del schema.
 
 ---
 

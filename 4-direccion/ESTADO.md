@@ -5,13 +5,13 @@
 capa:       IV — Dirección
 pregunta:   ¿dónde vamos y cómo retomar?
 tiempo:     vamos aquí
-corte:      2026-09-13
+corte:      2026-09-15
 verificado: Punto de corte · sin bloqueos
 ```
 
 > **Léeme primero.** Punto de corte, cómo retomar, y dónde va cada cosa.
 >
-> Corte: 2026-09-12
+> Corte: 2026-09-15
 
 ---
 
@@ -68,10 +68,10 @@ analizados y sus hallazgos escritos.
 |---|---|
 | **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
-| **Modelo de datos** | `MODELO.md` aprobado, con 6 hallazgos resueltos |
+| **Modelo de datos** | `MODELO.md` aprobado, con 10 hallazgos resueltos |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 177 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 199 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -81,6 +81,7 @@ analizados y sus hallazgos escritos.
 | **Capas** | 🆕 Cuatro: Mundo · Operación · Historia · Dirección |
 | **Escalabilidad** | 🆕 Contrato de módulo · ERP nuevo y ERP existente |
 | **Coherencia** | 🆕 `verificar-cerebro.py` — el cerebro se comprueba solo |
+| **Motor de cálculo** | 🆕 `backend/core/` — sin Django, puerto + adaptador en memoria. 11 pruebas contra `CASO-TRABAJADO.md`, D-178 a D-182 |
 | **Caso trabajado** | Un ejemplo de punta a punta con 12 reglas |
 | **Artefacto** | Rehecho con datos verificados: $1,842,430.31 vs $1,842,426.01 |
 | **Catálogos corregidos** | Conceptos, materiales, trabajos, mano de obra, fletes |
@@ -95,13 +96,13 @@ analizados y sus hallazgos escritos.
 
 | # | Qué | Dónde |
 |---|---|---|
-| 1 | **Montos como `string` en la API** (D-53) | Barato hoy, caro tras generar clientes. `erp-construccion.md` §9 |
-| 2 | **Salidas de almacén de ALAMO 18** | Cierra el triángulo: prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12 |
+| 1 | ~~**Montos como `string` en la API**~~ ✅ D-53 ya estaba escrito en `erp-construccion.md` §9 — nada pendiente de aplicar hasta que exista un cliente generado (D-55) | Barato hoy, caro tras generar clientes |
+| 2 | **Salidas de almacén de ALAMO 18** — ⛔ bloqueado: falta el dato | Cierra el triángulo: prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12 |
 | 3 | ~~**Las 16 decisiones de los cuatro módulos**~~ ✅ cerradas · quedan P-5, B-40, B-45 | Factorizador primero: el más barato y el que más desbloquea |
-| 4 | **Pasar `MODELO.md` a implementación** | Tipos, índices, motor de cálculo. Trabajo del constructor |
+| 4 | 🔶 **Pasar `MODELO.md` a implementación** — en curso: motor de cálculo escrito y probado en `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182). Falta la persistencia (Django/Postgres) y el resto del schema | Tipos, índices, motor de cálculo. Trabajo del constructor |
 | 5 | **Clasificar a mano el 8% de conceptos** sin derivación | El 92% sale del trabajo que usa. **No confundir con el otro 92%**: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
-| 6 | Los demás pendientes | `PENDIENTES-MEJORAS.md` — 38 de decisión, 14 de datos, 25 módulos |
-| 7 | Las ideas del modelo | `IDEAS.md` — seis, sin diseñar |
+| 6 | 🔶 Los demás pendientes — en curso: P-02, P-03, P-04, P-05, P-06, P-12, P-13, P-25, M-13 cerrados; P-11 pasó a accionable (D-183 a D-191, todas revisadas y aprobadas con el usuario) | `PENDIENTES-MEJORAS.md` — 38 de decisión, 14 de datos, 25 módulos |
+| 7 | Las ideas del modelo | `IDEAS.md` — siete, sin diseñar |
 
 ---
 

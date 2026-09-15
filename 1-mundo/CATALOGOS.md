@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué trae cada catálogo de OPUS y qué trampas tiene?
 tiempo:     es así
-corte:      2026-09-12
+corte:      2026-09-15
 verificado: 8 catálogos de OPUS 2025 · aritmética comprobada
 ```
 
@@ -744,7 +744,7 @@ Otros que ya migraron y **ya no están en materiales**: `PET-00002 ARENA 7 M3`,
 > reconciliación al importar es por clave contra **el conjunto completo de
 > insumos**, nunca contra el catálogo que se está cargando.
 
-### `Flete` se está usando como apartado
+### `Flete` se estaba usando como apartado — resuelto
 
 Cinco de los nueve no son fletes:
 
@@ -759,11 +759,15 @@ Se mandaron ahí para **apartarlos**, no para clasificarlos.
 > costo de fletes de una obra, va a incluir unas tablas y un manómetro sin saberlo.
 > Y en la explosión reportarán como flete — justo lo que `CONOCIMIENTO.md` §10.5 dice que no debe pasar.
 
-**Recomendación: que el apartado sea un campo, no una categoría.** Un `revisar` o
-`sin clasificar` en el insumo los aísla igual —se filtran y ahí están— pero se
-quedan en Materiales, siguen reportando como material y no ensucian el costo de
-fletes. Y cuando toque clasificar los materiales, ese campo **es** la lista de
-trabajo.
+**Resuelto: `revisar` es un campo del insumo, no un abuso de la categoría.**
+`MODELO.md` §1 lo agrega como booleano en `NODO` (hallazgo 9) — aísla igual que
+antes —se filtra y ahí está—, pero el insumo se queda en Materiales, sigue
+reportando como material y no ensucia el costo de fletes. Y cuando toque
+clasificar los materiales, ese campo **es** la lista de trabajo.
+
+Sirve para más que este caso: **es la misma bandera para cuando se revisan
+insumos al preparar un cambio masivo** — cualquier insumo que necesite mirarse
+antes de tocarlo se marca igual, sin inventar un mecanismo aparte.
 
 ### Vocabulario
 
@@ -775,11 +779,12 @@ trabajo.
 **El presupuesto se recalcula cuando cambian los precios**, así que el desfase entre
 catálogos no se traslada al PU importado.
 
-### Pendiente: `Flete` contra la clase `Acarreo`
+### `Flete` contra la clase `Acarreo` — resuelto
 
 Existe un catálogo `Fletes` y también una clase `Acarreo` dentro de Trabajos (§3).
-Lectura probable —**flete es traer material de fuera a la obra, acarreo es moverlo
-dentro**— pero hay que definirlo: la frontera se va a preguntar seguido.
+**La frontera es el límite de la obra, no la dirección**: `Flete` es cruzarlo —de
+fuera hacia adentro, o de adentro hacia afuera—; `Acarreo` es moverlo sin cruzarlo.
+Regla completa y evidencia en `CONOCIMIENTO.md` §10.2 (P-02/P-03).
 
 
 ## 7 Análisis de básicos compuestos — `ANALISIS_DE_BASICOS_COMPUESTOS.xlsx`
