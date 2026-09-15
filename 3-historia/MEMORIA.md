@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 195 decisiones · 12 descartes · 8 correcciones
+verificado: 199 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -269,6 +269,10 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-193 | **`diferencia_sin_causa` (P-29) e `identidad_dudosa` (P-30) nunca autocorrigen** | La identidad dudosa se calcula como razón entre el total cargado y el total del prototipo declarado, umbral 20% por defecto y parámetro, no número fijo. Dos métodos independientes —contenido y cantidad— que coinciden se validan mutuamente (`METODO.md` §1.4); no hace falta un tercer criterio |
 | D-194 | **M-15/M-16 confirmados resueltos por `EQUIVALENCIA`** | La tabla ya estaba aprobada en `MODELO.md` §4 desde el 10 de septiembre, con `tipo=duplicado_exacto` cubriendo exactamente este caso. Sin cambios nuevos |
 | D-195 | **P-23 confirmado resuelto** | El CPM tiene sus cuatro decisiones cerradas (D-90, D-99 a D-102, `PROPUESTA-CUATRO-MODULOS.md`). Lo único abierto de ese módulo es P-5 (la actividad interrumpida/tramos), que ya tiene su propio renglón |
+| D-196 | **`ESCALABILIDAD.md` §10 corregido: el auditor no «falta»** | `agentes/auditor-erp.md` ya existe desde D-58. Quinta vez que un archivo queda sin sincronizar con una resolución ya escrita en otro |
+| D-197 | **`diferencia_sin_causa` e `identidad_dudosa` viven bajo el detector `Desviación`**, no un quinto detector | Mismo mecanismo (D-52): comparan algo cargado contra una referencia declarada. Se separan solo si en la práctica necesitan herramientas distintas |
+| D-198 | **B-31 (Agente de Consulta) ya no depende de B-01** | El modelo está aprobado. Sigue en fase 2 por D-06 —el asistente de obra se aplaza—, no por falta de esquema |
+| D-199 | **Séptima idea del modelo: sustitución de insumo dentro de una matriz** | `IDEAS.md` §7. Ninguna de las seis operaciones de rediseño la cubre — clonación duplica el insumo entero, no dice cómo se usa dentro de un concepto que ya lo tenía. Necesita ser operación formal, no edición suelta, para seguir siendo reproducible |
 
 ---
 

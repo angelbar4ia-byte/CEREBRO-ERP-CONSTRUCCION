@@ -71,7 +71,7 @@ analizados y sus hallazgos escritos.
 | **Modelo de datos** | `MODELO.md` aprobado, con 10 hallazgos resueltos |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 195 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 199 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -102,7 +102,7 @@ analizados y sus hallazgos escritos.
 | 4 | 🔶 **Pasar `MODELO.md` a implementación** — en curso: motor de cálculo escrito y probado en `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182). Falta la persistencia (Django/Postgres) y el resto del schema | Tipos, índices, motor de cálculo. Trabajo del constructor |
 | 5 | **Clasificar a mano el 8% de conceptos** sin derivación | El 92% sale del trabajo que usa. **No confundir con el otro 92%**: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
 | 6 | 🔶 Los demás pendientes — en curso: P-02, P-03, P-04, P-05, P-06, P-12, P-13, P-25, M-13 cerrados; P-11 pasó a accionable (D-183 a D-191, todas revisadas y aprobadas con el usuario) | `PENDIENTES-MEJORAS.md` — 38 de decisión, 14 de datos, 25 módulos |
-| 7 | Las ideas del modelo | `IDEAS.md` — seis, sin diseñar |
+| 7 | Las ideas del modelo | `IDEAS.md` — siete, sin diseñar |
 
 ---
 

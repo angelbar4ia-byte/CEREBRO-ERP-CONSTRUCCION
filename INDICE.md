@@ -227,7 +227,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 195 decisiones · 12 descartes · 8 correcciones |
+| `MEMORIA.md` | III | ✅ 199 decisiones · 12 descartes · 8 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
 | `GLOSARIO-DOMINIO.md` | I | **78 términos · 25 ambigüedades** |
@@ -247,7 +247,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `agentes/gravity-obra.md` | II | 🆕 Orquestador interno · Ollama local, Groq red · diseñado, no construido |
 | `agentes/auditor-erp.md` | II | 🆕 Corre las invariantes — **de los datos y del cerebro** |
 | `verificar-cerebro.py` | II | 🆕 7 comprobaciones mecánicas de coherencia |
-| `IDEAS.md` | IV | 🆕 6 ideas sin diseñar · dividido de CONOCIMIENTO |
+| `IDEAS.md` | IV | 🆕 7 ideas sin diseñar · dividido de CONOCIMIENTO |
 | `PROPUESTA-CUATRO-MODULOS.md` | IV | ✅ **16 decisiones cerradas** · pendiente diseño formal |
 | `agentes/` | II | Gravity, arquitecto, constructor, migrador, auditor |
 

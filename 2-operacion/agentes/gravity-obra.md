@@ -9,7 +9,7 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿cómo responde y qué propone el agente que vive dentro del ERP?
 tiempo:     se hace así
-corte:      2026-09-12
+corte:      2026-09-15
 verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
 ```
 
@@ -158,8 +158,13 @@ cosas es imposible de evaluar: cuando falla, no se sabe en qué.
 |---|---|---|
 | **Consulta** | — | **Nada.** Sólo responde |
 | Equivalencias | Descripciones idénticas, claves duplicadas | Equivalencia de concepto |
-| Desviación | Almacén contra explosión; patrones por contratista y por obra | Versión nueva de concepto |
+| Desviación | Almacén contra explosión · patrones por contratista y por obra · prototipo contra ingeniería sin causa declarada (P-29) · identidad del prototipo por razón de cantidades (P-30) | Versión nueva de concepto — o **alerta**, cuando no hay valor concreto que proponer (`MODELO.md` §5a) |
 | Conversión | Unidades y presentaciones | Factor, cuando cruza dimensiones |
+
+> **`diferencia_sin_causa` e `identidad_dudosa` viven bajo `Desviación`**, no en un
+> quinto detector: las dos comparan algo cargado contra una referencia declarada, el
+> mismo mecanismo que ya usa este detector (D-52). Un detector nuevo solo se
+> justifica si en la práctica resulta que necesita herramientas distintas.
 
 ### El primero es Consulta
 

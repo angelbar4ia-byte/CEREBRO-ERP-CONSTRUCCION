@@ -231,7 +231,7 @@ puede escribir de lo que primero hay que definir.
 | B-19 | **Cuantificador gráfico** | Trazo → medida → cantidad, ligado al plano | 🔶 **Propuesta escrita** — `PROPUESTA-CUATRO-MODULOS.md` |
 | B-25 | **Factorizador de unidades** | Unidad base, presentaciones, mínimo de compra, conversión segura | ✅ **Sus 4 decisiones cerradas** (D-86 a D-92) — listo para que el arquitecto lo diseñe en `CONOCIMIENTO.md` |
 | B-20 | **Agente interno** `gravity-obra` | Orquestador + detectores angostos, una sola bandeja | 🔶 **Diseñado** en `gravity-obra.md`. Sigue en fase 2: sus herramientas *son* el modelo de datos |
-| B-31 | **Agente de Consulta** — el primero de los internos | Define la superficie de herramientas que reusan los otros tres | ⏸️ Depende de B-01 |
+| 🔧 B-31 | **Agente de Consulta** — el primero de los internos | Define la superficie de herramientas que reusan los otros tres | Su bloqueo (B-01) ya está resuelto — sigue en fase 2 por D-06, no por falta de modelo |
 | ✅ B-32 | ~~La alerta no tiene dónde vivir~~ | No es propuesta —sin `objeto` ni `propone`— y hoy se pierde al cerrarse. Sin persistirla no se sabe si la misma salió tres meses seguidos, que es cuando deja de ser aviso | **Resuelto: tabla `ALERTA`**, `MODELO.md` §5a, D-192 |
 | B-33 | **La consulta no deja rastro** | El agente de Consulta no escribe nada por diseño. Se pierde qué se pregunta seguido, qué no supo responder y qué herramienta le faltó | ⏸️ Decidir si se registra y con qué retención |
 | B-34 | **Embeddings para el diccionario** | Si la detección semántica los usa, necesita `pgvector` en la misma base, y traer su propia regla: cuándo se recalculan al cambiar una descripción | ⏸️ Se decide al llegar al diccionario |

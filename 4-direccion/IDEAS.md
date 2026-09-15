@@ -5,8 +5,8 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se pensó y aún no se diseña?
 tiempo:     vamos aquí
-corte:      2026-09-12
-verificado: 6 ideas · ninguna diseñada
+corte:      2026-09-15
+verificado: 7 ideas · ninguna diseñada
 ```
 
 > **Sólo las ideas del modelo que aún no se diseñan.** Todo pendiente de datos, de
@@ -25,6 +25,7 @@ verificado: 6 ideas · ninguna diseñada
 | Constructor de matrices | §4 |
 | Cambiar la unidad de un insumo | §5 |
 | Corregir el prefijo `AUX-` | §6 |
+| Sustitución de insumo dentro de una matriz | §7 |
 
 ## 1 Idea: la matriz a partir de la descripción
 
@@ -377,3 +378,63 @@ o total.
 
 > **El caso no es sólo `AUX-`.** Un material hidráulico con prefijo sanitario tiene el
 > mismo problema, y ahí corregir sí importa: el prefijo engaña sobre la naturaleza.
+
+---
+
+## 7 Sustitución de insumo dentro de una matriz
+
+Un concepto necesita cambiar **uno de sus insumos** —el piso de cerámico a
+porcelanato, el material de un muro— sin tocar el resto de su matriz. Puede venir
+con cantidad distinta: el porcelanato rinde distinto que el cerámico.
+
+### No es ninguna de las seis operaciones que ya existen
+
+Repasada contra `erp-rediseno.md` §1:
+
+| Operación | Por qué no alcanza |
+|---|---|
+| Clonación | Duplica el **insumo entero**. No dice qué cambia adentro de un concepto que lo usa |
+| Composición | Combina **varios conceptos** en uno nuevo. No sustituye una línea |
+| Fusión / División | Trabajan sobre **destajos**, no sobre materiales de una matriz |
+| Extracción | Saca materiales sueltos a un concepto propio — no reemplaza nada |
+
+La más cercana es clonación —*«partir de la trabe T-3 y crear la T-4 cambiando la
+sección»*—, pero clona el **insumo**, no dice cómo se usa esa variante **dentro**
+de los conceptos que antes usaban el original.
+
+### Por qué tiene que ser una operación, no una edición suelta
+
+El principio del rediseño es que *no puede ser una edición: tiene que ser una
+receta* (`erp-rediseno.md` §0). Si «cambiar el cerámico por porcelanato en los
+pisos» no queda como paso reproducible, cuando llegue el prototipo Zafiro 2.0 hay
+que rehacer la sustitución a mano — exactamente lo que las tres capas
+CARGADO/REDISEÑO/VIGENTE existen para evitar.
+
+### Los dos momentos en que puede pedirse
+
+| Momento | Qué pasa | Por qué |
+|---|---|---|
+| **El concepto se está diseñando** — la capa 1 aún no existe | Se edita directo, sin rediseño | Nada «cargado» que proteger todavía |
+| **El concepto viene de una carga** — ya tiene capa 1 | Necesita una operación de rediseño formal | «Lo cargado no se toca» (`erp-rediseno.md` §0) |
+
+No son dos mecanismos distintos: es la misma frontera que ya gobierna todo el
+modelo — mientras nada dependa de un dato, se corrige; en cuanto viene de una
+carga, se agrega encima como receta.
+
+### Forma preliminar — sin diseñar
+
+```
+SUSTITUCION
+  concepto_id          a qué concepto aplica (o una regla: "todo concepto con...")
+  insumo_anterior_id
+  insumo_nuevo_id
+  cantidad_nueva       nullable — si no se da, se conserva la cantidad original
+```
+
+Falta decidir: si aplica a un concepto puntual o a una regla que alcanza a varios
+(«todo piso que use X»), y si el ajuste de cantidad se declara a mano o se deriva
+de un factor de rendimiento (ligaría con el factorizador, D-86 a D-92).
+
+> **No es más que una idea todavía.** Necesita el mismo tratamiento que las otras
+> seis: evidencia de casos reales, y que el arquitecto la revise antes de agregarla
+> a `CONOCIMIENTO.md` §12.

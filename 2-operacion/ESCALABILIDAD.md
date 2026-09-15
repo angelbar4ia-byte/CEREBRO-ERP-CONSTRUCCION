@@ -5,7 +5,7 @@
 capa:       II — Operación
 pregunta:   ¿cómo se agrega un módulo, incluso uno que aún no está definido?
 tiempo:     se hace así
-corte:      2026-09-12
+corte:      2026-09-15
 verificado: Derivado de los 25 módulos de PENDIENTES §F y de las costuras de `erp-construccion.md` §9
 ```
 
@@ -344,12 +344,12 @@ divergir.
 arquitecto   planea la forma        premotor
 constructor  la vuelve código       motor
 migrador     lee el mundo crudo     sensorial
-auditor      comprueba que cuadra   nociceptivo     ← falta
+auditor      comprueba que cuadra   nociceptivo
 ```
 
-**El auditor falta y se nota:** `INVARIANTES.md` existe, pero ningún agente lo corre.
-Las comprobaciones están repartidas entre constructor y migrador, que son los mismos
-que produjeron lo que hay que comprobar.
+**Los cuatro están escritos** (D-58, `agentes/auditor-erp.md`). Esta sección decía
+«el auditor falta» — quedó desactualizada desde que se escribió: otro caso de
+pendiente-ya-resuelto-sin-sincronizar, como D-183.
 
 ## El interno
 
