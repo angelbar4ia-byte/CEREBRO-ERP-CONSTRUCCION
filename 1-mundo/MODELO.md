@@ -242,13 +242,34 @@ el perímetro para el zoclo — dos filas en `ENLACE_CUANTIFICACION`, un solo
 `TRAZO` (`PROPUESTA-CUATRO-MODULOS.md` §2: *«guardando solo la cantidad, habría que
 trazar la recámara tres veces»*).
 
+### Muchas instancias del mismo elemento
+
+Cuarenta trabes en una losa nervada no son mecanismo nuevo: son cuarenta filas en
+`TRAZO` —una por trabe física, para poder auditar «la trabe 17 mide tanto»— cada
+una enlazada por su propio `ENLACE_CUANTIFICACION`. Si el presupuesto quiere una
+sola línea "trabe × 40 ml", los cuarenta enlaces apuntan al mismo `nodo_id` y la
+cantidad se suma; si quiere cuarenta líneas, cada trazo enlaza a su propio nodo.
+**La agregación es decisión del árbol del presupuesto, no del cuantificador** —
+mismo principio que D-60: el cuantificador no crea árbol propio, alimenta el que
+ya existe.
+
 ### La vigencia vive en el enlace, no en el trazo
 
-El mismo trazo puede alimentar dos nodos con destinos distintos, pero **un nodo
-tiene una sola cantidad vigente a la vez**. Cuando llega una medida de mayor
-precedencia (`IFC > DWG > PDF`), el enlace anterior pasa a `vigente = falso` —
-**se conserva como evidencia, nunca se borra ni se suma**. Así se evita el
-pisamiento: el mismo muro medido en PDF y en DWG no se cuenta dos veces.
+El mismo trazo puede alimentar dos nodos con destinos distintos. **Un nodo puede
+tener muchos enlaces vigentes a la vez** — uno por cada instancia física que lo
+alimenta (las cuarenta trabes, cada una con el suyo) — y todos suman entre sí.
+Lo que no puede haber son **dos enlaces vigentes de la misma instancia física**:
+cuando llega una medida nueva de esa instancia con mayor precedencia
+(`IFC > DWG > PDF`), el enlace anterior —de esa instancia, no de las demás—
+pasa a `vigente = falso`, se conserva como evidencia y nunca se borra ni se
+suma. Así se evita el pisamiento sin impedir la suma: el mismo muro medido en
+PDF y en DWG no se cuenta dos veces, pero cuarenta muros distintos sí suman
+cuarenta veces.
+
+> **Cómo el sistema sabe que dos trazos son "la misma instancia"** queda sin
+> resolver — hoy depende de que quien traza reemplace el enlace a mano, no de
+> un emparejamiento automático por cercanía espacial. Anotado, no bloquea: es
+> la misma familia de pregunta que B-45 (quién traza, gobierno por obra).
 
 > **Dos fuentes que discrepan mucho no se promedian ni se eligen solas: es
 > `PROPUESTA` con evidencia** (§5) — no corrección automática.

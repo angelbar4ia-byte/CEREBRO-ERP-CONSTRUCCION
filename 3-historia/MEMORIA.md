@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 212 decisiones · 12 descartes · 8 correcciones
+verificado: 214 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -286,6 +286,8 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-210 | **Inventario de dieciocho funciones para el cuantificador**, básicas y especializadas, solo enlistadas en `IDEAS.md` §2 — ninguna diseñada todavía | Volumen y peso son las más urgentes: `M3` y `KG` ya son unidades canónicas, y el concreto de `CASO-TRABAJADO.md` se mide en `M3` |
 | D-211 | **El inventario crece a 29 y se reorganiza en ocho tipos de herramienta** — escalas y mediciones, limpieza de planos, primitivas, medidas directas, cruce de capas, agrupación, relación espacial, especializadas de dominio | El usuario aportó funciones reales de PostGIS (`ST_MakeValid`, `ST_SnapToGrid`, `ST_SimplifyPreserveTopology`, `ST_Intersection`, `ST_Difference`, `ST_Buffer`, `ST_Union`, `ST_Centroid`, `ST_DWithin`, `ST_Touches`) que formalizan varias de las especializadas ya anotadas. Sigue siendo inventario, no schema — `IDEAS.md` §2 |
 | D-212 | **Media lista con nombre real de PostGIS es evidencia fuerte a favor de un tipo espacial de Postgres para la geometría** | Responde en parte lo que `MODELO.md` §1b deja abierto a propósito. No se cierra solo con esto: es infraestructura —la extensión PostGIS tiene que estar habilitada donde corra la base—, y esa decisión la confirma el usuario, no queda implícita en una lista |
+| D-213 | **Un nodo puede tener muchos enlaces vigentes a la vez, uno por instancia física; `vigente=falso` compite dentro de la misma instancia, no entre instancias distintas** | Aclara `MODELO.md` §1b: «una sola cantidad vigente» no era un tope de un enlace por nodo. Confirmado con el usuario sobre el caso de trabes repetidas dentro de una losa nervada |
+| D-214 | **Muchas instancias repetidas del mismo elemento (cuarenta trabes) no son mecanismo nuevo**: cada una es su propio `TRAZO`, y la agregación a uno o a varios nodos la decide el árbol del presupuesto, no el cuantificador | Mismo principio que D-60. Descarta que hiciera falta "un generador de clones" o un cuantificador distinto para el caso de elementos repetidos |
 
 ---
 
