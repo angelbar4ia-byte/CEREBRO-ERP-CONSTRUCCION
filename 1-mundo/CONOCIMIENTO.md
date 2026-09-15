@@ -1898,6 +1898,40 @@ Los dos escenarios caen en causas ya definidas:
 **El prototipo es la plantilla; la ingeniería del lote es la instancia.** Mismo
 patrón que APU, ensamble, contrato y trazo.
 
+### Sin causa declarada, o con la identidad en duda: alerta, no autocorrección
+
+**El sistema nunca corrige solo.** Cuando detecta algo raro, lo marca — nunca
+cambia el dato por su cuenta. Mismo principio que D-145: corregir sin que quede
+declarado borra la evidencia de que algo cambió sin avisar.
+
+Dos disparadores distintos, la misma respuesta:
+
+**1 · Diferencia sin causa (P-29).** Es la «ausencia de causa» de arriba: no cae en
+ninguna de las seis causas de §13.6. Se marca como alerta. Alguien decide si es
+desviación real de obra, si faltaba declarar la causa, o si es un error de captura.
+
+**2 · Identidad dudosa por cantidades (P-30).** Comparar por contenido —qué trae la
+ingeniería, sin mirar la etiqueta— ya atrapó una descripción que mentía: `ALAMO 18`
+decía «Zafiro Plus», era Diamante (D-121, `PRUEBA-ZAFIRO-1.md`). Se formaliza así:
+
+```
+razón = total de la ingeniería cargada ÷ total del prototipo que dice la etiqueta
+```
+
+Verificado sobre `ALAMO 18`: las etapas que sí eran Diamante dieron razón 1.00 a
+1.03; ninguna se acercó a Zafiro Plus. **Si la razón se desvía más del umbral
+—20% por defecto, parámetro, no número fijo en el código—, la etiqueta queda en
+duda** y se marca como alerta, igual que el caso 1.
+
+> **Dos métodos independientes que coinciden se validan mutuamente** (`METODO.md`
+> §1.4): identificar por contenido (qué trae) y por cantidad (cuánto suma) miden
+> cosas distintas. Cuando los dos apuntan al mismo prototipo, la identidad queda
+> confirmada sin ambigüedad — y no hace falta un tercer criterio.
+
+**Ninguno de los dos se resuelve solo.** Quedan en `ALERTA` (`MODELO.md` §5a) hasta
+que alguien las mira — nunca se pierden al cerrar la sesión que las detectó, que es
+justo lo que le pasaba a toda alerta antes de esto (B-32).
+
 
 ## 11.8 Once archivos del mismo lote
 

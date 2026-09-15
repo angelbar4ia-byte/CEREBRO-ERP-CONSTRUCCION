@@ -68,10 +68,10 @@ analizados y sus hallazgos escritos.
 |---|---|
 | **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
-| **Modelo de datos** | `MODELO.md` aprobado, con 9 hallazgos resueltos |
+| **Modelo de datos** | `MODELO.md` aprobado, con 10 hallazgos resueltos |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 191 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 195 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |

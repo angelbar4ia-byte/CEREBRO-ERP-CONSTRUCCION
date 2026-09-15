@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 9 hallazgos resueltos
+verificado: Aprobado · 10 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -349,6 +349,50 @@ técnica**, no como error.
 
 ---
 
+## 5a. La alerta — cuando algo no cuadra y nadie lo declaró
+
+> Cierra B-32: **«la alerta no tiene dónde vivir»** — se detectaba y se perdía al
+> cerrar la sesión que la encontró. Es el peldaño de abajo de `PROPUESTA` en la
+> escalera de D-71: tiene objeto, pero no sugiere un valor — solo dice *«mirá esto»*.
+
+```
+ALERTA
+  id
+  tipo              enum: diferencia_sin_causa · identidad_dudosa · …
+                     — abierta, crece igual que PROPUESTA.tipo
+  objeto_id         FK Nodo, nullable — a qué nodo, etapa o prototipo aplica
+  evidencia         JSON — qué se comparó, con qué método, y qué dio
+  parametro_usado   JSON, nullable — el umbral que la disparó
+                     (ej. {"umbral_pct": 20}), para ajustar sin tocar código
+  primera_vez       timestamp
+  ultima_vez        timestamp
+  veces_vista       entero, default 1 — sube si la misma alerta (tipo + objeto)
+                     reaparece sin resolverse
+  estado            enum: activa · resuelta · descartada
+  resuelto_por, resuelto_en, nota_resolucion
+```
+
+**`veces_vista` es la razón de ser de esta tabla.** Sin ella nadie puede contestar
+*«¿esto ya salió antes?»* — la pregunta que decide si algo sigue siendo un aviso o
+ya merece atención (B-32, «tres meses seguidos» es cuando deja de ser aviso).
+
+**No es `PROPUESTA` con otro nombre.** `PROPUESTA` sugiere un `valor_propuesto`;
+`ALERTA` no sugiere nada, solo señala. Si alguien quiere convertir una alerta en
+una propuesta de corrección, crea una `PROPUESTA` nueva que la referencia dentro de
+su `evidencia` — no se reusa la fila.
+
+**Nunca se autorresuelve.** Detectar no necesita permiso; corregir sí (D-46). Una
+alerta pasa a `resuelta` solo cuando alguien la mira y decide qué era.
+
+Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
+
+| `tipo` | Dispara cuando | Cierra |
+|---|---|---|
+| `diferencia_sin_causa` | Prototipo contra ingeniería difiere y la diferencia no cae en ninguna de las seis causas de `CONOCIMIENTO.md` §13.6 | P-29 |
+| `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
+
+---
+
 # 6. Lo que este modelo deliberadamente NO resuelve
 
 | No incluido | Por qué |
@@ -377,6 +421,7 @@ técnica**, no como error.
 | 7 | `Acarreo` no tenía dónde guardarse en el dato | Tabla abierta `CLASE_TRABAJO`, no `ENUM` — las clases van a crecer | ✅ |
 | 8 | Falta saber cuánta ingeniería está cargada | Tabla aparte `ESTADO_CARGA`, por nodo, con caché de porcentaje | ✅ |
 | 9 | `Flete` se usaba como apartado para insumos no clasificables | Campo `revisar` (boolean) en `NODO`, en vez de abusar de la categoría | ✅ |
+| 10 | La alerta no tenía dónde vivir, y se perdía al cerrar la sesión que la detectaba | Tabla `ALERTA`, peldaño de abajo de `PROPUESTA`, con `veces_vista` para saber si reaparece | ✅ |
 
 **Los seis primeros hallazgos fueron revisados y aprobados el 2026-09-10**, con dos
 ajustes sobre la propuesta original:
@@ -388,9 +433,9 @@ ajustes sobre la propuesta original:
 
 Los hallazgos 1, 4, 5 y 6 quedan tal como se propusieron.
 
-**Los hallazgos 7, 8 y 9 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04
-y P-25 en una sesión de trabajo con el usuario — no en la revisión original del
-09-10. Los tres aprobados en la misma conversación que los originó.
+**Los hallazgos 7 a 10 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
+P-25, P-29 y P-30 en una sesión de trabajo con el usuario — no en la revisión
+original del 09-10. Los cuatro aprobados en la misma conversación que los originó.
 
 > **Este modelo puede pasar a la siguiente fase**: tipos de columna concretos,
 > índices, y el motor de cálculo como funciones sobre este schema. Eso no se hace

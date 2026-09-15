@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 191 decisiones · 12 descartes · 8 correcciones
+verificado: 195 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -265,6 +265,10 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-189 | **Nuevo campo `revisar` (boolean) en `NODO`** | Insumo apartado sin clasificar bien, en vez de abusar de una categoría —el caso de `Tablas` y los materiales de prueba hidráulica marcados como `Flete`—. También sirve como bandera al revisar insumos para un cambio masivo. Cierra P-04 |
 | D-190 | **Un presupuesto incompleto por partes se carga igual, nunca bloquea, y avisa con alerta no bloqueante** | D-30 (registrar nunca se bloquea) y D-71 (la escalera de alerta). Cierra P-25 en su parte de política |
 | D-191 | **Nueva tabla `ESTADO_CARGA`, por nodo estructural** | `estado` incompleto/completo y `porcentaje_cargado` como caché con fecha, recalculado cada vez que entra una parte nueva. Mismo patrón que `ESTADO_CONGELAMIENTO` (D-25). Cierra P-25 en su parte de mecanismo |
+| D-192 | **Nueva tabla `ALERTA`, peldaño de abajo de `PROPUESTA`** | Cierra B-32: la alerta no tenía dónde vivir y se perdía al cerrar la sesión que la detectaba. `veces_vista` contesta si algo ya salió antes, que es cuando deja de ser aviso |
+| D-193 | **`diferencia_sin_causa` (P-29) e `identidad_dudosa` (P-30) nunca autocorrigen** | La identidad dudosa se calcula como razón entre el total cargado y el total del prototipo declarado, umbral 20% por defecto y parámetro, no número fijo. Dos métodos independientes —contenido y cantidad— que coinciden se validan mutuamente (`METODO.md` §1.4); no hace falta un tercer criterio |
+| D-194 | **M-15/M-16 confirmados resueltos por `EQUIVALENCIA`** | La tabla ya estaba aprobada en `MODELO.md` §4 desde el 10 de septiembre, con `tipo=duplicado_exacto` cubriendo exactamente este caso. Sin cambios nuevos |
+| D-195 | **P-23 confirmado resuelto** | El CPM tiene sus cuatro decisiones cerradas (D-90, D-99 a D-102, `PROPUESTA-CUATRO-MODULOS.md`). Lo único abierto de ese módulo es P-5 (la actividad interrumpida/tramos), que ya tiene su propio renglón |
 
 ---
 
