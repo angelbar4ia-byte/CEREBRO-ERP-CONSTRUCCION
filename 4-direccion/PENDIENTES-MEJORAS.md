@@ -191,7 +191,7 @@ puede escribir de lo que primero hay que definir.
 
 | # | Módulo | Qué hace | Reglas | Depende de |
 |---|---|---|---|---|
-| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 10 hallazgos resueltos | — |
+| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 11 hallazgos resueltos | — |
 | B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ **Escrito y probado** — `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182) | B-01 |
 | B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas | B-01 |
 | B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas | B-02, B-03 |
@@ -228,7 +228,7 @@ puede escribir de lo que primero hay que definir.
 | # | Módulo | Qué hace | Reglas |
 |---|---|---|---|
 | B-18 | **Constructor de matrices** | Generar el APU de un elemento. Orden: estructural → instalaciones → carpintería | ⏸️ `IDEAS.md` §4 |
-| B-19 | **Cuantificador gráfico** | Trazo → medida → cantidad, ligado al plano | 🔶 **Propuesta escrita** — `PROPUESTA-CUATRO-MODULOS.md` |
+| ✅ B-19 | **Cuantificador gráfico** | Trazo → medida → cantidad, ligado al plano | **Sus 4 decisiones cerradas** (C-1 a C-4, D-111 a D-114) **y con tabla** — `MODELO.md` §1b, hallazgo 11, D-200/D-201 |
 | B-25 | **Factorizador de unidades** | Unidad base, presentaciones, mínimo de compra, conversión segura | ✅ **Sus 4 decisiones cerradas** (D-86 a D-92) — listo para que el arquitecto lo diseñe en `CONOCIMIENTO.md` |
 | B-20 | **Agente interno** `gravity-obra` | Orquestador + detectores angostos, una sola bandeja | 🔶 **Diseñado** en `gravity-obra.md`. Sigue en fase 2: sus herramientas *son* el modelo de datos |
 | 🔧 B-31 | **Agente de Consulta** — el primero de los internos | Define la superficie de herramientas que reusan los otros tres | Su bloqueo (B-01) ya está resuelto — sigue en fase 2 por D-06, no por falta de modelo |
@@ -253,7 +253,7 @@ puede escribir de lo que primero hay que definir.
 | B-50 | **Normalizar la unidad del presupuesto al cargar** | El presupuesto usa `pza`/`ser`; los catálogos usan `PZ`/`SERV` | ✅ **Resuelto:** se normaliza al cargar y se guarda normalizada, contra el catálogo cerrado de 17. Lo que no mapea **se carga igual** y se da de alta por validar. `erp-importacion.md` §4b. **Verificado: los catálogos estaban limpios; `M²` no existía** |
 | B-51 | **La regla del concepto no clasificable** | Qué pasa con el 8% que no tiene de dónde derivar su clase | ✅ **Ya estaba resuelto en `MODELO.md`:** `subfamilia_id` es nullable, se clasifica después a mano y **no bloquea la carga**. Tercera vez que un pendiente ya tenía respuesta sin releerse |
 | B-52 | **La cohorte de cimentación no es el número de plantas** | Qué separa a Zafiro Plus y Oro del resto | 🔶 **Recalculado:** 5 de 7 comparten tasa con CV 2.8% —los Diamante de dos plantas incluidos—; Zafiro Plus y Oro están 1.71× abajo. **No es plantas.** Falta saber qué es |
-| B-53 | **El parámetro propio por ensamble no tiene dónde vivir ni de dónde salir** | Decidido en D-98, sin campo ni fuente | ⏸️ El catálogo trae m² construidos, no desplante ni salidas. **El cuantificador es quien los produciría** |
+| 🔶 B-53 | **El parámetro propio por ensamble no tiene dónde vivir ni de dónde salir** | Decidido en D-98, sin campo ni fuente | **La fuente ya existe** — `TRAZO`/`ENLACE_CUANTIFICACION` (`MODELO.md` §1b) puede producir desplante y salidas. Sigue sin campo del lado del paramétrico |
 | B-54 | **Renovación semestral de las invariantes de valor** | Quién y cuándo actualiza $16,460,623.50 y las demás cifras base | ⏸️ Sin proceso. Si nadie las renueva, el verificador marcará falla sobre datos correctos |
 | B-55 | **Rendimiento de material — el triángulo con el avance** | Salida de almacén + avance físico + rendimiento del material: dos comprueban el tercero | ⏸️ **Nuevo y de otra familia:** los tres rendimientos del modelo son de mano de obra. Caso: 500 ladrillos no alcanzan para 200 m² de muro. §11.12 hoy compara salidas contra explosión, **sin avance** |
 | B-56 | **El frente está marcado como informativo y se quiere calcular con él** | Cuántas cuadrillas hacen falta para atacar un frente | ⏸️ `CATALOGOS.md` advierte: «no valida, no impide, no calcula… si no, alguien construirá encima algo que no la soporta». Además el frente hoy es catálogo propio, no concepto/etapa/nivel |

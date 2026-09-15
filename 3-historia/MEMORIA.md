@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 199 decisiones · 12 descartes · 8 correcciones
+verificado: 203 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -273,6 +273,10 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-197 | **`diferencia_sin_causa` e `identidad_dudosa` viven bajo el detector `Desviación`**, no un quinto detector | Mismo mecanismo (D-52): comparan algo cargado contra una referencia declarada. Se separan solo si en la práctica necesitan herramientas distintas |
 | D-198 | **B-31 (Agente de Consulta) ya no depende de B-01** | El modelo está aprobado. Sigue en fase 2 por D-06 —el asistente de obra se aplaza—, no por falta de esquema |
 | D-199 | **Séptima idea del modelo: sustitución de insumo dentro de una matriz** | `IDEAS.md` §7. Ninguna de las seis operaciones de rediseño la cubre — clonación duplica el insumo entero, no dice cómo se usa dentro de un concepto que ya lo tenía. Necesita ser operación formal, no edición suelta, para seguir siendo reproducible |
+| D-200 | **B-19 (cuantificador gráfico) confirmado resuelto** | Sus cuatro decisiones (C-1 a C-4) ya estaban en D-111 a D-114 desde antes de esta sesión, sin sincronizar en `PENDIENTES-MEJORAS.md`. Sexta vez que pasa este patrón |
+| D-201 | **Nuevas tablas `TRAZO` y `ENLACE_CUANTIFICACION`** (`MODELO.md` §1b) | Conectan directo con `NODO.modo_cantidad = medida`, que existía desde la primera versión del modelo sin ningún mecanismo que lo alimentara |
+| D-202 | **La vigencia por precedencia de fuente (`IFC > DWG > PDF`) vive en `ENLACE_CUANTIFICACION`, no en `TRAZO`** | El mismo trazo puede alimentar nodos distintos con vigencia independiente entre sí — la vigencia es de la relación trazo-nodo, no del trazo en sí |
+| D-203 | **Un agente interno que cuantifique solo queda como aspiración, no como diseño** | `IDEAS.md` §2. Depende de que el cuantificador exista primero, y es una capacidad geométrica —interpretar un plano— distinta a la de los detectores actuales de `gravity-obra.md`, que leen texto y números |
 
 ---
 

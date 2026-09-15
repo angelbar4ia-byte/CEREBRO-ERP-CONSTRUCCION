@@ -6,7 +6,7 @@ capa:       IV — Dirección
 pregunta:   ¿qué se pensó y aún no se diseña?
 tiempo:     vamos aquí
 corte:      2026-09-15
-verificado: 7 ideas · ninguna diseñada
+verificado: 7 ideas · una con tabla propia (§2), ninguna de las demás diseñada
 ```
 
 > **Sólo las ideas del modelo que aún no se diseñan.** Todo pendiente de datos, de
@@ -20,7 +20,7 @@ verificado: 7 ideas · ninguna diseñada
 | Idea | Sección |
 |---|---|
 | La matriz a partir de la descripción | §1 |
-| Módulo de cuantificación gráfica | §2 |
+| Módulo de cuantificación gráfica — 🔶 mecanismo con tabla, solo queda la aspiración de un agente que trace solo | §2 |
 | Clasificar los materiales: dos ejes | §3 |
 | Constructor de matrices | §4 |
 | Cambiar la unidad de un insumo | §5 |
@@ -85,6 +85,11 @@ enseñan.
 
 ## 2 Idea: módulo de cuantificación gráfica
 
+> **El mecanismo (trazo → medida → cantidad) ya no es idea: tiene tabla aprobada**
+> en `MODELO.md` §1b (hallazgo 11, 2026-09-15). Lo que sigue siendo idea sin
+> diseñar es solo la aspiración al final de esta sección — un agente que trace
+> solo.
+
 Crear el presupuesto **trazando sobre el plano**, al estilo de PlanSwift o
 Navisworks.
 
@@ -144,6 +149,25 @@ No hay «cuantificador de PU», «paramétrico» ni «alzado».
 
 Así **el mismo polígono alimenta los tres a la vez**, y cada uno toma lo que le
 sirve. La mezcla por renglón sale sola, sin declararla en ningún lado.
+
+### Aspiración, no diseño: un agente interno que trace solo
+
+El usuario lo planteó así: que el módulo tenga **herramientas propias**, y de ser
+posible, que **algún agente interno cuantifique por su cuenta** — quizás trazando
+sobre el plano él mismo. No está claro todavía cómo se daría.
+
+Dos cosas lo distinguen de cualquier otra propuesta de este archivo:
+
+- **Depende de que el cuantificador exista primero.** No hay nada que automatizar
+  sobre un mecanismo que todavía es solo tabla (`MODELO.md` §1b).
+- **Es una capacidad distinta, no un detector más.** Los detectores de
+  `gravity-obra.md` §6 leen texto y números — Consulta, Equivalencias, Desviación,
+  Conversión. Interpretar un plano para producir un `TRAZO` es geometría sobre una
+  imagen o un archivo CAD, no una consulta sobre la base.
+
+> **Se anota para no perderla**, no para diseñarla. Inventar el mecanismo ahora
+> sería la misma trampa que un campo provisional: una vez que algo dependa de él,
+> deja de poder cambiarse sin costo.
 
 ## 3 Clasificar los materiales: dos ejes que faltan
 

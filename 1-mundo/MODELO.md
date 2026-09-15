@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 10 hallazgos resueltos
+verificado: Aprobado · 11 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -178,6 +178,64 @@ convención mexicana — cada capa se calcula sobre lo que dejaron las anteriore
 veces en una matriz con cantidades distintas — alambre recocido en `AUX-00001` para
 amarre de varilla y amarre de estribos (26 casos verificados). Si la llave fuera
 `(padre_id, hijo_id)`, la segunda línea no se podría insertar.
+
+---
+
+## 1b. Cuantificación — de dónde sale la cantidad
+
+> Cierra B-19: las cuatro decisiones (C-1 a C-4, D-111 a D-114) ya estaban tomadas
+> en `PROPUESTA-CUATRO-MODULOS.md` §2. Faltaba la tabla.
+
+**Conecta directo con algo que el modelo ya tenía y nadie alimentaba:**
+`NODO.modo_cantidad` incluye `medida` desde la primera versión — este es el
+mecanismo que la produce.
+
+```
+TRAZO
+  id
+  geometria       polígono · línea · punto — la forma sobre el plano       firme
+  plano_id, version_plano, capa                                           firme
+  fuente          enum: PDF · DWG · IFC                                   firme
+  autor, fecha                                                            firme — quién traza: C-3, roles — vive en B-45
+
+ENLACE_CUANTIFICACION
+  id
+  trazo_id        FK Trazo                                                firme
+  nodo_id         FK Nodo — a qué concepto alimenta                       firme
+  medida          enum: area · perimetro · longitud · conteo              firme
+  factor          NUMERIC — medida × factor = cantidad                    firme
+  vigente         boolean — falso si otra fuente de mayor precedencia
+                   lo reemplazó; queda como evidencia, no se borra        firme
+```
+
+**Un trazo, varios enlaces.** El polígono de una recámara da el área para el piso y
+el perímetro para el zoclo — dos filas en `ENLACE_CUANTIFICACION`, un solo
+`TRAZO` (`PROPUESTA-CUATRO-MODULOS.md` §2: *«guardando solo la cantidad, habría que
+trazar la recámara tres veces»*).
+
+### La vigencia vive en el enlace, no en el trazo
+
+El mismo trazo puede alimentar dos nodos con destinos distintos, pero **un nodo
+tiene una sola cantidad vigente a la vez**. Cuando llega una medida de mayor
+precedencia (`IFC > DWG > PDF`), el enlace anterior pasa a `vigente = falso` —
+**se conserva como evidencia, nunca se borra ni se suma**. Así se evita el
+pisamiento: el mismo muro medido en PDF y en DWG no se cuenta dos veces.
+
+> **Dos fuentes que discrepan mucho no se promedian ni se eligen solas: es
+> `PROPUESTA` con evidencia** (§5) — no corrección automática.
+
+### Si el plano cambia
+
+Las cantidades trazadas sobre la versión anterior **quedan marcadas para
+revisión**, no se recalculan solas — mismo principio que «detectar no necesita
+permiso, corregir sí» (D-46).
+
+### Lo que esto NO decide todavía
+
+- **Cómo se guarda la geometría** —GeoJSON, WKT, un tipo espacial de Postgres— es
+  tipo de columna, la siguiente pasada.
+- **Quién puede trazar y si hace falta aprobación por obra.** C-3 ya está decidido
+  en principio, pero necesita dónde vivir — B-45, sin resolver.
 
 ---
 
@@ -422,6 +480,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | 8 | Falta saber cuánta ingeniería está cargada | Tabla aparte `ESTADO_CARGA`, por nodo, con caché de porcentaje | ✅ |
 | 9 | `Flete` se usaba como apartado para insumos no clasificables | Campo `revisar` (boolean) en `NODO`, en vez de abusar de la categoría | ✅ |
 | 10 | La alerta no tenía dónde vivir, y se perdía al cerrar la sesión que la detectaba | Tabla `ALERTA`, peldaño de abajo de `PROPUESTA`, con `veces_vista` para saber si reaparece | ✅ |
+| 11 | `NODO.modo_cantidad = medida` no tenía mecanismo que lo alimentara | Tablas `TRAZO` y `ENLACE_CUANTIFICACION` — el trazo es evidencia, el enlace tipa qué mide y con qué factor | ✅ |
 
 **Los seis primeros hallazgos fueron revisados y aprobados el 2026-09-10**, con dos
 ajustes sobre la propuesta original:
@@ -433,9 +492,9 @@ ajustes sobre la propuesta original:
 
 Los hallazgos 1, 4, 5 y 6 quedan tal como se propusieron.
 
-**Los hallazgos 7 a 10 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
-P-25, P-29 y P-30 en una sesión de trabajo con el usuario — no en la revisión
-original del 09-10. Los cuatro aprobados en la misma conversación que los originó.
+**Los hallazgos 7 a 11 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
+P-25, P-29, P-30 y B-19 en una sesión de trabajo con el usuario — no en la revisión
+original del 09-10. Los cinco aprobados en la misma conversación que los originó.
 
 > **Este modelo puede pasar a la siguiente fase**: tipos de columna concretos,
 > índices, y el motor de cálculo como funciones sobre este schema. Eso no se hace
