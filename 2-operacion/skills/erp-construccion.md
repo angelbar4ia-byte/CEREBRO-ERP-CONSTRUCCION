@@ -10,7 +10,7 @@ description: Modelo de datos, reglas de cálculo y convenciones para construir, 
 capa:       II — Operación
 pregunta:   ¿qué respetar al construir?
 tiempo:     se hace así
-corte:      2026-09-12
+corte:      2026-09-15
 verificado: Derivado de CONOCIMIENTO · 16 errores que previene
 ```
 
@@ -99,6 +99,17 @@ explosión de compuestos coinciden con su catálogo de origen, sin excepción.
 
 Los agregados se calculan. Si por rendimiento hace falta materializarlos, se marcan
 como caché con su marca de tiempo, **nunca como fuente de verdad**.
+
+### El redondeo vive en cada línea, no al final
+
+**El importe de cada línea se redondea a centavos antes de sumarse al padre.** La
+cantidad nunca se redondea — arrastra hasta doce decimales por Excel (§8) y es
+magnitud física, no dinero.
+
+Verificado con la zapata de `CASO-TRABAJADO.md` §3: sumar sin redondear por línea da
+$1,135.47; redondeando cada línea da **$1,135.48**, el costo exacto del catálogo.
+Confirma la hipótesis de D-124 — el PU se redondea a centavos antes de multiplicar.
+Es la misma deriva de `INVARIANTES.md` §4, ahora con la regla que la reproduce.
 
 ### Los tres rendimientos
 

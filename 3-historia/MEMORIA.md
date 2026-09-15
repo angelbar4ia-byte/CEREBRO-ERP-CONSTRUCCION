@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
-corte:      2026-09-12
-verificado: 177 decisiones · 12 descartes · 8 correcciones
+corte:      2026-09-15
+verificado: 182 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -14,7 +14,7 @@ verificado: 177 decisiones · 12 descartes · 8 correcciones
 > El conocimiento tiene la verdad de hoy. Este archivo tiene **cómo se llegó a
 > ella** — y sobre todo **lo que ya se rechazó**, para que no se vuelva a proponer.
 >
-> Última actualización: 2026-09-10
+> Última actualización: 2026-09-15
 
 ---
 
@@ -233,6 +233,21 @@ buena, pero **no el aviso de «esto se creyó al revés»**.
 | D-175 | **No hay catálogo de proveedores, así que el tiempo de entrega no puede colgar de ahí** | Sería lo más exacto y no se puede. Y los días no laborables del proveedor no se modelan ni se inventan |
 | D-176 | **Tercera forma de obtener la duración: preestablecida por nivel** | Para lo que se contrata terminado y no tiene rendimiento del cual derivarla |
 | D-177 | **El disparador de la fecha puede ser contractual: anticipo o junta de arranque** | Dirección nueva entre programa y contratos. Hasta aquí el programa proponía y el contrato congelaba; **aquí el contrato arranca el reloj** |
+
+## Implementación
+
+Primeras decisiones de código, no solo de modelo. `MODELO.md` cierra pidiendo
+exactamente esto: *"tipos de columna concretos, índices, y el motor de cálculo
+como funciones sobre este schema... es la fase de implementación del
+constructor."* Viven en `backend/core/`, probadas contra `CASO-TRABAJADO.md`.
+
+| # | Decisión | Por qué |
+|---|---|---|
+| D-178 | **El motor de cálculo navega por `COMPOSICION`, no por `NODO.padre_id`** | El mismo insumo de catálogo (`ACR-00002`) aparece referenciado desde líneas distintas —bajo `EST-01053` directo y bajo la zapata `ZA1-000001`—, confirmando que la matriz vive en `COMPOSICION` (MODELO.md §1a: «de aquí sale el cálculo completo») |
+| D-179 | **`precio_declarado` sirve igual para un insumo de catálogo que para un concepto en modo alzado** | Los dos casos significan lo mismo: el precio no se deriva de una matriz propia. `MODELO.md` no pide un campo aparte y no hace falta inventarlo |
+| D-180 | **El importe de cada línea se redondea a centavos antes de sumarse al padre; la cantidad nunca se redondea** | Sin este redondeo por línea, la zapata da $1,135.47 en vez de $1,135.48 — confirma la hipótesis de D-124: el PU se redondea a centavos antes de multiplicar. Verificado contra los tres importes reales de `CASO-TRABAJADO.md` |
+| D-181 | **`acumulado_hasta_aqui` (`COMPOSICION.base_porcentaje`) queda sin implementar, con error explícito** | Pertenece a las capas de sobrecosto (`MODELO.md` §6), que no tienen datos reales todavía. Mejor `NotImplementedError` que adivinar la regla |
+| D-182 | **El motor de cálculo se escribe sin Django ni base concreta**: un puerto `RepositorioArbol` más un adaptador en memoria para las pruebas | erp-construccion.md §9: «ltree va detrás de un puerto de repositorio.» La capa de persistencia (Django, Postgres, migraciones) queda pendiente — es el siguiente paso, no este |
 
 ---
 
