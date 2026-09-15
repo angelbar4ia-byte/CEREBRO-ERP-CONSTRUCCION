@@ -448,8 +448,8 @@ Análisis de Precio Unitario. La explosión de un concepto en sus insumos con su
 
 Cuánto se consume. Significa cosas distintas según dónde esté.
 
-- **También:** Consumo; Coeficiente
-- **No confundir con:** Volumen de obra; Rendimiento
+- **También:** Consumo; Coeficiente; Rendimiento de matriz (alias en fórmulas del paramétrico — D-217)
+- **No confundir con:** Volumen de obra; Rendimiento (de cuadrilla, en `§Tiempo y ejecución`)
 - **Se usa con:** APU; Insumo; Volumen
 - **Ejemplo:** 0.13125 PZ de estuco por m² de aplanado
 - **Hoy vive en:** `Columna `Cantidad``
@@ -876,7 +876,7 @@ es decisión, no vocabulario.**
 |---|---|---|
 | Consumo de insumo por unidad de concepto | ``ANALISIS_DE_BASICOS_*`` | 0.13125 PZ de estuco por m² |
 | Volumen de obra a ejecutar | ``CATALOGO_DE_PRESUPUESTO`` | 279 m² de muro |
-| Receta del ensamble | `Paramétrico` | 1 regadera de las 3 |
+| Receta del ensamble, alias **rendimiento de matriz** en fórmulas | `Paramétrico` | 1 regadera de las 3 — no confundir con el rendimiento de cuadrilla |
 
 ### «Tipo» — 4 significados
 

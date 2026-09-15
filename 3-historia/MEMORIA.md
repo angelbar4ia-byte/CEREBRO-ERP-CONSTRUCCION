@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 214 decisiones · 12 descartes · 8 correcciones
+verificado: 218 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -288,6 +288,10 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-212 | **Media lista con nombre real de PostGIS es evidencia fuerte a favor de un tipo espacial de Postgres para la geometría** | Responde en parte lo que `MODELO.md` §1b deja abierto a propósito. No se cierra solo con esto: es infraestructura —la extensión PostGIS tiene que estar habilitada donde corra la base—, y esa decisión la confirma el usuario, no queda implícita en una lista |
 | D-213 | **Un nodo puede tener muchos enlaces vigentes a la vez, uno por instancia física; `vigente=falso` compite dentro de la misma instancia, no entre instancias distintas** | Aclara `MODELO.md` §1b: «una sola cantidad vigente» no era un tope de un enlace por nodo. Confirmado con el usuario sobre el caso de trabes repetidas dentro de una losa nervada |
 | D-214 | **Muchas instancias repetidas del mismo elemento (cuarenta trabes) no son mecanismo nuevo**: cada una es su propio `TRAZO`, y la agregación a uno o a varios nodos la decide el árbol del presupuesto, no el cuantificador | Mismo principio que D-60. Descarta que hiciera falta "un generador de clones" o un cuantificador distinto para el caso de elementos repetidos |
+| D-215 | **Dos campos nuevos para la fórmula personalizada**: `COMPOSICION.formula_personalizada` (si no es null, ignora `cantidad` y `tipo_cantidad`) y `NODO.variables` (JSONB, valores sueltos que no ameritan nodo propio) | Resuelve la «Variable del Usuario» y la puerta de escape que propuso el usuario. Ninguno de los dos vive en `ENLACE_CUANTIFICACION`: mezclaría costo con geometría pura (D-182). `MODELO.md` §1a, hallazgo 13 |
+| D-216 | **Nodo hijo propio vs. `NODO.variables` se elige por concepto o compuesto, no con una regla global** | Mismo estatus que la elección entre `medida` y `estimada` (D-209). El usuario lo pidió explícito: «puede ser una o otra dependiendo la necesidad» |
+| D-217 | **"Rendimiento de matriz" es alias de `COMPOSICION.cantidad`, no una cantidad nueva por categoría** | Evita dividir en `rendimiento_material`, `rendimiento_mano_obra`, etc. — un solo campo ya sirve a las seis categorías, mismo principio que evitó separar `base_porcentaje` por tipo. Cross-referenciado en `GLOSARIO-DOMINIO.md`, ambigüedad «Cantidad», para no chocar con el rendimiento de cuadrilla |
+| D-218 | **PostGIS confirmado como motor de geometría pura — Decisión 1 de 3** | El usuario lo confirmó con sus propias palabras: «PostGIS solo se encarga de guardar el vector y entregar la métrica limpia... no mezcles lógica de costos dentro de las funciones espaciales». Cierra D-212. Quedan Decisión 2 (GeoJSON, transporte API↔frontend) y Decisión 3 (WKT, captura rápida) |
 
 ---
 

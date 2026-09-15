@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 12 hallazgos resueltos
+verificado: Aprobado · 13 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -59,6 +59,9 @@ NODO
   subfamilia_id      FK Subfamilia (nullable)                        firme — nullable, resuelto (P-12)
   clase_id           FK Clase_Trabajo (nullable)                     firme — nuevo, solo si categoria=trabajo (P-02/P-03)
   revisar            boolean, default false                          firme — nuevo, insumo apartado sin clasificar bien (P-04)
+  variables          JSONB, nullable — valores nombrados que una
+                      `formula_personalizada` puede leer, cuando el
+                      valor no amerita su propio nodo hijo             firme — nuevo, ver hallazgo 13
   modo_precio        enum: calculado · declarado                     firme
   precio_declarado   NUMERIC, nullable                                firme — solo si modo_precio=declarado
   procedencia        enum: importado · manual · fusion · division ·
@@ -186,6 +189,9 @@ COMPOSICION
   tipo_cantidad      enum: fija · porcentaje                           firme
   base_porcentaje    solo si tipo_cantidad=porcentaje:
                       "suma_jornales_hermanos" | "acumulado_hasta_aqui" firme — dos reglas distintas comprobadas
+  formula_personalizada  texto/JSONB, nullable — si no es null, el motor
+                          de cálculo ignora `cantidad` y `tipo_cantidad`
+                          y evalúa la fórmula en su lugar                firme — nuevo, ver hallazgo 13
 ```
 
 ### ⚠ HALLAZGO 4 — dos reglas de porcentaje que se ven iguales y no lo son
@@ -207,6 +213,38 @@ convención mexicana — cada capa se calcula sobre lo que dejaron las anteriore
 veces en una matriz con cantidades distintas — alambre recocido en `AUX-00001` para
 amarre de varilla y amarre de estribos (26 casos verificados). Si la llave fuera
 `(padre_id, hijo_id)`, la segunda línea no se podría insertar.
+
+### ⚠ HALLAZGO 13 — la receta fija no basta cuando el múltiplo depende de esta obra
+
+`COMPOSICION.cantidad` es un número de catálogo: sirve mientras la relación
+hijo/padre no cambie de un presupuesto a otro. Pero pintura con dos manos y
+pintura con tres manos son la misma matriz con un múltiplo distinto — y ese
+múltiplo no es catálogo, es una decisión de **esta** obra. Ahí no alcanza un
+solo número fijo. El campo `NODO.variables` (tabla `NODO`, arriba) existe para
+esto.
+
+**Dos formas de guardar esa variable, misma elección que ya existe entre
+`medida` y `estimada` (D-209): por concepto o compuesto, según lo que haga
+falta auditar — no una regla única para todos los casos.**
+
+| Forma | Cuándo | Ejemplo |
+|---|---|---|
+| **Nodo hijo propio** (`modo_cantidad=capturada`) | La variable merece su propia línea, unidad y bitácora | Altura de muro, si se va a comparar contra otros muros |
+| **`NODO.variables`** | Es un ajuste suelto, sin unidad propia que valga la pena auditar | Número de manos de pintura |
+
+`formula_personalizada` se evalúa en `backend/core/motor_calculo.py`, **nunca
+en SQL**: la geometría entrega la métrica (`ENLACE_CUANTIFICACION.medida`), la
+fórmula la combina con `variables` y con los `cantidad` de otras líneas de
+`COMPOSICION`. Misma frontera que D-182: **el recorrido es infraestructura, la
+regla de qué suma a qué es dominio.**
+
+> **"Rendimiento de matriz"** es el nombre que se usa en conversación para
+> `COMPOSICION.cantidad` cuando alimenta una fórmula — es la misma «receta del
+> ensamble» de siempre (`GLOSARIO-DOMINIO.md`, ambigüedad «Cantidad»), no una
+> cantidad nueva por categoría. Material, mano de obra, flete, herramienta,
+> equipo y trabajo comparten el mismo campo: dividirlo por categoría
+> multiplicaría el lugar donde una misma regla puede divergir, el mismo riesgo
+> que ya evitó `base_porcentaje` unas líneas arriba.
 
 ---
 

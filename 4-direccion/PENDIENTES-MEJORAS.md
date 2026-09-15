@@ -191,7 +191,7 @@ puede escribir de lo que primero hay que definir.
 
 | # | Módulo | Qué hace | Reglas | Depende de |
 |---|---|---|---|---|
-| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 12 hallazgos resueltos | — |
+| B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 13 hallazgos resueltos | — |
 | B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ **Escrito y probado** — `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182) | B-01 |
 | B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas | B-01 |
 | B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas | B-02, B-03 |
