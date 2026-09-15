@@ -74,7 +74,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | M-14 | El alcance vive dentro de la descripción | 395 de 461 con *«Incluye:»*, en 36 variantes | Catálogo de textos de alcance |
 | M-15 | Duplicados exactos de concepto | 22 casos: `ISN-02001`≡`ISN-02005`, `CAN-01001`≡`CAN-01011` | Tabla de equivalencia. **Sin fusionar claves** |
 | M-16 | Mismo concepto en dos familias | `CAR-01030` ≡ `ICA-01030`, texto idéntico | Igual que M-15 |
-| ✅ M-13 | ~~Moneda extranjera declarada y muerta~~ | `Costo base M. E.` en cero en los 387 | **Resuelto: no se modela.** Mismo criterio que el `OID` de OPUS. `MODELO.md` §6, D-186 |
+| ✅ M-13 | ~~Moneda extranjera declarada y muerta~~ | `Costo base M. E.` en cero en los 387 | **Resuelto: no se modela hoy.** Se retoma el día que haga falta convertir a moneda extranjera. `MODELO.md` §6, D-186 |
 | M-17 | Precio inconsistente entre presentaciones | `ELE-00044` en PZ a $580 y `ELE-00046`, misma descripción, en M a $29 | Verificar cuál es el correcto |
 | M-18 | Mismo material en dos familias y presentaciones | Pija lámina: `COM-00200` en CJ a $8.96, `ELE-00048` en PZ a $0.50 | Igual |
 

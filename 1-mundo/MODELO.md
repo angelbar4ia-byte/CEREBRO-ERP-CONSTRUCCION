@@ -307,7 +307,7 @@ técnica**, no como error.
 | Estimaciones, contratos, almacén | P-18, P-19 — sin definir |
 | Roles y permisos | P-21 — sin definir |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
-| Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso. Mismo criterio que el `OID` de OPUS: no se carga un campo muerto «por si acaso». M-13 |
+| Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |
 
 ---
 

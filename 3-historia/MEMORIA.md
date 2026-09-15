@@ -251,7 +251,7 @@ constructor."* Viven en `backend/core/`, probadas contra `CASO-TRABAJADO.md`.
 | D-183 | **`PENDIENTES-MEJORAS.md` no se resincroniza solo cuando otro archivo resuelve uno de sus temas** | P-12 y P-13 ya tenían respuesta —B-51/D-149 y D-41/`LENGUAJE.md`— sin reflejarse en su propio renglón. Cuarta vez que pasa, después de M-4, B-01 y B-51 |
 | D-184 | **`%MO` se normaliza a esa forma exacta al cargar** — mayúsculas, sin paréntesis | Cierra P-05: que se queda como unidad ya estaba decidido (`MEMORIA.md` §2); faltaba solo la forma canónica entre las tres que trae OPUS. Mismo mecanismo que D-146 |
 | D-185 | **`cantidad` se guarda como `NUMERIC` sin precisión ni escala fijas** | Cierra P-06: no hace falta una regla por tipo de unidad. Se guarda lo que llegó, consistente con erp-construccion.md §9 y con D-180 (la cantidad nunca se redondea) |
-| D-186 | **La moneda extranjera (`Costo base M. E.`) no se modela** | Cierra M-13: cero en los 387 materiales, sin evidencia de uso. Mismo criterio que el `OID` de OPUS — no se carga un campo muerto «por si acaso». Agregado a `MODELO.md` §6 |
+| D-186 | **La moneda extranjera (`Costo base M. E.`) no se modela hoy, pero no se descarta** | Cierra M-13: cero en los 387 materiales, sin evidencia de uso. Distinto del `OID` de OPUS —que no vuelve nunca—: si en algún momento hace falta convertir a moneda extranjera, ahí se modela. Anotado en `MODELO.md` §6 |
 
 ---
 
