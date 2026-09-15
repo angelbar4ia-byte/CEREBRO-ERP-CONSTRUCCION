@@ -104,7 +104,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-18 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones y retenciones. Es donde el dinero se vuelve real |
 | P-19 | **Almacén** | Surtido contra consumido, devoluciones, y el corte matricial |
 | P-20 | **Programación** | Actividades, asignaciones y avance. Está en el skill, sin asentar en el conocimiento |
-| P-21 | **Roles y permisos** | Quién captura causa, quién aprueba versión, quién autoriza cambio |
+| 🔶 P-21 | **Roles y permisos** | **Borrador aprobado, módulo sin cerrar** (R-1 a R-3): 5 roles —Residente, Supervisor, Costos, Cotizador, Control— y 14 funciones atómicas mínimas (`trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes`), cada rol una combinación, no un bloque fijo. Falta decidir tope por monto en `comprometer_gasto` y si los roles son disjuntos en funciones |
 | P-22 | **Autoría de matrices y compuestos** | Cómo se arma una explosión desde cero. Ideas en `IDEAS.md` §1 y `IDEAS.md` §4 del conocimiento |
 | ✅ P-23 | ~~**Ruta crítica**~~ | **Resuelto: las 4 decisiones del CPM están cerradas** (D-90, D-99 a D-102, `PROPUESTA-CUATRO-MODULOS.md`). Lo único abierto de ese módulo es P-5, ya con su propio renglón. D-195 |
 | ~~P-24~~ | **16 decisiones de los cuatro módulos** | ✅ **Las 16 cerradas** (D-86 a D-113). Aparecieron tres piezas nuevas: P-5, B-40, B-45 |

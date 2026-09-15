@@ -99,7 +99,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Modelo de datos** | `MODELO.md` aprobado, con 11 hallazgos resueltos |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 203 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 206 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |

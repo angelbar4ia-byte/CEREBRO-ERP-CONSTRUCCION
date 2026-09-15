@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 203 decisiones · 12 descartes · 8 correcciones
+verificado: 206 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -277,6 +277,9 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-201 | **Nuevas tablas `TRAZO` y `ENLACE_CUANTIFICACION`** (`MODELO.md` §1b) | Conectan directo con `NODO.modo_cantidad = medida`, que existía desde la primera versión del modelo sin ningún mecanismo que lo alimentara |
 | D-202 | **La vigencia por precedencia de fuente (`IFC > DWG > PDF`) vive en `ENLACE_CUANTIFICACION`, no en `TRAZO`** | El mismo trazo puede alimentar nodos distintos con vigencia independiente entre sí — la vigencia es de la relación trazo-nodo, no del trazo en sí |
 | D-203 | **Un agente interno que cuantifique solo queda como aspiración, no como diseño** | `IDEAS.md` §2. Depende de que el cuantificador exista primero, y es una capacidad geométrica —interpretar un plano— distinta a la de los detectores actuales de `gravity-obra.md`, que leen texto y números |
+| D-204 | **R-1: cinco roles de obra** — Residente, Supervisor, Costos, Cotizador, Control | Borrador de P-21, aprobado con el usuario. Queda pendiente cerrar el módulo completo |
+| D-205 | **R-2: el rol es una combinación de funciones atómicas, no un bloque cerrado** | Permite variar una asignación sin tocar el catálogo de funciones — mismo principio que separar `categoria` de `clase` en D-187/D-188 |
+| D-206 | **R-3: catorce funciones mínimas para el menú de herramientas** — `trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes` | Ninguna inventada: ya estaban implícitas en D-30, D-114, `CONOCIMIENTO.md` §2.2, `CONOCIMIENTO.md` §13.2, `CONOCIMIENTO.md` §13.4, `CONOCIMIENTO.md` §13.6, D-32/D-44, D-192, P-01 e `INVARIANTES.md` §8. Faltan dos preguntas antes de cerrar P-21: tope por monto en `comprometer_gasto`, y si los roles son disjuntos en funciones |
 
 ---
 
