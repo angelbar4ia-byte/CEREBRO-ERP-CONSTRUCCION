@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 218 decisiones · 12 descartes · 8 correcciones
+verificado: 220 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -292,6 +292,8 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-216 | **Nodo hijo propio vs. `NODO.variables` se elige por concepto o compuesto, no con una regla global** | Mismo estatus que la elección entre `medida` y `estimada` (D-209). El usuario lo pidió explícito: «puede ser una o otra dependiendo la necesidad» |
 | D-217 | **"Rendimiento de matriz" es alias de `COMPOSICION.cantidad`, no una cantidad nueva por categoría** | Evita dividir en `rendimiento_material`, `rendimiento_mano_obra`, etc. — un solo campo ya sirve a las seis categorías, mismo principio que evitó separar `base_porcentaje` por tipo. Cross-referenciado en `GLOSARIO-DOMINIO.md`, ambigüedad «Cantidad», para no chocar con el rendimiento de cuadrilla |
 | D-218 | **PostGIS confirmado como motor de geometría pura — Decisión 1 de 3** | El usuario lo confirmó con sus propias palabras: «PostGIS solo se encarga de guardar el vector y entregar la métrica limpia... no mezcles lógica de costos dentro de las funciones espaciales». Cierra D-212. Quedan Decisión 2 (GeoJSON, transporte API↔frontend) y Decisión 3 (WKT, captura rápida) |
+| D-219 | **GeoJSON confirmado como Decisión 2 de 3 — transporte de geometría entre API y frontend** | PostGIS lo exporta/importa nativo (`ST_AsGeoJSON`/`ST_GeomFromGeoJSON`), sin serialización a mano. Cada `Feature.properties` lleva `trazo_id`/`nodo_id` para el resaltado bidireccional tipo Navisworks que buscaba el usuario. `MODELO.md` §1b |
+| D-220 | **GeoJSON es transporte, no almacenamiento; y usa coordenadas de plano, no geográficas** | `TRAZO.geometria` sigue en el tipo nativo de PostGIS —conserva el índice espacial—, GeoJSON se genera solo al leer. `ENLACE_CUANTIFICACION` sigue siendo la fuente de verdad; `properties.nodo_id` es copia de lectura, no un lugar nuevo donde ese dato pueda divergir. Coordenadas locales al plano: desviación deliberada de RFC 7946, no error a corregir |
 
 ---
 

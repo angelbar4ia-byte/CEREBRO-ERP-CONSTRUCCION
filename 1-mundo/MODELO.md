@@ -318,10 +318,38 @@ Las cantidades trazadas sobre la versión anterior **quedan marcadas para
 revisión**, no se recalculan solas — mismo principio que «detectar no necesita
 permiso, corregir sí» (D-46).
 
+### Cómo viaja la geometría hacia el frontend
+
+**GeoJSON — Decisión 2 de 3.** PostGIS la exporta nativa (`ST_AsGeoJSON`) y la
+importa nativa (`ST_GeomFromGeoJSON`): no hace falta serialización a mano en
+ninguna punta. Es JSON plano —el navegador lo parsea solo, sin librería— y
+cualquier visor de planos (Leaflet, MapboxGL, OpenLayers, canvas propio) ya lo
+entiende.
+
+Cada `Feature` de la `FeatureCollection` lleva `properties: { trazo_id,
+nodo_id }` junto a su `geometry` — así el clic en una forma del plano sabe a
+qué nodo del árbol resaltar, y viceversa (el enlace bidireccional tipo
+Navisworks que se buscaba).
+
+> **Transporte, no almacenamiento.** `TRAZO.geometria` se guarda en el tipo
+> nativo de PostGIS, no como texto GeoJSON — así conserva el índice espacial
+> (`GiST`) y los `ST_*` no reparsean texto en cada cálculo. GeoJSON se genera
+> al leer y se parsea al escribir, en el borde de la API — nunca es la fuente
+> de verdad. Esa sigue siendo `ENLACE_CUANTIFICACION`: el `properties.nodo_id`
+> de cada `Feature` es una copia de lectura para que el frontend resuelva el
+> clic, no un lugar nuevo donde ese dato pueda vivir por su cuenta.
+
+> **Coordenadas de plano, no geográficas.** GeoJSON asume por convención
+> lon/lat WGS84 (RFC 7946); acá las coordenadas son locales al plano —igual
+> que hace cualquier herramienta CAD-a-web—, con su propia escala (categoría
+> A del inventario, `IDEAS.md` §2: calibración de escala). Es una desviación
+> deliberada de la convención, no un error a corregir después.
+
 ### Lo que esto NO decide todavía
 
-- **Cómo se guarda la geometría** —GeoJSON, WKT, un tipo espacial de Postgres— es
-  tipo de columna, la siguiente pasada.
+- **Cómo se captura la geometría rápido** —WKT, la Decisión 3 de 3— sigue sin
+  resolver. El almacenamiento (PostGIS, D-218) y el transporte (GeoJSON,
+  D-219/D-220) ya están confirmados.
 - **Quién puede trazar y si hace falta aprobación por obra.** C-3 ya está decidido
   en principio, pero necesita dónde vivir — B-45, sin resolver.
 
