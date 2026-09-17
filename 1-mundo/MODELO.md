@@ -345,11 +345,32 @@ Navisworks que se buscaba).
 > A del inventario, `IDEAS.md` §2: calibración de escala). Es una desviación
 > deliberada de la convención, no un error a corregir después.
 
+### Cómo se captura una geometría nueva
+
+**WKT — Decisión 3 de 3.** Cuando alguien traza un elemento nuevo con clics
+sobre el plano, la secuencia de puntos se arma directo como texto WKT
+(`LINESTRING(x1 y1, x2 y2, ...)`) del lado del frontend, y `ST_GeomFromText`
+la convierte a geometría nativa de un solo golpe — mismo principio nativo que
+`ST_GeomFromGeoJSON` en la Decisión 2, para el otro momento del flujo.
+
+**No compite con GeoJSON, resuelve otro momento.** GeoJSON transporta *varios*
+trazos ya existentes con su enlace al árbol (`properties.nodo_id`) para
+pintarlos todos y habilitar el clic. WKT captura *un* trazo nuevo, todavía sin
+enlace, mientras se dibuja — el mismo par que ya usan PlanSwift (captura) y
+Navisworks (coordinación con el modelo) por separado en la construcción real.
+
+> **WKT no tiene bolsillo de propiedades.** `nodo_id`, `medida`, `factor`,
+> `plano_id`, `autor` viajan como campos comunes de la misma llamada a la
+> API, nunca adentro del texto WKT — el formato solo contesta "qué forma es".
+> Meter metadato ahí sería inventar un WKT no estándar.
+>
+> **Es formato de entrada, no un tercer almacenamiento.** `ST_GeomFromText`
+> convierte y el texto WKT se descarta — lo que persiste es siempre la
+> geometría nativa de PostGIS (D-218). Igual que GeoJSON en la Decisión 2, no
+> es una copia paralela de la fuente de verdad.
+
 ### Lo que esto NO decide todavía
 
-- **Cómo se captura la geometría rápido** —WKT, la Decisión 3 de 3— sigue sin
-  resolver. El almacenamiento (PostGIS, D-218) y el transporte (GeoJSON,
-  D-219/D-220) ya están confirmados.
 - **Quién puede trazar y si hace falta aprobación por obra.** C-3 ya está decidido
   en principio, pero necesita dónde vivir — B-45, sin resolver.
 
