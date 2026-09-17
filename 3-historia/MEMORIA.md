@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 222 decisiones · 12 descartes · 8 correcciones
+verificado: 225 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -296,6 +296,9 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-220 | **GeoJSON es transporte, no almacenamiento; y usa coordenadas de plano, no geográficas** | `TRAZO.geometria` sigue en el tipo nativo de PostGIS —conserva el índice espacial—, GeoJSON se genera solo al leer. `ENLACE_CUANTIFICACION` sigue siendo la fuente de verdad; `properties.nodo_id` es copia de lectura, no un lugar nuevo donde ese dato pueda divergir. Coordenadas locales al plano: desviación deliberada de RFC 7946, no error a corregir |
 | D-221 | **WKT confirmado como Decisión 3 de 3 — captura rápida de una geometría nueva** | `ST_GeomFromText` la convierte a geometría nativa en un solo paso, mismo principio que `ST_GeomFromGeoJSON` en la Decisión 2 pero para el momento de captura, no de transporte masivo. Resuelve el par que buscaba el usuario: WKT como PlanSwift, GeoJSON como Navisworks. `MODELO.md` §1b |
 | D-222 | **Cierran las tres decisiones de geometría del cuantificador**: PostGIS almacena y calcula (D-218), GeoJSON transporta varios trazos con su enlace al árbol (D-219/D-220), WKT captura un trazo nuevo sin enlace todavía (D-221) | Ninguno es un tercer almacenamiento paralelo: WKT y GeoJSON son formato de entrada/salida, la fuente de verdad sigue siendo `TRAZO`/`ENLACE_CUANTIFICACION` en PostGIS |
+| D-223 | **R-2 confirmado explícito: `ROL_FUNCION` es muchos-a-muchos, ninguna función atómica pertenece a un solo rol** | Consistente con «combinación, no bloque cerrado» (D-205) y el patrón «nada reasigna» repetido cinco veces (`ESTADO.md`) |
+| D-224 | **`comprometer_gasto` no lleva tope por monto — es binaria** | Si hace falta controlar el gasto en subcontratos, la vía no es un límite por rol: es modelarlos como matriz (`COMPOSICION`), donde el control ya es por línea |
+| D-225 | **P-21 cierra: roles y permisos completo** — R-1 a R-3 (D-204 a D-206) más D-223/D-224 | `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` en `MODELO.md` §5b, hallazgo 14 |
 
 ---
 

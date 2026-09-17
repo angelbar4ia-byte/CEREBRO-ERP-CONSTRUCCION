@@ -104,7 +104,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-18 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones y retenciones. Es donde el dinero se vuelve real |
 | P-19 | **Almacén** | Surtido contra consumido, devoluciones, y el corte matricial |
 | P-20 | **Programación** | Actividades, asignaciones y avance. Está en el skill, sin asentar en el conocimiento |
-| 🔶 P-21 | **Roles y permisos** | **Borrador aprobado, módulo sin cerrar** (R-1 a R-3): 5 roles —Residente, Supervisor, Costos, Cotizador, Control— y 14 funciones atómicas mínimas (`trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes`), cada rol una combinación, no un bloque fijo. Falta decidir tope por monto en `comprometer_gasto` y si los roles son disjuntos en funciones |
+| ✅ P-21 | ~~**Roles y permisos**~~ | **Resuelto: módulo completo.** 5 roles —Residente, Supervisor, Costos, Cotizador, Control—, 14 funciones atómicas (`trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes`), combinación muchos-a-muchos no disjunta (D-223), y sin tope por monto en `comprometer_gasto` —binaria; el control de subcontratos se resuelve como matriz, no como límite de rol (D-224). `MODELO.md` §5b, hallazgo 14. D-204 a D-206, D-223 a D-225 |
 | P-22 | **Autoría de matrices y compuestos** | Cómo se arma una explosión desde cero. Ideas en `IDEAS.md` §1 y `IDEAS.md` §4 del conocimiento |
 | ✅ P-23 | ~~**Ruta crítica**~~ | **Resuelto: las 4 decisiones del CPM están cerradas** (D-90, D-99 a D-102, `PROPUESTA-CUATRO-MODULOS.md`). Lo único abierto de ese módulo es P-5, ya con su propio renglón. D-195 |
 | ~~P-24~~ | **16 decisiones de los cuatro módulos** | ✅ **Las 16 cerradas** (D-86 a D-113). Aparecieron tres piezas nuevas: P-5, B-40, B-45 |
@@ -216,11 +216,11 @@ puede escribir de lo que primero hay que definir.
 | B-10 | **`diccionario`** | Términos, equivalencias, homologación. **Vive dentro del ERP** | ✅ Definidas · datos en `DICCIONARIO-DATOS.md` | B-03 |
 | B-11 | **`rediseno`** | Fusión, división, extracción, composición, clonación + las tres capas | ✅ Definidas | B-04 |
 | B-12 | **`parametrico`** | Ensambles: plantilla e instancia, divisor, cohorte | ✅ Definidas | B-02, B-04 |
-| B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | 🔶 **P-20**, **P-23** — faltan las precedencias | B-05, B-07 |
+| B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | 🔶 **P-20** sin asentar en el conocimiento · **P-23 resuelto** (D-195), solo falta P-5 (tramos) | B-05, B-07 |
 | B-14 | **`contratos`** | Cadena de precios, precio por contratista, control de cambio | ✅ Definidas | B-05 |
 | B-15 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones, retenciones | ⏸️ **P-18** — sin definir | B-14 |
 | B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | ⏸️ **P-19** — sin definir | B-06 |
-| B-17 | **Roles y permisos** | Quién captura, aprueba y autoriza | ⏸️ **P-21** — sin definir | Todos |
+| B-17 | **Roles y permisos** | Quién captura, aprueba y autoriza | ✅ **P-21 resuelto** — `MODELO.md` §5b | Todos |
 | B-24 | **`propuestas`** | La bandeja única de «propone, no aplica». Con evidencia, origen y rechazos conservados | ✅ Definidas en `CONOCIMIENTO.md` §14 | B-01 |
 
 ### Aún sin diseñar

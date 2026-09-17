@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 13 hallazgos resueltos
+verificado: Aprobado · 14 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -585,6 +585,43 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 |---|---|---|
 | `diferencia_sin_causa` | Prototipo contra ingeniería difiere y la diferencia no cae en ninguna de las seis causas de `CONOCIMIENTO.md` §13.6 | P-29 |
 | `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
+
+---
+
+## 5b. Roles y permisos — quién puede hacer qué
+
+> Cierra P-21: cinco roles (R-1, D-204), catorce funciones atómicas (R-3,
+> D-206), y las dos preguntas que faltaban para cerrar el módulo — confirmadas
+> con el usuario.
+
+```
+ROL
+  id, nombre        Residente · Supervisor · Costos · Cotizador · Control    firme
+
+FUNCION_ATOMICA
+  id, clave         trazar · aprobar_trazo · registrar_avance ·
+                     comprometer_gasto · capturar_causa_desviacion ·
+                     revisar_patrones_desviacion · aprobar_version_concepto ·
+                     pactar_precio_contratista · aplicar_descuento ·
+                     autorizar_orden_cambio · aprobar_propuesta ·
+                     resolver_alerta · clasificar_manualmente ·
+                     correr_invariantes                                     firme
+
+ROL_FUNCION
+  id, rol_id FK, funcion_id FK                                              firme
+```
+
+**Muchos a muchos, no disjunto.** La misma función puede estar en varios roles
+a la vez — Residente y Supervisor pueden compartir `registrar_avance` sin que
+asignársela a uno se la quite al otro. Es la misma «combinación, no bloque
+cerrado» de R-2 (D-205), y el mismo patrón que ya se repitió cinco veces en
+este cerebro: nada reasigna, se agrega encima.
+
+**`comprometer_gasto` no lleva tope por monto.** Es binaria: el rol la tiene o
+no la tiene, sin límite de monto asociado. Si algún día hace falta controlar
+el gasto en subcontratos específicamente, la vía no es un tope por rol — es
+modelarlos como matriz (`COMPOSICION`), donde el control ya es por línea, no
+por permiso.
 
 ---
 
