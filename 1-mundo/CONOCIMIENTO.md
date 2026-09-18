@@ -2211,6 +2211,124 @@ Con las tres, se puede distinguir:
 > Falta el segundo para saber si lo planeado en la ingeniería **de verdad se
 > surtió así**, o si hubo otra desviación encima.
 
+## 11.13 El catálogo completo se reconstruye con dos técnicas, no una
+
+§11.9 probó la reversión por destajo sobre un solo nivel —cimentación, 84%—.
+Escalada a **diez niveles completos** de `ALAMO 18` (los cuatro ya probados más
+Acabados, Obras Exteriores, Asador, Barda Perimetral, Pintura y Pergolado
+Cochera — 72 conceptos nuevos), la reversión no fue la técnica dominante:
+**la mayoría de los bloques no la necesitaron.**
+
+### Técnica A — concepto auxiliar: la cantidad ya está ahí
+
+Es el mismo mecanismo de §5.4 («heredada de un destajo»), aplicado ahora a
+construir el presupuesto completo y no solo la cantidad de un ensamble.
+Cuando el bloque de ingeniería ya trae su propio encabezado —
+`ACA-01090,,"Renivelación con concreto h.o...."`— y una sola línea de mano
+de obra clara debajo, no hace falta revertir nada:
+
+```
+cantidad  = la cantidad de la línea MO-/MOA-/MOC-/...
+PU        = importe total del bloque ÷ cantidad
+importe   = suma de todas las líneas del bloque
+```
+
+De los 72 conceptos nuevos, la gran mayoría llegó así — acabados, pintura,
+obra exterior, asador, barda, pergolado. La reversión (técnica B, §11.9) solo
+hizo falta donde el bloque **no** trae encabezado propio: instalaciones y
+cableado, agrupados bajo un rótulo de etapa o ubicación, no de concepto.
+
+### Técnica B — la reversión gana el desempate que le faltaba
+
+§11.9 dejó **4 ambiguos** sin regla de desempate. El recorrido a diez niveles
+encontró los dos huecos que esa regla necesitaba:
+
+> **La ambigüedad se prueba después de deduplicar candidatos, no antes.**
+> `ECO-00009` (eléctricas PB) traía una clave de catálogo repetida
+> —`IEC-01260` dos veces, a cantidades de referencia distintas, una por
+> sub-ubicación— y el primer intento de desambiguar leyó eso como **dos
+> candidatos en conflicto** cuando era **un solo concepto**. Corrección:
+> `sorted(set(...))` sobre las claves candidatas, sumando la cantidad del
+> destajo en todas sus ocurrencias de la etapa, antes de decidir si hay
+> empate.
+>
+> **El ancla de mano de obra siempre gana.** Un primer intento eligió, para
+> cada insumo, «el candidato que da el entero más limpio» de forma
+> independiente — y produjo un vertedero de 25 unidades, absurdo. El motivo:
+> los materiales compartidos (`SAN-`, `HID-`) tienen tarifas por unidad
+> pequeñas en muchos conceptos a la vez, así que cualquier ruido parece
+> «limpio». La mano de obra no tiene ese problema — es 1.0 por unidad por
+> convención — así que **la cantidad del concepto es siempre la de su propia
+> línea MO**, y el material solo estima cuando no hay línea MO que anclar.
+>
+> **Dos destajos de un mismo concepto en desacuerdo se resuelven por el de
+> armado, o el de mayor costo.** La losa maciza de Planta Baja traía armado
+> (32.80) y descimbrado (56.80) en desacuerdo — se tomó armado. Validado
+> independiente: 182.40 (nervada) + 32.80 (maciza) + 24.00 (losa 4.20) =
+> 239.20 exacto contra la cimbra declarada aparte (`MAD-00002`).
+
+### Cuando ni A ni B alcanzan: el concepto "lote"
+
+Cinco de los 72 bloques compartían material entre varios sub-conceptos sin
+una llave real de prorrateo — el cable de una misma bobina alimenta
+contacto, apagador y timbre a la vez, sin metraje declarado por punto—.
+Forzar un split ahí no reconstruye un dato: **inventa uno.**
+
+> Mismo principio que `EST-01060` en cimentación: cuando no hay llave
+> confiable, **el bloque completo se registra como un solo concepto "lote"**,
+> cantidad 1, en vez de una división ficticia con apariencia de precisión.
+> `IEC-00410`/`IEC-00420` (cableado PB/PA), `API-01020`/`API-04020`
+> (limpieza y sellado, mezclan M2 de mármol, piedra y metros de durmiente
+> bajo un solo encabezado) y `OBE-01010` (muros de cisterna — **sin ninguna
+> referencia en el catálogo maestro**, B-65) se cerraron así.
+
+### El residuo se anota, no se fuerza — `TMP-XXXXX`
+
+Cuando el material real sobra contra lo que el catálogo esperaría para ese
+concepto, y no hay dónde asignarlo con evidencia, se anota como **concepto
+temporal**: clave `TMP-00001`, `TMP-00002`…, descripción corta al estilo del
+catálogo, costo íntegro si el concepto esperado era cero, o **prorrateado
+por `(residuo ÷ real) × importe`** si el concepto sí llama parte del
+material. Decisión del usuario: «de momento solo crea como concepto
+temporal… ya en sistema se desglosa su matriz temporal». El prorrateo de
+`TMP-00002` es un supuesto propio, marcado como tal — **sin confirmar
+todavía.**
+
+### El resultado, a diez niveles
+
+| Nivel | Real (ingeniería) | Catálogo de referencia | Diferencia |
+|---|---:|---:|---:|
+| NIV-00005 Acabados | $247,970.03 | $226,708.45 | +9.4% |
+| NIV-00006 Obras Exteriores | $103,069.66 | $100,735.02 | +2.3% |
+| NIV-00011 Asador | $56,204.80 | $54,790.44 | +2.6% |
+| NIV-00012 Barda Perimetral | $21,021.78 | $27,434.63 | **-23.4%** |
+| NIV-00013 Pintura | $123,023.14 | $114,344.55 | +7.6% |
+| NIV-00014 Pergolado Cochera | $59,567.51 | $72,734.53 | **-18.1%** |
+| **Diez niveles (con los cuatro de §11.9)** | **$2,560,634.51** | $2,287,461.31 | **+12.0%** |
+
+Dos validaron exacto contra el catálogo — `ECO-00028` cableado y
+`ECO-00031` instalaciones OE, **0.0% de diferencia** — evidencia de que la
+técnica no arrastra sesgo sistemático. Las dos peores —barda perimetral y
+pergolado cochera— van **por debajo** del presupuesto, no por arriba: menos
+metro lineal de barda y una pérgola de cochera de 28.00 m² real contra
+34.57 m² de catálogo. Y en pisos de Planta Baja aparecen **claves de
+material distintas a las presupuestadas** —`ACA-02101` Brunei Ivory donde
+el catálogo tenía Brunei Beige, `ACA-80473`/`ACA-80474` Sequoia Beige y
+Amaretto Tobacco donde tenía Lugano Naturale— sustituciones reales, no
+error de captura, en la misma familia que la del cemento (§11.7).
+
+**Cuatro niveles no tienen ninguna ingeniería cargada** —Cancelería,
+Carpintería, Muebles/Iluminación, Herrería— $542,464.67, **19.2% del
+presupuesto base en dinero.** Es un número distinto al 92%/8% de §5, que
+cuenta **etapas**, no **pesos** — ahí no se toca. Contar etapas y contar
+dinero miden cosas distintas y **las dos son correctas a la vez**: cancelería
+y carpintería concentran presupuesto alto en pocas etapas.
+
+> Con las cuatro técnicas fijas, la reconstrucción es reproducible: dado un
+> archivo de ingeniería con encabezados de concepto, el catálogo se arma sin
+> intervención humana en la mayoría de los bloques. Lote, TMP y ambiguos
+> siguen pidiendo criterio — pero ahora con reglas escritas, no con juicio
+> caso por caso.
 
 ---
 

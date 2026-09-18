@@ -5,7 +5,7 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-13
+corte:      2026-09-18
 verificado: 12 etapas recorridas · 5 pasan · 2 se rompen · 5 sin poder probarse
 ```
 
@@ -119,6 +119,13 @@ ingeniería — cancelería, carpintería, muebles, herrería y consumibles.
 > **Las 41 etapas de la ingeniería existen en el presupuesto.** Ninguna es ajena: la
 > detección de faltantes funciona y no produce falsos positivos.
 
+> **Precisión 2026-09-18, en dinero:** de los cinco niveles sin ingeniería,
+> Consumibles vale $0 — no cuenta. Los otros cuatro sí tienen presupuesto real:
+> **$542,464.67, 19.2% del base.** El 8% de arriba cuenta **etapas** (41 de las
+> totales); 19.2% cuenta **pesos**. No se contradicen — miden cosas distintas, y
+> cancelería/carpintería concentran presupuesto alto en pocas etapas. Detalle en
+> `CONOCIMIENTO.md` §11.13.
+
 **Pregunta que abre para el programa:** si cinco niveles no tienen ingeniería,
 **¿el CPM puede programarlos?** Hoy no hay respuesta.
 
@@ -146,6 +153,48 @@ Y las cantidades salen **enteras exactas** —6.000, 4.000, 5.000, 3.000, 2.000,
 > distinto.
 
 **Hallazgo: falta la regla del residuo de la reversión.**
+
+### Escalado a diez niveles completos — 2026-09-18
+
+Lo de arriba se probó solo sobre cimentación. Se repitió sobre **los diez
+niveles con ingeniería cargada** —Planta Baja, Planta Alta, Azotea, Acabados,
+Obras Exteriores, Asador, Barda Perimetral, Pintura y Pergolado Cochera— para
+ver si el método aguanta a escala, no solo en el caso que lo probó.
+
+**Resultado: $2,560,634.51 reconstruidos, +12.0% contra el catálogo de
+referencia de esos mismos diez niveles ($2,287,461.31).** Tabla completa y
+método —las dos técnicas, las reglas de desempate nuevas, el concepto "lote"
+y la convención `TMP-XXXXX`— en `CONOCIMIENTO.md` §11.13. Acá solo lo que es
+específico de esta obra.
+
+La reversión por destajo **no fue la técnica que más se usó**: la mayoría de
+los 72 conceptos nuevos ya traían su propio encabezado, y la cantidad salió
+directo de su línea de mano de obra («concepto auxiliar», §5.4 de
+`CONOCIMIENTO.md`). La reversión solo hizo falta en instalaciones y
+cableado — y ahí encontró **las dos reglas de desempate que le faltaban** al
+16% que se rompía arriba: deduplicar candidatos antes de declarar
+ambigüedad, y que la mano de obra siempre ancla sobre el material.
+
+**Hallazgos propios de ALAMO 18, no del método:**
+
+| Hallazgo | Cifra |
+|---|---|
+| Barda perimetral, **por debajo** del presupuesto | $21,021.78 vs $27,434.63 — **-23.4%** |
+| Pergolado cochera, **por debajo** — pérgola más chica que la de catálogo | 28.00 m² reales vs 34.57 m² de catálogo — **-18.1%** |
+| Cableado eléctrico e instalaciones de obra exterior, **exactos** | $22,451.61 y $10,362.86 — **0.0%** de diferencia |
+| Pisos de planta baja con **material distinto al presupuestado** | `ACA-02101` Brunei Ivory, `ACA-80473`/`80474` Sequoia Beige y Amaretto Tobacco — claves nuevas, no las del catálogo |
+| Jardinería, **por arriba** — más pasto y más excavación de lo presupuestado | $21,419.50 vs $15,479.00 — **+38.4%** |
+| `OBE-01010` (muros de cisterna) **sin ninguna fila en el catálogo maestro** | $12,726.59 — B-65 |
+
+**Y confirma, con más peso, lo que arriba ya había encontrado:** cuatro
+niveles —Cancelería, Carpintería, Muebles/Iluminación, Herrería— siguen sin
+ninguna ingeniería cargada. Contados en dinero, no en etapas, son
+**$542,464.67 — 19.2% del presupuesto base.**
+
+> **Persiste sin confirmar:** el prorrateo del costo de `TMP-00002` — cuando
+> el material sobrante sí tiene relación parcial con un concepto existente,
+> se repartió por `(residuo ÷ real) × importe`. Es un supuesto propio,
+> señalado como tal al usuario, **todavía no aprobado ni corregido.**
 
 ---
 
@@ -249,6 +298,7 @@ empieza la ejecución.
 | 3 | **Comparar dos fuentes exige normalizar la profundidad de explosión primero** | B-47 |
 | 4 | ¿Se programan los niveles sin ingeniería? | B-48 |
 | 5 | **Dos exports de salidas pueden ser la misma fuente filtrada distinto** — hay que verificar identidad de origen antes de sumar | B-64 |
+| 6 | **El catálogo maestro no cubre el 100% de los conceptos reales**, aunque nivel y etapa existan — `OBE-01010` no tiene ninguna fila de referencia | B-65 |
 
 ## Lo que la prueba validó
 
@@ -258,6 +308,10 @@ empieza la ejecución.
 - La reversión recupera cantidades **enteras exactas** — no aproxima.
 - La comparación contra prototipo **encuentra hechos de obra**, no sólo errores de
   captura.
+- **La reconstrucción escala:** de cimentación (un nivel, prueba de concepto) a
+  diez niveles completos ($2,560,634.51, +12.0% vs. catálogo) sin cambiar de
+  método — solo agregando dos reglas de desempate y una técnica más
+  («concepto auxiliar», dominante sobre la reversión). `CONOCIMIENTO.md` §11.13.
 
 ## Cómo se vuelve a correr
 

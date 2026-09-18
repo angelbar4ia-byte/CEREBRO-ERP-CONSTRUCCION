@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 237 decisiones · 12 descartes · 8 correcciones
+verificado: 242 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -311,6 +311,11 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-235 | **Ejes y niveles del cuantificador sigue bloqueado** | Depende de `FRENTE`, que no tiene uso operativo. No se fuerza el diseño sin un consumidor real. `CONOCIMIENTO.md` §17.4 |
 | D-236 | **B-45 cierra: `trazar` y `aprobar_trazo` ya existían en `ROL_FUNCION` desde P-21, antes de que este hallazgo los necesitara** | `trazar` → Costos, Control, Residente, Supervisor; `aprobar_trazo` → Control. Residente/Supervisor cuantifican para orden de cambio, que ya pasa por `autorizar_orden_cambio` — el control no se duplica en el trazo. Visualizar no es función atómica: las catorce existentes son de acción, ninguna de lectura. `MODELO.md` §1b |
 | D-237 | **`NOTA_PLANO`, entidad nueva y chica: anotar el plano sin generar cantidad** | Distinta de `TRAZO` — nunca tiene `ENLACE_CUANTIFICACION`. Decimoquinta función atómica: `anotar_plano` → Residente, Supervisor. Propuesto, no cerrado del todo si aparece un caso que pida más. `MODELO.md` §1b |
+| D-238 | **Técnica "concepto auxiliar" confirmada como la dominante para reconstruir catálogo desde ingeniería real** — cuando el bloque ya trae su propio encabezado y una sola línea de mano de obra clara, la cantidad y el PU se leen directo, sin reversión | Mismo mecanismo que «heredada de un destajo» (§5.4), ahora probado para construir el presupuesto completo, no solo la cantidad de un ensamble. `CONOCIMIENTO.md` §11.13 |
+| D-239 | **El ancla de mano de obra siempre gana sobre un estimado derivado de material al desambiguar destajo** | Un primer intento que elegía «el candidato más limpio» por insumo, de forma independiente, produjo un vertedero de 25 unidades. La mano de obra es 1.0-por-unidad por convención; el material compartido no. `CONOCIMIENTO.md` §11.13 |
+| D-240 | **Material o destajo compartido entre varios conceptos sin llave de prorrateo confiable se registra como un solo concepto "lote"**, no se fuerza un split ficticio | Mismo principio que `EST-01060` en cimentación. Cerraron así el cableado PB/PA, la limpieza-y-sellado de pintura interior/fachada, y los muros de cisterna sin referencia en catálogo (B-65). `CONOCIMIENTO.md` §11.13 |
+| D-241 | **Losa con dos destajos en desacuerdo (armado ≠ descimbrado) se resuelve tomando el de armado, o el de mayor costo** | Validado cruzando contra la cimbra declarada independiente: 182.40+32.80+24.00 = 239.20 exacto contra `MAD-00002`. `CONOCIMIENTO.md` §11.13 |
+| D-242 | **El catálogo de presupuesto se reconstruyó completo para diez de catorce niveles de ALAMO 18** — $2,560,634.51, +12.0% contra el catálogo de referencia de esos mismos niveles | Cuatro niveles (Cancelería, Carpintería, Muebles/Iluminación, Herrería — $542,464.67) no tienen ninguna ingeniería cargada: 19.2% del presupuesto base en dinero, métrica distinta al 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5 — ambas correctas, miden cosas distintas. `CONOCIMIENTO.md` §11.13, B-65 |
 
 ---
 
