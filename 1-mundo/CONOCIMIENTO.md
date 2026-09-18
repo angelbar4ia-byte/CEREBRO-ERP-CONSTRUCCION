@@ -2295,7 +2295,8 @@ Cada salto tiene significado propio:
 ## 13.2 Precio por contratista
 
 El mismo concepto tiene **precios distintos según con quién se contrate**. Es un
-tabulador por contratista, con vigencia — igual que el precio del insumo (`PENDIENTES-MEJORAS.md`, M-12).
+tabulador por contratista, con vigencia — igual que el precio del insumo
+(`MODELO.md` §4a, `TABULADOR_CONTRATISTA`).
 
 ### Cuando el pactado no coincide con el PU
 

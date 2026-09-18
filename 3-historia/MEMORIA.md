@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 225 decisiones · 12 descartes · 8 correcciones
+verificado: 230 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -299,6 +299,11 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-223 | **R-2 confirmado explícito: `ROL_FUNCION` es muchos-a-muchos, ninguna función atómica pertenece a un solo rol** | Consistente con «combinación, no bloque cerrado» (D-205) y el patrón «nada reasigna» repetido cinco veces (`ESTADO.md`) |
 | D-224 | **`comprometer_gasto` no lleva tope por monto — es binaria** | Si hace falta controlar el gasto en subcontratos, la vía no es un límite por rol: es modelarlos como matriz (`COMPOSICION`), donde el control ya es por línea |
 | D-225 | **P-21 cierra: roles y permisos completo** — R-1 a R-3 (D-204 a D-206) más D-223/D-224 | `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` en `MODELO.md` §5b, hallazgo 14 |
+| D-226 | **`PRECIO_HISTORICO` por insumo, independiente de `VERSION_CONCEPTO`** — `fuente` enum `catalogo` (auto-versiona) · `ingenieria` (requiere validación) | Cierra P-07/P-08. `almacen` y `estimacion` quedan pendientes de P-19/P-18, no se agregan hoy. `MODELO.md` §4a, hallazgo 15 |
+| D-227 | **`VERSION_CONCEPTO` gana `pu`, congelado al crearse; segundo disparador de versión: pasar a `contratado`**, además del cambio de huella (§2.2) | Fija el PU exactamente al contratar, sin esperar a que cambie la receta |
+| D-228 | **Precio de insumo y versión de concepto son independientes — excepto trabajo y subcontrato**, donde un cambio de precio dispara directo validar o descartar la versión | Su precio nace de una negociación puntual, no de un mercado que fluctúa |
+| D-229 | **`TABULADOR_CONTRATISTA`, tabla separada, nunca toca el PU** — cierra la cita rota de `CONOCIMIENTO.md` §13.2 a un `M-12` inexistente | El PU es la referencia fija; lo pactado se compara contra él, nunca lo reemplaza |
+| D-230 | **Dos huecos nuevos quedan anotados, sin diseñar**: catálogo de contratistas (P-39, mismo hueco que D-175 con proveedores) y marcador de presupuesto-base/plantilla en `PRESUPUESTO` (P-40) | No se inventan hoy |
 
 ---
 

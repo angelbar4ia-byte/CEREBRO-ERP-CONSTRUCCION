@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-15
-verificado: Aprobado · 14 hallazgos resueltos
+verificado: Aprobado · 15 hallazgos resueltos
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -492,6 +492,96 @@ EQUIVALENCIA
 CLON
   id, original_id, clon_id, modo (mantener|sustituir)                  firme
 ```
+
+---
+
+## 4a. Histórico de precios — de dónde sale el precio, y cuándo se congela
+
+> Cierra P-07 (histórico de precios) y P-08 (antigüedad dispar). De paso
+> cierra una referencia rota: `CONOCIMIENTO.md` §13.2 citaba un `M-12` que
+> no existe en `PENDIENTES-MEJORAS.md`.
+
+`VERSION_CONCEPTO.huella` (arriba) versiona la receta —insumos y
+cantidades— a propósito sin precio: la receta cambia rara vez, el precio
+todo el tiempo, mezclarlos ahogaría la señal real de «cambió la matriz» en
+ruido de mercado. El precio necesita su propio mecanismo, independiente:
+
+```
+PRECIO_HISTORICO
+  id
+  nodo_id          FK Nodo — solo si modo_precio=declarado                  firme
+  precio           NUMERIC                                                  firme
+  vigente_desde    DATE                                                     firme
+  vigente_hasta    DATE, nullable — null = el vigente hoy                   firme
+  fuente           enum: catalogo · ingenieria                              firme
+```
+
+**`catalogo` es fuente de verdad y versiona sola**, sin validar — mismo
+principio que F-1 (D-86: lo cargado se toma como definido). **`ingenieria`
+exige validación** antes de aceptarse, y esa validación puede confirmar una
+fila ya existente o crear una nueva. `almacen` y `estimacion` quedan
+pendientes de P-19 y P-18 — se agregan al enum cuando esos módulos existan,
+no antes.
+
+**Nunca se edita una fila cerrada** — mismo principio que
+`ENLACE_CUANTIFICACION.vigente`. `NODO.precio_declarado` pasa a ser caché de
+la fila vigente, nunca fuente de verdad — mismo principio que
+`ESTADO_CARGA.porcentaje_cargado` (hallazgo 8).
+
+### `VERSION_CONCEPTO` gana un campo, y un segundo disparador
+
+```
+VERSION_CONCEPTO
+  id, concepto_id (nodo), version, vigente_desde
+  huella          hash de (unidad, insumos, cantidades) — NO incluye descripción   firme
+  pu              NUMERIC — el PU resuelto al crear esta versión, usando
+                   PRECIO_HISTORICO de cada insumo a esa fecha. Se congela,
+                   nunca se recalcula                                        firme — nuevo
+```
+
+**Dos disparadores de versión, no uno**: cambia la huella (§2.2, ya firme),
+o **el nodo pasa a `contratado`** (`ESTADO_CONGELAMIENTO`) — este segundo es
+nuevo, y fija el `pu` exactamente al momento de contratar, aunque la receta
+no haya cambiado ese día.
+
+**`PRECIO_HISTORICO` y `VERSION_CONCEPTO` son independientes.** Que el
+precio de un insumo se mueva no crea versión nueva por sí solo: la tabla de
+precio registra el movimiento, la versión sigue siendo la misma receta.
+**Trabajo y subcontrato son la excepción** — ahí un cambio de precio no pasa
+por `PRECIO_HISTORICO` como un insumo más: dispara directo validar o
+descartar la versión, porque su precio nace de una negociación puntual, no
+de un mercado que fluctúa.
+
+**Solo `ORDEN DE CAMBIO` mueve un PU ya contratado** — `CONOCIMIENTO.md` §13.4, ya firme — con causa, impacto en monto, quién autoriza.
+
+### El tabulador por contratista no toca el PU
+
+```
+TABULADOR_CONTRATISTA
+  id
+  nodo_id          FK Nodo — trabajo o subcontrato                          firme
+  contratista_id   FK Contratista — el catálogo no existe todavía, ver
+                     P-39                                                    firme — nuevo
+  precio           NUMERIC — lo pactado con este contratista                firme
+  vigente_desde    DATE                                                     firme
+  vigente_hasta    DATE, nullable                                           firme
+```
+
+Cierra `CONOCIMIENTO.md` §13.2 («tabulador por contratista, con vigencia —
+igual que el precio del insumo»). **Tabla separada, a propósito**: el PU es
+la referencia fija (`CONOCIMIENTO.md` §13.2: «no es piso ni techo»), y lo
+pactado con cada contratista se compara contra él, nunca lo reemplaza.
+
+### Lo que esto NO resuelve
+
+- **No hay catálogo de contratistas** (P-39) — mismo hueco que D-175 ya
+  verificó para proveedores: no está en ningún catálogo de origen, y no se
+  inventa. `contratista_id` queda apuntando a algo que hoy no existe.
+- **«Prototipo» es una convención de nombre, no un campo** (P-40,
+  `GLOSARIO-DOMINIO.md`). Un auxiliar que nace en un presupuesto
+  base/plantilla reutilizable debería versionar distinto a uno de una obra
+  real, pero eso necesita que `PRESUPUESTO` distinga «es plantilla» de «es
+  obra» — y ese campo no existe todavía.
 
 ---
 

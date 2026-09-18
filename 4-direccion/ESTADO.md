@@ -96,11 +96,12 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 |---|---|
 | **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
-| **Modelo de datos** | `MODELO.md` aprobado, con 14 hallazgos resueltos |
+| **Modelo de datos** | `MODELO.md` aprobado, con 15 hallazgos resueltos |
 | **Roles y permisos** | Cierra P-21 — `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` (`MODELO.md` §5b) · muchos-a-muchos, sin tope por monto |
+| **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) y marcador de prototipo (P-40) quedan anotados |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 225 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
+| **Memoria** | 230 decisiones · 12 descartes · 8 correcciones · 11 hallazgos de construcción |
 | **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -135,7 +136,7 @@ al usuario si hace falta, este archivo no lo guarda).
 | # | Qué | Dónde |
 |---|---|---|
 | 1 | **Revisar y mergear el PR abierto** | [PR #1](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1) — motor de cálculo + los 21 pendientes de arriba |
-| 2 | **Módulos grandes sin diseñar**: histórico de precios, estimaciones, almacén | P-07/P-08 · P-18 · P-19 — ninguno tiene decisiones tomadas todavía, a diferencia de factorizador/CPM/cuantificador/roles |
+| 2 | **Módulos grandes sin diseñar**: estimaciones, almacén | P-18 · P-19 — ninguno tiene decisiones tomadas todavía, a diferencia de factorizador/CPM/cuantificador/roles/histórico de precios |
 | 3 | **`IDEAS.md` §7 — Sustitución de insumo dentro de una matriz** | Séptima operación de rediseño, propuesta pero sin que el arquitecto la revise |
 | 4 | **Cerrar el cuantificador**: las tres decisiones de geometría cerradas (PostGIS D-218, GeoJSON D-219/D-220, WKT D-221/D-222) | `MODELO.md` §1a tiene ya `formula_personalizada` y `NODO.variables` (hallazgo 13, D-215 a D-217) y §1b cierra el trío de geometría · `IDEAS.md` §2 sigue con las 29 funciones sin diseño formal · B-45 (quién traza, gobierno por obra) sigue sin dónde vivir |
 | 5 | **Persistencia del motor de cálculo** | `backend/core/` es solo dominio — Django/Postgres, el resto del schema de `MODELO.md`, y las demás piezas de B-03 a B-07 |

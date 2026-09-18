@@ -90,8 +90,8 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ P-04 | ~~`Flete` se usa como apartado~~ | **Resuelto.** Campo `revisar` (boolean) en `NODO` — `MODELO.md` §1, hallazgo 9, D-189 |
 | ✅ P-05 | ~~`%MO`: unidad o campo~~ | **Resuelto.** Se queda como unidad (`MEMORIA.md` §2). Forma canónica: `%MO` — mayúsculas, sin paréntesis; las otras dos se normalizan al cargar, igual que la unidad del presupuesto (D-146). D-184 |
 | ✅ P-06 | ~~Precisión de cantidades~~ | **Resuelto: no hace falta definir por unidad.** `cantidad` es `NUMERIC` sin precisión ni escala fijas — se guarda lo que llegó, igual que ya pedía erp-construccion.md §9 para el arrastre de Excel. D-185 |
-| P-07 | Histórico de precios | Un solo precio vigente. Sin versionado no hay presupuestos comparables entre periodos |
-| P-08 | Antigüedad dispar de precios | Materiales de julio 2026; mano de obra desde enero 2023 |
+| ✅ P-07 | ~~Histórico de precios~~ | **Resuelto: `PRECIO_HISTORICO` por insumo** (fuente `catalogo`/`ingenieria`), independiente de `VERSION_CONCEPTO`, que ahora congela su `pu` al cambiar de huella o al pasar a contratado. `MODELO.md` §4a, hallazgo 15. D-226 a D-230 |
+| ✅ P-08 | ~~Antigüedad dispar de precios~~ | **Resuelto: consulta directa sobre `vigente_desde`** de la fila activa de cada insumo en `PRECIO_HISTORICO` — sin mecanismo nuevo |
 | P-09 | 4 conceptos sin costear | `IGAS-02131`, `IGAS-02132`, `ISN-02061`, `ACC-00003` |
 | P-10 | Agrupadores sin costear | `ACA-00021 Cubiertas cocina` y `NIV-00015 Consumibles`, en cero en los 7 prototipos |
 | 🔧 P-11 | **Corregir el prefijo `AUX-`** | **Diseño completo en `IDEAS.md` §6**: clonar y sustituir, con el viaje de vuelta resuelto por homologación (`CONOCIMIENTO.md` §16.2). No queda decisión — falta ejecutarlo sobre las 79 claves reales |
@@ -119,6 +119,8 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ P-37 | ~~Confirmar la sustitución cemento↔mortero~~ | **Confirmado.** ALAMO 18 se cargó con la versión anterior del catálogo, donde el mortero se usaba para muros, repellos y finas exteriores |
 | P-38 | **Cargar salidas de almacén de ALAMO 18** | La tercera pata: prototipo vs. ingeniería (ya funciona) + ingeniería vs. **almacén** = desviación real de obra. Objetivo en `CONOCIMIENTO.md` §11.12 del conocimiento |
 | P-27 | **Cuál es el método de carga definitivo** | La carga por partes es un camino a explorar. Puede ser una mezcla de métodos o requerir confirmaciones (`CONOCIMIENTO.md` §11.4) |
+| P-39 | **No hay catálogo de contratistas** | Mismo hueco que D-175 ya verificó para proveedores. `TABULADOR_CONTRATISTA` necesita `contratista_id`, sin tabla a la que apuntar. No se inventa |
+| P-40 | **`PRESUPUESTO` no distingue plantilla/prototipo de obra real** | «Prototipo» hoy es solo convención de nombre (`GLOSARIO-DOMINIO.md`). Hace falta para que un auxiliar que nace en un presupuesto base pueda versionar distinto a uno de obra real |
 | ✅ P-28 | ~~Reversar la explosión por destajo~~ | **Probado** sobre ALAMO 18: **84%** de los destajos resuelve a un solo concepto al filtrar por prototipo, y las cantidades salen **enteras exactas** (`CONOCIMIENTO.md` §11.9) |
 | ✅ P-29 | ~~Auditoría prototipo contra ingeniería~~ | **Resuelto: sin causa declarada, alerta, nunca autocorrección.** Nueva tabla `ALERTA` (`MODELO.md` §5a). `CONOCIMIENTO.md` §11.7, D-192/D-193 |
 | ✅ P-30 | ~~La descripción puede mentir sobre el prototipo~~ | **Resuelto: detecta y propone, nunca corrige solo.** Dos métodos —contenido y razón de cantidades, umbral 20% parametrizable— que se validan mutuamente. `CONOCIMIENTO.md` §11.7, D-193 |
