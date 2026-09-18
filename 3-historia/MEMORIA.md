@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 231 decisiones · 12 descartes · 8 correcciones
+verificado: 237 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -305,6 +305,12 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-229 | **`TABULADOR_CONTRATISTA`, tabla separada, nunca toca el PU** — cierra la cita rota de `CONOCIMIENTO.md` §13.2 a un `M-12` inexistente | El PU es la referencia fija; lo pactado se compara contra él, nunca lo reemplaza |
 | D-230 | **Dos huecos nuevos quedan anotados, sin diseñar**: catálogo de contratistas (P-39, mismo hueco que D-175 con proveedores) y marcador de presupuesto-base/plantilla en `PRESUPUESTO` (P-40) | No se inventan hoy |
 | D-231 | **Dos exports de "salidas" pueden ser la misma fuente filtrada distinto — no dos independientes** | En ALAMO 18, el "resumen del lote" propio del usuario y el export de almacén de abril comparten 76 filas por `# Reg` exacto, mismo Lote 18. Verificar identidad de origen antes de sumar, no solo que las columnas coincidan — B-64 |
+| D-232 | **Veintidós de las 29 funciones del cuantificador son infraestructura, no conocimiento — mismo límite que D-182** | Escalas, limpieza de planos, primitivas, medidas directas, cruces y agrupación son PostGIS genérico sin regla de construcción detrás. Solo las 7 de dominio (grupo H, `IDEAS.md` §2) se evalúan para `CONOCIMIENTO.md`. `CONOCIMIENTO.md` §17.1 |
+| D-233 | **Cinco de las siete funciones de dominio del cuantificador ya calzan en `medida × factor = cantidad`, sin campo nuevo** | Volumen, peso desde longitud, superficie inclinada y conteo por patrón; la quinta (paramétrico por fórmula) ya estaba resuelta en otro módulo. `CONOCIMIENTO.md` §17.2 |
+| D-234 | **Cubicación con taludes resuelve con `formula_personalizada`, no con mecanismo nuevo** | `V = L × (A1+A2)/2`, método del área media — dos medidas de área más una de longitud, combinadas por fórmula. Sin verificar contra dato real todavía. `CONOCIMIENTO.md` §17.3, `MODELO.md` §1a hallazgo 13 |
+| D-235 | **Ejes y niveles del cuantificador sigue bloqueado** | Depende de `FRENTE`, que no tiene uso operativo. No se fuerza el diseño sin un consumidor real. `CONOCIMIENTO.md` §17.4 |
+| D-236 | **B-45 cierra: `trazar` y `aprobar_trazo` ya existían en `ROL_FUNCION` desde P-21, antes de que este hallazgo los necesitara** | `trazar` → Costos, Control, Residente, Supervisor; `aprobar_trazo` → Control. Residente/Supervisor cuantifican para orden de cambio, que ya pasa por `autorizar_orden_cambio` — el control no se duplica en el trazo. Visualizar no es función atómica: las catorce existentes son de acción, ninguna de lectura. `MODELO.md` §1b |
+| D-237 | **`NOTA_PLANO`, entidad nueva y chica: anotar el plano sin generar cantidad** | Distinta de `TRAZO` — nunca tiene `ENLACE_CUANTIFICACION`. Decimoquinta función atómica: `anotar_plano` → Residente, Supervisor. Propuesto, no cerrado del todo si aparece un caso que pida más. `MODELO.md` §1b |
 
 ---
 

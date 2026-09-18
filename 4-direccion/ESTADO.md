@@ -101,8 +101,8 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) y marcador de prototipo (P-40) quedan anotados |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 231 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
-| **Skill** | Base + 3 satélites compilados: importación, rediseño, paramétrico |
+| **Memoria** | 237 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
+| **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
 | **Módulos** | Las 16 decisiones de los cuatro cerradas · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
@@ -113,7 +113,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Coherencia** | 🆕 `verificar-cerebro.py` — el cerebro se comprueba solo |
 | **Motor de cálculo** | `backend/core/` — sin Django, puerto + adaptador en memoria. 11 pruebas contra `CASO-TRABAJADO.md`, D-178 a D-182. **Falta la persistencia** (Django/Postgres) |
 | **La alerta** | Tabla `ALERTA` (`MODELO.md` §5a) — peldaño de abajo de `PROPUESTA`. Cierra B-32, P-29, P-30 |
-| **Cuantificación** | Tablas `TRAZO` y `ENLACE_CUANTIFICACION` (`MODELO.md` §1b) — cierra B-19. Las tres decisiones de geometría cerradas: PostGIS almacena (D-218), GeoJSON transporta (D-219/D-220), WKT captura (D-221). Falta gobierno por obra (B-45) |
+| **Cuantificación** | Tablas `TRAZO`/`ENLACE_CUANTIFICACION` y geometría cerrados (PostGIS D-218, GeoJSON D-219/D-220, WKT D-221) — cierra B-19. 🆕 Gobierno cierra (B-45, roles reusados, D-236) · 5 de 7 reglas de dominio en `medida×factor`, taludes vía `formula_personalizada` (`CONOCIMIENTO.md` §17) · `NOTA_PLANO` nueva (D-237) · skill `erp-cuantificador` compilado. Quedan ejes/niveles (bloqueado por `FRENTE`) y la aspiración de un agente que trace solo |
 | **Caso trabajado** | Un ejemplo de punta a punta con 12 reglas |
 | **Artefacto** | Rehecho con datos verificados: $1,842,430.31 vs $1,842,426.01 |
 | **Catálogos corregidos** | Conceptos, materiales, trabajos, mano de obra, fletes |
@@ -138,12 +138,11 @@ al usuario si hace falta, este archivo no lo guarda).
 | 1 | **Revisar y mergear el PR abierto** | [PR #1](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1) — motor de cálculo + los 21 pendientes de arriba |
 | 2 | **Módulos grandes sin diseñar**: estimaciones, almacén | P-18 · P-19 — ninguno tiene decisiones tomadas todavía, a diferencia de factorizador/CPM/cuantificador/roles/histórico de precios |
 | 3 | **`IDEAS.md` §7 — Sustitución de insumo dentro de una matriz** | Séptima operación de rediseño, propuesta pero sin que el arquitecto la revise |
-| 4 | **Cerrar el cuantificador**: las tres decisiones de geometría cerradas (PostGIS D-218, GeoJSON D-219/D-220, WKT D-221/D-222) | `MODELO.md` §1a tiene ya `formula_personalizada` y `NODO.variables` (hallazgo 13, D-215 a D-217) y §1b cierra el trío de geometría · `IDEAS.md` §2 sigue con las 29 funciones sin diseño formal · B-45 (quién traza, gobierno por obra) sigue sin dónde vivir |
-| 5 | **Persistencia del motor de cálculo** | `backend/core/` es solo dominio — Django/Postgres, el resto del schema de `MODELO.md`, y las demás piezas de B-03 a B-07 |
-| 6 | **Clasificar a mano el 8% de conceptos** sin derivación — ⛔ bloqueado: falta el dato | El 92% sale del trabajo que usa. No confundir con el otro 92%: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
-| 7 | **Salidas de almacén de ALAMO 18** — ⛔ bloqueado: falta el dato | Cierra el triángulo prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12 |
-| 8 | El resto de `PENDIENTES-MEJORAS.md` — mayormente ⛔ bloqueado por los catálogos crudos de OPUS, que no están en este repo | M-14, M-17/18, P-09/10, P-26 a P-36 |
-| 9 | Las ideas sin tocar del modelo | `IDEAS.md` §1, §3, §4, §5, §6 — seis, sin diseñar |
+| 4 | **Persistencia del motor de cálculo** | `backend/core/` es solo dominio — Django/Postgres, el resto del schema de `MODELO.md`, y las demás piezas de B-03 a B-07 |
+| 5 | **Clasificar a mano el 8% de conceptos** sin derivación — ⛔ bloqueado: falta el dato | El 92% sale del trabajo que usa. No confundir con el otro 92%: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
+| 6 | **Salidas de almacén de ALAMO 18** — ⚠️ el dato empezó a llegar (2026-09-18) | Cierra el triángulo prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12. `almacen-abril` y el "resumen del lote" ya cargados — ver `PRUEBA-ALAMO-18.md` §12, B-64 |
+| 7 | El resto de `PENDIENTES-MEJORAS.md` — mayormente ⛔ bloqueado por los catálogos crudos de OPUS, que no están en este repo | M-14, M-17/18, P-09/10, P-26 a P-36 |
+| 8 | Las ideas sin tocar del modelo | `IDEAS.md` §1, §3, §4, §5, §6 — seis, sin diseñar. Cuantificación (§2) cierra hoy — ver tabla de arriba |
 
 ---
 

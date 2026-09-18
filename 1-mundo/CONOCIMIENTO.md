@@ -2784,3 +2784,78 @@ hay forma de distinguirlo solo de un prefijo legítimamente distinto.
 
 Y nunca por proximidad: §11.9 ya probó que un dígito de diferencia cae sobre otra
 clave que existe y es distinta.
+
+---
+
+# 17. Cuantificación gráfica — de inventario a regla verificada
+
+> `IDEAS.md` §2 enlistó 29 funciones por tipo de herramienta, sin schema y sin
+> distinguir qué es infraestructura y qué es dominio. Esta sección cierra esa
+> distinción para los siete casos que sí son dominio — los otros 22 no entran
+> aquí, y esa ausencia es la decisión, no un olvido.
+
+## 17.1 Veintidós de las 29 son infraestructura, no conocimiento
+
+Calibrar escala, reparar geometría rota (`ST_MakeValid`), medir un área,
+cruzar dos capas (`ST_Intersection`), agrupar polígonos (`ST_Union`) — ninguna
+lleva una regla de construcción detrás. Son PostGIS, igual que el CPM es
+forward pass y backward pass: **el recorrido es infraestructura, la regla de
+qué suma a qué es dominio** (D-182 — el mismo límite que ya separó `ltree`
+del modelo y `formula_personalizada` del SQL).
+
+No se documentan aquí — el inventario ya vive en `IDEAS.md` §2, con su nombre
+real de función PostGIS, y ahí se queda. Repetirlo en dos archivos sería el
+mismo riesgo que ya se evitó con los catálogos crudos de OPUS: un hecho, un
+archivo.
+
+## 17.2 Cinco de las siete de dominio no piden campo nuevo
+
+`ENLACE_CUANTIFICACION.medida × factor = cantidad` (`MODELO.md` §1b) ya
+alcanza:
+
+| Función (`IDEAS.md` §2) | Medida | Factor | Cantidad |
+|---|---|---|---|
+| Volumen | área (losa, muro) | espesor | `M3` |
+| Peso desde longitud | longitud (acero) | peso lineal por diámetro, de tabla | `KG` |
+| Desarrollo de superficie inclinada | área (proyección plana) | corrección por pendiente (secante del ángulo) | `M2` real |
+| Conteo por patrón o símbolo | conteo | 1 | `PZ` — la diferencia es **cómo** se detecta (selección por patrón), no qué se mide |
+| Cómputo paramétrico por fórmula | — | — | Ya resuelto: reusa el paramétrico existente (§5), no es mecanismo del cuantificador |
+
+**Ninguna es dato nuevo — las primeras cuatro son el mismo mecanismo con otro
+factor.** Se documentan como ejemplo trabajado, no como campo: si en la
+práctica alguna necesita algo que `factor` no alcanza a expresar, eso sí sería
+un hallazgo. No lo hay todavía.
+
+## 17.3 Cubicación con taludes — no es medida×factor, es `formula_personalizada`
+
+El volumen de una excavación con taludes no sale de una sola medida: la
+sección transversal es un trapecio que cambia con la profundidad, y el
+volumen del tramo depende de **dos secciones, no una**.
+
+```
+A1, A2     áreas de las secciones transversales en cada extremo del tramo
+            (trapecio: base_menor + 2 × talud × profundidad = base_mayor)
+L          longitud del tramo
+
+V = L × (A1 + A2) / 2        método del área media — el estándar de obra
+```
+
+Encaja en `COMPOSICION.formula_personalizada` (`MODELO.md` §1a, hallazgo 13):
+`A1` y `A2` son dos `ENLACE_CUANTIFICACION.medida` (área) sobre dos trazos —
+dos secciones—, `L` es un tercer trazo (longitud) o un valor en
+`NODO.variables`, y la fórmula los combina. **No es un mecanismo nuevo del
+cuantificador** — es el mismo escape hatch que ya resolvía "número de manos
+de pintura", con tres entradas en vez de una.
+
+> **Sin verificar contra dato real todavía.** A diferencia del resto de este
+> archivo, no hay un caso de obra con taludes en lo cargado hasta hoy. Es la
+> fórmula estándar de ingeniería civil, no una regla comprobada
+> aritméticamente contra un caso real. Se anota así, no como excepción
+> silenciosa.
+
+## 17.4 Ejes y niveles — sigue sin poder usarse
+
+Referenciar una medida a la rejilla estructural depende de `FRENTE`
+(`MODELO.md` §2), que hoy no tiene uso operativo — existe la tabla, nadie la
+alimenta. No se fuerza: cuando `FRENTE` tenga un consumidor real —el
+candidato natural es el programa (§15)— esta función se revisita.

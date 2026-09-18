@@ -263,7 +263,7 @@ TRAZO
   geometria       polígono · línea · punto — la forma sobre el plano       firme
   plano_id, version_plano, capa                                           firme
   fuente          enum: PDF · DWG · IFC                                   firme
-  autor, fecha                                                            firme — quién traza: C-3, roles — vive en B-45
+  autor, fecha                                                            firme — quién traza: C-3, por rol — ver abajo, B-45
 
 ENLACE_CUANTIFICACION
   id
@@ -369,10 +369,58 @@ Navisworks (coordinación con el modelo) por separado en la construcción real.
 > geometría nativa de PostGIS (D-218). Igual que GeoJSON en la Decisión 2, no
 > es una copia paralela de la fuente de verdad.
 
-### Lo que esto NO decide todavía
+### Quién puede trazar — B-45 cierra
 
-- **Quién puede trazar y si hace falta aprobación por obra.** C-3 ya está decidido
-  en principio, pero necesita dónde vivir — B-45, sin resolver.
+No hace falta tabla nueva de gobierno por obra: **`ROL_FUNCION` (§5b) ya es el
+mecanismo**, y ya tenía dos de las tres funciones que hacían falta — `trazar`
+y `aprobar_trazo` — declaradas desde P-21, antes de que este hallazgo las
+necesitara.
+
+```
+trazar          →  Costos · Control · Residente · Supervisor   (no Cotizador)
+aprobar_trazo   →  Control
+```
+
+**No es tan restrictivo como sonaba en la propuesta original.** Residente y
+Supervisor trazan igual que Costos y Control — la diferencia no es de
+permiso, es de para qué: cuantifican para sustentar una orden de cambio
+(`CONOCIMIENTO.md` §13.4), y esa orden ya pasa por `autorizar_orden_cambio`
+antes de tocar un nodo contratado. El control no se duplica en el trazo: ya
+existe un paso más adelante en la cadena.
+
+**Visualizar el estado de cuantificación no es una función atómica nueva.**
+Las catorce de §5b son todas de acción — ninguna de lectura. Ver cómo está
+cuantificada la obra sigue el mismo patrón: es lectura, abierta a quien tiene
+acceso a la obra, no un permiso aparte.
+
+### Notas flotantes sobre el plano — capacidad nueva, entidad chica
+
+Residente y Supervisor pueden **anotar el plano** sin que la nota alimente
+ninguna cantidad — distinto de `TRAZO`, que siempre alimenta un
+`ENLACE_CUANTIFICACION`. Entidad propia, la más chica posible:
+
+```
+NOTA_PLANO
+  id
+  plano_id, version_plano                                              firme
+  ubicacion       punto — WKT al capturar, GeoJSON al transportar,
+                   mismo par de decisiones que TRAZO (D-219 a D-222)    firme
+  autor_id, fecha                                                       firme
+  texto                                                                 firme
+  nodo_id         FK Nodo, nullable — si la nota es sobre un concepto
+                   puntual y no solo un lugar del plano                 firme
+```
+
+**Nunca tiene `ENLACE_CUANTIFICACION`.** Si algún día una nota necesita
+generar cantidad, no se amplía esta tabla: se convierte en `TRAZO`, que ya
+sabe hacer eso.
+
+`FUNCION_ATOMICA` gana una decimoquinta: `anotar_plano` → Residente,
+Supervisor.
+
+> **Propuesto, no cerrado del todo.** La forma de `NOTA_PLANO` es la más
+> chica que cubre lo pedido. Si hace falta algo más —adjuntar una foto, marcar
+> la nota como resuelta— se agrega encima cuando haya un caso real.
 
 ---
 
@@ -695,7 +743,7 @@ FUNCION_ATOMICA
                      pactar_precio_contratista · aplicar_descuento ·
                      autorizar_orden_cambio · aprobar_propuesta ·
                      resolver_alerta · clasificar_manualmente ·
-                     correr_invariantes                                     firme
+                     correr_invariantes · anotar_plano                      firme
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -706,6 +754,11 @@ a la vez — Residente y Supervisor pueden compartir `registrar_avance` sin que
 asignársela a uno se la quite al otro. Es la misma «combinación, no bloque
 cerrado» de R-2 (D-205), y el mismo patrón que ya se repitió cinco veces en
 este cerebro: nada reasigna, se agrega encima.
+
+**Primeras asignaciones concretas de `ROL_FUNCION`, cerrando B-45:** quién
+traza y quién anota el plano — ver §1b. Las quince funciones existen desde
+P-21; las asignaciones reales se agregan según aparece el caso, no todas de
+una vez.
 
 **`comprometer_gasto` no lleva tope por monto.** Es binaria: el rol la tiene o
 no la tiene, sin límite de monto asociado. Si algún día hace falta controlar

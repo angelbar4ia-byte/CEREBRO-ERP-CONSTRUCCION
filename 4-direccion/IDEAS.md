@@ -86,9 +86,16 @@ enseñan.
 ## 2 Idea: módulo de cuantificación gráfica
 
 > **El mecanismo (trazo → medida → cantidad) ya no es idea: tiene tabla aprobada**
-> en `MODELO.md` §1b (hallazgo 11, 2026-09-15). Lo que sigue siendo idea sin
-> diseñar es la lista de funciones de abajo y la aspiración al final de esta
-> sección — un agente que trace solo.
+> en `MODELO.md` §1b (hallazgo 11, 2026-09-15).
+>
+> **Actualización 2026-09-18:** de las 7 funciones de dominio (grupo H), 5 ya
+> cierran en `CONOCIMIENTO.md` §17 como ejemplo de `medida × factor`, y
+> cubicación con taludes cierra vía `formula_personalizada`. Las 22 de
+> infraestructura (A-G) siguen aquí a propósito — son PostGIS genérico, no
+> entran a conocimiento (D-182, `CONOCIMIENTO.md` §17.1). Sigue sin diseñar:
+> ejes y niveles (bloqueado por `FRENTE`) y la aspiración al final de esta
+> sección — un agente que trace solo. **B-45 (quién traza) cierra en
+> `MODELO.md` §1b**, reusando roles que ya existían.
 
 Crear el presupuesto **trazando sobre el plano**, al estilo de PlanSwift o
 Navisworks.
