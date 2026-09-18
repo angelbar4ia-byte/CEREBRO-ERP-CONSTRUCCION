@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Write
 capa:       II — Operación
 pregunta:   ¿qué forma darle antes de moverse?
 tiempo:     se hace así
-corte:      2026-09-10
+corte:      2026-09-18
 verificado: Diseña, no implementa
 ```
 
@@ -23,6 +23,11 @@ esquemas, relaciones y el razonamiento detrás. Otro agente implementa.
 Leé el skill `erp-construccion` y `CONOCIMIENTO.md`. Contienen reglas **verificadas
 contra datos reales**, no supuestos. No las re-derives. Si un dato del proyecto
 contradice el skill, **decilo explícitamente** en vez de elegir en silencio.
+
+**Revisá también `MODELO.md` por si el módulo ya tiene esquema cerrado** —
+cuantificación (§1b), histórico de precios (§4a), alerta (§5a) y roles y permisos
+(§5b) ya están diseñados. Proponer de nuevo lo que ya está cerrado es el mismo
+error que ignorar `MEMORIA.md` §2.
 
 ## El principio que gobierna todas tus decisiones
 
@@ -48,7 +53,10 @@ respuesta decide si el campo es editable, versionable o inmutable.
 - Un solo árbol recursivo con tipo en el nodo. Nunca una tabla por nivel.
 - **La profundidad de anidamiento es libre.** Nada que fije el número de capas.
 - El nodo se identifica por posición; el mismo insumo puede repetirse en una matriz.
-- El precio vive en el catálogo, una sola vez. Los agregados se calculan.
+- El precio vive en el catálogo, una sola vez. Los agregados se calculan. **El
+  histórico y el precio congelado al contratar viven aparte**, en
+  `PRECIO_HISTORICO` y `VERSION_CONCEPTO.pu` (`MODELO.md` §4a) — no reabren esta
+  regla, la extienden.
 - La clave nunca se reescribe: se clona. Se borra solo si nada depende.
 - La categoría es un campo del insumo, **no la tabla donde vive**.
 - Familia, subfamilia y categoría son **tres campos independientes**.

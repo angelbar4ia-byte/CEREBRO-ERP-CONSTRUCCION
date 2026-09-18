@@ -9,7 +9,7 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿cómo responde y qué propone el agente que vive dentro del ERP?
 tiempo:     se hace así
-corte:      2026-09-15
+corte:      2026-09-18
 verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
 ```
 
@@ -111,7 +111,8 @@ y la propuesta **espera resolución**.
 **1 · Sin modelo, siempre.** Lo determinista va en consulta, no en LLM:
 
 - duplicados exactos de descripción con claves distintas — **22 casos ya verificados**
-- precio inconsistente entre presentaciones del mismo material
+- precio inconsistente entre presentaciones del mismo material — cruza contra
+  `PRECIO_HISTORICO` y `TABULADOR_CONTRATISTA` (`MODELO.md` §4a)
 - desviación de almacén contra explosión
 - huella de concepto distinta entre cargas
 
