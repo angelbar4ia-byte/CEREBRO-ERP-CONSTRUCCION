@@ -215,6 +215,23 @@ planeó distinto al prototipo; **no puede decir si se construyó como se planeó
 
 Es P-38, y esta prueba lo confirma como el dato que más falta.
 
+> **Actualización 2026-09-18 — empezó a llegar el dato, y trae su propio riesgo.**
+> Con `04_ABRIL_MOVIMIENTOS_DE_ALMACEN.xlsx` y el "resumen del lote" del ERP propio
+> del usuario (`PRECIO_REAL_ALAMO_18.xlsx`) cargados, aparece algo que P-38 no
+> había previsto: **dos exports del mismo lote pueden venir de la misma tabla de
+> origen, solo que filtrada distinto.** 76 filas de la hoja `Materiales` del
+> resumen comparten `# Reg` exacto —mismo movimiento, mismo Lote 18, misma
+> cantidad— con filas ya presentes en el export de almacén de abril. **No son dos
+> fuentes que se suman: es una sola, exportada dos veces con distinto filtro de
+> fecha.** Sumarlas habría duplicado abril completo dentro de la desviación real.
+>
+> **Hallazgo: antes de combinar dos exports de salidas como si fueran
+> independientes, hay que verificar identidad de origen (una llave como `# Reg`),
+> no solo que las columnas se parezcan.** B-64.
+>
+> El dato para cerrar P-38 sigue incompleto —todavía no hay salidas para el resto
+> de los meses de obra— pero ya se sabe cómo NO combinar lo que vaya llegando.
+
 ---
 
 # Resultado de la prueba
@@ -231,6 +248,7 @@ empieza la ejecución.
 | 2 | **Falta la regla del residuo de la reversión** — qué hacer con los ambiguos y los sin candidato | B-46 |
 | 3 | **Comparar dos fuentes exige normalizar la profundidad de explosión primero** | B-47 |
 | 4 | ¿Se programan los niveles sin ingeniería? | B-48 |
+| 5 | **Dos exports de salidas pueden ser la misma fuente filtrada distinto** — hay que verificar identidad de origen antes de sumar | B-64 |
 
 ## Lo que la prueba validó
 

@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 230 decisiones · 12 descartes · 8 correcciones
+verificado: 231 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -304,6 +304,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-228 | **Precio de insumo y versión de concepto son independientes — excepto trabajo y subcontrato**, donde un cambio de precio dispara directo validar o descartar la versión | Su precio nace de una negociación puntual, no de un mercado que fluctúa |
 | D-229 | **`TABULADOR_CONTRATISTA`, tabla separada, nunca toca el PU** — cierra la cita rota de `CONOCIMIENTO.md` §13.2 a un `M-12` inexistente | El PU es la referencia fija; lo pactado se compara contra él, nunca lo reemplaza |
 | D-230 | **Dos huecos nuevos quedan anotados, sin diseñar**: catálogo de contratistas (P-39, mismo hueco que D-175 con proveedores) y marcador de presupuesto-base/plantilla en `PRESUPUESTO` (P-40) | No se inventan hoy |
+| D-231 | **Dos exports de "salidas" pueden ser la misma fuente filtrada distinto — no dos independientes** | En ALAMO 18, el "resumen del lote" propio del usuario y el export de almacén de abril comparten 76 filas por `# Reg` exacto, mismo Lote 18. Verificar identidad de origen antes de sumar, no solo que las columnas coincidan — B-64 |
 
 ---
 

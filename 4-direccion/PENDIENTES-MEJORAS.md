@@ -266,6 +266,7 @@ puede escribir de lo que primero hay que definir.
 | B-61 | **Bitácora de cambio de familia y subfamilia** | Anterior, nueva, quién, cuándo · y marcar recalculable la tasa paramétrica | ⏸️ Decidido, sin modelar |
 | B-62 | **Capa de servicio separada de la API** | La lógica no vive en los endpoints | ⏸️ **Decidido (D-167), sin construir.** Es lo único de MCP que es caro si se deja para después |
 | B-63 | **Servidor MCP** | Herramientas específicas sobre la capa de servicio | ⏸️ **Después del agente interno.** Uno solo para empezar; se parte por permisos cuando haga falta |
+| B-64 | **Dos exports de "salidas" pueden ser la misma fuente filtrada distinto** | Antes de sumar dos fuentes de almacén hay que verificar identidad de origen, no solo que las columnas se parezcan | ✅ **Resuelto: comparar por llave de origen (`# Reg`), no por columnas.** En ALAMO 18, 76 filas de la hoja `Materiales` del "resumen del lote" (`PRECIO_REAL_ALAMO_18.xlsx`) resultaron tener el mismo `# Reg`, mismo Lote 18 y misma cantidad que filas ya presentes en el export de almacén de abril — mismo movimiento, exportado dos veces con distinto filtro de fecha. Sumarlas habría duplicado abril completo. `PRUEBA-ALAMO-18.md` §12 |
 
 ### Infraestructura
 
