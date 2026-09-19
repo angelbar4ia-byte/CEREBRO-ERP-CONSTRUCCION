@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-15
-verificado: 242 decisiones · 12 descartes · 8 correcciones
+verificado: 243 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -315,7 +315,8 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-239 | **El ancla de mano de obra siempre gana sobre un estimado derivado de material al desambiguar destajo** | Un primer intento que elegía «el candidato más limpio» por insumo, de forma independiente, produjo un vertedero de 25 unidades. La mano de obra es 1.0-por-unidad por convención; el material compartido no. `CONOCIMIENTO.md` §11.13 |
 | D-240 | **Material o destajo compartido entre varios conceptos sin llave de prorrateo confiable se registra como un solo concepto "lote"**, no se fuerza un split ficticio | Mismo principio que `EST-01060` en cimentación. Cerraron así el cableado PB/PA, la limpieza-y-sellado de pintura interior/fachada, y los muros de cisterna sin referencia en catálogo (B-65). `CONOCIMIENTO.md` §11.13 |
 | D-241 | **Losa con dos destajos en desacuerdo (armado ≠ descimbrado) se resuelve tomando el de armado, o el de mayor costo** | Validado cruzando contra la cimbra declarada independiente: 182.40+32.80+24.00 = 239.20 exacto contra `MAD-00002`. `CONOCIMIENTO.md` §11.13 |
-| D-242 | **El catálogo de presupuesto se reconstruyó completo para diez de catorce niveles de ALAMO 18** — $2,560,634.51, +12.0% contra el catálogo de referencia de esos mismos niveles | Cuatro niveles (Cancelería, Carpintería, Muebles/Iluminación, Herrería — $542,464.67) no tienen ninguna ingeniería cargada: 19.2% del presupuesto base en dinero, métrica distinta al 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5 — ambas correctas, miden cosas distintas. `CONOCIMIENTO.md` §11.13, B-65 |
+| D-242 | **El catálogo de presupuesto se reconstruyó completo para diez de catorce niveles de ALAMO 18** — $2,561,657.71, +12.0% contra el catálogo de referencia de esos mismos niveles | Cuatro niveles (Cancelería, Carpintería, Muebles/Iluminación, Herrería — $542,464.67) no tienen ninguna ingeniería cargada: 19.2% del presupuesto base en dinero, métrica distinta al 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5 — ambas correctas, miden cosas distintas. `CONOCIMIENTO.md` §11.13, B-65 |
+| D-243 | **`TMP-00002` cierra: el prorrateo se hace con el PU de la matriz de concepto confirmada, nunca con la columna `Total` de la ingeniería sin cruzarla antes** | En las 4 filas de `TMP-00002`, `Total` no era cantidad×PU — 2 filas con `Total=PU` (como cantidad=1), 2 con `Total` de la cantidad esperada del catálogo, no la real capturada. Solo se detectó cruzando contra 7+ referencias independientes en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`. `TMP-00002` sube de $1,423.84 a $2,447.04. B-66, `CONOCIMIENTO.md` §11.13 |
 
 ---
 

@@ -2288,11 +2288,24 @@ Cuando el material real sobra contra lo que el catálogo esperaría para ese
 concepto, y no hay dónde asignarlo con evidencia, se anota como **concepto
 temporal**: clave `TMP-00001`, `TMP-00002`…, descripción corta al estilo del
 catálogo, costo íntegro si el concepto esperado era cero, o **prorrateado
-por `(residuo ÷ real) × importe`** si el concepto sí llama parte del
-material. Decisión del usuario: «de momento solo crea como concepto
-temporal… ya en sistema se desglosa su matriz temporal». El prorrateo de
-`TMP-00002` es un supuesto propio, marcado como tal — **sin confirmar
-todavía.**
+por `(excedente) × PU`** si el concepto sí llama parte del material —
+prorratear por cantidad, nunca por dinero de la fila entera, para no
+duplicar lo que el concepto confirmado ya paga. Decisión del usuario: «de
+momento solo crea como concepto temporal… ya en sistema se desglosa su
+matriz temporal».
+
+> **El PU del prorrateo sale de la matriz de concepto confirmada, nunca de
+> la columna `Total` de la ingeniería sin cruzarla antes.** `TMP-00002`
+> (Cimentación) se armó primero confiando en `Total ÷ cantidad` de la
+> propia fila — y las cuatro filas resultaron tener `Total` mal capturado:
+> dos con `Total = PU` (como si la cantidad fuera 1, ignorando la cantidad
+> real de 3), dos con `Total` calculado sobre la cantidad *esperada* del
+> catálogo en vez de la real capturada. Cruzando el mismo insumo contra
+> siete referencias independientes en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`
+> —todas de acuerdo entre sí en su propio PU— se encontró el precio
+> confiable y `TMP-00002` subió de $1,423.84 a $2,447.04. **Cuando existe
+> una matriz de concepto que ya usa el mismo insumo, es la fuente de PU —
+> la fila de ingeniería sola no se valida a sí misma.** B-66.
 
 ### El resultado, a diez niveles
 
@@ -2304,7 +2317,7 @@ todavía.**
 | NIV-00012 Barda Perimetral | $21,021.78 | $27,434.63 | **-23.4%** |
 | NIV-00013 Pintura | $123,023.14 | $114,344.55 | +7.6% |
 | NIV-00014 Pergolado Cochera | $59,567.51 | $72,734.53 | **-18.1%** |
-| **Diez niveles (con los cuatro de §11.9)** | **$2,560,634.51** | $2,287,461.31 | **+12.0%** |
+| **Diez niveles (con los cuatro de §11.9)** | **$2,561,657.71** | $2,287,461.31 | **+12.0%** |
 
 Dos validaron exacto contra el catálogo — `ECO-00028` cableado y
 `ECO-00031` instalaciones OE, **0.0% de diferencia** — evidencia de que la

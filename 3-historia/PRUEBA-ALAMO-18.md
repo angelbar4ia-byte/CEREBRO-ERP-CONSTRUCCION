@@ -161,7 +161,7 @@ niveles con ingeniería cargada** —Planta Baja, Planta Alta, Azotea, Acabados,
 Obras Exteriores, Asador, Barda Perimetral, Pintura y Pergolado Cochera— para
 ver si el método aguanta a escala, no solo en el caso que lo probó.
 
-**Resultado: $2,560,634.51 reconstruidos, +12.0% contra el catálogo de
+**Resultado: $2,561,657.71 reconstruidos, +12.0% contra el catálogo de
 referencia de esos mismos diez niveles ($2,287,461.31).** Tabla completa y
 método —las dos técnicas, las reglas de desempate nuevas, el concepto "lote"
 y la convención `TMP-XXXXX`— en `CONOCIMIENTO.md` §11.13. Acá solo lo que es
@@ -191,10 +191,38 @@ niveles —Cancelería, Carpintería, Muebles/Iluminación, Herrería— siguen 
 ninguna ingeniería cargada. Contados en dinero, no en etapas, son
 **$542,464.67 — 19.2% del presupuesto base.**
 
-> **Persiste sin confirmar:** el prorrateo del costo de `TMP-00002` — cuando
-> el material sobrante sí tiene relación parcial con un concepto existente,
-> se repartió por `(residuo ÷ real) × importe`. Es un supuesto propio,
-> señalado como tal al usuario, **todavía no aprobado ni corregido.**
+> **`TMP-00002` cerrado — 2026-09-19, y trajo un hallazgo más grande que el
+> prorrateo.** Al revisar la opción con el usuario (¿prorratear, cobrar la
+> fila completa, o repartir a un concepto existente?), se cruzó el PU de
+> los cuatro insumos sobrantes contra las matrices de concepto confirmadas
+> —independientes de la fila de ingeniería, ya validadas en otros
+> conceptos— y **no coincidía con la columna `Total` de la fila real:**
+>
+> | Insumo | `Total` de la fila (lo que se había usado) | Total real (cantidad × PU de matriz) |
+> |---|---:|---:|
+> | `SAN-00005` (Yee 4x4, cantidad real 3) | $63.50 | $190.50 |
+> | `SAN-00006` (Yee 6x4, cantidad real 3) | $94.01 | $282.03 |
+> | `SAN-00018` (tubo reforzado 6", cantidad real 6) | $3,034.00 | $4,551.00 |
+> | `SAN-00019` (tubo reforzado 4", cantidad real 4) | $615.02 | $1,230.04 |
+>
+> **La columna `Total` de la ingeniería no es cantidad×PU en ninguna de las
+> cuatro filas** — en dos, `Total` quedó igual al `PU` (como si la cantidad
+> fuera 1); en las otras dos, `Total` corresponde a la cantidad *esperada*
+> del catálogo, no a la cantidad real capturada. Es un error de captura de
+> la fuente, no algo que el método pudiera prevenir sin el cruce contra la
+> matriz — B-66.
+>
+> **Con el PU correcto, se prorrateó el excedente** (la opción del usuario,
+> descontando lo que el concepto confirmado ya necesita, para no duplicar
+> ese costo): `TMP-00002` sube de $1,423.84 a **$2,447.04** — $127.00 +
+> $188.02 + $1,517.00 + $615.02. `NIV-00001` queda en **$292,339.84**
+> (antes $291,316.64) y el total de los diez niveles en **$2,561,657.71**.
+>
+> **`TMP-00001` no se pudo revisar igual** — sus cuatro insumos (`HD-00411`,
+> `HID-00134/135/181`) no aparecen en ninguna matriz de concepto confirmada,
+> así que no hay PU independiente contra qué cruzarlos. Queda con su costo
+> original ($658.28), con la duda abierta y sin forma de cerrarla con los
+> datos de hoy.
 
 ---
 
@@ -309,7 +337,7 @@ empieza la ejecución.
 - La comparación contra prototipo **encuentra hechos de obra**, no sólo errores de
   captura.
 - **La reconstrucción escala:** de cimentación (un nivel, prueba de concepto) a
-  diez niveles completos ($2,560,634.51, +12.0% vs. catálogo) sin cambiar de
+  diez niveles completos ($2,561,657.71, +12.0% vs. catálogo) sin cambiar de
   método — solo agregando dos reglas de desempate y una técnica más
   («concepto auxiliar», dominante sobre la reversión). `CONOCIMIENTO.md` §11.13.
 

@@ -101,7 +101,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) y marcador de prototipo (P-40) quedan anotados |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 242 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 243 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -120,7 +120,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Vocabularios** | Unidades, niveles, etapas, familias — **derivados**, no pedidos |
 | **Semilla** | Cuadrilla y rendimiento teórico, 265 filas |
 | **Ingenierías de ALAMO 18** | 12 archivos. Las partes se suman; faltan 5 niveles (uno, Consumibles, en $0). 🆕 De los otros 4 sin ingeniería —Cancelería/Carpintería/Muebles-Iluminación/Herrería— se sabe el costo exacto: $542,464.67, 19.2% del base **en dinero** (no confundir con el 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5) |
-| **Reversión por destajo** | Probada: 84% en cimentación. 🆕 Escalada a diez niveles completos: **catálogo de presupuesto reconstruido desde la ingeniería real**, $2,560,634.51, +12.0% vs. catálogo de referencia. Dos técnicas nuevas fijas —concepto auxiliar (dominante) y concepto "lote" para material compartido sin llave— más las reglas de desempate que le faltaban a la reversión. `CONOCIMIENTO.md` §11.13, D-238 a D-242 |
+| **Reversión por destajo** | Probada: 84% en cimentación. 🆕 Escalada a diez niveles completos: **catálogo de presupuesto reconstruido desde la ingeniería real**, $2,561,657.71, +12.0% vs. catálogo de referencia. Dos técnicas nuevas fijas —concepto auxiliar (dominante) y concepto "lote" para material compartido sin llave— más las reglas de desempate que le faltaban a la reversión. `CONOCIMIENTO.md` §11.13, D-238 a D-242 |
 
 ---
 
