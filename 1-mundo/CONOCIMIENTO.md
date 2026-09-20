@@ -26,7 +26,7 @@ verificado: 16 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 168 | 6 |
-| §11 | Los flujos entre sistemas | 468 | 12 |
+| §11 | Los flujos entre sistemas | 1026 | 18 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 318 | 6 |
 | §14 | La propuesta | 66 | 5 |
@@ -2183,7 +2183,12 @@ finas exteriores — antes de que el cemento la sustituyera.
 > comparación contra el prototipo detecta correctamente cuándo una obra quedó
 > capturada con una versión de APU distinta a la vigente.
 
-## 11.12 La tercera pata: salidas de almacén — pendiente
+## 11.12 La tercera pata: salidas de almacén — primeros cruces reales
+
+> **Actualización:** los primeros cruces reales contra almacén ya se hicieron —
+> cómo se lee el archivo (§11.15), el rendimiento real contra la matriz (§11.16),
+> el corte semanal (§11.17) y los controles de cambio que lo completan (§11.18).
+> Sigue parcial: solo dos conceptos de un mes.
 
 Hoy la comparación cruza dos momentos **planeados**: el prototipo vigente contra la
 ingeniería del lote. Falta la que compara contra lo **ejecutado de verdad**.
@@ -2472,6 +2477,213 @@ del catálogo), no mal rendimiento.** En material queda un residuo de
   en su primera aparición del recorrido — sumarlo en cada rama triplicó el
   total pagado en el primer intento.
 
+## 11.15 Salidas de almacén: cómo leer el archivo
+
+El export mensual de almacén (hoja `Consulta`, 46 columnas) no se puede cruzar a
+ciegas — dos de sus columnas engañan y una tercera se repite. Hallazgos válidos
+para cualquier obra, no solo `ALAMO 18`.
+
+### El filtro de lote correcto
+
+Hay **tres** columnas candidatas a decir «de qué lote es este movimiento», y solo
+una sirve:
+
+| Columna | Qué trae | ¿Sirve para filtrar por lote? |
+|---|---|---|
+| `Lote` | Numérico: 0, 1, 4, 9, 11, 16, 18, 19, 20… | **Sí — es la correcta** |
+| `# Lote` | Siempre `S/L` | No. Es un campo de lote de fabricación/calidad, no de la casa |
+| `Ubicacion` | Nombre de calle (`ALAMO`, `FRESNO`, `TABACHIN`…) | No confiable: una calle cruza varios números de lote — `ALAMO` sola trae Lote 19 (106 filas), Lote 18 (76), Lote 1 (58) y Lote 0 (7) mezclados |
+
+> Filtrar por `Ubicacion="ALAMO"` en vez de `Lote=18` da un conjunto equivocado —
+> mezcla cuatro lotes distintos bajo el mismo nombre de calle.
+
+### `Ubicacion` aparece dos veces, con significados distintos
+
+El encabezado trae `Ubicacion` en la columna 4 (nombre de calle) **y otra vez** en
+la columna 17 (bodega física: `GENERAL`, `UBC-PRUEBA`, `EXTERIOR`). Armar un
+diccionario `{encabezado: índice}` de la forma habitual **se queda solo con la
+última ocurrencia** — la de bodega, no la de calle — sin ningún error visible: la
+consulta corre, regresa datos, y están mal.
+
+> **Con dos columnas del mismo nombre, el mapeo por nombre no basta: hay que leer
+> por posición.** Ya estaba escrito para `Tipo` en `Trabajos` (`CATALOGOS.md` §3,
+> §2.4 arriba) — es la misma trampa, en un archivo distinto.
+
+### La cadena de referencia de la actividad
+
+El movimiento clave es `Motivo = "Implosión De Materiales"`: el propio sistema
+explota el concepto en sus insumos — no es una entrega genérica, es la traza que
+`P-38` necesitaba. Su columna `Referencia` (texto libre) trae, cuando está
+poblada:
+
+```
+OP:23186, No.Parte:EST-01060, Parte ALAMO 18 - LOSA DE CIMENTACION...
+```
+
+`OP` es el folio de la orden de producción — agrupa todas las líneas de insumo de
+una misma ejecución de concepto. `No.Parte` es la clave del concepto o etapa que
+se explotó — puede ser a nivel concepto (`EST-02010`) o a nivel etapa
+(`ECO-00002`).
+
+> La columna `# OP` (índice 36) trae el mismo folio que el `OP:` de `Referencia`,
+> **validado exacto en 67 de 67 filas** con ambos poblados. Es un join limpio
+> alternativo, y confirma que el texto libre no miente.
+
+### Por qué esto no es un caso aislado
+
+Ninguna de las tres trampas de arriba se ve en una revisión superficial: la
+consulta corre, no tira error, y el resultado *parece* razonable hasta que se
+cruza contra una segunda fuente. Mismo patrón que la matriz prestada (§11.14) y el
+`Total` mal capturado de la ingeniería (§11.13, B-66): **un archivo de origen no
+se valida solo por correr sin errores.**
+
+## 11.16 Rendimiento real de material contra la matriz — primera prueba, y un bug propio
+
+Con la lectura correcta de almacén (§11.15), se puede comparar material real
+consumido contra el rendimiento estándar del catálogo, **para el mismo concepto y
+la misma escala**. Probado sobre los dos únicos conceptos de abril con las dos
+puntas —almacén y matriz— en `ALAMO 18`: `EST-01060` (losa de cimentación) y
+`EST-02010` (muro de tabique).
+
+### La escala se revierte, no se copia del pagado acumulado
+
+`PRECIO_REAL_ALAMO_18.xlsx` trae la cantidad pagada **acumulada a la fecha de
+corte**, de todo el proyecto — mezclar eso contra un solo mes de almacén compara
+ventanas de tiempo distintas. En su lugar, la escala real de cada orden se obtiene
+**revirtiendo un insumo ancla contra su propia matriz** — misma idea de §11.9
+(«la mano de obra siempre ancla»), **generalizada**: cualquier insumo con una tasa
+limpia y exclusiva del concepto sirve de ancla, no solo la mano de obra.
+`CON-00001` (concreto, exclusivo de la losa — los castillos usan otro concreto)
+para `EST-01060`; `PET-00001` (tabique, 50 PZ/M2 exacto) para `EST-02010`.
+
+### El bug: comparar material contra material-más-mano-de-obra
+
+Almacén **nunca** registra mano de obra — los destajos se pagan aparte. La
+primera versión de esta comparación sumaba, del lado de la matriz, también las
+líneas `Tipo=Contrato` (mano de obra) — una resta que nunca podía cuadrar, sin
+importar qué tan bien construida esté la casa.
+
+| Concepto | $ matriz, con mano de obra (mal) | $ matriz, solo material | Real | Diferencia correcta |
+|---|---:|---:|---:|---:|
+| `EST-01060` (losa + castillos) | $232,460.08 | $174,884.05 | $140,346.91 | **-19.7%** |
+| `EST-02010` (muro tabique) | $46,440.48 | $28,440.48 | $27,712.92 | **-2.6%** |
+
+> **Comparar material real contra un total que incluye mano de obra infla la
+> brecha artificialmente.** El primer reporte de esta comparación decía -31.2% y
+> -40.3% — el error era del cálculo, no del dato de obra.
+
+`EST-02010`, una vez corregido, prácticamente cuadra: el tabique sale **exacto**
+(6,000 de 6,000 piezas, 0.0%).
+
+### El concepto auxiliar necesita su alcance completo, no solo el hijo con ancla
+
+Una orden de almacén no distingue de cuál sub-concepto viene cada insumo — agrupa
+todo bajo un mismo folio. Comparar `EST-01060` solo contra la matriz de su hijo
+con ancla propia (`EST-01053`, la losa) deja fuera lo que la misma orden también
+cubrió (los castillos K1/K2/K3/K7/K8, `EST-10011`/`10021`/`10031`/`10071`/`10081`)
+— y por eso la primera versión (solo losa) mostraba -31.2% en vez de -19.7%: la
+mitad de la diferencia era simplemente material que la matriz de comparación no
+estaba mirando.
+
+### Lo que queda, después del bug: en su mayoría explicable
+
+Sobre `EST-01060`, con material puro y alcance completo, ~55% de los $34,537
+restantes es **precio, no rendimiento**: el concreto sale en cantidad **idéntica**
+(37.330 = 37.330 M3, 0.0% de diferencia de rendimiento) pero a un precio real
+(~$1,928/M3) menor al que asume la matriz (~$2,442/M3). El resto se reparte entre
+insumos que corren por encima del estándar (varios aceros y alambres) y tres
+—cemento, tablas, tabique— **100% ausentes** de esta orden de abril pese a que la
+matriz los espera: la hipótesis más simple es que ya se habían surtido en un mes
+anterior, fuera de la ventana de este archivo — **sin datos de meses previos no
+se puede confirmar.**
+
+## 11.17 Rendimiento semanal: tabique y cemento no se leen igual
+
+`PRECIO_REAL_ALAMO_18.xlsx`, hoja `Mano de Obra`, trae columna `Semana` — permite
+comparar la salida de almacén contra lo pagado en la **misma semana**
+(jueves-miércoles), más fino que el acumulado de §11.16.
+
+### Dos insumos, dos patrones de abasto — dato de campo, no supuesto
+
+Sobre `EST-02010` (único concepto con las dos semanas completas en abril):
+
+| Semana | Tabique (almacén) | Cemento (almacén) | M² pagado |
+|---|---:|---:|---:|
+| 18 | 6,000 PZ | 30 sacos | 50 |
+| 19 | 0 PZ | 30 sacos | 293 |
+
+> **El tabique se abastece por lote — más de lo que se consume en una semana. Su
+> desfase semana a semana es normal, no comparable 1:1.** El cemento se entrega
+> **a diario**: es la señal confiable para verificar si lo pagado esa semana tiene
+> respaldo real de material. Aportado por el usuario, con experiencia directa de
+> obra — no se dedujo de los datos.
+
+### El hallazgo: la semana 19 no tiene respaldo de cemento
+
+Con el rendimiento teórico exacto (0.325416 sacos/M2), 30 sacos alcanzan para
+~92.2 M2. La semana 18 pagó 50 M2 —hay margen, consistente con abasto por
+adelantado—. **La semana 19 pagó 293 M2 con los mismos 30 sacos: 68.5% de lo
+pagado esa semana no tiene material que lo respalde.**
+
+> Consistente con una hipótesis de campo del usuario: **tiende a sobre-estimarse
+> para cerrar la semana el viernes**, y hoy la verificación contra almacén ocurre
+> *después* del pago —cuando ya no hay oportunidad de comparar— en vez de al
+> momento de preparar la estimación.
+
+### Idea a futuro, sin diseñar
+
+Automatizar este mismo cruce (salida de cemento del día/semana contra el M2 que se
+va a estimar) para que corra **al preparar la estimación, antes del cierre del
+viernes** — hoy este cruce se hizo a mano y después del hecho.
+`PENDIENTES-MEJORAS.md` B-70.
+
+## 11.18 Los controles de cambio de ALAMO 18 — CC-ALM-18XXX
+
+§13.4 define el control de cambio en general: referencia un nodo congelado,
+propone un delta, no edita. Los archivos `AJU_*` de `ALAMO 18` —ajustes sueltos
+sin nivel ni etapa declarados, `P-31`— son la primera aplicación concreta.
+
+### La clave
+
+```
+CC-ALM-18XXX
+CC   control de cambio
+ALM  cluster Alamo
+18   número de lote
+XXX  consecutivo
+```
+
+### Clasificación, por lo que el propio archivo trae
+
+| El archivo trae… | Tratamiento |
+|---|---|
+| Un destajo claro | El control de cambio es un **agrupador con un concepto hijo** — mismo patrón que concepto auxiliar |
+| Dos destajos en desacuerdo | **Matriz invertida**: se reparte el material contra lo que cada concepto hijo ya reclama; el residuo que no cuadra con ninguno se anota como concepto temporal `TMP-ALM18-XX` |
+| Material sin destajo propio | Se queda como **concepto auxiliar** — mismo tratamiento que si no tuviera destajo en la reconstrucción base (§11.13) |
+| Sin encabezado `NIV-`/`ECO-` | Se marca **«sin identificar»**: entra al consolidado (cuenta en el total) pero se excluye del árbol por nivel/etapa — no se le inventa una ubicación |
+
+> Responde la pregunta abierta de `P-31` («¿se parsea el nombre, se pregunta o se
+> rechaza?»): **se lee primero el propio encabezado interno del archivo** —casi
+> siempre trae su `NIV-`/`ECO-`—, y solo si no lo trae se marca sin identificar.
+
+### Se verifica contra el archivo crudo, no se asume
+
+Antes de contar una línea, se revisa si de verdad es aditiva o si ya vive dentro
+de otro concepto. Ejemplo probado: cemento extra en fachada se confirmó **no
+traslapado** porque el concepto base de esa fachada usa mortero, no cemento — son
+insumos distintos, no el mismo material contado dos veces.
+
+> Si el material que baja fuera el mismo que el concepto base ya reclama, **eso
+> es una alerta para el usuario** —puede señalar que el concepto base quedó sin
+> usar el material que se le asignó—, no un control de cambio silencioso.
+
+### Es una capa complementaria, no se suma
+
+Sobre `ALAMO 18`, cinco controles de cambio (`CC-ALM-18001` a `18005`,
+$36,214.03) cubren exactamente el hueco que PRESUPUESTO FORMADO (§11.14) no pudo
+explotar por no tener matriz propia del prototipo — no se suman a Presupuesto
+Formado, se leen en su columna aparte.
+
 ---
 
 # 12. Las tres capas del rediseño
@@ -2649,6 +2861,9 @@ Lleva:
 > En obra la orden de cambio casi siempre se autoriza **después**. No se prohíbe,
 > pero se registra: **el porcentaje de órdenes retroactivas es una medida directa de
 > qué tan sano está el proceso**, y hoy nadie la tiene.
+
+> **Aplicación concreta, con clave y método cerrados:** §11.18, sobre los
+> ajustes sueltos (`AJU_*`) de `ALAMO 18` — `CC-ALM-18XXX`.
 
 ## 13.5 Empujar el presupuesto sin frenar la obra
 

@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-20
-verificado: 248 decisiones · 12 descartes · 8 correcciones
+verificado: 256 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -322,6 +322,14 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-246 | **El concepto auxiliar sin matriz propia se descompone en sus hijos reales del catálogo base para explotarlo por destajo/material** — no se prorratea su costo combinado (eso ya lo cerró D-240), pero el hijo que sí tiene su propia línea MO- ancla en la ingeniería reconstruye su cantidad real por reversión (`CONOCIMIENTO.md` §11.9) y se explota con su propia matriz | Probado sobre `EST-01060` (losa cimentación+5 castillos), `EST-00090` (4 losas de PB) y `EST-00100` (losa azotea+escalón). `MOC-01010` reconstruido cuadra exacto ($56,120) por ser la propia ancla. Los castillos K1-K8 y una de las losas nervadas de PB se quedan sin dato propio — B-67. `CONOCIMIENTO.md` §11.14 |
 | D-247 | **Separar el excedente en efecto cantidad y efecto receta cambia la lectura completa del hallazgo** — con las losas mal explotadas el excedente de destajo se leía casi todo como "mal rendimiento"; descompuestas, **87% es "se construyó más"** (244 m² reales contra 216 del catálogo) y solo 13% es receta distinta | Mismo giro en material, con un residuo de ~$101,071 que sigue sin explicarse — B-68. `CONOCIMIENTO.md` §11.14 |
 | D-248 | **Cuando una clave de destajo/material se repite en más de un nivel/etapa del árbol de comparación, lo pagado real solo se cuenta en su primera aparición del recorrido** | Lo pagado real no distingue ubicación — sumarlo en cada rama donde la clave reaparece triplicó el total pagado en el primer intento. `CONOCIMIENTO.md` §11.14 |
+| D-249 | **`Lote` (numérico) es el filtro correcto de lote en el export de almacén — no `Ubicacion` (nombre de calle, cruza 4 lotes) ni `# Lote` (siempre `S/L`)** | Y `Ubicacion` se repite dos veces en el encabezado con significados distintos (calle / bodega física): un diccionario `{encabezado:índice}` armado sin cuidado se queda con la última y da resultado sin error visible. `CONOCIMIENTO.md` §11.15 |
+| D-250 | **La cadena de referencia de la actividad que pedía P-38 ya existe: `Motivo="Implosión De Materiales"` + `Referencia` con `OP:folio, No.Parte:clave`** | La columna `# OP` trae el mismo folio, validado exacto en 67 de 67 filas contra el texto libre. `CONOCIMIENTO.md` §11.15 |
+| D-251 | **La reversión (`CONOCIMIENTO.md` §11.9) se generaliza: cualquier insumo con tasa limpia y exclusiva del concepto sirve de ancla, no solo la mano de obra** | Usada para escalar la salida de almacén de un mes a la misma escala implícita de su matriz, en vez de la cantidad pagada acumulada de `PRECIO_REAL` (que mezcla meses fuera de la ventana del archivo). `CONOCIMIENTO.md` §11.16 |
+| D-252 | **Comparar material real de almacén contra un total de matriz que incluye mano de obra infla la brecha — hay que excluirla del subtotal** | Almacén nunca registra mano de obra. El primer reporte decía -31.2%/-40.3%; corregido, -19.7%/-2.6%. Error de cálculo propio, no del dato de obra. `CONOCIMIENTO.md` §11.16 |
+| D-253 | **Un concepto auxiliar comparado contra una orden de almacén necesita su alcance completo (todos los hijos que la orden cubrió), no solo el hijo con ancla propia** | La orden no distingue de cuál sub-concepto viene cada insumo. Explica la mitad de la brecha de D-252 en `EST-01060`: castillos que la matriz de comparación no estaba mirando. `CONOCIMIENTO.md` §11.16 |
+| D-254 | **Nueva fuente para verificación semanal: `PRECIO_REAL_ALAMO_18.xlsx` hoja `Mano de Obra`, columna `Semana`** | Compara salida de almacén contra lo pagado en la misma semana (jueves-miércoles) — más fino que el acumulado de proyecto. `CONOCIMIENTO.md` §11.17 |
+| D-255 | **Tabique y cemento no se leen igual semana a semana — dato de campo, no supuesto: el tabique se abastece por lote (desfase normal), el cemento a diario (señal confiable)** | Aportado por el usuario, con experiencia directa de obra. Sobre `EST-02010`, una semana con 293 m² pagados solo tiene respaldo de cemento para ~92 m² — 68.5% sin respaldo. `CONOCIMIENTO.md` §11.17 |
+| D-256 | **Los controles de cambio de ALAMO 18 quedan con su clave y método cerrados: `CC-ALM-18XXX`, agrupador con hijo o matriz invertida con residuo `TMP-ALM18-XX`, verificado contra el archivo crudo antes de contarlo** | Resuelve `P-31` (qué hacer con los archivos `AJU_*` sueltos). Es capa complementaria a Presupuesto Formado, no se suma — cinco controles, $36,214.03. `CONOCIMIENTO.md` §11.18 |
 
 ---
 

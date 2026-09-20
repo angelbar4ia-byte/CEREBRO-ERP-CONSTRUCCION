@@ -5,13 +5,13 @@
 capa:       IV — Dirección
 pregunta:   ¿dónde vamos y cómo retomar?
 tiempo:     vamos aquí
-corte:      2026-09-18
+corte:      2026-09-20
 verificado: Punto de corte · sin bloqueos
 ```
 
 > **Léeme primero.** Punto de corte, cómo retomar, y dónde va cada cosa.
 >
-> Corte: 2026-09-18
+> Corte: 2026-09-20
 
 > **Si te dicen «continuar con el roadmap» o «continuar con pendientes»: es acá.**
 > Este archivo es el punto de entrada — no un artifact publicado ni el historial de
@@ -101,7 +101,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) y marcador de prototipo (P-40) quedan anotados |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 248 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 256 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 78 términos · 25 ambigüedades |
@@ -121,6 +121,8 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Semilla** | Cuadrilla y rendimiento teórico, 265 filas |
 | **Ingenierías de ALAMO 18** | 12 archivos. Las partes se suman; faltan 5 niveles (uno, Consumibles, en $0). 🆕 De los otros 4 sin ingeniería —Cancelería/Carpintería/Muebles-Iluminación/Herrería— se sabe el costo exacto: $542,464.67, 19.2% del base **en dinero** (no confundir con el 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5) |
 | **Reversión por destajo** | Probada: 84% en cimentación. 🆕 Escalada a diez niveles completos: **catálogo de presupuesto reconstruido desde la ingeniería real**, $2,561,657.71, +12.0% vs. catálogo de referencia. Dos técnicas nuevas fijas —concepto auxiliar (dominante) y concepto "lote" para material compartido sin llave— más las reglas de desempate que le faltaban a la reversión. `CONOCIMIENTO.md` §11.13, D-238 a D-242 |
+| **Rendimiento real vs. almacén** | 🆕 Léxico del archivo resuelto (`Lote`, no `Ubicacion`/`# Lote`; cadena `OP:`/`No.Parte:`). Dos conceptos de abril cruzados contra su matriz a la misma escala (reversión), con el bug de mano de obra corregido: -19.7%/-2.6%. Corte semanal nuevo: tabique por lote (normal) vs. cemento a diario (señal confiable) — una semana de `EST-02010` con 68.5% del pagado sin respaldo de cemento. `CONOCIMIENTO.md` §11.15 a §11.17, D-249 a D-255 |
+| **Controles de cambio — CC-ALM-18XXX** | 🆕 Método cerrado para los archivos `AJU_*` sueltos: agrupador con hijo, o matriz invertida con residuo `TMP-ALM18-XX`; verificado contra crudo antes de contar. Cinco controles, $36,214.03, capa complementaria a Presupuesto Formado. Cierra P-31. `CONOCIMIENTO.md` §11.18, §13.4, D-256 |
 
 ---
 
@@ -140,7 +142,7 @@ al usuario si hace falta, este archivo no lo guarda).
 | 3 | **`IDEAS.md` §7 — Sustitución de insumo dentro de una matriz** | Séptima operación de rediseño, propuesta pero sin que el arquitecto la revise |
 | 4 | **Persistencia del motor de cálculo** | `backend/core/` es solo dominio — Django/Postgres, el resto del schema de `MODELO.md`, y las demás piezas de B-03 a B-07 |
 | 5 | **Clasificar a mano el 8% de conceptos** sin derivación — ⛔ bloqueado: falta el dato | El 92% sale del trabajo que usa. No confundir con el otro 92%: el de la ingeniería de `ALAMO 18` cubriendo el presupuesto |
-| 6 | **Salidas de almacén de ALAMO 18** — ⚠️ el dato empezó a llegar (2026-09-18) | Cierra el triángulo prototipo → ingeniería → **ejecutado**. P-38, objetivo en `CONOCIMIENTO.md` §11.12. `almacen-abril` y el "resumen del lote" ya cargados — ver `PRUEBA-ALAMO-18.md` §12, B-64 |
+| 6 | **Salidas de almacén de ALAMO 18** — 🔶 primeros cruces reales hechos, solo 2 conceptos de abril | Cierra el triángulo prototipo → ingeniería → **ejecutado**. P-38, `CONOCIMIENTO.md` §11.12 a §11.17: léxico del archivo, rendimiento real vs. matriz (con el bug de mano de obra corregido), corte semanal tabique/cemento. Ver `PRUEBA-ALAMO-18.md` §12, B-55, B-64, B-70 |
 | 7 | El resto de `PENDIENTES-MEJORAS.md` — mayormente ⛔ bloqueado por los catálogos crudos de OPUS, que no están en este repo | M-14, M-17/18, P-09/10, P-26 a P-36 |
 | 8 | **Completar el catálogo de ALAMO 18** — faltan 4 niveles sin ingeniería cargada (Cancelería, Carpintería, Muebles/Iluminación, Herrería — $542,464.67) | ⛔ Bloqueado: no se sabe si los archivos existen y no se subieron, o si de verdad no hay ingeniería para esos niveles todavía. Después, Paso 2: explotar el catálogo reconstruido contra salidas de almacén (fila 6) |
 | 8 | Las ideas sin tocar del modelo | `IDEAS.md` §1, §3, §4, §5, §6 — seis, sin diseñar. Cuantificación (§2) cierra hoy — ver tabla de arriba |

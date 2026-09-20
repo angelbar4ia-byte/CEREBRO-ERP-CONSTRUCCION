@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
 corte:      2026-09-20
-verificado: 12 etapas recorridas · 5 pasan · 2 se rompen · 5 sin poder probarse
+verificado: 12 etapas recorridas · 5 pasan · 3 se rompen · 4 sin poder probarse
 ```
 
 > **Escenario de prueba** en el sentido de B-42: un caso real recorrido de punta a
@@ -44,7 +44,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 9 | Programa y ruta crítica | ⛔ No existe |
 | 10 | Recursos por fecha | ⛔ No existe |
 | 11 | Contratación y congelamiento | ⛔ Sin probar |
-| 12 | Salidas y desviación | ⛔ **Falta el dato** (P-38) |
+| 12 | Salidas y desviación | ⚠️ **Primeros cruces reales, sobre 2 conceptos de un mes** (P-38) |
 
 ---
 
@@ -277,7 +277,7 @@ existan:
 
 ---
 
-## 12 · Salidas y desviación — ⛔ falta el dato
+## 12 · Salidas y desviación — ⚠️ primeros cruces reales, parcial
 
 Es la tercera pata, y la única que compara contra lo **ejecutado de verdad**:
 
@@ -323,13 +323,55 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > solo entre dos planes: la parte de mano de obra y material que sí llegó,
 > ya se compara contra lo ejecutado de verdad.
 
+> **Mismo día, un nivel más profundo — el archivo crudo de almacén, no solo el
+> consolidado.** Con `04_ABRIL_MOVIMIENTOS_DE_ALMACEN.xlsx` (hoja `Consulta`) se
+> resolvió su léxico —`Lote` numérico es el filtro correcto, no `Ubicacion`
+> (nombre de calle, cruza cuatro lotes) ni `# Lote` (siempre `S/L`); `Ubicacion`
+> además se repite dos veces en el encabezado con significados distintos— y se
+> identificó la cadena de referencia de la actividad que pedía P-38:
+> `Motivo="Implosión De Materiales"` + `Referencia` con `OP:folio,
+> No.Parte:clave`, validada contra la columna `# OP` (67 de 67 exacto).
+> `CONOCIMIENTO.md` §11.15, D-249/D-250.
+>
+> Con eso se cruzaron los dos únicos conceptos de abril con las dos puntas
+> —`EST-01060` losa de cimentación, `EST-02010` muro de tabique— contra su
+> propia matriz, a la misma escala implícita (reversión sobre un insumo ancla,
+> no la cantidad pagada acumulada). **El primer resultado tenía un bug propio:**
+> comparar material de almacén —que nunca registra mano de obra— contra un
+> total de matriz que sí la incluía. Corregido: de -31.2%/-40.3% a
+> **-19.7%/-2.6%**. `EST-02010` corregido prácticamente cuadra.
+> (`CONOCIMIENTO.md` §11.16, D-251 a D-253.)
+>
+> Bajando un nivel más, a la semana: `PRECIO_REAL_ALAMO_18.xlsx` trae en su hoja
+> `Mano de Obra` una columna `Semana` no usada hasta ahora. Cruzada contra la
+> salida de almacén semana a semana, aparece una asimetría real de campo —el
+> tabique se abastece por lote (desfase normal), el cemento a diario (señal
+> confiable)— y con ella un hallazgo concreto: una semana de `EST-02010` pagó
+> 293 m² con material que solo respalda ~92 m², **68.5% sin respaldo**.
+> `CONOCIMIENTO.md` §11.17, D-254/D-255. Motivó una idea a futuro, sin diseñar
+> todavía: verificar la estimación contra almacén *al prepararla*, no después
+> del pago del viernes (B-70).
+>
+> Y en paralelo, los ajustes sueltos `AJU_*` —que P-38 no sabía dónde ubicar
+> (P-31)— se resolvieron como **controles de cambio**, con clave propia
+> `CC-ALM-18XXX`: agrupador con concepto hijo, o matriz invertida con residuo
+> `TMP-ALM18-XX` cuando dos destajos están en desacuerdo, verificado contra el
+> archivo crudo antes de contar cada línea. Cinco controles, $36,214.03,
+> complementan —no se suman a— Presupuesto Formado.
+> (`CONOCIMIENTO.md` §11.18 · §13.4, D-256.)
+>
+> **Sigue siendo parcial y probablemente traiga sus propios errores**: solo dos
+> conceptos, un mes, y el patrón tabique/cemento se probó sobre un solo caso.
+> Se anota así — «no digo que esté bien», en palabras del usuario— para que la
+> siguiente corrida lo corrija si hace falta, no para cerrarlo.
+
 ---
 
 # Resultado de la prueba
 
-**Cinco etapas pasan, dos se rompen, cinco no se pueden probar.** El flujo aguanta
-completo desde la carga hasta la comparación entre planes, y se corta justo donde
-empieza la ejecución.
+**Cinco etapas pasan, tres se rompen, cuatro no se pueden probar.** El flujo aguanta
+completo desde la carga hasta la comparación entre planes, y donde empieza la
+ejecución ya hay primeros cruces reales, aunque parciales.
 
 ## Lo que la prueba encontró y no estaba
 
@@ -341,6 +383,8 @@ empieza la ejecución.
 | 4 | ¿Se programan los niveles sin ingeniería? | B-48 |
 | 5 | **Dos exports de salidas pueden ser la misma fuente filtrada distinto** — hay que verificar identidad de origen antes de sumar | B-64 |
 | 6 | **El catálogo maestro no cubre el 100% de los conceptos reales**, aunque nivel y etapa existan — `OBE-01010` no tiene ninguna fila de referencia | B-65 |
+| 7 | **Comparar material real contra un total de matriz que incluye mano de obra infla la brecha artificialmente** — almacén nunca la registra | D-252, `CONOCIMIENTO.md` §11.16 |
+| 8 | **No todos los insumos sirven igual para verificar semana a semana** — el que se abastece por lote no sirve, el que se entrega a diario sí | D-255, B-70 |
 
 ## Lo que la prueba validó
 
