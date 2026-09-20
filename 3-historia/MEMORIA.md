@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
-corte:      2026-09-15
-verificado: 243 decisiones · 12 descartes · 8 correcciones
+corte:      2026-09-20
+verificado: 248 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -317,6 +317,11 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-241 | **Losa con dos destajos en desacuerdo (armado ≠ descimbrado) se resuelve tomando el de armado, o el de mayor costo** | Validado cruzando contra la cimbra declarada independiente: 182.40+32.80+24.00 = 239.20 exacto contra `MAD-00002`. `CONOCIMIENTO.md` §11.13 |
 | D-242 | **El catálogo de presupuesto se reconstruyó completo para diez de catorce niveles de ALAMO 18** — $2,561,657.71, +12.0% contra el catálogo de referencia de esos mismos niveles | Cuatro niveles (Cancelería, Carpintería, Muebles/Iluminación, Herrería — $542,464.67) no tienen ninguna ingeniería cargada: 19.2% del presupuesto base en dinero, métrica distinta al 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5 — ambas correctas, miden cosas distintas. `CONOCIMIENTO.md` §11.13, B-65 |
 | D-243 | **`TMP-00002` cierra: el prorrateo se hace con el PU de la matriz de concepto confirmada, nunca con la columna `Total` de la ingeniería sin cruzarla antes** | En las 4 filas de `TMP-00002`, `Total` no era cantidad×PU — 2 filas con `Total=PU` (como cantidad=1), 2 con `Total` de la cantidad esperada del catálogo, no la real capturada. Solo se detectó cruzando contra 7+ referencias independientes en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`. `TMP-00002` sube de $1,423.84 a $2,447.04. B-66, `CONOCIMIENTO.md` §11.13 |
+| D-244 | **La explosión de matriz debe recorrer compuestos anidados hasta el insumo atómico, en las dos lecturas** — un compuesto (`AUX-`, `ZA1-`…) puede contener otro compuesto (12 de 90 lo hacen, hasta dos niveles) y puede esconder una línea de Contrato marcada `Tipo=Material` (`ZA1-000001`→`MOC-12010`, `CASO-TRABAJADO.md` §3) | Detenerse en el primer nivel subvaluaba destajo y material por igual — afectaba las dos tablas a la vez, no solo una. `CONOCIMIENTO.md` §11.14 |
+| D-245 | **La "matriz prestada" es una clase de error que se repite, no un caso único** — una clave puede existir en el archivo de matrices perteneciendo a OTRO prototipo (`EST-01060`, `ACA-01070` son Zafiro Plus, no Diamante con chimenea) | Ya había aparecido una vez (`EST-01060` confundida con `EST-01053`, antes de esta sesión) y volvió a aparecer en un camino de cálculo distinto, escalando material a 10-13× lo esperado antes de detectarse. Regla: cruzar contra el conjunto de claves del prototipo antes de usar su matriz. `CONOCIMIENTO.md` §11.14 |
+| D-246 | **El concepto auxiliar sin matriz propia se descompone en sus hijos reales del catálogo base para explotarlo por destajo/material** — no se prorratea su costo combinado (eso ya lo cerró D-240), pero el hijo que sí tiene su propia línea MO- ancla en la ingeniería reconstruye su cantidad real por reversión (`CONOCIMIENTO.md` §11.9) y se explota con su propia matriz | Probado sobre `EST-01060` (losa cimentación+5 castillos), `EST-00090` (4 losas de PB) y `EST-00100` (losa azotea+escalón). `MOC-01010` reconstruido cuadra exacto ($56,120) por ser la propia ancla. Los castillos K1-K8 y una de las losas nervadas de PB se quedan sin dato propio — B-67. `CONOCIMIENTO.md` §11.14 |
+| D-247 | **Separar el excedente en efecto cantidad y efecto receta cambia la lectura completa del hallazgo** — con las losas mal explotadas el excedente de destajo se leía casi todo como "mal rendimiento"; descompuestas, **87% es "se construyó más"** (244 m² reales contra 216 del catálogo) y solo 13% es receta distinta | Mismo giro en material, con un residuo de ~$101,071 que sigue sin explicarse — B-68. `CONOCIMIENTO.md` §11.14 |
+| D-248 | **Cuando una clave de destajo/material se repite en más de un nivel/etapa del árbol de comparación, lo pagado real solo se cuenta en su primera aparición del recorrido** | Lo pagado real no distingue ubicación — sumarlo en cada rama donde la clave reaparece triplicó el total pagado en el primer intento. `CONOCIMIENTO.md` §11.14 |
 
 ---
 

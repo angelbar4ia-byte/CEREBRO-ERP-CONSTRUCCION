@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-15
+corte:      2026-09-20
 verificado: 16 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -2342,6 +2342,135 @@ y carpintería concentran presupuesto alto en pocas etapas.
 > intervención humana en la mayoría de los bloques. Lote, TMP y ambiguos
 > siguen pidiendo criterio — pero ahora con reglas escritas, no con juicio
 > caso por caso.
+
+## 11.14 Comparar por destajo y material — la explosión de matriz sobre el catálogo reconstruido
+
+§11.13 reconstruye el catálogo **por concepto**. Compararlo contra el
+presupuesto base y lo pagado real **por destajo** (mano de obra, que es lo que
+se contrata) y **por material** (insumo, que es lo que se surte) necesita una
+capa más: explotar cada concepto por su matriz, no solo sumar su importe.
+Probado sobre `ALAMO 18`, catálogo Diamante con chimenea — **hallazgos
+recientes, sujetos a corrección** conforme se prueben sobre más casos.
+
+### La explosión no se detiene en el primer nivel
+
+Un insumo dentro de la matriz de un concepto puede ser él mismo un
+**compuesto** (`AUX-`, `ZA1-`… — §10.4, `CASO-TRABAJADO.md` §3) y ese
+compuesto puede anidar **otro** compuesto. De 90 compuestos usados como
+insumo en matrices de concepto, 89 se usan al menos una vez y **12 anidan
+otro compuesto adentro** — hasta **dos niveles** encontrados. Detenerse en el
+primer nivel subvalúa destajo y material por igual, y puede esconder mano de
+obra: `ZA1-000001` (zapata, `Tipo=Material`) contiene `MOC-12010` (`Tipo=
+Contrato`) — ya descrito en `CASO-TRABAJADO.md` §3. **La explosión recursiva
+tiene que llegar al insumo atómico en las dos lecturas (de costo y de
+contratación, §5.5), clasificando por el `Tipo` de cada hoja, no por el de su
+contenedor.**
+
+### La matriz prestada: una clave puede pertenecer a otro prototipo
+
+Una clave puede existir en el archivo de matrices **perteneciendo a un
+prototipo distinto** del que se está armando — incluso con la cantidad de
+referencia en una unidad de convención distinta (`act`). `EST-01060` y
+`ACA-01070` tienen matriz en el archivo, pero son de **Zafiro Plus**, no de
+Diamante con chimenea: usarla escaló el material a **10-13 veces** el valor
+esperado antes de detectarse.
+
+> **Antes de usar la matriz de una clave, se cruza contra el conjunto de
+> claves del prototipo que se está armando.** Que la clave *tenga* matriz no
+> basta — tiene que ser *su* matriz. Este error ya había aparecido una vez
+> (`EST-01060` confundida con `EST-01053`, antes de esta sesión) y volvió a
+> aparecer en un camino de cálculo distinto: **no es un caso aislado, es una
+> clase de error que se repite** cada vez que se cruza contra el archivo de
+> matrices sin filtrar por prototipo primero.
+
+### El concepto auxiliar no se explota directo — se descompone en sus hijos reales
+
+El concepto auxiliar (Nivel 3, agregador — `GLOSARIO-DOMINIO.md`, término
+«Concepto auxiliar») **no tiene matriz propia**: su valor es la suma de sus
+hijos. Igual que el concepto "lote" de §11.13 no se prorratea por no haber
+llave confiable de costo (D-240), el agregado tampoco se explota directo por
+destajo/material — pero **no es el mismo problema**: el lote no tiene forma
+de separar su costo combinado; el concepto auxiliar sí tiene, casi siempre,
+hijos identificables en el catálogo base con su propia matriz.
+
+```
+1. Identificar los hijos reales del concepto auxiliar en el catálogo base
+   (Nivel 4 bajo el mismo Nivel 3 — CATALOGO_DE_PRESUPUESTO, no inventado)
+2. Para cada hijo, buscar su línea de mano de obra ancla en la ingeniería
+   cruda — si aparece sola y reconocible, su cantidad real se reconstruye
+   por reversión (§11.9): cantidad_real = cantidad_ancla_real / rendimiento
+3. Explotar cada hijo con SU matriz, a su cantidad real
+4. El hijo sin ancla propia en la ingeniería se queda a la cantidad del
+   catálogo base — no se inventa (mismo principio que D-240)
+```
+
+Probado sobre los tres auxiliares de cimentación/losas de `ALAMO 18`:
+
+| Auxiliar (mi catálogo) | Hijos reales (catálogo base) | Ancla | Real vs. base |
+|---|---|---|---|
+| `EST-01060` (losa cim. + castillos) | `EST-01053` losa | `MOC-01010` | 244 vs 216 M2 (+13.0%) |
+| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | — sin ancla propia | sin cambio (cantidad base) |
+| `EST-00090` (losas PB) | `EST-20010` losa maciza 11cm | `MOE-02213` | 32.80 vs 39 M2 (-15.9%) |
+| | `EST-20020` losa maciza 12cm ("4.20") | `MOE-02217` | 24.00 vs 24 M2 (exacto) |
+| | `EST-20017`+`EST-20022` losa nervada (63+84 M2) | `MOE-02211`, **compartida** | 182.40 vs 147 M2 combinados — mismo factor (+24.1%) a las dos, sin forma de separarlas |
+| `EST-00100` (losa azotea) | `EST-20033` losa azotea | `MOE-02213` | 43.90 vs 33 M2 (+33.0%) |
+| | `EST-01510` escalón forjado | `MOE-02311`/`02312` | 4 vs 4 PZA (exacto) |
+
+`MOC-01010` reconstruido ($56,120) cuadra **exacto** contra la ingeniería
+cruda — es la propia ancla, así que confirma el mecanismo, no lo prueba
+contra un tercero. La losa nervada de PB es el caso honesto de datos
+insuficientes: dos hijos, una sola ancla combinada en la ingeniería — se
+aplicó el mismo factor a los dos por no haber llave para separarlos, **no
+porque sea lo correcto, sino porque es lo que hay.**
+
+### Efecto cantidad y efecto receta — separar por qué creció el excedente
+
+Con el concepto auxiliar bien descompuesto, se puede leer el excedente
+(Ingeniería − Presupuesto base) en dos partes, calculando un tercer valor:
+**Presupuesto Formado** — mi catálogo reconstruido, a su cantidad REAL,
+explotado con el MISMO rendimiento (matriz) que usa el presupuesto base.
+
+```
+Efecto cantidad = Presupuesto Formado − Presupuesto base   (construir más o menos, misma receta)
+Efecto receta    = Ingeniería − Presupuesto Formado          (usar distinto rendimiento, misma cantidad)
+Efecto cantidad + Efecto receta = Excedente                  (identidad exacta, fila por fila)
+```
+
+El auxiliar mal explotado (matriz prestada, o excluido sin descomponer)
+**invierte la lectura**: al no tener Presupuesto Formado, todo el excedente
+de esa clave se ve como "mal rendimiento" cuando puede ser, en gran parte,
+"se construyó más". En `ALAMO 18`, corregir las tres losas cambió el signo:
+
+| | Efecto cantidad | Efecto receta | = Excedente |
+|---|---:|---:|---:|
+| Destajo, con las losas mal explotadas | -$83,254 | +$164,940 | $81,687 |
+| Destajo, con las losas descompuestas | **+$71,372** | **+$10,315** | $81,687 |
+| Material, con las losas mal explotadas | -$485,127 | +$601,452 | $116,325 |
+| Material, con las losas descompuestas | **+$15,254** | **+$101,071** | $116,325 |
+
+**87% del excedente de destajo es construir más (244 m² reales contra 216
+del catálogo), no mal rendimiento.** En material queda un residuo de
+~$101,071 sin explicar — sigue abierto (`PENDIENTES-MEJORAS.md` B-68).
+
+### Alcance: qué queda fuera, y qué no se debe leer de más
+
+- **No reconcilia contra el total en dinero del catálogo reconstruido**
+  (§11.13). Son dos lecturas de valor distintas — costo real declarado
+  contra rendimiento estándar a cantidad real — y no tienen por qué sumar
+  igual.
+- **Una clave del catálogo base/ingeniería que nunca aparece en el
+  catálogo reconstruido explotado no significa que "no se construyó"**:
+  puede ser un hijo sin ancla propia dentro de un concepto auxiliar (los
+  castillos de la tabla arriba), o una clave que mi catálogo agrupó bajo
+  otro nombre. Se marca, no se interpreta en automático.
+- **40 conceptos de mi catálogo ($394,172.93) siguen sin matriz para esta
+  comparación** — TMP-/AJU-/agregados propios sin matriz válida del
+  prototipo. Cuentan en el total del catálogo (§11.13) pero no en esta
+  capa. `PENDIENTES-MEJORAS.md` B-69.
+- **Cuando una clave de destajo/material se repite en más de un
+  nivel/etapa**, lo pagado real (que no distingue ubicación) solo se cuenta
+  en su primera aparición del recorrido — sumarlo en cada rama triplicó el
+  total pagado en el primer intento.
 
 ---
 

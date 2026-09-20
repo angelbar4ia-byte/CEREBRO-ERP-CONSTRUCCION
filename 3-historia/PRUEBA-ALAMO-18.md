@@ -5,7 +5,7 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-18
+corte:      2026-09-20
 verificado: 12 etapas recorridas · 5 pasan · 2 se rompen · 5 sin poder probarse
 ```
 
@@ -308,6 +308,20 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 >
 > El dato para cerrar P-38 sigue incompleto —todavía no hay salidas para el resto
 > de los meses de obra— pero ya se sabe cómo NO combinar lo que vaya llegando.
+
+> **Actualización 2026-09-20 — la tercera pata ya se arma, con lo que hay.**
+> Con `PRECIO_REAL_ALAMO_18.xlsx` (hoja Mano de Obra para destajo pagado, hojas
+> Consolidado Materiales/MO para consumo de almacén) se construyó la
+> comparación completa **por destajo y por material** —árbol y consolidado,
+> presupuesto base / ingeniería / pagado real / **Presupuesto Formado** (el
+> catálogo reconstruido a cantidad real, explotado con el rendimiento del
+> catálogo base)— `CONOCIMIENTO.md` §11.14. Sigue siendo parcial: el pagado
+> real mezcla lo registrado por concepto y por destajo suelto (se convierte),
+> y 40 conceptos del catálogo reconstruido ($394,172.93) todavía no tienen
+> matriz para esta capa (B-69). **No es la tabla de salidas completa
+> que pide P-38** —siguen faltando meses de almacén— pero ya no se compara
+> solo entre dos planes: la parte de mano de obra y material que sí llegó,
+> ya se compara contra lo ejecutado de verdad.
 
 ---
 
