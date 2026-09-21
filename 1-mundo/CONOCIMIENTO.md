@@ -28,7 +28,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §10 | Categorías | 234 | 6 |
 | §11 | Los flujos entre sistemas | 1026 | 18 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 355 | 7 |
+| §13 | Contratación, cambios y obra en marcha | 366 | 7 |
 | §14 | La propuesta | 66 | 5 |
 | §15 | La ruta crítica no está en el modelo | 39 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
@@ -1895,8 +1895,8 @@ rendimiento           → cuántas jornadas costó
 ## 11.7 Auditar la diferencia no es un módulo nuevo
 
 Comparar la ingeniería del lote contra su prototipo usa **el mecanismo que ya
-existe**: la descomposición en desviación de precio y de consumo, y las seis causas
-con quién paga cada una (§13.6).
+existe**: la descomposición en desviación de precio y de consumo, y las nueve
+causas con quién paga cada una (§13.6).
 
 **Lo único nuevo es cuándo se compara:**
 
@@ -1929,7 +1929,7 @@ declarado borra la evidencia de que algo cambió sin avisar.
 Dos disparadores distintos, la misma respuesta:
 
 **1 · Diferencia sin causa (P-29).** Es la «ausencia de causa» de arriba: no cae en
-ninguna de las seis causas de §13.6. Se marca como alerta. Alguien decide si es
+ninguna de las nueve causas de §13.6. Se marca como alerta. Alguien decide si es
 desviación real de obra, si faltaba declarar la causa, o si es un error de captura.
 
 **2 · Identidad dudosa por cantidades (P-30).** Comparar por contenido —qué trae la
@@ -2946,7 +2946,7 @@ agregar ni comparar:
 
 Por eso la primera pregunta al capturar no es la causa, sino: **¿es la misma obra?**
 
-### Las seis causas, y quién paga cada una
+### Las nueve causas, y quién paga cada una
 
 La palabra «omisión» tapa situaciones que se pagan al revés. **Lo que las separa es
 contra qué se comparan, y la única referencia que importa es el contrato del
@@ -2960,6 +2960,17 @@ cliente.**
 | 4 | **Omisión de proyecto, dentro del contrato** — el cliente ya lo compró, el plano no lo dibujó | No | **Tú** | **No es cobrable.** Error de proyecto |
 | 5 | **Petición nueva del cliente** — fuera de lo contratado | **Sí** | **El cliente** | Orden de cambio, precio nuevo |
 | 6 | **Contrato cambiado sin propagar** — autorizado, pero nadie bajó el impacto | **Sí** | **El cliente** | Orden de cambio · ver abajo |
+| 7 | **Falta de insumos** | No | No aplica — es causa de tiempo, no de costo | Programa: tramo de una actividad existente (P-5 abajo) |
+| 8 | **Temporalidad o clima** | Depende — si solo detiene, no; si daña, la reparación sí | Si solo detiene, nadie; si daña, **Tú** (salvo que el contrato diga otra cosa) | Si solo detiene: calendario, sin pasar de ahí. Si daña y crece obra: incidencia + merma por daño/clima (fila Materiales, arriba) |
+| 9 | **Mejora de proyecto** — nadie la pidió, ni el proyecto ni el cliente | **Sí** | **Sin definir** — no es error que se absorba (3/4) ni petición del cliente que se cobre sola (5) | Incidencia, propuesta — no se ejecuta sola |
+
+> **Las causas 7 a 9 se agregaron leyendo el programa, no el costo** — mismo
+> vocabulario, pero no siempre caen limpio en las columnas de arriba: una falta de
+> insumos casi nunca es una desviación de precio o consumo, es un hueco en el
+> programa. Cuando el motivo además cambia el alcance —el viento que tira un muro,
+> una mejora que nadie pidió— el hecho se registra como **incidencia**
+> (`PROPUESTA-CUATRO-MODULOS.md` §4), un registro aparte que puede o no generar
+> también una desviación o un control de cambio: no son el mismo renglón.
 
 ### Las dos omisiones son opuestas
 

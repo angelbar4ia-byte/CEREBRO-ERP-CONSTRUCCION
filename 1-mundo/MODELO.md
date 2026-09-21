@@ -721,7 +721,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 
 | `tipo` | Dispara cuando | Cierra |
 |---|---|---|
-| `diferencia_sin_causa` | Prototipo contra ingeniería difiere y la diferencia no cae en ninguna de las seis causas de `CONOCIMIENTO.md` §13.6 | P-29 |
+| `diferencia_sin_causa` | Prototipo contra ingeniería difiere y la diferencia no cae en ninguna de las nueve causas de `CONOCIMIENTO.md` §13.6 | P-29 |
 | `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
 
 ---
@@ -775,7 +775,7 @@ por permiso.
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Paramétrico / Ensamble | Diseño en `CONOCIMIENTO.md` §5 del conocimiento, sin tabla propuesta aún |
-| Programa / CPM | Las 19 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4) — falta el diseño formal de sus tablas aquí |
+| Programa / CPM | Las 20 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4) — falta el diseño formal de sus tablas aquí, `INCIDENCIA` incluida |
 | Estimaciones, contratos, almacén | P-18, P-19 — sin definir |
 | Roles y permisos | P-21 — sin definir |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |

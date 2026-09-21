@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-21
-verificado: 264 decisiones · 12 descartes · 8 correcciones
+verificado: 270 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -338,6 +338,12 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-262 | **P-7 cierra: el CPM usa el rendimiento real de mano de obra como segunda proyección, nunca reemplaza al teórico** | Si diverge más allá de un umbral avisa `Desviación`, nunca reprograma sola. El umbral no es un número fijo: es un rango sugerido —2 a 4 semanas seguidas de datos— que el sistema propone (proactivo o a petición del agente Consulta) y el usuario confirma; puede existir un real global agregado entre obras como referencia adicional. `PROPUESTA-CUATRO-MODULOS.md` §4 |
 | D-263 | **«Rendimiento real» nombra dos cosas que no se deben mezclar: el de mano de obra alimenta solo al CPM, el de material alimenta solo al costo** | Mezclarlos repetiría D-252 en la otra dirección. El de mano de obra lo registra el residente con avance y cuadrillas; el de material se concilia después contra salida de almacén. `CONOCIMIENTO.md` §6.2 · §11.16 · §11.17 |
 | D-264 | **Avance físico (inspección, rol Control) y avance pagado (estimación semanal) son dos registros independientes — ninguno sobrescribe al otro, la diferencia es la señal** | Mismo patrón que la cadena de precios. Caso real: `EST-02010` semana 19, 293 m² pagados con respaldo de cemento para ~92 m² (D-255) — sin avance físico propio no se puede saber si es sobreestimación o material adelantado. `CONOCIMIENTO.md` §13.1 · §13.7 |
+| D-265 | **El programa se arma manual o por carga, y en cada uno Control de obra edita estructura mientras Residente edita solo fechas** | Manual con diseño: Control marca duración desde presupuesto PU o paramétrico. Manual sin diseño: Residente da fechas concretas y la duración se deriva al revés —cuarta forma de obtener duración—, reprograma solo al registrar avance. Por carga: Control fija vínculos y puede modificarlo todo, Residente solo fechas. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-266 | **Un control de cambio también dispara reprogramar, no solo altera el árbol de presupuesto** | Costos o Control de obra lo genera —o se detecta al cargar—; si cambia qué hay que construir, cambia cuándo. `CONOCIMIENTO.md` §13.4 · `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-267 | **P-8 cierra: incidencia de programa y desviación de costo son registros independientes, no el mismo hecho leído dos veces** | Evidencia del usuario: un error de ejecución se cobra al contratista sin pagar destajo —sin desviación de costo— y el programa igual se retrasa. Comparten vocabulario de causa, extendido a nueve en `CONOCIMIENTO.md` §13.6. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-268 | **El efecto de una incidencia sobre el programa no es uniforme: pausa una actividad (tramo, P-5), crea o hace crecer una, o solo se propone sin ejecutar** | La lluvia que detiene un colado no necesita incidencia —ya la cubre el calendario, P-2—; el viento que tira un muro sí, porque cambia qué hay que construir. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-269 | **La cadena de aprobación de una incidencia: quien la origina no se autoaprueba ni se autovalida, y el Supervisor siempre da seguimiento hasta el cierre** | Tres variantes según quién origina —Residente, Supervisor o Control de obra—, cada una saltándose el paso que le tocaría al originador. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-270 | **Cierre de frente es un trámite nuevo —solicitar, aprobar, validar— ligado al 90% de avance, y no contradice que Frente sea informativo** | Es la primera vez que Frente carga un evento propio; no calcula nada, solo pregunta si se puede dar por terminado. Momento natural para una incidencia de calidad. `CATALOGOS.md` · `PROPUESTA-CUATRO-MODULOS.md` §4 |
 
 ---
 
