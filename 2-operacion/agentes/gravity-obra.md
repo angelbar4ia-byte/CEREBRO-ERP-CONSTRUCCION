@@ -31,8 +31,16 @@ instalar.
 **Motor y modelo son cosas distintas** — Ollama y Groq no son modelos, son dónde y
 cómo se ejecuta uno. El modelo corre como su propio servicio, nunca embebido en el
 backend: mismo principio que «el MCP habla con la capa de servicio, nunca con la
-base» (`ESCALABILIDAD.md` §4), aplicado al modelo. Por qué esta recomendación,
-`MEMORIA.md` D-257.
+base» (`ESCALABILIDAD.md` §4), aplicado al modelo.
+
+**Por qué Llama 3.1 8B, en orden de peso:** alcanza para el trabajo angosto del
+interno (§4 · §7 abajo — compara texto, redacta, nunca calcula dinero); es barato
+(el modelo más económico de Groq, ~$0.05/$0.08 por millón de tokens
+entrada/salida); y corre igual en los dos perfiles sin fricción. Detalle,
+cifras y la alternativa (Qwen3 14B) en `MEMORIA.md` D-257.
+
+> **Este terreno cambia rápido — revisar de nuevo al momento de construir**, no dar
+> la recomendación de hoy por buena sin más.
 
 **Difícilmente se mezclan.** Si algún día una instalación necesita los dos, eso se
 diseña entonces; no se construye hoy por si acaso.
