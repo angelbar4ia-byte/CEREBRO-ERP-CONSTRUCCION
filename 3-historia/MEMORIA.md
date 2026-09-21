@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-21
-verificado: 257 decisiones · 12 descartes · 8 correcciones
+verificado: 258 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -331,6 +331,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-255 | **Tabique y cemento no se leen igual semana a semana — dato de campo, no supuesto: el tabique se abastece por lote (desfase normal), el cemento a diario (señal confiable)** | Aportado por el usuario, con experiencia directa de obra. Sobre `EST-02010`, una semana con 293 m² pagados solo tiene respaldo de cemento para ~92 m² — 68.5% sin respaldo. `CONOCIMIENTO.md` §11.17 |
 | D-256 | **Los controles de cambio de ALAMO 18 quedan con su clave y método cerrados: `CC-ALM-18XXX`, agrupador con hijo o matriz invertida con residuo `TMP-ALM18-XX`, verificado contra el archivo crudo antes de contarlo** | Resuelve `P-31` (qué hacer con los archivos `AJU_*` sueltos). Es capa complementaria a Presupuesto Formado, no se suma — cinco controles, $36,214.03. `CONOCIMIENTO.md` §11.18 |
 | D-257 | **D-68 mezclaba motor de ejecución con modelo — `agentes/gravity-obra.md` decía "Modelo: Ollama" y "Modelo: Groq", y ninguno de los dos es un modelo.** Corregido: motor (Ollama local, Groq red) separado del modelo que corre encima. **Recomendado, pendiente de confirmar: Llama 3.1 8B** (familia 3.x) en los dos perfiles — soportado en Ollama sin GPU cara y es el más barato de Groq, ~$0.05/$0.08 por millón de tokens entrada/salida. Alcanza porque el trabajo del interno es angosto a propósito (`gravity-obra.md` §4 · §7: compara texto y redacta, nunca calcula dinero). Alternativa si el español técnico del oficio lo exige: Qwen3 14B — mejor multilingüe, mismo desempeño en Ollama, disponibilidad menos estable en Groq | El usuario preguntó dónde entraban Groq/Llama/Ollama y expuso la imprecisión. Verificado por búsqueda: [Groq Pricing In 2026](https://www.cloudzero.com/blog/groq-pricing/), [The Best Open Source LLM For Spanish In 2026](https://www.siliconflow.com/articles/en/best-open-source-llm-for-spanish) |
+| D-258 | **Consulta necesita un solo orquestador, no varios — y su catálogo de tools queda abierto, en `gravity-obra.md` §6, para crecer sin volver a preguntar dónde va cada cosa** — diez tools en cinco grupos, siete listas y tres pendientes de otro bloqueo. Se agrega un cuarto detector, "Auditoría de explosión/método": no compara la obra contra un plan, compara si el propio cálculo siguió las reglas — matriz prestada, concepto auxiliar sin descomponer, alcance mezclado, compuestos sin explotar hasta el fondo, fuente de almacén cargada dos veces | Los cinco casos que agrupa ya pasaron uno por uno en esta obra, no son hipotéticos (D-244, D-245, D-252, B-64). Cierra el cabo suelto entre `ESCALABILIDAD.md` §7 (donde "Auditoría de explosión" y "Comparador de obras" vivían como ideas sin conectar) y la tabla de detectores de `gravity-obra.md` §6 |
 
 ---
 

@@ -5,7 +5,7 @@
 capa:       II — Operación
 pregunta:   ¿cómo se agrega un módulo, incluso uno que aún no está definido?
 tiempo:     se hace así
-corte:      2026-09-15
+corte:      2026-09-21
 verificado: Derivado de los 25 módulos de PENDIENTES §F y de las costuras de `erp-construccion.md` §9
 ```
 
@@ -266,8 +266,8 @@ Son los que sólo **leen** y producen una dimensión que el sistema viejo no tie
 |---|---|---|
 | Diccionario | El catálogo | Equivalencias y homologación |
 | Factorizador | Materiales y unidades | Compras reales, sobrante contra desperdicio |
-| Auditoría de explosión | Presupuesto y matrices | Dónde no cuadra y por qué |
-| Comparador de obras | Dos presupuestos | Desviación entre lotes o prototipos |
+| Auditoría de explosión | Presupuesto y matrices | Dónde no cuadra y por qué — ya es detector de `gravity-obra.md` §6 |
+| Comparador de obras | Dos presupuestos | Desviación entre lotes o prototipos — catalogado como `comparar_obras` en `gravity-obra.md` §6 |
 
 **Ninguno escribe en el sistema origen.** Por eso son los primeros candidatos: el
 riesgo de deshacerlos es cero.
