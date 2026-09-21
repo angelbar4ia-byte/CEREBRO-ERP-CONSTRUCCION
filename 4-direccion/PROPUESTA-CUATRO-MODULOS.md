@@ -5,8 +5,8 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se propone construir?
 tiempo:     vamos aquí
-corte:      2026-09-13
-verificado: ✅ 16 decisiones cerradas · pendiente diseño formal
+corte:      2026-09-21
+verificado: ✅ 17 decisiones cerradas · pendiente diseño formal
 ```
 
 > **Para revisar y decidir, no para construir todavía.**
@@ -391,9 +391,9 @@ la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cu
 | ~~P-2~~ | ~~¿Cuántos calendarios?~~ | **Uno por obra, con excepciones por cuadrilla.** La lluvia para la obra entera; que un subcontratista no trabaje sábados sólo lo para a él. El global manda salvo excepción declarada |
 | ~~P-3~~ | ~~¿Cuándo se recalcula?~~ | **Siempre se recalcula; sólo avisa si cambia la ruta**, no cuando únicamente se corren fechas. Un aviso diario deja de leerse |
 | ~~P-4~~ | ~~¿Las fechas contratadas se mueven?~~ | **Se congelan: una fecha contratada no se mueve sola.** Misma regla que el precio — en lo contratado, el cambio pasa por control de cambio |
-| P-5 | **¿La actividad puede partirse en tramos?** ¿El tramo se captura o se deduce de la precedencia técnica? | — |
+| ~~P-5~~ | ~~¿La actividad puede partirse en tramos?~~ | **Depende de la fuente de la pausa — misma clasificación que ya usa P-1.** Si la fuerza una precedencia técnica (la cadena debe colarse antes de seguir), el tramo se deduce solo, igual que cualquier precedencia técnica (es física). Si la fuerza un recurso o una decisión (la cuadrilla se fue a otro frente, el clima), se captura a mano — no hay de dónde deducirlo. El reparto de material entre tramos se calcula por default y queda como campo editable — cuarta aparición de «declarado menos calculado» (`MEMORIA.md` D-259) |
 
-**Cuatro decididas, una nueva abierta.**
+**Las cinco decididas.**
 
 > **P-4 completa la simetría:** en lo contratado, el precio y la fecha son las dos
 > obligaciones, y ninguna de las dos se mueve por recálculo. Reprogramar propone la
@@ -408,11 +408,12 @@ la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cu
 | **Factorizador** | Compras reales, inventario contra desperdicio, catálogo más chico | Bajo | ✅ 4 de 4 |
 | **Cuantificador** | Cantidades auditables, corpus del paramétrico | **Alto** | ✅ 4 de 4 |
 | **Paramétrico** | Presupuestar sin planos, priorizar por incertidumbre | Medio | ✅ 4 de 4 + corpus |
-| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 4 de 4 · **P-5 abierta** |
+| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 5 de 5 |
 
-**Las 16 decisiones están cerradas.** Quedan tres piezas que aparecieron al cerrarlas:
-`P-5` (actividad en tramos), `B-40` (tiempo de entrega) y `B-45` (dónde vive una regla
-de gobierno por obra).
+**Las 17 decisiones están cerradas** — las 16 originales más `P-5` (actividad en
+tramos), la última en cerrar. Las otras dos piezas que aparecieron al cerrar las
+primeras 16 también se resolvieron después: `B-40` (tiempo de entrega) y `B-45`
+(dónde vive una regla de gobierno por obra) — ninguna de las tres sigue abierta.
 
 ## Mi recomendación
 

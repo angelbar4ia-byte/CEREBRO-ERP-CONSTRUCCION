@@ -5,8 +5,8 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se pensó y aún no se diseña?
 tiempo:     vamos aquí
-corte:      2026-09-15
-verificado: 7 ideas · una con tabla propia (§2), ninguna de las demás diseñada
+corte:      2026-09-21
+verificado: 8 ideas · una con tabla propia (§2), ninguna de las demás diseñada
 ```
 
 > **Sólo las ideas del modelo que aún no se diseñan.** Todo pendiente de datos, de
@@ -26,6 +26,7 @@ verificado: 7 ideas · una con tabla propia (§2), ninguna de las demás diseña
 | Cambiar la unidad de un insumo | §5 |
 | Corregir el prefijo `AUX-` | §6 |
 | Sustitución de insumo dentro de una matriz | §7 |
+| El agente interno sugiere tramos, aprendiendo de la salida de almacén | §8 |
 
 ## 1 Idea: la matriz a partir de la descripción
 
@@ -562,3 +563,28 @@ de un factor de rendimiento (ligaría con el factorizador, D-86 a D-92).
 > **No es más que una idea todavía.** Necesita el mismo tratamiento que las otras
 > seis: evidencia de casos reales, y que el arquitecto la revise antes de agregarla
 > a `CONOCIMIENTO.md` §12.
+
+## 8 Idea: el agente interno sugiere tramos, aprendiendo de la salida de almacén
+
+Que `gravity-obra`, con el tiempo, observe patrones de salida de almacén que se
+parecen a un tramo —una salida que se corta y luego retoma— y **proponga** marcar
+la actividad como partida, con la evidencia que lo sostiene. Nunca la aplica sola:
+mismo principio de siempre, «propone, no aplica».
+
+### Por qué hay que ser especialmente cuidadoso acá
+
+Se probó, sobre `EST-02010` (el mismo caso que motivó P-5 — el muro de tabique),
+si el patrón real confirmaba la hipótesis. **No la confirma.** No hay ninguna
+actividad de cadena o cerramiento visible en el almacén durante esa ventana, y la
+explicación más simple del hueco de tabique en la semana 19 es que **todavía
+había existencia** de la entrega grande de la semana 18 —6,000 piezas alcanzan
+para ~120 m², más del doble de lo pagado esa semana— no que la obra se detuvo.
+`CONOCIMIENTO.md` §11.17.
+
+> Es exactamente el tipo de caso que un detector de tramos mal construido
+> confundiría con un tramo real. La evidencia tiene que distinguir «no llegó
+> material nuevo» de «la actividad se detuvo» — son cosas distintas, y solo la
+> segunda es un tramo.
+
+**No es más que una idea todavía.** Necesita casos reales que sí confirmen el
+patrón antes de proponerse como detector formal en `gravity-obra.md` §6.
