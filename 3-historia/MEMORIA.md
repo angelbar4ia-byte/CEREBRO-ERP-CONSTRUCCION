@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-21
-verificado: 270 decisiones · 12 descartes · 8 correcciones
+verificado: 275 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -344,6 +344,11 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-268 | **El efecto de una incidencia sobre el programa no es uniforme: pausa una actividad (tramo, P-5), crea o hace crecer una, o solo se propone sin ejecutar** | La lluvia que detiene un colado no necesita incidencia —ya la cubre el calendario, P-2—; el viento que tira un muro sí, porque cambia qué hay que construir. `PROPUESTA-CUATRO-MODULOS.md` §4 |
 | D-269 | **La cadena de aprobación de una incidencia: quien la origina no se autoaprueba ni se autovalida, y el Supervisor siempre da seguimiento hasta el cierre** | Tres variantes según quién origina —Residente, Supervisor o Control de obra—, cada una saltándose el paso que le tocaría al originador. `PROPUESTA-CUATRO-MODULOS.md` §4 |
 | D-270 | **Cierre de frente es un trámite nuevo —solicitar, aprobar, validar— ligado al 90% de avance, y no contradice que Frente sea informativo** | Es la primera vez que Frente carga un evento propio; no calcula nada, solo pregunta si se puede dar por terminado. Momento natural para una incidencia de calidad. `CATALOGOS.md` · `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-271 | **El avance se captura de dos formas: número o porcentaje contra lo programado, o un trazo opcional comparado contra el trazo de programación** | El trazo reusa el mecanismo de C-4 (`PROPUESTA-CUATRO-MODULOS.md` §2) — se compara, las dos versiones quedan. Ninguna forma reemplaza a la otra |
+| D-272 | **Trazar avance es más angosto que trazar en general: Control, Residente y Supervisor, sin Costos** | Costos participa del trazo de presupuesto (B-45, `MODELO.md` §1b) pero no del de avance, que es de campo |
+| D-273 | **Hay dos cuantificadores, no uno: el de presupuesto es el techo, el de programación se mide contra ese techo con tolerancia** | La tolerancia reusa `ALERTA.parametro_usado` (`MODELO.md` §5a), que ya traía `{"umbral_pct": 20}` como su propio ejemplo — no hizo falta inventar el mecanismo. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-274 | **P-9 cierra: cruzar el umbral del cuantificador de programación no es la misma incidencia, aunque se resuelven con el mismo mecanismo** | Control revisa la alerta y decide: incidencia real (la origina) o descartada (error de trazo, no de obra). Validado contra siete escenarios de campo: seis caen en las nueve causas de `CONOCIMIENTO.md` §13.6, uno —cuantificación mal trazada— no es causa, es alerta descartada |
+| D-275 | **El residente ve la brecha de avance contra el presupuesto, no solo contra lo programado, y puede solicitar ajuste de cantidad a Control de obra** | Mismo patrón que solicitar extender el techo del cuantificador de programación (D-273) |
 
 ---
 

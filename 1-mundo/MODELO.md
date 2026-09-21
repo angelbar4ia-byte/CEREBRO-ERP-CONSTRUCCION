@@ -775,7 +775,7 @@ por permiso.
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Paramétrico / Ensamble | Diseño en `CONOCIMIENTO.md` §5 del conocimiento, sin tabla propuesta aún |
-| Programa / CPM | Las 20 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4) — falta el diseño formal de sus tablas aquí, `INCIDENCIA` incluida |
+| Programa / CPM | Las 21 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4) — falta el diseño formal de sus tablas aquí, `INCIDENCIA` y el registro de avance incluidos |
 | Estimaciones, contratos, almacén | P-18, P-19 — sin definir |
 | Roles y permisos | P-21 — sin definir |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
