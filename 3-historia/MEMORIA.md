@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-21
-verificado: 275 decisiones · 12 descartes · 8 correcciones
+verificado: 277 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -349,6 +349,8 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-273 | **Hay dos cuantificadores, no uno: el de presupuesto es el techo, el de programación se mide contra ese techo con tolerancia** | La tolerancia reusa `ALERTA.parametro_usado` (`MODELO.md` §5a), que ya traía `{"umbral_pct": 20}` como su propio ejemplo — no hizo falta inventar el mecanismo. `PROPUESTA-CUATRO-MODULOS.md` §4 |
 | D-274 | **P-9 cierra: cruzar el umbral del cuantificador de programación no es la misma incidencia, aunque se resuelven con el mismo mecanismo** | Control revisa la alerta y decide: incidencia real (la origina) o descartada (error de trazo, no de obra). Validado contra siete escenarios de campo: seis caen en las nueve causas de `CONOCIMIENTO.md` §13.6, uno —cuantificación mal trazada— no es causa, es alerta descartada |
 | D-275 | **El residente ve la brecha de avance contra el presupuesto, no solo contra lo programado, y puede solicitar ajuste de cantidad a Control de obra** | Mismo patrón que solicitar extender el techo del cuantificador de programación (D-273) |
+| D-276 | **La proyección de insumos no es módulo nuevo: es `recursos_por_fecha` (`PROPUESTA-CUATRO-MODULOS.md` §4) expuesto como reporte** | Los reportes de lo ya consumido ya existían en Consulta (`resumen_salidas_material`, `rendimiento_material`). Confirmado por el usuario: aplican los dos, no uno u otro |
+| D-277 | **Nueva regla general, no solo de este módulo: el alcance de datos por rol.** Residente ve sus obras, Supervisor hereda las de sus residentes, Control ve todo y filtra | No existía — los roles hasta hoy solo definían qué acciones puede hacer cada uno (D-204 a D-206), nunca qué datos ve. Faltan dos piezas: asignación supervisor↔residente (nueva) y el alcance de Costos/Cotizador (sin definir). `MODELO.md` §5b |
 
 ---
 

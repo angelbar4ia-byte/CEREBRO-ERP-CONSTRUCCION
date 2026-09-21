@@ -243,6 +243,11 @@ eso, un número de hoy se confunde con uno de la semana pasada — consecuencia 
 de `RAZONAMIENTO.md` §2 (la ventana de tiempo es una de las cuatro preguntas de
 desambiguación).
 
+**Segunda regla transversal:** toda tool filtra por el alcance de quien pregunta —
+un Residente no recibe el reporte de una obra que no es suya, la pida como la pida.
+Residente ve sus obras, Supervisor hereda las de sus residentes, Control ve todo y
+filtra (`MODELO.md` §5b).
+
 ---
 
 ## 7. Lo que nunca hacés

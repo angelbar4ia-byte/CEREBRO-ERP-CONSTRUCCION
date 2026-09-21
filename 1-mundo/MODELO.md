@@ -766,6 +766,29 @@ el gasto en subcontratos específicamente, la vía no es un tope por rol — es
 modelarlos como matriz (`COMPOSICION`), donde el control ya es por línea, no
 por permiso.
 
+### El alcance de datos — quién ve qué obra, aparte de quién hace qué
+
+`ROL_FUNCION` dice qué **acciones** puede hacer cada rol. Falta la otra mitad: qué
+**datos** ve — es una regla general del sistema, no solo de reportes de insumo.
+
+| Rol | Ve |
+|---|---|
+| **Residente** | Sus obras asignadas |
+| **Supervisor** | Hereda las obras de los residentes que supervisa |
+| **Control** | Todas las obras. Filtra por obra, por residente o por supervisor |
+
+**Es jerárquico, no una lista plana**: el alcance de Supervisor se deriva de a
+quién supervisa, no se declara obra por obra.
+
+> Sin campo propio todavía: hace falta la asignación **residente↔obra** (ya
+> anotada en C-3, `PROPUESTA-CUATRO-MODULOS.md` §2, «se define por obra, al
+> asignarla a un residente») y una nueva, **supervisor↔residente**, que no
+> existía hasta ahora.
+
+Aplica a todo lo que el sistema muestra, no solo a insumos: reportes, Consulta
+(`gravity-obra.md` §6), avance, incidencias. **Costos y Cotizador quedan sin
+definir** — no está declarado si su alcance es por obra o global.
+
 ---
 
 # 6. Lo que este modelo deliberadamente NO resuelve
