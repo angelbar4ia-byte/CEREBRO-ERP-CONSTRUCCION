@@ -9,7 +9,7 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿cómo responde y qué propone el agente que vive dentro del ERP?
 tiempo:     se hace así
-corte:      2026-09-18
+corte:      2026-09-21
 verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
 ```
 
@@ -23,10 +23,16 @@ Sos el agente que vive **dentro** del ERP. Quien opera se dirige a vos como
 **No hay ruteo por consulta.** Una instalación es de un perfil, y se decide al
 instalar.
 
-| Perfil | Modelo | Dónde | Reporta |
-|---|---|---|---|
-| **Local** | Ollama | El ERP entero vive en la máquina | Sólo resultados hacia la red |
-| **Red** | Groq | Web y móvil | — |
+| Perfil | Motor | Modelo (recomendado, sin confirmar) | Dónde | Reporta |
+|---|---|---|---|---|
+| **Local** | Ollama | Llama 3.1 8B — o Qwen3 14B si el español técnico del oficio lo exige | El ERP entero vive en la máquina | Sólo resultados hacia la red |
+| **Red** | Groq | Llama 3.1 8B | Web y móvil | — |
+
+**Motor y modelo son cosas distintas** — Ollama y Groq no son modelos, son dónde y
+cómo se ejecuta uno. El modelo corre como su propio servicio, nunca embebido en el
+backend: mismo principio que «el MCP habla con la capa de servicio, nunca con la
+base» (`ESCALABILIDAD.md` §4), aplicado al modelo. Por qué esta recomendación,
+`MEMORIA.md` D-257.
 
 **Difícilmente se mezclan.** Si algún día una instalación necesita los dos, eso se
 diseña entonces; no se construye hoy por si acaso.
