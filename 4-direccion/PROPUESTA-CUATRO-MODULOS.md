@@ -6,7 +6,7 @@ capa:       IV — Dirección
 pregunta:   ¿qué se propone construir?
 tiempo:     vamos aquí
 corte:      2026-09-21
-verificado: ✅ 17 decisiones cerradas · pendiente diseño formal
+verificado: ✅ 19 decisiones cerradas · pendiente diseño formal
 ```
 
 > **Para revisar y decidir, no para construir todavía.**
@@ -372,10 +372,11 @@ Dos consecuencias que hay que asumir:
   con sus supuestos a la vista, nunca el número solo. Un flujo de efectivo presentado
   como dato es la forma más cara de esa confusión.
 
-### El tope de cuadrillas por frente
+### El tope de cuadrillas, por oficio dentro del frente
 
 Ya está anotado que la relación no es lineal. Con CPM se vuelve concreto: **acortar
-la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cuál.
+la ruta crítica metiendo gente tiene un techo** — no por frente, sino por cuántas
+cuadrillas del mismo oficio caben en la misma etapa sin estorbarse. **P-6**, abajo.
 
 ## Qué cuesta
 
@@ -392,12 +393,18 @@ la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cu
 | ~~P-3~~ | ~~¿Cuándo se recalcula?~~ | **Siempre se recalcula; sólo avisa si cambia la ruta**, no cuando únicamente se corren fechas. Un aviso diario deja de leerse |
 | ~~P-4~~ | ~~¿Las fechas contratadas se mueven?~~ | **Se congelan: una fecha contratada no se mueve sola.** Misma regla que el precio — en lo contratado, el cambio pasa por control de cambio |
 | ~~P-5~~ | ~~¿La actividad puede partirse en tramos?~~ | **Depende de la fuente de la pausa — misma clasificación que ya usa P-1.** Si la fuerza una precedencia técnica (la cadena debe colarse antes de seguir), el tramo se deduce solo, igual que cualquier precedencia técnica (es física). Si la fuerza un recurso o una decisión (la cuadrilla se fue a otro frente, el clima), se captura a mano — no hay de dónde deducirlo. El reparto de material entre tramos se calcula por default y queda como campo editable — cuarta aparición de «declarado menos calculado» (`MEMORIA.md` D-259) |
+| ~~P-6~~ | ~~¿Hay un tope de cuadrillas por frente, y de dónde sale?~~ | **No es «por frente»: es por oficio dentro del frente.** Frente agrupa actividades de una etapa donde conviven cuadrillas de oficios distintos a la vez —cimentación usa albañil y peón para lo estructural, y otra cuadrilla para instalaciones, al mismo tiempo—; eso es normal, no la restricción. Lo que sí tiene techo es cuántas cuadrillas del **mismo oficio** caben en el mismo frente/etapa sin estorbarse, y depende de la actividad. **Se declara, no se deriva** del catálogo de Frente —que sigue siendo informativo, `CATALOGOS.md`—: mismo origen que una precedencia de Recurso (arriba), media confianza, capturado por quien programa, por combinación frente+oficio. Cierra `PENDIENTES-MEJORAS.md` B-56 |
+| ~~P-7~~ | ~~¿El CPM usa el rendimiento real (mano de obra, `CONOCIMIENTO.md` §6.2) en vez del teórico cuando existe?~~ | **El teórico nunca se sobrescribe** — misma cadena que el precio (`CONOCIMIENTO.md` §13.1). El real de mano de obra da una **segunda proyección que convive con la teórica**, nunca un reemplazo. Si diverge más allá de un umbral, avisa `Desviación` (`gravity-obra.md` §6) — nunca reprograma sola, mismo «propone, no aplica». **El umbral no es un número fijo:** es un **rango sugerido —2 a 4 semanas seguidas de datos—** que el sistema propone y el usuario confirma, por dos caminos: proactivo (alerta) o a petición directa (agente Consulta). Puede existir un rendimiento real **global**, agregado entre obras, como referencia adicional — el usuario siempre decide cuál usar |
 
-**Las cinco decididas.**
+**Las siete decididas.**
 
 > **P-4 completa la simetría:** en lo contratado, el precio y la fecha son las dos
 > obligaciones, y ninguna de las dos se mueve por recálculo. Reprogramar propone la
 > fecha nueva; alguien la acepta.
+
+> **P-6 y P-7 cierran los dos cabos que quedaban sueltos en el cuerpo del módulo:**
+> el techo de cuadrillas y qué hacer cuando el rendimiento real diverge del teórico.
+> Las dos se declaran o se avisan; ninguna se calcula ni se aplica sola.
 
 ---
 
@@ -408,12 +415,13 @@ la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cu
 | **Factorizador** | Compras reales, inventario contra desperdicio, catálogo más chico | Bajo | ✅ 4 de 4 |
 | **Cuantificador** | Cantidades auditables, corpus del paramétrico | **Alto** | ✅ 4 de 4 |
 | **Paramétrico** | Presupuestar sin planos, priorizar por incertidumbre | Medio | ✅ 4 de 4 + corpus |
-| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 5 de 5 |
+| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 7 de 7 |
 
-**Las 17 decisiones están cerradas** — las 16 originales más `P-5` (actividad en
-tramos), la última en cerrar. Las otras dos piezas que aparecieron al cerrar las
-primeras 16 también se resolvieron después: `B-40` (tiempo de entrega) y `B-45`
-(dónde vive una regla de gobierno por obra) — ninguna de las tres sigue abierta.
+**Las 19 decisiones están cerradas** — las 17 anteriores más `P-6` (tope de
+cuadrillas por oficio dentro del frente) y `P-7` (el CPM y el rendimiento real),
+las últimas dos en cerrar. Las dos piezas que aparecieron al cerrar las primeras 16
+también se resolvieron: `B-40` (tiempo de entrega) y `B-45` (dónde vive una regla
+de gobierno por obra) — ninguna sigue abierta.
 
 ## Mi recomendación
 

@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué trae cada catálogo de OPUS y qué trampas tiene?
 tiempo:     es así
-corte:      2026-09-15
+corte:      2026-09-21
 verificado: 8 catálogos de OPUS 2025 · aritmética comprobada
 ```
 
@@ -620,6 +620,9 @@ ayudante sirve a Estructura y a Obra Exterior; un frente ocupa varias cuadrillas
 
 Sirve para filtrar 39 cuadrillas por frente al programar, en vez de recorrer 97
 registros. **Las relaciones operativas se definen después.**
+
+> Dónde se definen: `PROPUESTA-CUATRO-MODULOS.md` §4 · P-6, el tope de cuadrillas
+> por oficio dentro del frente.
 
 ### La unidad `%MO`
 

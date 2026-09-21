@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿dónde vamos y cómo retomar?
 tiempo:     vamos aquí
-corte:      2026-09-20
+corte:      2026-09-21
 verificado: Punto de corte · sin bloqueos
 ```
 
@@ -101,11 +101,11 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) y marcador de prototipo (P-40) quedan anotados |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 260 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 264 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 79 términos · 25 ambigüedades |
-| **Módulos** | Las 17 decisiones de los cuatro cerradas (CPM cierra con P-5) · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
+| **Módulos** | Las 19 decisiones de los cuatro cerradas (CPM cierra con P-7: tope de cuadrillas por oficio, rendimiento real como segunda proyección) · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
 | **Pruebas de flujo** | 🆕 Tres corridas: ALAMO 18, Zafiro 1.0, siete prototipos · 13 pasan, 8 se rompen, 5 sin dato |
 | **Invariantes** | 🆕 Las cifras de control, juntas · condición de paro |
 | **Capas** | 🆕 Cuatro: Mundo · Operación · Historia · Dirección |
@@ -121,7 +121,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Semilla** | Cuadrilla y rendimiento teórico, 265 filas |
 | **Ingenierías de ALAMO 18** | 12 archivos. Las partes se suman; faltan 5 niveles (uno, Consumibles, en $0). 🆕 De los otros 4 sin ingeniería —Cancelería/Carpintería/Muebles-Iluminación/Herrería— se sabe el costo exacto: $542,464.67, 19.2% del base **en dinero** (no confundir con el 92%/8% por conteo de etapas de `PRUEBA-ALAMO-18.md` §5) |
 | **Reversión por destajo** | Probada: 84% en cimentación. 🆕 Escalada a diez niveles completos: **catálogo de presupuesto reconstruido desde la ingeniería real**, $2,561,657.71, +12.0% vs. catálogo de referencia. Dos técnicas nuevas fijas —concepto auxiliar (dominante) y concepto "lote" para material compartido sin llave— más las reglas de desempate que le faltaban a la reversión. `CONOCIMIENTO.md` §11.13, D-238 a D-242 |
-| **Rendimiento real vs. almacén** | 🆕 Léxico del archivo resuelto (`Lote`, no `Ubicacion`/`# Lote`; cadena `OP:`/`No.Parte:`). Dos conceptos de abril cruzados contra su matriz a la misma escala (reversión), con el bug de mano de obra corregido: -19.7%/-2.6%. Corte semanal nuevo: tabique por lote (normal) vs. cemento a diario (señal confiable) — una semana de `EST-02010` con 68.5% del pagado sin respaldo de cemento. `CONOCIMIENTO.md` §11.15 a §11.17, D-249 a D-255 |
+| **Rendimiento real vs. almacén** | 🆕 Léxico del archivo resuelto (`Lote`, no `Ubicacion`/`# Lote`; cadena `OP:`/`No.Parte:`). Dos conceptos de abril cruzados contra su matriz a la misma escala (reversión), con el bug de mano de obra corregido: -19.7%/-2.6%. Corte semanal nuevo: tabique por lote (normal) vs. cemento a diario (señal confiable) — una semana de `EST-02010` con 68.5% del pagado sin respaldo de cemento. La hipótesis de tramo sobre ese mismo caso no se confirmó (D-260). 🆕 «Rendimiento real» separado en dos: mano de obra (alimenta al CPM) y material (alimenta al costo), nunca el mismo dato (`CONOCIMIENTO.md` §6.2) · avance físico y avance pagado son dos registros que no se sobrescriben, la diferencia es la señal (§13.7). `CONOCIMIENTO.md` §11.15 a §11.17, D-249 a D-256, D-260, D-263, D-264 |
 | **Controles de cambio — CC-ALM-18XXX** | 🆕 Método cerrado para los archivos `AJU_*` sueltos: agrupador con hijo, o matriz invertida con residuo `TMP-ALM18-XX`; verificado contra crudo antes de contar. Cinco controles, $36,214.03, capa complementaria a Presupuesto Formado. Cierra P-31. `CONOCIMIENTO.md` §11.18, §13.4, D-256 |
 
 ---

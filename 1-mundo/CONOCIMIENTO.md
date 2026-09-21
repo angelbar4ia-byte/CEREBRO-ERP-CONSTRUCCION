@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-20
-verificado: 16 partes · cada regla comprobada antes de escribirse
+corte:      2026-09-21
+verificado: 17 partes · cada regla comprobada antes de escribirse
 ```
 
 > **Las reglas del sistema.** Los catálogos de origen están en `CATALOGOS.md`; las
@@ -21,17 +21,18 @@ verificado: 16 partes · cada regla comprobada antes de escribirse
 | §3 | Notas de implementación | 129 | 5 |
 | §4 | Estados del nodo y exportación | 110 | 3 |
 | §5 | Presupuesto paramétrico — ensambles | 240 | 10 |
-| §6 | Destajos: precio, cuadrilla y fusión | 157 | 4 |
+| §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
-| §10 | Categorías | 168 | 6 |
+| §10 | Categorías | 234 | 6 |
 | §11 | Los flujos entre sistemas | 1026 | 18 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 318 | 6 |
+| §13 | Contratación, cambios y obra en marcha | 355 | 7 |
 | §14 | La propuesta | 66 | 5 |
 | §15 | La ruta crítica no está en el modelo | 39 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
+| §17 | Cuantificación gráfica — de inventario a regla verificada | 72 | 4 |
 
 > **Las partes que ya tienen skill compilado:** §2 importación, §5 paramétrico,
 > §8 y §12 rediseño. Ver `2-operacion/skills/`.
@@ -1094,6 +1095,27 @@ calculado sale absurdo.
 ### La unidad va anclada al rendimiento
 
 Arrastra tres anclajes —obra, tiempo y **cuál cuadrilla**—. Ver `IDEAS.md` §5.
+
+### El "real" de este cuadro es de mano de obra — hay otro real, y no es el mismo dato
+
+**"Rendimiento real" nombra dos cosas distintas en este sistema, y mezclarlas repite
+un error ya cometido:**
+
+| | Rendimiento real de **mano de obra** | Rendimiento real de **material** |
+|---|---|---|
+| Qué mide | Cuadrillas × avance físico ÷ tiempo | Insumo consumido ÷ unidad de avance |
+| Quién lo registra | El residente, al capturar avance y cuadrillas | Se concilia después, contra salida de almacén |
+| Vive en | Esta sección (§6.2) | §11.16 · §11.17 |
+| A quién alimenta | **Solo al programa** (`PROPUESTA-CUATRO-MODULOS.md` §4) | Al costo — Presupuesto Formado, control de cambio. **Nunca al programa** |
+
+> Mezclarlos repite D-252 en la otra dirección: ahí comparar material contra un total
+> que incluía mano de obra infló la brecha. Explicar un retraso de cuadrilla con el
+> rendimiento del material —o al revés— sería el mismo error.
+
+El teórico **nunca se sobrescribe** con ninguno de los dos reales — misma cadena que
+el precio (§13.1). Si el real de mano de obra diverge, el programa gana una
+**segunda proyección que convive con la teórica**, no un reemplazo —
+`PROPUESTA-CUATRO-MODULOS.md` §4.
 
 ## 6.3 Es un APU de un solo insumo
 
@@ -3057,6 +3079,39 @@ por el sistema con la evidencia acumulada, aprobada por alguien.
 Es el mismo ciclo del agente que aprende de lo decidido (`APRENDIZAJE.md`): **la
 obra informa al catálogo — y alguien decide si lo corrige.**
 
+## 13.7 Avance físico y avance pagado no se sobrescriben
+
+**Dos registros, cada uno en su lugar. Ninguno corrige al otro.**
+
+```
+Avance físico     lo que Control ve en obra          inspección directa
+Avance pagado     lo que la estimación reconoce      proceso financiero, semanal
+```
+
+Igual que la cadena de precios (§13.1): **pueden ser el mismo número, registrado en
+momentos distintos, y con eso basta.** No hace falta que uno actualice al otro.
+
+> El pagado no pesa más por mover dinero. Si la estimación se ajusta, el avance
+> físico ya registrado **no se pierde**: sigue siendo el dato de qué había en obra,
+> en esa fecha.
+
+Cuando difieren, **la diferencia es la señal, no un error que se resuelve eligiendo
+uno** — mismo mecanismo que «dos métodos independientes que coinciden validan»
+(`METODO.md` §1.4, D-209), leído al revés: aquí divergen, y divergir también informa.
+Resuelve con evidencia el rol **Control** (D-204 a D-206) — nunca ajustando uno al
+otro en automático.
+
+### Por qué esto le falta al rendimiento de material
+
+El rendimiento real de material (§11.16 · §11.17) divide insumo consumido entre
+avance. **Sin avance físico independiente, el único avance disponible es el
+pagado** — y pagado no es lo mismo que construido.
+
+Caso real: `EST-02010`, semana 19 — 293 m² pagados, con respaldo de cemento para
+solo ~92 m² (§11.17, D-255). Sin un registro de avance físico esa semana, no se
+puede distinguir «se pagó de más» de «el cemento llegó antes de instalarse»: son
+dos historias distintas y solo el avance físico las separa. Pendiente de método de
+captura — `PENDIENTES-MEJORAS.md` B-55.
 
 ---
 
