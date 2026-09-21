@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
-corte:      2026-09-15
+corte:      2026-09-21
 verificado: Aprobado · 15 hallazgos resueltos
 ```
 
@@ -775,7 +775,7 @@ por permiso.
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Paramétrico / Ensamble | Diseño en `CONOCIMIENTO.md` §5 del conocimiento, sin tabla propuesta aún |
-| Programa / CPM | Depende de la propuesta de 4 módulos, sin aprobar |
+| Programa / CPM | Las 19 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4) — falta el diseño formal de sus tablas aquí |
 | Estimaciones, contratos, almacén | P-18, P-19 — sin definir |
 | Roles y permisos | P-21 — sin definir |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
