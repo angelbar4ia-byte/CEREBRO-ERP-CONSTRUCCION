@@ -4,7 +4,7 @@
 órgano:     cuerpo calloso — conecta las capas, no pertenece a ninguna
 capa:       —
 pregunta:   ¿dónde va cada cosa?
-corte:      2026-09-12
+corte:      2026-09-21
 ```
 
 > **Regla de oro: cada hecho vive en un solo archivo. Los demás lo referencian.**
@@ -21,7 +21,7 @@ nombrarlo.
 | Capa | Tiempo | Qué contiene | Archivos |
 |---|---|---|---|
 | **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
-| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `INVARIANTES` · `ESCALABILIDAD` · `skills/` · `agentes/` |
+| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `skills/` · `agentes/` |
 | **III · Historia** | *Fue así* | Lo consolidado y lo que enseñó | `MEMORIA` · `CASO-TRABAJADO` · `APRENDIZAJE` |
 | **IV · Dirección** | *Vamos aquí* | Dónde estoy, qué falta, qué merece el enfoque | `ESTADO` · `PENDIENTES` · `PRIORIDADES` · `IDEAS` · `PROPUESTA-…` |
 
@@ -41,7 +41,7 @@ cerebro/
 ├── README.md                  ← puerta de entrada del repositorio
 ├── INDICE.md                  ← fuera de las capas: las conecta
 ├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
-├── 2-operacion/               METODO · INVARIANTES · ESCALABILIDAD
+├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
 │   ├── skills/                erp-construccion + importacion · rediseno · parametrico
 │   └── agentes/               gravity (orquesta) · arquitecto · constructor · migrador · auditor
@@ -91,6 +91,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 |---|---|---|---|
 | **ESTADO** | IV | ¿Dónde vamos y cómo retomar? | Propiocepción |
 | **MÉTODO** | II | ¿Cómo se piensa aquí? · identidad | Función ejecutiva |
+| **RAZONAMIENTO** | II | ¿Cómo se responde una pregunta que el cerebro no tiene guardada? | Corteza prefrontal |
 | **CONOCIMIENTO** | I | ¿Cómo funciona el sistema? | Corteza asociativa |
 | **CATALOGOS** | I | ¿Qué trae cada catálogo de origen? | Memoria perceptiva |
 | **MODELO** | I | ¿Qué forma tienen los datos? | Esquema corporal |
@@ -142,6 +143,13 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 **CONOCIMIENTO contra MÉTODO.** El conocimiento dice **qué es verdad**; el método
 dice **cómo se averigua**. Si una línea empieza con «se descubrió que…», es
 conocimiento. Si empieza con «para descubrir…», es método.
+
+**MÉTODO contra RAZONAMIENTO.** El método dice cómo se construyó y se audita el
+cerebro — mirando hacia adentro, con tiempo por delante. El razonamiento dice
+cómo se responde, con el cerebro ya construido, una pregunta que alguien hace
+hoy — mirando hacia afuera, en el momento. Si la regla explica cómo se verificó
+un hecho, es método. Si explica cómo contestar sin tener el hecho guardado, es
+razonamiento.
 
 **CONOCIMIENTO contra INVARIANTES.** El conocimiento trae el hecho con su
 explicación; las invariantes traen **la cifra desnuda contra la cual se comprueba**.
@@ -223,6 +231,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 |---|---|---|
 | `ESTADO.md` | IV | ✅ Punto de entrada · punto de corte |
 | `METODO.md` | II | ✅ Razonamiento e identidad |
+| `RAZONAMIENTO.md` | II | 🆕 Cómo responder preguntas operativas con el cerebro ya construido |
 | `MODELO.md` | I | ✅ Aprobado, 6 hallazgos |
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
@@ -230,7 +239,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `MEMORIA.md` | III | ✅ 256 decisiones · 12 descartes · 8 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
-| `GLOSARIO-DOMINIO.md` | I | **78 términos · 25 ambigüedades** |
+| `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |
 | `INVARIANTES.md` | II | 🆕 Cifras de control y condición de paro |

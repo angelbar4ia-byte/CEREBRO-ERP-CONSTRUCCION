@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
-corte:      2026-09-10
-verificado: 78 términos · 25 ambigüedades
+corte:      2026-09-21
+verificado: 79 términos · 25 ambigüedades
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 78 términos · 25 ambigüedades
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 78 términos · 25 ambigüedades · 2026-09-12
+> 79 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -50,7 +50,7 @@ verificado: 78 términos · 25 ambigüedades
 
 **Tiempo y ejecución** — Rendimiento calculado · Rendimiento teórico · Rendimiento real · Gantt · Actividad · Asignación · Avance · Estimación
 
-**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Orden de cambio · Desviación · Ejecutado sin respaldo
+**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Desviación · Ejecutado sin respaldo
 
 **Operaciones** — Fusión · División · Extracción · Composición · Procedencia
 
@@ -774,6 +774,18 @@ Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Ant
 - **Se usa con:** Precio pactado; Estimación
 - **Ejemplo:** Cobró a $55, se le deduce $5
 - **Hoy vive en:** `— pendiente`
+
+### Presupuesto Formado
+
+El catálogo reconstruido a cantidad real (Paso 1), explotado con el mismo
+rendimiento (matriz) que usa el presupuesto base. Aísla si el excedente es por
+construir más (efecto cantidad) o por usar distinto rendimiento (efecto receta).
+
+- **También:** Presupuesto reformado (variante hablada — no canónica, se resuelve igual)
+- **No confundir con:** Presupuesto Base; Ingeniería; Control de Cambio
+- **Se usa con:** Efecto cantidad; Efecto receta; Concepto auxiliar
+- **Ejemplo:** 244 m² reales de losa, explotados con el rendimiento del catálogo base
+- **Hoy vive en:** `CONOCIMIENTO.md` §11.14
 
 ### Orden de cambio
 

@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Write
 capa:       II — Operación
 pregunta:   ¿qué forma darle antes de moverse?
 tiempo:     se hace así
-corte:      2026-09-18
+corte:      2026-09-21
 verificado: Diseña, no implementa
 ```
 
@@ -28,6 +28,13 @@ contradice el skill, **decilo explícitamente** en vez de elegir en silencio.
 cuantificación (§1b), histórico de precios (§4a), alerta (§5a) y roles y permisos
 (§5b) ya están diseñados. Proponer de nuevo lo que ya está cerrado es el mismo
 error que ignorar `MEMORIA.md` §2.
+
+**Si el módulo toca comparación o reportes de obra** (Presupuesto Base,
+Ingeniería, Pagado Real, Presupuesto Formado, Control de Cambio), el método ya
+está probado sobre datos reales de `ALAMO 18` — no hace falta redescubrirlo:
+`CONOCIMIENTO.md` §11.14 a §11.18, `RAZONAMIENTO.md`. Hoy se calcula con scripts
+ad hoc fuera de este repositorio; el diseño de ese módulo queda anotado y sin
+cerrar en `PENDIENTES-MEJORAS.md` B-71.
 
 ## El principio que gobierna todas tus decisiones
 

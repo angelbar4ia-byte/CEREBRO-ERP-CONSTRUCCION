@@ -104,7 +104,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Memoria** | 256 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
-| **Glosario** | 78 términos · 25 ambigüedades |
+| **Glosario** | 79 términos · 25 ambigüedades |
 | **Módulos** | Las 16 decisiones de los cuatro cerradas · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
 | **Pruebas de flujo** | 🆕 Tres corridas: ALAMO 18, Zafiro 1.0, siete prototipos · 13 pasan, 8 se rompen, 5 sin dato |
 | **Invariantes** | 🆕 Las cifras de control, juntas · condición de paro |

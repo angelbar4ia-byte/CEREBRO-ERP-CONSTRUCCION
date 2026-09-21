@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué falta?
 tiempo:     vamos aquí
-corte:      2026-09-20
+corte:      2026-09-21
 verificado: 38 de decisión · 14 de datos · 25 módulos
 ```
 
@@ -273,6 +273,7 @@ puede escribir de lo que primero hay que definir.
 | B-68 | **El efecto receta en material (~$101,071) sigue sin explicarse** | Tras corregir las tres losas como concepto auxiliar, destajo bajó a solo 13% de receta distinta de la matriz — material se quedó con un residuo grande y sin causa identificada | ⏸️ **¿Desperdicio real de obra, otra matriz prestada sin detectar, o otro concepto auxiliar sin descomponer?** No se investigó insumo por insumo. `CONOCIMIENTO.md` §11.14, D-247 |
 | B-69 | **40 conceptos de mi catálogo Paso 1 ($394,172.93) siguen sin matriz para la comparación por destajo/material** | Quedan las claves `TMP-`/`AJU-`/`ACA-01070`/`API-`/`IEC-00410`/`IEC-00420`/`INS-`/`OBE-01010`/`SUB-` — cuentan en el total del catálogo (§11.13) pero no en esta capa | 🔶 **No se revisó si alguna tiene el mismo patrón de concepto auxiliar que `EST-01060`/`EST-00090`/`EST-00100`** (D-246) — solo se probó ahí porque el usuario lo señaló, no por una revisión sistemática de las 40. `CONOCIMIENTO.md` §11.14 |
 | B-70 | **Verificar la estimación contra almacén al momento de estimarla, no después del pago** | Cruzar la salida de material del día/semana contra el m² que se va a estimar, antes del cierre del viernes — hoy el cruce se hace a mano y después del hecho | ⏸️ **Idea del usuario, sin diseñar.** Motivada por el hallazgo de `EST-02010`: una semana pagó 293 m² con solo 30 sacos de cemento, que alcanzan para ~92 m² — 68.5% sin respaldo, detectable solo después del pago con el método de hoy. `CONOCIMIENTO.md` §11.17, D-255 |
+| B-71 | **Módulo de comparación/reportes de obra** — Presupuesto Base, Ingeniería, Pagado Real, Presupuesto Formado y Control de Cambio, por destajo y por material | Hoy se calcula con scripts ad hoc fuera de este repositorio, no como parte del sistema — decisión explícita del usuario: no se sube el script ni el archivo hasta que exista el sistema real | ⏸️ **Sin diseñar.** El método ya está probado sobre datos reales de `ALAMO 18` y no hay que redescubrirlo: `CONOCIMIENTO.md` §11.14 a §11.18, `RAZONAMIENTO.md` §4. Anotado en `agentes/arquitecto-erp.md` para cuando se diseñe |
 
 ### Infraestructura
 
