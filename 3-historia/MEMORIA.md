@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-22
-verificado: 294 decisiones · 12 descartes · 8 correcciones
+verificado: 298 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -368,6 +368,10 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-292 | **En el archivo de estimación del ERP externo, `UDM OP` y `UDM Operación` no son la misma unidad en 59% de las filas** | `UDM OP` cuenta la orden en piezas (1 orden = 1 pieza); `UDM Operación` trae la unidad real del concepto. No es error de datos: son dos objetos distintos en la misma fila. `CONOCIMIENTO.md` §13.8 |
 | D-293 | **`Nivel OP` mezcla nivel y etapa sin avisar, en el mismo archivo** — antes de que el edificio tenga niveles (cimentación), etiqueta por etapa; en cuanto hay plantas, etiqueta por nivel | Mismo tipo de trampa que `Lote` contra `Ubicacion` en almacén (D-249). `# Parte/SKU` es el concepto real, `Operacion` es el destajo — `Nivel OP` es el único campo ambiguo de los cinco. `CONOCIMIENTO.md` §13.8 |
 | D-294 | **El cruce de `CONOCIMIENTO.md` §11.16 · §11.17 se generaliza a todo el catálogo, no solo a los dos casos investigados** — salida de almacén contra todo material, avance del ERP externo contra todo destajo | Cobertura parcial (fotos de abril): 58 de 288 materiales, 36 de 225 destajos. Ya aparecen coincidencias casi exactas (`MOC-12010`: 6 y 6) y brechas reales (`ACE-00001`: 487.42 contra 133.7) a revisar. `CONOCIMIENTO.md` §11.19 |
+| D-295 | **Se encontró un hueco no anotado en ningún pendiente: no existía una entidad `USUARIO` en `MODELO.md`** — `ROL_FUNCION` conecta un tipo de rol con lo que puede hacer, pero nada conectaba una persona real con un rol | Se agrega `USUARIO` + `USUARIO_ROL` (muchos-a-muchos, mismo patrón que `ROL_FUNCION`). `MODELO.md` §5b |
+| D-296 | **B-74 cierra: `RESIDENTE_OBRA` usa `PRESUPUESTO` como la obra —no existe tabla `OBRA` aparte, §3 ya la cubre— y `SUPERVISION` es una sola tabla para los dos niveles de la cascada, no dos** | Supervisor-sobre-Residente y Superintendente-sobre-Supervisor tienen la misma forma; cuál es cuál lo dice el rol de cada quien en `USUARIO_ROL`, no un campo nuevo. `MODELO.md` §5b |
+| D-297 | **`INCIDENCIA` y `REGISTRO_AVANCE` ya tienen tabla, sobre un stub mínimo de `ACTIVIDAD` — B-73 avanza a parcial** | `REGISTRO_AVANCE` separa físico de pagado por fila, no por columna (`CONOCIMIENTO.md` §13.7) — la forma más directa de que ninguno sobrescriba al otro. `INCIDENCIA` modela «quien origina no se autoaprueba» dejando `aprobado_por`/`validado_por` en null, no con un valor especial. Falta el resto de `ACTIVIDAD` (P-20) y nombrar quién escribe cada campo. `MODELO.md` §5c |
+| D-298 | **`MODELO.md` §6 decía "Roles y permisos: sin definir" y "Estimaciones, contratos: sin definir" — los dos ya estaban resueltos en el mismo archivo o en `CONOCIMIENTO.md`** | Roles y permisos se quita de la lista (tiene tablas, §5b); estimaciones/contratos se corrige a «política definida, falta la tabla». Mismo patrón de pendiente ya resuelto sin sincronizar de siempre |
 
 ---
 

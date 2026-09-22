@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
-corte:      2026-09-21
+corte:      2026-09-22
 verificado: Aprobado · 15 hallazgos resueltos
 ```
 
@@ -785,13 +785,49 @@ por permiso.
 quién supervisa o le reporta, no se declara obra por obra. Cuatro niveles:
 Residente → Supervisor → Superintendente → Control.
 
-> Sin campo propio todavía: hace falta la asignación **residente↔obra** (ya
-> anotada en C-3, `PROPUESTA-CUATRO-MODULOS.md` §2, «se define por obra, al
-> asignarla a un residente»), y dos nuevas que no existían hasta ahora:
-> **supervisor↔residente** y **superintendente↔supervisor**.
-
 Aplica a todo lo que el sistema muestra, no solo a insumos: reportes, Consulta
 (`gravity-obra.md` §6), avance, incidencias.
+
+### El campo que lo sostiene — cierra B-74
+
+`ROL_FUNCION` conecta un **tipo** de rol con lo que puede hacer. Faltaba la
+pieza de abajo: **quién es la persona**, y a qué o a quién queda asignada.
+
+```
+USUARIO
+  id, nombre, correo                                                     firme
+  activo            boolean — se retira, no se borra                     firme
+
+USUARIO_ROL
+  id, usuario_id FK, rol_id FK                                           firme
+
+RESIDENTE_OBRA
+  id, usuario_id FK USUARIO, presupuesto_id FK PRESUPUESTO                firme
+
+SUPERVISION
+  id, supervisor_id FK USUARIO, supervisado_id FK USUARIO                 firme
+```
+
+**`USUARIO_ROL` es muchos-a-muchos, mismo patrón que `ROL_FUNCION`** — una
+persona puede tener más de un rol (D-205), y quitarle uno no le quita el
+otro.
+
+**No hay tabla `OBRA` aparte** — `PRESUPUESTO` ya es esa entidad (§3): su
+`raiz_id` cuelga del árbol completo de una obra. `RESIDENTE_OBRA` apunta ahí,
+cerrando la asignación que C-3 (`PROPUESTA-CUATRO-MODULOS.md` §2) ya había
+anotado sin tabla.
+
+**`SUPERVISION` es una sola tabla para los dos niveles de la cascada**, no
+dos — Supervisor-sobre-Residente y Superintendente-sobre-Supervisor tienen
+la misma forma (`usuario` que supervisa a `usuario`); cuál de los dos es
+cada fila lo dice el rol de cada quien en `USUARIO_ROL`, no un campo nuevo.
+El alcance de Superintendente y Control (D-277 a D-279) se calcula
+recorriendo esta tabla, no se declara aparte.
+
+> **Quién puede escribir en estas tres tablas queda sin nombrar** — ninguna
+> de las quince funciones atómicas cubre "asignar residente" o "asignar
+> supervisión" con exactitud. Mismo pendiente que "crear precio nuevo"
+> abajo: se nombra al formalizar.
 
 ### Costos: cuantifica y crea precios, con doble aprobación
 
@@ -821,6 +857,57 @@ presupuesto PU (`CONOCIMIENTO.md` §7, mismo modo de valuación ya definido).
 
 ---
 
+## 5c. Programa — lo mínimo para que exista una incidencia y un avance
+
+**No es el modelo completo del programa** — precedencias, calendario, tramos
+y los dos cuantificadores siguen sin tabla (P-20, §6 abajo). Esto es solo lo
+que `INCIDENCIA` y el registro de avance necesitan para tener dónde colgar.
+
+```
+ACTIVIDAD   (stub — el resto de sus campos los define P-20 al modelarse)
+  id, concepto_id FK Nodo, presupuesto_id FK PRESUPUESTO                  provisional
+
+INCIDENCIA
+  id
+  actividad_id        FK ACTIVIDAD — nullable si efecto crea una que aún no existe
+  motivo               enum: las nueve causas (`CONOCIMIENTO.md` §13.6)    firme
+  efecto                enum: pausa_actividad · crea_actividad ·
+                        crece_actividad · propone_actividad (D-268)       firme
+  origen_usuario_id    FK USUARIO
+  origen_rol_id         FK ROL — bajo cuál rol se originó, si el usuario
+                        tiene más de uno (`USUARIO_ROL`)                   firme
+  estado                enum: originada · aprobada · validada · ejecutada
+                        · cerrada · descartada                             firme
+  aprobado_por, aprobado_en      nullable — null si quien origina se lo
+                                  salta (D-269)                            firme
+  validado_por, validado_en      nullable — mismo caso                    firme
+  cierra_supervisor_id  FK USUARIO — el seguimiento, siempre (D-269)      firme
+  evidencia             texto
+
+REGISTRO_AVANCE
+  id
+  actividad_id          FK ACTIVIDAD
+  fuente                 enum: fisico · pagado — nunca se sobrescriben,
+                         cada uno su fila (`CONOCIMIENTO.md` §13.7, D-264)  firme
+  tipo                   enum: numero · porcentaje · trazo (D-271)        firme
+  valor                  numérico — nullable si tipo=trazo
+  trazo_id               FK TRAZO (§1b) — nullable si tipo≠trazo
+  capturado_por          FK USUARIO
+  fecha
+```
+
+**`INCIDENCIA` no se autoaprueba ni se autovalida** — el patrón de D-269 se
+modela dejando `aprobado_por`/`validado_por` en null cuando el paso se salta,
+no con un valor especial. **`REGISTRO_AVANCE` separa físico de pagado por
+fila, no por columna** — es la forma más directa de que ninguno sobrescriba
+al otro: son filas distintas, con su propia fecha y su propio autor.
+
+> **Quién puede escribir cada campo queda sin nombrar** — mismo pendiente
+> que arriba: las funciones de aprobar/validar/ejecutar una incidencia no
+> tienen clave todavía en `FUNCION_ATOMICA`.
+
+---
+
 # 6. Lo que este modelo deliberadamente NO resuelve
 
 | No incluido | Por qué |
@@ -828,9 +915,9 @@ presupuesto PU (`CONOCIMIENTO.md` §7, mismo modo de valuación ya definido).
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Paramétrico / Ensamble | Diseño en `CONOCIMIENTO.md` §5 del conocimiento, sin tabla propuesta aún |
-| Programa / CPM | Las 21 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4) — falta el diseño formal de sus tablas aquí, `INCIDENCIA` y el registro de avance incluidos |
-| Estimaciones, contratos, almacén | P-18, P-19 — sin definir |
-| Roles y permisos | P-21 — sin definir |
+| Programa / CPM | Las 22 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4). `INCIDENCIA` y el registro de avance ya tienen tabla (§5c) — falta el resto: precedencias, calendario, tramos, los dos cuantificadores |
+| Estimaciones, contratos | La política ya está definida (`CONOCIMIENTO.md` §13, §13.8) — falta el diseño de sus tablas aquí |
+| Almacén | P-19 — primeros cruces reales hechos, falta el diseño del módulo completo |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |
 
