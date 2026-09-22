@@ -916,6 +916,68 @@ al otro: son filas distintas, con su propia fecha y su propio autor.
 
 ---
 
+## 5d. Estimación — el tope, la conciliación y las tres formas de ajustar el pago
+
+Cierra B-76. La política ya estaba completa (`CONOCIMIENTO.md` §13.8); esto
+es su forma de tabla.
+
+```
+ESTIMACION
+  id, presupuesto_id FK PRESUPUESTO
+  periodo_inicio, periodo_fin      semanal (`CONOCIMIENTO.md` §13.8)       firme
+  fuente             enum: erp_externo · manual (D-284)                   firme
+  estado             enum: capturada · devuelta · validada · pagada       firme
+  validado_por        FK USUARIO — bajo validar_estimacion, D-299
+  validado_en
+
+ESTIMACION_LINEA
+  id, estimacion_id FK ESTIMACION
+  concepto_id         FK Nodo — nullable si es fuera de catálogo
+  actividad_id         FK ACTIVIDAD (§5c) — nullable
+  incidencia_id         FK INCIDENCIA (§5c) — nullable, si esta línea nace
+                        de una incidencia ya aprobada
+  cantidad_avance       lo que esta línea reconoce en este periodo
+  monto
+  excede_tope           caché — compara contra el contratado vigente
+                        (D-285) al validar. NUNCA fuente de verdad, mismo
+                        principio que `ESTADO_CARGA.porcentaje_cargado` (§3)
+
+DEDUCCION
+  id, estimacion_linea_id FK ESTIMACION_LINEA
+  tipo                enum: sobrepago · rehacer_trabajo (D-289)           firme
+  monto
+  contratista_responsable_id   sin tabla — mismo hueco que P-39, no se
+                                inventa aquí tampoco
+  absorbe_empresa      boolean — true si el responsable ya no está activo
+
+RETENCION
+  id, estimacion_linea_id FK ESTIMACION_LINEA
+  monto                — solo si el contratista de esa línea es
+                        subcontrato (D-290)
+
+PRESTAMO
+  id, contratista_id   sin tabla — mismo hueco que P-39
+  monto
+  salda_via            enum: avance_obra · estimacion_futura (D-290)      firme
+  saldo_restante
+```
+
+**No hay columna `tope` guardada en ningún lado** — el tope es el contratado
+vigente (D-285), se lee de donde ya vive (`VERSION_CONCEPTO`/`ACTIVIDAD`),
+nunca se copia. Guardarlo aparte lo desincroniza en cuanto el contratado
+cambie.
+
+**`contratista_responsable_id` y `PRESTAMO.contratista_id` no apuntan a
+ninguna tabla** — es el mismo hueco que P-39 ya dejó anotado (no hay
+catálogo de contratistas) y esto no lo resuelve ni lo intenta resolver.
+
+> **Quién escribe cada campo sigue sin nombrar** — mismo pendiente que
+> `INCIDENCIA` y `REGISTRO_AVANCE`: las funciones de capturar, devolver y
+> conciliar una estimación no tienen clave en `FUNCION_ATOMICA` todavía.
+> Solo `validar_estimacion` (D-299) ya existe, sin asignar a rol.
+
+---
+
 # 6. Lo que este modelo deliberadamente NO resuelve
 
 | No incluido | Por qué |
@@ -924,7 +986,6 @@ al otro: son filas distintas, con su propia fecha y su propio autor.
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Paramétrico / Ensamble | Diseño en `CONOCIMIENTO.md` §5 del conocimiento, sin tabla propuesta aún |
 | Programa / CPM | Las 22 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4). `INCIDENCIA` y el registro de avance ya tienen tabla (§5c) — falta el resto: precedencias, calendario, tramos, los dos cuantificadores |
-| Estimaciones, contratos | La política ya está definida (`CONOCIMIENTO.md` §13, §13.8) — falta el diseño de sus tablas aquí |
 | Almacén | P-19 — primeros cruces reales hechos, falta el diseño del módulo completo |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |

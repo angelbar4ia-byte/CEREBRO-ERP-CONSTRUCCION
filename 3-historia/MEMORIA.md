@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-22
-verificado: 299 decisiones · 12 descartes · 8 correcciones
+verificado: 300 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -373,6 +373,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-297 | **`INCIDENCIA` y `REGISTRO_AVANCE` ya tienen tabla, sobre un stub mínimo de `ACTIVIDAD` — B-73 avanza a parcial** | `REGISTRO_AVANCE` separa físico de pagado por fila, no por columna (`CONOCIMIENTO.md` §13.7) — la forma más directa de que ninguno sobrescriba al otro. `INCIDENCIA` modela «quien origina no se autoaprueba» dejando `aprobado_por`/`validado_por` en null, no con un valor especial. Falta el resto de `ACTIVIDAD` (P-20) y nombrar quién escribe cada campo. `MODELO.md` §5c |
 | D-298 | **`MODELO.md` §6 decía "Roles y permisos: sin definir" y "Estimaciones, contratos: sin definir" — los dos ya estaban resueltos en el mismo archivo o en `CONOCIMIENTO.md`** | Roles y permisos se quita de la lista (tiene tablas, §5b); estimaciones/contratos se corrige a «política definida, falta la tabla». Mismo patrón de pendiente ya resuelto sin sincronizar de siempre |
 | D-299 | **B-75 avanza a parcial: `validar_estimacion` se cataloga como función atómica número dieciséis, sin asignarla a ningún rol** | Compras la ejerce hoy en la práctica, pero no es un `ROL` formal y no está decidido si se formaliza como rol propio o se asigna a uno de los seis existentes — la función se nombra, la asignación se deja pendiente a propósito. `MODELO.md` §5b |
+| D-300 | **B-76 cierra: `ESTIMACION`, `ESTIMACION_LINEA`, `DEDUCCION`, `RETENCION` y `PRESTAMO` modelan la política de `CONOCIMIENTO.md` §13.8** | El tope no se guarda como columna — se lee del contratado vigente (D-285) y nunca se copia, mismo principio que `ESTADO_CARGA.porcentaje_cargado` (caché, nunca fuente de verdad). `contratista_id` en `DEDUCCION`/`PRESTAMO` queda sin tabla a propósito — mismo hueco que P-39 ya había dejado anotado, no se inventa aquí. `MODELO.md` §5d |
 
 ---
 
