@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-22
-verificado: 291 decisiones · 12 descartes · 8 correcciones
+verificado: 293 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -365,6 +365,8 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-289 | **Deducción por rehacer el trabajo de otro contratista: se descuenta al responsable si sigue activo; si ya no está, la empresa absorbe** | Mismo «quién paga» de la causa 1 (`CONOCIMIENTO.md` §13.6), ahora con su mecanismo concreto. La deducción por sobrepago ya existía (`CONOCIMIENTO.md` §13.2) |
 | D-290 | **Retención solo aplica a subcontratos. Préstamo se salda con avance de obra o directo contra una estimación futura** | `CONOCIMIENTO.md` §13.8 |
 | D-291 | **Un archivo real del ERP externo valida el diseño de topes sin haberlo visto: 0 de 416 filas exceden el tope** | `O/Requerida` (el tope) · `O/Avance` (el pagado) · `$/Operación = O/Avance × C/Promedio`, confirmado fila por fila. El límite se respeta en la práctica, no solo en el diseño. `CONOCIMIENTO.md` §13.8 |
+| D-292 | **En el archivo de estimación del ERP externo, `UDM OP` y `UDM Operación` no son la misma unidad en 59% de las filas** | `UDM OP` cuenta la orden en piezas (1 orden = 1 pieza); `UDM Operación` trae la unidad real del concepto. No es error de datos: son dos objetos distintos en la misma fila. `CONOCIMIENTO.md` §13.8 |
+| D-293 | **`Nivel OP` mezcla nivel y etapa sin avisar, en el mismo archivo** — antes de que el edificio tenga niveles (cimentación), etiqueta por etapa; en cuanto hay plantas, etiqueta por nivel | Mismo tipo de trampa que `Lote` contra `Ubicacion` en almacén (D-249). `# Parte/SKU` es el concepto real, `Operacion` es el destajo — `Nivel OP` es el único campo ambiguo de los cinco. `CONOCIMIENTO.md` §13.8 |
 
 ---
 

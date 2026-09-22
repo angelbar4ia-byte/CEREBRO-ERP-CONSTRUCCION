@@ -28,7 +28,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §10 | Categorías | 234 | 6 |
 | §11 | Los flujos entre sistemas | 1026 | 18 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 434 | 8 |
+| §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
 | §15 | La ruta crítica no está en el modelo | 39 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
@@ -3191,6 +3191,21 @@ Export de abril del ERP externo, 416 filas, a nivel de operación: `O/Requerida`
 (el tope) · `O/Avance` (el pagado) · `C/Promedio` (precio unitario) ·
 `$/Operación = O/Avance × C/Promedio`. **Cero de 416 filas exceden el tope** —
 el límite se respeta en la práctica, no solo en el diseño.
+
+### El léxico de este archivo trae una trampa
+
+`UDM OP` y `UDM Operación` no son la misma unidad en 59% de las filas —
+`UDM OP` cuenta la orden en piezas (1 orden = 1 pieza), `UDM Operación` trae la
+unidad real del concepto (m², m...). No es error: son dos objetos distintos en
+la misma fila.
+
+**`Nivel OP` mezcla nivel y etapa sin avisar** — mismo tipo de hallazgo que
+`Lote` contra `Ubicacion` en el archivo de almacén (D-249). Antes de que el
+edificio tenga niveles que lo justifiquen (cimentación), el campo etiqueta por
+etapa; en cuanto hay plantas, etiqueta por nivel. `# Parte/SKU` es el concepto
+real (`EST-`, `ECO-`...); `Operacion` es el destajo (`Moc-`, `Moe-`, `Mog-`...)
+— de los cinco campos de identidad de este archivo, `Nivel OP` es el único
+ambiguo. **No cruzar por `Nivel OP` sin filtrar primero por etapa conocida.**
 
 ---
 
