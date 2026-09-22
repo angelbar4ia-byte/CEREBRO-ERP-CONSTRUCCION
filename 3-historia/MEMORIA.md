@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-22
-verificado: 300 decisiones · 12 descartes · 8 correcciones
+verificado: 301 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -374,6 +374,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-298 | **`MODELO.md` §6 decía "Roles y permisos: sin definir" y "Estimaciones, contratos: sin definir" — los dos ya estaban resueltos en el mismo archivo o en `CONOCIMIENTO.md`** | Roles y permisos se quita de la lista (tiene tablas, §5b); estimaciones/contratos se corrige a «política definida, falta la tabla». Mismo patrón de pendiente ya resuelto sin sincronizar de siempre |
 | D-299 | **B-75 avanza a parcial: `validar_estimacion` se cataloga como función atómica número dieciséis, sin asignarla a ningún rol** | Compras la ejerce hoy en la práctica, pero no es un `ROL` formal y no está decidido si se formaliza como rol propio o se asigna a uno de los seis existentes — la función se nombra, la asignación se deja pendiente a propósito. `MODELO.md` §5b |
 | D-300 | **B-76 cierra: `ESTIMACION`, `ESTIMACION_LINEA`, `DEDUCCION`, `RETENCION` y `PRESTAMO` modelan la política de `CONOCIMIENTO.md` §13.8** | El tope no se guarda como columna — se lee del contratado vigente (D-285) y nunca se copia, mismo principio que `ESTADO_CARGA.porcentaje_cargado` (caché, nunca fuente de verdad). `contratista_id` en `DEDUCCION`/`PRESTAMO` queda sin tabla a propósito — mismo hueco que P-39 ya había dejado anotado, no se inventa aquí. `MODELO.md` §5d |
+| D-301 | **B-66 cierra: auditadas las 1,174 filas con Cantidad+PU+Total de los 11 archivos de ingeniería — el bug de `Total` mal capturado está contenido, no es sistémico** | Solo 9 de 1,174 (0.77%) fallan, y 8 caen en un solo bloque de 19 líneas de un solo archivo — firma de una fórmula arrastrada mal, no un problema disperso en todo el dataset. Se encontraron 4 nuevas (`HD-00411`, `HID-00134`, `HID-00135`, `HID-00181`, +$179.14) además de las 4 ya conocidas, con evidencia más fuerte: la misma clave con la misma cantidad aparece correcta en otro archivo. Corregidas en el workbook de trabajo. Una quinta (`PIS-80475`) no encaja en el mismo patrón, queda aparte sin explicar |
 
 ---
 
