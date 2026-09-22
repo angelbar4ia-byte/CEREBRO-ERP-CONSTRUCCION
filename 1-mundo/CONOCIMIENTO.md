@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1026 | 18 |
+| §11 | Los flujos entre sistemas | 1053 | 19 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2705,6 +2705,33 @@ Sobre `ALAMO 18`, cinco controles de cambio (`CC-ALM-18001` a `18005`,
 $36,214.03) cubren exactamente el hueco que PRESUPUESTO FORMADO (§11.14) no pudo
 explotar por no tener matriz propia del prototipo — no se suman a Presupuesto
 Formado, se leen en su columna aparte.
+
+## 11.19 El cruce se extiende a todo el catálogo, no solo a los dos casos investigados
+
+Los cruces de §11.16/§11.17 probaron el método sobre `EST-01060` y
+`EST-02010`. Extendido a **todo el catálogo de destajo y de material**, el
+método es el mismo — solo cambia qué se agrupa:
+
+| | Material | Destajo |
+|---|---|---|
+| Fuente | Almacén (`Lote`=18, `Efecto Qty` negativo = salida) | Estimación del ERP externo (`Lote`=18, `Operacion` → clave por prefijo, §13.8) |
+| Se agrupa por | `# Parte` | Clave extraída de `Operacion` (el prefijo, ej. `MOC-01010`) |
+| Se suma | Cantidad de salida | `O/Avance` y `$/Operación` |
+
+**Cobertura parcial, no total** — las dos fuentes son fotos de abril, no el
+catálogo completo: 58 de 288 materiales y 36 de 225 destajos tienen dato ese
+mes. Una clave sin dato no significa «sin consumo»: significa «sin
+movimiento ese mes».
+
+**Ya aparecen dos lecturas** al cruzar: claves donde ambas fuentes coinciden
+casi exacto (`MOC-12010`: 6 y 6 · `ACE-00010`: 4.31 y 4.31) — señal de que
+las dos fuentes miran lo mismo —, y claves con brecha real (`ACE-00001`:
+487.42 contra 133.7) — candidatas a revisar, mismo patrón que `EST-01060` y
+`EST-02010`.
+
+> El resultado vive en el workbook de trabajo (pestañas de consolidado por
+> material y por destajo), fuera del repo por la misma razón de siempre
+> (`INDICE.md`) — aquí queda el método, no la cifra.
 
 ---
 

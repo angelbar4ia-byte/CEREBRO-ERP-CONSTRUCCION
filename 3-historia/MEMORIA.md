@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-22
-verificado: 293 decisiones · 12 descartes · 8 correcciones
+verificado: 294 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -367,6 +367,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-291 | **Un archivo real del ERP externo valida el diseño de topes sin haberlo visto: 0 de 416 filas exceden el tope** | `O/Requerida` (el tope) · `O/Avance` (el pagado) · `$/Operación = O/Avance × C/Promedio`, confirmado fila por fila. El límite se respeta en la práctica, no solo en el diseño. `CONOCIMIENTO.md` §13.8 |
 | D-292 | **En el archivo de estimación del ERP externo, `UDM OP` y `UDM Operación` no son la misma unidad en 59% de las filas** | `UDM OP` cuenta la orden en piezas (1 orden = 1 pieza); `UDM Operación` trae la unidad real del concepto. No es error de datos: son dos objetos distintos en la misma fila. `CONOCIMIENTO.md` §13.8 |
 | D-293 | **`Nivel OP` mezcla nivel y etapa sin avisar, en el mismo archivo** — antes de que el edificio tenga niveles (cimentación), etiqueta por etapa; en cuanto hay plantas, etiqueta por nivel | Mismo tipo de trampa que `Lote` contra `Ubicacion` en almacén (D-249). `# Parte/SKU` es el concepto real, `Operacion` es el destajo — `Nivel OP` es el único campo ambiguo de los cinco. `CONOCIMIENTO.md` §13.8 |
+| D-294 | **El cruce de `CONOCIMIENTO.md` §11.16 · §11.17 se generaliza a todo el catálogo, no solo a los dos casos investigados** — salida de almacén contra todo material, avance del ERP externo contra todo destajo | Cobertura parcial (fotos de abril): 58 de 288 materiales, 36 de 225 destajos. Ya aparecen coincidencias casi exactas (`MOC-12010`: 6 y 6) y brechas reales (`ACE-00001`: 487.42 contra 133.7) a revisar. `CONOCIMIENTO.md` §11.19 |
 
 ---
 
