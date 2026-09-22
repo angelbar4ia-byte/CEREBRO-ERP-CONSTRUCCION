@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
-corte:      2026-09-21
-verificado: 283 decisiones · 12 descartes · 8 correcciones
+corte:      2026-09-22
+verificado: 291 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -357,6 +357,14 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-281 | **P-10 cierra: reiniciar programa o actividad no toca lo registrado — solo borra fechas y vínculos, nunca avance ni incidencias, y solo aplica a nivel diseño** | Mismo límite que M-1 (`PROPUESTA-CUATRO-MODULOS.md` §3): una vez contratada la actividad, no se reinicia así |
 | D-282 | **Dos capturas reales de OPUS validan diseños de esta sesión sin haberlos visto** | `Interrupciones` se guarda como lista de rangos de fecha — el mismo mecanismo de tramo (P-5). `Programación` trae Cantidad programada/total/Remanente, casi idéntico a D-273 — se adopta el nombre **Remanente** en vez de inventar uno nuevo. `PROPUESTA-CUATRO-MODULOS.md` §4 |
 | D-283 | **La visualización del programa tiene tres reglas de negocio, no solo preferencia de pantalla**: la barra rotula cantidad/importe/%/%proyecto/agrupado; la escala es de dos niveles (mayor y menor) más una vista de días con prefijo; vincular y configurar vínculo son dos acciones separadas | Color, forma de barra y fijar columnas quedan fuera — eso sí es preferencia visual. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-284 | **P-18 cierra: la estimación tiene dos fuentes, no una** — ERP externo cuando hay ingeniería cargada, manual/Excel cuando no la hay, cuando la actividad está fuera de catálogo, o cuando es una incidencia | Se consolidan en un extractor y se acomodan a mano en un machote — manual hoy, con la meta de que el reporte salga ya armado y solo se valide. `CONOCIMIENTO.md` §13.8 |
+| D-285 | **Topes en estimación es el mismo techo del cuantificador de presupuesto (D-273), sin importar la fuente** —ingeniería, cuantificador o paramétrico— **lo único que importa es cuál se volvió el contratado** | Mismo patrón de siempre: el contratado se congela (M-1, `PROPUESTA-CUATRO-MODULOS.md` §3; D-227). Se amplía reusando incidencia (P-8) o el umbral del cuantificador de programación (P-9), no un mecanismo nuevo |
+| D-286 | **Validar estimación es un rol distinto de los seis ya definidos — hoy lo realiza Compras, un actor sin formalizar** | Puede recaer en cualquier usuario existente; no está decidido si se vuelve rol propio. `MODELO.md` §5b, `PENDIENTES-MEJORAS.md` B-75 |
+| D-287 | **La conciliación de estimación tiene tres pasos: el Residente ve la brecha, Costos recuantifica, Control valida después y descuenta si hace falta** | Lo olvidado se agrega al final, revisado contra su propio tope. `CONOCIMIENTO.md` §13.8 |
+| D-288 | **Topes pagados = Tope − Pagado**, algebraicamente el mismo mecanismo que Remanente (D-273 · D-282) pero contra lo pagado en vez de lo programado | Confirmado con el usuario: Remanente + (Programado − Pagado) se simplifica exactamente a Tope − Pagado |
+| D-289 | **Deducción por rehacer el trabajo de otro contratista: se descuenta al responsable si sigue activo; si ya no está, la empresa absorbe** | Mismo «quién paga» de la causa 1 (`CONOCIMIENTO.md` §13.6), ahora con su mecanismo concreto. La deducción por sobrepago ya existía (`CONOCIMIENTO.md` §13.2) |
+| D-290 | **Retención solo aplica a subcontratos. Préstamo se salda con avance de obra o directo contra una estimación futura** | `CONOCIMIENTO.md` §13.8 |
+| D-291 | **Un archivo real del ERP externo valida el diseño de topes sin haberlo visto: 0 de 416 filas exceden el tope** | `O/Requerida` (el tope) · `O/Avance` (el pagado) · `$/Operación = O/Avance × C/Promedio`, confirmado fila por fila. El límite se respeta en la práctica, no solo en el diseño. `CONOCIMIENTO.md` §13.8 |
 
 ---
 

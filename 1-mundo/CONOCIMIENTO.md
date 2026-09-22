@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-21
+corte:      2026-09-22
 verificado: 17 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -28,7 +28,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §10 | Categorías | 234 | 6 |
 | §11 | Los flujos entre sistemas | 1026 | 18 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 366 | 7 |
+| §13 | Contratación, cambios y obra en marcha | 434 | 8 |
 | §14 | La propuesta | 66 | 5 |
 | §15 | La ruta crítica no está en el modelo | 39 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
@@ -3123,6 +3123,74 @@ solo ~92 m² (§11.17, D-255). Sin un registro de avance físico esa semana, no 
 puede distinguir «se pagó de más» de «el cemento llegó antes de instalarse»: son
 dos historias distintas y solo el avance físico las separa. Pendiente de método de
 captura — `PENDIENTES-MEJORAS.md` B-55.
+
+## 13.8 Estimación — cuando el avance se vuelve pago
+
+**Documento que cobra el avance ejecutado en un periodo**, semanal
+(`GLOSARIO-DOMINIO.md`: Corte, Generador y Valuación son el mismo concepto en
+otro dialecto).
+
+### Dos fuentes, no una
+
+| Fuente | Cuándo |
+|---|---|
+| ERP externo | Cuando hay ingeniería cargada ahí |
+| Manual / Excel | Sin ingeniería, actividades fuera de catálogo, o una incidencia (`PROPUESTA-CUATRO-MODULOS.md` §4) |
+
+Las dos se consolidan en un extractor y se acomodan a mano en un formato o
+machote — hoy manual, con el mismo destino que el resto del sistema: que el
+reporte consolidado salga ya armado, y quien revisa **solo valide**.
+
+### El tope es el mismo techo, de cualquier fuente
+
+**Topes** se alimenta de varios lados —ingeniería, cuantificador, paramétrico—,
+pero solo importa uno: **cuál se volvió el contratado**. Mismo patrón de
+siempre: el contratado se congela (M-1, `PROPUESTA-CUATRO-MODULOS.md` §3;
+D-227). Es el mismo techo del cuantificador de presupuesto (D-273) leído al
+momento de estimar, no al programar.
+
+**Ampliar el tope no es mecanismo nuevo** — reusa lo que ya existe: una
+incidencia (P-8, `PROPUESTA-CUATRO-MODULOS.md` §4) si la causa aplica, o el
+umbral del cuantificador de programación (P-9) si el origen es ahí.
+
+### Topes pagados
+
+```
+Topes pagados = Remanente + (Programado − Pagado)
+              = (Tope − Programado) + (Programado − Pagado)
+              = Tope − Pagado
+```
+
+Se simplifica al mismo mecanismo que Remanente (D-273 · D-282), pero contra lo
+pagado en vez de lo programado.
+
+### Validación y conciliación
+
+Un rol **distinto** valida la estimación — no es Control de obra con otro
+sombrero. **Hoy lo realiza Compras**, y puede recaer en cualquier usuario
+existente; no está formalizado como los seis roles de `MODELO.md` §5b. Si algo
+excede su tope, **se regresa**.
+
+En la conciliación: el Residente ve la brecha (sube lo que quedó bajo,
+reduce lo que un contratista no cumplió), **Costos recuantifica**, y
+**Control valida después y descuenta si hace falta**. Lo olvidado se agrega al
+final, revisado contra su propio tope.
+
+### Deducciones, retenciones y préstamos
+
+| Mecanismo | Cómo funciona |
+|---|---|
+| **Deducción por sobrepago** | Ya definida (§13.2) — se descuenta sin tocar el pactado |
+| **Deducción por rehacer trabajo** | Si el contratista responsable sigue activo, se descuenta de su estimación; si ya no está, la empresa absorbe — mismo «quién paga» de la causa 1 (§13.6), ahora concreto |
+| **Retención** | Solo para subcontratos |
+| **Préstamo** | Se salda con avance de obra, o directo contra una estimación futura |
+
+### Un archivo real valida el diseño sin haberlo visto
+
+Export de abril del ERP externo, 416 filas, a nivel de operación: `O/Requerida`
+(el tope) · `O/Avance` (el pagado) · `C/Promedio` (precio unitario) ·
+`$/Operación = O/Avance × C/Promedio`. **Cero de 416 filas exceden el tope** —
+el límite se respeta en la práctica, no solo en el diseño.
 
 ---
 

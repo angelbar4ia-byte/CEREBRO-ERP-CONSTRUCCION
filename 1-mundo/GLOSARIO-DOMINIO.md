@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
-corte:      2026-09-21
+corte:      2026-09-22
 verificado: 79 términos · 25 ambigüedades
 ```
 
@@ -740,7 +740,7 @@ Documento que cobra el avance ejecutado en un periodo.
 - **No confundir con:** Presupuesto (eso es lo planeado)
 - **Se usa con:** Avance; Presupuesto; Contratista
 - **Ejemplo:** — aún no modelado
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `CONOCIMIENTO.md` §13.8
 
 
 ## Precios y cambios

@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué falta?
 tiempo:     vamos aquí
-corte:      2026-09-21
+corte:      2026-09-22
 verificado: 38 de decisión · 14 de datos · 25 módulos
 ```
 
@@ -101,7 +101,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-15 | ¿Hace falta un agente traductor? | El migrador trae OPUS a este sistema; no vuelve bilingüe a un tercero |
 | P-16 | Declarar el dialecto del árbol de ingeniería | *No prioritario.* Sus cantidades vienen multiplicadas por el volumen y su PU congelado |
 | P-17 | **`Ingenieria ERP` no es generable** | La prueba de ida y vuelta lo demostró: la regla no es deducible. O se obtiene del ERP externo, o el código se arrastra del archivo original |
-| P-18 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones y retenciones. Es donde el dinero se vuelve real |
+| ✅ P-18 | ~~**Estimaciones**~~ | **Resuelto.** Dos fuentes (ERP externo con ingeniería, manual/Excel sin ella), consolidadas por extractor. El tope es el mismo techo del cuantificador de presupuesto (D-273), de cualquier fuente. Deducciones, retenciones y préstamos definidos. `CONOCIMIENTO.md` §13.8, D-284 a D-291 |
 | 🔶 P-19 | **Almacén** | Surtido contra consumido, devoluciones, y el corte matricial. **Primeros cruces reales hechos** (léxico del archivo, rendimiento vs. matriz, corte semanal) sobre 2 conceptos de un mes — falta el diseño del módulo completo. `CONOCIMIENTO.md` §11.15 a §11.17 |
 | 🔶 P-20 | **Programación** | Actividades, asignaciones y avance. **La política ya cerró** — `PROPUESTA-CUATRO-MODULOS.md` §4, 22 decisiones (P-1 a P-10), incidencia y registro de avance incluidos — falta asentarla como modelo de datos (`MODELO.md` §6): `registrar_avance` existe como función atómica (P-21) sin entidad propia |
 | ✅ P-21 | ~~**Roles y permisos**~~ | **Resuelto: módulo completo.** 6 roles —Residente, Supervisor, Superintendente, Costos, Cotizador, Control—, 15 funciones atómicas (`trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes`, `anotar_plano`), combinación muchos-a-muchos no disjunta (D-223), y sin tope por monto en `comprometer_gasto` —binaria; el control de subcontratos se resuelve como matriz, no como límite de rol (D-224). `MODELO.md` §5b, hallazgo 14. D-204 a D-206, D-223 a D-225. `anotar_plano` se agrega el 2026-09-18 al cerrar B-45, D-237 |
@@ -220,7 +220,7 @@ puede escribir de lo que primero hay que definir.
 | B-12 | **`parametrico`** | Ensambles: plantilla e instancia, divisor, cohorte | ✅ Definidas | B-02, B-04 |
 | B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | 🔶 **P-20** — la política cerró (22 decisiones, P-1 a P-10), sin asentar como modelo de datos | B-05, B-07 |
 | B-14 | **`contratos`** | Cadena de precios, precio por contratista, control de cambio | ✅ Definidas | B-05 |
-| B-15 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones, retenciones | ⏸️ **P-18** — sin definir | B-14 |
+| B-15 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones, retenciones | ✅ **P-18 resuelto** — `CONOCIMIENTO.md` §13.8 | B-14 |
 | B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | 🔶 **P-19** — primeros cruces reales hechos, falta el diseño del módulo completo | B-06 |
 | B-17 | **Roles y permisos** | Quién captura, aprueba y autoriza | ✅ **P-21 resuelto** — `MODELO.md` §5b | Todos |
 | B-24 | **`propuestas`** | La bandeja única de «propone, no aplica». Con evidencia, origen y rechazos conservados | ✅ Definidas en `CONOCIMIENTO.md` §14 | B-01 |
@@ -276,6 +276,7 @@ puede escribir de lo que primero hay que definir.
 | B-72 | **El agente interno aprende a sugerir tramos, desde la salida de almacén** | Nunca aplica solo — propone, con evidencia, cuando una salida de material se corta y retoma como si fuera un tramo | ⏸️ **Idea, sin diseñar.** El caso que la motivó (`EST-02010`) no confirmó el patrón al probarse — el hueco de material puede ser solo existencia sobrante, no una pausa real; hay que ser cuidadoso con falsos positivos. `IDEAS.md` §8, D-260 |
 | B-73 | **Incidencia, cierre de frente, los métodos de programar, el registro de avance y el cuantificador de programación no tienen modelo de datos** | La política ya cerró (`PROPUESTA-CUATRO-MODULOS.md` §4, D-265 a D-275) — falta la tabla `INCIDENCIA`, el registro de avance, las funciones atómicas de aprobar/validar/ejecutar, y sumarlo a la deuda ya anotada en B-13/P-20 | B-13 |
 | B-74 | **El alcance de datos por rol ya está decidido para los seis roles — falta el campo que lo sostenga** | Cascada de cuatro niveles cerrada (D-277 a D-279): Residente→obra, Supervisor y Superintendente heredan, Control y Costos ven todo. Faltan modelar tres asignaciones: residente↔obra (C-3, ya anotada), supervisor↔residente y superintendente↔supervisor (ninguna de las dos existe). `MODELO.md` §5b | — |
+| B-75 | **Validar estimación es un rol distinto de los seis ya definidos, y hoy no tiene dueño formal** | Lo realiza Compras en la práctica — un actor que no aparece en `MODELO.md` §5b. Puede recaer en cualquier usuario existente, pero eso todavía no se decide. `CONOCIMIENTO.md` §13.8, D-286 | — |
 | B-71 | **Módulo de comparación/reportes de obra** — Presupuesto Base, Ingeniería, Pagado Real, Presupuesto Formado y Control de Cambio, por destajo y por material | Hoy se calcula con scripts ad hoc fuera de este repositorio, no como parte del sistema — decisión explícita del usuario: no se sube el script ni el archivo hasta que exista el sistema real | ⏸️ **Sin diseñar.** El método ya está probado sobre datos reales de `ALAMO 18` y no hay que redescubrirlo: `CONOCIMIENTO.md` §11.14 a §11.18, `RAZONAMIENTO.md` §4. Anotado en `agentes/arquitecto-erp.md` para cuando se diseñe |
 
 ### Infraestructura
@@ -299,4 +300,5 @@ puede escribir de lo que primero hay que definir.
 en `backend/core/`. B-03 a B-07 y B-10 a B-12 siguen con sus reglas escritas y
 verificadas: **se pueden construir sin esperar ninguna decisión.**
 
-Lo demás espera a que se definan P-14, P-18, P-19, P-20 y P-21.
+Lo demás espera a que se definan P-14 y el resto de P-19/P-20 — P-18 y P-21 ya
+cerraron.
