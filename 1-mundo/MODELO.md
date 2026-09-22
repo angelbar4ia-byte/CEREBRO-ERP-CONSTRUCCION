@@ -744,7 +744,8 @@ FUNCION_ATOMICA
                      pactar_precio_contratista · aplicar_descuento ·
                      autorizar_orden_cambio · aprobar_propuesta ·
                      resolver_alerta · clasificar_manualmente ·
-                     correr_invariantes · anotar_plano                      firme
+                     correr_invariantes · anotar_plano ·
+                     validar_estimacion                                    firme
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -757,9 +758,16 @@ cerrado» de R-2 (D-205), y el mismo patrón que ya se repitió cinco veces en
 este cerebro: nada reasigna, se agrega encima.
 
 **Primeras asignaciones concretas de `ROL_FUNCION`, cerrando B-45:** quién
-traza y quién anota el plano — ver §1b. Las quince funciones existen desde
-P-21; las asignaciones reales se agregan según aparece el caso, no todas de
-una vez.
+traza y quién anota el plano — ver §1b. Quince de las dieciséis funciones
+existen desde P-21; las asignaciones reales se agregan según aparece el
+caso, no todas de una vez.
+
+**`validar_estimacion` es la dieciseisava, y queda sin asignar a ningún
+rol a propósito** — cierra B-75 solo en parte: hoy la ejerce Compras, un
+actor que no está en `ROL`, y no está decidido si se formaliza como rol
+propio o se asigna a uno de los seis ya existentes. La función se cataloga
+para que exista una clave a la que apuntar; la asignación se queda
+pendiente, no se fuerza.
 
 **`comprometer_gasto` no lleva tope por monto.** Es binaria: el rol la tiene o
 no la tiene, sin límite de monto asociado. Si algún día hace falta controlar
