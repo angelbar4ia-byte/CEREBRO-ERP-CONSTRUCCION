@@ -245,8 +245,8 @@ desambiguación).
 
 **Segunda regla transversal:** toda tool filtra por el alcance de quien pregunta —
 un Residente no recibe el reporte de una obra que no es suya, la pida como la pida.
-Residente ve sus obras, Supervisor hereda las de sus residentes, Control ve todo y
-filtra (`MODELO.md` §5b).
+Residente ve sus obras, Supervisor hereda las de sus residentes, Superintendente
+hereda las de sus supervisores, Control y Costos ven todo (`MODELO.md` §5b).
 
 ---
 

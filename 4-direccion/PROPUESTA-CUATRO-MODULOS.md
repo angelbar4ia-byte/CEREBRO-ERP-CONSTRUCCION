@@ -6,7 +6,7 @@ capa:       IV — Dirección
 pregunta:   ¿qué se propone construir?
 tiempo:     vamos aquí
 corte:      2026-09-21
-verificado: ✅ 21 decisiones cerradas · pendiente diseño formal
+verificado: ✅ 22 decisiones cerradas · pendiente diseño formal
 ```
 
 > **Para revisar y decidir, no para construir todavía.**
@@ -499,6 +499,37 @@ de `CONOCIMIENTO.md` §13.6 (incluida la causa 6, "plano desactualizado" — un
 cambio que nunca llegó a planos), y el séptimo —cuantificación mal trazada desde
 el inicio— no es causa: es alerta descartada.
 
+### Cómo se visualiza el programa
+
+Lo que es regla de negocio, no preferencia de pantalla:
+
+| Herramienta | Qué hace |
+|---|---|
+| Rótulo de la barra | Cantidad, importe, %, % sobre el proyecto total, o agrupado — no es un modo u otro, es qué dato se muestra encima |
+| Escala | Dos niveles: mayor (meses) y menor (semanas, en rangos) — más una vista de solo días con prefijo |
+| Vincular / configurar vínculo | Dos acciones separadas: crear el vínculo, y editar su tipo, traslape o espera |
+| Calendario de trabajo | Ya definido en P-2 — aquí solo se confirma que es herramienta con botón propio |
+
+**Color, forma de barra y fijar columnas quedan fuera** — son preferencia visual,
+no regla del sistema.
+
+### Reiniciar programa o actividad
+
+Borra fechas y vínculos para empezar de cero — **nunca avance ni incidencias**,
+que quedan como registro aparte. Y **solo aplica a nivel diseño**: mismo límite
+que ya existía (M-1, arriba — la plantilla flota, la instancia se congela al
+contratarse). Una vez que hay avance registrado o la actividad está contratada,
+no se puede reiniciar así. **P-10**, abajo.
+
+### Dos capturas reales validan diseños sin haberlos visto
+
+`Interrupciones` de OPUS se guarda como una lista de rangos —fecha inicio, fecha
+término, días calendario, con botón para agregar más de uno— exactamente el
+mecanismo de tramo de P-5. Y `Programación` trae **Cantidad programada / Cantidad
+total / Remanente**, casi el mismo par que D-273 diseñó sin verlo: cuantificador
+de presupuesto (el techo) y cuantificador de programación (lo programado). Se
+adopta el nombre **Remanente** = total − programada, en vez de inventar uno nuevo.
+
 ## Qué cuesta
 
 - Es el módulo con **más aritmética** y el más fácil de implementar mal.
@@ -518,8 +549,9 @@ el inicio— no es causa: es alerta descartada.
 | ~~P-7~~ | ~~¿El CPM usa el rendimiento real (mano de obra, `CONOCIMIENTO.md` §6.2) en vez del teórico cuando existe?~~ | **El teórico nunca se sobrescribe** — misma cadena que el precio (`CONOCIMIENTO.md` §13.1). El real de mano de obra da una **segunda proyección que convive con la teórica**, nunca un reemplazo. Si diverge más allá de un umbral, avisa `Desviación` (`gravity-obra.md` §6) — nunca reprograma sola, mismo «propone, no aplica». **El umbral no es un número fijo:** es un **rango sugerido —2 a 4 semanas seguidas de datos—** que el sistema propone y el usuario confirma, por dos caminos: proactivo (alerta) o a petición directa (agente Consulta). Puede existir un rendimiento real **global**, agregado entre obras, como referencia adicional — el usuario siempre decide cuál usar |
 | ~~P-8~~ | ~~¿Una incidencia de programa y una desviación de costo son el mismo registro?~~ | **No — son independientes.** Comparten vocabulario de causa (`CONOCIMIENTO.md` §13.6, extendido a nueve), pero no siempre coexisten: un error de ejecución puede cobrarse al contratista sin pagar destajo —sin desviación de costo que registrar— y el programa igual se retrasa. Cada uno decide si el motivo le aplica |
 | ~~P-9~~ | ~~¿Cruzar el umbral del cuantificador de programación es la misma incidencia?~~ | **No — pero se resuelven con el mismo mecanismo.** La alerta es un disparador automático (`ALERTA`, `MODELO.md` §5a); Control la revisa y decide si es una incidencia real (la origina él, misma cadena de P-8) o se descarta (error de trazo, no de obra) |
+| ~~P-10~~ | ~~¿Reiniciar el programa o una actividad es destructivo?~~ | **No para lo registrado.** Solo borra fechas y vínculos — nunca avance ni incidencias, que quedan aparte. Y solo aplica a nivel diseño: mismo límite que M-1 (§3, arriba), una vez contratada la actividad no se reinicia así |
 
-**Las nueve decididas.**
+**Las diez decididas.**
 
 > **P-4 completa la simetría:** en lo contratado, el precio y la fecha son las dos
 > obligaciones, y ninguna de las dos se mueve por recálculo. Reprogramar propone la
@@ -538,13 +570,13 @@ el inicio— no es causa: es alerta descartada.
 | **Factorizador** | Compras reales, inventario contra desperdicio, catálogo más chico | Bajo | ✅ 4 de 4 |
 | **Cuantificador** | Cantidades auditables, corpus del paramétrico | **Alto** | ✅ 4 de 4 |
 | **Paramétrico** | Presupuestar sin planos, priorizar por incertidumbre | Medio | ✅ 4 de 4 + corpus |
-| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 9 de 9 |
+| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 10 de 10 |
 
-**Las 21 decisiones están cerradas** — las 20 anteriores más `P-9` (cruzar el
-umbral del cuantificador de programación no es la misma incidencia, aunque se
-resuelven igual). Las dos piezas que aparecieron al cerrar las primeras 16 también
-se resolvieron: `B-40` (tiempo de entrega) y `B-45` (dónde vive una regla de
-gobierno por obra) — ninguna sigue abierta.
+**Las 22 decisiones están cerradas** — las 21 anteriores más `P-10` (reiniciar
+programa o actividad no toca lo registrado, y solo aplica a nivel diseño). Las
+dos piezas que aparecieron al cerrar las primeras 16 también se resolvieron:
+`B-40` (tiempo de entrega) y `B-45` (dónde vive una regla de gobierno por obra)
+— ninguna sigue abierta.
 
 ## Mi recomendación
 

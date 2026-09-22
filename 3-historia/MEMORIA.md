@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-21
-verificado: 277 decisiones · 12 descartes · 8 correcciones
+verificado: 283 decisiones · 12 descartes · 8 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -351,6 +351,12 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-275 | **El residente ve la brecha de avance contra el presupuesto, no solo contra lo programado, y puede solicitar ajuste de cantidad a Control de obra** | Mismo patrón que solicitar extender el techo del cuantificador de programación (D-273) |
 | D-276 | **La proyección de insumos no es módulo nuevo: es `recursos_por_fecha` (`PROPUESTA-CUATRO-MODULOS.md` §4) expuesto como reporte** | Los reportes de lo ya consumido ya existían en Consulta (`resumen_salidas_material`, `rendimiento_material`). Confirmado por el usuario: aplican los dos, no uno u otro |
 | D-277 | **Nueva regla general, no solo de este módulo: el alcance de datos por rol.** Residente ve sus obras, Supervisor hereda las de sus residentes, Control ve todo y filtra | No existía — los roles hasta hoy solo definían qué acciones puede hacer cada uno (D-204 a D-206), nunca qué datos ve. Faltan dos piezas: asignación supervisor↔residente (nueva) y el alcance de Costos/Cotizador (sin definir). `MODELO.md` §5b |
+| D-278 | **Superintendente es un sexto rol, no estaba en R-1 (D-204)** — mismos privilegios que Supervisor, pero hereda de los supervisores que le reportan, extendiendo la cascada a cuatro niveles: Residente → Supervisor → Superintendente → Control | Confirmado por el usuario: «paralelo con Supervisor», misma naturaleza de campo, con línea de reporte. `MODELO.md` §5b |
+| D-279 | **Costos cuantifica y crea precios nuevos, con aprobación doble: Control de obra y Superintendente, los dos** | Su alcance global (todas las obras) no es arbitrario: es consecuencia de que cuantificar y fijar precio son procesos compartidos entre obras, igual que el catálogo y las matrices. Ninguna función atómica existente cubre «crear precio nuevo» con exactitud — falta nombrarla, `PENDIENTES-MEJORAS.md` B-73. `MODELO.md` §5b |
+| D-280 | **Cotizador tiene dos artefactos —highlight antes de ejecución, adicional en ejecución—, ambos foliados, que se vuelven control de cambio al aprobarse (mismo mecanismo de `CONOCIMIENTO.md` §13.4)** | También registra conceptos nuevos; una cotización se estructura como presupuesto PU (`CONOCIMIENTO.md` §7). **No es rol activo hoy: lo ejecuta Control de obra** — puede evolucionar a rol propio o fundirse con Costos, ninguna decidida. `MODELO.md` §5b |
+| D-281 | **P-10 cierra: reiniciar programa o actividad no toca lo registrado — solo borra fechas y vínculos, nunca avance ni incidencias, y solo aplica a nivel diseño** | Mismo límite que M-1 (`PROPUESTA-CUATRO-MODULOS.md` §3): una vez contratada la actividad, no se reinicia así |
+| D-282 | **Dos capturas reales de OPUS validan diseños de esta sesión sin haberlos visto** | `Interrupciones` se guarda como lista de rangos de fecha — el mismo mecanismo de tramo (P-5). `Programación` trae Cantidad programada/total/Remanente, casi idéntico a D-273 — se adopta el nombre **Remanente** en vez de inventar uno nuevo. `PROPUESTA-CUATRO-MODULOS.md` §4 |
+| D-283 | **La visualización del programa tiene tres reglas de negocio, no solo preferencia de pantalla**: la barra rotula cantidad/importe/%/%proyecto/agrupado; la escala es de dos niveles (mayor y menor) más una vista de días con prefijo; vincular y configurar vínculo son dos acciones separadas | Color, forma de barra y fijar columnas quedan fuera — eso sí es preferencia visual. `PROPUESTA-CUATRO-MODULOS.md` §4 |
 
 ---
 

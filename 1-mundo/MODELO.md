@@ -728,13 +728,14 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 
 ## 5b. Roles y permisos — quién puede hacer qué
 
-> Cierra P-21: cinco roles (R-1, D-204), catorce funciones atómicas (R-3,
-> D-206), y las dos preguntas que faltaban para cerrar el módulo — confirmadas
-> con el usuario.
+> Cierra P-21: seis roles (R-1, D-204 · Superintendente agregado después,
+> D-278), catorce funciones atómicas (R-3, D-206), y las dos preguntas que
+> faltaban para cerrar el módulo — confirmadas con el usuario.
 
 ```
 ROL
-  id, nombre        Residente · Supervisor · Costos · Cotizador · Control    firme
+  id, nombre        Residente · Supervisor · Superintendente · Costos ·
+                     Cotizador · Control                                    firme
 
 FUNCION_ATOMICA
   id, clave         trazar · aprobar_trazo · registrar_avance ·
@@ -775,19 +776,48 @@ por permiso.
 |---|---|
 | **Residente** | Sus obras asignadas |
 | **Supervisor** | Hereda las obras de los residentes que supervisa |
-| **Control** | Todas las obras. Filtra por obra, por residente o por supervisor |
+| **Superintendente** | Hereda las obras de los supervisores que le reportan — mismos privilegios que Supervisor, alcance más amplio |
+| **Control** | Todas las obras. Filtra por obra, por residente, por supervisor o por superintendente |
+| **Costos** | Todas las obras, igual que Control — consecuencia de que cuantificar y fijar precio son procesos compartidos entre obras, no una asignación arbitraria |
+| **Cotizador** | No aplica todavía — no es un rol activo, ver abajo |
 
-**Es jerárquico, no una lista plana**: el alcance de Supervisor se deriva de a
-quién supervisa, no se declara obra por obra.
+**Es jerárquico, no una lista plana**: el alcance de cada nivel se deriva de a
+quién supervisa o le reporta, no se declara obra por obra. Cuatro niveles:
+Residente → Supervisor → Superintendente → Control.
 
 > Sin campo propio todavía: hace falta la asignación **residente↔obra** (ya
 > anotada en C-3, `PROPUESTA-CUATRO-MODULOS.md` §2, «se define por obra, al
-> asignarla a un residente») y una nueva, **supervisor↔residente**, que no
-> existía hasta ahora.
+> asignarla a un residente»), y dos nuevas que no existían hasta ahora:
+> **supervisor↔residente** y **superintendente↔supervisor**.
 
 Aplica a todo lo que el sistema muestra, no solo a insumos: reportes, Consulta
-(`gravity-obra.md` §6), avance, incidencias. **Costos y Cotizador quedan sin
-definir** — no está declarado si su alcance es por obra o global.
+(`gravity-obra.md` §6), avance, incidencias.
+
+### Costos: cuantifica y crea precios, con doble aprobación
+
+Costos **cuantifica** (produce presupuesto) y **crea precios nuevos** — estos
+últimos necesitan aprobación de **Control de obra y Superintendente**, los
+dos, no uno solo. Ninguna de las quince funciones atómicas existentes cubre
+"crear precio nuevo" con exactitud — falta nombrarla al formalizar el modelo
+(`PENDIENTES-MEJORAS.md` B-73).
+
+### Cotizador: la responsabilidad existe, el rol activo todavía no
+
+Dos artefactos, no uno:
+
+| Artefacto | Cuándo | Qué es |
+|---|---|---|
+| **Highlight** | Antes de la ejecución | El cliente pide un estimado preliminar |
+| **Adicional al presupuesto** | Ya en ejecución | Presupuesto extra sobre lo contratado |
+
+Los dos se **folian** — y al aprobarse, se vuelven **control de cambio**
+(`CONOCIMIENTO.md` §13.4), mismo mecanismo, no uno nuevo. Cotizador también
+lleva el registro de conceptos nuevos, y una cotización se estructura como
+presupuesto PU (`CONOCIMIENTO.md` §7, mismo modo de valuación ya definido).
+
+> **Hoy esto lo ejecuta Control de obra** — Cotizador no es todavía un rol
+> separado en la práctica. Puede evolucionar a rol propio, o fundirse con
+> Costos; ninguna de las dos está decidida.
 
 ---
 

@@ -101,11 +101,11 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) y marcador de prototipo (P-40) quedan anotados |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 277 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 283 decisiones · 12 descartes · 8 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 79 términos · 25 ambigüedades |
-| **Módulos** | Las 21 decisiones de los cuatro cerradas (CPM cierra con P-9: el registro de avance, y dos cuantificadores — presupuesto y programación) · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
+| **Módulos** | Las 22 decisiones de los cuatro cerradas (CPM cierra con P-10: reiniciar programa no toca lo registrado) · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
 | **Pruebas de flujo** | 🆕 Tres corridas: ALAMO 18, Zafiro 1.0, siete prototipos · 13 pasan, 8 se rompen, 5 sin dato |
 | **Invariantes** | 🆕 Las cifras de control, juntas · condición de paro |
 | **Capas** | 🆕 Cuatro: Mundo · Operación · Historia · Dirección |
