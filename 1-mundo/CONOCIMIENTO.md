@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-22
+corte:      2026-09-24
 verificado: 17 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1053 | 19 |
+| §11 | Los flujos entre sistemas | 1077 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2296,7 +2296,7 @@ encontró los dos huecos que esa regla necesitaba:
 
 ### Cuando ni A ni B alcanzan: el concepto "lote"
 
-Cinco de los 72 bloques compartían material entre varios sub-conceptos sin
+Cuatro de los 72 bloques compartían material entre varios sub-conceptos sin
 una llave real de prorrateo — el cable de una misma bobina alimenta
 contacto, apagador y timbre a la vez, sin metraje declarado por punto—.
 Forzar un split ahí no reconstruye un dato: **inventa uno.**
@@ -2304,10 +2304,34 @@ Forzar un split ahí no reconstruye un dato: **inventa uno.**
 > Mismo principio que `EST-01060` en cimentación: cuando no hay llave
 > confiable, **el bloque completo se registra como un solo concepto "lote"**,
 > cantidad 1, en vez de una división ficticia con apariencia de precisión.
-> `IEC-00410`/`IEC-00420` (cableado PB/PA), `API-01020`/`API-04020`
+> `IEC-00410`/`IEC-00420` (cableado PB/PA) y `API-01020`/`API-04020`
 > (limpieza y sellado, mezclan M2 de mármol, piedra y metros de durmiente
-> bajo un solo encabezado) y `OBE-01010` (muros de cisterna — **sin ninguna
-> referencia en el catálogo maestro**, B-65) se cerraron así.
+> bajo un solo encabezado) se cerraron así.
+
+### `OBE-01010` no era "sin referencia" — era un auxiliar sin reconocer (B-65)
+
+`OBE-01010` (muros de cisterna, $12,726.59) también se cerró como lote, pero
+por una razón que resultó incorrecta: se registró como «sin ninguna
+referencia en el catálogo maestro». No es cierto. El catálogo maestro trae
+`OBE-01010` en los **siete prototipos**, como Nivel 3 —concepto auxiliar,
+igual que `EST-01060`—, agregando 7 hijos reales (afine, firme, muro de
+tabique, repellado, aplanado, losa, tapa) bajo un rótulo engañoso:
+"ENCOFRADO DE CISTERNA 3000 LTS" para lo que en realidad es el paquete
+completo de muros, no solo la cimbra. El error no fue de catálogo: fue no
+reconocer un Nivel 3 como concepto auxiliar y tratarlo como concepto suelto.
+
+No es el mismo error que la matriz prestada (D-245): ahí la clave
+pertenecía a *otro prototipo*; aquí la clave es la correcta, pero al *nivel
+equivocado* de la jerarquía — un agregador no es una referencia de PU
+directa, aunque el grep lo encuentre.
+
+Mejor aún: la ingeniería cruda de `ALAMO 18` trae ancla de MO propia para 6
+de los 7 hijos (`MOE-02010` muro, `MOE-30010` firme, `MOE-30020` repello,
+`MOE-30030` finas, `MOE-30040` afine, `MOE-31110` tapa, cada una con su
+propia cantidad) — mejor evidencia de la que tenían `EST-01060` o las losas
+de Planta Baja cuando se explotaron por el método de §11.14. El lote
+($12,726.59) sigue siendo el valor vigente; explotarlo en sus 7 hijos
+reales queda pendiente, no ejecutado (B-69, D-302).
 
 ### El residuo se anota, no se fuerza — `TMP-XXXXX`
 
