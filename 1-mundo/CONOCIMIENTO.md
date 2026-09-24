@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1077 | 20 |
+| §11 | Los flujos entre sistemas | 1145 | 22 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2331,7 +2331,43 @@ de los 7 hijos (`MOE-02010` muro, `MOE-30010` firme, `MOE-30020` repello,
 propia cantidad) — mejor evidencia de la que tenían `EST-01060` o las losas
 de Planta Baja cuando se explotaron por el método de §11.14. El lote
 ($12,726.59) sigue siendo el valor vigente; explotarlo en sus 7 hijos
-reales queda pendiente, no ejecutado (B-69, D-302).
+reales quedó documentado como oportunidad — ejecutado después, junto con el
+resto de B-69, ver abajo.
+
+### Los otros ocho de B-69: mismo patrón, no todos se explotan igual
+
+Confirmado el patrón en `OBE-01010`, se revisaron los ocho Nivel 3
+restantes de la lista de B-69 (`IEC-00410`, `IEC-00420`, `API-01010`,
+`API-01020`, `API-02010`, `API-02020`, `API-04010`, `API-04020`,
+`API-05010`) contra el catálogo maestro y la ingeniería cruda. **Los siete
+`API-` sí se explotaron** — la MO trae ancla propia por hijo, algunas veces
+con cantidades idénticas al catálogo:
+
+| Código (antes) | Hijos reales | Real vs. antes |
+|---|---|---|
+| `API-01010` Pintura PB | 2 (muro, plafond) | $36,828.57 vs $37,139.61 (-0.8%) |
+| `API-01020` Limpieza/sellado PB | 5 (mármol×2, piedra, gualdra, asador) | $11,123.88 vs $9,603.71 (**+15.8%**, todo en `ACA-10040`, sin ancla propia — se queda en catálogo, no es hallazgo, es límite del dato) |
+| `API-02010` Pintura PA | 3 (muro, plafond, fachada) | $14,513.88 vs $14,603.66 (-0.6%) |
+| `API-02020` Limpieza/sellado PA | 2 (mármol sellado, mármol lavado) | $1,975.73 vs $1,704.36 (**`ACA-10040` faltaba por completo** en la reconstrucción anterior — no es alza real, es un hijo nunca capturado) |
+| `API-04010` Pintura fachada | 1 (ya era real) | $17,288.13, sin cambio |
+| `API-04020` Limpieza/sellado fachada | 6 (piedra, moldura, 2 rodapiés, gualdra, durmiente) | $16,680.48 vs $16,680.49, sin cambio real |
+| `API-05010` Pintura azotea | 1 (ya era real) | $798.14, sin cambio — la reconstrucción ya había detectado que la azotea real (19.2 M2) triplica el supuesto del catálogo (6 M2, $249.42) y lo había corregido antes de esta revisión |
+
+`IEC-00410`/`IEC-00420` (cableado) **no se explotaron.** El material sigue
+genuinamente compartido (bobina sin metraje por punto), y aunque la MO trae
+más estructura de la que este mismo párrafo reconocía antes (4 categorías
+de accesorio, no cero), no alcanza para separar los hijos específicos del
+catálogo — `apagador sencillo/doble/triple/...` son un solo bulto de 19 en
+la ingeniería, cuando el catálogo distingue 6 subtipos. Validación parcial,
+sí posible, por agregado: contacto (49 real = 39+4+6 del catálogo, exacto)
+y timbre+zumbador+arbotante (2+2=4, exacto) reconcilian; apagador no (19
+real contra 26 que implica la suma del catálogo, más un bulto "general" de
+10 sin atribuir) — brecha real, sin explicar, sin forzar.
+
+> Aplicado sobre el catálogo reconstruido de `ALAMO 18` (scratchpad, fuera
+> del repo): 20 filas nuevas reemplazan 7 lotes/mezclas, el total del
+> prototipo sube $1,390.71 (0.05% de $2.57M) — explotar no cambia el
+> presupuesto, lo hace auditable hijo por hijo. D-303.
 
 ### El residuo se anota, no se fuerza — `TMP-XXXXX`
 
@@ -2460,7 +2496,7 @@ Probado sobre los tres auxiliares de cimentación/losas de `ALAMO 18`:
 | Auxiliar (mi catálogo) | Hijos reales (catálogo base) | Ancla | Real vs. base |
 |---|---|---|---|
 | `EST-01060` (losa cim. + castillos) | `EST-01053` losa | `MOC-01010` | 244 vs 216 M2 (+13.0%) |
-| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | — sin ancla propia | sin cambio (cantidad base) |
+| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — validación indirecta abajo | K1 confirmado (61 PZA); K2/K3/K7/K8 sin cambio (cantidad base) |
 | `EST-00090` (losas PB) | `EST-20010` losa maciza 11cm | `MOE-02213` | 32.80 vs 39 M2 (-15.9%) |
 | | `EST-20020` losa maciza 12cm ("4.20") | `MOE-02217` | 24.00 vs 24 M2 (exacto) |
 | | `EST-20017`+`EST-20022` losa nervada (63+84 M2) | `MOE-02211`, **compartida** | 182.40 vs 147 M2 combinados — mismo factor (+24.1%) a las dos, sin forma de separarlas |
@@ -2473,6 +2509,38 @@ contra un tercero. La losa nervada de PB es el caso honesto de datos
 insuficientes: dos hijos, una sola ancla combinada en la ingeniería — se
 aplicó el mismo factor a los dos por no haber llave para separarlos, **no
 porque sea lo correcto, sino porque es lo que hay.**
+
+### Los castillos de Planta Baja, en metros, abren una validación cruzada para los de cimentación (B-67)
+
+Los cinco castillos de cimentación (K1/K2/K3/K7/K8, dentro de `EST-01060`)
+se quedaron sin ancla de MO propia — cantidad de catálogo, sin evidencia de
+que fuera correcta. Planta Baja tiene sus propios castillos — misma
+nomenclatura K1-K8, pero **en metros lineales, no en piezas** (es el tramo
+de muro, no el arranque de cimentación) — y sí traen ancla real y limpia en
+la ingeniería cruda: `MOE-02020` K1=260 M, `MOE-02021` K2=76 M, `MOE-02022`
+K3=20 M, `MOE-02027` K7=16+8.4=24.4 M, `MOE-02028` K8=20 M.
+
+Con la altura estándar (**solo dos: 3.00 y 4.20 m** — dato del usuario),
+esos metros deberían reducirse a un número entero de piezas — y ese número,
+para un castillo que arranca en cimentación y sube por Planta Baja, tendría
+que **coincidir con el PZA del catálogo de cimentación**, porque es el
+mismo castillo medido dos veces, en dos unidades distintas:
+
+| Castillo | M real (PB) | ÷ 4.20 | PZA cimentación (catálogo) | ¿Cuadra? |
+|---|---|---|---|---|
+| K1 | 260.00 | 61.90 | 61 | **Sí** — 61×4.20=256.2, a 1.5% del real. Confirma el supuesto |
+| K2 | 76.00 | 18.10 | 19 | No limpio — ni 19×4.20 (79.8) ni 19×3.00 (57) calzan, y ninguna mezcla entera de 3.00/4.20 en 19 piezas da 76.00 |
+| K3 | 20.00 | 4.76 | 7 | No cuadra — pero K3 también existe empaquetado como "columna" (`EST-07011`, 3 PZA aparte), así que el 7 del catálogo puede repartirse entre dos tratamientos distintos, no ser todo "castillo suelto" |
+| K7 | 24.40 | 5.81 | 5 | No cuadra limpio |
+| K8 | 20.00 | 4.76 | 5 | No cuadra limpio |
+
+**Un caso confirma, cuatro quedan abiertos.** K1 es evidencia fuerte de que
+61 PZA es razonable — el promedio (260/61=4.26 m) cae a 1.5% de la altura
+estándar más alta. Los otros cuatro no se resuelven con esta sola pista: K3
+sugiere que el empaquetado "columna vs. castillo suelto" divide el mismo
+conteo en dos códigos, sin información aquí para separar cuánto va a cada
+uno. **No se cambia ningún valor de cimentación** — B-67 sigue abierto para
+K2/K3/K7/K8, con la pista de altura anotada para quien lo retome. D-304.
 
 ### Efecto cantidad y efecto receta — separar por qué creció el excedente
 
