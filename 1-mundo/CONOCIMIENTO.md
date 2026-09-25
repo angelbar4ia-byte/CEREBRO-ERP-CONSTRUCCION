@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1276 | 25 |
+| §11 | Los flujos entre sistemas | 1290 | 25 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2662,6 +2662,21 @@ comprar mortero en costal salió, en conjunto, casi igual que mezclar
 cemento y arena en obra. El cemento que sigue apareciendo en la
 ingeniería real ($60,443) es el correcto — castillos y firmes nunca pasan
 por `MEZ-07010`, no tienen por qué cambiar.
+
+> **La arena también se actualizó (dato del usuario) — el grupo completo
+> es más grande de lo que este párrafo cerró.** `PET-00002` "Arena 7M3"
+> aparece en castillos, muros y columnas forjadas, pero ninguna de las
+> tres recetas de mezcla del catálogo la referencia — `MEZ-07010` (muro),
+> `MEZ-01020` (concreto de castillo), `MEZ-03020` (`ALB-01110`/`01112`)
+> piden las tres `PET-00015` "Arena de Rio 14M3", que la ingeniería real
+> nunca compró ($0 en 454 filas). Mismo mecanismo que el mortero, misma
+> causa raíz — la matriz no se actualizó — solo que en la arena, no en el
+> cemento. Agrupando el grupo completo (Mortero + Cemento + Arena 7M3 +
+> Arena de Rio + Pipa + Grava), el neto sube de $6,443 a **+$54,633**: el
+> 27.8% del efecto receta total ($196,704, tras corregir Piedra Galarza)
+> queda explicado por este grupo — no todo. Lo que resta ($142,071) sigue
+> siendo una cola larga sin un patrón tan limpio como este. D-310 (extiende
+> D-308).
 
 Queda la Piedra Galarza 40×40/60×40 (-$134,114/-$95,968) sin revisar —
 mismo patrón sospechado, sin confirmar. D-308.
