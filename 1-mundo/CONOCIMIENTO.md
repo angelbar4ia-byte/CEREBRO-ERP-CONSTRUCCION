@@ -20,7 +20,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §2 | Importación desde OPUS | 386 | 9 |
 | §3 | Notas de implementación | 129 | 5 |
 | §4 | Estados del nodo y exportación | 110 | 3 |
-| §5 | Presupuesto paramétrico — ensambles | 272 | 11 |
+| §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
 | §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
@@ -894,8 +894,36 @@ población.
 > dejaba el otro en 32% — **el residuo alto era la señal de que la explicación estaba
 > incompleta, y se leyó como ruido.**
 
-Qué separa al grupo B sigue sin saberse (B-52). Lo que sí se sabe es que **no es el
-número de plantas.**
+### B-52 cierra: es desplante, no plantas — una regla ya escrita, ahora comprobada
+
+**Cimentación escala con el área de desplante (la losa que realmente se cuela),
+no con el m² total construido.** Cada prototipo declara su propio desplante en la
+descripción de su losa de cimentación — y en Zafiro Plus y Oro ese número es
+mucho más chico que su m² total: son los dos prototipos con más planta alta
+relativa, no una población distinta.
+
+| Prototipo | Cimentación | Desplante (losa) | m² total | $/m² desplante |
+|---|---:|---:|---:|---:|
+| Zafiro 1.0 | $178,769 | 172 | 172 | 1,039 |
+| Rubí | $209,540 | 200 | 207 | 1,048 |
+| Zafiro Plus | $147,745 | **137** | 224 | 1,078 |
+| Jade | $242,273 | 230 | 230 | 1,053 |
+| Diamante − | $260,486 | 216 | 239 | 1,206 |
+| Diamante + | $259,316 | 216 | 239 | 1,201 |
+| Oro | $173,136 | **160** | 300 | 1,082 |
+
+Medido contra desplante, **los siete caen en el mismo rango — CV 6.0%**, contra
+21.5% midiendo contra m² total (y el 32% original del grupo mixto por plantas).
+Zafiro Plus y Oro dejan de ser "otra población": su desplante es 61% y 53% de su
+m² total (los otros cinco están en 90-100%) — dividir su cimentación entre el m²
+total, que incluye planta alta que nunca toca el suelo, los hacía ver
+artificialmente baratos.
+
+> **No era un hallazgo nuevo — era una regla ya escrita sin comprobar.** "Cimentación
+> escala con desplante" ya estaba anotada como regla de método, antes de tener la
+> evidencia específica que la probara. El residuo de 6% que queda (Diamante algo
+> arriba del resto) es variación normal — no hay señal de una tercera cohorte.
+> D-312.
 
 ### B-49 cierra: la Δ es redondeo del PU en la explosión, confirmado en los siete
 
