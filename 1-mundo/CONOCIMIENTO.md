@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1167 | 22 |
+| §11 | Los flujos entre sistemas | 1198 | 23 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2588,11 +2588,50 @@ de esa clave se ve como "mal rendimiento" cuando puede ser, en gran parte,
 | Destajo, con las losas mal explotadas | -$83,254 | +$164,940 | $81,687 |
 | Destajo, con las losas descompuestas | **+$71,372** | **+$10,315** | $81,687 |
 | Material, con las losas mal explotadas | -$485,127 | +$601,452 | $116,325 |
-| Material, con las losas descompuestas | **+$15,254** | **+$101,071** | $116,325 |
+| Material, con las losas descompuestas | +$15,254 | +$101,071 | $116,325 |
+| Material, con los 7 `API-` también explotados (B-69) | +$59,138 | +$57,187 | $116,325 |
+| Material, sin los dos subcontratos (`SUB-`) | **+$181,973** | **-$52,267** | $129,706 |
 
 **87% del excedente de destajo es construir más (244 m² reales contra 216
-del catálogo), no mal rendimiento.** En material queda un residuo de
-~$101,071 sin explicar — sigue abierto (`PENDIENTES-MEJORAS.md` B-68).
+del catálogo), no mal rendimiento.**
+
+### B-68 cierra: el residuo de material no era una causa, eran tres
+
+Explotar los 7 `API-` de B-69 con el mismo método que las losas bajó el
+residuo de $101,071 a $57,187 — **~$43,884 era el mismo error: concepto
+auxiliar sin descomponer**, no receta distinta ni desperdicio.
+
+Lo que quedaba no era limpio. Dos subcontratos (`SUB-00001` pergolado,
+`SUB-00006` impermeabilización) se comparaban contra una matriz de
+materiales que no les aplica — un subcontrato no se construye del catálogo
+propio, no tiene receta que comparar contra la suya. Al excluirlos **de las
+tres columnas** (el catálogo base también trae $122,835.50 en material
+para ese mismo alcance, asumiendo que se construye y no se subcontrata) el
+universo comparado cambia — el excedente sube a $129,706 — y el efecto
+receta **cambia de signo**: la receta ahora sobra ($52,267), no falta.
+
+Lo que sigue después de las dos correcciones **no es desperdicio: son
+pares que huelen a la misma clave contada dos veces**, insumo por insumo:
+
+| Par | Ingeniería | Formado | Lectura |
+|---|---:|---:|---|
+| `ADH-00004` Mortero / `ADH-00005` Cemento | +$180,526 / -$136,201 | | Misma obra gris, dos códigos |
+| `PET-00033`+`PET-00032` Piedra Galarza 40×40/60×40 | -$134,114 / -$95,968 | | La receta espera mucha más piedra de la que el real usó |
+| `PET-00002` Arena 7M3 / `PET-00015` Arena de Rio 14M3 | +$47,355 / -$38,459 | | Mismo patrón: dos SKU, un insumo |
+| `PIS-80473`/`PIS-00003` Pisos Sequoia/Brunei | +$33,528 / +$23,342 | | Insumo real de conceptos sin matriz — ver abajo, no es sustitución |
+
+> `PIS-80473`/`PIS-00003` no son sustitución de clave: son el material real
+> de siete conceptos (`EST-00080`, `ACA-02101`, `ACA-02073`,
+> `ACA-80473`/`80474`/`80475`/`80476`) que resultaron **sin matriz en
+> ningún archivo de referencia** — ni en conceptos ni en compuestos. A
+> diferencia de los `API-`, esto no se puede explotar: es un límite real
+> del método (acabados de piso elegidos por el cliente, sin receta
+> genérica que comparar), no un hueco por cerrar. Estas siete claves
+> faltaban en la enumeración de B-69 — se corrige ahí.
+
+Mortero/Cemento y las dos Piedras Galarza son, juntos, ~$366K de las
+diferencias brutas — el siguiente paso es confirmar insumo por insumo si de
+verdad son la misma compra con clave distinta. D-307.
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
