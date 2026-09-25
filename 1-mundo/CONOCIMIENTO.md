@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1318 | 26 |
+| §11 | Los flujos entre sistemas | 1341 | 26 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2557,7 +2557,7 @@ Probado sobre los tres auxiliares de cimentación/losas de `ALAMO 18`:
 | Auxiliar (mi catálogo) | Hijos reales (catálogo base) | Ancla | Real vs. base |
 |---|---|---|---|
 | `EST-01060` (losa cim. + castillos) | `EST-01053` losa | `MOC-01010` | 244 vs 216 M2 (+13.0%) |
-| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — validación indirecta abajo | K2 confirmado (19=19); K1/K3/K8 dividen limpio a 4.00 pero en un conteo distinto (66/5/6, no 61/7/5); K7 sin resolver |
+| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — cimentación es otro alcance (solo acero), no se cruza contra Planta Baja | sin cambio (cantidad base) — no lo necesita, ver abajo |
 | `EST-00090` (losas PB) | `EST-20010` losa maciza 11cm | `MOE-02213` | 32.80 vs 39 M2 (-15.9%) |
 | | `EST-20020` losa maciza 12cm ("4.20") | `MOE-02217` | 24.00 vs 24 M2 (exacto) |
 | | `EST-20017`+`EST-20022` losa nervada (63+84 M2) | `MOE-02211`, **compartida** | 182.40 vs 147 M2 combinados — mismo factor (+24.1%) a las dos, sin forma de separarlas |
@@ -2571,7 +2571,7 @@ insuficientes: dos hijos, una sola ancla combinada en la ingeniería — se
 aplicó el mismo factor a los dos por no haber llave para separarlos, **no
 porque sea lo correcto, sino porque es lo que hay.**
 
-### Los castillos de Planta Baja, en metros, abren una validación cruzada para los de cimentación (B-67)
+### Los castillos de Planta Baja se reconstruyen en metros, sin convertir a piezas (B-67)
 
 Los cinco castillos de cimentación (K1/K2/K3/K7/K8, dentro de `EST-01060`)
 se quedaron sin ancla de MO propia — cantidad de catálogo, sin evidencia de
@@ -2616,15 +2616,38 @@ confirmaba limpio, K2 y K3 quedaban plausibles cada uno a su propia altura.
 **Cuatro de cinco dividen exacto a 4.00 — solo K7 no cierra.** Que cuatro
 códigos independientes caigan en un entero exacto a la misma altura no es
 casualidad: confirma el modelo (4.20 nominal, 4.00 real por la cadena de
-cerramiento) para Planta Baja completa. De esos cuatro, **solo K2 coincide
-con el PZA que cimentación declaró** (19=19). K1 (66≠61), K3 (5≠7) y K8
-(6≠5) dividen igual de limpio, pero a un conteo **distinto** del que
-cimentación asume — ya no es falta de dato ni altura equivocada, es que el
-PZA de cimentación probablemente no refleja lo que Planta Baja construyó.
-K7 queda como el único caso realmente sin resolver. **No se cambia ningún
-valor de cimentación** — B-67 sigue abierto: la pista ahora apunta a
-revisar el PZA de `EST-10011`/`EST-10031`/`EST-10081` (K1/K3/K8) contra el
-conteo real, no a seguir buscando más ingeniería. D-306 (extiende D-305).
+cerramiento) para Planta Baja completa.
+
+> **Corrección de fondo: cimentación y Planta Baja no tienen por qué
+> numerar igual (dato del usuario).** `EST-10011` (cimentación) solo lleva
+> el **acero** — el arranque de varilla que empieza en la losa. `EST-02110`
+> (Planta Baja) lleva el **concreto completo y la mano de obra** de colar
+> el castillo alrededor de ese acero. Son dos alcances distintos del mismo
+> elemento físico, valuados en dos unidades distintas (PZA de arranques,
+> M de colado) — cruzarlos por una conversión de altura fue una validación
+> que este dato nunca prometió. **Que K1/K3/K8 no calcen contra el PZA de
+> cimentación no es una discrepancia que corregir**: `ALAMO 18` no tiene
+> que cuadrar con el prototipo base — si tiene más o menos piezas de
+> castillo que el genérico, es normal, cada lote es distinto. Esta
+> reconstrucción es una **propuesta**; confirmarla, si hiciera falta, es
+> trabajo del cuantificador, no de cruzarla contra cimentación.
+>
+> **La regla que sí aplica:** para un concepto auxiliar reconstruido por
+> reversión, el material no debe quedar ni arriba ni abajo del real de
+> ingeniería — se logra manteniendo el PU/matriz del concepto y ajustando
+> solo la cantidad al ancla real (mismo principio de §11.13/§11.14). Eso
+> ya estaba bien hecho: la cantidad real de cada castillo (264/76/20/24.4/
+> 24 M) es exactamente la de su ancla, sin inventar. El error fue el paso
+> de más — convertir esa M a piezas para cruzarla contra un alcance que no
+> le corresponde.
+
+Con esto, B-67 cierra: Planta Baja usa su M real directo, sin conversión a
+piezas; cimentación se queda en el valor de catálogo, sin necesidad de
+evidencia adicional que lo confirme o lo corrija — no es su lugar. K7
+(24.40 M) cierra igual que los demás: es su real, no necesita dividir
+limpio en nada. La losa nervada de Planta Baja (dos hijos, una sola ancla
+combinada) sigue como quedó — sin llave para separarla, no por falta de
+revisión. D-314 (corrige D-306).
 
 ### Efecto cantidad y efecto receta — separar por qué creció el excedente
 
