@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1198 | 23 |
+| §11 | Los flujos entre sistemas | 1230 | 24 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2632,6 +2632,38 @@ pares que huelen a la misma clave contada dos veces**, insumo por insumo:
 Mortero/Cemento y las dos Piedras Galarza son, juntos, ~$366K de las
 diferencias brutas — el siguiente paso es confirmar insumo por insumo si de
 verdad son la misma compra con clave distinta. D-307.
+
+### Mortero/Cemento resuelto: confirma por qué el ancla es la MO, no el material (B-77)
+
+34 conceptos de muro y aplanado (`ALB-`, `ACA-`, `EST-020xx`, `BAP-`,
+`OBE-`) tienen en su matriz `MEZ-07010` — "Mezcla Cemento-Arena 1:4", un
+compuesto que explota en Cemento (7.28 sacos), Arena de Rio (0.0786) y
+Pipa (0.0185) por M3. La ingeniería real de esos mismos conceptos no trae
+`MEZ-07010` ni una vez: trae `MORTERO SACO DE 50 KG` — un producto
+premezclado que la matriz nunca referencia.
+
+> **No es un dato mal capturado — es la ingeniería de referencia sin
+> actualizar.** La obra usó mortero premezclado y lo dejó de usar (dato
+> del usuario), pero la matriz de referencia nunca se puso al día con el
+> cambio — ni cuando se adoptó, ni cuando se abandonó. **Por eso el
+> destajo se calcula a la inversa**: no se puede partir del material de
+> la ingeniería como ancla porque queda desactualizado; se parte de la
+> MO/destajo, que no cambia con el proveedor o el producto del día, y el
+> material se deriva de ahí. Es el mismo principio ya establecido — «el
+> ancla de mano de obra siempre gana» (§11.13) — con una causa raíz
+> concreta detrás: este caso es la evidencia de por qué, no solo un
+> ejemplo más.
+
+Agrupando las tres líneas que en realidad son el mismo evento (Mortero
+real vs. Cemento+Arena de Rio+Pipa que explota la matriz), el neto es
+**+$6,443 — 1.8% de los $366K en diferencias brutas.** No es desperdicio:
+comprar mortero en costal salió, en conjunto, casi igual que mezclar
+cemento y arena en obra. El cemento que sigue apareciendo en la
+ingeniería real ($60,443) es el correcto — castillos y firmes nunca pasan
+por `MEZ-07010`, no tienen por qué cambiar.
+
+Queda la Piedra Galarza 40×40/60×40 (-$134,114/-$95,968) sin revisar —
+mismo patrón sospechado, sin confirmar. D-308.
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
