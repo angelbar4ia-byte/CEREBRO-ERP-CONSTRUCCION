@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-24
+corte:      2026-09-25
 verificado: 17 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1145 | 22 |
+| §11 | Los flujos entre sistemas | 1154 | 22 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2496,7 +2496,7 @@ Probado sobre los tres auxiliares de cimentación/losas de `ALAMO 18`:
 | Auxiliar (mi catálogo) | Hijos reales (catálogo base) | Ancla | Real vs. base |
 |---|---|---|---|
 | `EST-01060` (losa cim. + castillos) | `EST-01053` losa | `MOC-01010` | 244 vs 216 M2 (+13.0%) |
-| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — validación indirecta abajo | K1 confirmado (61 PZA); K2/K3/K7/K8 sin cambio (cantidad base) |
+| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — validación indirecta abajo | K2/K3 plausibles (c/u a su altura); K1/K7/K8 sin cambio, discrepancia real sin explicar |
 | `EST-00090` (losas PB) | `EST-20010` losa maciza 11cm | `MOE-02213` | 32.80 vs 39 M2 (-15.9%) |
 | | `EST-20020` losa maciza 12cm ("4.20") | `MOE-02217` | 24.00 vs 24 M2 (exacto) |
 | | `EST-20017`+`EST-20022` losa nervada (63+84 M2) | `MOE-02211`, **compartida** | 182.40 vs 147 M2 combinados — mismo factor (+24.1%) a las dos, sin forma de separarlas |
@@ -2516,31 +2516,41 @@ Los cinco castillos de cimentación (K1/K2/K3/K7/K8, dentro de `EST-01060`)
 se quedaron sin ancla de MO propia — cantidad de catálogo, sin evidencia de
 que fuera correcta. Planta Baja tiene sus propios castillos — misma
 nomenclatura K1-K8, pero **en metros lineales, no en piezas** (es el tramo
-de muro, no el arranque de cimentación) — y sí traen ancla real y limpia en
-la ingeniería cruda: `MOE-02020` K1=260 M, `MOE-02021` K2=76 M, `MOE-02022`
-K3=20 M, `MOE-02027` K7=16+8.4=24.4 M, `MOE-02028` K8=20 M.
+de muro, no el arranque de cimentación) — y sí traen ancla real en la
+ingeniería cruda.
 
-Con la altura estándar (**solo dos: 3.00 y 4.20 m** — dato del usuario),
-esos metros deberían reducirse a un número entero de piezas — y ese número,
-para un castillo que arranca en cimentación y sube por Planta Baja, tendría
-que **coincidir con el PZA del catálogo de cimentación**, porque es el
-mismo castillo medido dos veces, en dos unidades distintas:
+> **Primer intento, corregido.** La primera lectura solo buscó en el
+> archivo `PB` y encontró que K1 (260 M) casi cuadraba con 61 PZA a 4.20 m
+> (256.2 M, 1.5%). Faltaba revisar otros dos archivos que también traen
+> estos códigos: `AJU_PB` sí es de Planta Baja (K1 y K8 adicionales); el
+> otro reutiliza los mismos códigos K1/K2/K7 para **Planta Alta, Azotea y
+> Asador** — otro nivel, no cuenta aquí, y se excluye. Filtrado
+> correctamente (`PB`+`AJU_PB`, sin los de otro nivel), K1 sube a 264 M y
+> la aparente confirmación se cae: fue coincidencia sobre un dato
+> incompleto, no una validación real.
 
-| Castillo | M real (PB) | ÷ 4.20 | PZA cimentación (catálogo) | ¿Cuadra? |
-|---|---|---|---|---|
-| K1 | 260.00 | 61.90 | 61 | **Sí** — 61×4.20=256.2, a 1.5% del real. Confirma el supuesto |
-| K2 | 76.00 | 18.10 | 19 | No limpio — ni 19×4.20 (79.8) ni 19×3.00 (57) calzan, y ninguna mezcla entera de 3.00/4.20 en 19 piezas da 76.00 |
-| K3 | 20.00 | 4.76 | 7 | No cuadra — pero K3 también existe empaquetado como "columna" (`EST-07011`, 3 PZA aparte), así que el 7 del catálogo puede repartirse entre dos tratamientos distintos, no ser todo "castillo suelto" |
-| K7 | 24.40 | 5.81 | 5 | No cuadra limpio |
-| K8 | 20.00 | 4.76 | 5 | No cuadra limpio |
+Con la altura estándar (**solo dos: 3.00 y 4.20 m** — dato del usuario) y
+el material completo, probando **las dos alturas** contra cada castillo
+(el intento anterior solo probó 4.20):
 
-**Un caso confirma, cuatro quedan abiertos.** K1 es evidencia fuerte de que
-61 PZA es razonable — el promedio (260/61=4.26 m) cae a 1.5% de la altura
-estándar más alta. Los otros cuatro no se resuelven con esta sola pista: K3
-sugiere que el empaquetado "columna vs. castillo suelto" divide el mismo
-conteo en dos códigos, sin información aquí para separar cuánto va a cada
-uno. **No se cambia ningún valor de cimentación** — B-67 sigue abierto para
-K2/K3/K7/K8, con la pista de altura anotada para quien lo retome. D-304.
+| Castillo | M real (PB+`AJU_PB`) | PZA cimentación | × 3.00 | × 4.20 | Entero limpio |
+|---|---|---|---|---|---|
+| K1 | 264.00 | 61 | 183.0 (+44%) | 256.2 (+3.0%) | 88 pzas a 3.00 exacto, o 63 a 4.19 |
+| K2 | 76.00 | 19 | 57.0 (+33%) | 79.8 (-4.8%) | 18 pzas a 4.22 |
+| K3 | 20.00 | 7 | **21.0 (-4.8%)** | 29.4 (-32%) | — |
+| K7 | 24.40 | 5 | 15.0 (+63%) | 21.0 (+16%) | 8 pzas a 3.05 |
+| K8 | 24.00 | 5 | 15.0 (+60%) | 21.0 (+14%) | **8 pzas a 3.00 exacto** |
+
+**Ninguno se confirma limpio; dos son plausibles, cada uno a su propia
+altura.** K2 (-4.8% a 4.20) y K3 (-4.8% a 3.00 — sin necesitar ninguna
+hipótesis de "columna": bastaba con probar la altura corta, que el intento
+anterior no probó) quedan dentro de un margen razonable. K1, K7 y K8 no
+cuadran con el PZA de cimentación en ninguna combinación simple, y sí
+tienen un entero limpio **distinto** (88 o 63 para K1; 8, no 5, para K7 y
+K8) — eso ya no es falta de dato, es una discrepancia real entre lo que
+cimentación declaró y lo que Planta Baja construyó. **No se cambia ningún
+valor de cimentación** — B-67 sigue abierto, ahora con evidencia completa
+pero sin cerrar. D-305 (corrige D-304).
 
 ### Efecto cantidad y efecto receta — separar por qué creció el excedente
 
