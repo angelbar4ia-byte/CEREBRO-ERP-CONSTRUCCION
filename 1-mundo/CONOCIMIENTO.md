@@ -20,7 +20,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §2 | Importación desde OPUS | 386 | 9 |
 | §3 | Notas de implementación | 129 | 5 |
 | §4 | Estados del nodo y exportación | 110 | 3 |
-| §5 | Presupuesto paramétrico — ensambles | 240 | 10 |
+| §5 | Presupuesto paramétrico — ensambles | 272 | 11 |
 | §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
@@ -896,6 +896,39 @@ población.
 
 Qué separa al grupo B sigue sin saberse (B-52). Lo que sí se sabe es que **no es el
 número de plantas.**
+
+### B-49 cierra: la Δ es redondeo del PU en la explosión, confirmado en los siete
+
+D-124 (sesión anterior) probó un prototipo y predijo: la Δ$4.30 es compatible con
+redondear el **PU** a centavos antes de multiplicar, no con redondear el importe
+(eso daría solo ±$0.11) — comprobable, dijo, sobre los siete.
+
+Repetido con el motor de explosión (`explosion_recursiva.py`): explotar cada
+concepto por su matriz y sumar el costo atómico, contra el importe declarado del
+catálogo maestro. Primero salió mal — $220,137 de diferencia en Zafiro 1.0 — pero
+la causa no era el redondeo: **8 conceptos de subcontrato** (`CAR-`, `CAN-`,
+`HER-04010`) tienen una matriz de relleno que no llega ni al 1% de su valor real,
+mismo patrón que los `SUB-` de `ALAMO 18` (§11.14) — no se construyen del
+catálogo, no hay receta que explotar.
+
+Excluidos esos 8, el drift de Zafiro 1.0 cae a **-$4.59** — el mismo orden que el
+$4.30 original. Repetido sobre los siete:
+
+| Prototipo | Drift |
+|---|---:|
+| Zafiro 1.0 | -$4.59 |
+| Rubí | -$4.68 |
+| Zafiro Plus | -$3.15 |
+| Jade | -$4.29 |
+| Diamante sin chimenea | -$6.42 |
+| Diamante con chimenea | -$7.73 |
+| Oro 4.01 | -$8.28 |
+
+**Siempre negativo, y crece con la complejidad del prototipo — la firma de
+redondeo acumulado, no de un error.** El total (-$39.14) no calza con el "~$11"
+que predijo D-124, pero esa predicción era una extrapolación simple sobre un solo
+caso — el mecanismo, que es lo que importaba, queda comprobado en los siete, no
+solo en uno. D-311.
 
 > **El paramétrico no falla por ser paramétrico. Falla por usar el parámetro
 > equivocado o la cohorte equivocada.**
