@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1230 | 24 |
+| §11 | Los flujos entre sistemas | 1276 | 25 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2590,7 +2590,8 @@ de esa clave se ve como "mal rendimiento" cuando puede ser, en gran parte,
 | Material, con las losas mal explotadas | -$485,127 | +$601,452 | $116,325 |
 | Material, con las losas descompuestas | +$15,254 | +$101,071 | $116,325 |
 | Material, con los 7 `API-` también explotados (B-69) | +$59,138 | +$57,187 | $116,325 |
-| Material, sin los dos subcontratos (`SUB-`) | **+$181,973** | **-$52,267** | $129,706 |
+| Material, sin los dos subcontratos (`SUB-`) | +$181,973 | -$52,267 | $129,706 |
+| Material, con Piedra Galarza corregida (era bug, no receta) | **-$66,998** | **+$196,704** | $129,706 |
 
 **87% del excedente de destajo es construir más (244 m² reales contra 216
 del catálogo), no mal rendimiento.**
@@ -2664,6 +2665,51 @@ por `MEZ-07010`, no tienen por qué cambiar.
 
 Queda la Piedra Galarza 40×40/60×40 (-$134,114/-$95,968) sin revisar —
 mismo patrón sospechado, sin confirmar. D-308.
+
+### Piedra Galarza era un bug mío, no receta — y corregirlo reabre B-68
+
+No era sustitución. `ACA-11013`/`14`/`15` (forrado de columna con piedra
+galarza) tenían **unidad M2** en mi catálogo reconstruido, con cantidades
+(60.48/11.76/6.3) que no correspondían a nada real. El catálogo maestro
+las define en **PZA** (8/2/1) — y el material real de la ingeniería cruda
+confirma, exacto, esas mismas 8/2/1 piezas:
+
+```
+ACA-11013: 168.00 PET-00032 / 21 (matriz) = 8.0000 PZA   168.00 PET-00033 / 21 = 8.0000 PZA
+ACA-11014:  44.00 PET-00032 / 22 (matriz) = 2.0000 PZA    24.00 PET-00033 / 12 = 2.0000 PZA
+ACA-11015:  21.00 PET-00032 / 21 (matriz) = 1.0000 PZA    21.00 PET-00033 / 21 = 1.0000 PZA
+```
+
+Corregidas unidad/cantidad/PU/importe a los del catálogo maestro — el
+total de mi catálogo reconstruido baja $16,691.81. Piedra Galarza ahora
+cuadra a los centavos (diff -$0.01 y -$0.04).
+
+> **El bug estaba enmascarando el hueco real, no explicándolo.** La
+> inflación de Piedra Galarza sumaba ~$249K de más al Presupuesto Formado
+> — de casualidad, en la dirección que hacía ver el efecto receta más
+> chico de lo que es. Corregido el bug, el efecto receta (material, sin
+> subcontratos) no queda en -$52,267 como reportó D-307: **sube a
+> +$196,704.** Con subcontratos incluidos, comparable con la tabla
+> original de B-68, pasa de +$101,071 (el original) a **+$306,158**. El
+> excedente total no cambia (siempre fue Ingeniería − Presupuesto base,
+> ninguno de los dos depende de mi catálogo) — lo que cambia es cuánto de
+> ese excedente queda sin explicar.
+
+Revisado si hay más bugs del mismo tipo (unidad de mi catálogo distinta a
+la del maestro, para toda clave que ambos comparten): dos más, ninguno del
+calibre de Piedra Galarza. `ACA-07011` dice M2, debería decir "m" — pero
+cantidad × PU ya da el importe correcto, es error de etiqueta, no de
+cálculo. `EST-10020` (JGO vs PZA, $122.22) es un dato deliberado de una
+sesión anterior, no un bug.
+
+**B-68 se reabre.** Las tres causas de D-307 (concepto auxiliar sin
+descomponer, subcontratos sin matriz aplicable, Mortero/Cemento por
+ingeniería de referencia sin actualizar) siguen siendo ciertas — juntas
+explican una parte real. Pero con Piedra Galarza corregida, lo que queda
+sin explicar ($196,704) es mucho más grande de lo que D-307 reportó, y
+está repartido en una cola larga de 206 pares de insumo, no en dos o tres
+grandes — mortero/cemento (ya resuelto, D-308) es la única excepción
+grande y limpia encontrada hasta ahora. D-309 (corrige D-307).
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
