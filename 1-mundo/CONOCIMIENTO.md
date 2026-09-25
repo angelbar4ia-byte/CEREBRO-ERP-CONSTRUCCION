@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1154 | 22 |
+| §11 | Los flujos entre sistemas | 1167 | 22 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2496,7 +2496,7 @@ Probado sobre los tres auxiliares de cimentación/losas de `ALAMO 18`:
 | Auxiliar (mi catálogo) | Hijos reales (catálogo base) | Ancla | Real vs. base |
 |---|---|---|---|
 | `EST-01060` (losa cim. + castillos) | `EST-01053` losa | `MOC-01010` | 244 vs 216 M2 (+13.0%) |
-| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — validación indirecta abajo | K2/K3 plausibles (c/u a su altura); K1/K7/K8 sin cambio, discrepancia real sin explicar |
+| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — validación indirecta abajo | K2 confirmado (19=19); K1/K3/K8 dividen limpio a 4.00 pero en un conteo distinto (66/5/6, no 61/7/5); K7 sin resolver |
 | `EST-00090` (losas PB) | `EST-20010` losa maciza 11cm | `MOE-02213` | 32.80 vs 39 M2 (-15.9%) |
 | | `EST-20020` losa maciza 12cm ("4.20") | `MOE-02217` | 24.00 vs 24 M2 (exacto) |
 | | `EST-20017`+`EST-20022` losa nervada (63+84 M2) | `MOE-02211`, **compartida** | 182.40 vs 147 M2 combinados — mismo factor (+24.1%) a las dos, sin forma de separarlas |
@@ -2531,26 +2531,39 @@ ingeniería cruda.
 
 Con la altura estándar (**solo dos: 3.00 y 4.20 m** — dato del usuario) y
 el material completo, probando **las dos alturas** contra cada castillo
-(el intento anterior solo probó 4.20):
+(el intento anterior solo probó 4.20) salió un primer resultado: ninguno
+confirmaba limpio, K2 y K3 quedaban plausibles cada uno a su propia altura.
 
-| Castillo | M real (PB+`AJU_PB`) | PZA cimentación | × 3.00 | × 4.20 | Entero limpio |
-|---|---|---|---|---|---|
-| K1 | 264.00 | 61 | 183.0 (+44%) | 256.2 (+3.0%) | 88 pzas a 3.00 exacto, o 63 a 4.19 |
-| K2 | 76.00 | 19 | 57.0 (+33%) | 79.8 (-4.8%) | 18 pzas a 4.22 |
-| K3 | 20.00 | 7 | **21.0 (-4.8%)** | 29.4 (-32%) | — |
-| K7 | 24.40 | 5 | 15.0 (+63%) | 21.0 (+16%) | 8 pzas a 3.05 |
-| K8 | 24.00 | 5 | 15.0 (+60%) | 21.0 (+14%) | **8 pzas a 3.00 exacto** |
+> **Segunda corrección: 3.00/2.80 no aplican a este prototipo.** La
+> estructura de cimentación distingue dos tipos de castillo por altura —
+> pero eso es la regla general entre prototipos, no dentro de uno.
+> `ALAMO 18` (Diamante con chimenea) **es toda de 4.20 m** — no tiene
+> castillos de 3.00 en ningún punto. El ajuste de K3 a 2.80 (§ anterior)
+> estaba probando una altura que este prototipo no usa. Se repite la
+> prueba con solo 4.20 (nominal) y 4.00 (descontando ~20 cm de cadena de
+> cerramiento, la misma resta que explica K2, y que el usuario confirmó
+> también para pretiles: 1.00 nominal cuela a 0.80).
 
-**Ninguno se confirma limpio; dos son plausibles, cada uno a su propia
-altura.** K2 (-4.8% a 4.20) y K3 (-4.8% a 3.00 — sin necesitar ninguna
-hipótesis de "columna": bastaba con probar la altura corta, que el intento
-anterior no probó) quedan dentro de un margen razonable. K1, K7 y K8 no
-cuadran con el PZA de cimentación en ninguna combinación simple, y sí
-tienen un entero limpio **distinto** (88 o 63 para K1; 8, no 5, para K7 y
-K8) — eso ya no es falta de dato, es una discrepancia real entre lo que
-cimentación declaró y lo que Planta Baja construyó. **No se cambia ningún
-valor de cimentación** — B-67 sigue abierto, ahora con evidencia completa
-pero sin cerrar. D-305 (corrige D-304).
+| Castillo | M real (PB+`AJU_PB`) | PZA cimentación | ÷ 4.20 | ÷ 4.00 |
+|---|---|---|---|---|
+| K1 | 264.00 | 61 | 62.86 | **66.00 exacto** |
+| K2 | 76.00 | 19 | 18.10 | **19.00 exacto — coincide** |
+| K3 | 20.00 | 7 | 4.76 | **5.00 exacto** |
+| K7 | 24.40 | 5 | 5.81 | 6.10 (no exacto) |
+| K8 | 24.00 | 5 | 5.71 | **6.00 exacto** |
+
+**Cuatro de cinco dividen exacto a 4.00 — solo K7 no cierra.** Que cuatro
+códigos independientes caigan en un entero exacto a la misma altura no es
+casualidad: confirma el modelo (4.20 nominal, 4.00 real por la cadena de
+cerramiento) para Planta Baja completa. De esos cuatro, **solo K2 coincide
+con el PZA que cimentación declaró** (19=19). K1 (66≠61), K3 (5≠7) y K8
+(6≠5) dividen igual de limpio, pero a un conteo **distinto** del que
+cimentación asume — ya no es falta de dato ni altura equivocada, es que el
+PZA de cimentación probablemente no refleja lo que Planta Baja construyó.
+K7 queda como el único caso realmente sin resolver. **No se cambia ningún
+valor de cimentación** — B-67 sigue abierto: la pista ahora apunta a
+revisar el PZA de `EST-10011`/`EST-10031`/`EST-10081` (K1/K3/K8) contra el
+conteo real, no a seguir buscando más ingeniería. D-306 (extiende D-305).
 
 ### Efecto cantidad y efecto receta — separar por qué creció el excedente
 
