@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1290 | 25 |
+| §11 | Los flujos entre sistemas | 1318 | 26 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2671,6 +2671,34 @@ tres columnas** (el catálogo base también trae $122,835.50 en material
 para ese mismo alcance, asumiendo que se construye y no se subcontrata) el
 universo comparado cambia — el excedente sube a $129,706 — y el efecto
 receta **cambia de signo**: la receta ahora sobra ($52,267), no falta.
+
+### Un subcontrato se compara contra su propia base, no contra el m² de la casa
+
+Excluir el subcontrato de la matriz responde cómo NO compararlo. Falta cómo
+sí. Dato del usuario: **un subcontrato no crece con el m² total de la
+casa** —salvo que el espacio que cubre crezca de verdad (una recámara
+nueva, un estudio)—, y ese crecimiento depende del tipo de espacio, no es
+uniforme. La comparación correcta es **Real contra Base del mismo
+subcontrato**, no contra ningún escalado por m². La diferencia se separa
+en dos: lo que explica el crecimiento del espacio (esperado, no se
+factura) y lo que no explica (**adicional al cliente**, Control de
+Cambio).
+
+`ALAMO 18` ya tiene los tres casos, y confirman el método:
+
+| Subcontrato | Base (catálogo maestro) | Real (`ALAMO 18`) | Real/Base |
+|---|---|---|---|
+| Pergolado asador | 20.70 M2, $35,811.50 | 20.70 M2, $35,811.50 | **100%** |
+| Impermeabilización | 195.00 M2, $25,351.95 | 193.87 M2, $25,205.04 | 99.4% |
+| Pergolado cochera | 34.57 M2, $61,675.00 | 28.00 M2, $48,440.50 | 81% |
+
+Dos calzan casi exacto contra su base — nada que explicar. La cochera está
+**por debajo** de la base, no por arriba: no es crecimiento, y por la
+misma regla tampoco es adicional al cliente — es una reducción de alcance
+frente al prototipo genérico, a revisar por qué (¿cochera más chica en
+este lote?), no a facturar. Ningún caso real de crecimiento-que-sí-es-
+adicional apareció todavía en los datos — la regla queda anotada, sin un
+ejemplo vivo que la ponga a prueba del lado que crece. D-313.
 
 Lo que sigue después de las dos correcciones **no es desperdicio: son
 pares que huelen a la misma clave contada dos veces**, insumo por insumo:
