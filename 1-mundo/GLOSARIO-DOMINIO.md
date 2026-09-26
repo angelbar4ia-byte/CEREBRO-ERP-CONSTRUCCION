@@ -327,7 +327,7 @@ La forma comercial en que se compra un material, con su factor y su mínimo. Cam
 - **No confundir con:** Unidad (la de medida)
 - **Se usa con:** Material; Unidad; Factor
 - **Ejemplo:** Arena: se consume en m³, se compra por camión de 14 m³
-- **Hoy vive en:** `— aún no existe`
+- **Hoy vive en:** `PRESENTACION_COMPRA` — `MODELO.md` §2a, D-348
 
 ### Flete
 

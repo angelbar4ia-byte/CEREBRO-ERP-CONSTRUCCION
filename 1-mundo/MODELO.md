@@ -509,10 +509,13 @@ CONSTANTE_FISICA
   id
   categoria        enum: longitud_comercial · factor_corte_por_altura ·
                     factor_traslape · desperdicio · calibre_circuito ·
-                    puntas_circuito · tiempo_entrega — abierto, crece
-                    con evidencia                                             abierto — gana tiempo_entrega
+                    puntas_circuito · tiempo_entrega ·
+                    factor_conversion_dimensional — abierto, crece
+                    con evidencia                                        abierto — gana factor_conversion_dimensional
   clave             qué fila específica dentro de la categoría (ej. "varilla",
-                     "castillo 4.20m", una familia o un insumo)                firme
+                     "castillo 4.20m", una familia, un insumo o un
+                     concepto — este último solo para
+                     `factor_conversion_dimensional`, F-4/D-91)                firme
   valor             NUMERIC                                                    firme
   unidad_id         FK Unidad                                                  firme
   base               enum: natural · habil, nullable — solo aplica a
@@ -532,7 +535,11 @@ CONSTANTE_FISICA
 > (B-40) se agrega con la misma forma**: `clave` lleva la familia por
 > default —18 valores cubren los 387 materiales— o el insumo cuando
 > hace falta afinar la excepción; **por proveedor no se puede** — no hay
-> catálogo de proveedores (mismo hueco que P-39). `CONOCIMIENTO.md` §15
+> catálogo de proveedores (mismo hueco que P-39). `CONOCIMIENTO.md` §15.
+> **`factor_conversion_dimensional` (B-25) se agrega igual**: tabique
+> pza→m² depende del aparejo del muro, no es constante universal — por
+> eso `clave` puede apuntar a un concepto, no solo a insumo o familia.
+> `MODELO.md` §2a
 
 ---
 
@@ -585,6 +592,94 @@ La frontera que separa `Flete` (categoría de insumo, en `NODO.categoria`) de
 `Acarreo` (clase de trabajo, en `NODO.clase_id`) es **el límite de la obra, no la
 dirección**: `Flete` cruza —de fuera hacia adentro, o de adentro hacia afuera—;
 `Acarreo` se queda dentro. Evidencia completa en `CONOCIMIENTO.md` §10.2 (P-02/P-03).
+
+---
+
+## 2a. Presentación de compra — el factorizador de unidades (cierra B-25)
+
+Cuatro decisiones cerradas desde el 10 de septiembre (F-1 a F-4,
+`PROPUESTA-CUATRO-MODULOS.md` §1, D-86 a D-92) sin diseño formal — la
+misma clase de hueco que dejó P-14 o B-39 antes de cerrar: **la política
+ya estaba, faltaba la tabla.**
+
+```
+PRESENTACION_COMPRA
+  id
+  material_id        FK Material — nunca FK proveedor: el mínimo de
+                      compra es del insumo, no de a quién se le compre
+                      (F-2, D-87) — mismo hueco que P-39, no se inventa
+                      un catálogo de proveedores para esto               nuevo
+  nombre              texto — "camión", "saco"... no es `UNIDAD` del
+                      catálogo (esa es de medida; esto es de empaque o
+                      compra, `GLOSARIO-DOMINIO.md`: Presentación de
+                      compra, no confundir con Unidad)                   nuevo
+  factor              NUMERIC — cuántas `unidad_base` (la que ya trae el
+                      material en su catálogo) equivale una unidad de
+                      esta presentación                                  nuevo
+  minimo              NUMERIC, default 1 — cantidad mínima comprable en
+                      esta presentación                                  nuevo
+  indivisible         boolean — si no se puede comprar una fracción
+                      (no hay medio camión)                              nuevo
+  fuente              texto — empaque, transporte, norma, o la
+                      `PROPUESTA` que aprobó un factor capturado a mano  nuevo
+```
+
+**`unidad_base` no es campo nuevo — ya es la `unidad_id` que trae el
+material desde su catálogo (F-1, D-86): lo cargado se toma como
+definido, nunca se re-pregunta.** Insumo nuevo sin unidad detectable: se
+sugiere y se marca solo si es ambiguo — la validación es la excepción,
+no el paso por defecto, mismo criterio que el 92% de conceptos que ya se
+clasifica solo (`CONOCIMIENTO.md` §11.7).
+
+### Las conversiones se clasifican solas, y eso decide si hace falta `PROPUESTA`
+
+| Conversión | Ejemplo | ¿Cruza dimensión física? | Captura |
+|---|---|---|---|
+| Empaque | Saco → kg | No | Directa en `factor`, nadie aprueba |
+| Transporte | Camión → m³ | No | Directa en `factor`, nadie aprueba |
+| Propiedad variable | m³ de arena → kg (densidad) | No, pero varía | Directa, **con aviso** al usarse |
+| Dimensional | Tabique pza → m² de muro (aparejo) | Sí | `PROPUESTA` — nunca automática |
+
+> **La regla:** si la conversión se queda dentro de la misma dimensión
+> física —masa a masa, volumen a volumen, pieza a pieza— el sistema la
+> aplica solo. Si cruza dimensiones o mete una propiedad que varía con
+> el contexto, propone y espera — mismo principio que ya rige cada
+> automatización de este modelo (`CONOCIMIENTO.md` §14).
+
+**El caso dimensional (F-4, D-91) no vive en `PRESENTACION_COMPRA`.**
+Depende del **aparejo**, propiedad del muro, no del insumo — guardado
+**por concepto o por insumo, nunca global** (tabique pza→m² cambia si
+cambia el aparejo). Reusa `CONSTANTE_FISICA` (`MODELO.md` §1c,
+`categoria=factor_conversion_dimensional`) en vez de abrir tabla nueva.
+
+### Qué desbloquea
+
+- **El catálogo se encoge** — una clave por material, no una por
+  presentación.
+- **El sobrante deja de ser desperdicio.** Comprar 1 camión (14 m³) y
+  gastar 0.026 m³ se veía como 13.974 de sobreconsumo; ahora es
+  inventario. A nombre de quién queda ese sobrante es **F-3 (D-88): del
+  lote de compra, no de un `PRESUPUESTO`** — lo comparten varias obras
+  del mismo desarrollo. No es la misma palabra que `Lote` en
+  `MOVIMIENTO_ALMACEN` (§5e) —ahí identifica una obra, aquí un lote de
+  compra— y **ya se ve en el dato real**: los movimientos `recepcion`
+  entran sin `presupuesto_id` en el 100% de las 1,767 filas reales
+  (D-337) — la compra siempre entra a existencia general, nunca a
+  nombre de una obra. F-3 no pide tabla nueva: ya es lo que el dato hacía
+  antes de que se le pusiera nombre.
+- **Habilita `MODELO.md` §5g sin falsos positivos**: sin factorizador,
+  comparar una compra de 1 camión contra una explosión en m³ se ve como
+  una `DESVIACION` de consumo enorme que no existe — la causa
+  `cambio_de_presentacion` (§5g) ahora tiene de dónde salir.
+
+### ⏸ Lo que esto NO resuelve
+
+**Sin caso real confirmado todavía.** Esta sesión no verificó si algún
+movimiento de `MOVIMIENTO_ALMACEN` ya registra una compra en
+presentación distinta de la unidad base — confirmarlo es el primer paso
+para poblar `PRESENTACION_COMPRA` con datos reales, más allá del ejemplo
+de la arena que ya trae `PROPUESTA-CUATRO-MODULOS.md` §1. El diseño
+queda completo; el caso real que lo ejerza, no.
 
 ---
 
