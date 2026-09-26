@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-20
-verificado: 12 etapas recorridas · 5 pasan · 3 se rompen · 4 sin poder probarse
+corte:      2026-09-26
+verificado: 12 etapas recorridas · 3 pasan · 3 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
 ```
 
 > **Escenario de prueba** en el sentido de B-42: un caso real recorrido de punta a
@@ -34,17 +34,17 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | # | Etapa | Resultado |
 |---|---|---|
 | 1 | Diseño del presupuesto | ✅ Pasa |
-| 2 | Escenarios | ⛔ No existe — **y la obra tenía uno sin declarar** |
+| 2 | Escenarios | 🔶 **Diseñado desde el 26/09** (`PRESUPUESTO.tipo=escenario`, `MODELO.md` §3a) — sin caso real que lo ejercite en su sentido prospectivo. El caso que motivó B-39 (abajo) resultó ser otro mecanismo |
 | 3 | Cuantificación de volúmenes | ⛔ No existe |
-| 4 | Paramétrico | ⛔ No existe |
+| 4 | Paramétrico | 🔶 **Diseñado desde el 26/09** (`NODO`(rol=ensamble)+`COMPOSICION`+`ENSAMBLE_PARAMETRO`, `MODELO.md` §1c) — sin correr todavía contra la cimentación de dos plantas de este lote |
 | 5 | Carga de la ingeniería del lote | ✅ Pasa |
 | 6 | Reversión por destajo | ⚠️ **Pasa al 84% — falta qué hacer con el 16%** |
 | 7 | Comparación contra prototipo | ✅ Pasa, y encuentra un hecho real |
-| 8 | Factorizador | ⚠️ **No resuelve el problema que parecía suyo** |
-| 9 | Programa y ruta crítica | ⛔ No existe |
-| 10 | Recursos por fecha | ⛔ No existe |
+| 8 | Factorizador | ⚠️ **No resuelve el problema que parecía suyo — la política de consolidar ya cerró (P-36, 26/09), la comparación no se ha vuelto a correr con ella** |
+| 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse, y esta obra no tiene actividades cargadas para correrlo |
+| 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
 | 11 | Contratación y congelamiento | ⛔ Sin probar |
-| 12 | Salidas y desviación | ⚠️ **Primeros cruces reales, sobre 2 conceptos de un mes** (P-38) |
+| 12 | Salidas y desviación | ⚠️ **Modelo de datos completo desde el 26/09** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g) — topado en dato, sigue siendo un solo mes de almacén (D-322) |
 
 ---
 
@@ -57,10 +57,21 @@ $2,829,925.98 declarado**, la misma diferencia de redondeo de siempre.
 
 ---
 
-## 2 · Escenarios — ⛔, y aquí está el primer hallazgo
+## 2 · Escenarios — 🔶, y aquí está el primer hallazgo
 
-El módulo no existe (B-39). Pero al recorrer la obra apareció algo mejor que una
-carencia teórica:
+> **Actualización 2026-09-26 — el módulo ya existe, y el caso que lo motivó no
+> lo necesitaba.** `PRESUPUESTO.tipo` gana el valor `escenario` (`MODELO.md`
+> §3a, D-335): ya tiene gratis su propio árbol y su propio programa, y elegir
+> uno se traduce a la obra vía rediseño sin reemplazar su identidad. Pero al
+> revisar el caso real de abajo con la fecha correcta, resultó ser **otro
+> mecanismo** — leer `VERSION_CONCEPTO` vigente a la fecha en que se cargó la
+> obra, no la de hoy, con campos que ya existían desde antes (§4a). El
+> mecanismo prospectivo (comparar precio/proveedor, alcance o programa antes
+> de construir) queda diseñado sin un solo caso real que lo haya ejercitado
+> todavía.
+
+El módulo no existía cuando se corrió esta prueba (B-39). Al recorrer la obra
+apareció algo mejor que una carencia teórica:
 
 > **`ALAMO 18` se cargó con la versión anterior del catálogo**, donde el mortero se
 > usaba para muros, repellos y finas exteriores — antes de que el cemento lo
@@ -93,11 +104,19 @@ cuadra— pero **impide distinguir un error de medición de un cambio de obra.**
 
 ---
 
-## 4 · Paramétrico — ⛔
+## 4 · Paramétrico — 🔶
 
-No existe. Y con lo decidido en M-3, esta obra sería un buen caso: es de dos plantas,
-y la cimentación de dos plantas tiene **32% de dispersión** contra 2% en una planta.
-Entra en la cohorte difícil, no en la fácil.
+> **Actualización 2026-09-26 — diseñado: no era tabla nueva, era el árbol un
+> piso arriba.** `NODO`(rol=ensamble) + `COMPOSICION` ya cubrían plantilla/
+> instancia, origen de cantidad y la referencia al concepto sin campo nuevo;
+> lo único que faltaba era `ENSAMBLE_PARAMETRO` (tasa, cohorte, dispersión —
+> `MODELO.md` §1c, D-325). Sigue sin correr contra ningún caso real, y este
+> lote —cimentación de dos plantas, cohorte difícil— sería el primero.
+
+No existía cuando se corrió esta prueba. Y con lo decidido en M-3, esta obra
+sería un buen caso: es de dos plantas, y la cimentación de dos plantas tiene
+**32% de dispersión** contra 2% en una planta. Entra en la cohorte difícil,
+no en la fácil.
 
 ---
 
@@ -261,23 +280,50 @@ cúbicos hay.
 > explosión** antes de restar. Eso no está en ninguno de los cuatro módulos, y sin
 > ello cualquier comparación produce desproporciones que parecen hallazgos.
 
----
-
-## 9 a 11 · Programa, recursos por fecha, contratación — ⛔
-
-No se pueden probar. Pero el recorrido deja tres preguntas concretas para cuando
-existan:
-
-- **Los cinco niveles sin ingeniería** (§5): ¿se programan con la cantidad del
-  prototipo, o quedan fuera del programa?
-- **La actividad en tramos** (P-5): la cimentación de este lote tiene colados que
-  interrumpen — es exactamente el caso.
-- **El tiempo de entrega** (B-40): sin él, el material por fecha da consumo, no
-  pedido.
+> **Actualización 2026-09-26 — la pregunta que se quedó abierta detrás de esta
+> (P-36) ya cerró.** Normalizar profundidad antes de comparar ya lo resolvía
+> B-47; lo que faltaba era una capa más simple: si el cargador debía
+> **consolidar** insumos repetidos como esta arena al importar. Dato del
+> usuario: depende de quién lee, no del insumo — compras/obra necesitan el
+> consolidado, costos/control necesitan el detalle crudo. No se consolida al
+> cargar; cada lector agrupa a su modo (`CONOCIMIENTO.md` §11.11, D-340). No
+> se volvió a correr la comparación de esta etapa con la regla ya aplicada.
 
 ---
 
-## 12 · Salidas y desviación — ⚠️ primeros cruces reales, parcial
+## 9 a 11 · Programa, recursos por fecha, contratación — 🔶 🔶 ⛔
+
+No se podían probar cuando se corrió esta prueba. **Actualización 2026-09-26 —
+9 y 10 ya tienen modelo de datos completo**, sin que nada de esta obra lo haya
+ejercitado todavía:
+
+- **Programa** (`MODELO.md` §5c, D-327): `ACTIVIDAD` completa, `PRECEDENCIA`,
+  `CALENDARIO_OBRA`/`CALENDARIO_EXCEPCION`, `TRAMO` — el motor de cálculo del
+  CPM (fechas tempranas/tardías, ruta crítica) sigue siendo código, no
+  schema, y esta obra no tiene ni una `ACTIVIDAD` cargada para correrlo.
+- **Recursos por fecha** (`MODELO.md` §5f, D-336): la misma explosión leída
+  por fecha, con `CONSTANTE_FISICA(categoria=tiempo_entrega)` para separar
+  pedido de consumo — depende por completo de que 9 tenga datos que leer.
+- **Contratación y congelamiento** sigue igual que el 2026-09-20: sin probar.
+  `ESTADO_CONGELAMIENTO` existe desde la primera versión del modelo, antes de
+  esta obra; nada de esta sesión lo tocó.
+
+Las tres preguntas que dejó esta prueba ya tienen dónde resolverse, ninguna
+probada aún contra este lote:
+
+- **Los cinco niveles sin ingeniería** (§5): siguen sin lista de qué se
+  contrata terminado y qué se programa — B-48 quedó parcial en esa misma
+  pregunta.
+- **La actividad en tramos** (P-5): `TRAMO.reparto_material` ya existe
+  (`MODELO.md` §5c) — la cimentación de este lote, con colados que
+  interrumpen, sigue siendo el caso que lo probaría primero.
+- **El tiempo de entrega** (B-40): ya es `CONSTANTE_FISICA(categoria=
+  tiempo_entrega)`, con base natural/hábil — sin un programa cargado para
+  esta obra, no hay fecha de inicio de la que restarlo todavía.
+
+---
+
+## 12 · Salidas y desviación — ⚠️ modelo de datos completo, topado en dato real
 
 Es la tercera pata, y la única que compara contra lo **ejecutado de verdad**:
 
@@ -365,13 +411,57 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > Se anota así — «no digo que esté bien», en palabras del usuario— para que la
 > siguiente corrida lo corrija si hace falta, no para cerrarlo.
 
+> **Actualización 2026-09-26 — el modelo de datos que faltaba ya no falta; el
+> mes de almacén sigue siendo el único que hay.** Tres piezas cerraron:
+>
+> - **`MOVIMIENTO_ALMACEN`** (`MODELO.md` §5e, D-333): el archivo real de
+>   abril ya separaba surtido (`salida_produccion`, nunca liga a concepto) de
+>   consumido (`implosion`, siempre liga vía `op`/`nodo_id`) — exactamente la
+>   fórmula de arriba, sin campo nuevo. Auditoría propia (D-337) le agregó
+>   `presupuesto_id`, resuelto de la columna `Lote` al importar — sin él, la
+>   tabla no tenía cómo decir de qué obra es un movimiento sin `nodo_id`.
+> - **El reporte de cinco columnas** (`MODELO.md` §5f, D-334): Presupuesto
+>   Base, Ingeniería, Pagado Real, Presupuesto Formado y Control de Cambio
+>   quedaron con dónde vivir cada una — cuatro reusan tabla ya cerrada, la
+>   quinta (`PROPUESTA(tipo=orden_cambio)`) solo necesitaba la forma de su
+>   JSON. La misma auditoría corrigió un error real: «Pagado Real» de
+>   material apuntaba a `motivo=recepcion`, que no se puede atribuir a una
+>   obra (las 1,767 filas reales de ese motivo traen `Lote` vacío — la
+>   compra entra a almacén general antes de saber a qué casa va). Corregido
+>   a `salida_produccion`/`implosion`.
+> - **`DESVIACION`** (`MODELO.md` §5g, D-343): la política de
+>   `CONOCIMIENTO.md` §13.6 —nueve causas, «sin causa» válido, la causa se
+>   agrega después sin penalizar— llevaba meses cerrada sin tabla. Los
+>   patrones que dicen si algo corrige el catálogo (mismo insumo en todo
+>   concepto, mismo concepto en toda obra) son consulta agregada sobre ella,
+>   no tabla aparte.
+>
+> **Nada de esto agrega un segundo mes de almacén.** El cuello de botella
+> sigue siendo el mismo que el 2026-09-20: `CONOCIMIENTO.md` §11.19 confirmó
+> que la cobertura real es parcial (58 de 288 materiales, 36 de 225
+> destajos, D-294), y D-322 confirmó que un segundo archivo que parecía
+> traer más dato era el mismo abril exportado dos veces. El modelo ya no es
+> lo que falta — el dato, sí.
+
 ---
 
 # Resultado de la prueba
 
-**Cinco etapas pasan, tres se rompen, cuatro no se pueden probar.** El flujo aguanta
-completo desde la carga hasta la comparación entre planes, y donde empieza la
-ejecución ya hay primeros cruces reales, aunque parciales.
+**Tres etapas pasan, tres tienen matices, cuatro quedaron diseñadas sin caso real
+que las ejercite, dos no se pueden probar.** El flujo aguanta completo desde la
+carga hasta la comparación entre planes, y donde empieza la ejecución ya hay
+modelo de datos completo — el cuello de botella dejó de ser el diseño y pasó a
+ser, en cada una de las cuatro `🔶`, la falta de un caso real corriendo encima.
+
+> **Actualización 2026-09-26.** Cuando se corrió esta prueba (2026-09-20), 6 de
+> las 12 etapas no tenían dónde apoyarse (`⛔`). Hoy son 2 (`Cuantificación`,
+> `Contratación`) — las otras 4 pasaron a `🔶` (2, 4, 9, 10); las notas de 8 y
+> 12 también cambiaron, pero esas dos ya eran `⚠️` desde el 20/09, no `⛔`.
+> Todo por el mismo patrón: la política ya estaba escrita, y la mayoría de las veces la
+> tabla que hacía falta resultó ser mucho más chica de lo que el hueco
+> parecía prometer. Ninguna de las cuatro `🔶` se ha corrido todavía contra
+> este lote — «diseñado» no es «probado», y esta prueba existe justamente
+> para no confundir las dos cosas.
 
 ## Lo que la prueba encontró y no estaba
 
@@ -404,3 +494,10 @@ ejecución ya hay primeros cruces reales, aunque parciales.
 Los cuatro pasos de arriba son reproducibles con los mismos archivos. **Cuando se
 cargue la tabla de salidas, esta prueba se retoma desde la etapa 12** y entonces se
 puede cerrar el flujo completo por primera vez.
+
+**Y ahora hay cuatro etapas más con la misma forma de pendiente** (2, 4, 9, 10):
+diseño cerrado, sin un caso real que lo corra sobre `ALAMO 18`. Ninguna necesita
+dato nuevo para intentarse — a diferencia de la 12, que sí lo necesita. Correrlas
+es la forma más directa de encontrar el próximo hallazgo real, mismo principio que
+motivó esta prueba desde el inicio: **el modelo se rompe donde nadie miró
+todavía, no donde se supone que debería.**
