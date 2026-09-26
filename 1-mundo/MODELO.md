@@ -1153,6 +1153,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `diferencia_sin_causa` | Prototipo contra ingeniería difiere y la diferencia no cae en ninguna de las nueve causas de `CONOCIMIENTO.md` §13.6 | P-29 |
 | `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
 | `invariante_por_vencer` | Pasan más de `parametro_usado.meses_vencimiento` (default 6, D-129) desde el `corte:` de `INVARIANTES.md` — sin campo nuevo, lee el mismo encabezado que ya lleva todo archivo del cerebro | B-54 |
+| `estimacion_sin_respaldo_material` | Al correr `validar_estimacion`, la salida de almacén del insumo testigo (`MOVIMIENTO_ALMACEN`, `motivo` ∈ {`salida_produccion`, `implosion`}) del periodo no alcanza, contra el rendimiento teórico, para los m² que la estimación reclama — más del `umbral_pct` de faltante | B-70 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -1160,6 +1161,37 @@ usuario: la resuelve Control de obra, mismo criterio de gobierno cruzado
 entre obras que ya asignó `gestionar_rol_funcion`/`asignar_residente`
 (D-330) — nueva función atómica `renovar_invariante_valor` → Control de
 obra, en la lista de §5b.
+
+### `estimacion_sin_respaldo_material` cierra B-70 — mover el cruce de después del pago a antes
+
+`CONOCIMIENTO.md` §11.17 ya probó el método a mano: la semana 19 de
+`EST-02010` pagó 293 M² con 30 sacos de cemento, que alcanzan para
+~92.2 — 68.5% sin respaldo, detectado **después** del pago, cuando ya no
+había oportunidad de comparar. La idea quedó anotada sin diseño; no
+pedía tabla nueva, pedía mover el momento en que corre.
+
+**El punto de enganche ya existe: `validar_estimacion`** (`MODELO.md`
+§5b, asignada a Control de obra desde D-206). Antes de aprobar, corre el
+mismo cruce de `CONOCIMIENTO.md` §11.16 y `CONOCIMIENTO.md` §11.17
+—salida de almacén del insumo testigo contra el rendimiento teórico— y
+si no alcanza para lo reclamado, dispara la alerta en vez de aprobar en
+silencio. `evidencia` guarda
+`{insumo_testigo, cantidad_almacen, m2_soportado, m2_estimado, periodo}`;
+`parametro_usado.umbral_pct` acota cuánto faltante es tolerable, mismo
+mecanismo que `identidad_dudosa`.
+
+**Cuál insumo es el «testigo» no es campo nuevo — es criterio de quien
+configura la revisión, caso por caso.** El propio hallazgo lo muestra:
+cemento sirve porque se entrega a diario; tabique no, porque se abastece
+por lote y su desfase semanal es normal. Generalizar esa elección a una
+regla automática pediría más de un caso confirmado — hoy solo hay uno.
+Guardar el insumo usado en `evidencia` de cada alerta es suficiente para
+auditar la elección sin comprometerse a una regla que todavía no tiene
+evidencia.
+
+**Sigue topado en el mismo dato que `CONOCIMIENTO.md` §11.17 ya señaló:**
+un solo mes de almacén cargado (D-322) — extender la prueba más allá de
+`EST-02010` pide meses reales adicionales, no más diseño.
 
 ---
 
