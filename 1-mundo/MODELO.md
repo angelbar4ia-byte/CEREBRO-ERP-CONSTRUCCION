@@ -1566,6 +1566,21 @@ ACTIVIDAD
                          las fechas                                         calculado
 ```
 
+### `modo_duracion=preestablecida_nivel` + `disparador_fecha=contractual` cierran B-48
+
+Un nivel que se contrata **terminado** —un solo subcontratista entrega el
+paquete completo, sin actividades internas que programar— no necesita
+tabla ni campo nuevo: ya es esta combinación exacta. La duración no se
+calcula del rendimiento ni se captura a mano: es la misma para ese nivel
+en cualquier obra (`preestablecida_nivel`). El arranque no depende de una
+precedencia técnica ni de una cuadrilla libre: lo dispara el anticipo o
+la junta de arranque (`contractual`, con `fecha_disparador`). Dato del
+usuario: en `ALAMO 18` van por esta ruta Cancelería, Carpintería,
+Herrería, Cubiertas, Pérgolas e Impermeabilizante — «tiene ingeniería
+cargada» y «se contrata terminado» resultaron ejes independientes, no el
+mismo (`CONOCIMIENTO.md` §11.13). Muebles/Iluminación no entra aquí: se
+programa como el resto, con `modo_duracion` calculada o capturada.
+
 ### ⚠ Precedencia, calendario y tramo comparten el mismo eje de confianza
 
 Precedencia (P-1), tramo (P-5) y el origen de una duración (arriba) usan

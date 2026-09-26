@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1556 | 31 |
+| §11 | Los flujos entre sistemas | 1627 | 31 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2565,6 +2565,20 @@ presupuesto base en dinero.** Es un número distinto al 92%/8% de §5, que
 cuenta **etapas**, no **pesos** — ahí no se toca. Contar etapas y contar
 dinero miden cosas distintas y **las dos son correctas a la vez**: cancelería
 y carpintería concentran presupuesto alto en pocas etapas.
+
+> **B-48 cierra: de estos cuatro, tres se contratan terminados —llave en
+> mano, un solo subcontratista entrega el paquete completo— y uno se
+> programa con actividades detalladas, dato del usuario.** Cancelería,
+> Carpintería y Herrería van por la ruta de paquete completo; Muebles/
+> Iluminación no. Y el patrón no depende de tener o no ingeniería
+> cargada: **Cubiertas, pérgolas e impermeabilizante también se
+> contratan terminados, aunque sí tienen presupuesto propio** —Pergolado
+> Cochera aparece arriba con $59,567.51 reales— confirmando que «tiene
+> ingeniería» y «se contrata terminado» son dos ejes independientes, no
+> uno. El mecanismo ya existía sin conectar: `ACTIVIDAD.modo_duracion=
+> preestablecida_nivel` con `disparador_fecha=contractual`
+> (`MODELO.md` §5c, D-327) — duración fija por nivel, arranque por
+> anticipo o junta de arranque, no por precedencia técnica.
 
 > Con las cuatro técnicas fijas, la reconstrucción es reproducible: dado un
 > archivo de ingeniería con encabezados de concepto, el catálogo se arma sin
