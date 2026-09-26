@@ -5,7 +5,7 @@
 capa:       II — Operación
 pregunta:   ¿cómo se responde una pregunta que el cerebro no tiene guardada?
 tiempo:     se hace así
-corte:      2026-09-21
+corte:      2026-09-26
 verificado: 3 preguntas de prueba sobre ALAMO 18
 ```
 
@@ -77,10 +77,12 @@ está disponible, se dice explícitamente que no se tiene el dato: no se
 aproxima ni se inventa.
 
 **Cuando exista el sistema real:** esto lo resuelve el módulo de
-reportes/comparación — sin diseñar todavía, `PENDIENTES-MEJORAS.md` B-71 —, no
-un script aparte. `agentes/arquitecto-erp.md` lo señala al evaluar ese módulo,
-para que quien lo diseñe sepa que el método ya está probado sobre datos reales
-y no hay que redescubrirlo.
+reportes/comparación — ya diseñado, `MODELO.md` §5f (B-71, D-334) —, no un
+script aparte. Cuatro de las cinco columnas reusan tabla ya existente; la
+quinta (Control de Cambio) solo necesitaba la forma de su JSON dentro de
+`PROPUESTA`. Sigue habiendo un hueco, pero de dato: los subcontratos
+necesitan su propio origen (`subcontratos.csv`, vacío — D-321), no diseño
+nuevo.
 
 ## 5. Caso de prueba — las tres preguntas de ALAMO 18
 

@@ -1598,6 +1598,122 @@ mercado).
 
 ---
 
+## 5f. Comparación y reportes de obra — cinco columnas, cuatro ya tenían dónde vivir (B-71 cierra)
+
+`RAZONAMIENTO.md` §4 y `CONOCIMIENTO.md` §11.14 a `CONOCIMIENTO.md` §11.18
+ya probaron el método sobre datos reales de `ALAMO 18` — Presupuesto Base,
+Ingeniería, Pagado Real, Presupuesto Formado y Control de Cambio, por
+destajo y por material. Lo que faltaba no era el método: era ver que
+cuatro de las cinco columnas ya tenían tabla, y la quinta ya tenía
+`enum`.
+
+### De dónde sale cada columna — ninguna se guarda aparte
+
+| Columna | Fuente | Nueva? |
+|---|---|---|
+| Presupuesto Base | `PRESUPUESTO(tipo=plantilla)` — su árbol, su matriz | No — cierra con P-40, §3 |
+| Ingeniería (del lote) | `PRESUPUESTO(tipo=obra)` — su propio árbol, su cantidad y matriz reales tal como quedaron tras el rediseño | No — §1, §1a |
+| Pagado Real | `ESTIMACION_LINEA` (§5d) para destajo/MO · `MOVIMIENTO_ALMACEN` con `motivo=recepcion` (§5e) para material | No — cerraron hoy mismo |
+| Presupuesto Formado | Cálculo, no tabla — ver abajo | No |
+| Control de Cambio | `PROPUESTA(tipo=orden_cambio)` — ya existía en el enum, sin forma escrita para `valor_propuesto` | Solo la forma, no la tabla |
+
+**Ninguna columna se persiste.** Mismo principio que `RAZONAMIENTO.md` §4:
+«el cerebro nunca guarda un valor vigente» — este módulo es la consulta que
+hoy corre a mano en un script fuera del repositorio, no un lugar nuevo
+donde guardar el número.
+
+### Presupuesto Formado es el cruce de dos instancias, no una tercera
+
+`CONOCIMIENTO.md` §11.14 ya lo define: el catálogo reconstruido, **a su
+cantidad real, explotado con el mismo rendimiento que usa el presupuesto
+base.** Cantidad real ya vive en `PRESUPUESTO(tipo=obra)`
+(`NODO.cantidad`, con `modo_cantidad` diciendo cómo se obtuvo); el
+rendimiento base ya vive en `PRESUPUESTO(tipo=plantilla)`
+(`COMPOSICION`+`VERSION_CONCEPTO`). Formado es el cruce de las dos — la
+cantidad de una instancia, la matriz de la otra —, nunca una tercera copia
+que se pueda desincronizar:
+
+```
+Efecto cantidad = Presupuesto Formado − Presupuesto Base   (construir más o menos, misma receta)
+Efecto receta    = Ingeniería − Presupuesto Formado          (usar distinto rendimiento, misma cantidad)
+```
+
+Identidad ya probada en los siete prototipos y en `ALAMO 18`
+(`CONOCIMIENTO.md` §11.14): las dos suman exacto el excedente total, fila
+por fila.
+
+### Control de Cambio ya tenía bandeja — le faltaba la forma de su JSON
+
+`PROPUESTA.tipo` ya incluye `orden_cambio` (§5) desde el primer diseño;
+`autorizar_orden_cambio` ya es función atómica (P-21, hoy sin rol
+asignado). Lo único que el glosario marcaba «— pendiente» era la forma de
+`valor_propuesto` para ese `tipo` — `CONOCIMIENTO.md` §13.4 y el espécimen
+real `CC-ALM-18XXX` de `CONOCIMIENTO.md` §11.18 ya la dan:
+
+```
+valor_propuesto (JSON, tipo=orden_cambio)
+  clave                texto — patrón CC-{cluster}-{lote}{consecutivo},
+                        ej. CC-ALM-18001
+  delta_monto          NUMERIC con signo — impacto en costo
+  delta_plazo_dias     INTEGER, nullable — impacto en plazo
+  causa                enum: cambio_proyecto · error · condicion_sitio
+  ejecutado_en         TIMESTAMP, nullable — si ya se ejecutó en obra
+                        antes de esta propuesta
+```
+
+**`objeto_id` (el campo que ya existe en `PROPUESTA`) es el nodo
+congelado que referencia** — y también resuelve, sin campo nuevo, el caso
+«sin identificar» de `CONOCIMIENTO.md` §11.18 (el archivo no trae
+`NIV-`/`ECO-`): se liga a la raíz del árbol de `PRESUPUESTO(tipo=obra)`,
+no a un concepto — cuenta en el consolidado de la obra, como pide el
+método, sin inventar un nodo que el dato no dio.
+
+**Retroactividad no es un campo — es comparar dos fechas que ya
+existen.** `PROPUESTA.resuelto_en` (cuándo se autorizó) contra
+`ejecutado_en` (arriba, cuándo se ejecutó): si `ejecutado_en` es
+anterior, fue retroactiva. El **porcentaje de órdenes retroactivas** que
+`CONOCIMIENTO.md` §13.4 pide como medida de salud del proceso es una
+consulta sobre `PROPUESTA(tipo=orden_cambio)`, no una columna aparte.
+
+### Por destajo y por material — un solo eje, tres formas de aplicarlo
+
+Las cinco columnas no necesitan un filtro nuevo: `categoria` (canon,
+`LENGUAJE.md`) ya distingue `material` de `mano de obra`/`trabajo`, y ya
+es el eje que usó todo `CONOCIMIENTO.md` §11.14 para separar destajo de
+material. Cómo se aplica cambia según la columna, no el eje:
+
+| Columna | Cómo se filtra |
+|---|---|
+| Base · Ingeniería · Formado | `categoria` de cada hoja de la explosión (insumo), no de su contenedor — mismo principio que `CONOCIMIENTO.md` §11.14 ya fijó para la explosión recursiva |
+| Pagado Real | Ya viene separado por tabla de origen: `ESTIMACION_LINEA` es destajo, `MOVIMIENTO_ALMACEN` es material |
+| Control de Cambio | `categoria` del nodo que referencia `objeto_id` |
+
+### Los subcontratos no entran en esta comparación — tienen la suya, y le falta dato
+
+`CONOCIMIENTO.md` §11.14 ya lo estableció (D-307): un subcontrato no se
+explota contra su propia matriz de material, así que no cruza por este
+eje. Se compara Real contra su propia Base (D-313, validado en los tres
+casos de `ALAMO 18`, D-321) — un tercer eje, ya probado, que no necesita
+tabla nueva: lee `PROPUESTA`/`ESTIMACION_LINEA` del subcontrato contra la
+misma partida en `PRESUPUESTO(tipo=plantilla)`. **Lo que falta no es
+diseño, es dato**: el archivo `subcontratos.csv` del resumen de obra
+llegó vacío (D-321) — sin origen de subcontratos reales, este eje no
+tiene qué leer todavía.
+
+### Lo que esto NO resuelve
+
+**Desviación y Ejecutado sin respaldo** (`GLOSARIO-DOMINIO.md`, «Precios y
+cambios» — los dos seguían «— pendiente») no cierran aquí. Este reporte
+ya da los números que las definen (Ingeniería contra Base es la
+desviación; lo pagado sin orden de cambio que lo respalde es lo
+ejecutado sin respaldo), pero **capturar y persistir la causa**
+(`CONOCIMIENTO.md` §13.6 — vocabulario controlado, quién la captura, que
+«sin causa» sea un estado válido) es su propio diseño, todavía sin
+hacer. `capturar_causa_desviacion`/`revisar_patrones_desviacion` ya
+existen como función atómica (P-21) sin tabla a la que escribir.
+
+---
+
 # 6. Lo que este modelo deliberadamente NO resuelve
 
 | No incluido | Por qué |

@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
-corte:      2026-09-22
+corte:      2026-09-26
 verificado: 79 términos · 25 ambigüedades
 ```
 
@@ -795,7 +795,7 @@ Documento que referencia un nodo congelado y propone un delta. No edita: agrega.
 - **No confundir con:** Desviación
 - **Se usa con:** Contrato; Causa; Autorización
 - **Ejemplo:** Con causa, impacto y si se autorizó antes o después de ejecutar
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `PROPUESTA(tipo=orden_cambio)` — `MODELO.md` §5f, D-334
 
 ### Desviación
 

@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Write
 capa:       II — Operación
 pregunta:   ¿qué forma darle antes de moverse?
 tiempo:     se hace así
-corte:      2026-09-21
+corte:      2026-09-26
 verificado: Diseña, no implementa
 ```
 
@@ -25,16 +25,19 @@ contra datos reales**, no supuestos. No las re-derives. Si un dato del proyecto
 contradice el skill, **decilo explícitamente** en vez de elegir en silencio.
 
 **Revisá también `MODELO.md` por si el módulo ya tiene esquema cerrado** —
-cuantificación (§1b), histórico de precios (§4a), alerta (§5a) y roles y permisos
-(§5b) ya están diseñados. Proponer de nuevo lo que ya está cerrado es el mismo
+cuantificación (§1b), ensamble/paramétrico (§1c), histórico de precios (§4a),
+diccionario de datos (§4b), alerta (§5a), roles y permisos (§5b), programa
+(§5c), estimación (§5d), almacén (§5e) y comparación/reportes de obra (§5f)
+ya están diseñados. Proponer de nuevo lo que ya está cerrado es el mismo
 error que ignorar `MEMORIA.md` §2.
 
 **Si el módulo toca comparación o reportes de obra** (Presupuesto Base,
-Ingeniería, Pagado Real, Presupuesto Formado, Control de Cambio), el método ya
-está probado sobre datos reales de `ALAMO 18` — no hace falta redescubrirlo:
-`CONOCIMIENTO.md` §11.14 a §11.18, `RAZONAMIENTO.md`. Hoy se calcula con scripts
-ad hoc fuera de este repositorio; el diseño de ese módulo queda anotado y sin
-cerrar en `PENDIENTES-MEJORAS.md` B-71.
+Ingeniería, Pagado Real, Presupuesto Formado, Control de Cambio), el modelo
+ya está cerrado — `MODELO.md` §5f, D-334: cuatro de las cinco columnas
+reusan tabla ya existente y la quinta (`PROPUESTA(tipo=orden_cambio)`) solo
+necesitaba la forma de su JSON. Sigue habiendo un hueco, pero es de dato, no
+de diseño: los subcontratos comparan contra su propia base (D-313) y
+`subcontratos.csv` sigue vacío (D-321) — nada que leer todavía.
 
 ## El principio que gobierna todas tus decisiones
 
