@@ -1909,8 +1909,8 @@ lo esconde una proyección por fecha.
 Tercera vez que el hueco aparece (auditoría de `MODELO.md` §5f, D-334;
 mecanismo de sustitución, D-342) es la señal de que ya toca. La política
 lleva meses cerrada sin tabla — `CONOCIMIENTO.md` §13.6 la describe con
-las nueve causas, la fórmula de dos factores y las cuatro reglas de
-captura; esta pasada solo le pone forma.
+la fórmula de dos factores, las causas por categoría y las cuatro reglas
+de captura; esta pasada solo le pone forma.
 
 ```
 DESVIACION
@@ -1929,15 +1929,26 @@ DESVIACION
   cantidad_real        NUMERIC, nullable — solo si tipo=consumo           firme — nuevo
   precio_plan,
   precio_real          NUMERIC, nullable — solo si tipo=precio            firme — nuevo
-  causa                enum, nullable — las nueve causas de
-                       `CONOCIMIENTO.md` §13.6 (error de ejecución ·
-                       necesario para ejecutar · omisión de presupuesto
-                       · omisión de proyecto · petición nueva del
-                       cliente · contrato cambiado sin propagar · falta
-                       de insumos · temporalidad o clima · mejora de
-                       proyecto) más `sustitucion_por_equivalente`
-                       (D-342, grupo funcional) — null es un estado
-                       válido, «sin causa», no un dato faltante          abierto — nuevo
+  causa                enum, nullable — «Causas por categoría» de
+                       `CONOCIMIENTO.md` §13.6, según el tipo del
+                       nodo_id y el `tipo` de esta fila: material·precio
+                       (mercado · volumen · proveedor_distinto ·
+                       cambio_de_presentacion) · material·consumo
+                       (desperdicio_mayor_al_teorico ·
+                       merma_por_dano_clima_o_robo ·
+                       sustitucion_por_equivalente, D-342) ·
+                       mano_de_obra·precio (renegociacion · urgencia ·
+                       alza_de_tabulador) · mano_de_obra·consumo
+                       (rendimiento_real_distinto · retrabajo ·
+                       trabajo_fuera_de_alcance) · herramienta·precio
+                       (tarifa_distinta) · herramienta·consumo
+                       (dias_reales_de_renta · equipo_parado) ·
+                       maquinaria·precio (tarifa · combustible) ·
+                       maquinaria·consumo
+                       (horas_efectivas_contra_facturadas) ·
+                       contratos·consumo (volumen_realmente_ejecutado) —
+                       null es «sin causa», estado válido, no dato
+                       faltante                                          corregido — D-347
   causa_capturada_por  FK USUARIO, nullable                               firme — nuevo
   causa_capturada_en   TIMESTAMP, nullable — puede llegar después de
                        `detectada_en`, sin penalización                  firme — nuevo
@@ -1951,6 +1962,25 @@ cada vez.** Si se recalcularan contra la versión vigente de la matriz,
 una `DESVIACION` de hace tres meses cambiaría de valor cuando el catálogo
 avance — mismo error que ya evitó `VERSION_CONCEPTO.pu` (§4a: «se congela,
 nunca se recalcula»). Es un registro histórico, no una vista.
+
+### Las nueve causas de `CONOCIMIENTO.md` §13.6 no son el vocabulario de `causa`
+
+Corrige D-343: la primera versión de `causa` tomaba «las nueve causas, y
+quién paga cada una» (`CONOCIMIENTO.md` §13.6) como si fueran su
+vocabulario. Pero esa tabla resuelve algo anterior a `causa` —**si el
+hecho es una `DESVIACION` siquiera**— y su propia columna «a dónde va» lo
+dice sin ambigüedad: de las nueve, solo 1 (error de ejecución) y 2
+(necesario para ejecutar) terminan ahí. La 3 y la 4 (omisión de
+presupuesto, omisión de proyecto) van a **ejecutado sin respaldo** —
+`GLOSARIO-DOMINIO.md` ya marca ese término «no confundir con Desviación»,
+y sigue sin tabla propia. La 5, la 6 y la 9 (petición del cliente,
+contrato cambiado sin propagar, mejora de proyecto) van a
+`PROPUESTA(tipo=orden_cambio)` o a `INCIDENCIA`. La 7 (falta de insumos)
+es un hueco de programa, no de costo. El propio `CONOCIMIENTO.md` §13.6
+lo dice explícito para estos casos: **«no son el mismo renglón».** Cuando
+una incidencia o una orden de cambio generan además una desviación real,
+esa desviación es su propia fila, con su propia causa de categoría —
+nunca copia el motivo que la disparó.
 
 ### Las cuatro reglas de captura ya estaban escritas — el schema solo las deja cumplirse
 
