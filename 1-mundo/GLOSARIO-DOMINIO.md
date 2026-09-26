@@ -805,7 +805,7 @@ La misma obra a otro precio o consumo. Se descompone en desviación de precio y 
 - **No confundir con:** Cambio de alcance (ese se cobra)
 - **Se usa con:** Causa; Almacén; Explosión
 - **Ejemplo:** Se absorbe; el cambio de alcance se factura
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `DESVIACION` — `MODELO.md` §5g, D-343
 
 ### Ejecutado sin respaldo
 

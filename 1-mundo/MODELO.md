@@ -1057,6 +1057,14 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 |---|---|---|
 | `diferencia_sin_causa` | Prototipo contra ingeniería difiere y la diferencia no cae en ninguna de las nueve causas de `CONOCIMIENTO.md` §13.6 | P-29 |
 | `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
+| `invariante_por_vencer` | Pasan más de `parametro_usado.meses_vencimiento` (default 6, D-129) desde el `corte:` de `INVARIANTES.md` — sin campo nuevo, lee el mismo encabezado que ya lleva todo archivo del cerebro | B-54 |
+
+**`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
+no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
+usuario: la resuelve Control de obra, mismo criterio de gobierno cruzado
+entre obras que ya asignó `gestionar_rol_funcion`/`asignar_residente`
+(D-330) — nueva función atómica `renovar_invariante_valor` → Control de
+obra, en la lista de §5b.
 
 ---
 
@@ -1089,6 +1097,7 @@ FUNCION_ATOMICA
                      gestionar_rol_funcion · asignar_residente ·
                      asignar_supervision · reclasificar_familia ·
                      resolver_revisar_parametro                          nuevo — B-73/B-75, ver abajo
+                     · renovar_invariante_valor                          nuevo — B-54, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -1128,7 +1137,7 @@ precisamente para que una asignación no sea definitiva.
 `ROL_FUNCION` ya es la respuesta de fondo a "poder reasignar quién puede
 hacer qué": es una tabla, no una regla de código — `gestionar_rol_funcion`
 (arriba) decide quién puede editarla, no un tipo de dato nuevo. Esto es
-el inventario que faltaba encima: las treinta y tres funciones a la
+el inventario que faltaba encima: las treinta y cuatro funciones a la
 fecha, en un solo lugar.
 
 | Función | Rol(es) asignados | Fuente |
@@ -1154,6 +1163,7 @@ fecha, en un solo lugar.
 | `asignar_supervision` | Control de obra | dato del usuario |
 | `reclasificar_familia` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
 | `resolver_revisar_parametro` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
+| `renovar_invariante_valor` | Control de obra | dato del usuario, D-345 |
 | `registrar_avance` | **Sin asignar** | P-21 |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
@@ -1167,12 +1177,12 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintiuna asignadas, doce sin asignar — a propósito, no por olvido.**
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.**
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
 evidencia. Se cierran conforme aparezca el caso, igual que las
-veintiuna de arriba se cerraron cuando apareció el suyo.
+veintidós de arriba se cerraron cuando apareció el suyo.
 
 > **Todas estas asignaciones son `propuesto`, no `firme`, salvo las
 > heredadas de P-21/B-45** — son la primera pasada de un criterio nuevo
@@ -1891,6 +1901,124 @@ lo esconde una proyección por fecha.
 > fecha temprana o la tardía de la actividad. No se elige aquí en
 > silencio — queda para cuando haya un caso real que la fuerce a
 > decidirse.
+
+---
+
+## 5g. Desviación — la comprobación más fuerte, con causa opcional y patrones que se leen sin ella
+
+Tercera vez que el hueco aparece (auditoría de `MODELO.md` §5f, D-334;
+mecanismo de sustitución, D-342) es la señal de que ya toca. La política
+lleva meses cerrada sin tabla — `CONOCIMIENTO.md` §13.6 la describe con
+las nueve causas, la fórmula de dos factores y las cuatro reglas de
+captura; esta pasada solo le pone forma.
+
+```
+DESVIACION
+  id
+  nodo_id              FK Nodo — el concepto o insumo donde se detecta   firme — nuevo
+  presupuesto_id       FK PRESUPUESTO — la obra. No basta con `nodo_id`
+                       para agrupar por obra en un cruce entre obras,
+                       mismo motivo que llevó a `presupuesto_id` en
+                       `MOVIMIENTO_ALMACEN` (D-337)                      firme — nuevo
+  tipo                 enum: precio · consumo — los dos factores de la
+                       fórmula de `CONOCIMIENTO.md` §13.6, nunca sumados
+                       en una sola fila                                  firme — nuevo
+  monto                NUMERIC — el efecto en dinero de este factor,
+                       solamente                                         firme — nuevo
+  cantidad_plan,
+  cantidad_real        NUMERIC, nullable — solo si tipo=consumo           firme — nuevo
+  precio_plan,
+  precio_real          NUMERIC, nullable — solo si tipo=precio            firme — nuevo
+  causa                enum, nullable — las nueve causas de
+                       `CONOCIMIENTO.md` §13.6 (error de ejecución ·
+                       necesario para ejecutar · omisión de presupuesto
+                       · omisión de proyecto · petición nueva del
+                       cliente · contrato cambiado sin propagar · falta
+                       de insumos · temporalidad o clima · mejora de
+                       proyecto) más `sustitucion_por_equivalente`
+                       (D-342, grupo funcional) — null es un estado
+                       válido, «sin causa», no un dato faltante          abierto — nuevo
+  causa_capturada_por  FK USUARIO, nullable                               firme — nuevo
+  causa_capturada_en   TIMESTAMP, nullable — puede llegar después de
+                       `detectada_en`, sin penalización                  firme — nuevo
+  detectada_en         TIMESTAMP — la detección no espera a la causa,
+                       `CONOCIMIENTO.md` §13.6: «existe se declare o
+                       no»                                               firme — nuevo
+```
+
+**`cantidad_plan`/`precio_plan` se congelan al detectar, no se leen en vivo
+cada vez.** Si se recalcularan contra la versión vigente de la matriz,
+una `DESVIACION` de hace tres meses cambiaría de valor cuando el catálogo
+avance — mismo error que ya evitó `VERSION_CONCEPTO.pu` (§4a: «se congela,
+nunca se recalcula»). Es un registro histórico, no una vista.
+
+### Las cuatro reglas de captura ya estaban escritas — el schema solo las deja cumplirse
+
+`CONOCIMIENTO.md` §13.6 las fija en prosa; aquí es donde se ven en columna:
+
+| Regla | Cómo la cumple el schema |
+|---|---|
+| La detección no depende de nadie | `detectada_en` se llena solo, `causa` puede quedar `null` indefinidamente |
+| Quien corrige el catálogo mira patrones, no causas | Los patrones (`nodo_id` que se desvía en toda obra, `presupuesto_id` que se desvía en todo concepto) son consulta agregada sobre `DESVIACION`, no un campo que alguien declare |
+| «Sin causa» es un estado válido, con su propio % | `causa IS NULL` es una fila completa, nunca un placeholder a rellenar |
+| La causa se agrega después, sin penalizar | `causa_capturada_en` es independiente de `detectada_en` — nunca bloquea ni vence |
+
+### Los patrones no piden tabla — son la misma consulta de siempre
+
+`CONOCIMIENTO.md` §13.6 ya da la lectura: un insumo que se desvía en **todos**
+los conceptos es problema de compra o medida; un concepto que se desvía en
+**todos** sus insumos es problema de ese trabajo; repetido en todas las
+obras apunta al catálogo, repetido en una sola es condición local. Las
+cuatro son `GROUP BY nodo_id` / `GROUP BY presupuesto_id` sobre
+`DESVIACION` — mismo criterio que excluyó una tabla de "comparación" en
+`MODELO.md` §5f: se calcula al preguntar, no se guarda aparte.
+`revisar_patrones_desviacion` (P-21) ya tenía nombre de función; ahora
+tiene sobre qué correr.
+
+**Por contratista, la misma lectura queda bloqueada en dato, no en
+diseño** — sin catálogo de contratistas (P-39) no hay `contratista_id` al
+que agrupar, mismo hueco que ya dejaron anotado `TABULADOR_CONTRATISTA`
+(§4a) y `DEDUCCION`/`PRESTAMO` (§5d).
+
+### Cuando el patrón corrige el catálogo, ya sabe a quién avisar
+
+Una `DESVIACION` recurrente y atribuible al método (no a condición local ni
+a error corregible, `CONOCIMIENTO.md` §13.6) se resuelve con lo que ya
+existe: `PROPUESTA(tipo=version)`, evidencia = las filas de `DESVIACION`
+que la sustentan. Es el mismo mecanismo que acaba de cerrar P-35 — una
+sustitución detectada es un caso particular de este patrón general, no
+uno aparte.
+
+**`capturar_causa_desviacion` y `revisar_patrones_desviacion` (P-21) siguen
+sin asignar a rol** — nada en esta pasada cambia esa decisión; ahora
+tienen tabla a la que escribir y consultar, que es lo que les faltaba.
+
+---
+
+## 5h. Rastro de Consulta — la única bandeja fuera de `PROPUESTA` (B-33 cierra)
+
+`PROPUESTA` es la memoria de los agentes que proponen (D-77) — Consulta no
+califica: **nunca propone, solo lee** (D-75). Necesita su propia bandeja,
+más chica, porque no tiene dónde más vivir.
+
+```
+CONSULTA_LOG
+  id
+  pregunta               texto — tal como llegó                          firme — nuevo
+  herramienta_usada_id   FK a la tool del catálogo (`gravity-obra.md`
+                         §6), nullable si ninguna aplicó                 firme — nuevo
+  respondida             boolean — ¿hubo con qué contestar?               firme — nuevo
+  herramienta_faltante   texto, nullable — qué tool hubiera hecho falta,
+                         cuando se puede nombrar                         firme — nuevo
+  usuario_id             FK USUARIO, nullable                             firme — nuevo
+  capturada_en           TIMESTAMP                                       firme — nuevo
+```
+
+**Sin retención — dato del usuario, explícito: persistente, para que la
+señal de mejora no se pierda.** Distinto de `ALERTA`/`PROPUESTA`, que sí
+resuelven y cierran: aquí no hay «resuelto», el valor está en acumular
+para ver qué se pregunta seguido y qué herramienta falta, no en cerrar
+cada fila. `PENDIENTES-MEJORAS.md` B-33.
 
 ---
 
