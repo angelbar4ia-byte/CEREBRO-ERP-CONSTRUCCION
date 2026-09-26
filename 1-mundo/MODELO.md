@@ -1222,6 +1222,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
 | `invariante_por_vencer` | Pasan más de `parametro_usado.meses_vencimiento` (default 6, D-129) desde el `corte:` de `INVARIANTES.md` — sin campo nuevo, lee el mismo encabezado que ya lleva todo archivo del cerebro | B-54 |
 | `estimacion_sin_respaldo_material` | Al correr `validar_estimacion`, la salida de almacén del insumo testigo (`MOVIMIENTO_ALMACEN`, `motivo` ∈ {`salida_produccion`, `implosion`}) del periodo no alcanza, contra el rendimiento teórico, para los m² que la estimación reclama — más del `umbral_pct` de faltante | B-70 |
+| `subcontrato_fuera_de_base` | El Real de un subcontrato (D-313) difiere de su Base, en cualquier dirección — sin umbral por %, dato del usuario | B-78 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -1260,6 +1261,39 @@ evidencia.
 **Sigue topado en el mismo dato que `CONOCIMIENTO.md` §11.17 ya señaló:**
 un solo mes de almacén cargado (D-322) — extender la prueba más allá de
 `EST-02010` pide meses reales adicionales, no más diseño.
+
+### `subcontrato_fuera_de_base` cierra B-78 — no hay umbral por %, hay alerta y criterio
+
+`CONOCIMIENTO.md` §11.14/D-313 ya separaba Real-vs-Base de un
+subcontrato en dos destinos —crecimiento esperado (mismo alcance, se
+absorbe) y adicional al cliente (alcance cambió, `PROPUESTA(tipo=
+orden_cambio)`)— pero **cuánto crecimiento es «esperado» antes de
+volverse adicional dependía de un umbral por tipo de espacio que nunca
+se definió.** Dato del usuario: no hay número. La alerta dispara en
+cuanto `Real` difiere de `Base` en cualquier dirección, y quien resuelve
+—informado por qué tipo de espacio es, entre otro contexto— decide a
+mano de qué lado cae. `evidencia` guarda `{subcontrato_id, base, real,
+diferencia_pct}`; no lleva `parametro_usado.umbral_pct` como
+`identidad_dudosa` o `estimacion_sin_respaldo_material` — no hay umbral
+que parametrizar, ese es justo el punto.
+
+**El lado bajo tiene el mismo criterio, con el mismo mecanismo de
+siempre.** `CONOCIMIENTO.md` §11.14 ya lo nombraba para la cochera de
+`ALAMO 18` (81% de su base, D-321): no toda baja es ahorro, puede ser
+**reducción de alcance** —se construyó menos, por diseño— y eso también
+es cambio de alcance, solo que a la baja. `PROPUESTA(tipo=orden_cambio)`
+ya soporta esto sin tocarlo: `delta_monto` es «NUMERIC con signo» desde
+que se escribió (§5, D-334) — un descuento al cliente es la misma fila,
+con el signo al revés. Si en cambio es variación normal del mismo
+alcance, se absorbe igual que el crecimiento esperado: ninguna de las
+dos mitades simétricas pide una propuesta.
+
+**Los tres casos reales conocidos nunca ejercieron el lado alto:**
+pergolado asador 100% de su base, impermeabilización 99.4%, pergolado
+cochera 81% —confirmada como reducción real por diseño, no error
+(D-321)—. El umbral por tipo de espacio que B-78 pedía definir deja de
+hacer falta: no hay umbral, hay alerta bidireccional más criterio de
+quien resuelve.
 
 ---
 
