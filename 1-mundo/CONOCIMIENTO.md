@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1514 | 30 |
+| §11 | Los flujos entre sistemas | 1531 | 30 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2718,10 +2718,27 @@ Cambio).
 Dos calzan casi exacto contra su base — nada que explicar. La cochera está
 **por debajo** de la base, no por arriba: no es crecimiento, y por la
 misma regla tampoco es adicional al cliente — es una reducción de alcance
-frente al prototipo genérico, a revisar por qué (¿cochera más chica en
-este lote?), no a facturar. Ningún caso real de crecimiento-que-sí-es-
+frente al prototipo genérico. Ningún caso real de crecimiento-que-sí-es-
 adicional apareció todavía en los datos — la regla queda anotada, sin un
 ejemplo vivo que la ponga a prueba del lado que crece. D-313.
+
+> **Las tres bases son correctas — verificado contra el catálogo de
+> presupuesto por prototipo.** Diamante sin chimenea y Diamante con
+> chimenea (`ALAMO 18`) comparten exactamente la misma especificación en
+> los tres subcontratos (mismo M2, mismo importe) — no hay error de
+> cruzar contra el prototipo equivocado. **La cochera al 81% es reducción
+> real, confirmada por diseño (dato del usuario)**: este lote construyó
+> una cochera/pergolado más chico que el estándar Diamante a propósito,
+> no por error de dato ni de comparación. El porqué de fondo (por qué el
+> diseño de este lote la achicó) es pregunta de arquitectura, no de
+> datos — mismo tipo de límite que el cuantificador para la contratrabe
+> (arriba), con otro actor del lado que sí sabe. D-321.
+>
+> Revisada también la ingeniería cruda completa de `ALAMO 18`: no hay más
+> subcontratos que los tres de la tabla. El archivo `subcontratos.csv` del
+> resumen de obra está vacío — no es una omisión de esta reconstrucción,
+> es un hueco en el dato de origen que el módulo de B-71 necesitará
+> resolver cuando se diseñe.
 
 Lo que sigue después de las dos correcciones **no es desperdicio: son
 pares que huelen a la misma clave contada dos veces**, insumo por insumo:
