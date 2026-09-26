@@ -681,9 +681,8 @@ PRECIO_HISTORICO
 **`catalogo` es fuente de verdad y versiona sola**, sin validar — mismo
 principio que F-1 (D-86: lo cargado se toma como definido). **`ingenieria`
 exige validación** antes de aceptarse, y esa validación puede confirmar una
-fila ya existente o crear una nueva. `almacen` y `estimacion` quedan
-pendientes de P-19 y P-18 — se agregan al enum cuando esos módulos existan,
-no antes.
+fila ya existente o crear una nueva. `almacen` y `estimacion` se agregan al
+enum en §5e, ahora que P-19 y P-18 ya cerraron.
 
 **Nunca se edita una fila cerrada** — mismo principio que
 `ENLACE_CUANTIFICACION.vigente`. `NODO.precio_declarado` pasa a ser caché de
@@ -1480,6 +1479,125 @@ catálogo de contratistas) y esto no lo resuelve ni lo intenta resolver.
 
 ---
 
+## 5e. Almacén — surtido, consumido y el hueco de las devoluciones (P-19/B-16 cierran)
+
+El primer cruce real (`CONOCIMIENTO.md` §11.15 a `CONOCIMIENTO.md` §11.19)
+ya probó el método sobre el export mensual real (4,445 filas, un mes) —
+esto es su tabla.
+
+### `Motivo`, no `Tipo`, es la señal real — misma trampa, otro archivo
+
+El export trae 46 columnas; `Tipo` (`PUR-STK`/`STK-UNK`/`STK-ASM`) parece
+la clasificación, pero es más grueso que `Motivo` y no agrega nada que
+`Motivo` no diga ya — **no se traduce**, mismo principio que `Ubicacion`
+repetida que `CONOCIMIENTO.md` §11.15 ya documentó.
+
+```
+MOVIMIENTO_ALMACEN
+  id
+  clave              texto — el insumo (`# Parte`)                          firme — nuevo
+  cantidad           NUMERIC con signo — `Efecto Qty`: + entrada, - salida   firme — nuevo
+  costo_total        NUMERIC con signo — `Efecto Costo`, el impacto en
+                      dinero de este movimiento                             firme — nuevo
+  fecha              TIMESTAMP                                              firme — nuevo
+  motivo             enum: recepcion · salida_produccion · implosion ·
+                      ajuste_salida · sobrante · faltante ·
+                      inventario_inicial · consumo_interno                  firme — nuevo
+  nivel              texto — la etapa (Cimentación, Planta Baja…), misma
+                      llave que «nivel de construcción» (`LENGUAJE.md`);
+                      null en `recepcion` — no aplica a algo que aún no
+                      sale a obra. Trae también la variante «Control de
+                      Cambio X» — la misma señal cruda que
+                      `CONOCIMIENTO.md` §11.18 ya trata como
+                      `CC-ALM-18XXX`, no un caso nuevo                       firme — nuevo
+  nodo_id            FK Nodo, nullable — el concepto/etapa que se explotó
+                      (`No.Parte`). Solo poblado cuando `motivo=implosion`
+                      — es la única vía con esta liga; `salida_produccion`
+                      no la tiene nunca en el archivo real, sale a un
+                      `nivel`, no a un concepto                             firme — nuevo
+  op                 texto, nullable — folio de orden de producción, solo
+                      en `motivo=implosion`. Se lee de `Referencia` (texto
+                      libre: `OP:23622, No.Parte:BAP-03010…`), no hay
+                      columna propia — mismo parseo validado ya (67 de 67
+                      contra `# OP`) por `CONOCIMIENTO.md` §11.15          firme — nuevo
+  proveedor          texto, nullable — solo poblado en `motivo=recepcion`
+                      (1,764 de 1,767 filas reales)                         firme — nuevo
+  referencia         texto libre, nullable                                  firme — nuevo
+```
+
+**`bodega` no se modela como campo propio todavía** — 4,440 de 4,445 filas
+reales son el mismo almacén; sin un segundo almacén real en uso, es una
+dimensión sin variación que observar.
+
+### Surtido contra consumido no es un campo — ya lo separa `motivo`
+
+B-16 pedía distinguir **surtido** de **consumido**. En el archivo real son
+dos motivos distintos, no una lectura que haya que calcular:
+
+| | `salida_produccion` | `implosion` |
+|---|---|---|
+| Qué es | Sale del almacén hacia una etapa (`nivel`) | El sistema la explota y la liga a un concepto (`nodo_id`) vía `op` |
+| Se liga a concepto | **Nunca** (0 de 1,674 filas reales) | **Siempre** (950 de 950) |
+| Es el «surtido» de B-16 | Sí | — |
+| Es el «consumido» de B-16 | — | Sí |
+
+**No hace falta un booleano `es_consumido`** — `motivo IN (...)` ya lo
+dice, mismo criterio que evitó un campo nuevo en P-7 (`CONOCIMIENTO.md`
+§5c).
+
+### El corte matricial es vista, no tabla
+
+`CONOCIMIENTO.md` §13.6 ya lo describe: insumo × concepto, con lo teórico
+(`COMPOSICION.cantidad`, vía `nodo_id`), lo surtido/consumido
+(`MOVIMIENTO_ALMACEN` agrupado por `clave`+`nodo_id`) y la diferencia.
+**Se calcula al cruzar, no se guarda** — mismo principio que el
+rendimiento real del programa (P-7) y que
+`ESTADO_CARGA.porcentaje_cargado`: nunca un campo paralelo que se
+desincronice.
+
+### Las devoluciones no tienen espécimen real todavía
+
+B-16 las esperaba. El archivo real de abril no las trae como motivo
+propio — lo más parecido son `sobrante`/`faltante` (20 filas), que son
+**otra cosa**: corrección de conteo físico de inventario, sin
+`referencia` ni `op`, no material que vuelve de obra sin usar. Si esa
+devolución existe, hoy no deja rastro distinto de una `salida_produccion`
+que nunca se registró — **queda abierto, sin forzar `sobrante`/`faltante`
+a significar algo que el dato no confirma.**
+
+### Dos formas consideradas y descartadas
+
+- **`ORDEN_PRODUCCION` como tabla propia** — el `op` agrupa varias líneas
+  (ej. `IEC-00410` con 4 líneas bajo el mismo folio), pero no tiene ciclo
+  de vida propio ni estado que aprobar: es una llave de agrupación, no una
+  entidad. Se queda como campo en `MOVIMIENTO_ALMACEN`, no como tabla.
+- **Un catálogo `NIVEL`/`ETAPA` formal** — `nivel` ya es la misma «llave al
+  catálogo de niveles» que `LENGUAJE.md` nombra para `Nivel ERP`, y ese
+  catálogo tampoco tiene tabla propia todavía en este modelo. Es un hueco
+  más chico que éste, compartido con Programa — se anota, no se resuelve
+  aquí.
+
+### `PRECIO_HISTORICO` cobra las dos fuentes que quedaron pendientes
+
+`MODELO.md` §4a dejó anotado que «almacén y estimación quedan pendientes
+de P-19 y P-18 — se agregan al enum cuando esos módulos existan, no
+antes.» P-18 ya cerró (D-300) sin que nadie volviera a esa línea — se
+corrige aquí, junto con almacén:
+
+```
+PRECIO_HISTORICO.fuente   enum: catalogo · ingenieria · almacen ·
+                           estimacion
+```
+
+`almacen` lee `costo_total`/`cantidad` de cada `MOVIMIENTO_ALMACEN` con
+`motivo=recepcion` — el precio real de compra, con proveedor. `estimacion`
+lee `monto`/`cantidad_avance` de cada `ESTIMACION_LINEA` (§5d) al
+conciliar — mismo principio que la excepción de trabajo y subcontrato que
+`MODELO.md` §4a ya declaraba (su precio nace de negociación puntual, no de
+mercado).
+
+---
+
 # 6. Lo que este modelo deliberadamente NO resuelve
 
 | No incluido | Por qué |
@@ -1488,7 +1606,6 @@ catálogo de contratistas) y esto no lo resuelve ni lo intenta resolver.
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
 | Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad) |
-| Almacén | P-19 — primeros cruces reales hechos, falta el diseño del módulo completo |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |
 

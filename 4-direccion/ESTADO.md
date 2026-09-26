@@ -98,11 +98,12 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
 | **Modelo de datos** | `MODELO.md` aprobado, con 15 hallazgos resueltos |
 | **Roles y permisos** | Cierra P-21 — `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` (`MODELO.md` §5b) · muchos-a-muchos, sin tope por monto · Cierra B-73 — 28 funciones atómicas (12 nuevas: incidencia, cierre de frente, edición de programa, precio nuevo con aprobación doble), D-329 · 🆕 Cierra B-75 — `validar_estimacion` a Control de obra, `gestionar_rol_funcion` nueva para reasignar sin tocar esquema, lista completa de 33 funciones (21 asignadas, 12 a propósito sin asignar), D-330 |
-| **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) sigue anotado, marcador de prototipo (P-40) cierra con `PRESUPUESTO.tipo` |
+| **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) sigue anotado, marcador de prototipo (P-40) cierra con `PRESUPUESTO.tipo` · 🆕 `fuente` gana `almacen`/`estimacion`, pendiente desde que P-18/P-19 cerraron |
+| **Almacén** | 🆕 Cierra P-19/B-16 — tabla `MOVIMIENTO_ALMACEN`; el archivo real ya separaba surtido (`salida_produccion`) de consumido (`implosion`) sin campo nuevo, corte matricial es vista sobre `COMPOSICION`, no tabla (`MODELO.md` §5e, D-333). Devoluciones sin espécimen real todavía, queda abierto |
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326 |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada · 🆕 Avanza P-14/B-09 — Cabeceras/Materiales/Operaciones confirmados contra el propio dialecto OPUS y el join entre ellos validado sin huérfanos; `Flete`, archivo-vs-API y los 4 catálogos de salida siguen abiertos (`CONOCIMIENTO.md` §4.3, D-331/D-332) |
-| **Memoria** | 332 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 333 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 79 términos · 25 ambigüedades |
@@ -162,13 +163,12 @@ al usuario si hace falta, este archivo no lo guarda).
 él los módulos con reglas escritas y verificadas siguen creciendo: motor de
 cálculo, catálogo, APU, presupuesto, importación, semilla, diccionario,
 rediseño, paramétrico/ensamble, propuestas, alerta, cuantificación, histórico
-de precios, estimaciones y programa (modelo de datos completo — el motor de
-cálculo del CPM sigue siendo código, no schema) y permisos.
+de precios, estimaciones, programa (modelo de datos completo — el motor de
+cálculo del CPM sigue siendo código, no schema), permisos y almacén.
 
-Lo que sigue sin decisión: exportación —los tres reportes ya resueltos, faltan
-los cuatro catálogos que se volvieron salida, bloqueados en el catálogo
-viejo— (P-14) y almacén, el diseño completo del módulo más allá de los
-primeros cruces reales (P-19).
+Lo único que sigue sin decisión: exportación —los tres reportes ya resueltos,
+faltan los cuatro catálogos que se volvieron salida, bloqueados en el catálogo
+viejo— (P-14).
 
 ---
 

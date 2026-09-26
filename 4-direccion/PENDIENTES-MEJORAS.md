@@ -102,7 +102,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | P-16 | Declarar el dialecto del árbol de ingeniería | *No prioritario.* Sus cantidades vienen multiplicadas por el volumen y su PU congelado |
 | P-17 | **`Ingenieria ERP` no es generable** | La prueba de ida y vuelta lo demostró: la regla no es deducible. O se obtiene del ERP externo, o el código se arrastra del archivo original |
 | ✅ P-18 | ~~**Estimaciones**~~ | **Resuelto.** Dos fuentes (ERP externo con ingeniería, manual/Excel sin ella), consolidadas por extractor. El tope es el mismo techo del cuantificador de presupuesto (D-273), de cualquier fuente. Deducciones, retenciones y préstamos definidos. `CONOCIMIENTO.md` §13.8, D-284 a D-291 |
-| 🔶 P-19 | **Almacén** | Surtido contra consumido, devoluciones, y el corte matricial. **Primeros cruces reales hechos** (léxico del archivo, rendimiento vs. matriz, corte semanal) sobre 2 conceptos de un mes — falta el diseño del módulo completo. `CONOCIMIENTO.md` §11.15 a §11.17 |
+| ✅ P-19 | ~~**Almacén**~~ | **Resuelto: modelo de datos completo, tabla `MOVIMIENTO_ALMACEN`.** El archivo real ya separaba surtido de consumido en dos motivos distintos, no una lectura por calcular: `salida_produccion` nunca se liga a concepto (0 de 1,674 filas reales), `implosion` siempre lo hace (950 de 950) vía `op`/`nodo_id`. El corte matricial de `CONOCIMIENTO.md` §13.6 es vista sobre `MOVIMIENTO_ALMACEN`+`COMPOSICION`, no tabla — mismo criterio que el rendimiento real del programa (P-7). Las devoluciones que se esperaban no tienen espécimen real todavía: `sobrante`/`faltante` son corrección de conteo físico, otra cosa — queda abierto. `MODELO.md` §5e, D-333 |
 | ✅ P-20 | ~~Programación~~ | **Resuelto: modelo de datos completo.** Las diez decisiones de política (`PROPUESTA-CUATRO-MODULOS.md` §4, P-1 a P-10) ya tienen tabla — `ACTIVIDAD` completa, `PRECEDENCIA`, `CALENDARIO_OBRA`/`CALENDARIO_EXCEPCION`, `TRAMO`, el segundo cuantificador (`ENLACE_CUANTIFICACION_PROGRAMA`), `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`. Queda el motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica) — es código, no schema, mismo criterio que el resto de `MODELO.md` §6. `MODELO.md` §5c, D-327 |
 | ✅ P-21 | ~~**Roles y permisos**~~ | **Resuelto: módulo completo.** 6 roles —Residente, Supervisor, Superintendente, Costos, Cotizador, Control—, 15 funciones atómicas (`trazar`, `aprobar_trazo`, `registrar_avance`, `comprometer_gasto`, `capturar_causa_desviacion`, `revisar_patrones_desviacion`, `aprobar_version_concepto`, `pactar_precio_contratista`, `aplicar_descuento`, `autorizar_orden_cambio`, `aprobar_propuesta`, `resolver_alerta`, `clasificar_manualmente`, `correr_invariantes`, `anotar_plano`), combinación muchos-a-muchos no disjunta (D-223), y sin tope por monto en `comprometer_gasto` —binaria; el control de subcontratos se resuelve como matriz, no como límite de rol (D-224). `MODELO.md` §5b, hallazgo 14. D-204 a D-206, D-223 a D-225. `anotar_plano` se agrega el 2026-09-18 al cerrar B-45, D-237 |
 | P-22 | **Autoría de matrices y compuestos** | Cómo se arma una explosión desde cero. Ideas en `IDEAS.md` §1 y `IDEAS.md` §4 del conocimiento |
@@ -221,7 +221,7 @@ puede escribir de lo que primero hay que definir.
 | B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | ✅ **P-20 resuelto** — modelo de datos completo (`MODELO.md` §5c, D-327). Falta el motor de cálculo del CPM (código, no schema) | B-05, B-07 |
 | B-14 | **`contratos`** | Cadena de precios, precio por contratista, control de cambio | ✅ Definidas | B-05 |
 | B-15 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones, retenciones | ✅ **P-18 resuelto** — `CONOCIMIENTO.md` §13.8 | B-14 |
-| B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | 🔶 **P-19** — primeros cruces reales hechos, falta el diseño del módulo completo | B-06 |
+| B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | ✅ **P-19 resuelto** — `MOVIMIENTO_ALMACEN` nueva; el archivo real ya separaba surtido/consumido sin campo extra, corte matricial es vista, no tabla. Devoluciones sin espécimen real todavía, queda abierto. `MODELO.md` §5e, D-333 | B-06 |
 | B-17 | **Roles y permisos** | Quién captura, aprueba y autoriza | ✅ **P-21 resuelto** — `MODELO.md` §5b | Todos |
 | B-24 | **`propuestas`** | La bandeja única de «propone, no aplica». Con evidencia, origen y rechazos conservados | ✅ Definidas en `CONOCIMIENTO.md` §14 | B-01 |
 
@@ -303,6 +303,6 @@ puede escribir de lo que primero hay que definir.
 en `backend/core/`. B-03 a B-07 y B-10 a B-12 siguen con sus reglas escritas y
 verificadas: **se pueden construir sin esperar ninguna decisión.**
 
-Lo demás ya tiene menos huecos: P-18, P-20 y P-21 cerraron. Lo que queda es P-14
-— solo para los 4 catálogos de salida, falta el catálogo viejo, igual que P-32
-— y P-19, el diseño completo del módulo de almacén (B-16).
+Lo demás ya tiene menos huecos: P-18, P-19, P-20 y P-21 cerraron. Lo único
+que sigue sin decisión es P-14 — solo para los 4 catálogos de salida, falta
+el catálogo viejo, igual que P-32.
