@@ -2282,6 +2282,21 @@ contra $332.
 > aparece suelta, repetida en cada bloque.** Es un artefacto de cómo se construye el
 > archivo, no un hecho de la obra.
 
+### P-36 cierra: no se consolida al cargar — cada lector agrupa a su modo
+
+**Depende del proceso que lee, no del insumo** (dato del usuario). Compras y obra
+necesitan el consolidado —cuánta arena hace falta pedir o surtir esta semana—;
+costos y control necesitan el detalle crudo —cómo se formó el PU, entender el
+rendimiento real (`CONOCIMIENTO.md` §11.16/§11.17)—. Consolidar al cargar le
+quita al segundo grupo el dato que necesita; no consolidar nunca le exige al
+primero rearmarlo cada vez.
+
+**No hace falta guardar las dos versiones.** Lo cargado se queda atomizado, como
+llegó (§12.1: lo cargado no se toca) — la vista consolidada de compras/obra es
+una agregación (`SUM(cantidad) GROUP BY clave`) al leer, nunca un segundo lugar
+donde el dato pueda desincronizarse del original. Mismo principio que
+`ESTADO_CARGA.porcentaje_cargado`: se calcula, no se guarda.
+
 ### Un caso que rompe el patrón, y por eso destaca
 
 Casi todo en ALAMO 18 sale **igual o mayor** que el prototipo — ampliaciones,
@@ -2299,6 +2314,38 @@ finas exteriores — antes de que el cemento la sustituyera.
 > **El método encontró un hecho real de la obra, no un error de datos.** La
 > comparación contra el prototipo detecta correctamente cuándo una obra quedó
 > capturada con una versión de APU distinta a la vigente.
+
+### P-35 cierra: este caso ya era la respuesta, solo faltaba nombrar el mecanismo
+
+**Cómo se declara una sustitución (P-35) es exactamente lo que acaba de pasar
+arriba, formalizado.** Dato del usuario: al confirmarse, se declara para quedar
+auditable — y una vez aprobada, deja de contar como desviación real. Los tres
+pasos, ninguno nuevo:
+
+```
+1. Detectar    Casi todo crece y una cosa baja fuerte → candidato (ya probado, arriba)
+2. Proponer    PROPUESTA(tipo=version) sobre el concepto, evidencia = los casos
+               acumulados; valor_propuesto lleva insumo_anterior_id/insumo_nuevo_id
+               y el `GRUPO_FUNCIONAL` que los declara intercambiables (§16.3, D-328)
+               — la sustitución queda auditable por esos dos campos, no solo en prosa
+3. Aprobar     VERSION_CONCEPTO nueva (§2.2/§4a) con la matriz actualizada — desde
+               su vigente_desde, la comparación ya no encuentra brecha: el nuevo
+               material ES la referencia, no hay desviación que seguir marcando
+```
+
+**No pidió cantidad negativa** (la otra opción que se evaluó): no hay evidencia de
+ese mecanismo en los 12 archivos de ingeniería vistos, y `PROPUESTA(tipo=version)`
+ya resuelve lo mismo con lo que existe — `CONOCIMIENTO.md` §13.6 ya lo decía
+("cuando sí corrige el catálogo: versión nueva, propuesta con evidencia,
+aprobada por alguien"), solo nunca se había conectado con nombre a este caso.
+
+> **Lo que este mecanismo no resuelve todavía:** las desviaciones ya capturadas
+> *antes* de que la sustitución se aprobara —cuando el patrón apenas se estaba
+> acumulando— se quedan como estaban. Marcarlas retroactivamente como "explicadas"
+> necesita la entidad `DESVIACION` (`GLOSARIO-DOMINIO.md`, «Precios y cambios» —
+> sigue «— pendiente»), que ya se anotó como hueco en `MODELO.md` §5f al cerrar
+> B-71. Tres veces que aparece la misma falta es la señal de que ya toca
+> diseñarla — sin caso urgente que lo fuerce hoy, queda para la próxima pasada.
 
 ## 11.12 La tercera pata: salidas de almacén — primeros cruces reales
 

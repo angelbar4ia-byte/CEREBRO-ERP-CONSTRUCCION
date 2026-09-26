@@ -59,6 +59,12 @@ NODO
   subfamilia_id      FK Subfamilia (nullable)                        firme — nullable, resuelto (P-12)
   clase_id           FK Clase_Trabajo (nullable)                     firme — nuevo, solo si categoria=trabajo (P-02/P-03)
   revisar            boolean, default false                          firme — nuevo, insumo apartado sin clasificar bien (P-04)
+  marca_revisado     boolean, default false — checklist de captura
+                      ("OK" en la descripción cruda). NO afirma que el
+                      dato sea correcto, solo que alguien ya lo miró —
+                      dato del usuario. Dirección opuesta a `revisar`
+                      (ese pide revisión futura, este registra una ya
+                      hecha)                                          nuevo — cierra P-34
   variables          JSONB, nullable — valores nombrados que una
                       `formula_personalizada` puede leer, cuando el
                       valor no amerita su propio nodo hijo             firme — nuevo, ver hallazgo 13
@@ -942,7 +948,8 @@ que ya rige todo el sistema: **propone, no aplica.**
 PROPUESTA
   id
   tipo             enum: equivalencia · version · reparto · conversion ·
-                    matriz_generada · fusion · clonacion · orden_cambio
+                    matriz_generada · fusion · clonacion · orden_cambio ·
+                    patron_carga
   objeto_id         a qué nodo o línea aplica
   valor_propuesto   JSON — la forma cambia según `tipo`
   evidencia         texto — de dónde salió
@@ -977,8 +984,35 @@ entrara, el modelo aprendería de sus propias dudas.
 
 Cada `tipo` de propuesta tiene forma distinta (una equivalencia son dos claves; una
 conversión es un factor). Modelarlo con una tabla por tipo sería más limpio pero
-son 8 tablas para una entidad que hoy no tiene volumen. **Queda anotado como deuda
-técnica**, no como error.
+son nueve tablas para una entidad que hoy no tiene volumen. **Queda anotado como
+deuda técnica**, no como error.
+
+### `patron_carga` cierra P-27 — confirmar una vez, no una vez por archivo
+
+El cargador reconoce una tabla sin encabezados por los datos, según ya
+fija `CONOCIMIENTO.md` §11.4; cuando no está seguro, propone en vez de
+adivinar — dato del usuario, con un cuidado explícito: que confirmar no
+se vuelva una cola que crece con cada
+archivo nuevo hasta que nadie la revise.
+
+```
+valor_propuesto (JSON, tipo=patron_carga)
+  firma             hash de la forma estructural — conteo de columnas,
+                    posición de los marcadores que identifican clave/
+                    cantidad/unidad, no del contenido de una fila
+  mapeo             qué columna es qué campo canon, propuesto por el
+                    cargador
+```
+
+**El cargador consulta primero si ya existe una `patron_carga` con esa
+`firma` exacta, `estado=aprobada`.** Si sí, aplica el mapeo sin volver a
+preguntar — la firma es de la *forma* del archivo, no del archivo en sí,
+así que un lote nuevo con la misma estructura no genera una propuesta
+nueva. Solo pide confirmación **la primera vez que aparece una forma**,
+no cada vez que aparece un archivo. El número de decisiones que le
+llegan a alguien está acotado por cuántas formas distintas existen, no
+por cuántos archivos se cargan — y eso ya se vio: doce archivos de
+`ALAMO 18` cayeron en muy pocas formas reales (`CONOCIMIENTO.md` §11.8).
 
 ---
 
