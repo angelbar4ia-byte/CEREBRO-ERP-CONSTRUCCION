@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
-corte:      2026-09-22
+corte:      2026-09-26
 verificado: Aprobado · 15 hallazgos resueltos
 ```
 
@@ -424,6 +424,100 @@ Supervisor.
 
 ---
 
+## 1c. Ensamble — el árbol un piso arriba (cierra la mitad de B-53/Paramétrico)
+
+**Ensamble no es una tabla nueva.** `CONOCIMIENTO.md` §5.1 ya lo dice: "no es
+un módulo con reglas propias, es el árbol recursivo aplicado a otro nivel de
+abstracción." Es un `NODO` con `rol=ensamble` (el valor ya existe en el enum
+de §1) cuyos hijos en `COMPOSICION` son otros nodos —`rol=ensamble` para
+sub-ensambles, `rol=concepto` para hojas— nunca insumos directos.
+
+```
+[reusa NODO + COMPOSICION de §1/§1a, sin campo nuevo, para:]
+  - plantilla/instancia (§5.2)        → heredado de PRESUPUESTO.tipo (§3)     firme
+  - de dónde sale la cantidad (§5.4)  → NODO.modo_cantidad ya cubre los 3
+                                         casos: heredada (nace del presupuesto
+                                         base) · cargada (de una ingeniería
+                                         importada) · medida (del cuantificador,
+                                         §1b, hallazgo 12)                     firme
+  - la referencia apunta al concepto,
+    no al renglón (§5.6)              → COMPOSICION.hijo_id ya apunta a NODO,
+                                         nunca a una fila de presupuesto       firme
+```
+
+### ⏸ PENDIENTE — lo genuinamente nuevo: el parámetro propio y su cohorte (B-53)
+
+`CONOCIMIENTO.md` §5.7 cerró la regla, comprobada esta sesión en los siete
+prototipos (D-311, D-312): un ensamble no escala con el m² total, escala con
+**su propio divisor** —desplante para cimentación, salidas para
+instalaciones— con una cohorte explícita (a qué población aplica) y una
+dispersión que se guarda junto al valor, nunca sola. Esto no tiene dónde
+vivir en `NODO`/`COMPOSICION` — es atributo del ensamble-plantilla, no de la
+línea del árbol.
+
+```
+ENSAMBLE_PARAMETRO
+  id
+  ensamble_id      FK Nodo — solo válido si rol=ensamble                      firme
+  parametro        enum: desplante · m2_total · salidas · piezas · ... —
+                    abierto, §5.7 solo probó desplante                        abierto
+  tasa             NUMERIC — $/parámetro, aprendido sobre obras ya
+                    cuantificadas                                             propuesto
+  cohorte          texto — a qué población aplica esta tasa (§5.7: "cada
+                    ensamble declara a qué aplica; fuera de ella, no se usa")  abierto
+  dispersion       NUMERIC — CV medido junto con la tasa (§5.7: "un precio
+                    sin su dispersión es un número disfrazado de certeza")     firme
+```
+
+**El valor del divisor para una instancia nueva no necesita campo propio.**
+Los 216 m² de desplante de una obra real ya son la `cantidad` del `NODO` de
+esa instancia, con `modo_cantidad=medida` si vino del cuantificador
+(`TRAZO`/`ENLACE_CUANTIFICACION`, §1b) o `capturada` si se declaró a mano —
+mismo mecanismo que ya existe, sin duplicarlo. `ENSAMBLE_PARAMETRO` guarda la
+**tasa** (cuánto cuesta cada unidad del divisor), no el divisor en sí.
+
+> **Aprender y generar leen el mismo campo en direcciones opuestas** (§5.10):
+> dividir cantidad medida entre divisor la escribe (`tasa`); multiplicar
+> `tasa` por el divisor de una obra nueva la usa para generar. No son dos
+> números — es el mismo, leído en un sentido o en otro.
+
+### ⏸ Lo que esto NO resuelve
+
+- **Cómo se declara la cohorte** — hoy es texto libre, sin regla de qué la
+  hace válida ni de cómo el sistema decide "esta obra cae en esta cohorte."
+  §5.7 la prueba a mano (desplante/m² total, plantas) — falta el mecanismo.
+- **Quién puede crear o aprobar un `ENSAMBLE_PARAMETRO`** — mismo pendiente
+  que el resto del modelo: sin clave todavía en `FUNCION_ATOMICA`.
+- **El constructor de matrices paramétrico (B-18)** es una capa distinta y
+  más abajo del árbol: genera la `COMPOSICION` de un **concepto** (trabe,
+  castillo) a partir de fórmula, no la de un ensamble. Motor de cálculo, no
+  schema — mismo criterio que ya excluye el resto de §6. Lo único que sí es
+  schema es la tabla de constantes físicas que ese motor consulta:
+
+```
+CONSTANTE_FISICA
+  id
+  categoria        enum: longitud_comercial · factor_corte_por_altura ·
+                    factor_traslape · desperdicio · calibre_circuito ·
+                    puntas_circuito — abierto, crece con evidencia            abierto
+  clave             qué fila específica dentro de la categoría (ej. "varilla",
+                     "castillo 4.20m")                                        firme
+  valor             NUMERIC                                                    firme
+  unidad_id         FK Unidad                                                  firme
+  fuente             texto — de dónde salió (norma, medición propia, dato de
+                     usuario)                                                  firme
+```
+
+> **Ya tiene dos filas reales, no hipotéticas** (dato del usuario,
+> `CONOCIMIENTO.md` §11.14): la vara comercial de varilla mide 12 M
+> (`categoria=longitud_comercial`);
+> un castillo de 4.20 M corta cada vara a 6 M, uno de 3.00 M la corta a 4 M
+> (`categoria=factor_corte_por_altura`) — verificado exacto contra la
+> descripción real de K3 en `ALAMO 18` (D-319). El generador de B-18 todavía no
+> existe; la tabla que va a consultar, sí.
+
+---
+
 # 2. Catálogos de vocabulario
 
 ```
@@ -482,12 +576,28 @@ dirección**: `Flete` cruza —de fuera hacia adentro, o de adentro hacia afuera
 PRESUPUESTO
   id, nombre, estado (por SUBÁRBOL, ver hallazgo 6)                    firme
   raiz_id            FK Nodo                                            firme
+  tipo               enum: plantilla · obra                             nuevo — cierra P-40, ver abajo
 
 ESTADO_CONGELAMIENTO   (por nodo, no por presupuesto)
   nodo_id            FK Nodo
   estado             enum: diseño · contratado                         firme
   fecha              cuándo cambió                                     firme
 ```
+
+### ✅ `PRESUPUESTO.tipo` cierra P-40 — y le da hogar a plantilla/instancia del ensamble
+
+**"Prototipo" era convención de nombre, no campo** (`GLOSARIO-DOMINIO.md`,
+P-40): nada distinguía, en el dato, un presupuesto de referencia reutilizable
+(Zafiro 1.0, Diamante) de uno de obra real (`ALAMO 18`) — ambos eran la misma
+fila de `PRESUPUESTO` sin marca. Un solo campo lo resuelve, sin tabla nueva:
+`estado` es por nodo (hallazgo 6, abajo) porque el avance de la obra varía
+por subárbol; `tipo` es del presupuesto entero porque **una plantilla no dejó
+de serlo a medias** — o es la receta reutilizable, o es la obra que la usó.
+
+**Este mismo campo le da hogar a la distinción plantilla/instancia del
+ensamble** (`CONOCIMIENTO.md` §5.2, `MODELO.md` §1c más abajo): un ensamble no
+declara dos veces si es plantilla o instancia — lo hereda del `PRESUPUESTO`
+que contiene su raíz.
 
 ### ⚠ HALLAZGO 6 — el estado no puede vivir en `PRESUPUESTO`
 
@@ -984,7 +1094,7 @@ catálogo de contratistas) y esto no lo resuelve ni lo intenta resolver.
 |---|---|
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
-| Paramétrico / Ensamble | Diseño en `CONOCIMIENTO.md` §5 del conocimiento, sin tabla propuesta aún |
+| Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
 | Programa / CPM | Las 22 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4). `INCIDENCIA` y el registro de avance ya tienen tabla (§5c) — falta el resto: precedencias, calendario, tramos, los dos cuantificadores |
 | Almacén | P-19 — primeros cruces reales hechos, falta el diseño del módulo completo |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
