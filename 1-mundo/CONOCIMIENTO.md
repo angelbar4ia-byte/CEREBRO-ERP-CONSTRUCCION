@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1478 | 29 |
+| §11 | Los flujos entre sistemas | 1514 | 30 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2974,6 +2974,42 @@ ancla propia (D-318, límite de dato), K3 y K8 confirmados correctos. El
 residuo de $18,494 no tiene más causa identificable desde los datos
 disponibles de `ALAMO 18` — lo que quede es del mismo tipo que la
 contratrabe, confirmable solo por el cuantificador.
+
+### B-68 cierra: cisterna y tapas eran omisión de catálogo, el resto es cola delgada sin patrón (D-320)
+
+Tres claves —`EQU-01011` (cisterna equipada), `OBE-01014` (tapa de
+cisterna) y `OBE-01021` (tapa de registro sanitario)— tienen matriz
+completa en el catálogo maestro, pero nunca se agregaron al catálogo
+reconstruido de `ALAMO 18`: no es "sin matriz", es una omisión mía al
+armar el catálogo. Sus hijos ya aparecían huérfanos en el cruce de B-68
+(`EQU-00081` +$6,035, `HER-00003` +$1,700, `HER-00001` +$2,700). Agregadas
+al catálogo (`EQU-01011` x1, `OBE-01014` x1, `OBE-01021` x3 — 3, no las 4
+de la base, confirmado por `HER-00001` real $2,700.03 ÷ $900 = 3.0003) y
+reexplotadas, las tres cuadran a la práctica exacta.
+
+`EQU-01011` y `OBE-01014` no pertenecen a las claves propias del
+prototipo 6 (se catalogaron bajo otro prototipo) — se forzó su explosión
+igual, porque son equipo genérico (una cisterna de 3,000 L no cambia por
+estilo de casa) y su real cuadra exacto, a diferencia de la matriz
+prestada (D-245) donde usar el prototipo equivocado daba un número
+equivocado.
+
+De paso, `PIN-00147` (Pintura Deville, matriz de `ACA-03047`) y
+`PIN-00138` (Pintura Arena Cálida Exterior, sin matriz) resultaron ser el
+mismo patrón que mortero/arena: la ingeniería real cambió de color/marca
+de pintura y la matriz nunca se actualizó — $5,910.66 formado contra
+$5,909.36 real, neto -$1.30. Sin impacto en dinero, pero confirma que el
+mecanismo de "receta sin actualizar" no es exclusivo del mortero.
+
+Con esto, el residuo oficial de B-68 baja de $37,133 a **$25,909**. De
+ahí, `ACR-00002` ($18,494) ya está diagnosticado sin más corrección
+posible (D-318, D-319). **Lo que queda sin `ACR-00002`: $7,415 neto**,
+repartido en 171 pares de insumo sin un patrón dominante — concreto y
+estuco sobrestimados contra lo real, tabique y pinturas por debajo,
+acero en cantidades chicas de sobra y de falta. Mismo perfil que el
+redondeo de PU ya confirmado en B-49 y la variación normal ya aceptada en
+B-67/D-314: no hay más señal que perseguir con los datos disponibles de
+`ALAMO 18`. **B-68 cierra.**
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
