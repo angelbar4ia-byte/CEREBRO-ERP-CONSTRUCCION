@@ -975,15 +975,146 @@ presupuesto PU (`CONOCIMIENTO.md` §7, mismo modo de valuación ya definido).
 
 ---
 
-## 5c. Programa — lo mínimo para que exista una incidencia y un avance
+## 5c. Programa — precedencias, calendario, tramos y los dos cuantificadores (P-20 cierra)
 
-**No es el modelo completo del programa** — precedencias, calendario, tramos
-y los dos cuantificadores siguen sin tabla (P-20, §6 abajo). Esto es solo lo
-que `INCIDENCIA` y el registro de avance necesitan para tener dónde colgar.
+**Las diez decisiones de política ya estaban cerradas**
+(`PROPUESTA-CUATRO-MODULOS.md` §4, P-1 a P-10) desde antes de que existiera
+tabla — `ACTIVIDAD` era un stub de tres campos con `INCIDENCIA` y
+`REGISTRO_AVANCE` colgando de él. Esta pasada le pone forma al resto: qué
+va antes que qué, con qué calendario, partido en cuántos tramos, y los dos
+cuantificadores que P-9 ya distinguía sin tabla donde vivir.
 
 ```
-ACTIVIDAD   (stub — el resto de sus campos los define P-20 al modelarse)
-  id, concepto_id FK Nodo, presupuesto_id FK PRESUPUESTO                  provisional
+ACTIVIDAD
+  id
+  concepto_id           FK Nodo                                             firme
+  presupuesto_id        FK PRESUPUESTO                                      firme
+  origen_captura        enum: manual_con_diseño · manual_sin_diseño ·
+                         por_carga_estructura · por_carga_fechas — el mismo
+                         patrón en los dos orígenes: Control de obra edita
+                         estructura, Residente edita fechas                 firme
+  modo_duracion         enum: capturada · calculada_rendimiento ·
+                         preestablecida_nivel · derivada_fechas — la cuarta
+                         es «manual sin diseño»: no hay días ni rendimiento,
+                         se derivan de fecha_fin − fecha_inicio              firme
+  duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas   firme
+  disparador_fecha      enum: precedencia · recurso · contractual — el
+                         contractual lo fija el anticipo o la junta de
+                         arranque, no una precedencia técnica ni una
+                         cuadrilla libre                                    firme
+  fecha_disparador      DATE, nullable — solo si disparador_fecha=contractual firme
+  fecha_inicio_real,
+  fecha_fin_real        nullable — capturadas cuando origen_captura=
+                         manual_sin_diseño o al registrarse avance          firme
+  fecha_inicio_temprana / fecha_inicio_tardia /
+  fecha_fin_temprana / fecha_fin_tardia          calculadas por el motor
+                         CPM — caché, nunca fuente de verdad (§2)           calculado
+  holgura                calculada, misma regla                             calculado
+  es_ruta_critica        boolean, calculado — recalcula siempre (P-3); solo
+                         dispara aviso cuando este valor cambia de una
+                         corrida a la siguiente, nunca cuando solo corren
+                         las fechas                                         calculado
+```
+
+### ⚠ Precedencia, calendario y tramo comparten el mismo eje de confianza
+
+Precedencia (P-1), tramo (P-5) y el origen de una duración (arriba) usan
+la **misma clasificación de tres**: técnica (física, se propone sola) ·
+recurso (media confianza, cambia si cambia la disponibilidad) · decisión
+(baja confianza, es preferencia de quien programa). No es casualidad —es
+la misma pregunta, "¿por qué existe este orden?", hecha en tres lugares
+del árbol. Un solo enum se reutiliza en las tres tablas.
+
+```
+PRECEDENCIA
+  id
+  predecesora_id        FK ACTIVIDAD                                        firme
+  sucesora_id            FK ACTIVIDAD                                       firme
+  tipo_vinculo            enum: fin_inicio · inicio_inicio · fin_fin         firme
+  traslape_espera         NUMERIC — días; negativo es traslape, positivo
+                          es espera                                          firme
+  origen                  enum: tecnica · recurso · decision                 firme — P-1
+  confianza                enum: alta · media · baja — derivada de origen,
+                          no declarada (mismo patrón que `PROPUESTA.confianza`,
+                          §5)                                                firme
+
+CALENDARIO_OBRA
+  id
+  presupuesto_id          FK PRESUPUESTO — uno por obra                      firme — P-2
+  dias_no_habiles          definición (feriados, domingos, lo que aplique)   firme
+
+CALENDARIO_EXCEPCION
+  id
+  calendario_obra_id       FK CALENDARIO_OBRA
+  cuadrilla_id               FK Cuadrilla (semilla, B-07)                     firme
+  regla                       override sobre el global — ej. "no trabaja
+                             sábados". El global manda salvo excepción       firme — P-2
+
+TRAMO
+  id
+  actividad_id               FK ACTIVIDAD                                    firme
+  orden                        posición dentro de la actividad                firme
+  fecha_inicio, fecha_fin                                                     firme
+  origen                       mismo enum que `PRECEDENCIA.origen` — técnica
+                             se deduce sola de una precedencia física (la
+                             cadena que interrumpe el muro); recurso o
+                             decisión se capturan a mano, no hay de dónde
+                             deducirlos                                      firme — P-5
+  reparto_material             NUMERIC o % — calculado por default,
+                             editable (`MEMORIA.md` D-259, «declarado
+                             menos calculado»)                                firme — P-5
+```
+
+### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
+
+`PROPUESTA-CUATRO-MODULOS.md` §4 ya distinguía los dos sin tabla: el
+cuantificador de presupuesto (§1b) **fija el techo**, no se pretende
+superar; el cuantificador de programación **mide contra ese techo, con
+tolerancia**. Mismo mecanismo de `TRAZO`, otro destino del enlace:
+
+```
+ENLACE_CUANTIFICACION_PROGRAMA
+  id
+  trazo_id                FK TRAZO (§1b) — el mismo trazo puede alimentar
+                          presupuesto y programa a la vez, con dos enlaces  firme
+  actividad_id              FK ACTIVIDAD, en vez de FK Nodo                  firme
+  medida, factor              igual que `ENLACE_CUANTIFICACION`              firme
+  vigente                      igual                                        firme
+```
+
+**El umbral no es mecanismo nuevo.** Reusa `ALERTA.parametro_usado`
+(`MODELO.md` §5a), que ya trae `{"umbral_pct": 20}` como su propio ejemplo.
+Cruzar el umbral dispara la alerta; Control decide si es incidencia real
+o se descarta (P-9) — no crea la incidencia por sí solo.
+
+### Frente gana su primer par de tablas propias — cierra B-56, P-6 y P-20 en ese punto
+
+`Frente` seguía siendo puro catálogo informativo (`CATALOGOS.md`: "no
+valida, no impide, no calcula"). El tope de cuadrillas (B-56, ya resuelto
+como política) y el cierre de frente son sus dos primeros eventos reales
+— ninguno lo convierte en validador: el tope se declara, no se calcula
+del catálogo, y el cierre pregunta, no impide.
+
+```
+FRENTE_TOPE_CUADRILLA
+  id
+  frente_id                FK Frente                                        firme
+  oficio_id                  FK Familia (el oficio, no el frente completo —
+                            cimentación usa albañil y peón en instalaciones
+                            a la vez, eso es normal)                          firme
+  tope                       INTEGER — cuántas cuadrillas del mismo oficio
+                            caben sin estorbarse                             firme — P-6
+  capturado_por, fecha         media confianza, mismo origen que una
+                            precedencia de recurso                           firme
+
+CIERRE_FRENTE
+  id
+  frente_id                 FK Frente
+  solicitado_por             FK USUARIO — Residente, al 90% de avance        firme
+  aprobado_por, aprobado_en   FK USUARIO — Supervisor                         firme
+  validado_por, validado_en    FK USUARIO — Control de obra                  firme
+  incidencia_calidad_id        FK INCIDENCIA, nullable — si el cierre
+                              levantó una                                    firme
 
 INCIDENCIA
   id
@@ -1019,10 +1150,42 @@ modela dejando `aprobado_por`/`validado_por` en null cuando el paso se salta,
 no con un valor especial. **`REGISTRO_AVANCE` separa físico de pagado por
 fila, no por columna** — es la forma más directa de que ninguno sobrescriba
 al otro: son filas distintas, con su propia fecha y su propio autor.
+**`CIERRE_FRENTE` sigue la misma forma que `INCIDENCIA`** a propósito —tres
+pasos, cada uno nullable si se salta— porque es el mismo patrón de
+aprobación, aplicado a un trámite distinto.
 
-> **Quién puede escribir cada campo queda sin nombrar** — mismo pendiente
-> que arriba: las funciones de aprobar/validar/ejecutar una incidencia no
-> tienen clave todavía en `FUNCION_ATOMICA`.
+**Dos reglas de política no piden campo nuevo, piden reusar lo que ya
+existe:**
+
+- **P-4, fechas contratadas no se mueven solas** — reusa
+  `ESTADO_CONGELAMIENTO` (§3) sobre el `concepto_id` de la actividad: una vez
+  `contratado`, `fecha_inicio_real`/`fecha_fin_real` no se editan directo,
+  igual que el precio no se edita directo en un nodo contratado. Reprogramar
+  propone la fecha nueva; alguien la acepta.
+- **P-7, el rendimiento real nunca sobrescribe el teórico** — `duracion_dias`
+  quedó `firme` como la teórica; el real (`CONOCIMIENTO.md` §11.16,
+  `CONOCIMIENTO.md` §11.17, ya con datos de `ALAMO 18`) da una **segunda
+  proyección calculada al vuelo**, comparando contra `duracion_dias`, no un
+  campo paralelo que duplique el dato y pueda desincronizarse. Si diverge
+  más de un umbral
+  sugerido (2 a 4 semanas de datos, no un número fijo), avisa — nunca
+  reprograma sola.
+
+> **Quién puede escribir cada campo sigue sin nombrar** — mismo pendiente
+> en todo el módulo: aprobar/validar/ejecutar una incidencia, solicitar o
+> validar un cierre de frente, editar estructura contra editar fechas
+> (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
+
+### ⏸ Lo que esto sigue sin resolver
+
+- **Reglas de visualización declaradas como regla de negocio** (rótulo de
+  barra, las dos escalas de Gantt, vincular/configurar vínculo por
+  separado) — el texto de política las marca explícitamente como no
+  preferencia de pantalla, pero no piden tabla propia todavía: son
+  parámetros de una pantalla, no una entidad. Se resuelve al diseñar esa
+  pantalla, no aquí.
+- **`FUNCION_ATOMICA`** no gana ninguna clave nueva en esta pasada — quedan
+  nombradas en prosa (arriba), sin asignar a rol.
 
 ---
 
@@ -1095,7 +1258,7 @@ catálogo de contratistas) y esto no lo resuelve ni lo intenta resolver.
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
-| Programa / CPM | Las 22 decisiones de política ya cerraron (`PROPUESTA-CUATRO-MODULOS.md` §4). `INCIDENCIA` y el registro de avance ya tienen tabla (§5c) — falta el resto: precedencias, calendario, tramos, los dos cuantificadores |
+| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad) |
 | Almacén | P-19 — primeros cruces reales hechos, falta el diseño del módulo completo |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |

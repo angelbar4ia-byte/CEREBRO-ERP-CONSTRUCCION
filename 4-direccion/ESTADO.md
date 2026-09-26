@@ -102,11 +102,11 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326 |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 326 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 327 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 79 términos · 25 ambigüedades |
-| **Módulos** | Las 22 decisiones de los cuatro cerradas (CPM cierra con P-10: reiniciar programa no toca lo registrado) · Cuantificador con tabla (`MODELO.md` §1b) · Factorizador y CPM listos para diseño formal |
+| **Módulos** | Las 22 decisiones de los cuatro cerradas (CPM cierra con P-10: reiniciar programa no toca lo registrado) · Cuantificador con tabla (`MODELO.md` §1b) · 🆕 CPM con tabla completa (`MODELO.md` §5c, D-327) — `ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE` · Factorizador listo para diseño formal |
 | **Estimación** | 🆕 Cierra P-18 — dos fuentes, el tope es el mismo techo del cuantificador de presupuesto (D-273/D-285), topes pagados = Tope − Pagado, deducciones/retenciones/préstamos definidos. Validado contra un archivo real: 0 de 416 filas exceden el tope. `CONOCIMIENTO.md` §13.8 |
 | **Pruebas de flujo** | 🆕 Tres corridas: ALAMO 18, Zafiro 1.0, siete prototipos · 13 pasan, 8 se rompen, 5 sin dato |
 | **Invariantes** | 🆕 Las cifras de control, juntas · condición de paro |
