@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1531 | 30 |
+| §11 | Los flujos entre sistemas | 1556 | 31 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3201,12 +3201,37 @@ pagado esa semana no tiene material que lo respalde.**
 > *después* del pago —cuando ya no hay oportunidad de comparar— en vez de al
 > momento de preparar la estimación.
 
+### Las otras cuatro operaciones de abril: limpias, pero sin testigo de material posible
+
+Abril trae seis operaciones de destajo en Lote 18, no solo `EST-02010`. Las
+otras cuatro —`MOS-01020` salida de respiración, `MOH-05010` llave
+vertedero, `MOE-01012` punta TV, `MOG-05030` gas estufa— son instalaciones
+puntuales: sin material masivo (cemento, tabique) que sirva de testigo
+independiente. Revisados sus 38 renglones de avance: **ningún caso de
+avance pagado por encima de lo requerido dentro del propio registro del
+ERP**, en ninguna de las cuatro.
+
+> Esto no cierra la pregunta de fondo — un avance/requerida limpio **dentro
+> del ERP** no es lo mismo que un avance respaldado por material real, es
+> la misma distinción que ya separó la semana 18 de la semana 19 arriba.
+> Pero estas cuatro operaciones no tienen cómo probarse contra un testigo de
+> material: una salida de TV o una llave de vertedero no consumen un insumo
+> "por pieza" que se pueda cruzar contra almacén, a diferencia del cemento
+> por M2 de muro. **El cruce material-contra-avance solo aplica —y solo
+> hace falta— donde hay detrás una partida de material masivo**; para
+> instalación puntual, la única vía de verificación sería otra (conteo
+> físico, no consumo). Acota el alcance del método, no lo contradice.
+
 ### Idea a futuro, sin diseñar
 
 Automatizar este mismo cruce (salida de cemento del día/semana contra el M2 que se
 va a estimar) para que corra **al preparar la estimación, antes del cierre del
 viernes** — hoy este cruce se hizo a mano y después del hecho.
-`PENDIENTES-MEJORAS.md` B-70.
+`PENDIENTES-MEJORAS.md` B-70. **Solo un mes de almacén está cargado** (abril) —
+verificado que un segundo archivo de avance (`_28.xlsx`) era el mismo abril
+con otro nombre, mismo patrón de doble exportación que B-64. Cargar más
+meses reales es condición para extender esta prueba más allá de dos
+conceptos.
 
 ## 11.18 Los controles de cambio de ALAMO 18 — CC-ALM-18XXX
 
