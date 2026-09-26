@@ -1132,6 +1132,51 @@ falta nombrarlo. `firma` queda así: conteo de columnas, posición de
 clave/cantidad/unidad, y si la columna de agrupador está siempre vacía,
 siempre con prefijo de nivel/etapa, o siempre con prefijo de concepto.
 
+### `matriz_generada` cierra la mitad de P-22 — ya tenía enum, nunca tuvo forma
+
+`tipo=matriz_generada` lleva en la lista de arriba desde que se escribió
+esta tabla, sin `valor_propuesto` propio — el mismo hueco que dejó a
+`APRENDIZAJE.md` naciendo de una referencia rota: `CONOCIMIENTO.md`
+señalaba «el ciclo del agente que aprende de lo decidido» hacia una
+sección que hablaba de otra cosa, la matriz a partir de la descripción,
+`IDEAS.md` §1. Esa idea ya traía la decisión de fondo, solo sin schema:
+**razonar por analogía, no generar.**
+
+```
+valor_propuesto (JSON, tipo=matriz_generada)
+  analogo_id            FK Nodo — el concepto o compuesto existente más
+                        parecido, con su propia COMPOSICION ya aprobada
+  parametros_extraidos  JSON — lo leído de la descripción (espesor,
+                        altura máxima, desarrollo…) que escala las
+                        cantidades del análogo
+  composicion_propuesta JSON — estructura e insumos del análogo,
+                        copiados tal cual; solo la cantidad cambia,
+                        escalada por los parámetros de arriba
+```
+
+**Las cantidades nunca se generan de cero** (`IDEAS.md` §1: «un agente
+que las genere produce números plausibles y equivocados, peor que
+dejarlas vacías»). Se copian de `analogo_id` y se escalan — verificable
+contra un caso real, no adivinanza. Si no hay análogo con parecido
+suficiente, no se genera propuesta: se dice, no se rellena.
+
+**El corpus contra el que se busca el análogo no es tabla nueva — es
+`PROPUESTA(tipo=matriz_generada, estado=aprobada)` acumulada**, mismo
+mecanismo que ya cierra `APRENDIZAJE.md` en general: el rechazo enseña
+tanto como la aprobación (§3 de ese archivo — «el rechazo es la mitad
+del corpus»), así que una `matriz_generada` rechazada también queda
+indexada, no se descarta. El corpus semilla ya existe y es real: los 89
+conceptos que solo cambian de prototipo y las 22 familias detectadas
+(`DICCIONARIO-DATOS.md`) — no arranca vacío. Buscar cuál es «el más
+parecido» sigue siendo código, no schema, mismo criterio que el resto de
+§6: esta pasada solo le da forma a lo que ya se decide proponer.
+
+**La otra mitad de P-22 es B-18** (`IDEAS.md` §4): generar por fórmula en
+vez de por analogía, para lo estructural donde sí hay cálculo exacto
+detrás. Las dos rutas conviven — no compiten — y B-18 sigue abierto,
+bloqueado en constantes físicas que este archivo no trae (peso por
+metro de varilla, factores de traslape y gancho), no en diseño.
+
 ---
 
 ## 5a. La alerta — cuando algo no cuadra y nadie lo declaró
