@@ -1094,7 +1094,10 @@ archivo nuevo hasta que nadie la revise.
 valor_propuesto (JSON, tipo=patron_carga)
   firma             hash de la forma estructural — conteo de columnas,
                     posición de los marcadores que identifican clave/
-                    cantidad/unidad, no del contenido de una fila
+                    cantidad/unidad, y el patrón de llenado de la
+                    columna de agrupador (nunca · siempre con prefijo de
+                    nivel/etapa · siempre con prefijo de concepto) —
+                    nunca el contenido de una fila, P-26/D-351
   mapeo             qué columna es qué campo canon, propuesto por el
                     cargador
 ```
@@ -1108,6 +1111,26 @@ no cada vez que aparece un archivo. El número de decisiones que le
 llegan a alguien está acotado por cuántas formas distintas existen, no
 por cuántos archivos se cargan — y eso ya se vio: doce archivos de
 `ALAMO 18` cayeron en muy pocas formas reales (`CONOCIMIENTO.md` §11.8).
+
+### La firma necesita un dato más para las cinco formas de la ingeniería — cierra P-26
+
+`CONOCIMIENTO.md` §11.8 documenta cinco estructuras reales, y el conteo
+de columnas por sí solo separa solo tres grupos: 5 columnas
+(`Sin costear`), 6 (`Ajena`) y **7 para Completa, Suelta y Con concepto a
+la vez** — la misma firma, si `firma` fuera solo conteo de columnas más
+qué columna es cuál. Lo que las distingue no está en qué columna es la
+del agrupador, sino en **cómo se llena esa columna**: nunca (`Suelta`,
+«sin agrupador, solo insumos»), en la primera fila de cada bloque con un
+prefijo de nivel/etapa (`Completa`), o con un prefijo de concepto
+(`Con concepto`) — el mismo patrón que ya fijó `CONOCIMIENTO.md` §11.5
+(«col 0, clave del agrupador, solo en la primera fila del bloque») y
+`CONOCIMIENTO.md` §11.8 («después de una fila vacía siempre viene un
+agrupador», 155 de 155 casos). **Sigue siendo estructura, no contenido de una fila**: es el
+patrón de llenado de una columna a través de todo el archivo, la misma
+clase de dato que ya captura «posición de los marcadores» — solo hacía
+falta nombrarlo. `firma` queda así: conteo de columnas, posición de
+clave/cantidad/unidad, y si la columna de agrupador está siempre vacía,
+siempre con prefijo de nivel/etapa, o siempre con prefijo de concepto.
 
 ---
 
