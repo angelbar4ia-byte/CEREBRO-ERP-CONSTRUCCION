@@ -209,7 +209,7 @@ puede escribir de lo que primero hay que definir.
 | B-06 | **`importacion`** | Carga desde OPUS: 4 columnas obligatorias, alias, placeholders, huella, versionado | ✅ Definidas | B-03, B-05 |
 | B-07 | **Semilla** | Cuadrilla y rendimiento teórico, una sola vez | ✅ El archivo ya existe | B-03 |
 | B-08 | **`exportacion`** | Cabeceras, Materiales, Operaciones + los 4 catálogos que se volvieron salida | 🔶 **P-14** — Cabeceras/Materiales/Operaciones resueltas contra especímenes reales (D-331); los 4 catálogos de salida siguen sin columna, falta el catálogo viejo | B-05 |
-| B-09 | **Traductor de dialectos** | Canon, mapeo por ficha, prueba de ida y vuelta | 🔶 Canon listo; falta el segundo dialecto | B-06 |
+| B-09 | **Traductor de dialectos** | Canon, mapeo por ficha, prueba de ida y vuelta | 🔶 Canon listo; el segundo dialecto (ERP externo) avanza —dos campos de entrada, tres reportes de salida confirmados y el join entre ellos validado, `LENGUAJE.md`, D-331/D-332— pero no cierra: falta `Flete`, archivo-vs-API, los 4 catálogos de salida y una prueba de ida y vuelta propia de este lado | B-06 |
 
 ### Sobre el modelo ya definido
 

@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo se nombra en cada sistema?
 tiempo:     es así
-corte:      2026-09-10
+corte:      2026-09-26
 verificado: Canon 1.0 · prueba de ida y vuelta ejecutada
 ```
 
@@ -287,7 +287,7 @@ PRUEBA
 | Dialecto | Canon | Conexión | Estado |
 |---|---|---|---|
 | **OPUS 2025** | 1.0 | Fuente | ✅ Mapeado y probado |
-| **ERP externo** | 1.0 | B · correspondencia | ⏸️ Solo dos campos conocidos |
+| **ERP externo** | 1.0 | B · correspondencia | 🔶 Dos campos de entrada + tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3, D-331/D-332); falta `Flete`, archivo-vs-API y los 4 catálogos que se volvieron salida |
 | **Árbol de ingeniería** | — | — | ⏸️ P-16, no prioritario |
 
 ---

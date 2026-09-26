@@ -19,7 +19,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §1 | Identidad y posición | 94 | 4 |
 | §2 | Importación desde OPUS | 386 | 9 |
 | §3 | Notas de implementación | 129 | 5 |
-| §4 | Estados del nodo y exportación | 131 | 3 |
+| §4 | Estados del nodo y exportación | 144 | 3 |
 | §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
 | §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
@@ -767,6 +767,19 @@ dialecto OPUS, sin conectarlas todavía a esta pregunta.
 > trata como `categoria` propia, distinta de material y de mano de obra
 > (`LENGUAJE.md`) — ninguno de los tres reportes tiene todavía un lugar
 > declarado para él.
+
+### El cruce confirma que es el mismo árbol, no columnas parecidas (D-332)
+
+467 de los 596 `Clave Padre` distintos de `ANALISIS_DE_BASICOS_CONCEPTOS.csv`
+(78%) son `Concepto` real en `CATALOGO_DE_PRESUPUESTO.csv` — join directo. Los
+129 restantes son códigos de matriz auxiliar (`AUX-`, `MOCU-`, `MEZ-`), y esos
+mismos códigos son, sin excepción, los 89 `Clave Padre` de
+`ANALISIS_DE_BASICOS_COMPUESTOS.csv` — ninguno de los 89 aparece en Cabeceras,
+**por diseño**: son un nivel más profundo del mismo árbol, la matriz dentro de
+la matriz que la explosión recursiva de concepto/APU/compuesto ya conocía
+(§5.1). No hay huérfanos: todo `Clave Padre` resuelve a Cabeceras directo o a
+través de un compuesto que a su vez resuelve. **No es que las columnas se
+parezcan — es el mismo árbol, verificado por el join, no solo por la forma.**
 
 **Lo que sigue sin especificar:** dónde cae `Flete`; si el ERP externo
 consume estos tres por archivo o por API (ningún espécimen lo dice); y
