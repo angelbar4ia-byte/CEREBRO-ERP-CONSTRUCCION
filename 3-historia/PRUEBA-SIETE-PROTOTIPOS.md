@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿el camino paramétrico aguanta sobre el catálogo real?
 tiempo:     fue así
-corte:      2026-09-13
-verificado: 6 etapas · 3 pasan · 3 se rompen
+corte:      2026-09-26
+verificado: 6 etapas · 2 pasan · 1 con matices · 2 diseñadas sin caso real que las ejerciten · 1 sin poder probarse
 ```
 
 > **Tercera prueba (B-42).** Las otras dos siguen **una obra**. Ésta sigue **el
@@ -25,8 +25,8 @@ verificado: 6 etapas · 3 pasan · 3 se rompen
 | 2 | Paramétrico por subcapítulo | ⚠️ **Pasa en 3 de 6** |
 | 3 | La cohorte como explicación | ✅ Pasa — el mejor resultado |
 | 4 | La dispersión como diagnóstico | ✅ Pasa |
-| 5 | El parámetro propio | ⛔ **Sin probar: no hay los datos** |
-| 6 | Extracción y generación | ⛔ No existe |
+| 5 | El parámetro propio | 🔶 **Diseñado (B-53)** — desplante ya se usó con dato real; salidas y el parámetro de Herrería siguen sin confirmarse |
+| 6 | Extracción y generación | 🔶 **Diseñado desde antes** (`CONOCIMIENTO.md` §5.8) — ninguna dirección construida |
 
 ---
 
@@ -102,6 +102,12 @@ dispersión, es otra población.
 > mejora el número no queda probada por mejorarlo.** El 32% que quedaba en el otro
 > subgrupo era la señal de que faltaba explicación, y se leyó como ruido.
 
+> **Actualización 2026-09-26 — B-52 ya contestó qué es.** Medido contra el
+> desplante declarado en la propia losa de cimentación de cada prototipo (no el
+> número de plantas), los siete caen en el mismo rango, CV 6.0%. `Zafiro Plus` y
+> `Oro` tenían mucha más planta alta relativa que los otros cinco — por eso salían
+> «1.71× abajo» al dividir entre m² total. `CONOCIMIENTO.md` §5.7, D-312
+
 ---
 
 ## 4 · La dispersión como diagnóstico — ✅
@@ -120,7 +126,7 @@ mostrara como aviso, los tres se verían igual.
 
 ---
 
-## 5 · El parámetro propio — ⛔ no se puede probar
+## 5 · El parámetro propio — 🔶
 
 Está decidido que cimentación escala con desplante e instalaciones con salidas
 (D-98). **Pero no hay datos para comprobarlo:** el catálogo trae m² construidos, no
@@ -139,18 +145,36 @@ superficie de desplante ni número de salidas.
 Y cierra un círculo con la prueba de ALAMO 18: **el cuantificador es el que produciría
 esos parámetros.** Sin él, el paramétrico está limitado a lo que el catálogo ya trae.
 
+> **Actualización 2026-09-26 — diseñado, y parcialmente probado con dato real.**
+> `ENSAMBLE_PARAMETRO` (B-53, `MODELO.md` §1c, D-325) le da dónde vivir a
+> tasa/cohorte/dispersión; el resto —plantilla/instancia, origen de cantidad,
+> referencia al concepto— ya lo cubrían `NODO`/`COMPOSICION` sin campo nuevo. El
+> desplante en concreto ya se usó con dato real, declarado en la propia losa de
+> cimentación de cada prototipo (arriba, B-52). Pero el cuantificador que
+> produciría estos valores de forma sistemática para un caso nuevo **sigue sin
+> existir** — `PRUEBA-ALAMO-18.md` etapa 3 sigue `⛔` — y el parámetro propio de
+> Herrería sigue sin identificarse. Por eso queda en `🔶`, no en `✅`: tiene schema
+> y un caso real parcial, no el mecanismo completo.
+
 ---
 
-## 6 · Extracción y generación — ⛔
+## 6 · Extracción y generación — 🔶
 
 No existen. Las dos direcciones están diseñadas (§5.8) y ninguna construida.
+
+> **Actualización 2026-09-26 — cambia el símbolo, no el contenido.** Este mismo
+> texto ya decía «diseñadas, ninguna construida» desde 2026-09-13 — es exactamente
+> lo que `🔶` significa en las otras dos pruebas de flujo. Se corrige el símbolo
+> para que las tres cuenten igual (B-42).
 
 ---
 
 # Resultado
 
-**Tres pasan, tres se rompen**, y las tres roturas son de un tipo distinto al de las
-otras pruebas:
+**Dos pasan, una tiene matices, dos quedan diseñadas sin caso real que las
+ejerciten, una no se puede probar.** Cuando se corrió esta prueba (2026-09-13) el
+resumen era otro —tres pasan, tres se rompen— y las tres roturas eran de un tipo
+distinto al de las otras pruebas:
 
 | Prueba | Modo de fallo |
 |---|---|
@@ -160,6 +184,15 @@ otras pruebas:
 
 > Tres modos de fallo distintos, y ninguno se arregla igual. Eso por sí solo
 > justificaba correr las tres.
+
+> **Actualización 2026-09-26.** El modo de fallo de esta prueba seguía siendo
+> cierto en parte: el desplante sí estaba, declarado en la propia losa de
+> cimentación de cada prototipo, y ya se usó con dato real para cerrar B-52. Lo que
+> sigue faltando es el mecanismo que produzca ese dato de forma sistemática para un
+> caso nuevo (el cuantificador, todavía `⛔` en `PRUEBA-ALAMO-18.md`) y el parámetro
+> propio de Herrería, que sigue sin identificarse. Por eso la etapa 5 pasa de `⛔` a
+> `🔶` y no a `✅`. La etapa 6 solo corrige símbolo: «diseñadas, ninguna construida»
+> ya era `🔶` desde el 2026-09-13, en todo menos el nombre.
 
 ## Lo que validó
 
