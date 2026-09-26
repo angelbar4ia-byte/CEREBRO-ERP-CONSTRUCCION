@@ -681,10 +681,13 @@ PRESUPUESTO.elegido       boolean, default false — solo si tipo=escenario.
 Comparar «6 meses contra 8 meses» no pide tabla nueva: son dos
 `PRESUPUESTO(tipo=escenario)`, cada uno con su propio `ACTIVIDAD`.
 
-**Crear un escenario es clonar el árbol de la obra**, reusando
-`procedencia=clonación` (canon, `LENGUAJE.md`) — la operación de copiar
-es código, no schema, mismo criterio que excluye el resto de `MODELO.md`
-§6.
+**Crear un escenario de precio/proveedor o de alcance es clonar el árbol
+de la obra** (reusando `procedencia=clonación`, canon `LENGUAJE.md` — la
+operación de copiar es código, no schema, mismo criterio que excluye el
+resto de `MODELO.md` §6); **uno de programa no necesita clonar nada**:
+sus `ACTIVIDAD` pueden apuntar a los mismos `concepto_id` de la obra,
+solo con `presupuesto_id` distinto — comparar calendarios no exige
+duplicar el árbol de costo que no cambia.
 
 **Elegir un escenario no reemplaza la obra — se traduce a ella.** La
 identidad de `PRESUPUESTO(tipo=obra)` nunca cambia: una vez que tiene
@@ -1575,6 +1578,13 @@ repetida que `CONOCIMIENTO.md` §11.15 ya documentó.
 ```
 MOVIMIENTO_ALMACEN
   id
+  presupuesto_id     FK PRESUPUESTO — se resuelve de la columna `Lote`
+                      (numérica) al importar, **no** de `Ubicacion` (nombre
+                      de calle, cruza varios lotes) ni de `# Lote` (siempre
+                      `S/L`, es otro campo) — la misma trampa que
+                      `CONOCIMIENTO.md` §11.15 ya documentó. Es la única
+                      forma de filtrar por obra en los motivos que no
+                      tienen `nodo_id`                                       firme — nuevo
   clave              texto — el insumo (`# Parte`)                          firme — nuevo
   cantidad           NUMERIC con signo — `Efecto Qty`: + entrada, - salida   firme — nuevo
   costo_total        NUMERIC con signo — `Efecto Costo`, el impacto en
@@ -1625,7 +1635,7 @@ dos motivos distintos, no una lectura que haya que calcular:
 dice, mismo criterio que evitó un campo nuevo en P-7 (`CONOCIMIENTO.md`
 §5c).
 
-### El corte matricial es vista, no tabla
+### El corte matricial es vista, no tabla — y solo alcanza donde hay `nodo_id`
 
 `CONOCIMIENTO.md` §13.6 ya lo describe: insumo × concepto, con lo teórico
 (`COMPOSICION.cantidad`, vía `nodo_id`), lo surtido/consumido
@@ -1634,6 +1644,13 @@ dice, mismo criterio que evitó un campo nuevo en P-7 (`CONOCIMIENTO.md`
 rendimiento real del programa (P-7) y que
 `ESTADO_CARGA.porcentaje_cargado`: nunca un campo paralelo que se
 desincronice.
+
+**El cruce por concepto solo corre sobre `motivo=implosion`** — es el
+único motivo con `nodo_id`, el mismo que ya usaron para esto
+`CONOCIMIENTO.md` §11.16 y `CONOCIMIENTO.md` §11.17. `salida_produccion`
+no tiene concepto, solo `nivel`:
+compara contra el presupuesto por etapa, no insumo por insumo — más
+grueso, no el mismo cruce.
 
 ### Las devoluciones no tienen espécimen real todavía
 
@@ -1693,7 +1710,7 @@ cuatro de las cinco columnas ya tenían tabla, y la quinta ya tenía
 |---|---|---|
 | Presupuesto Base | `PRESUPUESTO(tipo=plantilla)` — su árbol, su matriz | No — cierra con P-40, §3 |
 | Ingeniería (del lote) | `PRESUPUESTO(tipo=obra)` — su propio árbol, su cantidad y matriz reales tal como quedaron tras el rediseño | No — §1, §1a |
-| Pagado Real | `ESTIMACION_LINEA` (§5d) para destajo/MO · `MOVIMIENTO_ALMACEN` con `motivo=recepcion` (§5e) para material | No — cerraron hoy mismo |
+| Pagado Real | `ESTIMACION_LINEA` (§5d) para destajo/MO · `MOVIMIENTO_ALMACEN` con `motivo` ∈ {`salida_produccion`, `implosion`} (§5e) para material — **no** `recepcion`: esa entra a almacén general, sin `presupuesto_id` (`Lote` vacío en las 1,767 filas reales), no se le puede atribuir a una obra | No — cerraron hoy mismo, corregido en auditoría (D-337) |
 | Presupuesto Formado | Cálculo, no tabla — ver abajo | No |
 | Control de Cambio | `PROPUESTA(tipo=orden_cambio)` — ya existía en el enum, sin forma escrita para `valor_propuesto` | Solo la forma, no la tabla |
 
@@ -1701,6 +1718,12 @@ cuatro de las cinco columnas ya tenían tabla, y la quinta ya tenía
 «el cerebro nunca guarda un valor vigente» — este módulo es la consulta que
 hoy corre a mano en un script fuera del repositorio, no un lugar nuevo
 donde guardar el número.
+
+> **`PRESUPUESTO(tipo=escenario)` (§3a) queda fuera de este reporte por
+> diseño** — Ingeniería lee solo `tipo=obra`, nunca sus escenarios
+> candidatos. Un escenario se compara contra su obra o contra otro
+> escenario con la misma mecánica (Base/Formado/Efecto), pero eso es
+> otra consulta, no una sexta columna aquí.
 
 ### Presupuesto Formado es el cruce de dos instancias, no una tercera
 
