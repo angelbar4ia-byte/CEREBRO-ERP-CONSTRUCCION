@@ -75,8 +75,8 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ M-15 | ~~Duplicados exactos de concepto~~ | 22 casos: `ISN-02001`≡`ISN-02005`, `CAN-01001`≡`CAN-01011` | **Resuelto: `EQUIVALENCIA` ya cubre esto**, `tipo=duplicado_exacto`, aprobada en `MODELO.md` §4 desde el 10 de septiembre. Sin fusionar claves. D-194 |
 | ✅ M-16 | ~~Mismo concepto en dos familias~~ | `CAR-01030` ≡ `ICA-01030`, texto idéntico | **Resuelto, igual que M-15.** D-194 |
 | ✅ M-13 | ~~Moneda extranjera declarada y muerta~~ | `Costo base M. E.` en cero en los 387 | **Resuelto: no se modela hoy.** Se retoma el día que haga falta convertir a moneda extranjera. `MODELO.md` §6, D-186 |
-| M-17 | Precio inconsistente entre presentaciones | `ELE-00044` en PZ a $580 y `ELE-00046`, misma descripción, en M a $29 | Verificar cuál es el correcto |
-| M-18 | Mismo material en dos familias y presentaciones | Pija lámina: `COM-00200` en CJ a $8.96, `ELE-00048` en PZ a $0.50 | Igual |
+| ✅ M-17 | ~~Precio inconsistente entre presentaciones~~ | `ELE-00044` en PZ a $580 y `ELE-00046`, misma descripción, en M a $29 | **Resuelto: no son inconsistentes, son presentaciones reales distintas.** `ELE-00044` es el rollo completo (50 M, PZ); `ELE-00046` es el metro suelto (M) — el metro suelto cuesta más por metro equivalente ($29 contra $11.60 del rollo), como es normal al menudeo. La ingeniería real de `ALAMO 18` confirma que las dos presentaciones se compran de verdad. Lo desactualizado es el precio de referencia de ambas por igual (~2× por debajo del real comprado) — mismo mecanismo ya cubierto por el histórico de precios, P-07/P-08. D-323 |
+| ✅ M-18 | ~~Mismo material en dos familias y presentaciones~~ | Pija lámina: `COM-00200` en CJ a $8.96, `ELE-00048` en PZ a $0.50 | **Resuelto: no es el mismo material.** `COM-00200` es Pija Lámina 8 X 1/2"; `ELE-00048` es Pija Lámina 8 X 1 1/2" — tres veces más larga. El nombre corto coincide, la descripción completa no. Nada que corregir. D-323 |
 
 ---
 
@@ -92,8 +92,8 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ P-06 | ~~Precisión de cantidades~~ | **Resuelto: no hace falta definir por unidad.** `cantidad` es `NUMERIC` sin precisión ni escala fijas — se guarda lo que llegó, igual que ya pedía erp-construccion.md §9 para el arrastre de Excel. D-185 |
 | ✅ P-07 | ~~Histórico de precios~~ | **Resuelto: `PRECIO_HISTORICO` por insumo** (fuente `catalogo`/`ingenieria`), independiente de `VERSION_CONCEPTO`, que ahora congela su `pu` al cambiar de huella o al pasar a contratado. `MODELO.md` §4a, hallazgo 15. D-226 a D-230 |
 | ✅ P-08 | ~~Antigüedad dispar de precios~~ | **Resuelto: consulta directa sobre `vigente_desde`** de la fila activa de cada insumo en `PRECIO_HISTORICO` — sin mecanismo nuevo |
-| P-09 | 4 conceptos sin costear | `IGAS-02131`, `IGAS-02132`, `ISN-02061`, `ACC-00003` |
-| P-10 | Agrupadores sin costear | `ACA-00021 Cubiertas cocina` y `NIV-00015 Consumibles`, en cero en los 7 prototipos |
+| P-09 | 4 conceptos sin costear | `IGAS-02131`, `IGAS-02132`, `ISN-02061`, `ACC-00003`. **Verificado: no aparecen ni una vez en `ANALISIS_DE_BASICOS_CONCEPTOS`/`COMPUESTOS`** (ni como padre ni como hijo) — no hay dato disponible en este cerebro para decidir por qué. Requiere `CATALOGO_DE_CONCEPTOS`/`CATALOGO_DE_TRABAJOS`, no subidos a esta sesión |
+| 🔶 P-10 | Agrupadores sin costear | `ACA-00021 Cubiertas cocina` y `NIV-00015 Consumibles`, en cero en los 7 prototipos. **`NIV-00015` resuelto: es un `Subcapítulo` declarado sin un solo hijo en ningún prototipo — mismo patrón que Acarreo, P-02, no falta nada.** `ACA-00021` (Nivel 3, $0 en los 7) sigue abierto: hipótesis fuerte de que es acabado elegido por cliente sin receta genérica (mismo patrón que piso, D-315), sin confirmar. D-323 |
 | 🔧 P-11 | **Corregir el prefijo `AUX-`** | **Diseño completo en `IDEAS.md` §6**: clonar y sustituir, con el viaje de vuelta resuelto por homologación (`CONOCIMIENTO.md` §16.2). No queda decisión — falta ejecutarlo sobre las 79 claves reales |
 | ✅ P-12 | ~~¿La subfamilia es obligatoria?~~ | **No.** `subfamilia_id` es nullable — resuelto en `MODELO.md` §1 y en B-51/D-149. Este renglón quedó sin sincronizar cuando eso se cerró; D-183 |
 | ✅ P-13 | ~~**Identidad compartida**~~ | **El mecanismo y el único caso conocido ya están decididos:** D-41 (contar referencias vivas) y `LENGUAJE.md`, «El ERP externo → B · correspondencia». Lo que falta no es la forma: es llenar el resto de su ficha de mapeo |
@@ -111,8 +111,8 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ P-25 | ~~El presupuesto llega por partes~~ | **Resuelto, las tres.** Se suman; el sistema sabe si está completo comparando contra el presupuesto; y cuando falta una parte, **carga igual y avisa** — nunca bloquea (D-30) — con `ESTADO_CARGA` llevando el `%` como caché que se actualiza con cada carga (`MODELO.md` §3, hallazgo 8). D-190, D-191 |
 | P-26 | **Cuatro estructuras distintas de ingeniería** | Completa, suelta, con concepto y ajena (`CONOCIMIENTO.md` §11.8). El cargador debe reconocerlas **por los datos**, no por el nombre de columna |
 | ✅ P-31 | ~~Los archivos sueltos no dicen dónde van~~ | **Resuelto: se lee primero el propio encabezado interno del archivo** —casi siempre trae su `NIV-`/`ECO-`—; si no lo trae, se marca «sin identificar» (cuenta en el consolidado, fuera del árbol por nivel/etapa). Se tratan como controles de cambio `CC-ALM-18XXX`, no como líneas sueltas. `CONOCIMIENTO.md` §11.18, D-256 |
-| P-32 | **Las 26 claves fuera de catálogo** | 7 existían en los catálogos viejos y se perdieron al migrar; 19 son nuevas. ¿Se dan de alta, se rechazan, o se cargan como pendientes? |
-| P-33 | **Dos claves con formato roto** | `HD-00411` (prefijo de 3) y `MOS-2079` (4 dígitos). ¿Se corrigen en origen o se mapean? |
+| P-32 | **Las 26 claves fuera de catálogo** | 7 existían en los catálogos viejos y se perdieron al migrar; 19 son nuevas. ¿Se dan de alta, se rechazan, o se cargan como pendientes? Requiere el catálogo viejo para identificar cuáles 7, no subido a esta sesión |
+| P-33 | **Dos claves con formato roto** | `HD-00411` (prefijo de 3) y `MOS-2079` (4 dígitos). ¿Se corrigen en origen o se mapean? **`HD-00411` confirmado real y en uso en `ALAMO 18`** ($1,650, Tubo HD 3/4, B-68) — sin matriz propia en ningún archivo de referencia; el prefijo roto (`HD-` en vez de `HID-`) es candidato a la causa. Sigue siendo decisión de política, no de dato |
 | P-34 | **Anotaciones a mano en la descripción** | El «OK» que marca niveles revisados. ¿Se preserva como metadato o se descarta al normalizar? |
 | P-35 | **Cómo se declararía una sustitución** | La ingeniería del lote no usa cantidades negativas en los 12 archivos vistos (`CONOCIMIENTO.md` §11.10). Sigue sin definirse el mecanismo para cuando sí haga falta |
 | P-36 | **Consolidar insumos repetidos al cargar** | La arena aparece 150x mayor en ALAMO que en el prototipo porque viene suelta en cada bloque en vez de embebida en compuestos (`CONOCIMIENTO.md` §11.11). ¿El cargador debe agruparla, o se deja como está? |
@@ -180,7 +180,7 @@ Lo de abajo habilita lo de arriba:
 > **Todo pendiente vive aquí.** Las *ideas del modelo* aún sin diseñar están en `IDEAS.md`
 > del conocimiento; este archivo no las repite (`INDICE.md`).
 
-**M-17 y M-18 se pueden reportar hoy**: no dependen de ninguna decisión pendiente.
+~~M-17 y M-18 se pueden reportar hoy~~ — **reportadas y resueltas: ninguna era inconsistencia real, D-323.**
 
 ---
 
