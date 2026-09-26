@@ -9,7 +9,7 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿cómo responde y qué propone el agente que vive dentro del ERP?
 tiempo:     se hace así
-corte:      2026-09-21
+corte:      2026-09-26
 verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
 ```
 
@@ -217,7 +217,7 @@ estado — nunca en un archivo aparte (`INDICE.md`: un hecho, un archivo).
 |---|---|---|
 | `resumen_salidas_material(obra, material, periodo)` | tabla de movimientos | Listo |
 | `rendimiento_material(obra, concepto, material)` | real vs. teórico | Listo — `CONOCIMIENTO.md` §11.16 · §11.17 |
-| `existencia_almacen(obra, material)` | surtido menos consumido | ⏸️ No lista — depende de B-16/P-19, el corte matricial sigue sin resolver |
+| `existencia_almacen(obra, material)` | surtido menos consumido | Listo — B-16/P-19 cerraron: surtido = `SUM(motivo=salida_produccion)`, consumido = `SUM(motivo=implosion)`, filtrado por `presupuesto_id`/`clave` (`MODELO.md` §5e, D-333/D-337) |
 
 **Destajo y mano de obra**
 
