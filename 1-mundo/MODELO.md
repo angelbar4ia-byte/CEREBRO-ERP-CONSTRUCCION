@@ -640,6 +640,78 @@ alerta) — no un error. `completo` se marca solo cuando `porcentaje_cargado` da
 
 ---
 
+## 3a. Escenario — versiones de la misma obra para comparar antes de decidir (B-39 cierra)
+
+D-107 ya había decidido la política, sin tabla: un escenario cambia
+precio/proveedor, alcance o programa — los tres tipos — y uno queda
+vigente mientras el resto se archiva, nunca se descarta. El caso real
+que probó por qué hace falta no fue una comparación prospectiva: fue
+`ALAMO 18` cargada con la versión anterior del catálogo (mortero, antes
+de que el cemento lo sustituyera) — sin escenario declarado, la
+diferencia se leyó como desviación falsa, 35% de cemento sin explicar,
+hasta que costó una investigación (`PRUEBA-ALAMO-18.md` §2, D-116).
+
+### `PRESUPUESTO.tipo` gana un tercer valor — el mismo campo que ya cerró P-40
+
+```
+PRESUPUESTO.tipo         enum: plantilla · obra · escenario
+PRESUPUESTO.escenario_de_id   FK PRESUPUESTO, nullable — solo si
+                          tipo=escenario: la obra real de la que este
+                          escenario es candidato                          nuevo
+PRESUPUESTO.tipo_cambio   enum: precio_proveedor · alcance · programa,
+                          nullable — solo si tipo=escenario, cuál de los
+                          tres tipos de D-107 varía                       nuevo
+PRESUPUESTO.elegido       boolean, default false — solo si tipo=escenario.
+                          El elegido es el único hecho que no se puede
+                          derivar de otra tabla —se guarda—; el resto
+                          queda archivado, nunca se borra (D-107)          nuevo
+```
+
+**Un escenario ya tiene, gratis, su propio árbol y su propio programa** —
+`raiz_id` (como cualquier `PRESUPUESTO`) y `ACTIVIDAD.presupuesto_id`
+(`MODELO.md` §5c) ya apuntan a cualquier presupuesto, escenario incluido.
+Comparar «6 meses contra 8 meses» no pide tabla nueva: son dos
+`PRESUPUESTO(tipo=escenario)`, cada uno con su propio `ACTIVIDAD`.
+
+**Crear un escenario es clonar el árbol de la obra**, reusando
+`procedencia=clonación` (canon, `LENGUAJE.md`) — la operación de copiar
+es código, no schema, mismo criterio que excluye el resto de `MODELO.md`
+§6.
+
+**Elegir un escenario no reemplaza la obra — se traduce a ella.** La
+identidad de `PRESUPUESTO(tipo=obra)` nunca cambia: una vez que tiene
+`ESTIMACION`/`ACTIVIDAD`/`MOVIMIENTO_ALMACEN` reales colgando de su
+`id`, intercambiar cuál fila "es" la obra rompería esas referencias. Lo
+que gana el escenario elegido se aplica a la obra vía rediseño
+(`CONOCIMIENTO.md` §12 — "propone, no aplica", el rediseño se adopta
+solo) — el escenario en sí se queda como archivo, `elegido=true`.
+
+### El caso real (D-116) no necesitaba un escenario — necesitaba leer la fecha correcta
+
+`ALAMO 18` no comparó conscientemente dos versiones antes de decidir: el
+catálogo base cambió *después* de que la obra se cargara. Ese caso no
+pide `tipo=escenario` — pide que la columna «Presupuesto Base» del
+reporte de `MODELO.md` §5f lea `VERSION_CONCEPTO` **vigente a la fecha en
+que se cargó la obra**, no la vigente hoy. `vigente_desde`/`vigente_hasta`
+ya existen (§4a) — es disciplina de consulta, no campo nuevo.
+
+> **B-39 tenía dos preguntas mezcladas bajo un solo nombre.** «Comparar
+> opciones antes de construir» (`tipo=escenario`, arriba) y «comparar
+> contra la referencia correcta después de construir» (leer
+> `VERSION_CONCEPTO` a la fecha, sin campo nuevo) son mecanismos
+> distintos — el caso real que motivó B-39 solo necesitaba el segundo.
+
+### Sin caso real todavía
+
+Ningún caso de esta sesión ejercitó `tipo=escenario` en sentido
+prospectivo — comparar precio/proveedor, alcance o programa **antes** de
+construir. La política (D-107) y el mecanismo quedan listos; falta el
+primer caso real que lo use, mismo principio que las devoluciones de
+almacén (`MODELO.md` §5e) o `Flete` en los reportes de salida
+(`CONOCIMIENTO.md` §4.3).
+
+---
+
 # 4. Identidad y versionado
 
 ```

@@ -1161,5 +1161,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 
 - **No confundir con:** Versión; Prototipo
 - **Se usa con:** Presupuesto; Paramétrico; Programa
-- **Hoy vive en:** `PENDIENTES-MEJORAS.md` B-39 y B-42 — ninguno diseñado
+- **Hoy vive en:** Escenario de presupuesto — `PRESUPUESTO(tipo=escenario)`,
+  `MODELO.md` §3a, D-335. Escenario de prueba — `PENDIENTES-MEJORAS.md`
+  B-42, sin diseñar (no aplica: son casos de prueba, no schema)
 
