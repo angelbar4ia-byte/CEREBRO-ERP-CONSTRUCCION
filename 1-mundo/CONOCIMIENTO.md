@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-25
+corte:      2026-09-26
 verificado: 17 partes · cada regla comprobada antes de escribirse
 ```
 
@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1341 | 26 |
+| §11 | Los flujos entre sistemas | 1402 | 27 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2837,6 +2837,67 @@ sin explicar ($196,704) es mucho más grande de lo que D-307 reportó, y
 está repartido en una cola larga de 206 pares de insumo, no en dos o tres
 grandes — mortero/cemento (ya resuelto, D-308) es la única excepción
 grande y limpia encontrada hasta ahora. D-309 (corrige D-307).
+
+### B-68 se acota: tres causas más, dos ya conocidas y una nueva (D-315 a D-317)
+
+Repetido el cruce de material insumo por insumo (sin subcontratos, sin el
+grupo mortero/cemento/arenas/pipa/grava ya resuelto), el residuo seguía en
+$142,071. Tres causas más lo explican, dos de ellas extensiones directas de
+hallazgos que ya existían y una genuinamente nueva.
+
+**Piso sin matriz — extiende B-69, +$122,753 (86% del residuo).**
+`PIS-80473`, `PIS-00003`, `ADH-00043`, `ADH-00056`, `PET-00007` y el
+faltante de `ADH-00001` Pegapiso son, todos, insumo real de los siete
+conceptos sin matriz ya identificados (`EST-00080`, `ACA-02101`,
+`ACA-02073`, `ACA-80473`/`80474`/`80475`/`80476`). Cruce independiente: la
+suma del Importe real de esos siete conceptos en el catálogo de `ALAMO 18`
+es $123,311.67 — a menos de 0.5% de los $122,753.32 en insumo huérfano. No
+es un hallazgo nuevo: es la sombra contable exacta de uno que ya estaba
+escrito. Estos siete conceptos nunca se reparten en material/MO porque no
+tienen receta, así que su costo real cae entero en "sin matriz" y su
+insumo aparece en la ingeniería sin contraparte en el Formado.
+
+**Cableado y centro de carga — extiende el mismo hallazgo de `IEC-00410`/
+`IEC-00420`, +$27,832.** Cable calibre 10/12/14 (`ELE-00025` a `ELE-00032`),
+centros de carga (`ELE-00037`, `ELE-00099`, `ELE-00077`) y su frente
+(`ELE-00100`) tienen padre en la matriz — pero ese padre (`IEC-10010` a
+`IEC-10160`, `IEC-20010` a `IEC-20040`, `IEC-01070`, `IEC-03010`) **no
+existe como concepto en el catálogo de `ALAMO 18`.** Los únicos `IEC-`
+presentes ahí son las salidas por punto (`IEC-01010` a `IEC-02130`) y los
+dos lotes ya conocidos. El destino real de este material es ese mismo lote
+agrupado — B-69 ya había confirmado que `IEC-00410`/`IEC-00420` no explotan
+a nivel hijo por ser "material de cableado genuinamente compartido"; esto
+es el mismo mecanismo, visto del lado del insumo en vez del concepto.
+
+**`ALB-03014` (relleno de azotea) se ejecutó dentro del subcontrato de
+impermeabilización, no como material — hallazgo nuevo, −$45,647 (dato del
+usuario, confirmado).** `ALB-03014` tiene matriz propia (mortero fc 50
+bombeado `CON-00020` + tezontle `PET-00069`, $45,646.70 en el Formado) y
+suma **193.87 M2** entre sus dos instancias del catálogo. `SUB-00006`
+"Subcontrato impermeabilización" (D-313, `ALAMO 18`) suma, real, **193.87
+M2** — la misma área, exacta. La ingeniería nunca compró mortero bombeado
+ni tezontle para esta partida ($0 en ambos insumos): el subcontratista
+entregó relleno e impermeabilización como un solo paquete, y su material
+propio no pasa por el almacén de la constructora — mismo principio ya
+escrito para pergolado/impermeabilización (D-307: "un subcontrato no se
+construye del catálogo propio, no tiene receta que comparar contra la
+suya"), aplicado aquí a un concepto que no está codificado `SUB-` pero se
+comporta igual en la práctica.
+
+> Que las tres causas sumen $104,938 netos y no $196,232 ($122,753+$27,832+
+> $45,647) es aritmética de signos, no un error: la de impermeabilización
+> resta (el Formado sobra donde la ingeniería no gastó), las otras dos
+> suman (la ingeniería gastó donde el Formado no lo vio venir).
+
+**Queda abierto: $37,133, sin patrón limpio.** `ACR-00002` Varilla 1/2
+(+$18,494) es lo mayor; no se rastreó todavía a un concepto específico, y
+podría ser variación real de cantidad del mismo tipo que B-67 acaba de
+declarar normal (D-314) — pero eso no está confirmado aquí, solo es
+plausible. `CON-00004` Concreto bombeado losas azotea (−$12,635) y
+`ADH-00006` Estuco (−$12,212) son la reconstrucción sobre-estimando contra
+lo real comprado, sin causa identificada todavía. El resto es cola larga de
+partidas menores (pinturas, tapas, hardware de conduit) sin patrón común.
+B-68 sigue abierto, mucho más acotado. D-315, D-316, D-317.
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
