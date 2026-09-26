@@ -101,8 +101,8 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) sigue anotado, marcador de prototipo (P-40) cierra con `PRESUPUESTO.tipo` |
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326 |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
-| **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 330 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
+| **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada · 🆕 Avanza P-14 — Cabeceras/Materiales/Operaciones confirmados contra el propio dialecto OPUS, `Flete` y los 4 catálogos de salida siguen abiertos (`CONOCIMIENTO.md` §4.3, D-331) |
+| **Memoria** | 331 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 79 términos · 25 ambigüedades |
@@ -159,14 +159,16 @@ al usuario si hace falta, este archivo no lo guarda).
 ## Lo único que bloquea
 
 **Nada para seguir construyendo lo ya aprobado.** `MODELO.md` está aprobado, y con
-él **trece módulos tienen sus reglas escritas y verificadas**: motor de cálculo,
-catálogo, APU, presupuesto, importación, semilla, diccionario, rediseño,
-paramétrico, propuestas, alerta, cuantificación, y las cuatro decisiones de
-factorizador y CPM listas para diseño formal.
+él los módulos con reglas escritas y verificadas siguen creciendo: motor de
+cálculo, catálogo, APU, presupuesto, importación, semilla, diccionario,
+rediseño, paramétrico/ensamble, propuestas, alerta, cuantificación, histórico
+de precios, estimaciones y programa (modelo de datos completo — el motor de
+cálculo del CPM sigue siendo código, no schema) y permisos.
 
-Los que esperan decisión están identificados: exportación (P-14), histórico de
-precios (P-07/P-08), estimaciones (P-18), almacén (P-19), programa —más allá del
-CPM, ya resuelto— (P-20), permisos (P-21).
+Lo que sigue sin decisión: exportación —los tres reportes ya resueltos, faltan
+los cuatro catálogos que se volvieron salida, bloqueados en el catálogo
+viejo— (P-14) y almacén, el diseño completo del módulo más allá de los
+primeros cruces reales (P-19).
 
 ---
 

@@ -97,7 +97,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | 🔧 P-11 | **Corregir el prefijo `AUX-`** | **Diseño completo en `IDEAS.md` §6**: clonar y sustituir, con el viaje de vuelta resuelto por homologación (`CONOCIMIENTO.md` §16.2). No queda decisión — falta ejecutarlo sobre las 79 claves reales |
 | ✅ P-12 | ~~¿La subfamilia es obligatoria?~~ | **No.** `subfamilia_id` es nullable — resuelto en `MODELO.md` §1 y en B-51/D-149. Este renglón quedó sin sincronizar cuando eso se cerró; D-183 |
 | ✅ P-13 | ~~**Identidad compartida**~~ | **El mecanismo y el único caso conocido ya están decididos:** D-41 (contar referencias vivas) y `LENGUAJE.md`, «El ERP externo → B · correspondencia». Lo que falta no es la forma: es llenar el resto de su ficha de mapeo |
-| P-14 | **Columnas de Cabeceras, Materiales y Operaciones** | Los tres reportes que consume el ERP externo, más el formato de los cuatro catálogos que se volvieron salida |
+| 🔶 P-14 | **Columnas de Cabeceras, Materiales y Operaciones** | **Los tres reportes, resueltos contra el propio dialecto OPUS** — `CATALOGO_DE_PRESUPUESTO.csv` (Cabeceras) y `ANALISIS_DE_BASICOS_CONCEPTOS.csv`/`COMPUESTOS.csv` filtrados por `Tipo` (Materiales, Operaciones — mismo archivo, filtro distinto). `CONOCIMIENTO.md` §4.3, D-331. Falta ubicar `Flete` (cuarto valor de `Tipo`, sin reporte propio) y definir el formato de los cuatro catálogos que se volvieron salida — falta el catálogo viejo, igual que P-32 |
 | P-15 | ¿Hace falta un agente traductor? | El migrador trae OPUS a este sistema; no vuelve bilingüe a un tercero |
 | P-16 | Declarar el dialecto del árbol de ingeniería | *No prioritario.* Sus cantidades vienen multiplicadas por el volumen y su PU congelado |
 | P-17 | **`Ingenieria ERP` no es generable** | La prueba de ida y vuelta lo demostró: la regla no es deducible. O se obtiene del ERP externo, o el código se arrastra del archivo original |
@@ -142,7 +142,7 @@ vale es su estructura**: sus columnas son el contrato de salida.
 
 | Qué hacer |
 |---|
-| Documentar sus columnas como **formato de exportación**, junto con Cabeceras, Materiales y Operaciones (P-14) |
+| Documentar sus columnas como **formato de exportación** — Cabeceras, Materiales y Operaciones ya resueltas (P-14, D-331); a estos cuatro les falta el catálogo viejo, igual que P-32 |
 
 ### D.2 Se derivaron — ✅
 
@@ -208,7 +208,7 @@ puede escribir de lo que primero hay que definir.
 |---|---|---|---|---|
 | B-06 | **`importacion`** | Carga desde OPUS: 4 columnas obligatorias, alias, placeholders, huella, versionado | ✅ Definidas | B-03, B-05 |
 | B-07 | **Semilla** | Cuadrilla y rendimiento teórico, una sola vez | ✅ El archivo ya existe | B-03 |
-| B-08 | **`exportacion`** | Cabeceras, Materiales, Operaciones + los 4 catálogos que se volvieron salida | ⏸️ **P-14** — columnas sin definir | B-05 |
+| B-08 | **`exportacion`** | Cabeceras, Materiales, Operaciones + los 4 catálogos que se volvieron salida | 🔶 **P-14** — Cabeceras/Materiales/Operaciones resueltas contra especímenes reales (D-331); los 4 catálogos de salida siguen sin columna, falta el catálogo viejo | B-05 |
 | B-09 | **Traductor de dialectos** | Canon, mapeo por ficha, prueba de ida y vuelta | 🔶 Canon listo; falta el segundo dialecto | B-06 |
 
 ### Sobre el modelo ya definido
@@ -303,5 +303,6 @@ puede escribir de lo que primero hay que definir.
 en `backend/core/`. B-03 a B-07 y B-10 a B-12 siguen con sus reglas escritas y
 verificadas: **se pueden construir sin esperar ninguna decisión.**
 
-Lo demás espera a que se definan P-14 y el resto de P-19/P-20 — P-18 y P-21 ya
-cerraron.
+Lo demás ya tiene menos huecos: P-18, P-20 y P-21 cerraron. Lo que queda es P-14
+— solo para los 4 catálogos de salida, falta el catálogo viejo, igual que P-32
+— y P-19, el diseño completo del módulo de almacén (B-16).

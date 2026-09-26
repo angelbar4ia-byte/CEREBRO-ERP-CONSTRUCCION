@@ -188,8 +188,10 @@ de formato.
 | `ruta` | `Ingenieria ERP` | Numérico, ancho fijo. **No se importa — y tampoco se puede generar**: la regla no es deducible (`CATALOGOS.md` §11) |
 | nivel de construcción | `Nivel ERP` | Llave al catálogo de niveles |
 
-**Reportes de salida:** Cabeceras · Materiales · Operaciones. *Columnas por
-definir.*
+**Reportes de salida:** Cabeceras · Materiales · Operaciones. Columnas
+confirmadas contra especímenes reales de `ALAMO 18` — `CONOCIMIENTO.md` §4.3.
+Cabeceras reutiliza estas mismas dos columnas de esta tabla (`Nivel ERP` e
+`Ingenieria ERP`).
 
 ---
 

@@ -19,7 +19,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §1 | Identidad y posición | 94 | 4 |
 | §2 | Importación desde OPUS | 386 | 9 |
 | §3 | Notas de implementación | 129 | 5 |
-| §4 | Estados del nodo y exportación | 110 | 3 |
+| §4 | Estados del nodo y exportación | 131 | 3 |
 | §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
 | §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
@@ -738,22 +738,43 @@ nodo aquí rompe su referencia allá, y es un sistema sobre el que no hay contro
 > Conviene mandarle también el `id` interno, que no cambia nunca. Si no acepta un
 > campo extra, hay que saber que la referencia entre sistemas es frágil por diseño.
 
-## 4.3 Los tres reportes de salida
+## 4.3 Los tres reportes de salida — columnas confirmadas contra el propio dialecto OPUS (P-14, B-08)
 
-El ERP externo se alimenta de tres reportes:
+El ERP externo se alimenta de tres reportes. **La hipótesis original era
+correcta** — cabeceras son los nodos estructurales, materiales son las
+hojas de tipo material, operaciones son las hojas de mano de obra y
+destajo, el mismo árbol partido en tres por tipo de hoja — y sus columnas
+no había que inventarlas: **ya estaban mapeadas en `LENGUAJE.md`**, en el
+dialecto OPUS, sin conectarlas todavía a esta pregunta.
 
-| Reporte | Qué contiene |
-|---|---|
-| **Cabeceras** | *(pendiente de especificar)* |
-| **Materiales** | *(pendiente de especificar)* |
-| **Operaciones** | *(pendiente de especificar)* |
+| Reporte | Columnas confirmadas | Espécimen real |
+|---|---|---|
+| **Cabeceras** | `Tipo, Nivel, Indice, Nivel ERP, Ingeniería ERP, Clave, Descripción de matriz, Descripción, Descripción Corta, Unidad de matriz, Unidad, Cantidad, Precio unitario, Total, %, Origen, Ruta paramétrica` (17) — las cinco filas del árbol (`Capítulo` · `Subcapítulo` · `Nivel 2` · `Nivel 3` · `Concepto`): el Concepto es cabecera de su propia explosión, no hoja | `CATALOGO_DE_PRESUPUESTO.csv`, archivo completo — 3,231 filas, la misma cuenta que la prueba de ida y vuelta de `LENGUAJE.md` |
+| **Materiales** | `Clave Padre, Clave Hijo, Descripción, Unidad, Cantidad, Costo, Importe, Tipo, Origen` (9) — filas con `Tipo = Material` | `ANALISIS_DE_BASICOS_CONCEPTOS.csv` + `ANALISIS_DE_BASICOS_COMPUESTOS.csv`, 2,193 filas entre los dos |
+| **Operaciones** | Mismas 9 columnas que Materiales — filas con `Tipo` ∈ {`Contrato`, `ManoDeObra`} | Los mismos dos archivos, 575 filas (463 `Contrato` + 112 `ManoDeObra`) |
 
-**Hipótesis a confirmar:** cabeceras son los nodos estructurales del árbol;
-materiales, las hojas de tipo material con su cantidad; operaciones, las de mano de
-obra y destajo. Es decir, el mismo árbol partido en tres por tipo de hoja.
+> **Materiales y Operaciones son el mismo archivo, filtrado distinto — no
+> dos formatos.** `Tipo` (categoría del hijo, «el ADN» según
+> `LENGUAJE.md`) ya separaba esto en el dialecto OPUS del análisis de
+> básicos. **Cabeceras sí trae marca propia del ERP externo**
+> (`Nivel ERP`/`Ingeniería ERP`, ya documentada en `LENGUAJE.md`);
+> Materiales y Operaciones no traen ninguna columna equivalente —
+> confirman la forma que la hipótesis predijo, no que este archivo exacto
+> sea ya el que se entrega hoy al ERP externo.
+>
+> Queda una cuarta lectura de `Tipo` sin resolver: **`Flete`** (51 filas
+> en Conceptos, 16 en Compuestos — 67 en total, 2.4%). El canon ya lo
+> trata como `categoria` propia, distinta de material y de mano de obra
+> (`LENGUAJE.md`) — ninguno de los tres reportes tiene todavía un lugar
+> declarado para él.
 
-Falta definir de cada uno: columnas exactas, si llevan el árbol completo o solo lo
-costeado, y si el ERP externo los consume por archivo o por API.
+**Lo que sigue sin especificar:** dónde cae `Flete`; si el ERP externo
+consume estos tres por archivo o por API (ningún espécimen lo dice); y
+las columnas de los cuatro catálogos que se volvieron pura salida
+(`Catalogo_de_Matriales`, `Catalogo_de_auxiliares`, `Catalogo_de_cuadrillas`,
+`catalogo_de_SUBCONTRATOS`) — de esos cuatro no hay espécimen subido a
+este cerebro, ni columna documentada en ningún archivo; hace falta el
+catálogo viejo real para definirlos, igual que P-32.
 
 ---
 

@@ -299,7 +299,7 @@ apuntando al mismo nivel 4. Es un caso para el diccionario, no un error de datos
 | ~~K-09~~ | ~~¿Qué diferencia de texto alerta?~~ ✅ **Resuelta:** `CONOCIMIENTO.md` §2.7.1 |
 | ~~K-10~~ | ~~¿Quién aprueba una versión nueva?~~ ✅ **Resuelta:** nadie por defecto; por impacto (`CONOCIMIENTO.md` §2.2) |
 | ~~K-11~~ | ~~`ACA-00021` vacío~~ ✅ **Resuelta:** agrupador pendiente de costear (`CONOCIMIENTO.md` §4.1) |
-| K-12 | ¿Qué columnas llevan Cabeceras, Materiales y Operaciones? (`CONOCIMIENTO.md` §4.3) |
+| ~~K-12~~ | ~~¿Qué columnas llevan Cabeceras, Materiales y Operaciones?~~ ✅ **Resuelta:** contra especímenes reales de `ALAMO 18` (`CONOCIMIENTO.md` §4.3). Los cuatro catálogos de solo salida siguen sin columna documentada — falta el catálogo viejo, igual que P-32 |
 | ~~K-13~~ | ~~¿El hermano 100?~~ ✅ **Resuelta:** alerta en 90, reagrupar. No hay tercer dígito (`CONOCIMIENTO.md` §4.2) |
 
 ## 2 Materiales — `CATALOGO_DE_MATERIALES.xlsx`
