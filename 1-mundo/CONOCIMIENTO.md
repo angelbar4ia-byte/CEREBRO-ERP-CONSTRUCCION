@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1402 | 27 |
+| §11 | Los flujos entre sistemas | 1438 | 28 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2898,6 +2898,42 @@ plausible. `CON-00004` Concreto bombeado losas azotea (−$12,635) y
 lo real comprado, sin causa identificada todavía. El resto es cola larga de
 partidas menores (pinturas, tapas, hardware de conduit) sin patrón común.
 B-68 sigue abierto, mucho más acotado. D-315, D-316, D-317.
+
+### Contratrabe no tiene ancla propia — confirma el mismo límite que castillos (D-318, extiende D-314)
+
+Duda del usuario: ¿la contratrabe aparece dentro del concepto de losa, y se
+puede reconstruir para `ALAMO 18`? Sí a lo primero, no a lo segundo.
+
+`EST-01053` (Losa de cimentación) trae, entre sus veinte líneas de matriz,
+`AUX-01011` "Contratrabe CT1 de 20x30 cm" (137 M) y `AUX-01040` "Contratrabe
+CT4 de 30x30 cm" (10 M), junto con bastones, malla electrosoldada, el
+concreto de toda la losa (`CON-00001`, 34 M3), las zapatas
+(`ZA1-000001`/`ZA2-000001`) y el ancla de mano de obra `MOC-01010` (216
+M2). Cada `AUX-01XXX` es en sí mismo un compuesto que explota en varilla +
+estribo + alambre — puro acero, sin concreto propio, mismo patrón que los
+castillos de cimentación (§11.14 arriba).
+
+La contratrabe **no aparece por nombre ni por código en ningún archivo
+crudo de `ALAMO 18`** — ni en mano de obra ni en materiales (dato del
+usuario). No tiene orden de producción propia: se cuela junto con toda la
+losa en una sola operación. La única cifra real que existe es la de
+`EST-01053` completa (244 M2 reales contra 216 M2 base), y la
+reconstrucción actual escala todo lo de adentro —contratrabe incluida—
+por esa misma razón de área (244/216 = 1.130), asumiendo que sus metros
+lineales crecen igual que el área de la losa.
+
+Así escalada, la contratrabe ya es **$14,199 de los $43,989 en ACR-00002
+del Formado — 32% del total, 70% de la varilla de la propia losa.** Es una
+pieza grande del residuo de ACR-00002 (+$18,494) montada sobre un supuesto
+de geometría, no sobre un ancla real.
+
+> **Confirmado con el usuario: no hay otro dato de contratrabe en `ALAMO
+> 18`.** La única vía de validación es el cuantificador, fuera de este
+> sistema. `ACR-00002` se queda como escala de área — mismo principio que
+> D-314 (castillos de cimentación): un elemento sin ancla propia en la
+> ingeniería real no se corrige por indicios ni se fuerza a cuadrar; se
+> documenta el límite y, si hiciera falta confirmarlo, es trabajo del
+> cuantificador.
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
