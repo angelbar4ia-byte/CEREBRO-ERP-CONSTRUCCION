@@ -961,6 +961,12 @@ FUNCION_ATOMICA
                      resolver_alerta · clasificar_manualmente ·
                      correr_invariantes · anotar_plano ·
                      validar_estimacion                                    firme
+                     · originar_incidencia · aprobar_incidencia ·
+                     validar_incidencia · ejecutar_incidencia ·
+                     cerrar_incidencia · solicitar_cierre_frente ·
+                     aprobar_cierre_frente · validar_cierre_frente ·
+                     editar_estructura_programa · editar_fechas_programa ·
+                     proponer_precio_nuevo · aprobar_precio_nuevo          nuevo — B-73, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -973,9 +979,11 @@ cerrado» de R-2 (D-205), y el mismo patrón que ya se repitió cinco veces en
 este cerebro: nada reasigna, se agrega encima.
 
 **Primeras asignaciones concretas de `ROL_FUNCION`, cerrando B-45:** quién
-traza y quién anota el plano — ver §1b. Quince de las dieciséis funciones
-existen desde P-21; las asignaciones reales se agregan según aparece el
-caso, no todas de una vez.
+traza y quién anota el plano — ver §1b. Dieciséis de las veintiocho
+funciones existen desde P-21 o de cierres posteriores; las asignaciones
+reales se agregan según aparece el caso, no todas de una vez — las doce
+que agrega esta pasada (abajo) son el siguiente caso concreto, no las
+últimas.
 
 **`validar_estimacion` es la dieciseisava, y queda sin asignar a ningún
 rol a propósito** — cierra B-75 solo en parte: hoy la ejerce Compras, un
@@ -1052,13 +1060,54 @@ recorriendo esta tabla, no se declara aparte.
 > supervisión" con exactitud. Mismo pendiente que "crear precio nuevo"
 > abajo: se nombra al formalizar.
 
-### Costos: cuantifica y crea precios, con doble aprobación
+### Costos: cuantifica y crea precios, con doble aprobación — cierra B-73 en ese punto
 
 Costos **cuantifica** (produce presupuesto) y **crea precios nuevos** — estos
 últimos necesitan aprobación de **Control de obra y Superintendente**, los
-dos, no uno solo. Ninguna de las quince funciones atómicas existentes cubre
-"crear precio nuevo" con exactitud — falta nombrarla al formalizar el modelo
-(`PENDIENTES-MEJORAS.md` B-73).
+dos, no uno solo. `proponer_precio_nuevo` → Costos; `aprobar_precio_nuevo` →
+Control de obra **y** Superintendente.
+
+> ⚠ **Primer caso de aprobación doble obligatoria, no de cadena secuencial
+> con salto.** `INCIDENCIA` y `CIERRE_FRENTE` (§5c) resuelven "quién aprueba"
+> con un solo campo que puede quedar en null si el paso se salta (D-269) —
+> aquí hacen falta **los dos**, no uno de dos posibles. Se modela como
+> `PROPUESTA` (`tipo=precio_nuevo`) con dos campos nuevos, en vez de forzar
+> el patrón de un solo `aprobado_por`:
+>
+> ```
+> PROPUESTA   (gana dos campos, solo aplican si tipo=precio_nuevo)
+>   aprobado_control_en          DATE, nullable                      propuesto
+>   aprobado_superintendente_en  DATE, nullable                      propuesto
+> ```
+>
+> `estado` pasa a `aprobada` solo cuando los dos están llenos — el motor lo
+> verifica, no un campo booleano nuevo que pueda desincronizarse de los
+> dos anteriores.
+
+### Programa: cinco funciones de incidencia, tres de cierre de frente, dos de edición — cierra B-73
+
+Formaliza en `ROL_FUNCION` lo que la política de `PROPUESTA-CUATRO-MODULOS.md`
+§4 ya describía en prosa para `INCIDENCIA`, `CIERRE_FRENTE` y `ACTIVIDAD`
+(§5c), sin una sola asignación todavía escrita como tabla:
+
+| Función | Rol(es) | Por qué |
+|---|---|---|
+| `originar_incidencia` | Residente, Supervisor, Control de obra | Los tres pueden originarla — quien lo hace se salta su propio paso de aprobación/validación (D-269) |
+| `aprobar_incidencia` | Supervisor | Salvo que Supervisor haya originado |
+| `validar_incidencia` | Control de obra | Salvo que Control de obra haya originado |
+| `ejecutar_incidencia` | Residente | Siempre, en los tres casos |
+| `cerrar_incidencia` | Supervisor | "El Supervisor siempre da seguimiento hasta que cierra" — nunca se salta |
+| `solicitar_cierre_frente` | Residente | Al 90% de avance del frente |
+| `aprobar_cierre_frente` | Supervisor | |
+| `validar_cierre_frente` | Control de obra | |
+| `editar_estructura_programa` | Control de obra | Vincular actividades, marcar duración desde presupuesto/paramétrico — `origen_captura` manual-con-diseño y por-carga-estructura |
+| `editar_fechas_programa` | Residente | Ajustar fechas sin tocar estructura — `origen_captura` manual-sin-diseño y por-carga-fechas |
+
+> **El patrón se repite en los tres módulos que este cerebro ya modeló con
+> cadena de aprobación**: quien origina no se autoaprueba ni se autovalida
+> (D-269), y hay un rol que da seguimiento hasta el cierre sin excepción.
+> No es tres veces la misma regla por casualidad — es la misma regla,
+> aplicada donde aparece.
 
 ### Cotizador: la responsabilidad existe, el rol activo todavía no
 
