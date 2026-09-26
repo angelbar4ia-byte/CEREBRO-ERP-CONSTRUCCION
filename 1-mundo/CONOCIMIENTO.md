@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1438 | 28 |
+| §11 | Los flujos entre sistemas | 1478 | 29 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -2934,6 +2934,46 @@ de geometría, no sobre un ancla real.
 > ingeniería real no se corrige por indicios ni se fuerza a cuadrar; se
 > documenta el límite y, si hiciera falta confirmarlo, es trabajo del
 > cuantificador.
+
+### K3 y K8 quedan confirmados correctos — la vara comercial de 12 M explica la "mitad" que parecía faltar (D-319)
+
+Las dos dudas que abrió la comparación de anillos (arriba) se resuelven con
+dato del usuario, no con corrección de catálogo.
+
+**K3: no faltaba acero, la PZA de la matriz es la vara comercial, no el
+corte de uso.** La varilla comercial se vende en tramos de **12 M**. Un
+castillo de 4.20 M (dato del usuario: la altura única de este prototipo,
+§11.14 arriba) corta cada varilla a **6 M** — de una vara de 12 M salen
+**2 cortes útiles de 6 M**. `EST-10031` trae 3.0 PZA de `ACR-00002` en su
+matriz: 3.0 varas × 2 cortes = **6 varillas útiles** — exacto contra "6
+var no.4" de la descripción real de K3 en Planta Baja (`INGENIERIA -
+ALAMO 18 - PB.csv`). La PZA de la matriz es la unidad de **compra** (vara
+entera), no la de **uso** (corte a la altura del castillo); confundir una
+con otra fue lo que hizo parecer que faltaba la mitad. No hay corrección
+que hacer.
+
+> Misma regla, para no repetir el error: un castillo de 3.00 M corta cada
+> vara a 4 M (3 cortes útiles por vara de 12 M); uno de 4.20 M corta a 6 M
+> (2 cortes por vara). El número de anillos por pieza depende, además, de
+> la separación entre estribos (`@15cm`, `@20cm`…) — la altura entre esa
+> separación da el conteo, no un valor fijo. Dato del usuario, regla
+> general para cualquier prototipo que mezcle las dos alturas (`ALAMO 18`
+> no las mezcla, por eso no aplicó aquí).
+
+**K8: el error estaba en la descripción libre de la ingeniería, no en la
+matriz (dato del usuario).** `EST-10081` usa `ACR-00002` + `ANILLO 10X25`
+— el mismo sistema que K3, coherente con compartir sección rectangular
+grande (15x30 y 15x40) frente a las secciones compactas de K1/K2/K7
+(15x15/15x15/15x20) que sí usan armex prefabricado. La descripción cruda
+de Planta Baja que dice "armado con armex de 10x15" para K8 está mal
+capturada — copiada de la fila de K7 y nunca corregida. La matriz es la
+que tiene razón.
+
+Con esto, `ACR-00002` queda completamente diagnosticado: contratrabe sin
+ancla propia (D-318, límite de dato), K3 y K8 confirmados correctos. El
+residuo de $18,494 no tiene más causa identificable desde los datos
+disponibles de `ALAMO 18` — lo que quede es del mismo tipo que la
+contratrabe, confirmable solo por el cuantificador.
 
 ### Alcance: qué queda fuera, y qué no se debe leer de más
 
