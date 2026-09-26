@@ -97,12 +97,12 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
 | **Modelo de datos** | `MODELO.md` aprobado, con 15 hallazgos resueltos |
-| **Roles y permisos** | Cierra P-21 — `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` (`MODELO.md` §5b) · muchos-a-muchos, sin tope por monto · 🆕 Cierra B-73 — 28 funciones atómicas (12 nuevas: incidencia, cierre de frente, edición de programa, precio nuevo con aprobación doble), D-329 |
+| **Roles y permisos** | Cierra P-21 — `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` (`MODELO.md` §5b) · muchos-a-muchos, sin tope por monto · Cierra B-73 — 28 funciones atómicas (12 nuevas: incidencia, cierre de frente, edición de programa, precio nuevo con aprobación doble), D-329 · 🆕 Cierra B-75 — `validar_estimacion` a Control de obra, `gestionar_rol_funcion` nueva para reasignar sin tocar esquema, lista completa de 33 funciones (21 asignadas, 12 a propósito sin asignar), D-330 |
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · catálogo de contratistas (P-39) sigue anotado, marcador de prototipo (P-40) cierra con `PRESUPUESTO.tipo` |
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326 |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada |
-| **Memoria** | 329 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
+| **Memoria** | 330 decisiones · 12 descartes · 15 correcciones · 12 hallazgos de construcción |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
 | **Agentes** | 🆕 **gravity** orquesta · arquitecto, constructor, migrador, auditor · 🆕 **gravity-obra** interno |
 | **Glosario** | 79 términos · 25 ambigüedades |

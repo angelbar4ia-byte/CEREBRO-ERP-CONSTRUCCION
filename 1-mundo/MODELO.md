@@ -842,9 +842,12 @@ escribir en `BITACORA_RECLASIFICACION`, el motor busca qué
 `ENSAMBLE_PARAMETRO` dependían de ese `nodo_id` y los marca — misma regla
 que ya rige todo el sistema: **propone, no aplica.**
 
-> **Quién puede reclasificar y quién resuelve un `revisar` sigue sin
-> nombrar** — mismo pendiente de siempre: sin clave todavía en
-> `FUNCION_ATOMICA`.
+> **`reclasificar_familia` y `resolver_revisar_parametro`, tentativamente
+> a Control de obra — con menos certeza que las de arriba.** Extiende el
+> mismo criterio (gobierno cruzado entre obras), pero reclasificar familia
+> es más catálogo que obra — se acerca más a lo que hoy hace Costos al
+> cuantificar y crear precios. Queda anotado como propuesto, no firme;
+> confirmar cuando aparezca un caso real de reclasificación.
 
 ---
 
@@ -966,7 +969,10 @@ FUNCION_ATOMICA
                      cerrar_incidencia · solicitar_cierre_frente ·
                      aprobar_cierre_frente · validar_cierre_frente ·
                      editar_estructura_programa · editar_fechas_programa ·
-                     proponer_precio_nuevo · aprobar_precio_nuevo          nuevo — B-73, ver abajo
+                     proponer_precio_nuevo · aprobar_precio_nuevo ·
+                     gestionar_rol_funcion · asignar_residente ·
+                     asignar_supervision · reclasificar_familia ·
+                     resolver_revisar_parametro                          nuevo — B-73/B-75, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -985,12 +991,79 @@ reales se agregan según aparece el caso, no todas de una vez — las doce
 que agrega esta pasada (abajo) son el siguiente caso concreto, no las
 últimas.
 
-**`validar_estimacion` es la dieciseisava, y queda sin asignar a ningún
-rol a propósito** — cierra B-75 solo en parte: hoy la ejerce Compras, un
-actor que no está en `ROL`, y no está decidido si se formaliza como rol
-propio o se asigna a uno de los seis ya existentes. La función se cataloga
-para que exista una clave a la que apuntar; la asignación se queda
-pendiente, no se fuerza.
+**`validar_estimacion` cierra B-75: se asigna a Control de obra, sin
+formalizar Compras como rol propio (dato del usuario).** Compras sigue
+sin existir en `ROL` — Control de obra absorbe la función en la práctica,
+sin que eso impida reasignarla después: `ROL_FUNCION` es muchos-a-muchos
+precisamente para que una asignación no sea definitiva.
+
+> **La reasignación no pide mecanismo nuevo — pide dueño para el
+> mecanismo que ya existe.** `ROL_FUNCION` ya es una tabla, no una regla
+> de código: reasignar `validar_estimacion` de Control de obra a otro rol
+> es un `INSERT`/`DELETE` sobre esa tabla, no un cambio de esquema. Lo que
+> faltaba —y sigue faltando en el resto del modelo— es **quién tiene
+> permiso de tocar `ROL_FUNCION` misma**. Se agrega `gestionar_rol_funcion`
+> (diecisieteava función, asignada a Control de obra, mismo criterio que
+> el usuario dio para `validar_estimacion`) — es la función que hace
+> posible reasignar todas las demás, incluida ella misma.
+
+### La lista completa — qué está asignado y qué no (pedida por el usuario)
+
+`ROL_FUNCION` ya es la respuesta de fondo a "poder reasignar quién puede
+hacer qué": es una tabla, no una regla de código — `gestionar_rol_funcion`
+(arriba) decide quién puede editarla, no un tipo de dato nuevo. Esto es
+el inventario que faltaba encima: las treinta y tres funciones a la
+fecha, en un solo lugar.
+
+| Función | Rol(es) asignados | Fuente |
+|---|---|---|
+| `trazar` | Costos, Control de obra, Residente, Supervisor | §1b, B-45 |
+| `aprobar_trazo` | Control de obra | §1b, B-45 |
+| `anotar_plano` | Residente, Supervisor | §1b, B-45 |
+| `validar_estimacion` | Control de obra | dato del usuario, cierra B-75 |
+| `originar_incidencia` | Residente, Supervisor, Control de obra | §5c, D-329 |
+| `aprobar_incidencia` | Supervisor | §5c, D-329 |
+| `validar_incidencia` | Control de obra | §5c, D-329 |
+| `ejecutar_incidencia` | Residente | §5c, D-329 |
+| `cerrar_incidencia` | Supervisor | §5c, D-329 |
+| `solicitar_cierre_frente` | Residente | §5c, D-329 |
+| `aprobar_cierre_frente` | Supervisor | §5c, D-329 |
+| `validar_cierre_frente` | Control de obra | §5c, D-329 |
+| `editar_estructura_programa` | Control de obra | §5c, D-329 |
+| `editar_fechas_programa` | Residente | §5c, D-329 |
+| `proponer_precio_nuevo` | Costos | D-329 |
+| `aprobar_precio_nuevo` | Control de obra **y** Superintendente (los dos) | D-329 |
+| `gestionar_rol_funcion` | Control de obra | dato del usuario |
+| `asignar_residente` | Control de obra | dato del usuario |
+| `asignar_supervision` | Control de obra | dato del usuario |
+| `reclasificar_familia` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
+| `resolver_revisar_parametro` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
+| `registrar_avance` | **Sin asignar** | P-21 |
+| `comprometer_gasto` | **Sin asignar** | P-21 |
+| `capturar_causa_desviacion` | **Sin asignar** | P-21 |
+| `revisar_patrones_desviacion` | **Sin asignar** | P-21 |
+| `aprobar_version_concepto` | **Sin asignar** | P-21 |
+| `pactar_precio_contratista` | **Sin asignar** | P-21 |
+| `aplicar_descuento` | **Sin asignar** | P-21 |
+| `autorizar_orden_cambio` | **Sin asignar** | P-21 |
+| `aprobar_propuesta` | **Sin asignar** | P-21 |
+| `resolver_alerta` | **Sin asignar** | P-21 |
+| `clasificar_manualmente` | **Sin asignar** | P-21 |
+| `correr_invariantes` | **Sin asignar** | P-21 |
+
+**Veintiuna asignadas, doce sin asignar — a propósito, no por olvido.**
+Las doce existen como clave desde P-21 (D-206): están catalogadas para
+que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
+concreto que forzara decidir el rol, y este cerebro no asigna sin
+evidencia. Se cierran conforme aparezca el caso, igual que las
+veintiuna de arriba se cerraron cuando apareció el suyo.
+
+> **Todas estas asignaciones son `propuesto`, no `firme`, salvo las
+> heredadas de P-21/B-45** — son la primera pasada de un criterio nuevo
+> (gobierno cruzado entre obras → Control de obra), no verificadas contra
+> un caso real todavía. `gestionar_rol_funcion` existe precisamente para
+> poder corregirlas sin tocar esquema el día que un caso real diga lo
+> contrario.
 
 **`comprometer_gasto` no lleva tope por monto.** Es binaria: el rol la tiene o
 no la tiene, sin límite de monto asociado. Si algún día hace falta controlar
@@ -1055,10 +1128,12 @@ cada fila lo dice el rol de cada quien en `USUARIO_ROL`, no un campo nuevo.
 El alcance de Superintendente y Control (D-277 a D-279) se calcula
 recorriendo esta tabla, no se declara aparte.
 
-> **Quién puede escribir en estas tres tablas queda sin nombrar** — ninguna
-> de las quince funciones atómicas cubre "asignar residente" o "asignar
-> supervisión" con exactitud. Mismo pendiente que "crear precio nuevo"
-> abajo: se nombra al formalizar.
+**Cierra aquí: `asignar_residente` y `asignar_supervision`, a Control de
+obra.** Mismo criterio que el usuario dio para `validar_estimacion` y
+para `gestionar_rol_funcion` arriba: quién queda asignado a qué obra, y
+quién supervisa a quién, es gobierno cruzado entre obras — no de una obra
+en particular —, y Control de obra ya es el rol con visibilidad completa
+para ejercerlo.
 
 ### Costos: cuantifica y crea precios, con doble aprobación — cierra B-73 en ese punto
 
