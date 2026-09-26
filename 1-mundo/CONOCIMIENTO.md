@@ -30,7 +30,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
-| §15 | La ruta crítica no está en el modelo | 39 | 0 |
+| §15 | La ruta crítica ya está en el modelo | 80 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
 | §17 | Cuantificación gráfica — de inventario a regla verificada | 72 | 4 |
 
@@ -3910,7 +3910,7 @@ aprobadas**, con su evidencia y su historia de rechazos.
 
 ---
 
-# 15. La ruta crítica no está en el modelo
+# 15. La ruta crítica ya está en el modelo — el tiempo de entrega seguía sin schema
 
 El Gantt quedó definido como **duración calculada**:
 
@@ -3918,24 +3918,24 @@ El Gantt quedó definido como **duración calculada**:
 duración = volumen ÷ (rendimiento × cuadrillas)
 ```
 
-Eso da **cuánto tarda cada actividad**. Pero no hay nada que diga **qué va antes que
-qué**.
+Eso da **cuánto tarda cada actividad**. Lo que faltaba —qué va antes que
+qué— ya cerró con P-20:
 
-> Sin precedencias no hay ruta crítica. Y sin ruta crítica, la suma de duraciones no
-> es un programa: **es una lista.**
-
-Lo que falta:
-
-| Falta | Por qué importa |
+| Faltaba | Dónde vive ahora |
 |---|---|
-| **Precedencias** entre actividades | Qué debe terminar para que otra empiece |
-| **Tipo de vínculo** | Fin-inicio, inicio-inicio, con o sin traslape |
-| **Holguras** | Cuánto puede retrasarse algo sin mover la fecha final |
-| **La ruta crítica** | Qué retraso importa y cuál no |
+| **Precedencias** entre actividades | `PRECEDENCIA`, `MODELO.md` §5c |
+| **Tipo de vínculo** — fin-inicio, inicio-inicio, con o sin traslape | `PRECEDENCIA.tipo_vinculo`/`traslape_espera`, `MODELO.md` §5c |
+| **Holguras** | `ACTIVIDAD.holgura` — calculado, `MODELO.md` §5c |
+| **La ruta crítica** | `ACTIVIDAD.es_ruta_critica` — calculado, `MODELO.md` §5c |
 
-Y hay una conexión que ya está a medias: **el tiempo de entrega del material** daría
-la fecha de pedido a partir del inicio de la actividad — pero ese inicio solo se
-conoce si hay precedencias.
+> El motor que calcula fechas tempranas/tardías y ruta crítica sigue sin
+> escribirse — es código sobre este schema, no schema en sí, mismo
+> criterio que excluye el resto de `MODELO.md` §6.
+
+Queda la conexión que seguía a medias: **el tiempo de entrega del material**
+da la fecha de pedido a partir del inicio de la actividad — ahora que el
+inicio ya se calcula (arriba), lo único que le faltaba a esta parte era el
+dato, no la tabla.
 
 ### El tiempo de entrega: dónde vive
 
@@ -3972,11 +3972,18 @@ resultados distintos y nadie sabe cuál es el bueno.
 > calendario de la obra — que no es el del proveedor. Los días no laborables del
 > proveedor no están modelados y **no se van a inventar**.
 
-> Al inicio del proyecto se aclaró que **CPU es APU, no CPM**. Eso resolvió una
-> ambigüedad de nombre, pero **el CPM como capacidad quedó fuera y nunca se
-> retomó.**
+> **La fórmula tiene una ambigüedad sin resolver, no elegida en silencio**
+> (`RAZONAMIENTO.md` §3): «inicio» puede ser la fecha temprana o la tardía
+> de la actividad, y restar `holgura` además del tiempo de entrega da un
+> resultado distinto según cuál sea. Ninguna de las dos lecturas está
+> descartada aquí — queda para quien implemente el reporte de
+> `MODELO.md` §5f decidirla con evidencia, no adivinarla.
 
-Va con la definición del módulo de programa — **P-20**.
+**Dónde vive ahora:** `CONSTANTE_FISICA` (`MODELO.md` §1c) gana la
+categoría `tiempo_entrega` — mismo mecanismo que ya tenía la vara
+comercial y el corte por altura, con un campo nuevo (`base`) para
+naturales/hábiles. `MODELO.md` §5f («Recursos por fecha») cierra B-41
+leyendo esta tabla para separar fecha de pedido de fecha de consumo.
 
 
 ---

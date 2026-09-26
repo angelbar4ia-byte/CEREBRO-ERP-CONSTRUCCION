@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se propone construir?
 tiempo:     vamos aquí
-corte:      2026-09-21
+corte:      2026-09-26
 verificado: ✅ 22 decisiones cerradas · pendiente diseño formal
 ```
 
@@ -392,7 +392,7 @@ Dos consecuencias que hay que asumir:
 
 - **`B-40` deja de ser menor.** Sin tiempo de entrega, el material por fecha da la
   fecha de **consumo**, no la de **pedido**. Para comprar, la útil es la segunda.
-- **La proyección cae bajo la regla de la proyección** (`gravity-obra.md` §3): sale
+- **La proyección cae bajo la regla de la proyección** (`gravity-obra.md` §2): sale
   con sus supuestos a la vista, nunca el número solo. Un flujo de efectivo presentado
   como dato es la forma más cara de esa confusión.
 

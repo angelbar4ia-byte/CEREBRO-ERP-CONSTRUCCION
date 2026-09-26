@@ -503,22 +503,30 @@ CONSTANTE_FISICA
   id
   categoria        enum: longitud_comercial · factor_corte_por_altura ·
                     factor_traslape · desperdicio · calibre_circuito ·
-                    puntas_circuito — abierto, crece con evidencia            abierto
+                    puntas_circuito · tiempo_entrega — abierto, crece
+                    con evidencia                                             abierto — gana tiempo_entrega
   clave             qué fila específica dentro de la categoría (ej. "varilla",
-                     "castillo 4.20m")                                        firme
+                     "castillo 4.20m", una familia o un insumo)                firme
   valor             NUMERIC                                                    firme
   unidad_id         FK Unidad                                                  firme
+  base               enum: natural · habil, nullable — solo aplica a
+                     `categoria=tiempo_entrega` (`CONOCIMIENTO.md` §15):
+                     quince días naturales y quince hábiles descuentan
+                     distinto contra el calendario                            nuevo
   fuente             texto — de dónde salió (norma, medición propia, dato de
                      usuario)                                                  firme
 ```
 
-> **Ya tiene dos filas reales, no hipotéticas** (dato del usuario,
-> `CONOCIMIENTO.md` §11.14): la vara comercial de varilla mide 12 M
-> (`categoria=longitud_comercial`);
-> un castillo de 4.20 M corta cada vara a 6 M, uno de 3.00 M la corta a 4 M
+> **Ya tiene evidencia real, no hipotética.** La vara comercial de
+> varilla mide 12 M (`categoria=longitud_comercial`); un castillo de
+> 4.20 M corta cada vara a 6 M, uno de 3.00 M la corta a 4 M
 > (`categoria=factor_corte_por_altura`) — verificado exacto contra la
-> descripción real de K3 en `ALAMO 18` (D-319). El generador de B-18 todavía no
-> existe; la tabla que va a consultar, sí.
+> descripción real de K3 en `ALAMO 18` (D-319). El generador de B-18
+> todavía no existe; la tabla que va a consultar, sí. **`tiempo_entrega`
+> (B-40) se agrega con la misma forma**: `clave` lleva la familia por
+> default —18 valores cubren los 387 materiales— o el insumo cuando
+> hace falta afinar la excepción; **por proveedor no se puede** — no hay
+> catálogo de proveedores (mismo hueco que P-39). `CONOCIMIENTO.md` §15
 
 ---
 
@@ -1783,6 +1791,49 @@ ejecutado sin respaldo), pero **capturar y persistir la causa**
 «sin causa» sea un estado válido) es su propio diseño, todavía sin
 hacer. `capturar_causa_desviacion`/`revisar_patrones_desviacion` ya
 existen como función atómica (P-21) sin tabla a la que escribir.
+
+### Recursos por fecha — la salida del CPM (B-41 cierra)
+
+`PROPUESTA-CUATRO-MODULOS.md` §4 ya daba la fórmula: la misma explosión
+de siempre, leída a lo largo del tiempo, no un módulo nuevo.
+
+```
+actividad  →  tramos con fecha       (ACTIVIDAD/TRAMO, §5c)
+actividad  →  conceptos              (ACTIVIDAD.concepto_id)
+concepto   →  explosión de insumos   (COMPOSICION, §1)
+─────────────────────────────────────────────────────────
+           →  material · mano de obra · subcontratos, por fecha
+```
+
+| Proyección | Cómo se filtra/fecha | Nueva? |
+|---|---|---|
+| Material por fecha | `categoria=material` (mismo eje que §5f arriba), fecha de `TRAMO`/`ACTIVIDAD` **menos** `CONSTANTE_FISICA(categoria=tiempo_entrega)` — pedido, no consumo | No |
+| Mano de obra por fecha | `categoria` ∈ {mano de obra, trabajo}, fecha de `TRAMO`/`ACTIVIDAD` sin corrimiento — no hay tiempo de entrega para contratar gente | No |
+| Subcontratos por fecha | Igual, filtrado a `clase=subcontrato` — **cuándo contratar, no solo cuándo empieza**, sigue sin un tiempo de entrega propio (no es el de material) | Sin resolver — ver abajo |
+| Egreso por fecha | Las tres anteriores, valuadas con `PRECIO_HISTORICO`/`TABULADOR_CONTRATISTA` y sumadas por periodo — es el flujo de efectivo | No |
+
+`TRAMO.reparto_material` (§5c, P-5) ya reparte el material por tramo, no
+parejo entre inicio y fin de la actividad — el hueco que deja una
+actividad interrumpida (el muro que para para colar la cadena) ya no
+lo esconde una proyección por fecha.
+
+**Dos huecos reales, los dos de dato, no de diseño:**
+
+- **Cuándo contratar un subcontrato** necesita su propio tiempo de
+  entrega (negociación, no logística de material) — no existe, y crearlo
+  sin evidencia sería inventar. Sigue como P-39 lo dejó anotado: falta
+  catálogo de contratistas.
+- **Cuándo se paga**, no solo cuándo se consume, movería el flujo de
+  efectivo más cerca de lo real — necesita términos de pago por
+  proveedor/contratista, y **no hay catálogo de proveedores** (mismo
+  hueco que P-39/D-175). El egreso por fecha de arriba es por fecha de
+  consumo, no de pago.
+
+> **La fórmula de fecha de pedido tiene una ambigüedad sin resolver**
+> (`CONOCIMIENTO.md` §15, `RAZONAMIENTO.md` §3): «inicio» puede ser la
+> fecha temprana o la tardía de la actividad. No se elige aquí en
+> silencio — queda para cuando haya un caso real que la fuerce a
+> decidirse.
 
 ---
 
