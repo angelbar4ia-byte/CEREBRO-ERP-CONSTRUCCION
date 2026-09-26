@@ -467,6 +467,10 @@ ENSAMBLE_PARAMETRO
                     ensamble declara a qué aplica; fuera de ella, no se usa")  abierto
   dispersion       NUMERIC — CV medido junto con la tasa (§5.7: "un precio
                     sin su dispersión es un número disfrazado de certeza")     firme
+  revisar          boolean, default false — mismo patrón que `NODO.revisar`
+                    (P-04): se enciende cuando un insumo de su cohorte
+                    cambia de familia (`BITACORA_RECLASIFICACION`, §4b),
+                    la tasa no se recalcula sola                              nuevo — B-61
 ```
 
 **El valor del divisor para una instancia nueva no necesita campo propio.**
@@ -735,11 +739,112 @@ pactado con cada contratista se compara contra él, nunca lo reemplaza.
 - **No hay catálogo de contratistas** (P-39) — mismo hueco que D-175 ya
   verificó para proveedores: no está en ningún catálogo de origen, y no se
   inventa. `contratista_id` queda apuntando a algo que hoy no existe.
-- **«Prototipo» es una convención de nombre, no un campo** (P-40,
-  `GLOSARIO-DOMINIO.md`). Un auxiliar que nace en un presupuesto
-  base/plantilla reutilizable debería versionar distinto a uno de una obra
-  real, pero eso necesita que `PRESUPUESTO` distinga «es plantilla» de «es
-  obra» — y ese campo no existe todavía.
+- ~~«Prototipo» es una convención de nombre, no un campo (P-40)~~ —
+  **resuelto**: `PRESUPUESTO.tipo` (§3) lo cierra, y de paso le da hogar a
+  plantilla/instancia del ensamble (§1c, D-325).
+
+---
+
+## 4b. Diccionario de datos — normalización, homologación y grupo funcional (B-60/B-61 cierran)
+
+**Homologación ya tenía tabla, sin saberlo.** `CONOCIMIENTO.md` §16
+distingue tres relaciones entre insumos, y la que exige juicio sobre **la
+misma cosa** —homologación— es exactamente lo que `EQUIVALENCIA` (arriba)
+ya modela: sus tres valores de `tipo` (`duplicado_exacto` ·
+`casi_identico` · `variante_dimensional`) son la homologación de
+`CONOCIMIENTO.md` §16, con
+datos reales ya reunidos en `DICCIONARIO-DATOS.md` §1 y §3 — 10 grupos
+"mismo núcleo", 77 variantes dimensionales, 133 casi idénticos. Lo que le
+faltaba a `EQUIVALENCIA`/`CLON` no era la relación: era el viaje de
+vuelta que `CONOCIMIENTO.md` §16.2 y `CONOCIMIENTO.md` §16.3 describen y
+que hoy ninguna tabla resuelve.
+
+```
+CLON   (ya existía — gana dos campos, CONOCIMIENTO.md §16.2, CONOCIMIENTO.md §16.3)
+  id, original_id, clon_id, modo (mantener|sustituir)                  firme
+  reconoce_clave_vieja_al_importar   boolean, default true — si modo=
+                                       sustituir, la clave vieja sigue
+                                       entrando y se resuelve al original  nuevo
+  exporta_clave_vieja                 boolean, default true hasta que el
+                                       usuario autorice — individual por
+                                       sistema externo, o total             nuevo
+```
+
+**Solo homologación viaja de vuelta; normalización no** (`CONOCIMIENTO.md` §16.3):
+`pza` no sale como `pza`, sale `PZ` siempre — es forma, no identidad. La clave sí
+es identidad: el sistema externo la reconoce por ella, así que la vieja
+tiene que poder seguir saliendo hasta que se autorice lo contrario.
+
+```
+NORMALIZACION
+  id
+  forma_sucia            texto — como llega ("pza", "Petreos")            firme
+  forma_canonica          texto — como se guarda y como sale siempre       firme
+  campo                    enum: unidad · familia · subfamilia ·
+                          texto_libre                                     firme
+  origen, evidencia,
+  capturado_por, fecha       mismo patrón que las otras dos — CONOCIMIENTO.md §16.1
+                          exige que las tres guarden su origen             firme
+  estado                    propuesto · aprobado · rechazado — mismo
+                          enum que `EQUIVALENCIA`                         firme
+```
+
+**`GRUPO_FUNCIONAL` es genuinamente distinto: no son la misma cosa, son
+intercambiables** (`CONOCIMIENTO.md` §16: "sustituir una por otra es una
+decisión de obra, y
+cambia el costo"). No cabe en `EQUIVALENCIA` a propósito — ahí, sustituir
+no pregunta.
+
+```
+GRUPO_FUNCIONAL
+  id
+  nombre                   texto — ej. "Cable 12", "Poliflex 50 Mts 1\" 5L" firme
+  criterio                   texto — qué los hace intercambiables          firme
+  origen, evidencia, estado    mismo patrón que arriba                     firme
+
+GRUPO_FUNCIONAL_MIEMBRO
+  id
+  grupo_id                  FK GRUPO_FUNCIONAL                             firme
+  insumo_id                   FK Nodo                                      firme
+  atributo_diferenciador        texto, nullable — ej. "Negro", "Blanco" —
+                             por qué esta fila y no otra del grupo          firme
+```
+
+> **Ya tiene datos reales, no hipotéticos** (`DICCIONARIO-DATOS.md` §5): 5
+> grupos, 13 materiales — cuatro por color (cable 8/10/12/14) y uno por
+> presentación (`ELE-00044`/`ELE-00046`, poliflex en rollo contra metro
+> suelto). Este último ya se confirmó esta sesión con dato real: no es
+> error de precio, son presentaciones reales que cuestan distinto por
+> volumen (D-323) — y esa misma confirmación **corrige** el marcado de
+> "error de precio" que `DICCIONARIO-DATOS.md` §6 le puso a
+> `COM-00200`/`ELE-00048` (pija lámina): son dos largos de tornillo
+> distintos (1/2" contra 1 1/2"), no el mismo material a dos precios.
+
+### Bitácora de reclasificación — cierra B-61
+
+```
+BITACORA_RECLASIFICACION
+  id
+  nodo_id                       FK Nodo                                    firme
+  familia_anterior_id,
+  familia_nueva_id                 FK Familia                              firme
+  subfamilia_anterior_id,
+  subfamilia_nueva_id               FK Subfamilia, nullable                firme
+  usuario_id, fecha                                                        firme
+```
+
+**"Marcar recalculable la tasa paramétrica" no pide campo en la
+bitácora — pide uno en el otro lado.** `ENSAMBLE_PARAMETRO` (§1c) gana
+`revisar` (boolean, default false) — mismo patrón que `NODO.revisar`
+(P-04): cuando un insumo que alimenta una cohorte cambia de familia, la
+tasa que aprendió de él no se recalcula sola, se marca para revisar. Al
+escribir en `BITACORA_RECLASIFICACION`, el motor busca qué
+`ENSAMBLE_PARAMETRO` dependían de ese `nodo_id` y los marca — misma regla
+que ya rige todo el sistema: **propone, no aplica.**
+
+> **Quién puede reclasificar y quién resuelve un `revisar` sigue sin
+> nombrar** — mismo pendiente de siempre: sin clave todavía en
+> `FUNCION_ATOMICA`.
 
 ---
 
