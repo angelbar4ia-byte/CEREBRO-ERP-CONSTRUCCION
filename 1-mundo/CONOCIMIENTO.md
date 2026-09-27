@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1725 | 32 |
+| §11 | Los flujos entre sistemas | 1749 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3499,6 +3499,30 @@ ninguna comparación existente.
 > el mismo problema que `MOF-00020` —ahí el material sí es ajeno—, es
 > catálogo con etiquetas inconsistentes. Ninguna decisión de diseño lo
 > resuelve; es limpieza de datos, para cuando se migre el catálogo.
+
+### La orden de compra ya viaja en el dato crudo — el catálogo de proveedores sigue sin existir
+
+Julio trae una columna nueva, `Orden Compra` (formato `PC-nnnnnn`), ausente
+en marzo a junio. Aparece exactamente cuando `Motivo=Recepción De
+Material` — 937 de 963 recepciones del mes (97.3%), nunca en
+implosión/salida/sobrante/ajuste. `Proveedor` seguía la misma correlación
+perfecta: puebla exactamente las mismas filas que `Orden Compra`, nunca
+las demás. Encaja con F-3 (§2a de `MODELO.md`, D-348/D-359): la recepción
+entra sin `Lote` a existencia general — y ahora se ve que entra también
+sin obra, pero sí con el nombre libre del proveedor y el número de la
+orden.
+
+Una misma `Orden Compra` agrupa muchas líneas — hasta 35 materiales bajo
+una sola PC en el mes—, consistente con una orden real, no una captura
+por línea. El campo confirma con datos reales lo que D-175/P-39/B-41 ya
+tenían anotado: el proveedor sí existe en el ERP de origen, como texto
+libre en cada movimiento, pero no como catálogo — nada normaliza
+"CONSTRULANDIA" contra sí misma entre movimientos, y hay ruido de
+captura (`PC-111345` frente a `pc-111148`, mayúsculas inconsistentes). No
+cambia la decisión de P-39/B-41 —no se inventa un catálogo sin necesidad
+real—; confirma la forma exacta que tendría si se construye: proveedor +
+número de orden, ya presentes en el crudo, agrupando varias líneas de
+material cada uno.
 
 ---
 
