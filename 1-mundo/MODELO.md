@@ -2041,6 +2041,32 @@ donde guardar el número.
 > escenario con la misma mecánica (Base/Formado/Efecto), pero eso es
 > otra consulta, no una sexta columna aquí.
 
+### El andamio no es material directo — primer caso real de la capa de indirectos (dato del usuario)
+
+`NODO.categoria` ya separaba `herramienta`/`equipo` de `material` (§1);
+lo que faltaba era que **`Pagado Real` (tabla de arriba) también los
+separara.** Confirmado con los cinco meses reales: el andamio
+(`HET-00034`, única clave, `Clase=Herramienta` en el catálogo de origen)
+se despacha con el mismo `motivo=salida_produccion` que el material que sí
+se consume, cargando el 100% de su costo de reposición ($1,661.54/pieza)
+contra la obra que lo recibió — y su regreso casi nunca se registra (2 de
+18 movimientos, ninguno ligado a la obra que lo devuelve). Cinco meses,
+todas las obras: -$73,107.73; solo `ALAMO 18`: -$13,292.31. Cero
+renglones de "andamio" en todo `CATALOGO_DE_PRESUPUESTO.csv` — no hay
+partida que estuviera esperando ese costo.
+
+**No es costo directo de material de una obra — es costo indirecto que se
+reparte.** `Pagado Real` de material (fila de arriba) excluye los
+movimientos cuyo insumo es `HET-00034`; ese costo pasa a la capa de
+indirectos que ya estaba diseñada (`COMPOSICION.reportar_a` +
+`base_porcentaje=acumulado_hasta_aqui`, `CONOCIMIENTO.md` §5) pero que
+hasta hoy no tenía **ningún** dato real que la ejerciera — el andamio es
+el primer caso real de esa capa. La regla se queda acotada a esta clave
+por ahora, a propósito: generalizarla a toda `categoria=herramienta`/
+`equipo` —lo que también le daría cierre a la cimbra, D-356— queda
+pospuesto, dato del usuario; un caso a la vez, no una regla general
+todavía sin más evidencia.
+
 ### Presupuesto Formado es el cruce de dos instancias, no una tercera
 
 `CONOCIMIENTO.md` §11.14 ya lo define: el catálogo reconstruido, **a su

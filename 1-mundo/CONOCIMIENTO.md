@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1788 | 32 |
+| §11 | Los flujos entre sistemas | 1809 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3562,6 +3562,27 @@ de esas filas no confirma un factor limpio de ×50, así que se anota como
 patrón sospechoso, no como el caso real que le faltaba a
 `PRESENTACION_COMPRA` (D-348/D-359) — hace falta más evidencia antes de
 forzarlo ahí.
+
+### El andamio se cobra como si se comprara de nuevo cada vez — dato del usuario, no es material directo
+
+Dato del usuario, sobre el mismo crudo: el andamio está "mal enfocado" —
+su precio de compra no debería pegarle directo a la obra, debería ser un
+rendimiento distinto, como desgaste. Los cinco meses lo confirman con
+números. Única clave real: `HET-00034 ANDAMIO BANQUETERO`, ya catalogada
+`Clase=Herramienta` (bien clasificada ahí; `Grupo=Materiales
+Construccion` sigue siendo el mismo ruido de `Grupo` de más arriba). 18
+movimientos, casi todos (16) `Salida De Material Para Producción` — el
+mismo motivo que usa el cemento — a **$1,661.53847 fijo por pieza**, sin
+importar que el mismo conjunto físico rote entre obras: `Lote=4` sola
+recibe cuatro despachos distintos en cinco meses. Solo dos `Sobrantes`
+(12.5% de las salidas), ninguno ligado a la obra que lo devuelve. Costo
+neto: -$73,107.73 en cinco meses, todas las obras; -$13,292.31 solo en
+`ALAMO 18` (14 de mayo, 8 piezas). Cero renglones de "andamio" en
+`CATALOGO_DE_PRESUPUESTO.csv` — no hay partida presupuestada que absorba
+ese gasto.
+
+**Resuelto, dato del usuario: no es material directo, es indirecto
+repartido.** El mecanismo y su alcance quedan en `MODELO.md` §5f.
 
 ---
 
