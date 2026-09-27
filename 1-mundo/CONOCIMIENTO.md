@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1685 | 32 |
+| §11 | Los flujos entre sistemas | 1699 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3459,6 +3459,20 @@ menciona cimbra, descimbra o cimbrado en **167 renglones** de
 > por eso no pasa por el mismo control que tabique o cemento. Mismo
 > principio que ya distinguió `Flete` de `Acarreo` (§10.2): el sistema
 > no inventa el dato que el proceso real no produce.
+
+### El sobrante compartido entre obras (F-3) ya tiene el otro lado de la evidencia
+
+`MODELO.md` §2a confirmó F-3 con la mitad de la prueba —toda `recepcion`
+entra sin `Lote`, cae a existencia general—. Los cinco meses completan la
+otra mitad: **`ADH-00005` (cemento saco de 50 kg), comprado 47 veces a
+existencia general (14,081 sacos), se consume después por 26 lotes
+distintos** — de `ALAMO 16` a `ALAMO 22`, ninguno con más de 1,518 sacos.
+No es una obra comprando su propio cemento: es un solo pozo de compra
+que sirve a un desarrollo completo, exactamente como F-3 (D-88) lo
+describía antes de tener dato que lo probara. `HID-00001`, `ADH-00001` y
+otros catorce materiales repiten el mismo patrón con 19 a 25 lotes cada
+uno — no es el comportamiento de un insumo raro, es cómo se compra la
+mayoría del material masivo.
 
 ---
 
