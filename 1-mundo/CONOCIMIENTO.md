@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1809 | 32 |
+| §11 | Los flujos entre sistemas | 1838 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3583,6 +3583,35 @@ ese gasto.
 
 **Resuelto, dato del usuario: no es material directo, es indirecto
 repartido.** El mecanismo y su alcance quedan en `MODELO.md` §5f.
+
+### El andamio sigue siendo caso único — verificado contra las otras dos fuentes de presupuesto y contra el resto del catálogo
+
+Pedido del usuario, una vuelta más antes de cerrar: ¿el andamio (D-363) se
+pasó por alto en algún otro archivo, o hay un segundo caso del mismo
+problema escondido en el catálogo? Verificado en tres frentes.
+
+**Cero presupuesto, las tres fuentes.** `HET-00034`/"andamio" no aparece
+ni en `CATALOGO_DE_PRESUPUESTO.csv` (ya confirmado en D-363), ni en
+`ANALISIS_DE_BASICOS_CONCEPTOS.csv`/`COMPUESTOS.csv` (las matrices de
+referencia), ni en ninguno de los 11 archivos reales de ingeniería de
+`ALAMO 18`. No es que faltara cargarlo en un archivo — no existe en
+ningún nivel de este cerebro.
+
+**No hay un segundo andamio.** Revisadas las dos clases más parecidas: los
+otros 20 `Clase=Herramienta` son herramienta menor genuina (machete,
+escalera, brochas, casco) — precio bajo, gasto directo correcto, no
+equipo que rote entre obras. Las 67 `Clase=Equipamiento` son accesorios
+que sí quedan instalados en la casa (cisternas, WC, calentadores, bombas,
+asadores) — material directo real, no equipo de construcción pese al
+nombre de la clase. Ninguna de las dos esconde el mismo patrón del
+andamio.
+
+**Sin contradicción con reglas ya cerradas.** La exclusión de `HET-00034`
+de `Pagado Real` (D-363) no toca la identidad Formado/Base/Ingeniería de
+B-71 (esas tres nunca leen `MOVIMIENTO_ALMACEN`), ni el
+`estimacion_sin_respaldo_material` de B-70 (su testigo sigue siendo
+cemento, nunca andamio), ni el corte matricial de P-19 (el andamio nunca
+aparece vía `implosion`, así que nunca estuvo dentro de ese corte).
 
 ---
 
