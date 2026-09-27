@@ -5,7 +5,7 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-26
+corte:      2026-09-27
 verificado: 12 etapas recorridas · 3 pasan · 3 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
 ```
 
@@ -44,7 +44,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse, y esta obra no tiene actividades cargadas para correrlo |
 | 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
 | 11 | Contratación y congelamiento | ⛔ Sin probar |
-| 12 | Salidas y desviación | ⚠️ **Modelo de datos completo desde el 26/09** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g) — topado en dato, sigue siendo un solo mes de almacén (D-322) |
+| 12 | Salidas y desviación | ⚠️ **Modelo de datos completo desde el 26/09** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g) — el 27/09 pasó de uno a cinco meses de almacén; ahora topado en el avance/pagado, que solo existe para uno de los cinco |
 
 ---
 
@@ -442,6 +442,23 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > destajos, D-294), y D-322 confirmó que un segundo archivo que parecía
 > traer más dato era el mismo abril exportado dos veces. El modelo ya no es
 > lo que falta — el dato, sí.
+
+> **Actualización 2026-09-27 — el cuello de botella se movió, no
+> desapareció.** Marzo, mayo, junio y julio se cargaron completos, sin
+> traslape con abril ni entre sí — de 77 a 386 movimientos reales de
+> `Lote`=18, de 2 `# OP` a 47. `EST-02010` (muro tabique) tiene ahora
+> cuatro meses seguidos de implosión, y julio —cero tabique, cemento
+> normal— es la confirmación más limpia hasta hoy de que el tabique se
+> abastece por lote y un mes sin movimiento no es desviación
+> (`CONOCIMIENTO.md` §11.20). **Pero el archivo de avance/pagado sigue
+> existiendo solo para abril** — sin él no se puede repetir el «% sin
+> respaldo de cemento» para los meses nuevos, así que la tercera pata
+> completa (ingeniería-almacén-pagado) sigue probada sobre un solo mes,
+> aunque el almacén por sí solo ya no lo esté. De paso, dato del usuario
+> al revisar estos archivos buscando insumos no registrados: **la cimbra
+> nunca se mueve para esta obra** pese a que su presupuesto la exige en
+> 167 renglones — no es hueco de diseño, es que nadie la registra
+> (`CONOCIMIENTO.md` §11.20, D-356).
 
 ---
 

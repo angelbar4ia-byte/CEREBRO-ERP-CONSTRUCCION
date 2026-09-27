@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1627 | 31 |
+| §11 | Los flujos entre sistemas | 1685 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3401,6 +3401,64 @@ las dos fuentes miran lo mismo —, y claves con brecha real (`ACE-00001`:
 > El resultado vive en el workbook de trabajo (pestañas de consolidado por
 > material y por destajo), fuera del repo por la misma razón de siempre
 > (`INDICE.md`) — aquí queda el método, no la cifra.
+
+## 11.20 Cinco meses reales, no uno — P-38 deja de estar topado en dato
+
+Cargados marzo a julio completos (antes solo abril). Verificado primero
+lo obvio: **sin traslape de fechas entre los cinco archivos** — no es el
+patrón de doble exportación que ya atrapó D-322/B-64. `Lote` de ALAMO 18
+pasa de **77 a 386 movimientos reales**, de **2 `# OP` a 47**, de una
+foto de una semana a cuatro meses seguidos sobre el mismo concepto.
+
+### El mismo concepto, cuatro meses seguidos
+
+`EST-02010` (Muro Tabique 14 cm) tiene implosión en abril, mayo, junio y
+julio — 39 filas, siempre los mismos dos materiales:
+
+| Mes | Tabique (PZ) | Cemento (sacos) |
+|---|---:|---:|
+| Abril | 6,000 | 60 |
+| Mayo | 18,000 | 98 |
+| Junio | 6,545 | 55 |
+| Julio | **0** | 25 |
+
+**Julio confirma la regla de §11.17 con el caso más limpio hasta hoy**:
+un mes entero sin una sola pieza de tabique consumida, y el muro siguió
+avanzando —el cemento lo prueba, 25 sacos ese mes—. El tabique se
+abastece por lote y su ausencia un mes no significa nada por sí sola;
+comparado 1 a 1 se vería como una desviación enorme que no existe.
+
+`EST-02110`/`EST-02310` (castillo K1, cadena CE-1) repiten tres meses
+seguidos; otros nueve conceptos, dos. Ninguno se explotó todavía contra
+su matriz completa — extender §11.19 a los 47 `# OP` es el siguiente
+paso, no una conclusión de esta pasada.
+
+### Lo que esto no permite todavía
+
+No hay archivo de avance/estimación pagada para marzo, mayo, junio ni
+julio —solo existe para abril—, así que el cálculo del «% de lo pagado
+sin respaldo de cemento» (§11.17) no se puede repetir para los meses
+nuevos todavía. Lo que sí confirman los cinco meses, con la sola
+cantidad de almacén, es el patrón de abasto — no el monto pagado sin
+respaldo.
+
+### Hallazgo nuevo: la cimbra no se registra para esta obra
+
+Dato del usuario, confirmado en los cinco meses: `MAD-00002 CIMBRA 4
+MTS` y `MAD-00003 CIMBRAPLAY 12 MM` existen en el catálogo (Clase
+Maderas) y se mueven para otros lotes — **cero veces para Lote 18** en
+386 movimientos reales. Y sin embargo el presupuesto de esta obra
+menciona cimbra, descimbra o cimbrado en **167 renglones** de
+`CATALOGO_DE_PRESUPUESTO.csv` — toda losa, castillo, cadena y zapata la
+«incluye» en su precio todo-incluido.
+
+> No es hueco de modelo: `MOVIMIENTO_ALMACEN` ya sabe representar una
+> salida de cimbra para cualquier obra (`MODELO.md` §5e) si alguien la
+> registrara. Es que nadie la registra — probablemente porque la cimbra
+> es equipo que se presta y regresa, no un consumible que se repone, y
+> por eso no pasa por el mismo control que tabique o cemento. Mismo
+> principio que ya distinguió `Flete` de `Acarreo` (§10.2): el sistema
+> no inventa el dato que el proceso real no produce.
 
 ---
 
