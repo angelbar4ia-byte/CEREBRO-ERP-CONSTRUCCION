@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1914 | 32 |
+| §11 | Los flujos entre sistemas | 1938 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3688,6 +3688,30 @@ D-365), sin ligar a ninguna `ESTIMACION` ni `CONTRATO`. No es un hueco
 de `MOVIMIENTO_ALMACEN` —la tabla ya registra estas filas sin problema—
 es un proceso de negocio completo que nunca entró al alcance. Anotado,
 no diseñado: P-41.
+
+### Dentro de postventa: humedad es la causa que más se repite, y el mismo desorden de calle/lote reaparece
+
+`ALAMO 18` no tiene ni una fila de postventa en los cinco meses —no le ha
+tocado garantía todavía, o cae fuera de esta ventana—, pero el resto del
+desarrollo sí, y con un patrón: **19.7% del costo de postventa ($22,877
+de $116,319) es material de impermeabilización o sellado** (Fester,
+Sikalastik, Festexsilicon, Sellador del Toro, boquilla selladora) — el
+grupo de causa más grande de todos, aunque no la mayoría. Dos referencias
+lo dicen sin rodeos: *"PISO MAL INSTALADO Y HUMEDAD"* (Fresno 21),
+*"...PASILLO ACACIA 18, HUMEDAD..."* (esta última capturada bajo
+`Ubicacion=FRESNO`, para una casa que el propio texto dice que es
+`ACACIA 18` — **el mismo desorden de calle/lote de D-365, ahora
+confirmado por tercera vez, esta vez dentro de la captura de postventa
+misma**). Aparte, cinco asadores se reponen en el periodo, cuatro de
+ellos el mismo día (30 de abril) en cuatro casas distintas — patrón de
+lote, sin texto que diga si es una falla de producto o solo un cierre de
+tickets agrupado; no hay evidencia para decidir cuál.
+
+70% del costo de postventa ($81,189 de $116,319) ni siquiera se liga a
+un lote — cae bajo `Ubicacion=POSTVENTA`, `Lote=0`, una bolsa general sin
+casa asignada. El 30% restante ($35,130) trae lote real, sobre 20 casas
+distintas — la mayoría con una sola fila, pero `FRESNO 16` concentra 13
+de las 53 filas con lote, la única que se acerca a un foco real.
 
 ---
 
