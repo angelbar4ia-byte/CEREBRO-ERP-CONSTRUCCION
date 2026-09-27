@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1938 | 32 |
+| §11 | Los flujos entre sistemas | 1951 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3712,6 +3712,19 @@ un lote — cae bajo `Ubicacion=POSTVENTA`, `Lote=0`, una bolsa general sin
 casa asignada. El 30% restante ($35,130) trae lote real, sobre 20 casas
 distintas — la mayoría con una sola fila, pero `FRESNO 16` concentra 13
 de las 53 filas con lote, la única que se acerca a un foco real.
+
+### Postventa no es una cuadrilla dedicada — son los mismos contratistas de obra
+
+De las 223 filas, solo 29 (13%) llevan la etiqueta genérica `"Cuadrilla
+Postventa"`. El 87% restante ya trae el nombre de un contratista real
+—`Elias Palma Palma` (74, el mayor), `Eduardo Andrade` (38), `Julio
+Hidalgo` (23), `Leonardo Gallegos` (18), incluso `Rigoberto Orduña` (4,
+uno de los dos contratistas de `ALAMO 18`, aunque nunca en la propia
+`ALAMO 18`)—. Postventa no es un equipo aparte: son los mismos
+destajistas que construyen, llamados de vuelta a arreglar garantía. El
+`CONTRATISTA` recién creado (D-366) ya cubre esta identidad sin pedir
+nada nuevo — la misma tabla atribuye obra nueva y reparación de
+garantía por igual.
 
 ---
 
