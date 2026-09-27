@@ -221,7 +221,7 @@ puede escribir de lo que primero hay que definir.
 | B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | ✅ **P-20 resuelto** — modelo de datos completo (`MODELO.md` §5c, D-327). Falta el motor de cálculo del CPM (código, no schema) | B-05, B-07 |
 | B-14 | **`contratos`** | Cadena de precios, precio por contratista, control de cambio | ✅ Definidas | B-05 |
 | B-15 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones, retenciones | ✅ **P-18 resuelto** — `CONOCIMIENTO.md` §13.8 | B-14 |
-| B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | ✅ **P-19 resuelto** — `MOVIMIENTO_ALMACEN` nueva; el archivo real ya separaba surtido/consumido sin campo extra, corte matricial es vista, no tabla. Devoluciones sin espécimen real todavía, queda abierto. `MODELO.md` §5e, D-333 | B-06 |
+| B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | ✅ **P-19 resuelto** — `MOVIMIENTO_ALMACEN` nueva; el archivo real ya separaba surtido/consumido sin campo extra, corte matricial es vista, no tabla. Devoluciones sin espécimen real todavía, queda abierto — 🆕 apareció `devolucion_cliente` en los cinco meses (D-358), pero es candidato débil: sin `Lote`, con texto de ajuste de inventario, no de devolución real. `MODELO.md` §5e, D-333 | B-06 |
 | B-17 | **Roles y permisos** | Quién captura, aprueba y autoriza | ✅ **P-21 resuelto** — `MODELO.md` §5b | Todos |
 | B-24 | **`propuestas`** | La bandeja única de «propone, no aplica». Con evidencia, origen y rechazos conservados | ✅ Definidas en `CONOCIMIENTO.md` §14 | B-01 |
 

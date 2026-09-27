@@ -1880,7 +1880,10 @@ MOVIMIENTO_ALMACEN
   fecha              TIMESTAMP                                              firme — nuevo
   motivo             enum: recepcion · salida_produccion · implosion ·
                       ajuste_salida · sobrante · faltante ·
-                      inventario_inicial · consumo_interno                  firme — nuevo
+                      inventario_inicial · consumo_interno ·
+                      reversion_movimiento_erroneo · devolucion_cliente —
+                      abierto, crece con evidencia (D-357: cinco meses
+                      reales trajeron dos motivos que abril no traía)     abierto — corregido
   nivel              texto — la etapa (Cimentación, Planta Baja…), misma
                       llave que «nivel de construcción» (`LENGUAJE.md`);
                       null en `recepcion` — no aplica a algo que aún no
@@ -1906,6 +1909,31 @@ MOVIMIENTO_ALMACEN
 **`bodega` no se modela como campo propio todavía** — 4,440 de 4,445 filas
 reales son el mismo almacén; sin un segundo almacén real en uso, es una
 dimensión sin variación que observar.
+
+### `motivo` no era cerrado — cinco meses trajeron dos valores que uno no traía
+
+Corrige la marca «firme» que llevaba desde D-333: sobre 23,075 filas
+reales (cinco meses, todas las obras, no solo Lote 18) aparecen
+`reversion_movimiento_erroneo` y `devolucion_cliente`, ninguno visto en
+abril solo. Mismo criterio que ya llevó a declarar `CLASE_TRABAJO` tabla
+abierta en vez de enum cerrado (§2): **una lista de motivos reales no se
+cierra con un mes de evidencia.**
+
+Los dos son casos únicos (1 fila cada uno, julio) y piden lectura
+cuidadosa, no una fila más sin más:
+
+- **`reversion_movimiento_erroneo`**: `Lote`=4 (no 18), `Referencia`
+  dice «REVERSION DE LOTE ALAMO 4» — deshace una salida capturada por
+  error. Caso limpio: confirma que el ERP real sí corrige movimientos
+  equivocados, con su propio motivo, no editando la fila original.
+- **`devolucion_cliente`**: **no es el espécimen de devolución que P-19
+  dejó pendiente.** `Lote` viene vacío y `Referencia` dice «INGRESO
+  AJUSTE DE INVENTARIO» — el nombre del motivo no calza con su propio
+  texto libre. Más parece un ajuste de inventario capturado bajo el
+  motivo equivocado que una devolución real de material sobrante desde
+  una obra. **La pregunta de P-19 sigue sin espécimen limpio** — esto no
+  la cierra, solo agrega un candidato débil que conviene no confundir
+  con la respuesta.
 
 ### Surtido contra consumido no es un campo — ya lo separa `motivo`
 
