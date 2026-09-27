@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1889 | 32 |
+| §11 | Los flujos entre sistemas | 1914 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3663,6 +3663,31 @@ mecanismo que ya resolvió `nescesario`×32, no pide tabla propia.
 **Resuelto: `CONTRATISTA(id, nombre)` nueva — cierra P-39.** Detalle y
 las tres FK que se desbloquean (`TABULADOR_CONTRATISTA`, `DEDUCCION`,
 `PRESTAMO`) en `MODELO.md` §4a, D-366.
+
+### Hallazgo nuevo: postventa es un proceso real, separado, sin modelar — no un ruido de captura
+
+Las 28 filas que contaminaban el conteo de ALAMO 18 (D-365) tenían algo
+en común además de la calle equivocada: sin `# OP`, `Referencia` genérica
+("Instalación extras", "Instalaciones adicionales") y, en un caso,
+literalmente la palabra **POSTVENTA** en el texto. Aislado ese patrón por
+señal genuina —`Ubicacion=POSTVENTA`, `Contratista="Cuadrilla
+Postventa"` o `Referencia` con "postventa"—, no por la ausencia de `# OP`
+(esa es toda `salida_produccion`, ya sabido desde D-333, 7,853 de 7,853
+filas): **223 filas reales en cinco meses, -$116,319.20, sobre 21
+combinaciones distintas de calle+lote** — casas ya entregadas donde
+alguien vuelve a sacar material. `Referencia` describe reparaciones
+reales: *"Colocación de piso"*, *"Repellos muros"*, *"Instalaciones
+termino conexiones"* — trabajo de garantía, no de obra nueva.
+
+**Este cerebro no ha modelado postventa en ningún momento** —todo lo
+construido hasta hoy asume una casa en construcción, con `presupuesto_id`
+activo y `# OP` corriendo. Postventa comparte el almacén físico pero no
+el resto del aparato: sin orden de producción, con `Lote`/`Ubicacion`
+capturados sueltos (la misma laxitud que produjo la contaminación de
+D-365), sin ligar a ninguna `ESTIMACION` ni `CONTRATO`. No es un hueco
+de `MOVIMIENTO_ALMACEN` —la tabla ya registra estas filas sin problema—
+es un proceso de negocio completo que nunca entró al alcance. Anotado,
+no diseñado: P-41.
 
 ---
 
