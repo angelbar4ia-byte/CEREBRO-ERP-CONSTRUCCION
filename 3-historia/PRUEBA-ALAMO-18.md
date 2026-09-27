@@ -445,8 +445,10 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 
 > **Actualización 2026-09-27 — el cuello de botella se movió, no
 > desapareció.** Marzo, mayo, junio y julio se cargaron completos, sin
-> traslape con abril ni entre sí — de 77 a 386 movimientos reales de
-> `Lote`=18, de 2 `# OP` a 47. `EST-02010` (muro tabique) tiene ahora
+> traslape con abril ni entre sí — de 76 a 358 movimientos reales de
+> ALAMO 18 (`Lote`=18 **y** `Ubicacion`=ALAMO juntos; `Lote` solo no basta
+> — se repite en otras calles, corregido en `CONOCIMIENTO.md` §11.15/D-365),
+> de 2 `# OP` a 47. `EST-02010` (muro tabique) tiene ahora
 > cuatro meses seguidos de implosión, y julio —cero tabique, cemento
 > normal— es la confirmación más limpia hasta hoy de que el tabique se
 > abastece por lote y un mes sin movimiento no es desviación

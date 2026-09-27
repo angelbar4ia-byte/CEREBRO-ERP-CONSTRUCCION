@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1838 | 32 |
+| §11 | Los flujos entre sistemas | 1859 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3149,19 +3149,27 @@ El export mensual de almacén (hoja `Consulta`, 46 columnas) no se puede cruzar 
 ciegas — dos de sus columnas engañan y una tercera se repite. Hallazgos válidos
 para cualquier obra, no solo `ALAMO 18`.
 
-### El filtro de lote correcto
+### El filtro de lote correcto — corregido: ninguna columna sola basta (§11.20)
 
-Hay **tres** columnas candidatas a decir «de qué lote es este movimiento», y solo
-una sirve:
+Hay **tres** columnas candidatas a decir «de qué lote es este movimiento», y con
+un mes y una sola obra de referencia parecía que solo una servía:
 
 | Columna | Qué trae | ¿Sirve para filtrar por lote? |
 |---|---|---|
-| `Lote` | Numérico: 0, 1, 4, 9, 11, 16, 18, 19, 20… | **Sí — es la correcta** |
+| `Lote` | Numérico: 0, 1, 4, 9, 11, 16, 18, 19, 20… | **Necesaria, no suficiente sola** — ver corrección abajo |
 | `# Lote` | Siempre `S/L` | No. Es un campo de lote de fabricación/calidad, no de la casa |
-| `Ubicacion` | Nombre de calle (`ALAMO`, `FRESNO`, `TABACHIN`…) | No confiable: una calle cruza varios números de lote — `ALAMO` sola trae Lote 19 (106 filas), Lote 18 (76), Lote 1 (58) y Lote 0 (7) mezclados |
+| `Ubicacion` | Nombre de calle (`ALAMO`, `FRESNO`, `TABACHIN`…) | No confiable sola: una calle cruza varios números de lote — `ALAMO` sola trae Lote 19 (106 filas), Lote 18 (76), Lote 1 (58) y Lote 0 (7) mezclados |
 
 > Filtrar por `Ubicacion="ALAMO"` en vez de `Lote=18` da un conjunto equivocado —
-> mezcla cuatro lotes distintos bajo el mismo nombre de calle.
+> mezcla cuatro lotes distintos bajo el mismo nombre de calle. **Esta mitad de la
+> trampa seguía siendo cierta.**
+
+> **Corrección con los cinco meses (§11.20): la otra mitad de la trampa nunca se
+> probó.** `Lote` tampoco es único por sí solo — es una numeración por calle, no
+> global: `Lote=18` existe en `ALAMO`, `OLIVO`, `FRESNO` y `MAPLE` a la vez, cuatro
+> casas distintas con el mismo número. La llave real es la combinación
+> `(Ubicacion, Lote)`, nunca una sola columna. Corrige D-249/D-337 — detalle
+> completo y el tamaño real del problema en §11.20.
 
 ### `Ubicacion` aparece dos veces, con significados distintos
 
@@ -3406,9 +3414,20 @@ las dos fuentes miran lo mismo —, y claves con brecha real (`ACE-00001`:
 
 Cargados marzo a julio completos (antes solo abril). Verificado primero
 lo obvio: **sin traslape de fechas entre los cinco archivos** — no es el
-patrón de doble exportación que ya atrapó D-322/B-64. `Lote` de ALAMO 18
-pasa de **77 a 386 movimientos reales**, de **2 `# OP` a 47**, de una
-foto de una semana a cuatro meses seguidos sobre el mismo concepto.
+patrón de doble exportación que ya atrapó D-322/B-64. ALAMO 18 pasa de
+**76 a 358 movimientos reales**, de **2 `# OP` a 47**, de una foto de una
+semana a cuatro meses seguidos sobre el mismo concepto.
+
+> **Corrección (D-365): el conteo original (77→386) traía contaminación
+> de otras calles.** `Lote` no es único por sí solo — es numeración por
+> calle, no global: `Lote=18` existe también en `OLIVO`, `FRESNO` y
+> `MAPLE`, cuatro casas distintas con el mismo número. El filtro correcto
+> es `Lote=18` **y** `Ubicacion=ALAMO` juntos, nunca `Lote` solo —
+> `§11.15` ya corregido. Los 28 movimientos de más (386→358, 11 de ellos
+> en marzo — ese mes queda en **cero** reales para esta obra, no 11) son
+> de otras casas: postventa sin `# OP`, por eso el conteo de `# OP`
+> distintos (47) no cambia. Ninguno toca `EST-02010` ni cimbra —las dos
+> secciones de abajo quedan exactas tal como estaban.
 
 ### El mismo concepto, cuatro meses seguidos
 
@@ -3446,8 +3465,10 @@ respaldo.
 
 Dato del usuario, confirmado en los cinco meses: `MAD-00002 CIMBRA 4
 MTS` y `MAD-00003 CIMBRAPLAY 12 MM` existen en el catálogo (Clase
-Maderas) y se mueven para otros lotes — **cero veces para Lote 18** en
-386 movimientos reales. Y sin embargo el presupuesto de esta obra
+Maderas) y se mueven para otros lotes — **cero veces para ALAMO 18** en
+358 movimientos reales (corregido de 386, ver arriba — ninguno de los 28
+que se restaron era cimbra, la conclusión no cambia). Y sin embargo el
+presupuesto de esta obra
 menciona cimbra, descimbra o cimbrado en **167 renglones** de
 `CATALOGO_DE_PRESUPUESTO.csv` — toda losa, castillo, cadena y zapata la
 «incluye» en su precio todo-incluido.

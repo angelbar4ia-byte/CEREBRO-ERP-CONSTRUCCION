@@ -1866,13 +1866,22 @@ repetida que `CONOCIMIENTO.md` §11.15 ya documentó.
 ```
 MOVIMIENTO_ALMACEN
   id
-  presupuesto_id     FK PRESUPUESTO — se resuelve de la columna `Lote`
-                      (numérica) al importar, **no** de `Ubicacion` (nombre
-                      de calle, cruza varios lotes) ni de `# Lote` (siempre
-                      `S/L`, es otro campo) — la misma trampa que
-                      `CONOCIMIENTO.md` §11.15 ya documentó. Es la única
-                      forma de filtrar por obra en los motivos que no
-                      tienen `nodo_id`                                       firme — nuevo
+  presupuesto_id     FK PRESUPUESTO — se resuelve de la COMBINACIÓN
+                      `(Ubicacion, Lote)` al importar, nunca de `Lote`
+                      solo ni de `Ubicacion` sola — ninguna de las dos es
+                      única por sí misma, ni de `# Lote` (siempre `S/L`,
+                      es otro campo). **Corrige D-249/D-337**: con cinco
+                      meses y todas las obras, 26 de 31 números de `Lote`
+                      se repiten bajo más de una `Ubicacion` (`Lote`=16
+                      aparece en seis calles distintas) — un número de
+                      lote tampoco es único por sí solo, la misma trampa
+                      que ya se sabía de `Ubicacion` pero en la otra
+                      dirección. Con un mes y una sola obra de referencia
+                      no se veía; con el portafolio completo, el 51% de
+                      las filas con `Lote` real caen bajo la calle
+                      minoritaria de su número. Es la única forma de
+                      filtrar por obra en los motivos que no tienen
+                      `nodo_id`                                              firme — corregido
   clave              texto — el insumo (`# Parte`)                          firme — nuevo
   cantidad           NUMERIC con signo — `Efecto Qty`: + entrada, - salida   firme — nuevo
   costo_total        NUMERIC con signo — `Efecto Costo`, el impacto en
