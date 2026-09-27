@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1699 | 32 |
+| §11 | Los flujos entre sistemas | 1725 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3473,6 +3473,32 @@ describía antes de tener dato que lo probara. `HID-00001`, `ADH-00001` y
 otros catorce materiales repiten el mismo patrón con 19 a 25 lotes cada
 uno — no es el comportamiento de un insumo raro, es cómo se compra la
 mayoría del material masivo.
+
+### Insumos que no hacen falta para construir la casa — uno real, no un patrón
+
+Dato del usuario, la otra mitad de la pregunta que trajo la cimbra:
+además de lo que falta por registrar, ¿hay algo registrado que no debería
+estar? Revisados los 387 materiales del catálogo por `Clase`, solo uno
+es limpiamente ajeno a construir una casa: **`MOF-00020`, «Ventilador de
+Piso», bajo `Clase=Material De Oficina`** — la única clave de esa clase
+en los cinco meses, tres movimientos, ~$1,823 en total, nunca ligada a
+un `Lote` real. Es gasto de oficina cargado al mismo catálogo y al mismo
+sistema de movimientos que el material de obra, no un insumo de la casa.
+
+**No es un patrón — es un caso aislado.** El resto de "Consumo Internos"
+(escoba, guantes desechables, una escalera, racks de almacén) son
+consumibles/herramienta de operación de almacén, no de la casa, pero
+tampoco se cuelan en ningún corte matricial: `Consumo Internos` nunca
+tiene `nodo_id` ni se cruza contra una matriz, así que no distorsiona
+ninguna comparación existente.
+
+> **Hallazgo aparte, no el que se buscaba:** `Grupo` trae ruido de
+> captura — un proyector LED bajo `Grupo=Servicios`, un piso bajo
+> `Grupo=Clientes`, taquetes bajo `Grupo=Equipo De Computo`. Son
+> materiales de obra reales, solo mal clasificados en ese campo. No es
+> el mismo problema que `MOF-00020` —ahí el material sí es ajeno—, es
+> catálogo con etiquetas inconsistentes. Ninguna decisión de diseño lo
+> resuelve; es limpieza de datos, para cuando se migre el catálogo.
 
 ---
 
