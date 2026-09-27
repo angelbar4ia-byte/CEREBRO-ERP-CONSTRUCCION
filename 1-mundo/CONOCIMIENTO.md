@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1999 | 32 |
+| §11 | Los flujos entre sistemas | 2044 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3773,6 +3773,51 @@ es para forma (`pza`→`PZ`, sin viaje de vuelta), no para una clave que el
 archivo de origen sigue reconociendo por sí misma. `HD-00411`→`HID-00411`
 y `MOS-2079`→`MOS-02079`, `modo=sustituir`, mismo mecanismo que ya cerró
 el prefijo `AUX-` (P-11).
+
+### P-17 cierra: `Ingeniería ERP` no pedía política — ya tenía la misma respuesta que `ruta`
+
+`Ingeniería ERP` (`LENGUAJE.md`, canon `ruta`) es la posición numérica que
+OPUS asigna a cada renglón — el mismo concepto que en este cerebro
+**ya es vista calculada, nunca campo capturado** (`ruta`, `MODELO.md` §1:
+«calculada, con puntos, NO se guarda como fuente»). No hacía falta
+decidir de dónde sale el valor cuando no viene de OPUS ni qué pasa si
+nunca llega: se preserva tal cual cuando el renglón se cargó desde OPUS
+real (dato opaco, no se recalcula), y simplemente no existe para nada
+generado dentro de este sistema — mismo criterio que ya regía `ruta`,
+solo que aquí la regla de OPUS para generarlo no es deducible
+(`LENGUAJE.md`, prueba de ida y vuelta).
+
+### El menú completo para cuando una ingeniería "se ve extraña" — dato del usuario
+
+La pregunta real detrás de P-17 no era la columna: era **cómo comprobar
+una ingeniería sospechosa desde distintos ángulos**, con niveles de rigor
+distintos según haga falta solo confirmar algo evidente o estar 100%
+seguros. Las cuatro piezas ya existían, sueltas — esto es el menú
+completo, organizado por cuándo se puede usar cada una:
+
+**Al cargar la ingeniería, antes de que exista obra real** — las tres no
+necesitan más que la ingeniería y lo que el catálogo ya trae:
+
+| Herramienta | Qué hace | Peso |
+|---|---|---|
+| Cuantificador gráfico (§1b, B-19) | Mide directo del plano — confirma o refuta un número puntual | Ligero |
+| Auditoría contra el prototipo (§11.7, P-29/P-30) | Compara la ingeniería completa contra la referencia de su tipo de casa; detecta y propone, nunca corrige solo | Medio |
+| Reversión por destajo / explosión de matriz (§11.9, §11.13, §11.14) | Reconstruye el catálogo completo desde la ingeniería real, insumo por insumo, contra la matriz teórica | Pesado |
+
+**Solo cuando la obra ya está avanzando o entregada** — porque compara
+contra algo que antes no existe:
+
+| Herramienta | Qué hace | Peso |
+|---|---|---|
+| Cruce contra almacén real (§11.16 a §11.20, todo el trabajo de P-38) | Compara lo que dice la ingeniería contra lo que de verdad se compró/consumió — responde si el papel pasó de verdad, no solo si es consistente consigo mismo | Pesado, dato real |
+
+**Ninguna reemplaza a las otras — se escalan.** El cuantificador gráfico
+resuelve una duda puntual sin tocar el resto; la auditoría contra
+prototipo y la reversión por destajo se disparan cuando algo se ve raro
+en general y hace falta ver todo el archivo; el cruce contra almacén es
+el único que confirma con dinero y material reales, pero solo puede
+correr después de que la obra ya avanzó. No es una regla única — es un
+criterio de a qué distancia del "100% seguro" hace falta llegar.
 
 ---
 
