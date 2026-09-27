@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1859 | 32 |
+| §11 | Los flujos entre sistemas | 1889 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3633,6 +3633,36 @@ B-71 (esas tres nunca leen `MOVIMIENTO_ALMACEN`), ni el
 `estimacion_sin_respaldo_material` de B-70 (su testigo sigue siendo
 cemento, nunca andamio), ni el corte matricial de P-19 (el andamio nunca
 aparece vía `implosion`, así que nunca estuvo dentro de ese corte).
+
+### El contratista también viaja en el crudo — cierra P-39
+
+Dato del usuario, siguiendo la misma pregunta que ya trajo `Proveedor`/
+`Orden Compra` (§11.20 arriba): la columna `Contratista` viene poblada al
+**100% de las filas con `Lote`**, no solo en recepción como `Proveedor` —
+más fuerte que esa evidencia, no solo paralela. 39 nombres reales en los
+cinco meses, con volumen alto y recurrente entre docenas de lotes cada
+uno (`Rigoberto Orduña`: 3,051 movimientos en 24 lotes distintos;
+`Eduardo Andrade`: 3,045 en 20) — no texto suelto, es la misma identidad
+reapareciendo obra tras obra.
+
+**Para ALAMO 18 específicamente (358 filas reales, corregido), solo dos:**
+`Luis Fernando Aguilera Mallagan` (198 filas — Planta Baja, Planta Alta,
+Cimentación, el grueso de la casa) y `Rigoberto Orduña` (160 —
+Cimentación, Planta Baja, Planta Alta). El mismo campo, en otras obras,
+también nombra subcontratos por oficio (`Candido Tierrablanca`: Pintura,
+Herrería; `Antonio Ramirez Pichardo`: Carpintería) — cubre tanto al
+destajista general como al subcontrato con nombre propio, los dos casos
+que `TABULADOR_CONTRATISTA.nodo_id` ya preveía («trabajo o subcontrato»).
+
+**Dos advertencias de captura antes de cargarlo, ninguna de diseño:**
+`"Bodega"` y `"Cuadrilla Postventa"` son etiquetas de operación interna,
+no contratistas — se excluyen. `"Abelardo Sanabria"`/`"Avelardo
+Sanabria"` son la misma persona con una letra distinta — homologa con el
+mecanismo que ya resolvió `nescesario`×32, no pide tabla propia.
+
+**Resuelto: `CONTRATISTA(id, nombre)` nueva — cierra P-39.** Detalle y
+las tres FK que se desbloquean (`TABULADOR_CONTRATISTA`, `DEDUCCION`,
+`PRESTAMO`) en `MODELO.md` §4a, D-366.
 
 ---
 

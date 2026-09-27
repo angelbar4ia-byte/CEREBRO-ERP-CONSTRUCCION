@@ -905,8 +905,7 @@ de un mercado que fluctúa.
 TABULADOR_CONTRATISTA
   id
   nodo_id          FK Nodo — trabajo o subcontrato                          firme
-  contratista_id   FK Contratista — el catálogo no existe todavía, ver
-                     P-39                                                    firme — nuevo
+  contratista_id   FK CONTRATISTA — cierra P-39, ver abajo                   firme — corregido
   precio           NUMERIC — lo pactado con este contratista                firme
   vigente_desde    DATE                                                     firme
   vigente_hasta    DATE, nullable                                           firme
@@ -917,14 +916,47 @@ igual que el precio del insumo»). **Tabla separada, a propósito**: el PU es
 la referencia fija (`CONOCIMIENTO.md` §13.2: «no es piso ni techo»), y lo
 pactado con cada contratista se compara contra él, nunca lo reemplaza.
 
-### Lo que esto NO resuelve
+### `CONTRATISTA` — cierra P-39, evidencia real en el crudo de almacén
 
-- **No hay catálogo de contratistas** (P-39) — mismo hueco que D-175 ya
-  verificó para proveedores: no está en ningún catálogo de origen, y no se
-  inventa. `contratista_id` queda apuntando a algo que hoy no existe.
-- ~~«Prototipo» es una convención de nombre, no un campo (P-40)~~ —
-  **resuelto**: `PRESUPUESTO.tipo` (§3) lo cierra, y de paso le da hogar a
-  plantilla/instancia del ensamble (§1c, D-325).
+`D-175` había verificado que no hay catálogo de proveedores; `P-39` anotó
+el mismo hueco para contratistas, «no se inventa». Los cinco meses de
+almacén sí lo dan: la columna `Contratista` viene poblada al 100% en cada
+movimiento (no solo en recepción, como `Proveedor`), con 39 nombres
+reales que se repiten con volumen alto entre docenas de lotes —evidencia
+del mismo tipo que ya cerró `PRESENTACION_COMPRA` (B-25, D-348/D-359),
+esta vez suficiente para dar de alta la tabla, no solo para confirmar el
+hueco:
+
+```
+CONTRATISTA
+  id
+  nombre           texto — tal como aparece en el crudo de almacén         firme — nuevo
+```
+
+Mínima a propósito: el crudo no trae oficio, contacto ni identificador
+fiscal — solo el nombre. Dos advertencias de captura, no de diseño:
+**"Bodega" y "Cuadrilla Postventa" no son contratistas** (son etiquetas
+de operación interna, mismo tipo de ruido que `Grupo` en
+`CONOCIMIENTO.md` §11.20) y se excluyen al cargar; **"Abelardo
+Sanabria"/"Avelardo Sanabria"
+son la misma persona**, una sola letra de diferencia — homologa con el
+mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
+`NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
+
+### Lo que esto ya resuelve, de paso
+
+`contratista_responsable_id` (`DEDUCCION`, abajo) y `PRESTAMO.contratista_id`
+dejan de apuntar a la nada — ambos citaban «mismo hueco que P-39». La
+lectura de `DESVIACION` por contratista (§5g) también se desbloquea: se
+agrupa uniendo `nodo_id` contra `TABULADOR_CONTRATISTA.contratista_id`,
+sin campo nuevo en `DESVIACION` — mismo criterio de «se calcula al
+preguntar» que ya evitó una tabla de comparación en `MODELO.md` §5f.
+
+### Lo que ya quedaba resuelto por otro lado
+
+«Prototipo» es una convención de nombre, no un campo (P-40) — resuelto:
+`PRESUPUESTO.tipo` (§3) lo cierra, y de paso le da hogar a
+plantilla/instancia del ensamble (§1c, D-325).
 
 ---
 
@@ -1818,8 +1850,7 @@ DEDUCCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
   tipo                enum: sobrepago · rehacer_trabajo (D-289)           firme
   monto
-  contratista_responsable_id   sin tabla — mismo hueco que P-39, no se
-                                inventa aquí tampoco
+  contratista_responsable_id   FK CONTRATISTA — cierra P-39 (§4a)          firme — corregido
   absorbe_empresa      boolean — true si el responsable ya no está activo
 
 RETENCION
@@ -1828,7 +1859,7 @@ RETENCION
                         subcontrato (D-290)
 
 PRESTAMO
-  id, contratista_id   sin tabla — mismo hueco que P-39
+  id, contratista_id   FK CONTRATISTA — cierra P-39 (§4a)                 firme — corregido
   monto
   salda_via            enum: avance_obra · estimacion_futura (D-290)      firme
   saldo_restante
@@ -1839,9 +1870,10 @@ vigente (D-285), se lee de donde ya vive (`VERSION_CONCEPTO`/`ACTIVIDAD`),
 nunca se copia. Guardarlo aparte lo desincroniza en cuanto el contratado
 cambie.
 
-**`contratista_responsable_id` y `PRESTAMO.contratista_id` no apuntan a
-ninguna tabla** — es el mismo hueco que P-39 ya dejó anotado (no hay
-catálogo de contratistas) y esto no lo resuelve ni lo intenta resolver.
+**`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
+`CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`
+(§4a, D-366): mismo hueco de P-39, resuelto una sola vez para las tres
+FK.
 
 > **Quién escribe cada campo sigue sin nombrar** — mismo pendiente que
 > `INCIDENCIA` y `REGISTRO_AVANCE`: las funciones de capturar, devolver y
@@ -2312,10 +2344,9 @@ cuatro son `GROUP BY nodo_id` / `GROUP BY presupuesto_id` sobre
 `revisar_patrones_desviacion` (P-21) ya tenía nombre de función; ahora
 tiene sobre qué correr.
 
-**Por contratista, la misma lectura queda bloqueada en dato, no en
-diseño** — sin catálogo de contratistas (P-39) no hay `contratista_id` al
-que agrupar, mismo hueco que ya dejaron anotado `TABULADOR_CONTRATISTA`
-(§4a) y `DEDUCCION`/`PRESTAMO` (§5d).
+**Por contratista, la misma lectura se desbloqueó con `CONTRATISTA`
+(§4a, D-366, cierra P-39)** — se agrupa uniendo `nodo_id` contra
+`TABULADOR_CONTRATISTA.contratista_id`, sin campo nuevo aquí.
 
 ### Cuando el patrón corrige el catálogo, ya sabe a quién avisar
 
