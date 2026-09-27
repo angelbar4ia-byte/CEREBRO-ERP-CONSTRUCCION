@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1749 | 32 |
+| §11 | Los flujos entre sistemas | 1788 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3523,6 +3523,45 @@ cambia la decisión de P-39/B-41 —no se inventa un catálogo sin necesidad
 real—; confirma la forma exacta que tendría si se construye: proveedor +
 número de orden, ya presentes en el crudo, agrupando varias líneas de
 material cada uno.
+
+### Precios: la deriva real es pequeña, pero `C/Ultimo`/`C/Promedio` no son la fuente confiable para `PRECIO_HISTORICO`
+
+Cruzados los cinco meses por `# Parte` en recepciones (`Motivo=Recepción
+De Material`, excluyendo cancelaciones): los materiales de alto volumen sí
+muestran una deriva de precio real y pequeña — tabique (`PET-00001`, 251
+recepciones) sube 3.6% en cinco meses, concreto bombeado (`CON-00004`, 88
+recepciones) 1.4% — exactamente lo que `PRECIO_HISTORICO` (P-07/P-08) ya
+está diseñado para capturar.
+
+Pero no todo lo que parece variación de precio lo es. Dos problemas reales
+de captura, no de diseño:
+
+**Filas sueltas rotas.** `SAN-00046` cuesta $15.95-$18.10 en 64 de sus 65
+recepciones — una sola fila (1 de julio) dice $165.95, diez veces más, y
+su propio `Efecto Costo` de esa fila (2 piezas, ≈$30.18 c/u) no cuadra ni
+con el precio normal ni con el roto. `HID-00016` repite el patrón:
+$1.00-$1.12 en 73 de 74 filas, una dice $10.34 sin que el `Efecto Costo`
+la respalde. El dato capturado en `C/Ultimo` puede estar mal sin que el
+costo real de la transacción lo esté — quien construya `PRECIO_HISTORICO`
+sobre este crudo necesita validar contra `Efecto Costo`, no leer
+`C/Ultimo` directo.
+
+**Cancelaciones con precio negativo, no precios negativos reales.**
+`ACE-00001`, `ACR-00001`, `ACE-00012` traen exactamente una fila cada uno
+con `C/Ultimo` negativo — las tres el mismo día, las tres con
+`Referencia="Cancelacion de IR"` y `Cantidad` también negativa. Es una
+reversión contable, no un precio real; se filtra por `Cantidad>0`, no es
+hueco de diseño.
+
+**Un caso sospechoso, no confirmado.** `ELE-00046` (Poliflex, `UDM=M` en
+las 18 recepciones, sin mezcla de unidad) cuesta ~$20-22/M cuando se
+compran 50 M de una vez, pero ronda $995-$1,115 cuando la recepción
+declara `Cantidad=1` — casi exactamente 50× el precio por metro, como si
+"1" significara "1 rollo completo" en vez de "1 metro". El `Efecto Costo`
+de esas filas no confirma un factor limpio de ×50, así que se anota como
+patrón sospechoso, no como el caso real que le faltaba a
+`PRESENTACION_COMPRA` (D-348/D-359) — hace falta más evidencia antes de
+forzarlo ahí.
 
 ---
 
