@@ -824,6 +824,66 @@ almacén (`MODELO.md` §5e) o `Flete` en los reportes de salida
 
 ---
 
+## 3b. Postventa — la casa entregada abre una garantía (P-41 cierra, dato del usuario)
+
+Dato del usuario: modelo completo, no el mínimo. `CONOCIMIENTO.md` §11.20
+(D-367 a D-369) ya probó que el proceso es real — 223 movimientos en
+cinco meses, $116,319.20 — pero 10 de esos (`"cierre oficinas de
+bodega"`, `"oficina bodega"`, `"VENTILADOR PARA OFICINA"`, $11,417.25)
+son gasto de oficina/bodega, no garantía de una casa — mismo patrón que
+`MOF-00020` en D-360, se excluyen. **Quedan 213 filas reales, $104,901.95,
+las que sí ejercen este diseño.**
+
+```
+PRESUPUESTO.fecha_entrega   DATE, nullable — cuándo se entregó al
+                             cliente. Null = sigue en construcción. No
+                             contradice el Hallazgo 6 (`estado` es por
+                             nodo): entrega es un solo evento de la obra
+                             entera, no una etapa de un subárbol           nuevo
+
+TICKET_GARANTIA
+  id
+  presupuesto_id       FK PRESUPUESTO — la casa                            nuevo
+  fecha_reporte        DATE — cuándo se reporta el defecto. Dato nuevo:
+                        el crudo de almacén solo trae la fecha en que se
+                        despachó el material para atenderlo, no cuándo
+                        se reportó — se captura desde ahora, no hay
+                        valor real que reconstruir para los cinco meses
+                        ya cargados                                        nuevo
+  causa                enum, abierto: humedad_impermeabilizacion ·
+                        electrico · acabado_piso_cantera ·
+                        estructural_menor · hidraulico_drenaje ·
+                        equipamiento · pintura · sin_especificar — del
+                        vocabulario real de las 213 filas
+                        (`CONOCIMIENTO.md` §11.20); `sin_especificar` es
+                        legítimo, no un cajón de sastre — 23 de 213 filas
+                        genuinamente no dicen más que "material postventa"  abierto — nuevo
+  contratista_id       FK CONTRATISTA — quien resuelve (D-366)             nuevo
+  estado               enum: abierto · cerrado                            nuevo
+
+MOVIMIENTO_ALMACEN.ticket_garantia_id   FK TICKET_GARANTIA, nullable —
+                             qué ticket generó este despacho; reemplaza
+                             la `Referencia` en texto libre como forma de
+                             ligar un movimiento a su causa                 nuevo
+```
+
+**Costo de garantía es su propia consulta, no una sexta columna de B-71**
+(`MODELO.md` §5f) — mismo criterio que ya excluyó ahí a
+`PRESUPUESTO(tipo=escenario)`: es otra pregunta, sobre otro periodo (después
+de la entrega, no durante la obra). `SUM(MOVIMIENTO_ALMACEN.costo_total)
+WHERE ticket_garantia_id IS NOT NULL`, agrupable por `presupuesto_id`,
+`causa` o periodo — sin tabla nueva de reporte.
+
+**Lo que este diseño no resuelve retroactivo:** de las 213 filas reales,
+160 ($69,771.87) no traen `Lote` real —cayeron en la bolsa general
+`Ubicacion=POSTVENTA`— y se quedan sin `presupuesto_id` posible; el
+ticket exige una casa desde que se abre, pero no hay forma honesta de
+reconstruir a cuál pertenecía cada una de esas 160 filas ya capturadas.
+El diseño corrige la captura hacia adelante, no reescribe lo que ya
+pasó suelto.
+
+---
+
 # 4. Identidad y versionado
 
 ```
@@ -1945,6 +2005,9 @@ MOVIMIENTO_ALMACEN
   proveedor          texto, nullable — solo poblado en `motivo=recepcion`
                       (1,764 de 1,767 filas reales)                         firme — nuevo
   referencia         texto libre, nullable                                  firme — nuevo
+  ticket_garantia_id FK TICKET_GARANTIA, nullable — cierra P-41 (§3b),
+                      solo poblado cuando el despacho es para una
+                      reparación de garantía, no obra nueva                 nuevo
 ```
 
 **`bodega` no se modela como campo propio todavía** — 4,440 de 4,445 filas

@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1951 | 32 |
+| §11 | Los flujos entre sistemas | 1973 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3725,6 +3725,28 @@ destajistas que construyen, llamados de vuelta a arreglar garantía. El
 `CONTRATISTA` recién creado (D-366) ya cubre esta identidad sin pedir
 nada nuevo — la misma tabla atribuye obra nueva y reparación de
 garantía por igual.
+
+### Dato del usuario: modelo completo — 10 de las 223 filas eran gasto de oficina, no garantía
+
+Al diseñar `TICKET_GARANTIA` (`MODELO.md` §3b, D-370) apareció una
+depuración pendiente: `"cierre oficinas de bodega"`, `"oficina bodega"`
+y `"VENTILADOR PARA OFICINA"` —10 filas, $11,417.25— son gasto de
+oficina/bodega capturado bajo el mismo paraguas `POSTVENTA`, no
+reparación de una casa — mismo patrón que `MOF-00020` en D-360, se
+excluyen. **Quedan 213 filas reales, $104,901.95**, las que sí describen
+garantía. El vocabulario real de esas 213 —extraído de `Referencia`, sin
+inventar categorías— agrupa limpio en ocho causas: humedad/
+impermeabilización, eléctrico, acabado de piso/cantera, estructural
+menor (grietas, resanes), hidráulico/drenaje, equipamiento (asadores,
+monomandos), pintura, y **23 filas genuinamente sin más causa que
+"material postventa"** — un octavo valor real, no un cajón de sastre.
+
+De esas 213, **160 ($69,771.87) no traen `Lote` real** — cayeron en la
+bolsa general `Ubicacion=POSTVENTA` sin casa asignada. El nuevo
+`TICKET_GARANTIA` exige una casa desde que se abre un folio; esas 160
+filas ya capturadas se quedan sin forma honesta de reconstruirse — el
+diseño corrige la captura hacia adelante, no reescribe lo que ya pasó
+suelto.
 
 ---
 
