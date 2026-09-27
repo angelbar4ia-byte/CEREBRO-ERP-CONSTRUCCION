@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 1973 | 32 |
+| §11 | Los flujos entre sistemas | 1999 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3747,6 +3747,32 @@ bolsa general `Ubicacion=POSTVENTA` sin casa asignada. El nuevo
 filas ya capturadas se quedan sin forma honesta de reconstruirse — el
 diseño corrige la captura hacia adelante, no reescribe lo que ya pasó
 suelto.
+
+### P-33 cierra: dos claves rotas, confirmadas por descripción, unidad y familia — no dos productos, una mal capturada
+
+`HD-00411` («TUBO HD 3/4 CED 40 NL», unidad `TMO`) aparece tres veces en
+archivos reales de ingeniería de `ALAMO 18`, siempre la misma
+descripción y precio ($150). La familia real `HID-` sí usa `TMO` como
+unidad (83 de sus movimientos reales en almacén) y no existe ningún
+`HID-00411` ya cargado con el que pudiera chocar — nada distingue a
+`HD-00411` de ser `HID-00411` con una letra perdida.
+
+`MOS-2079` («MO SALIDA SAN LAVADERO», unidad `PZ`) está confirmado en
+uso real (cimentación de `ALAMO 18`, $312.50). La familia `MOS-` es real
+y consistente — veinte hermanos confirmados (`MOS-02030` salida
+lavamanos, `MOS-02050` regadera, `MOS-02060` tarja cocina…), todos con
+**cinco dígitos y unidad `PZ`**. `MOS-2079` (cuatro dígitos) rompe ese
+patrón exactamente donde encaja: junto a sus vecinos de familia `02XXX`,
+le falta el cero inicial.
+
+**Resuelto, dato del usuario: las dos van por `CLON`, no por
+`NORMALIZACION`.** `MODELO.md` §4b ya lo distinguía sin que este caso lo
+hubiera ejercido: «la clave sí es identidad… la vieja tiene que poder
+seguir saliendo hasta que se autorice lo contrario» — `NORMALIZACION`
+es para forma (`pza`→`PZ`, sin viaje de vuelta), no para una clave que el
+archivo de origen sigue reconociendo por sí misma. `HD-00411`→`HID-00411`
+y `MOS-2079`→`MOS-02079`, `modo=sustituir`, mismo mecanismo que ya cerró
+el prefijo `AUX-` (P-11).
 
 ---
 
