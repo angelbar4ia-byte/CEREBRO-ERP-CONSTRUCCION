@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2065 | 32 |
+| §11 | Los flujos entre sistemas | 2106 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3304,6 +3304,45 @@ pagado esa semana no tiene material que lo respalde.**
 > *después* del pago —cuando ya no hay oportunidad de comparar— en vez de al
 > momento de preparar la estimación.
 
+### Corregido con cinco meses reales: el 68.5% era la ventana incompleta, no el material
+
+`grid_AvanceOPEventosOpr` para marzo, mayo, junio y julio (antes solo
+abril) permite lo que faltaba: ver la semana 19 completa, no solo su
+mitad de abril. La semana jueves-miércoles del 30 de abril al 6 de mayo
+trae **80 sacos de cemento, no 30** — los 50 restantes entraron el 4, 5
+y 6 de mayo, fuera de la ventana que existía cuando se calculó el 68.5%
+por primera vez.
+
+| | Con solo abril (cálculo original) | Con la semana completa |
+|---|---:|---:|
+| Cemento real | 30 sacos | 80 sacos |
+| Cemento requerido (293 M² × 0.325416) | 95.35 sacos | 95.35 sacos |
+| Respaldo | 31.5% | **83.9%** |
+| Sin respaldo | 68.5% | **16.1%** |
+
+**Y en acumulado, sobre las ocho semanas reales de `EST-02010` entre
+abril y julio, el ajuste es casi exacto:** 238 sacos de cemento real
+contra 237.6 sacos que el rendimiento teórico pide para los 730.15 M²
+pagados en total — **0.17% de diferencia.** Semana a semana el respaldo
+va de 85.9% a 184.4% —dos semanas incluso muestran 0% mirándolas
+solas, la del 11 y la del 21 de junio—, pero **ninguna semana suelta se
+sostiene sin ver el acumulado**: el cemento también llega por lote, en
+tandas de diez sacos cada pocos días, no estrictamente a diario. La
+premisa de que "cemento sí, tabique no" por frecuencia de entrega **era
+la mitad de la historia**: la diferencia es de grado —tabique llega en
+tandas de miles cada mes o más, cemento en tandas de decenas cada pocos
+días—, no de si hace falta ver el acumulado. Los dos lo necesitan.
+
+**Corrige D-251 a D-255 y D-350.** El hallazgo original de
+"sobre-estimación para cerrar la semana" no se sostiene con datos
+completos — era el instrumento el que estaba incompleto, no la obra. El
+mecanismo de `estimacion_sin_respaldo_material` (B-70, `MODELO.md` §5a)
+sigue siendo un control razonable —verificar antes de pagar es mejor que
+después, con cualquier evidencia—, pero su comparación tiene que ser
+contra el **acumulado**, no contra el periodo suelto, o repite el mismo
+falso positivo que produjo el 68.5% original. Detalle del ajuste al
+mecanismo en `MODELO.md` §5a.
+
 ### Las otras cuatro operaciones de abril: limpias, pero sin testigo de material posible
 
 Abril trae seis operaciones de destajo en Lote 18, no solo `EST-02010`. Las
@@ -3327,14 +3366,16 @@ ERP**, en ninguna de las cuatro.
 
 ### Idea a futuro, sin diseñar
 
-Automatizar este mismo cruce (salida de cemento del día/semana contra el M2 que se
-va a estimar) para que corra **al preparar la estimación, antes del cierre del
-viernes** — hoy este cruce se hizo a mano y después del hecho.
-`PENDIENTES-MEJORAS.md` B-70. **Solo un mes de almacén está cargado** (abril) —
-verificado que un segundo archivo de avance (`_28.xlsx`) era el mismo abril
-con otro nombre, mismo patrón de doble exportación que B-64. Cargar más
-meses reales es condición para extender esta prueba más allá de dos
-conceptos.
+Automatizar este mismo cruce (salida de cemento contra el M2 que se va a
+estimar, en acumulado) para que corra **al preparar la estimación, antes
+del cierre del viernes** — hoy este cruce se hizo a mano y después del
+hecho. `PENDIENTES-MEJORAS.md` B-70. **Ya no topado en dato**: cinco
+meses de almacén y cuatro de avance (`grid_AvanceOPEventosOpr`) están
+cargados — verificado que un segundo archivo de avance de abril
+(`_28.xlsx`) era el mismo mes con otro nombre, mismo patrón de doble
+exportación que B-64. Extender la prueba más allá de `EST-02010` con
+este mismo cruce acumulado es el siguiente paso, no una condición de
+dato pendiente.
 
 ## 11.18 Los controles de cambio de ALAMO 18 — CC-ALM-18XXX
 

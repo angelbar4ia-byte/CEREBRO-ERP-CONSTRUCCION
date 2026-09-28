@@ -1325,34 +1325,46 @@ obra, en la lista de §5b.
 
 ### `estimacion_sin_respaldo_material` cierra B-70 — mover el cruce de después del pago a antes
 
-`CONOCIMIENTO.md` §11.17 ya probó el método a mano: la semana 19 de
-`EST-02010` pagó 293 M² con 30 sacos de cemento, que alcanzan para
-~92.2 — 68.5% sin respaldo, detectado **después** del pago, cuando ya no
-había oportunidad de comparar. La idea quedó anotada sin diseño; no
-pedía tabla nueva, pedía mover el momento en que corre.
+`CONOCIMIENTO.md` §11.17 probó el método a mano: la primera lectura, con
+solo abril cargado, decía que la semana 19 de `EST-02010` pagó 293 M²
+con 30 sacos de cemento —68.5% sin respaldo—, detectado **después** del
+pago, cuando ya no había oportunidad de comparar. La idea de mover el
+momento en que corre sigue siendo válida — pero **corregido con cinco
+meses reales, el 68.5% era la ventana incompleta, no un problema real**:
+esa semana traía 80 sacos, no 30 —los otros 50 llegaron en mayo, fuera
+de la ventana de abril—, y en acumulado sobre las ocho semanas reales de
+`EST-02010` el respaldo cuadra al 99.8%. `CONOCIMIENTO.md` §11.17.
 
 **El punto de enganche ya existe: `validar_estimacion`** (`MODELO.md`
 §5b, asignada a Control de obra desde D-206). Antes de aprobar, corre el
 mismo cruce de `CONOCIMIENTO.md` §11.16 y `CONOCIMIENTO.md` §11.17
 —salida de almacén del insumo testigo contra el rendimiento teórico— y
 si no alcanza para lo reclamado, dispara la alerta en vez de aprobar en
-silencio. `evidencia` guarda
-`{insumo_testigo, cantidad_almacen, m2_soportado, m2_estimado, periodo}`;
-`parametro_usado.umbral_pct` acota cuánto faltante es tolerable, mismo
-mecanismo que `identidad_dudosa`.
+silencio. **Corregido: la comparación es contra el acumulado, nunca
+contra el periodo suelto** —el falso positivo de la semana 19 fue
+exactamente comparar un periodo aislado—. `evidencia` guarda
+`{insumo_testigo, cantidad_almacen_acumulada, m2_soportado_acumulado,
+m2_estimado_acumulado, periodo}`; `parametro_usado.umbral_pct` acota
+cuánto faltante acumulado es tolerable, mismo mecanismo que
+`identidad_dudosa`.
 
 **Cuál insumo es el «testigo» no es campo nuevo — es criterio de quien
-configura la revisión, caso por caso.** El propio hallazgo lo muestra:
-cemento sirve porque se entrega a diario; tabique no, porque se abastece
-por lote y su desfase semanal es normal. Generalizar esa elección a una
-regla automática pediría más de un caso confirmado — hoy solo hay uno.
-Guardar el insumo usado en `evidencia` de cada alerta es suficiente para
-auditar la elección sin comprometerse a una regla que todavía no tiene
-evidencia.
+configura la revisión, caso por caso.** El hallazgo original decía que
+cemento servía por entregarse a diario y tabique no, por abastecerse por
+lote — **corregido: es diferencia de grado, no de tipo.** Cemento
+también llega por lote —tandas de diez sacos cada pocos días, no una
+entrega diaria—, solo que su tanda es más chica y más frecuente que la
+de tabique. Los dos necesitan vista acumulada; lo que cambia entre
+insumos es cuánta ventana hace falta acumular antes de que la
+comparación sea justa, no si hace falta acumular. Generalizar el tamaño
+de esa ventana a una regla automática sigue pidiendo más casos
+confirmados — hoy solo hay uno completo (`EST-02010`). Guardar el
+insumo usado en `evidencia` de cada alerta sigue siendo suficiente para
+auditar la elección.
 
-**Sigue topado en el mismo dato que `CONOCIMIENTO.md` §11.17 ya señaló:**
-un solo mes de almacén cargado (D-322) — extender la prueba más allá de
-`EST-02010` pide meses reales adicionales, no más diseño.
+**Ya no topado en dato:** cinco meses de almacén y cuatro de avance
+(`grid_AvanceOPEventosOpr`) están cargados. Extender la prueba más allá
+de `EST-02010` con el mismo cruce acumulado es el siguiente paso.
 
 ### `subcontrato_fuera_de_base` cierra B-78 — no hay umbral por %, hay alerta y criterio
 

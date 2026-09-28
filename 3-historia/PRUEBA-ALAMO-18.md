@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-27
-verificado: 12 etapas recorridas · 3 pasan · 3 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
+corte:      2026-09-28
+verificado: 12 etapas recorridas · 4 pasan · 2 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
 ```
 
 > **Escenario de prueba** en el sentido de B-42: un caso real recorrido de punta a
@@ -44,7 +44,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse, y esta obra no tiene actividades cargadas para correrlo |
 | 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
 | 11 | Contratación y congelamiento | ⛔ Sin probar |
-| 12 | Salidas y desviación | ⚠️ **Modelo de datos completo desde el 26/09** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g) — el 27/09 pasó de uno a cinco meses de almacén; ahora topado en el avance/pagado, que solo existe para uno de los cinco |
+| 12 | Salidas y desviación | ✅ **Pasa — cinco meses de almacén y cuatro de avance, el triángulo material-avance cuadra en acumulado al 99.8%** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g). El 27/09 pasó de uno a cinco meses de almacén; el 28/09 cerró el avance —y con él, un falso positivo propio: el 68.5% sin respaldo que parecía un hallazgo real era la ventana de datos incompleta (D-375) |
 
 ---
 
@@ -462,15 +462,34 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > 167 renglones — no es hueco de diseño, es que nadie la registra
 > (`CONOCIMIENTO.md` §11.20, D-356).
 
+> **Actualización 2026-09-28 — la tercera pata completa, y un falso
+> positivo propio corregido.** El usuario cargó `grid_AvanceOPEventosOpr`
+> de marzo, mayo, junio y julio — el archivo de avance/pagado que faltaba
+> en la actualización de arriba. Con la semana 19 de `EST-02010` completa
+> (antes cortada a la mitad por el mes que faltaba), el 68.5% sin
+> respaldo de cemento que este mismo documento reportó **no se sostiene**:
+> esa semana traía 80 sacos, no 30 — los otros 50 llegaron en mayo, fuera
+> de la ventana que existía cuando se calculó. Extendido a las ocho
+> semanas reales de `EST-02010` entre abril y julio: en acumulado, 238
+> sacos de cemento real contra 237.6 que pide el rendimiento teórico para
+> los 730.15 M² pagados — **0.17% de diferencia**. El aprendizaje de
+> fondo también se corrige: cemento y tabique se abastecen los dos por
+> lote, diferencia de grado (tandas chicas y frecuentes contra tandas
+> grandes y espaciadas), no de tipo — ninguno se lee bien semana a
+> semana sin ver el acumulado. Corregido en `CONOCIMIENTO.md` §11.17 y en
+> el diseño de `estimacion_sin_respaldo_material` (`MODELO.md` §5a), que
+> ahora compara contra el acumulado. `CONOCIMIENTO.md` §11.17, D-375.
+
 ---
 
 # Resultado de la prueba
 
-**Tres etapas pasan, tres tienen matices, cuatro quedaron diseñadas sin caso real
+**Cuatro etapas pasan, dos tienen matices, cuatro quedaron diseñadas sin caso real
 que las ejercite, dos no se pueden probar.** El flujo aguanta completo desde la
 carga hasta la comparación entre planes, y donde empieza la ejecución ya hay
-modelo de datos completo — el cuello de botella dejó de ser el diseño y pasó a
-ser, en cada una de las cuatro `🔶`, la falta de un caso real corriendo encima.
+modelo de datos completo y probado con cinco meses reales — el cuello de botella
+dejó de ser el diseño y pasó a ser, en cada una de las cuatro `🔶`, la falta de un
+caso real corriendo encima.
 
 > **Actualización 2026-09-26.** Cuando se corrió esta prueba (2026-09-20), 6 de
 > las 12 etapas no tenían dónde apoyarse (`⛔`). Hoy son 2 (`Cuantificación`,
@@ -493,7 +512,7 @@ ser, en cada una de las cuatro `🔶`, la falta de un caso real corriendo encima
 | 5 | **Dos exports de salidas pueden ser la misma fuente filtrada distinto** — hay que verificar identidad de origen antes de sumar | B-64 |
 | 6 | **El catálogo maestro no cubre el 100% de los conceptos reales**, aunque nivel y etapa existan — `OBE-01010` no tiene ninguna fila de referencia | B-65 |
 | 7 | **Comparar material real contra un total de matriz que incluye mano de obra infla la brecha artificialmente** — almacén nunca la registra | D-252, `CONOCIMIENTO.md` §11.16 |
-| 8 | **No todos los insumos sirven igual para verificar semana a semana** — el que se abastece por lote no sirve, el que se entrega a diario sí | D-255, B-70 |
+| 8 | **Ningún insumo se verifica bien semana a semana sin ver el acumulado** — corregido: se creyó que cemento (diario) servía y tabique (por lote) no; los dos se abastecen por lote, solo que en tandas de tamaño distinto | D-255, D-375, B-70 |
 
 ## Lo que la prueba validó
 
