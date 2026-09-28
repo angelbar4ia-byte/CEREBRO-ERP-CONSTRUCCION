@@ -1314,6 +1314,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `identidad_dudosa` | La razón entre el total cargado y el total del prototipo declarado se desvía más del `umbral_pct` | P-30 |
 | `invariante_por_vencer` | Pasan más de `parametro_usado.meses_vencimiento` (default 6, D-129) desde el `corte:` de `INVARIANTES.md` — sin campo nuevo, lee el mismo encabezado que ya lleva todo archivo del cerebro | B-54 |
 | `estimacion_sin_respaldo_material` | Al correr `validar_estimacion`, la salida de almacén del insumo testigo (`MOVIMIENTO_ALMACEN`, `motivo` ∈ {`salida_produccion`, `implosion`}) del periodo no alcanza, contra el rendimiento teórico, para los m² que la estimación reclama — más del `umbral_pct` de faltante | B-70 |
+| `consumo_material_sin_respaldo_avance` | Mismo cruce, dirección contraria: el insumo testigo consumido excede, contra el rendimiento teórico, lo que el avance reclamado necesita — más del `umbral_pct` de exceso | B-79 |
 | `subcontrato_fuera_de_base` | El Real de un subcontrato (D-313) difiere de su Base, en cualquier dirección — sin umbral por %, dato del usuario | B-78 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
@@ -1348,23 +1349,63 @@ m2_estimado_acumulado, periodo}`; `parametro_usado.umbral_pct` acota
 cuánto faltante acumulado es tolerable, mismo mecanismo que
 `identidad_dudosa`.
 
-**Cuál insumo es el «testigo» no es campo nuevo — es criterio de quien
-configura la revisión, caso por caso.** El hallazgo original decía que
-cemento servía por entregarse a diario y tabique no, por abastecerse por
-lote — **corregido: es diferencia de grado, no de tipo.** Cemento
-también llega por lote —tandas de diez sacos cada pocos días, no una
-entrega diaria—, solo que su tanda es más chica y más frecuente que la
-de tabique. Los dos necesitan vista acumulada; lo que cambia entre
-insumos es cuánta ventana hace falta acumular antes de que la
-comparación sea justa, no si hace falta acumular. Generalizar el tamaño
-de esa ventana a una regla automática sigue pidiendo más casos
-confirmados — hoy solo hay uno completo (`EST-02010`). Guardar el
-insumo usado en `evidencia` de cada alerta sigue siendo suficiente para
-auditar la elección.
+**Cuál insumo es el «testigo» ya no es criterio suelto caso por caso —
+es la semilla `TESTIGO_MATERIAL` (`CATALOGOS.md` §12).** El hallazgo
+original decía que cemento servía por entregarse a diario y tabique no,
+por abastecerse por lote — **corregido: es diferencia de grado, no de
+tipo.** Cemento también llega por lote —tandas de diez sacos cada pocos
+días, no una entrega diaria—, solo que su tanda es más chica y más
+frecuente que la de tabique. Los dos necesitan vista acumulada; lo que
+cambia entre insumos es cuánta ventana hace falta acumular antes de que
+la comparación sea justa, no si hace falta acumular. Extendido el
+cruce a diecisiete conceptos reales (`CONOCIMIENTO.md` §11.20, D-376),
+la mayoría confirma la misma lectura dentro del ruido esperado por
+redondeo a saco entero — suficiente para dejar de tratarlo caso por
+caso. Guardar el insumo usado en `evidencia` de cada alerta sigue
+siendo la forma de auditar la elección, ahora contra un catálogo en vez
+de contra la memoria de quien configuró la revisión.
 
 **Ya no topado en dato:** cinco meses de almacén y cuatro de avance
-(`grid_AvanceOPEventosOpr`) están cargados. Extender la prueba más allá
-de `EST-02010` con el mismo cruce acumulado es el siguiente paso.
+(`grid_AvanceOPEventosOpr`) están cargados, y la prueba ya se extendió
+más allá de `EST-02010` — ver `consumo_material_sin_respaldo_avance`,
+abajo.
+
+### `consumo_material_sin_respaldo_avance` cierra B-79 — el mismo cruce, vigilando el otro lado
+
+Extender el cruce de `CONOCIMIENTO.md` §11.17 a los demás conceptos que
+comparten cemento como testigo (`CONOCIMIENTO.md` §11.20, D-376) confirmó
+la lectura en la mayoría, y de paso mostró que
+`estimacion_sin_respaldo_material` solo vigila **un** lado: cuando el
+material no alcanza para lo reclamado. Nunca vigiló el lado contrario
+—cuando el material consumido **excede** por mucho lo que el avance
+reclamado necesita—, pese a que el mismo cruce ya lo calcula.
+
+**El caso que lo motiva:** castillo K1 (`EST-02110`) en `ALAMO 18`
+consumió 33 sacos de cemento contra 13.65 que su rendimiento teórico
+pide para los M reales avanzados en sus tres meses —+141.7%—, un
+exceso que no es ruido de redondeo (33 contra 13.65 no se explica por
+sacos enteros). **Verificado que no es un problema del insumo testigo
+ni de la matriz**: el mismo concepto, a escala completa —todos los
+lotes, cinco meses—, da -7.4%, dentro del mismo rango que sus hermanos
+K2/K3/K7/K8 en `ALAMO 18` (-17.3% a +6.8%). La anomalía es real y sostenida, pero
+**aislada a este lote — sin explicación todavía.**
+
+`evidencia` guarda la misma forma que su espejo:
+`{insumo_testigo, cantidad_almacen_acumulada, avance_esperado_acumulado,
+periodo}`; `parametro_usado.umbral_pct` acota cuánto exceso acumulado es
+tolerable antes de disparar. Ambas alertas corren en la misma pasada de
+`validar_estimacion` —un cruce, dos lados posibles de salirse—, y solo
+sobre pares `TESTIGO_MATERIAL.confiabilidad` ∈ {`confirmado`,
+`consistente`} (`CATALOGOS.md` §12): no tiene caso alertar sobre un par
+que todavía no tiene suficiente historia para saber qué es normal.
+
+**Que el hueco de K1 quede sin explicar no es un defecto del diseño —es
+exactamente lo que esta alerta existe para señalar.** Si hubiera estado
+corriendo, habría marcado el castillo K1 de `ALAMO 18` para que alguien
+con contexto de campo lo revisara —material sobrante mal atribuido a
+esta orden, uso compartido con otra actividad no registrada, o consumo
+real por encima del estándar—, en vez de quedar enterrado en el cruce
+manual que lo encontró meses después.
 
 ### `subcontrato_fuera_de_base` cierra B-78 — no hay umbral por %, hay alerta y criterio
 

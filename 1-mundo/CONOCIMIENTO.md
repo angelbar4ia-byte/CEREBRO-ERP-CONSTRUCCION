@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2106 | 32 |
+| §11 | Los flujos entre sistemas | 2159 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3880,6 +3880,59 @@ que ya recibió OPUS: tabla columna por columna, prueba de ida y vuelta
 propia de este lado. Es trabajo pendiente, no hecho hoy — vive en B-09
 (`4-direccion/PENDIENTES-MEJORAS.md`), que ya era el lugar correcto para
 esto y ahora tiene un segundo caso real que atender, no solo el de OPUS.
+
+### Extendido a los demás conceptos que comparten cemento — confirma la regla, encuentra un caso sin explicar
+
+§11.17 probó el cruce acumulado sobre un solo concepto (`EST-02010`).
+Con los cinco `grid_AvanceOPEventosOpr` cargados, el mismo cruce —salida
+real del insumo testigo, vía `# OP` (une almacén con avance sin
+ambigüedad: verificado que ningún `# OP` de `ALAMO 18` se comparte entre
+dos conceptos distintos) contra el rendimiento teórico del avance
+reclamado— se repitió sobre los diecisiete conceptos reales que también
+usan cemento (`ADH-00005`) en su matriz.
+
+| Conceptos | Meses reales | Diferencia (acumulado) | Lectura |
+|---|---|---:|---|
+| `EST-02010` (muro tabique) | 4 | +0.2% | Ya confirmado, D-375 |
+| `EST-02011` (muro tabique, 3er nivel) | 1 | -1.0% | Mismo patrón que `EST-02010` |
+| Castillos K2/K3/K7/K8 (`EST-02120`/`02130`/`02170`/`02180`), cadena CE-1 (`EST-02310`) | 1 a 3 | -22.3% a +6.8% | Dentro del ruido esperado por redondeo a saco entero |
+| `ALB-01210` (repello fachada) | 1 | +18.9% | Consistente, historia corta |
+| Cadena CE-2, columnas CM-1 (`EST-02320`, `EST-07010`/`07011`) | 1 | +56.8% a +71.4% | Base de 1-8 sacos — el % es ruido, no señal |
+| Repello muro/plafond (`ALB-01010`/`01012`/`01110`/`01212`) | 1 cada uno | -100% a +632.6% | Contradictorios entre sí — un mes no alcanza, misma trampa que produjo el 68.5% original |
+| **Castillo K1 (`EST-02110`)** | 3 | **+141.7%** | **Real, sostenido — sin explicar** |
+
+**La mayoría confirma la lección de arriba, generalizada**: donde hay
+suficiente historia y volumen, el rendimiento teórico cuadra dentro de lo
+esperable; donde solo hay un mes o una base pequeña, el % rebota sin
+decir nada, exactamente el mismo tipo de falso positivo que produjo el
+68.5% original — no una excepción a la regla, una confirmación de por
+qué hace falta acumulado antes de alertar.
+
+**Castillo K1 es la excepción real.** 33 sacos de cemento reales contra
+13.65 que pide su rendimiento teórico para los M avanzados en sus tres
+meses (mayo-julio) — una diferencia demasiado grande para ser redondeo.
+Antes de anotarlo como hallazgo, se verificó si el problema era el
+testigo o la matriz: **a escala completa, todos los lotes, cinco
+meses, el mismo concepto da -7.4%**, dentro del mismo rango que sus
+hermanos K2 (-14.1%), K3, K7, K8. El rendimiento teórico de castillo K1
+está bien — lo que no cuadra es específicamente el consumo de
+`ALAMO 18`, y no hay en este cruce cómo saber si es material sobrante
+mal atribuido a esta orden, uso compartido con otra actividad sin
+registrar, o consumo real por encima del estándar. **Queda abierto,
+no se fuerza una explicación** — `PENDIENTES-MEJORAS.md` B-79.
+
+**De paso, un hueco de diseño**: el cruce de §11.17 solo revisaba el
+lado de faltante (material insuficiente para lo reclamado). Castillo K1
+está del otro lado —material de más—, y no había alerta que lo vigilara.
+Corregido en `MODELO.md` §5a: `ALERTA(tipo=
+consumo_material_sin_respaldo_avance)`, mismo cruce, dirección
+contraria.
+
+**La semilla que evita repetir este cruce a mano:** qué insumo sirve de
+testigo confiable para cada concepto, y con qué confianza, ya no vive
+solo en esta narración — `TESTIGO_MATERIAL` (`CATALOGOS.md` §12) la
+convierte en catálogo, con los diecisiete conceptos de esta corrida como
+carga inicial.
 
 ---
 

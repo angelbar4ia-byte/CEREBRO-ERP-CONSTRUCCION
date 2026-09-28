@@ -1177,5 +1177,53 @@ determina.
 > O se obtiene la regla del ERP externo, o **el código se arrastra del archivo
 > original** en vez de calcularse.
 
+---
+
+## 12 `TESTIGO_MATERIAL` — qué insumo sirve de testigo para verificar cada concepto
+
+`MODELO.md` §5a necesita, para `ALERTA(tipo=estimacion_sin_respaldo_material)` y su
+espejo `consumo_material_sin_respaldo_avance`, saber **qué insumo confiar como
+testigo de cada concepto** — el mismo criterio de campo que ya distinguió cemento de
+tabique en `CONOCIMIENTO.md` §11.17. Con un solo caso completo (`EST-02010`) eso era
+«criterio de quien configura la revisión, caso por caso»; con diecisiete conceptos
+reales cruzados contra cinco meses de almacén (`CONOCIMIENTO.md` §11.20), ya es
+catálogo.
+
+### Es semilla, no derivado
+
+**Qué insumo es confiable como testigo no sale de ningún catálogo ni se calcula —se
+confirma cruzando contra almacén real, obra por obra, hasta que el patrón se
+repite.** Igual que `SEMILLA-cuadrilla-rendimiento.xlsx` (§10): OPUS no lo sabe y no
+lo va a saber, porque no es un dato de OPUS — es evidencia acumulada de este cerebro.
+Se carga con lo ya confirmado hoy y **crece fila por fila** conforme se cruzan más
+conceptos; nunca se recalcula desde cero ni se repite este cruce a mano.
+
+| Concepto | Insumo testigo | Confiabilidad | Evidencia |
+|---|---|---|---|
+| `EST-02010` (muro tabique 14cm) | `PET-00001` (tabique) | **Confirmado** | Exacto — 6,000/6,000 PZ, abril (`CONOCIMIENTO.md` §11.16) |
+| `EST-02010` (muro tabique 14cm) | `ADH-00005` (cemento) | **Confirmado** | 0.2% de diferencia en acumulado, 4 meses, 8 eventos reales (§11.17, D-375) |
+| `EST-01060` (losa de cimentación) | `CON-00001` (concreto premezclado) | **Confirmado** | Exacto — 37.330/37.330 M3, abril (§11.16) |
+| `EST-02011` (muro tabique, 3er nivel) | `ADH-00005` | Consistente | -1.0% — mismo patrón que `EST-02010`, un solo evento (§11.20) |
+| `EST-02110`/`02120`/`02130`/`02170`/`02180` (castillos K1-K8), `EST-02310` (cadena CE-1) | `ADH-00005` | **Confirmado** | -22.3% a +6.8% por concepto en `ALAMO 18`; a escala completa (todos los lotes, 5 meses) -7.4% a -14.1% — dentro de lo esperado. **Excepción abierta: castillo K1 (`EST-02110`) específicamente en `ALAMO 18`, +141.7% sostenido en sus tres meses reales — no explicado.** `PENDIENTES-MEJORAS.md` B-79 |
+| `ALB-01210` (repello fachada) | `ADH-00005` | Consistente | +18.9%, un mes, tres eventos (§11.20) |
+| `EST-02320` (cadena CE-2), `EST-07010`/`07011` (columnas CM-1) | `ADH-00005` | Insuficiente | Un solo evento, base pequeña (1-8 sacos) — el % es ruido de redondeo a saco entero, no señal |
+| `ALB-01010`/`01012`/`01110`/`01212` (repello muro/plafond) | `ADH-00005` | Insuficiente | Un solo mes cada uno, resultados contradictorios entre sí (-100% a +632.6%) — misma trampa que produjo el 68.5% original (§11.17): falta más historia antes de confiar en cualquiera |
+
+**Cómo se usa:** `estimacion_sin_respaldo_material` y `consumo_material_sin_respaldo_avance`
+(`MODELO.md` §5a) solo corren en automático sobre pares marcados `Confirmado` o
+`Consistente`. Los `Insuficiente` quedan documentados —para no repetir el cruce a
+mano la próxima vez— pero no disparan alerta sola todavía: hace falta historia, no
+solo una lectura, mismo criterio que ya frenó una regla automática de tamaño de
+ventana en `MODELO.md` §5a.
+
+```
+TESTIGO_MATERIAL
+  id
+  concepto_id           FK Nodo (rol=concepto)                                firme — nuevo
+  insumo_id             FK Nodo (rol=material) — el insumo testigo            firme — nuevo
+  confiabilidad         enum: confirmado · consistente · insuficiente         firme — nuevo
+  evidencia             texto — de qué corrida y con qué cifra sale           firme — nuevo
+```
+
 
 ---

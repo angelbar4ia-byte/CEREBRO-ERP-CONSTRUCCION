@@ -480,6 +480,26 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > el diseño de `estimacion_sin_respaldo_material` (`MODELO.md` §5a), que
 > ahora compara contra el acumulado. `CONOCIMIENTO.md` §11.17, D-375.
 
+> **Mismo día, extensión — el método se generaliza a diecisiete conceptos
+> más, y aparece un caso nuevo sin explicar.** El cruce acumulado de
+> arriba se repitió sobre los demás conceptos que también usan cemento
+> como testigo. La mayoría confirma la misma lectura dentro del ruido
+> esperado por redondeo a saco entero; donde solo hay un mes de historia,
+> el % rebota sin decir nada —la familia de repello (`ALB-01010`/`01012`/
+> `01110`/`01212`) sale contradictoria entre sí, -100% a +632.6%, misma
+> trampa que produjo el 68.5% original. **Castillo K1 (`EST-02110`) es la
+> excepción real**: +141.7% de cemento sobre su rendimiento teórico en
+> sus tres meses, verificado que no es la matriz ni el testigo —a escala
+> completa, todos los lotes, el mismo concepto da -7.4%, igual que sus
+> hermanos K2/K3/K7/K8—. Queda abierto, sin forzar explicación
+> (`PENDIENTES-MEJORAS.md` B-79). De paso, un hueco de diseño: la alerta
+> de D-375 solo vigilaba faltante de material, nunca exceso — corregido
+> con `ALERTA(tipo=consumo_material_sin_respaldo_avance)`, mismo cruce,
+> dirección contraria. Y la elección de insumo testigo deja de vivir en
+> la memoria de quien configura la revisión: semilla `TESTIGO_MATERIAL`
+> nueva (`CATALOGOS.md` §12), dato del usuario: «guarda las tablas para
+> datos semilla». `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, D-376.
+
 ---
 
 # Resultado de la prueba
@@ -513,6 +533,7 @@ caso real corriendo encima.
 | 6 | **El catálogo maestro no cubre el 100% de los conceptos reales**, aunque nivel y etapa existan — `OBE-01010` no tiene ninguna fila de referencia | B-65 |
 | 7 | **Comparar material real contra un total de matriz que incluye mano de obra infla la brecha artificialmente** — almacén nunca la registra | D-252, `CONOCIMIENTO.md` §11.16 |
 | 8 | **Ningún insumo se verifica bien semana a semana sin ver el acumulado** — corregido: se creyó que cemento (diario) servía y tabique (por lote) no; los dos se abastecen por lote, solo que en tandas de tamaño distinto | D-255, D-375, B-70 |
+| 9 | **Verificar solo el lado de faltante deja ciego el lado de exceso** — el mismo cruce que corrigió el 68.5% encontró, al extenderse, un concepto (castillo K1) consumiendo 141.7% de más — sin alerta que lo vigilara hasta hoy | D-376, B-79 |
 
 ## Lo que la prueba validó
 
