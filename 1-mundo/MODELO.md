@@ -1370,6 +1370,17 @@ de contra la memoria de quien configuró la revisión.
 más allá de `EST-02010` — ver `consumo_material_sin_respaldo_avance`,
 abajo.
 
+**El caso que la motivó originalmente resultó falso positivo (D-375) —
+pero ya apareció uno real y más limpio.** `ALB-01212` (repellado muros
+fachada) está prácticamente terminado según las tres fuentes de avance
+que existen (ingeniería, `PRECIO_REAL`, `grid_AvanceOPEventosOpr`), y su
+orden no tiene **un solo movimiento de almacén, de ningún insumo**, en
+los cinco meses (`CONOCIMIENTO.md` §11.20, D-378). A diferencia de la
+semana 19, aquí no hay ventana incompleta que lo explique — las tres
+fuentes ya están de acuerdo en que el trabajo se dio por terminado.
+Exactamente el patrón que esta alerta existe para atrapar antes de
+aprobar, no meses después con un cruce manual.
+
 ### `consumo_material_sin_respaldo_avance` cierra B-79 — el mismo cruce, vigilando el otro lado
 
 Extender el cruce de `CONOCIMIENTO.md` §11.17 a los demás conceptos que

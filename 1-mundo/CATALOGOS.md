@@ -1206,22 +1206,31 @@ conceptos; nunca se recalcula desde cero ni se repite este cruce a mano.
 | `EST-02011` (muro tabique, 3er nivel) | `ADH-00005` | Consistente | -1.0% — mismo patrón que `EST-02010`, un solo evento (§11.20) |
 | `EST-02110`/`02120`/`02130`/`02170`/`02180` (castillos K1-K8), `EST-02310` (cadena CE-1) | `ADH-00005` | **Confirmado** | -22.3% a +6.8% por concepto en `ALAMO 18`; a escala completa (todos los lotes, 5 meses) -7.4% a -14.1% — dentro de lo esperado. Castillo K1 mostró +141.7% en una primera lectura — **corregido: era avance incompleto en una sola fuente (`grid_AvanceOPEventosOpr`, 32.8% de un diseño de 339.20 M), no exceso de material** (`CONOCIMIENTO.md` §11.20) |
 | `ALB-01210` (repello fachada) | `ADH-00005` | Consistente | +18.9%, un mes, tres eventos (§11.20) |
-| `EST-02320` (cadena CE-2), `EST-07010`/`07011` (columnas CM-1) | `ADH-00005` | Insuficiente | Un solo evento, base pequeña (1-8 sacos) — el % es ruido de redondeo a saco entero, no señal |
-| `ALB-01010`/`01012`/`01110`/`01212` (repello muro/plafond) | `ADH-00005` | Insuficiente | Un solo mes cada uno, resultados contradictorios entre sí (-100% a +632.6%) — misma trampa que produjo el 68.5% original (§11.17): falta más historia antes de confiar en cualquiera |
+| `EST-02320` (cadena CE-2), `EST-07010`/`07011` (columnas CM-1) | `ADH-00005` | Consistente | Un solo evento, base pequeña (1-8 sacos) — el % es ruido de redondeo a saco entero, **confirmado, no artefacto de fuente incompleta: las tres fuentes de avance coinciden 100%** (§11.20, D-378) |
+| `ALB-01010` (repello muro 3.00) | `ADH-00005` | **Confirmado** | +15.5% cruzado contra `PRECIO_REAL` (60.2% avanzado) — el +109.1% original era `grid_AvanceOPEventosOpr` viendo solo 33.2% del avance real, mismo patrón que castillo K1. **Corrige D-376** (§11.20, D-378) |
+| `ALB-01212` (repello muros fachada 3.00) | `ADH-00005` | **Confirmado** | Rate correcto —el testigo funciona—, pero **anomalía real sin resolver**: las tres fuentes de avance coinciden en ~100% completado y la orden no tiene un solo movimiento de almacén, de ningún insumo. Caso limpio para `estimacion_sin_respaldo_material` (§11.20, D-378) |
+| `ALB-01110` (repello plafond 3.00) | `ADH-00005` | Consistente | Déficit -48% a -59% bajo cualquier lectura, nunca exceso — consistente con material aún por surtir. Nota sin resolver: `PRECIO_REAL` supera a la ingeniería para este concepto, único caso así (§11.20, D-378) |
+| `ALB-01012` (repello plafond 3.00, código distinto de `ALB-01212`) | `ADH-00005` | **En investigación** | +326% contra `PRECIO_REAL` (24.1% avanzado), +2.8% contra el diseño completo — el material parece adelantado a **todas** las fuentes de avance, no solo a una. No es el patrón de castillo K1; sigue sin explicarse (§11.20, D-378) |
 
 **Cómo se usa:** `estimacion_sin_respaldo_material` y `consumo_material_sin_respaldo_avance`
 (`MODELO.md` §5a) solo corren en automático sobre pares marcados `Confirmado` o
 `Consistente`. Los `Insuficiente` quedan documentados —para no repetir el cruce a
 mano la próxima vez— pero no disparan alerta sola todavía: hace falta historia, no
 solo una lectura, mismo criterio que ya frenó una regla automática de tamaño de
-ventana en `MODELO.md` §5a.
+ventana en `MODELO.md` §5a. **`En investigación` es un cuarto estado, distinto de
+`Insuficiente`**: aquí sí hay historia suficiente —cruzada contra tres fuentes,
+caso de `ALB-01012` (D-378)— pero el resultado no cuadra con ninguna explicación
+disponible todavía. Tampoco dispara alerta sola: si el propio testigo resultara
+la causa, generalizar la regla con él encima repetiría el problema en vez de
+detectarlo.
 
 ```
 TESTIGO_MATERIAL
   id
   concepto_id           FK Nodo (rol=concepto)                                firme — nuevo
   insumo_id             FK Nodo (rol=material) — el insumo testigo            firme — nuevo
-  confiabilidad         enum: confirmado · consistente · insuficiente         firme — nuevo
+  confiabilidad         enum: confirmado · consistente ·                     firme — nuevo
+                         insuficiente · en_investigacion                     firme — nuevo
   evidencia             texto — de qué corrida y con qué cifra sale           firme — nuevo
 ```
 

@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2201 | 32 |
+| §11 | Los flujos entre sistemas | 2256 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3975,6 +3975,61 @@ testigo confiable para cada concepto, y con qué confianza, ya no vive
 solo en esta narración — `TESTIGO_MATERIAL` (`CATALOGOS.md` §12) la
 convierte en catálogo, con los diecisiete conceptos de esta corrida como
 carga inicial.
+
+### Revisados los siete `insuficiente` contra ingeniería: dos se resuelven, uno queda abierto más limpio que K1
+
+Mismo método que resolvió castillo K1 (`ingeniería` + `PRECIO_REAL` +
+`grid_AvanceOPEventosOpr`), aplicado a los conceptos que la semilla
+había marcado `insuficiente` por tener solo un mes de historia.
+
+**`EST-02320`, `EST-07010`, `EST-07011`: confirmados sin misterio.** Las
+tres fuentes coinciden exactas —100% completos—, y el `±57%` a `±106%`
+de diferencia en cemento es ruido puro de base chica (1 a 8 sacos). No
+eran artefacto de fuente incompleta: eran ruido de volumen, tal como se
+había leído la primera vez.
+
+**`ALB-01010` (repellado muro 3.00) se resuelve igual que castillo K1.**
+`grid_AvanceOPEventosOpr` solo veía 250 de 753 M diseñados (33.2%);
+`PRECIO_REAL` ya reporta 453 M (60.2%). Con la cifra más completa, el
++109.1% original —contradictorio con sus hermanos— baja a **+15.5%**,
+normal. **Corrige D-376.**
+
+**`ALB-01212` (repellado muros fachada 3.00) es un hallazgo nuevo, y más
+limpio que castillo K1.** Aquí las tres fuentes ya coinciden —191 a 223
+M, esencialmente terminado— y aun así el cemento real es **cero**.
+Revisada su orden completa, `# OP 24285`: **cero movimientos de
+almacén, de cualquier insumo, en los cinco meses** — no es solo el
+cemento, no hay nada. A diferencia de K1, aquí no hay margen para
+explicarlo por una fuente de avance incompleta: las tres ya dicen que
+la obra está prácticamente terminada. Es el caso real y limpio que
+`estimacion_sin_respaldo_material` (B-70) necesitaba —el que la motivó
+originalmente (semana 19 de `EST-02010`) resultó ser un falso positivo,
+D-375—: avance dado por bueno, sin un solo movimiento de material que
+lo respalde. Queda anotado, sin forzar una causa —pudo pagarse sin
+surtir material propio, capturarse con otro insumo no identificado, o
+ser un hueco de captura— pero con las tres fuentes de avance de acuerdo,
+la pregunta ya no es de dónde sale el % que falta, es por qué no hay
+ningún material.
+
+**`ALB-01110` (repellado plafond 3.00): sin exceso bajo ninguna
+lectura** —déficit de -48% a -59%, consistente con material que aún no
+se termina de surtir para un trabajo que sigue activo. Nota aparte, sin
+resolver: `PRECIO_REAL` (79.96 M) supera a la ingeniería (62.64 M) para
+este concepto —las dos fuentes que en los demás casos nunca se cruzan,
+aquí se invierten. No cambia la lectura del cemento (sigue sin exceso),
+pero es un cabo suelto de captura que no se investigó más a fondo.
+
+**`ALB-01012` (repellado plafond 3.00, código distinto de `ALB-01212`
+—se verificó que no es el mismo concepto ni un error de captura del
+otro: los dos existen en el catálogo, con matrices propias) sigue sin
+explicarse, y es una anomalía distinta.** Contra `PRECIO_REAL` (52 M,
+24.1% avanzado), el cemento real (42 sacos) sigue siendo **+326%** de
+exceso. Contra el diseño completo —214 M, 100% hipotético— da **+2.8%**,
+casi exacto. El material parece haberse surtido pensando en la obra ya
+terminada, muy por delante de lo que **todas** las fuentes de avance
+reportan — no es el mismo patrón que castillo K1 (ahí el material seguía
+de cerca a la fuente más completa; aquí va adelante de todas). **Sigue
+en investigación, sin conclusión todavía.**
 
 ---
 

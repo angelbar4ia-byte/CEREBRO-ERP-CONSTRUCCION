@@ -517,6 +517,21 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > real, no el recorte de una sola fuente. `CONOCIMIENTO.md` §11.20,
 > `MODELO.md` §5a, D-377.
 
+> **Mismo día, cuarta vuelta — el mismo cruce sobre los `insuficiente`
+> de la semilla: dos se resuelven, uno sale limpio, uno sigue abierto.**
+> `EST-02320`/`EST-07010`/`EST-07011` confirmados sin misterio (100% en
+> las tres fuentes, el % grande es ruido de base chica). `ALB-01010` se
+> resuelve igual que castillo K1: `grid_AvanceOPEventosOpr` veía 33.2%,
+> `PRECIO_REAL` ya reporta 60.2% — con eso el +109.1% baja a +15.5%.
+> **`ALB-01212` sale más limpio que K1**: las tres fuentes coinciden en
+> ~100% avanzado, y su orden no tiene un solo movimiento de almacén, de
+> ningún insumo — el caso real que `estimacion_sin_respaldo_material`
+> necesitaba, sin la ventana incompleta que salvó a K1. **`ALB-01012`
+> queda en investigación**: adelantado a todas las fuentes de avance a
+> la vez (+326% contra la más completa, +2.8% contra el diseño total),
+> patrón distinto al que sí se resolvió en los demás.
+> `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, D-378.
+
 ---
 
 # Resultado de la prueba
@@ -552,6 +567,7 @@ caso real corriendo encima.
 | 8 | **Ningún insumo se verifica bien semana a semana sin ver el acumulado** — corregido: se creyó que cemento (diario) servía y tabique (por lote) no; los dos se abastecen por lote, solo que en tandas de tamaño distinto | D-255, D-375, B-70 |
 | 9 | **Verificar solo el lado de faltante deja ciego el lado de exceso** — el mismo cruce que corrigió el 68.5% encontró, al extenderse, un concepto (castillo K1) consumiendo 141.7% de más — sin alerta que lo vigilara hasta hoy | D-376, B-79 |
 | 10 | **Una sola fuente de avance puede quedarse corta sin que se note — corregido: castillo K1 no consumía de más, `grid_AvanceOPEventosOpr` capturaba de menos.** Cruzado contra ingeniería y `PRECIO_REAL`, era el único de seis hermanos sin terminar, y la única fuente que no lo reflejaba. Antes de tomar un exceso como real, corroborar contra una segunda fuente | D-377 |
+| 11 | **El mismo cruce de tres fuentes no siempre resuelve la anomalía — a veces la confirma más limpia.** `ALB-01010` se resolvió igual que K1; `ALB-01212`, con las tres fuentes ya de acuerdo en que el trabajo terminó, resultó tener cero material — el caso real que la alerta necesitaba. `ALB-01012` no se resolvió: quedó adelantado a las tres fuentes a la vez, distinto de todo lo visto antes | D-378 |
 
 ## Lo que la prueba validó
 
