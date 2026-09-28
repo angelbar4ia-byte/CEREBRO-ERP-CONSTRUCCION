@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2159 | 32 |
+| §11 | Los flujos entre sistemas | 2201 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3899,7 +3899,7 @@ usan cemento (`ADH-00005`) en su matriz.
 | `ALB-01210` (repello fachada) | 1 | +18.9% | Consistente, historia corta |
 | Cadena CE-2, columnas CM-1 (`EST-02320`, `EST-07010`/`07011`) | 1 | +56.8% a +71.4% | Base de 1-8 sacos — el % es ruido, no señal |
 | Repello muro/plafond (`ALB-01010`/`01012`/`01110`/`01212`) | 1 cada uno | -100% a +632.6% | Contradictorios entre sí — un mes no alcanza, misma trampa que produjo el 68.5% original |
-| **Castillo K1 (`EST-02110`)** | 3 | **+141.7%** | **Real, sostenido — sin explicar** |
+| **Castillo K1 (`EST-02110`)** | 3 | **+141.7%** | Primera lectura — **corregido abajo: era avance incompleto, no exceso** |
 
 **La mayoría confirma la lección de arriba, generalizada**: donde hay
 suficiente historia y volumen, el rendimiento teórico cuadra dentro de lo
@@ -3908,25 +3908,67 @@ decir nada, exactamente el mismo tipo de falso positivo que produjo el
 68.5% original — no una excepción a la regla, una confirmación de por
 qué hace falta acumulado antes de alertar.
 
-**Castillo K1 es la excepción real.** 33 sacos de cemento reales contra
-13.65 que pide su rendimiento teórico para los M avanzados en sus tres
-meses (mayo-julio) — una diferencia demasiado grande para ser redondeo.
-Antes de anotarlo como hallazgo, se verificó si el problema era el
-testigo o la matriz: **a escala completa, todos los lotes, cinco
-meses, el mismo concepto da -7.4%**, dentro del mismo rango que sus
-hermanos K2 (-14.1%), K3, K7, K8. El rendimiento teórico de castillo K1
-está bien — lo que no cuadra es específicamente el consumo de
-`ALAMO 18`, y no hay en este cruce cómo saber si es material sobrante
-mal atribuido a esta orden, uso compartido con otra actividad sin
-registrar, o consumo real por encima del estándar. **Queda abierto,
-no se fuerza una explicación** — `PENDIENTES-MEJORAS.md` B-79.
+**La primera lectura marcó castillo K1 como la excepción real.** 33
+sacos de cemento reales contra 13.65 que pedía su rendimiento teórico
+para los M avanzados en `grid_AvanceOPEventosOpr`, sus tres meses
+(mayo-julio) — una diferencia demasiado grande para ser redondeo. Antes
+de anotarlo como hallazgo, se verificó si el problema era el testigo o
+la matriz: a escala completa, todos los lotes, cinco meses, el mismo
+concepto da -7.4%, dentro del mismo rango que sus hermanos K2 (-14.1%),
+K3, K7, K8 — el rendimiento teórico estaba bien. Quedó abierto, sin
+forzar una explicación.
 
-**De paso, un hueco de diseño**: el cruce de §11.17 solo revisaba el
-lado de faltante (material insuficiente para lo reclamado). Castillo K1
-está del otro lado —material de más—, y no había alerta que lo vigilara.
-Corregido en `MODELO.md` §5a: `ALERTA(tipo=
+### Corregido: no era exceso — `grid_AvanceOPEventosOpr` solo capturaba un tercio de castillo K1
+
+Dato del usuario, pidiendo cruzar el caso contra una tercera fuente. La
+ingeniería de `ALAMO 18` trae `EST-02110` **tres veces** —una por nivel
+(Planta Baja 260 M, Planta Alta 64 M, Azotea/Roof 15.2 M)—, algo que ni
+`grid_AvanceOPEventosOpr` ni la primera lectura habían sumado. Cruzando
+las tres fuentes de avance para castillo K1 y sus cinco hermanos:
+
+| Concepto | Ingeniería (M, diseño total) | `PRECIO_REAL` (M, Mano de Obra) | `grid_AvanceOPEventosOpr` (M) | % completado |
+|---|---:|---:|---:|---:|
+| **K1 (`EST-02110`)** | **339.20** | 241.19 | 111.14 | **71.1%** |
+| K2 (`EST-02120`) | 101.40 | 98.40 | 98.40 | 97.0% |
+| K3 (`EST-02130`) | 20.00 | 20.00 | 20.00 | 100.0% |
+| K7 (`EST-02170`) | 21.60 | 21.60 | 21.60 | 100.0% |
+| K8 (`EST-02180`) | 20.00 | 20.00 | 20.00 | 100.0% |
+| Cadena CE-1 (`EST-02310`) | 196.34 | 196.34 | 196.34 | 100.0% |
+
+**Los cinco hermanos ya están 97-100% construidos — por eso las tres
+fuentes coinciden exactas entre sí: no queda nada pendiente que una
+fuente vea y otra no.** Castillo K1 es, con mucho, el más grande de los
+seis (339.20 M diseñados, más de tres veces K2) y **el único que
+todavía no se termina** — 71.1% avanzado según `PRECIO_REAL`,
+`grid_AvanceOPEventosOpr` capturó menos todavía (32.8% del diseño). No
+es que K1 tenga un problema de consumo: es el único con trabajo real
+pendiente, y por eso es el único donde las fuentes de avance se quedan
+cortas de formas distintas. Los 33 sacos reales alcanzan para 268.6 M
+teóricos — entre el 241.19 M que `PRECIO_REAL` ya reporta avanzado y el
+339.20 M de diseño total. El cemento siguió al avance real de la obra,
+no al recorte que `grid_AvanceOPEventosOpr` alcanzó a capturar.
+
+**También se descartó, antes de esta corrección, que el cemento viniera
+de surtido suelto sin ligar a concepto**: las 69 filas de cemento de
+`ALAMO 18`, sin excepción, salen por `Motivo = Implosión De Materiales`
+—la que siempre liga vía `# OP`—, nunca por `Salida De Material Para
+Producción` —la que casi nunca trae `# OP`—. El cruce por `# OP` estaba
+parado en terreno sólido; lo que faltaba era una tercera fuente de
+avance, no una revisión del método de unión.
+
+**Corrige D-376.** `PENDIENTES-MEJORAS.md` B-79.
+
+**De paso, un hueco de diseño real que la corrección no borra**: el
+cruce de §11.17 solo revisaba el lado de faltante (material insuficiente
+para lo reclamado). Aunque el caso que lo mostró (castillo K1) resultó
+no ser exceso, el hueco seguía siendo real — no había alerta que
+vigilara el lado contrario. Corregido en `MODELO.md` §5a: `ALERTA(tipo=
 consumo_material_sin_respaldo_avance)`, mismo cruce, dirección
-contraria.
+contraria. **Lección añadida al mecanismo**: antes de concluir exceso
+real, corroborar el avance reclamado contra una segunda fuente si existe
+—ingeniería del concepto, o un segundo sistema de captura— es la misma
+disciplina que ya pedía comparar contra el acumulado (D-375), un nivel
+más abajo.
 
 **La semilla que evita repetir este cruce a mano:** qué insumo sirve de
 testigo confiable para cada concepto, y con qué confianza, ya no vive

@@ -1382,13 +1382,18 @@ reclamado necesita—, pese a que el mismo cruce ya lo calcula.
 
 **El caso que lo motiva:** castillo K1 (`EST-02110`) en `ALAMO 18`
 consumió 33 sacos de cemento contra 13.65 que su rendimiento teórico
-pide para los M reales avanzados en sus tres meses —+141.7%—, un
-exceso que no es ruido de redondeo (33 contra 13.65 no se explica por
-sacos enteros). **Verificado que no es un problema del insumo testigo
-ni de la matriz**: el mismo concepto, a escala completa —todos los
-lotes, cinco meses—, da -7.4%, dentro del mismo rango que sus hermanos
-K2/K3/K7/K8 en `ALAMO 18` (-17.3% a +6.8%). La anomalía es real y sostenida, pero
-**aislada a este lote — sin explicación todavía.**
+pedía para los M avanzados según `grid_AvanceOPEventosOpr` en sus tres
+meses —+141.7%—. **Corregido, cruzando contra una tercera fuente
+(`CONOCIMIENTO.md` §11.20): no era exceso, era avance incompleto.** La
+ingeniería de `ALAMO 18` diseña castillo K1 tres veces (una por nivel,
+339.20 M en total) — más del triple que cualquiera de sus cinco
+hermanos, todos ya 97-100% construidos. Castillo K1 mismo va en 71.1%
+según `PRECIO_REAL` (Mano de Obra) pero solo 32.8% según
+`grid_AvanceOPEventosOpr` — la única fuente de las tres que se quedó
+corta, y solo para este concepto. Los 33 sacos reales alcanzan para
+268.6 M teóricos, justo entre lo ya avanzado (241.19 M) y el diseño
+completo (339.20 M): el cemento seguía el avance real, no el recorte
+que una sola fuente alcanzó a capturar.
 
 `evidencia` guarda la misma forma que su espejo:
 `{insumo_testigo, cantidad_almacen_acumulada, avance_esperado_acumulado,
@@ -1398,14 +1403,20 @@ tolerable antes de disparar. Ambas alertas corren en la misma pasada de
 sobre pares `TESTIGO_MATERIAL.confiabilidad` ∈ {`confirmado`,
 `consistente`} (`CATALOGOS.md` §12): no tiene caso alertar sobre un par
 que todavía no tiene suficiente historia para saber qué es normal.
+**Lección del caso que la motivó:** antes de que la alerta se tome como
+exceso real, `avance_esperado_acumulado` debería corroborarse contra una
+segunda fuente cuando exista —la ingeniería del concepto es la más
+disponible, ya cargada siempre—; el mismo `# OP` puede estar completo
+en una fuente e incompleto en otra, y ahí es donde este mecanismo
+repetiría el falso positivo que ya corrigió D-375 a nivel de periodo.
 
-**Que el hueco de K1 quede sin explicar no es un defecto del diseño —es
-exactamente lo que esta alerta existe para señalar.** Si hubiera estado
-corriendo, habría marcado el castillo K1 de `ALAMO 18` para que alguien
-con contexto de campo lo revisara —material sobrante mal atribuido a
-esta orden, uso compartido con otra actividad no registrada, o consumo
-real por encima del estándar—, en vez de quedar enterrado en el cruce
-manual que lo encontró meses después.
+**Que el hueco de diseño (ningún lado de exceso vigilado hasta hoy)
+siga siendo real, aunque el caso que lo mostró se haya resuelto, es
+exactamente por qué la alerta vale la pena tenerla corriendo:** el
+cruce manual que encontró y luego resolvió el caso de castillo K1 tomó
+varias rondas y dos fuentes adicionales — corriendo dentro de
+`validar_estimacion`, con la corroboración de arriba, se hace en una
+sola pasada en vez de a mano, meses después.
 
 ### `subcontrato_fuera_de_base` cierra B-78 — no hay umbral por %, hay alerta y criterio
 

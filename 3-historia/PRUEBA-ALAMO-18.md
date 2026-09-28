@@ -500,6 +500,23 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > nueva (`CATALOGOS.md` §12), dato del usuario: «guarda las tablas para
 > datos semilla». `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, D-376.
 
+> **Mismo día, tercera vuelta — castillo K1 no era exceso, dato del
+> usuario pidiendo cruzar contra la ingeniería.** Verificado primero que
+> el cemento sale 100% por `Implosión De Materiales`, nunca por `Salida
+> De Material Para Producción` — el cruce por `# OP` estaba parado en
+> terreno sólido. La ingeniería de `ALAMO 18` diseña `EST-02110` tres
+> veces, una por nivel (Planta Baja/Alta/Azotea, 339.20 M en total) —
+> más del triple que cualquiera de sus cinco hermanos. Cruzando tres
+> fuentes de avance (ingeniería, `PRECIO_REAL`, `grid_AvanceOPEventosOpr`)
+> para los seis: los cinco hermanos están 97-100% construidos y las tres
+> fuentes coinciden exactas. **Solo castillo K1 sigue sin terminar**
+> (71.1% según `PRECIO_REAL`) **y solo ahí `grid_AvanceOPEventosOpr` se
+> quedó corto** (32.8% del diseño) — la fuente que se había usado para
+> el cruce original. Los 33 sacos reales alcanzan para 268.6 M teóricos,
+> entre lo ya avanzado y el diseño completo: el cemento siguió el avance
+> real, no el recorte de una sola fuente. `CONOCIMIENTO.md` §11.20,
+> `MODELO.md` §5a, D-377.
+
 ---
 
 # Resultado de la prueba
@@ -534,6 +551,7 @@ caso real corriendo encima.
 | 7 | **Comparar material real contra un total de matriz que incluye mano de obra infla la brecha artificialmente** — almacén nunca la registra | D-252, `CONOCIMIENTO.md` §11.16 |
 | 8 | **Ningún insumo se verifica bien semana a semana sin ver el acumulado** — corregido: se creyó que cemento (diario) servía y tabique (por lote) no; los dos se abastecen por lote, solo que en tandas de tamaño distinto | D-255, D-375, B-70 |
 | 9 | **Verificar solo el lado de faltante deja ciego el lado de exceso** — el mismo cruce que corrigió el 68.5% encontró, al extenderse, un concepto (castillo K1) consumiendo 141.7% de más — sin alerta que lo vigilara hasta hoy | D-376, B-79 |
+| 10 | **Una sola fuente de avance puede quedarse corta sin que se note — corregido: castillo K1 no consumía de más, `grid_AvanceOPEventosOpr` capturaba de menos.** Cruzado contra ingeniería y `PRECIO_REAL`, era el único de seis hermanos sin terminar, y la única fuente que no lo reflejaba. Antes de tomar un exceso como real, corroborar contra una segunda fuente | D-377 |
 
 ## Lo que la prueba validó
 
