@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2044 | 32 |
+| §11 | Los flujos entre sistemas | 2065 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3818,6 +3818,27 @@ en general y hace falta ver todo el archivo; el cruce contra almacén es
 el único que confirma con dinero y material reales, pero solo puede
 correr después de que la obra ya avanzó. No es una regla única — es un
 criterio de a qué distancia del "100% seguro" hace falta llegar.
+
+### P-15 cierra: sí hace falta un traductor — el caso real ya existe, es «Mi ERP PYME»
+
+Dato del usuario: el almacén de toda esta sesión no sale de OPUS —sale de
+**«Mi ERP PYME»**, un sistema de diseño particular que el usuario opera
+directamente, y que **corre sobre el motor de SAP Business One por
+dentro** (de ahí que el archivo real traiga `Tipo` con los valores
+propios de SAP —`PUR-STK`, `STK-UNK`, `STK-ASM`— y la estructura de 46
+columnas, hoja `Consulta`, que `CONOCIMIENTO.md` §11.15 ya documentó sin
+saber a qué sistema pertenecía). No es un ERP hipotético a futuro: es el
+tercer sistema real, distinto de OPUS, ya en uso.
+
+`CONOCIMIENTO.md` §11.15 a §11.20 ya funcionan como el trabajo informal
+de traducción —el léxico correcto (`Lote`, no `Ubicacion`/`# Lote`), las
+dos columnas repetidas, el corte por motivo, la cadena `OP:`— sin haber
+pasado por el canon formal que sí tiene OPUS (`LENGUAJE.md`). **Falta
+formalizarlo como el segundo dialecto real del canon**, mismo tratamiento
+que ya recibió OPUS: tabla columna por columna, prueba de ida y vuelta
+propia de este lado. Es trabajo pendiente, no hecho hoy — vive en B-09
+(`4-direccion/PENDIENTES-MEJORAS.md`), que ya era el lugar correcto para
+esto y ahora tiene un segundo caso real que atender, no solo el de OPUS.
 
 ---
 
