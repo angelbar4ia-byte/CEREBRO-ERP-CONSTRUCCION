@@ -5,8 +5,8 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se propone construir?
 tiempo:     vamos aquí
-corte:      2026-09-13
-verificado: ✅ 16 decisiones cerradas · pendiente diseño formal
+corte:      2026-09-26
+verificado: ✅ 22 decisiones cerradas · pendiente diseño formal
 ```
 
 > **Para revisar y decidir, no para construir todavía.**
@@ -191,6 +191,9 @@ fuente declarada.
 > Sin esa regla, mezclar fuentes no da más precisión: **da doble contabilidad con
 > apariencia de rigor.**
 
+> **El cuantificador tiene un segundo uso, para programar en vez de
+> presupuestar** — con su propio techo y tolerancia: `§4`, "Dos cuantificadores".
+
 ---
 
 # 3 · Paramétrico
@@ -301,6 +304,27 @@ La tercera es para las partidas que **no llevan ingeniería por naturaleza** —
 despiezan, se compran o contratan armadas—. No hay rendimiento del cual derivar días,
 así que la duración se declara.
 
+### Cómo se arma el programa: manual o por carga
+
+Dos orígenes, y dentro de cada uno el mismo reparto de roles:
+
+| | Quién | Qué controla |
+|---|---|---|
+| **Manual, con diseño** | Control de obra | Marca o edita duración desde un presupuesto PU o paramétrico. Vincula actividades: sucesora, predecesora, interrupción |
+| **Manual, sin diseño** | Residente | Captura fechas de inicio y fin concretas — la duración se calcula al revés que arriba (fecha menos fecha, no rendimiento). Al registrarse avance, reprograma solo |
+| **Por carga, estructura** | Control de obra | Fija el vínculo entre actividades cargadas; puede modificar duración, inicio, fin, predecesor, sucesor e interrupciones |
+| **Por carga, fechas** | Residente | Ajusta fechas sobre lo cargado — no toca estructura |
+
+**El patrón se repite: Control de obra edita estructura; Residente edita fechas.**
+Es la misma separación que ya existe entre roles (`MODELO.md` §5b) — aquí aparece su
+primer caso concreto para el programa. Nombrar las funciones atómicas queda para
+cuando el módulo se modele (`PENDIENTES-MEJORAS.md` B-73).
+
+> **"Manual, sin diseño" agrega una cuarta forma de obtener la duración**, distinta
+> de las tres de arriba: no se declara el número de días ni se deriva de
+> rendimiento — se derivan las fechas dadas. Es el modo de una obra sin presupuesto
+> formal todavía colgado del árbol.
+
 ### El disparador de la fecha puede ser contractual
 
 En esas partidas el inicio no lo fija una precedencia técnica ni la disponibilidad de
@@ -368,14 +392,143 @@ Dos consecuencias que hay que asumir:
 
 - **`B-40` deja de ser menor.** Sin tiempo de entrega, el material por fecha da la
   fecha de **consumo**, no la de **pedido**. Para comprar, la útil es la segunda.
-- **La proyección cae bajo la regla de la proyección** (`gravity-obra.md` §3): sale
+- **La proyección cae bajo la regla de la proyección** (`gravity-obra.md` §2): sale
   con sus supuestos a la vista, nunca el número solo. Un flujo de efectivo presentado
   como dato es la forma más cara de esa confusión.
 
-### El tope de cuadrillas por frente
+### El tope de cuadrillas, por oficio dentro del frente
 
 Ya está anotado que la relación no es lineal. Con CPM se vuelve concreto: **acortar
-la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cuál.
+la ruta crítica metiendo gente tiene un techo** — no por frente, sino por cuántas
+cuadrillas del mismo oficio caben en la misma etapa sin estorbarse. **P-6**, abajo.
+
+### Dos disparadores de reprogramar, y no son el mismo
+
+Algo obliga a tocar el programa por dos caminos distintos:
+
+| Disparador | Quién | Qué hace |
+|---|---|---|
+| **Control de cambio** | Costos o Control de obra — o se detecta al cargar | Altera el árbol de presupuesto (`CONOCIMIENTO.md` §13.4). Si cambia qué hay que construir, cambia cuándo |
+| **Incidencia** | Residente, Supervisor o Control de obra, desde el campo | Afecta el programa con o sin tocar el árbol de costo |
+
+**No son el mismo registro** — la evidencia es directa: un error de ejecución puede
+cobrarse al contratista sin pagar el destajo de repararlo (no hay desviación de
+costo que registrar), y el programa **igual se retrasa**. El costo se resolvió por
+un lado; el tiempo se perdió por el otro, sin que uno dependa del otro. **P-8**,
+abajo.
+
+### La incidencia: tres formas de tocar el programa, no una
+
+Comparte vocabulario de causa con `CONOCIMIENTO.md` §13.6 —cuatro de las nueve
+causas son las mismas que ya pagan una desviación de costo—, pero el efecto sobre
+el programa no es uniforme:
+
+| Efecto | Cuándo | Mecanismo |
+|---|---|---|
+| **Pausa una actividad que ya existe** | Falta un insumo · una lluvia detiene un colado | Es un tramo (P-5) — si la causa es solo calendario (lluvia sobre la obra entera), ya lo cubre P-2 y no hace falta incidencia |
+| **Crea o hace crecer una actividad** | El viento tira un muro (crece, excedente de catálogo) · el cliente pide algo fuera de catálogo (nueva) | Sí es incidencia — cambia qué hay que construir, no solo cuándo |
+| **Se propone, no se ejecuta todavía** | Mejora de proyecto · algo necesario para ejecutar que nadie había visto | Incidencia que **propone** una actividad — mismo patrón que `PROPUESTA`: alguien la aprueba antes de que exista |
+
+### Quién puede tocar una incidencia, en qué orden
+
+**Quien la origina no se autoaprueba ni se autovalida** — salta ese paso y sigue con
+el siguiente rol de la cadena. Lo único constante en los tres casos: **el
+Supervisor siempre da seguimiento hasta que cierra.**
+
+| Origina | Aprueba | Valida en sitio | Ejecuta |
+|---|---|---|---|
+| Residente | Supervisor | Control de obra | Residente |
+| Supervisor | *(se salta)* | Control de obra | Residente |
+| Control de obra | Supervisor | *(se salta)* | Residente |
+
+### Cierre de frente: el primer trámite propio de Frente
+
+Al 90% de avance de un frente —10% antes de cerrarlo—, el Residente solicita el
+cierre, el Supervisor aprueba y Control de obra valida. Es el momento natural para
+levantar una **incidencia de calidad**, con la misma cadena de arriba.
+
+> **Frente estaba marcado como puramente informativo** (`CATALOGOS.md`: «no valida,
+> no impide, no calcula»). Un trámite de cierre no lo contradice —no calcula nada,
+> solo pregunta si ya se puede dar por terminado lo que vive ahí— pero es la primera
+> vez que Frente carga un evento propio en vez de ser solo etiqueta para filtrar.
+
+### Cómo se registra el avance
+
+Dos formas de capturar, y una no reemplaza a la otra:
+
+| | Cómo | Contra qué compara |
+|---|---|---|
+| **Número o porcentaje** | El Residente anota cantidad o % avanzado — la vía rápida, siempre disponible | Lo programado |
+| **Trazo** | Opcional — un segundo trazo, "lo realmente construido", sobre el mismo plano | El trazo de programación (C-4, `§2`: mismo mecanismo — se compara, las dos versiones quedan) |
+
+**Traza avance quien ya traza en general, menos Costos**: Control, Residente y
+Supervisor — Costos participa en el trazo de presupuesto (`MODELO.md` §1b, B-45)
+pero no en el de avance, que es de campo.
+
+El Residente puede ver la brecha contra lo programado **y contra el presupuesto**;
+si la brecha contra presupuesto importa, **solicita ajuste de cantidad a Control de
+obra** — mismo patrón que pedir extender el techo de programación, abajo.
+
+La alerta que nace de lo pagado (`CONOCIMIENTO.md` §13.7) sigue la misma regla:
+**nunca corrige sola**, invita a revisar, y de ahí sale corregido, explicado con
+una causa (`CONOCIMIENTO.md` §13.6) o sin explicar.
+
+### Dos cuantificadores: uno fija presupuesto, el otro programa sobre él
+
+No es el mismo trazo con otro nombre — son dos usos distintos:
+
+| | Cuantificador de presupuesto (§2) | Cuantificador de programación |
+|---|---|---|
+| Para qué | Fija la cantidad de presupuesto | Fija la cantidad de una actividad del programa |
+| Es el techo o se mide contra él | **Es el techo** — no se pretende superar | Se mide contra el techo, con tolerancia |
+| Si se excede | No aplica | Hasta un umbral configurable (hoy 20%) sigue solo. Más de eso, se solicita extender a Control de obra |
+
+**El umbral no es mecanismo nuevo** — reusa `ALERTA.parametro_usado`
+(`MODELO.md` §5a), que ya trae `{"umbral_pct": 20}` como su propio ejemplo en el
+modelo. Cruzar el umbral dispara la alerta; no crea la incidencia por sí sola.
+
+### Cruzar el umbral no es lo mismo que una incidencia
+
+Cuando Control revisa la alerta, decide una de dos: **es una incidencia real**
+—y con eso la origina, misma cadena de aprobación de arriba— **o se descarta**
+—fue un error del trazo original, no pasó nada en obra, se corrige el dato—.
+**P-9**, abajo.
+
+Validado contra siete escenarios de campo: seis caen en alguna de las nueve causas
+de `CONOCIMIENTO.md` §13.6 (incluida la causa 6, "plano desactualizado" — un
+cambio que nunca llegó a planos), y el séptimo —cuantificación mal trazada desde
+el inicio— no es causa: es alerta descartada.
+
+### Cómo se visualiza el programa
+
+Lo que es regla de negocio, no preferencia de pantalla:
+
+| Herramienta | Qué hace |
+|---|---|
+| Rótulo de la barra | Cantidad, importe, %, % sobre el proyecto total, o agrupado — no es un modo u otro, es qué dato se muestra encima |
+| Escala | Dos niveles: mayor (meses) y menor (semanas, en rangos) — más una vista de solo días con prefijo |
+| Vincular / configurar vínculo | Dos acciones separadas: crear el vínculo, y editar su tipo, traslape o espera |
+| Calendario de trabajo | Ya definido en P-2 — aquí solo se confirma que es herramienta con botón propio |
+
+**Color, forma de barra y fijar columnas quedan fuera** — son preferencia visual,
+no regla del sistema.
+
+### Reiniciar programa o actividad
+
+Borra fechas y vínculos para empezar de cero — **nunca avance ni incidencias**,
+que quedan como registro aparte. Y **solo aplica a nivel diseño**: mismo límite
+que ya existía (M-1, arriba — la plantilla flota, la instancia se congela al
+contratarse). Una vez que hay avance registrado o la actividad está contratada,
+no se puede reiniciar así. **P-10**, abajo.
+
+### Dos capturas reales validan diseños sin haberlos visto
+
+`Interrupciones` de OPUS se guarda como una lista de rangos —fecha inicio, fecha
+término, días calendario, con botón para agregar más de uno— exactamente el
+mecanismo de tramo de P-5. Y `Programación` trae **Cantidad programada / Cantidad
+total / Remanente**, casi el mismo par que D-273 diseñó sin verlo: cuantificador
+de presupuesto (el techo) y cuantificador de programación (lo programado). Se
+adopta el nombre **Remanente** = total − programada, en vez de inventar uno nuevo.
 
 ## Qué cuesta
 
@@ -391,13 +544,22 @@ la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cu
 | ~~P-2~~ | ~~¿Cuántos calendarios?~~ | **Uno por obra, con excepciones por cuadrilla.** La lluvia para la obra entera; que un subcontratista no trabaje sábados sólo lo para a él. El global manda salvo excepción declarada |
 | ~~P-3~~ | ~~¿Cuándo se recalcula?~~ | **Siempre se recalcula; sólo avisa si cambia la ruta**, no cuando únicamente se corren fechas. Un aviso diario deja de leerse |
 | ~~P-4~~ | ~~¿Las fechas contratadas se mueven?~~ | **Se congelan: una fecha contratada no se mueve sola.** Misma regla que el precio — en lo contratado, el cambio pasa por control de cambio |
-| P-5 | **¿La actividad puede partirse en tramos?** ¿El tramo se captura o se deduce de la precedencia técnica? | — |
+| ~~P-5~~ | ~~¿La actividad puede partirse en tramos?~~ | **Depende de la fuente de la pausa — misma clasificación que ya usa P-1.** Si la fuerza una precedencia técnica (la cadena debe colarse antes de seguir), el tramo se deduce solo, igual que cualquier precedencia técnica (es física). Si la fuerza un recurso o una decisión (la cuadrilla se fue a otro frente, el clima), se captura a mano — no hay de dónde deducirlo. El reparto de material entre tramos se calcula por default y queda como campo editable — cuarta aparición de «declarado menos calculado» (`MEMORIA.md` D-259) |
+| ~~P-6~~ | ~~¿Hay un tope de cuadrillas por frente, y de dónde sale?~~ | **No es «por frente»: es por oficio dentro del frente.** Frente agrupa actividades de una etapa donde conviven cuadrillas de oficios distintos a la vez —cimentación usa albañil y peón para lo estructural, y otra cuadrilla para instalaciones, al mismo tiempo—; eso es normal, no la restricción. Lo que sí tiene techo es cuántas cuadrillas del **mismo oficio** caben en el mismo frente/etapa sin estorbarse, y depende de la actividad. **Se declara, no se deriva** del catálogo de Frente —que sigue siendo informativo, `CATALOGOS.md`—: mismo origen que una precedencia de Recurso (arriba), media confianza, capturado por quien programa, por combinación frente+oficio. Cierra `PENDIENTES-MEJORAS.md` B-56 |
+| ~~P-7~~ | ~~¿El CPM usa el rendimiento real (mano de obra, `CONOCIMIENTO.md` §6.2) en vez del teórico cuando existe?~~ | **El teórico nunca se sobrescribe** — misma cadena que el precio (`CONOCIMIENTO.md` §13.1). El real de mano de obra da una **segunda proyección que convive con la teórica**, nunca un reemplazo. Si diverge más allá de un umbral, avisa `Desviación` (`gravity-obra.md` §6) — nunca reprograma sola, mismo «propone, no aplica». **El umbral no es un número fijo:** es un **rango sugerido —2 a 4 semanas seguidas de datos—** que el sistema propone y el usuario confirma, por dos caminos: proactivo (alerta) o a petición directa (agente Consulta). Puede existir un rendimiento real **global**, agregado entre obras, como referencia adicional — el usuario siempre decide cuál usar |
+| ~~P-8~~ | ~~¿Una incidencia de programa y una desviación de costo son el mismo registro?~~ | **No — son independientes.** Comparten vocabulario de causa (`CONOCIMIENTO.md` §13.6, extendido a nueve), pero no siempre coexisten: un error de ejecución puede cobrarse al contratista sin pagar destajo —sin desviación de costo que registrar— y el programa igual se retrasa. Cada uno decide si el motivo le aplica |
+| ~~P-9~~ | ~~¿Cruzar el umbral del cuantificador de programación es la misma incidencia?~~ | **No — pero se resuelven con el mismo mecanismo.** La alerta es un disparador automático (`ALERTA`, `MODELO.md` §5a); Control la revisa y decide si es una incidencia real (la origina él, misma cadena de P-8) o se descarta (error de trazo, no de obra) |
+| ~~P-10~~ | ~~¿Reiniciar el programa o una actividad es destructivo?~~ | **No para lo registrado.** Solo borra fechas y vínculos — nunca avance ni incidencias, que quedan aparte. Y solo aplica a nivel diseño: mismo límite que M-1 (§3, arriba), una vez contratada la actividad no se reinicia así |
 
-**Cuatro decididas, una nueva abierta.**
+**Las diez decididas.**
 
 > **P-4 completa la simetría:** en lo contratado, el precio y la fecha son las dos
 > obligaciones, y ninguna de las dos se mueve por recálculo. Reprogramar propone la
 > fecha nueva; alguien la acepta.
+
+> **P-6 y P-7 cierran los dos cabos que quedaban sueltos en el cuerpo del módulo:**
+> el techo de cuadrillas y qué hacer cuando el rendimiento real diverge del teórico.
+> Las dos se declaran o se avisan; ninguna se calcula ni se aplica sola.
 
 ---
 
@@ -408,11 +570,13 @@ la ruta crítica metiendo gente tiene un techo**, y el modelo tiene que decir cu
 | **Factorizador** | Compras reales, inventario contra desperdicio, catálogo más chico | Bajo | ✅ 4 de 4 |
 | **Cuantificador** | Cantidades auditables, corpus del paramétrico | **Alto** | ✅ 4 de 4 |
 | **Paramétrico** | Presupuestar sin planos, priorizar por incertidumbre | Medio | ✅ 4 de 4 + corpus |
-| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 4 de 4 · **P-5 abierta** |
+| **CPM** | Recursos por fecha, flujo de efectivo, qué retraso importa | Medio | ✅ 10 de 10 |
 
-**Las 16 decisiones están cerradas.** Quedan tres piezas que aparecieron al cerrarlas:
-`P-5` (actividad en tramos), `B-40` (tiempo de entrega) y `B-45` (dónde vive una regla
-de gobierno por obra).
+**Las 22 decisiones están cerradas** — las 21 anteriores más `P-10` (reiniciar
+programa o actividad no toca lo registrado, y solo aplica a nivel diseño). Las
+dos piezas que aparecieron al cerrar las primeras 16 también se resolvieron:
+`B-40` (tiempo de entrega) y `B-45` (dónde vive una regla de gobierno por obra)
+— ninguna sigue abierta.
 
 ## Mi recomendación
 

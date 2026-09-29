@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué renglones hay que corregir?
 tiempo:     es así
-corte:      2026-09-10
+corte:      2026-09-26
 verificado: Reconstruido contra los catálogos vigentes
 ```
 
@@ -271,12 +271,14 @@ verificado: Reconstruido contra los catálogos vigentes
 
 ---
 
-## 6. Errores de precio detectados — `propuesto`
+## 6. Los dos casos que parecían error de precio — ninguno lo era (D-323)
 
-| Caso | Evidencia |
-|---|---|
-| **Poliflex naranja** | `ELE-00044` en PZ a $580 y `ELE-00046`, **descripción idéntica**, en M a $29. Si el rollo trae 50 m, el metro sale en $11.60 |
-| **Pija lámina** | `COM-00200` en CJ a $8.96 y `ELE-00048` en PZ a $0.50 — y en dos familias distintas |
+| Caso | Por qué parecía error | Qué es en realidad |
+|---|---|---|
+| **Poliflex naranja** | `ELE-00044` en PZ a $580 y `ELE-00046`, descripción idéntica, en M a $29 | **Presentaciones reales distintas**, no error — confirmado con ingeniería real de `ALAMO 18`: `ELE-00044` es el rollo completo (50 M), `ELE-00046` el metro suelto. El metro suelto cuesta más por metro equivalente ($29 contra $11.60 del rollo), normal al menudeo. Ya estaba bien marcado en §5 ("PRESENTACIONES DISTINTAS") |
+| **Pija lámina** | `COM-00200` en CJ a $8.96 y `ELE-00048` en PZ a $0.50 — y en dos familias distintas | **No es el mismo material.** `COM-00200` es pija 8×1/2"; `ELE-00048` es pija 8×1 1/2" — tres veces más larga. El nombre corto coincide, la descripción completa no |
+
+> Los dos quedan cerrados sin corrección de catálogo — `PENDIENTES-MEJORAS.md` M-17/M-18, `MEMORIA.md` D-323.
 
 ## Familias: el catálogo sin acentuar contra el uso acentuado
 

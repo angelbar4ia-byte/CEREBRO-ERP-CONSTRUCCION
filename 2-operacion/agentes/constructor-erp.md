@@ -9,7 +9,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 capa:       II — Operación
 pregunta:   ¿cómo se convierte la decisión en código?
 tiempo:     se hace así
-corte:      2026-09-10
+corte:      2026-09-18
 verificado: Requiere esquema definido
 ```
 
@@ -18,8 +18,8 @@ sobre PostgreSQL.
 
 ## Antes de escribir
 
-Leé el skill `erp-construccion`. La sección 9 tiene las convenciones y la 10 los
-quince errores que existe para prevenir. **Revisalos contra lo que estás por
+Leé el skill `erp-construccion`. La sección 9 tiene las convenciones y la 11 los
+dieciséis errores que existe para prevenir. **Revisalos contra lo que estás por
 escribir.**
 
 Si no hay un esquema definido para lo que te piden, **pará y pedilo**. Improvisar el

@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿qué trae cada catálogo de OPUS y qué trampas tiene?
 tiempo:     es así
-corte:      2026-09-15
+corte:      2026-09-21
 verificado: 8 catálogos de OPUS 2025 · aritmética comprobada
 ```
 
@@ -299,7 +299,7 @@ apuntando al mismo nivel 4. Es un caso para el diccionario, no un error de datos
 | ~~K-09~~ | ~~¿Qué diferencia de texto alerta?~~ ✅ **Resuelta:** `CONOCIMIENTO.md` §2.7.1 |
 | ~~K-10~~ | ~~¿Quién aprueba una versión nueva?~~ ✅ **Resuelta:** nadie por defecto; por impacto (`CONOCIMIENTO.md` §2.2) |
 | ~~K-11~~ | ~~`ACA-00021` vacío~~ ✅ **Resuelta:** agrupador pendiente de costear (`CONOCIMIENTO.md` §4.1) |
-| K-12 | ¿Qué columnas llevan Cabeceras, Materiales y Operaciones? (`CONOCIMIENTO.md` §4.3) |
+| ~~K-12~~ | ~~¿Qué columnas llevan Cabeceras, Materiales y Operaciones?~~ ✅ **Resuelta:** contra especímenes reales de `ALAMO 18` (`CONOCIMIENTO.md` §4.3). Los cuatro catálogos de solo salida siguen sin columna documentada — falta el catálogo viejo, igual que P-32 |
 | ~~K-13~~ | ~~¿El hermano 100?~~ ✅ **Resuelta:** alerta en 90, reagrupar. No hay tercer dígito (`CONOCIMIENTO.md` §4.2) |
 
 ## 2 Materiales — `CATALOGO_DE_MATERIALES.xlsx`
@@ -620,6 +620,9 @@ ayudante sirve a Estructura y a Obra Exterior; un frente ocupa varias cuadrillas
 
 Sirve para filtrar 39 cuadrillas por frente al programar, en vez de recorrer 97
 registros. **Las relaciones operativas se definen después.**
+
+> Dónde se definen: `PROPUESTA-CUATRO-MODULOS.md` §4 · P-6, el tope de cuadrillas
+> por oficio dentro del frente.
 
 ### La unidad `%MO`
 
@@ -1173,6 +1176,71 @@ determina.
 >
 > O se obtiene la regla del ERP externo, o **el código se arrastra del archivo
 > original** en vez de calcularse.
+
+---
+
+## 12 `TESTIGO_MATERIAL` — qué insumo sirve de testigo para verificar cada concepto
+
+`MODELO.md` §5a necesita, para `ALERTA(tipo=estimacion_sin_respaldo_material)` y su
+espejo `consumo_material_sin_respaldo_avance`, saber **qué insumo confiar como
+testigo de cada concepto** — el mismo criterio de campo que ya distinguió cemento de
+tabique en `CONOCIMIENTO.md` §11.17. Con un solo caso completo (`EST-02010`) eso era
+«criterio de quien configura la revisión, caso por caso»; con diecisiete conceptos
+reales cruzados contra cinco meses de almacén (`CONOCIMIENTO.md` §11.20), ya es
+catálogo.
+
+### Es semilla, no derivado
+
+**Qué insumo es confiable como testigo no sale de ningún catálogo ni se calcula —se
+confirma cruzando contra almacén real, obra por obra, hasta que el patrón se
+repite.** Igual que `SEMILLA-cuadrilla-rendimiento.xlsx` (§10): OPUS no lo sabe y no
+lo va a saber, porque no es un dato de OPUS — es evidencia acumulada de este cerebro.
+Se carga con lo ya confirmado hoy y **crece fila por fila** conforme se cruzan más
+conceptos; nunca se recalcula desde cero ni se repite este cruce a mano.
+
+| Concepto | Insumo testigo | Confiabilidad | Evidencia |
+|---|---|---|---|
+| `EST-02010` (muro tabique 14cm) | `PET-00001` (tabique) | **Confirmado** | Exacto — 6,000/6,000 PZ, abril (`CONOCIMIENTO.md` §11.16) |
+| `EST-02010` (muro tabique 14cm) | `ADH-00005` (cemento) | **Confirmado** | 0.2% de diferencia en acumulado, 4 meses, 8 eventos reales (§11.17, D-375) |
+| `EST-01060` (losa de cimentación) | `CON-00001` (concreto premezclado) | **Confirmado** | Exacto — 37.330/37.330 M3, abril (§11.16) |
+| `EST-02011` (muro tabique, 3er nivel) | `ADH-00005` | Consistente | -1.0%. Cruzado contra ingeniería (D-380): las tres fuentes coinciden exactas —31.03 M, 100% completo—, sin ambigüedad; base chica (10 sacos, un evento) es lo único que lo deja en `Consistente` y no `Confirmado`, mismo criterio que `EST-02320`/`07010`/`07011` (§11.20, D-380) |
+| `EST-02110`/`02120`/`02130`/`02170`/`02180` (castillos K1-K8), `EST-02310` (cadena CE-1) | `ADH-00005` | **Confirmado** | -22.3% a +6.8% por concepto en `ALAMO 18`; a escala completa (todos los lotes, 5 meses) -7.4% a -14.1% — dentro de lo esperado. Castillo K1 mostró +141.7% en una primera lectura — **corregido: era avance incompleto en una sola fuente (`grid_AvanceOPEventosOpr`, 32.8% de un diseño de 339.20 M), no exceso de material** (`CONOCIMIENTO.md` §11.20) |
+| `ALB-01210` (repello fachada) | `ADH-00005` | **Confirmado** | +15.5% cruzado contra ingeniería/`PRECIO_REAL` (192.53 M, ambas coinciden) — el +18.9% original usaba solo la escala de `grid_AvanceOPEventosOpr` (187 M, 97.1%). Volumen decente (34 sacos, tres eventos), tres fuentes de acuerdo — sube de `Consistente` (§11.20, D-380) |
+| `EST-02320` (cadena CE-2), `EST-07010`/`07011` (columnas CM-1) | `ADH-00005` | Consistente | Un solo evento, base pequeña (1-8 sacos) — el % es ruido de redondeo a saco entero, **confirmado, no artefacto de fuente incompleta: las tres fuentes de avance coinciden 100%** (§11.20, D-378) |
+| `ALB-01010` (repello muro 3.00) | `ADH-00005` | **Confirmado** | +15.5% cruzado contra `PRECIO_REAL` (60.2% avanzado) — el +109.1% original era `grid_AvanceOPEventosOpr` viendo solo 33.2% del avance real, mismo patrón que castillo K1. **Corrige D-376** (§11.20, D-378) |
+| `ALB-01212` (repello muros fachada 3.00) | `ADH-00005` | **Confirmado** | Rate correcto —el testigo funciona—, pero **anomalía real sin resolver**: las tres fuentes de avance coinciden en ~100% completado y la orden no tiene un solo movimiento de almacén, de ningún insumo. Caso limpio para `estimacion_sin_respaldo_material` (§11.20, D-378) |
+| `ALB-01110` (repello plafond 3.00) | `ADH-00005` | Consistente | Déficit -48% a -59% bajo cualquier lectura, nunca exceso — consistente con material aún por surtir. Nota sin resolver: `PRECIO_REAL` supera a la ingeniería para este concepto, único caso así (§11.20, D-378) |
+| `ALB-01012` (repello muro 3.00, código distinto de `ALB-01212`) | `ADH-00005` | **Confirmado** | Rate confirmado, dato del usuario: es cemento, el de su propia matriz genérica (`MEZ-07010`) — no el mortero de la ingeniería específica del lote, desactualizada (mismo patrón que B-68/D-308). +2.8% contra el diseño completo, casi exacto. El +326% contra `PRECIO_REAL` (24.1% avanzado) **no es ruido — es el caso real de `consumo_material_sin_respaldo_avance`** (B-79, D-379): material adelantado a todas las fuentes de avance a la vez (§11.20, D-379) |
+| `ECO-00004` + familia `IEC-` (habilitado eléctrico) | `ELE-00001` (poliducto) | Consistente | 72.8% del alcance completo (13.83→10.07), 169.2% del esperado ponderado — patrón «avance sin estimar» (D-379) del lado del material adelantado; confirmado con accesorio `ELE-00003` (chalupa, 78.7%). Prototipo verificado: es Diamante pese a etiqueta «Zafiro Plus» en almacén — método de identificación por contenido, D-121 (§11.20, D-381) |
+| `ECO-00003` + familia `IHD-` (habilitado hidráulico) | `HID-00004` (codo) | **Confirmado** | 100.0% exacto del alcance completo (111.00/111.00) — triple confirmado con `HID-00024` (tubo, 100.0%) y `HID-00012` (tee, 100.0%) (§11.20, D-381) |
+| `ECO-00005` + familia `IGA-` (habilitado gas) | `HID-00025`+`IGS-00014` combinados | **Confirmado** | 96.9% del esperado ponderado (83.4% del alcance completo) — dos claves de ingeniería para el mismo producto físico («2024446»), ambas reales, se suman (distinto de `HID-00411`, donde una clave nunca se usa); confirmado con accesorio `ACE-00001` (sellador, 92.2%) (§11.20, D-381) |
+| `ECO-00002` + familia `ISA-` (habilitado sanitario) | `HID-00411` (la ingeniería lo captura como `HD-00411`, misma trampa de D-371) | **Confirmado** | Testigo confiable —accesorios `HID-00135`/`SAN-00002` al 100.0%/125.6%— pero **anomalía real, tercer caso de `estimacion_sin_respaldo_material` (B-70)**: solo 41.7% del alcance completo; se emitió una sola vez (21/04/2026, `ECO-00002`) y nunca para `ISA-00110`/`00150`/`00210`, pese a que facturan 86.6%-100% de avance (§11.20, D-382) |
+
+**Los diecisiete conceptos originales (estructura) ya quedaron cruzados contra
+ingeniería, uno por uno** (D-377 a D-380). Ninguno queda pendiente de esa
+validación — lo que sigue abierto (`ALB-01012` como caso real de B-79) es
+interpretación de campo, no falta de dato. **Extendido a instalaciones (D-381/
+D-382):** eléctrica, hidráulica y gas confirman con el mismo método sobre un
+dominio compuesto (concepto con varias sub-actividades, alcance en $ ponderado
+por `O/Requerida`); sanitaria repite, por tercera vez y por primera fuera de
+estructura, el patrón que cierra B-70 — avance alto sin el material que lo
+respalde.
+
+**Cómo se usa:** `estimacion_sin_respaldo_material` y `consumo_material_sin_respaldo_avance`
+(`MODELO.md` §5a) solo corren en automático sobre pares marcados `Confirmado` o
+`Consistente`. Los `Insuficiente` quedan documentados —para no repetir el cruce a
+mano la próxima vez— pero no disparan alerta sola todavía: hace falta historia, no
+solo una lectura, mismo criterio que ya frenó una regla automática de tamaño de
+ventana en `MODELO.md` §5a.
+
+```
+TESTIGO_MATERIAL
+  id
+  concepto_id           FK Nodo (rol=concepto)                                firme — nuevo
+  insumo_id             FK Nodo (rol=material) — el insumo testigo            firme — nuevo
+  confiabilidad         enum: confirmado · consistente · insuficiente         firme — nuevo
+  evidencia             texto — de qué corrida y con qué cifra sale           firme — nuevo
+```
 
 
 ---

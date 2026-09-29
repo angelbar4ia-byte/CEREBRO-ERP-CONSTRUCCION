@@ -9,7 +9,7 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿cómo responde y qué propone el agente que vive dentro del ERP?
 tiempo:     se hace así
-corte:      2026-09-15
+corte:      2026-09-26
 verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
 ```
 
@@ -23,10 +23,24 @@ Sos el agente que vive **dentro** del ERP. Quien opera se dirige a vos como
 **No hay ruteo por consulta.** Una instalación es de un perfil, y se decide al
 instalar.
 
-| Perfil | Modelo | Dónde | Reporta |
-|---|---|---|---|
-| **Local** | Ollama | El ERP entero vive en la máquina | Sólo resultados hacia la red |
-| **Red** | Groq | Web y móvil | — |
+| Perfil | Motor | Modelo (recomendado, sin confirmar) | Dónde | Reporta |
+|---|---|---|---|---|
+| **Local** | Ollama | Llama 3.1 8B — o Qwen3 14B si el español técnico del oficio lo exige | El ERP entero vive en la máquina | Sólo resultados hacia la red |
+| **Red** | Groq | Llama 3.1 8B | Web y móvil | — |
+
+**Motor y modelo son cosas distintas** — Ollama y Groq no son modelos, son dónde y
+cómo se ejecuta uno. El modelo corre como su propio servicio, nunca embebido en el
+backend: mismo principio que «el MCP habla con la capa de servicio, nunca con la
+base» (`ESCALABILIDAD.md` §4), aplicado al modelo.
+
+**Por qué Llama 3.1 8B, en orden de peso:** alcanza para el trabajo angosto del
+interno (§4 · §7 abajo — compara texto, redacta, nunca calcula dinero); es barato
+(el modelo más económico de Groq, ~$0.05/$0.08 por millón de tokens
+entrada/salida); y corre igual en los dos perfiles sin fricción. Detalle,
+cifras y la alternativa (Qwen3 14B) en `MEMORIA.md` D-257.
+
+> **Este terreno cambia rápido — revisar de nuevo al momento de construir**, no dar
+> la recomendación de hoy por buena sin más.
 
 **Difícilmente se mezclan.** Si algún día una instalación necesita los dos, eso se
 diseña entonces; no se construye hoy por si acaso.
@@ -111,7 +125,8 @@ y la propuesta **espera resolución**.
 **1 · Sin modelo, siempre.** Lo determinista va en consulta, no en LLM:
 
 - duplicados exactos de descripción con claves distintas — **22 casos ya verificados**
-- precio inconsistente entre presentaciones del mismo material
+- precio inconsistente entre presentaciones del mismo material — cruza contra
+  `PRECIO_HISTORICO` y `TABULADOR_CONTRATISTA` (`MODELO.md` §4a)
 - desviación de almacén contra explosión
 - huella de concepto distinta entre cargas
 
@@ -160,11 +175,18 @@ cosas es imposible de evaluar: cuando falla, no se sabe en qué.
 | Equivalencias | Descripciones idénticas, claves duplicadas | Equivalencia de concepto |
 | Desviación | Almacén contra explosión · patrones por contratista y por obra · prototipo contra ingeniería sin causa declarada (P-29) · identidad del prototipo por razón de cantidades (P-30) | Versión nueva de concepto — o **alerta**, cuando no hay valor concreto que proponer (`MODELO.md` §5a) |
 | Conversión | Unidades y presentaciones | Factor, cuando cruza dimensiones |
+| Auditoría de explosión/método | Matriz prestada (D-245) · concepto auxiliar explotado directo en vez de descompuesto · alcance mezclado al comparar, ej. mano de obra sumada con material (D-252) · compuestos anidados sin explotar hasta el fondo (D-244) · la misma fuente de almacén cargada dos veces con distinto filtro (B-64) | Corrección del cálculo — o **alerta**, cuando no hay un valor único que proponer |
 
 > **`diferencia_sin_causa` e `identidad_dudosa` viven bajo `Desviación`**, no en un
 > quinto detector: las dos comparan algo cargado contra una referencia declarada, el
 > mismo mecanismo que ya usa este detector (D-52). Un detector nuevo solo se
 > justifica si en la práctica resulta que necesita herramientas distintas.
+
+> **Auditoría de explosión/método no compara la obra contra un plan — compara si el
+> propio cálculo siguió las reglas.** Ya existía como idea suelta en
+> `ESCALABILIDAD.md` §7 ("Auditoría de explosión: presupuesto y matrices → dónde no
+> cuadra y por qué"), nunca conectada a esta tabla. Los cinco casos que detecta ya
+> pasaron, uno por uno, en esta obra — no son hipotéticos. `MEMORIA.md` D-258.
 
 ### El primero es Consulta
 
@@ -174,6 +196,57 @@ sola vez.
 
 Y es el único que no propone nada, así que se puede equivocar sin consecuencia: **el
 lugar correcto para descubrir qué herramientas faltan.**
+
+### El catálogo de Consulta — abierto, se agrega conforme se detecten preguntas nuevas
+
+No es una lista cerrada. Cada fila nueva entra aquí mismo, en su grupo, con su
+estado — nunca en un archivo aparte (`INDICE.md`: un hecho, un archivo).
+
+**Presupuesto y avance**
+
+| Tool | Regresa | Estado |
+|---|---|---|
+| `saldo_pendiente(obra, alcance, tipo, referencia)` | cantidad y monto | Listo |
+| `avance(obra, alcance)` | % en cantidad y en $ | Listo |
+| `presupuesto_formado(obra, alcance)` | cantidad real, $ explotado, efecto cantidad, efecto receta | Listo — `CONOCIMIENTO.md` §11.14 |
+| `comparar_presupuestos(obra, alcance)` | Base / Ingeniería / Pagado / Formado / Control de Cambio, las cinco juntas | Listo — evita que el chatbot elija una interpretación en silencio (`RAZONAMIENTO.md` §3) |
+
+**Material y almacén**
+
+| Tool | Regresa | Estado |
+|---|---|---|
+| `resumen_salidas_material(obra, material, periodo)` | tabla de movimientos | Listo |
+| `rendimiento_material(obra, concepto, material)` | real vs. teórico | Listo — `CONOCIMIENTO.md` §11.16 · §11.17 |
+| `existencia_almacen(obra, material)` | surtido menos consumido | Listo — B-16/P-19 cerraron: surtido = `SUM(motivo=salida_produccion)`, consumido = `SUM(motivo=implosion)`, filtrado por `presupuesto_id`/`clave` (`MODELO.md` §5e, D-333/D-337) |
+
+**Destajo y mano de obra**
+
+| Tool | Regresa | Estado |
+|---|---|---|
+| `pagado_destajo(obra, destajo o contratista, periodo)` | monto pagado | Listo |
+| `rendimiento_destajo(obra, destajo)` | real vs. teórico | Método definido (`CONOCIMIENTO.md` §6.2), sin probar contra un caso real todavía |
+
+**Controles de cambio**
+
+| Tool | Regresa | Estado |
+|---|---|---|
+| `controles_de_cambio(obra, alcance)` | los `CC-ALM-XXXXX` activos con su monto | Listo — `CONOCIMIENTO.md` §11.18 |
+
+**Entre obras**
+
+| Tool | Regresa | Estado |
+|---|---|---|
+| `comparar_obras(prototipo, alcance)` | desviación entre lotes o prototipos | Idea — ya anotada como "Comparador de obras" en `ESCALABILIDAD.md` §7, nunca conectada a este catálogo hasta ahora |
+
+**Regla transversal, no una tool más:** toda respuesta declara su fecha de corte. Sin
+eso, un número de hoy se confunde con uno de la semana pasada — consecuencia directa
+de `RAZONAMIENTO.md` §2 (la ventana de tiempo es una de las cuatro preguntas de
+desambiguación).
+
+**Segunda regla transversal:** toda tool filtra por el alcance de quien pregunta —
+un Residente no recibe el reporte de una obra que no es suya, la pida como la pida.
+Residente ve sus obras, Supervisor hereda las de sus residentes, Superintendente
+hereda las de sus supervisores, Control y Costos ven todo (`MODELO.md` §5b).
 
 ---
 

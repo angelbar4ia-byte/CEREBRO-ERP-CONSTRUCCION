@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
-corte:      2026-09-15
-verificado: 16 partes · cada regla comprobada antes de escribirse
+corte:      2026-09-26
+verificado: 17 partes · cada regla comprobada antes de escribirse
 ```
 
 > **Las reglas del sistema.** Los catálogos de origen están en `CATALOGOS.md`; las
@@ -19,19 +19,20 @@ verificado: 16 partes · cada regla comprobada antes de escribirse
 | §1 | Identidad y posición | 94 | 4 |
 | §2 | Importación desde OPUS | 386 | 9 |
 | §3 | Notas de implementación | 129 | 5 |
-| §4 | Estados del nodo y exportación | 110 | 3 |
-| §5 | Presupuesto paramétrico — ensambles | 240 | 10 |
-| §6 | Destajos: precio, cuadrilla y fusión | 157 | 4 |
+| §4 | Estados del nodo y exportación | 144 | 3 |
+| §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
+| §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
-| §10 | Categorías | 168 | 6 |
-| §11 | Los flujos entre sistemas | 468 | 12 |
+| §10 | Categorías | 234 | 6 |
+| §11 | Los flujos entre sistemas | 2575 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 318 | 6 |
+| §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
-| §15 | La ruta crítica no está en el modelo | 39 | 0 |
+| §15 | La ruta crítica ya está en el modelo | 80 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
+| §17 | Cuantificación gráfica — de inventario a regla verificada | 72 | 4 |
 
 > **Las partes que ya tienen skill compilado:** §2 importación, §5 paramétrico,
 > §8 y §12 rediseño. Ver `2-operacion/skills/`.
@@ -737,22 +738,56 @@ nodo aquí rompe su referencia allá, y es un sistema sobre el que no hay contro
 > Conviene mandarle también el `id` interno, que no cambia nunca. Si no acepta un
 > campo extra, hay que saber que la referencia entre sistemas es frágil por diseño.
 
-## 4.3 Los tres reportes de salida
+## 4.3 Los tres reportes de salida — columnas confirmadas contra el propio dialecto OPUS (P-14, B-08)
 
-El ERP externo se alimenta de tres reportes:
+El ERP externo se alimenta de tres reportes. **La hipótesis original era
+correcta** — cabeceras son los nodos estructurales, materiales son las
+hojas de tipo material, operaciones son las hojas de mano de obra y
+destajo, el mismo árbol partido en tres por tipo de hoja — y sus columnas
+no había que inventarlas: **ya estaban mapeadas en `LENGUAJE.md`**, en el
+dialecto OPUS, sin conectarlas todavía a esta pregunta.
 
-| Reporte | Qué contiene |
-|---|---|
-| **Cabeceras** | *(pendiente de especificar)* |
-| **Materiales** | *(pendiente de especificar)* |
-| **Operaciones** | *(pendiente de especificar)* |
+| Reporte | Columnas confirmadas | Espécimen real |
+|---|---|---|
+| **Cabeceras** | `Tipo, Nivel, Indice, Nivel ERP, Ingeniería ERP, Clave, Descripción de matriz, Descripción, Descripción Corta, Unidad de matriz, Unidad, Cantidad, Precio unitario, Total, %, Origen, Ruta paramétrica` (17) — las cinco filas del árbol (`Capítulo` · `Subcapítulo` · `Nivel 2` · `Nivel 3` · `Concepto`): el Concepto es cabecera de su propia explosión, no hoja | `CATALOGO_DE_PRESUPUESTO.csv`, archivo completo — 3,231 filas, la misma cuenta que la prueba de ida y vuelta de `LENGUAJE.md` |
+| **Materiales** | `Clave Padre, Clave Hijo, Descripción, Unidad, Cantidad, Costo, Importe, Tipo, Origen` (9) — filas con `Tipo = Material` | `ANALISIS_DE_BASICOS_CONCEPTOS.csv` + `ANALISIS_DE_BASICOS_COMPUESTOS.csv`, 2,193 filas entre los dos |
+| **Operaciones** | Mismas 9 columnas que Materiales — filas con `Tipo` ∈ {`Contrato`, `ManoDeObra`} | Los mismos dos archivos, 575 filas (463 `Contrato` + 112 `ManoDeObra`) |
 
-**Hipótesis a confirmar:** cabeceras son los nodos estructurales del árbol;
-materiales, las hojas de tipo material con su cantidad; operaciones, las de mano de
-obra y destajo. Es decir, el mismo árbol partido en tres por tipo de hoja.
+> **Materiales y Operaciones son el mismo archivo, filtrado distinto — no
+> dos formatos.** `Tipo` (categoría del hijo, «el ADN» según
+> `LENGUAJE.md`) ya separaba esto en el dialecto OPUS del análisis de
+> básicos. **Cabeceras sí trae marca propia del ERP externo**
+> (`Nivel ERP`/`Ingeniería ERP`, ya documentada en `LENGUAJE.md`);
+> Materiales y Operaciones no traen ninguna columna equivalente —
+> confirman la forma que la hipótesis predijo, no que este archivo exacto
+> sea ya el que se entrega hoy al ERP externo.
+>
+> Queda una cuarta lectura de `Tipo` sin resolver: **`Flete`** (51 filas
+> en Conceptos, 16 en Compuestos — 67 en total, 2.4%). El canon ya lo
+> trata como `categoria` propia, distinta de material y de mano de obra
+> (`LENGUAJE.md`) — ninguno de los tres reportes tiene todavía un lugar
+> declarado para él.
 
-Falta definir de cada uno: columnas exactas, si llevan el árbol completo o solo lo
-costeado, y si el ERP externo los consume por archivo o por API.
+### El cruce confirma que es el mismo árbol, no columnas parecidas (D-332)
+
+467 de los 596 `Clave Padre` distintos de `ANALISIS_DE_BASICOS_CONCEPTOS.csv`
+(78%) son `Concepto` real en `CATALOGO_DE_PRESUPUESTO.csv` — join directo. Los
+129 restantes son códigos de matriz auxiliar (`AUX-`, `MOCU-`, `MEZ-`), y esos
+mismos códigos son, sin excepción, los 89 `Clave Padre` de
+`ANALISIS_DE_BASICOS_COMPUESTOS.csv` — ninguno de los 89 aparece en Cabeceras,
+**por diseño**: son un nivel más profundo del mismo árbol, la matriz dentro de
+la matriz que la explosión recursiva de concepto/APU/compuesto ya conocía
+(§5.1). No hay huérfanos: todo `Clave Padre` resuelve a Cabeceras directo o a
+través de un compuesto que a su vez resuelve. **No es que las columnas se
+parezcan — es el mismo árbol, verificado por el join, no solo por la forma.**
+
+**Lo que sigue sin especificar:** dónde cae `Flete`; si el ERP externo
+consume estos tres por archivo o por API (ningún espécimen lo dice); y
+las columnas de los cuatro catálogos que se volvieron pura salida
+(`Catalogo_de_Matriales`, `Catalogo_de_auxiliares`, `Catalogo_de_cuadrillas`,
+`catalogo_de_SUBCONTRATOS`) — de esos cuatro no hay espécimen subido a
+este cerebro, ni columna documentada en ningún archivo; hace falta el
+catálogo viejo real para definirlos, igual que P-32.
 
 ---
 
@@ -893,8 +928,69 @@ población.
 > dejaba el otro en 32% — **el residuo alto era la señal de que la explicación estaba
 > incompleta, y se leyó como ruido.**
 
-Qué separa al grupo B sigue sin saberse (B-52). Lo que sí se sabe es que **no es el
-número de plantas.**
+### B-52 cierra: es desplante, no plantas — una regla ya escrita, ahora comprobada
+
+**Cimentación escala con el área de desplante (la losa que realmente se cuela),
+no con el m² total construido.** Cada prototipo declara su propio desplante en la
+descripción de su losa de cimentación — y en Zafiro Plus y Oro ese número es
+mucho más chico que su m² total: son los dos prototipos con más planta alta
+relativa, no una población distinta.
+
+| Prototipo | Cimentación | Desplante (losa) | m² total | $/m² desplante |
+|---|---:|---:|---:|---:|
+| Zafiro 1.0 | $178,769 | 172 | 172 | 1,039 |
+| Rubí | $209,540 | 200 | 207 | 1,048 |
+| Zafiro Plus | $147,745 | **137** | 224 | 1,078 |
+| Jade | $242,273 | 230 | 230 | 1,053 |
+| Diamante − | $260,486 | 216 | 239 | 1,206 |
+| Diamante + | $259,316 | 216 | 239 | 1,201 |
+| Oro | $173,136 | **160** | 300 | 1,082 |
+
+Medido contra desplante, **los siete caen en el mismo rango — CV 6.0%**, contra
+21.5% midiendo contra m² total (y el 32% original del grupo mixto por plantas).
+Zafiro Plus y Oro dejan de ser "otra población": su desplante es 61% y 53% de su
+m² total (los otros cinco están en 90-100%) — dividir su cimentación entre el m²
+total, que incluye planta alta que nunca toca el suelo, los hacía ver
+artificialmente baratos.
+
+> **No era un hallazgo nuevo — era una regla ya escrita sin comprobar.** "Cimentación
+> escala con desplante" ya estaba anotada como regla de método, antes de tener la
+> evidencia específica que la probara. El residuo de 6% que queda (Diamante algo
+> arriba del resto) es variación normal — no hay señal de una tercera cohorte.
+> D-312.
+
+### B-49 cierra: la Δ es redondeo del PU en la explosión, confirmado en los siete
+
+D-124 (sesión anterior) probó un prototipo y predijo: la Δ$4.30 es compatible con
+redondear el **PU** a centavos antes de multiplicar, no con redondear el importe
+(eso daría solo ±$0.11) — comprobable, dijo, sobre los siete.
+
+Repetido con el motor de explosión (`explosion_recursiva.py`): explotar cada
+concepto por su matriz y sumar el costo atómico, contra el importe declarado del
+catálogo maestro. Primero salió mal — $220,137 de diferencia en Zafiro 1.0 — pero
+la causa no era el redondeo: **8 conceptos de subcontrato** (`CAR-`, `CAN-`,
+`HER-04010`) tienen una matriz de relleno que no llega ni al 1% de su valor real,
+mismo patrón que los `SUB-` de `ALAMO 18` (§11.14) — no se construyen del
+catálogo, no hay receta que explotar.
+
+Excluidos esos 8, el drift de Zafiro 1.0 cae a **-$4.59** — el mismo orden que el
+$4.30 original. Repetido sobre los siete:
+
+| Prototipo | Drift |
+|---|---:|
+| Zafiro 1.0 | -$4.59 |
+| Rubí | -$4.68 |
+| Zafiro Plus | -$3.15 |
+| Jade | -$4.29 |
+| Diamante sin chimenea | -$6.42 |
+| Diamante con chimenea | -$7.73 |
+| Oro 4.01 | -$8.28 |
+
+**Siempre negativo, y crece con la complejidad del prototipo — la firma de
+redondeo acumulado, no de un error.** El total (-$39.14) no calza con el "~$11"
+que predijo D-124, pero esa predicción era una extrapolación simple sobre un solo
+caso — el mecanismo, que es lo que importaba, queda comprobado en los siete, no
+solo en uno. D-311.
 
 > **El paramétrico no falla por ser paramétrico. Falla por usar el parámetro
 > equivocado o la cohorte equivocada.**
@@ -1094,6 +1190,27 @@ calculado sale absurdo.
 ### La unidad va anclada al rendimiento
 
 Arrastra tres anclajes —obra, tiempo y **cuál cuadrilla**—. Ver `IDEAS.md` §5.
+
+### El "real" de este cuadro es de mano de obra — hay otro real, y no es el mismo dato
+
+**"Rendimiento real" nombra dos cosas distintas en este sistema, y mezclarlas repite
+un error ya cometido:**
+
+| | Rendimiento real de **mano de obra** | Rendimiento real de **material** |
+|---|---|---|
+| Qué mide | Cuadrillas × avance físico ÷ tiempo | Insumo consumido ÷ unidad de avance |
+| Quién lo registra | El residente, al capturar avance y cuadrillas | Se concilia después, contra salida de almacén |
+| Vive en | Esta sección (§6.2) | §11.16 · §11.17 |
+| A quién alimenta | **Solo al programa** (`PROPUESTA-CUATRO-MODULOS.md` §4) | Al costo — Presupuesto Formado, control de cambio. **Nunca al programa** |
+
+> Mezclarlos repite D-252 en la otra dirección: ahí comparar material contra un total
+> que incluía mano de obra infló la brecha. Explicar un retraso de cuadrilla con el
+> rendimiento del material —o al revés— sería el mismo error.
+
+El teórico **nunca se sobrescribe** con ninguno de los dos reales — misma cadena que
+el precio (§13.1). Si el real de mano de obra diverge, el programa gana una
+**segunda proyección que convive con la teórica**, no un reemplazo —
+`PROPUESTA-CUATRO-MODULOS.md` §4.
 
 ## 6.3 Es un APU de un solo insumo
 
@@ -1873,8 +1990,8 @@ rendimiento           → cuántas jornadas costó
 ## 11.7 Auditar la diferencia no es un módulo nuevo
 
 Comparar la ingeniería del lote contra su prototipo usa **el mecanismo que ya
-existe**: la descomposición en desviación de precio y de consumo, y las seis causas
-con quién paga cada una (§13.6).
+existe**: la descomposición en desviación de precio y de consumo, y las nueve
+causas con quién paga cada una (§13.6).
 
 **Lo único nuevo es cuándo se compara:**
 
@@ -1907,7 +2024,7 @@ declarado borra la evidencia de que algo cambió sin avisar.
 Dos disparadores distintos, la misma respuesta:
 
 **1 · Diferencia sin causa (P-29).** Es la «ausencia de causa» de arriba: no cae en
-ninguna de las seis causas de §13.6. Se marca como alerta. Alguien decide si es
+ninguna de las nueve causas de §13.6. Se marca como alerta. Alguien decide si es
 desviación real de obra, si faltaba declarar la causa, o si es un error de captura.
 
 **2 · Identidad dudosa por cantidades (P-30).** Comparar por contenido —qué trae la
@@ -2165,6 +2282,21 @@ contra $332.
 > aparece suelta, repetida en cada bloque.** Es un artefacto de cómo se construye el
 > archivo, no un hecho de la obra.
 
+### P-36 cierra: no se consolida al cargar — cada lector agrupa a su modo
+
+**Depende del proceso que lee, no del insumo** (dato del usuario). Compras y obra
+necesitan el consolidado —cuánta arena hace falta pedir o surtir esta semana—;
+costos y control necesitan el detalle crudo —cómo se formó el PU, entender el
+rendimiento real (`CONOCIMIENTO.md` §11.16/§11.17)—. Consolidar al cargar le
+quita al segundo grupo el dato que necesita; no consolidar nunca le exige al
+primero rearmarlo cada vez.
+
+**No hace falta guardar las dos versiones.** Lo cargado se queda atomizado, como
+llegó (§12.1: lo cargado no se toca) — la vista consolidada de compras/obra es
+una agregación (`SUM(cantidad) GROUP BY clave`) al leer, nunca un segundo lugar
+donde el dato pueda desincronizarse del original. Mismo principio que
+`ESTADO_CARGA.porcentaje_cargado`: se calcula, no se guarda.
+
 ### Un caso que rompe el patrón, y por eso destaca
 
 Casi todo en ALAMO 18 sale **igual o mayor** que el prototipo — ampliaciones,
@@ -2183,7 +2315,44 @@ finas exteriores — antes de que el cemento la sustituyera.
 > comparación contra el prototipo detecta correctamente cuándo una obra quedó
 > capturada con una versión de APU distinta a la vigente.
 
-## 11.12 La tercera pata: salidas de almacén — pendiente
+### P-35 cierra: este caso ya era la respuesta, solo faltaba nombrar el mecanismo
+
+**Cómo se declara una sustitución (P-35) es exactamente lo que acaba de pasar
+arriba, formalizado.** Dato del usuario: al confirmarse, se declara para quedar
+auditable — y una vez aprobada, deja de contar como desviación real. Los tres
+pasos, ninguno nuevo:
+
+```
+1. Detectar    Casi todo crece y una cosa baja fuerte → candidato (ya probado, arriba)
+2. Proponer    PROPUESTA(tipo=version) sobre el concepto, evidencia = los casos
+               acumulados; valor_propuesto lleva insumo_anterior_id/insumo_nuevo_id
+               y el `GRUPO_FUNCIONAL` que los declara intercambiables (§16.3, D-328)
+               — la sustitución queda auditable por esos dos campos, no solo en prosa
+3. Aprobar     VERSION_CONCEPTO nueva (§2.2/§4a) con la matriz actualizada — desde
+               su vigente_desde, la comparación ya no encuentra brecha: el nuevo
+               material ES la referencia, no hay desviación que seguir marcando
+```
+
+**No pidió cantidad negativa** (la otra opción que se evaluó): no hay evidencia de
+ese mecanismo en los 12 archivos de ingeniería vistos, y `PROPUESTA(tipo=version)`
+ya resuelve lo mismo con lo que existe — `CONOCIMIENTO.md` §13.6 ya lo decía
+("cuando sí corrige el catálogo: versión nueva, propuesta con evidencia,
+aprobada por alguien"), solo nunca se había conectado con nombre a este caso.
+
+> **Lo que este mecanismo no resuelve todavía:** las desviaciones ya capturadas
+> *antes* de que la sustitución se aprobara —cuando el patrón apenas se estaba
+> acumulando— se quedan como estaban. Marcarlas retroactivamente como "explicadas"
+> necesita la entidad `DESVIACION` (`GLOSARIO-DOMINIO.md`, «Precios y cambios» —
+> sigue «— pendiente»), que ya se anotó como hueco en `MODELO.md` §5f al cerrar
+> B-71. Tres veces que aparece la misma falta es la señal de que ya toca
+> diseñarla — sin caso urgente que lo fuerce hoy, queda para la próxima pasada.
+
+## 11.12 La tercera pata: salidas de almacén — primeros cruces reales
+
+> **Actualización:** los primeros cruces reales contra almacén ya se hicieron —
+> cómo se lee el archivo (§11.15), el rendimiento real contra la matriz (§11.16),
+> el corte semanal (§11.17) y los controles de cambio que lo completan (§11.18).
+> Sigue parcial: solo dos conceptos de un mes.
 
 Hoy la comparación cruza dos momentos **planeados**: el prototipo vigente contra la
 ingeniería del lote. Falta la que compara contra lo **ejecutado de verdad**.
@@ -2211,6 +2380,1975 @@ Con las tres, se puede distinguir:
 > Falta el segundo para saber si lo planeado en la ingeniería **de verdad se
 > surtió así**, o si hubo otra desviación encima.
 
+## 11.13 El catálogo completo se reconstruye con dos técnicas, no una
+
+§11.9 probó la reversión por destajo sobre un solo nivel —cimentación, 84%—.
+Escalada a **diez niveles completos** de `ALAMO 18` (los cuatro ya probados más
+Acabados, Obras Exteriores, Asador, Barda Perimetral, Pintura y Pergolado
+Cochera — 72 conceptos nuevos), la reversión no fue la técnica dominante:
+**la mayoría de los bloques no la necesitaron.**
+
+### Técnica A — concepto auxiliar: la cantidad ya está ahí
+
+Es el mismo mecanismo de §5.4 («heredada de un destajo»), aplicado ahora a
+construir el presupuesto completo y no solo la cantidad de un ensamble.
+Cuando el bloque de ingeniería ya trae su propio encabezado —
+`ACA-01090,,"Renivelación con concreto h.o...."`— y una sola línea de mano
+de obra clara debajo, no hace falta revertir nada:
+
+```
+cantidad  = la cantidad de la línea MO-/MOA-/MOC-/...
+PU        = importe total del bloque ÷ cantidad
+importe   = suma de todas las líneas del bloque
+```
+
+De los 72 conceptos nuevos, la gran mayoría llegó así — acabados, pintura,
+obra exterior, asador, barda, pergolado. La reversión (técnica B, §11.9) solo
+hizo falta donde el bloque **no** trae encabezado propio: instalaciones y
+cableado, agrupados bajo un rótulo de etapa o ubicación, no de concepto.
+
+### Técnica B — la reversión gana el desempate que le faltaba
+
+§11.9 dejó **4 ambiguos** sin regla de desempate. El recorrido a diez niveles
+encontró los dos huecos que esa regla necesitaba:
+
+> **La ambigüedad se prueba después de deduplicar candidatos, no antes.**
+> `ECO-00009` (eléctricas PB) traía una clave de catálogo repetida
+> —`IEC-01260` dos veces, a cantidades de referencia distintas, una por
+> sub-ubicación— y el primer intento de desambiguar leyó eso como **dos
+> candidatos en conflicto** cuando era **un solo concepto**. Corrección:
+> `sorted(set(...))` sobre las claves candidatas, sumando la cantidad del
+> destajo en todas sus ocurrencias de la etapa, antes de decidir si hay
+> empate.
+>
+> **El ancla de mano de obra siempre gana.** Un primer intento eligió, para
+> cada insumo, «el candidato que da el entero más limpio» de forma
+> independiente — y produjo un vertedero de 25 unidades, absurdo. El motivo:
+> los materiales compartidos (`SAN-`, `HID-`) tienen tarifas por unidad
+> pequeñas en muchos conceptos a la vez, así que cualquier ruido parece
+> «limpio». La mano de obra no tiene ese problema — es 1.0 por unidad por
+> convención — así que **la cantidad del concepto es siempre la de su propia
+> línea MO**, y el material solo estima cuando no hay línea MO que anclar.
+>
+> **Dos destajos de un mismo concepto en desacuerdo se resuelven por el de
+> armado, o el de mayor costo.** La losa maciza de Planta Baja traía armado
+> (32.80) y descimbrado (56.80) en desacuerdo — se tomó armado. Validado
+> independiente: 182.40 (nervada) + 32.80 (maciza) + 24.00 (losa 4.20) =
+> 239.20 exacto contra la cimbra declarada aparte (`MAD-00002`).
+
+### Cuando ni A ni B alcanzan: el concepto "lote"
+
+Cuatro de los 72 bloques compartían material entre varios sub-conceptos sin
+una llave real de prorrateo — el cable de una misma bobina alimenta
+contacto, apagador y timbre a la vez, sin metraje declarado por punto—.
+Forzar un split ahí no reconstruye un dato: **inventa uno.**
+
+> Mismo principio que `EST-01060` en cimentación: cuando no hay llave
+> confiable, **el bloque completo se registra como un solo concepto "lote"**,
+> cantidad 1, en vez de una división ficticia con apariencia de precisión.
+> `IEC-00410`/`IEC-00420` (cableado PB/PA) y `API-01020`/`API-04020`
+> (limpieza y sellado, mezclan M2 de mármol, piedra y metros de durmiente
+> bajo un solo encabezado) se cerraron así.
+
+### `OBE-01010` no era "sin referencia" — era un auxiliar sin reconocer (B-65)
+
+`OBE-01010` (muros de cisterna, $12,726.59) también se cerró como lote, pero
+por una razón que resultó incorrecta: se registró como «sin ninguna
+referencia en el catálogo maestro». No es cierto. El catálogo maestro trae
+`OBE-01010` en los **siete prototipos**, como Nivel 3 —concepto auxiliar,
+igual que `EST-01060`—, agregando 7 hijos reales (afine, firme, muro de
+tabique, repellado, aplanado, losa, tapa) bajo un rótulo engañoso:
+"ENCOFRADO DE CISTERNA 3000 LTS" para lo que en realidad es el paquete
+completo de muros, no solo la cimbra. El error no fue de catálogo: fue no
+reconocer un Nivel 3 como concepto auxiliar y tratarlo como concepto suelto.
+
+No es el mismo error que la matriz prestada (D-245): ahí la clave
+pertenecía a *otro prototipo*; aquí la clave es la correcta, pero al *nivel
+equivocado* de la jerarquía — un agregador no es una referencia de PU
+directa, aunque el grep lo encuentre.
+
+Mejor aún: la ingeniería cruda de `ALAMO 18` trae ancla de MO propia para 6
+de los 7 hijos (`MOE-02010` muro, `MOE-30010` firme, `MOE-30020` repello,
+`MOE-30030` finas, `MOE-30040` afine, `MOE-31110` tapa, cada una con su
+propia cantidad) — mejor evidencia de la que tenían `EST-01060` o las losas
+de Planta Baja cuando se explotaron por el método de §11.14. El lote
+($12,726.59) sigue siendo el valor vigente; explotarlo en sus 7 hijos
+reales quedó documentado como oportunidad — ejecutado después, junto con el
+resto de B-69, ver abajo.
+
+### Los otros ocho de B-69: mismo patrón, no todos se explotan igual
+
+Confirmado el patrón en `OBE-01010`, se revisaron los ocho Nivel 3
+restantes de la lista de B-69 (`IEC-00410`, `IEC-00420`, `API-01010`,
+`API-01020`, `API-02010`, `API-02020`, `API-04010`, `API-04020`,
+`API-05010`) contra el catálogo maestro y la ingeniería cruda. **Los siete
+`API-` sí se explotaron** — la MO trae ancla propia por hijo, algunas veces
+con cantidades idénticas al catálogo:
+
+| Código (antes) | Hijos reales | Real vs. antes |
+|---|---|---|
+| `API-01010` Pintura PB | 2 (muro, plafond) | $36,828.57 vs $37,139.61 (-0.8%) |
+| `API-01020` Limpieza/sellado PB | 5 (mármol×2, piedra, gualdra, asador) | $11,123.88 vs $9,603.71 (**+15.8%**, todo en `ACA-10040`, sin ancla propia — se queda en catálogo, no es hallazgo, es límite del dato) |
+| `API-02010` Pintura PA | 3 (muro, plafond, fachada) | $14,513.88 vs $14,603.66 (-0.6%) |
+| `API-02020` Limpieza/sellado PA | 2 (mármol sellado, mármol lavado) | $1,975.73 vs $1,704.36 (**`ACA-10040` faltaba por completo** en la reconstrucción anterior — no es alza real, es un hijo nunca capturado) |
+| `API-04010` Pintura fachada | 1 (ya era real) | $17,288.13, sin cambio |
+| `API-04020` Limpieza/sellado fachada | 6 (piedra, moldura, 2 rodapiés, gualdra, durmiente) | $16,680.48 vs $16,680.49, sin cambio real |
+| `API-05010` Pintura azotea | 1 (ya era real) | $798.14, sin cambio — la reconstrucción ya había detectado que la azotea real (19.2 M2) triplica el supuesto del catálogo (6 M2, $249.42) y lo había corregido antes de esta revisión |
+
+`IEC-00410`/`IEC-00420` (cableado) **no se explotaron.** El material sigue
+genuinamente compartido (bobina sin metraje por punto), y aunque la MO trae
+más estructura de la que este mismo párrafo reconocía antes (4 categorías
+de accesorio, no cero), no alcanza para separar los hijos específicos del
+catálogo — `apagador sencillo/doble/triple/...` son un solo bulto de 19 en
+la ingeniería, cuando el catálogo distingue 6 subtipos. Validación parcial,
+sí posible, por agregado: contacto (49 real = 39+4+6 del catálogo, exacto)
+y timbre+zumbador+arbotante (2+2=4, exacto) reconcilian; apagador no (19
+real contra 26 que implica la suma del catálogo, más un bulto "general" de
+10 sin atribuir) — brecha real, sin explicar, sin forzar.
+
+> Aplicado sobre el catálogo reconstruido de `ALAMO 18` (scratchpad, fuera
+> del repo): 20 filas nuevas reemplazan 7 lotes/mezclas, el total del
+> prototipo sube $1,390.71 (0.05% de $2.57M) — explotar no cambia el
+> presupuesto, lo hace auditable hijo por hijo. D-303.
+
+### El residuo se anota, no se fuerza — `TMP-XXXXX`
+
+Cuando el material real sobra contra lo que el catálogo esperaría para ese
+concepto, y no hay dónde asignarlo con evidencia, se anota como **concepto
+temporal**: clave `TMP-00001`, `TMP-00002`…, descripción corta al estilo del
+catálogo, costo íntegro si el concepto esperado era cero, o **prorrateado
+por `(excedente) × PU`** si el concepto sí llama parte del material —
+prorratear por cantidad, nunca por dinero de la fila entera, para no
+duplicar lo que el concepto confirmado ya paga. Decisión del usuario: «de
+momento solo crea como concepto temporal… ya en sistema se desglosa su
+matriz temporal».
+
+> **El PU del prorrateo sale de la matriz de concepto confirmada, nunca de
+> la columna `Total` de la ingeniería sin cruzarla antes.** `TMP-00002`
+> (Cimentación) se armó primero confiando en `Total ÷ cantidad` de la
+> propia fila — y las cuatro filas resultaron tener `Total` mal capturado:
+> dos con `Total = PU` (como si la cantidad fuera 1, ignorando la cantidad
+> real de 3), dos con `Total` calculado sobre la cantidad *esperada* del
+> catálogo en vez de la real capturada. Cruzando el mismo insumo contra
+> siete referencias independientes en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`
+> —todas de acuerdo entre sí en su propio PU— se encontró el precio
+> confiable y `TMP-00002` subió de $1,423.84 a $2,447.04. **Cuando existe
+> una matriz de concepto que ya usa el mismo insumo, es la fuente de PU —
+> la fila de ingeniería sola no se valida a sí misma.** B-66.
+
+### El resultado, a diez niveles
+
+| Nivel | Real (ingeniería) | Catálogo de referencia | Diferencia |
+|---|---:|---:|---:|
+| NIV-00005 Acabados | $247,970.03 | $226,708.45 | +9.4% |
+| NIV-00006 Obras Exteriores | $103,069.66 | $100,735.02 | +2.3% |
+| NIV-00011 Asador | $56,204.80 | $54,790.44 | +2.6% |
+| NIV-00012 Barda Perimetral | $21,021.78 | $27,434.63 | **-23.4%** |
+| NIV-00013 Pintura | $123,023.14 | $114,344.55 | +7.6% |
+| NIV-00014 Pergolado Cochera | $59,567.51 | $72,734.53 | **-18.1%** |
+| **Diez niveles (con los cuatro de §11.9)** | **$2,561,657.71** | $2,287,461.31 | **+12.0%** |
+
+Dos validaron exacto contra el catálogo — `ECO-00028` cableado y
+`ECO-00031` instalaciones OE, **0.0% de diferencia** — evidencia de que la
+técnica no arrastra sesgo sistemático. Las dos peores —barda perimetral y
+pergolado cochera— van **por debajo** del presupuesto, no por arriba: menos
+metro lineal de barda y una pérgola de cochera de 28.00 m² real contra
+34.57 m² de catálogo. Y en pisos de Planta Baja aparecen **claves de
+material distintas a las presupuestadas** —`ACA-02101` Brunei Ivory donde
+el catálogo tenía Brunei Beige, `ACA-80473`/`ACA-80474` Sequoia Beige y
+Amaretto Tobacco donde tenía Lugano Naturale— sustituciones reales, no
+error de captura, en la misma familia que la del cemento (§11.7).
+
+**Cuatro niveles no tienen ninguna ingeniería cargada** —Cancelería,
+Carpintería, Muebles/Iluminación, Herrería— $542,464.67, **19.2% del
+presupuesto base en dinero.** Es un número distinto al 92%/8% de §5, que
+cuenta **etapas**, no **pesos** — ahí no se toca. Contar etapas y contar
+dinero miden cosas distintas y **las dos son correctas a la vez**: cancelería
+y carpintería concentran presupuesto alto en pocas etapas.
+
+> **B-48 cierra: de estos cuatro, tres se contratan terminados —llave en
+> mano, un solo subcontratista entrega el paquete completo— y uno se
+> programa con actividades detalladas, dato del usuario.** Cancelería,
+> Carpintería y Herrería van por la ruta de paquete completo; Muebles/
+> Iluminación no. Y el patrón no depende de tener o no ingeniería
+> cargada: **Cubiertas, pérgolas e impermeabilizante también se
+> contratan terminados, aunque sí tienen presupuesto propio** —Pergolado
+> Cochera aparece arriba con $59,567.51 reales— confirmando que «tiene
+> ingeniería» y «se contrata terminado» son dos ejes independientes, no
+> uno. El mecanismo ya existía sin conectar: `ACTIVIDAD.modo_duracion=
+> preestablecida_nivel` con `disparador_fecha=contractual`
+> (`MODELO.md` §5c, D-327) — duración fija por nivel, arranque por
+> anticipo o junta de arranque, no por precedencia técnica.
+
+> Con las cuatro técnicas fijas, la reconstrucción es reproducible: dado un
+> archivo de ingeniería con encabezados de concepto, el catálogo se arma sin
+> intervención humana en la mayoría de los bloques. Lote, TMP y ambiguos
+> siguen pidiendo criterio — pero ahora con reglas escritas, no con juicio
+> caso por caso.
+
+## 11.14 Comparar por destajo y material — la explosión de matriz sobre el catálogo reconstruido
+
+§11.13 reconstruye el catálogo **por concepto**. Compararlo contra el
+presupuesto base y lo pagado real **por destajo** (mano de obra, que es lo que
+se contrata) y **por material** (insumo, que es lo que se surte) necesita una
+capa más: explotar cada concepto por su matriz, no solo sumar su importe.
+Probado sobre `ALAMO 18`, catálogo Diamante con chimenea — **hallazgos
+recientes, sujetos a corrección** conforme se prueben sobre más casos.
+
+### La explosión no se detiene en el primer nivel
+
+Un insumo dentro de la matriz de un concepto puede ser él mismo un
+**compuesto** (`AUX-`, `ZA1-`… — §10.4, `CASO-TRABAJADO.md` §3) y ese
+compuesto puede anidar **otro** compuesto. De 90 compuestos usados como
+insumo en matrices de concepto, 89 se usan al menos una vez y **12 anidan
+otro compuesto adentro** — hasta **dos niveles** encontrados. Detenerse en el
+primer nivel subvalúa destajo y material por igual, y puede esconder mano de
+obra: `ZA1-000001` (zapata, `Tipo=Material`) contiene `MOC-12010` (`Tipo=
+Contrato`) — ya descrito en `CASO-TRABAJADO.md` §3. **La explosión recursiva
+tiene que llegar al insumo atómico en las dos lecturas (de costo y de
+contratación, §5.5), clasificando por el `Tipo` de cada hoja, no por el de su
+contenedor.**
+
+### La matriz prestada: una clave puede pertenecer a otro prototipo
+
+Una clave puede existir en el archivo de matrices **perteneciendo a un
+prototipo distinto** del que se está armando — incluso con la cantidad de
+referencia en una unidad de convención distinta (`act`). `EST-01060` y
+`ACA-01070` tienen matriz en el archivo, pero son de **Zafiro Plus**, no de
+Diamante con chimenea: usarla escaló el material a **10-13 veces** el valor
+esperado antes de detectarse.
+
+> **Antes de usar la matriz de una clave, se cruza contra el conjunto de
+> claves del prototipo que se está armando.** Que la clave *tenga* matriz no
+> basta — tiene que ser *su* matriz. Este error ya había aparecido una vez
+> (`EST-01060` confundida con `EST-01053`, antes de esta sesión) y volvió a
+> aparecer en un camino de cálculo distinto: **no es un caso aislado, es una
+> clase de error que se repite** cada vez que se cruza contra el archivo de
+> matrices sin filtrar por prototipo primero.
+
+### El concepto auxiliar no se explota directo — se descompone en sus hijos reales
+
+El concepto auxiliar (Nivel 3, agregador — `GLOSARIO-DOMINIO.md`, término
+«Concepto auxiliar») **no tiene matriz propia**: su valor es la suma de sus
+hijos. Igual que el concepto "lote" de §11.13 no se prorratea por no haber
+llave confiable de costo (D-240), el agregado tampoco se explota directo por
+destajo/material — pero **no es el mismo problema**: el lote no tiene forma
+de separar su costo combinado; el concepto auxiliar sí tiene, casi siempre,
+hijos identificables en el catálogo base con su propia matriz.
+
+```
+1. Identificar los hijos reales del concepto auxiliar en el catálogo base
+   (Nivel 4 bajo el mismo Nivel 3 — CATALOGO_DE_PRESUPUESTO, no inventado)
+2. Para cada hijo, buscar su línea de mano de obra ancla en la ingeniería
+   cruda — si aparece sola y reconocible, su cantidad real se reconstruye
+   por reversión (§11.9): cantidad_real = cantidad_ancla_real / rendimiento
+3. Explotar cada hijo con SU matriz, a su cantidad real
+4. El hijo sin ancla propia en la ingeniería se queda a la cantidad del
+   catálogo base — no se inventa (mismo principio que D-240)
+```
+
+Probado sobre los tres auxiliares de cimentación/losas de `ALAMO 18`:
+
+| Auxiliar (mi catálogo) | Hijos reales (catálogo base) | Ancla | Real vs. base |
+|---|---|---|---|
+| `EST-01060` (losa cim. + castillos) | `EST-01053` losa | `MOC-01010` | 244 vs 216 M2 (+13.0%) |
+| | `EST-10011/10021/10031/10071/10081` (K1/K2/K3/K7/K8) | sin ancla propia — cimentación es otro alcance (solo acero), no se cruza contra Planta Baja | sin cambio (cantidad base) — no lo necesita, ver abajo |
+| `EST-00090` (losas PB) | `EST-20010` losa maciza 11cm | `MOE-02213` | 32.80 vs 39 M2 (-15.9%) |
+| | `EST-20020` losa maciza 12cm ("4.20") | `MOE-02217` | 24.00 vs 24 M2 (exacto) |
+| | `EST-20017`+`EST-20022` losa nervada (63+84 M2) | `MOE-02211`, **compartida** | 182.40 vs 147 M2 combinados — mismo factor (+24.1%) a las dos, sin forma de separarlas |
+| `EST-00100` (losa azotea) | `EST-20033` losa azotea | `MOE-02213` | 43.90 vs 33 M2 (+33.0%) |
+| | `EST-01510` escalón forjado | `MOE-02311`/`02312` | 4 vs 4 PZA (exacto) |
+
+`MOC-01010` reconstruido ($56,120) cuadra **exacto** contra la ingeniería
+cruda — es la propia ancla, así que confirma el mecanismo, no lo prueba
+contra un tercero. La losa nervada de PB es el caso honesto de datos
+insuficientes: dos hijos, una sola ancla combinada en la ingeniería — se
+aplicó el mismo factor a los dos por no haber llave para separarlos, **no
+porque sea lo correcto, sino porque es lo que hay.**
+
+### Los castillos de Planta Baja se reconstruyen en metros, sin convertir a piezas (B-67)
+
+Los cinco castillos de cimentación (K1/K2/K3/K7/K8, dentro de `EST-01060`)
+se quedaron sin ancla de MO propia — cantidad de catálogo, sin evidencia de
+que fuera correcta. Planta Baja tiene sus propios castillos — misma
+nomenclatura K1-K8, pero **en metros lineales, no en piezas** (es el tramo
+de muro, no el arranque de cimentación) — y sí traen ancla real en la
+ingeniería cruda.
+
+> **Primer intento, corregido.** La primera lectura solo buscó en el
+> archivo `PB` y encontró que K1 (260 M) casi cuadraba con 61 PZA a 4.20 m
+> (256.2 M, 1.5%). Faltaba revisar otros dos archivos que también traen
+> estos códigos: `AJU_PB` sí es de Planta Baja (K1 y K8 adicionales); el
+> otro reutiliza los mismos códigos K1/K2/K7 para **Planta Alta, Azotea y
+> Asador** — otro nivel, no cuenta aquí, y se excluye. Filtrado
+> correctamente (`PB`+`AJU_PB`, sin los de otro nivel), K1 sube a 264 M y
+> la aparente confirmación se cae: fue coincidencia sobre un dato
+> incompleto, no una validación real.
+
+Con la altura estándar (**solo dos: 3.00 y 4.20 m** — dato del usuario) y
+el material completo, probando **las dos alturas** contra cada castillo
+(el intento anterior solo probó 4.20) salió un primer resultado: ninguno
+confirmaba limpio, K2 y K3 quedaban plausibles cada uno a su propia altura.
+
+> **Segunda corrección: 3.00/2.80 no aplican a este prototipo.** La
+> estructura de cimentación distingue dos tipos de castillo por altura —
+> pero eso es la regla general entre prototipos, no dentro de uno.
+> `ALAMO 18` (Diamante con chimenea) **es toda de 4.20 m** — no tiene
+> castillos de 3.00 en ningún punto. El ajuste de K3 a 2.80 (§ anterior)
+> estaba probando una altura que este prototipo no usa. Se repite la
+> prueba con solo 4.20 (nominal) y 4.00 (descontando ~20 cm de cadena de
+> cerramiento, la misma resta que explica K2, y que el usuario confirmó
+> también para pretiles: 1.00 nominal cuela a 0.80).
+
+| Castillo | M real (PB+`AJU_PB`) | PZA cimentación | ÷ 4.20 | ÷ 4.00 |
+|---|---|---|---|---|
+| K1 | 264.00 | 61 | 62.86 | **66.00 exacto** |
+| K2 | 76.00 | 19 | 18.10 | **19.00 exacto — coincide** |
+| K3 | 20.00 | 7 | 4.76 | **5.00 exacto** |
+| K7 | 24.40 | 5 | 5.81 | 6.10 (no exacto) |
+| K8 | 24.00 | 5 | 5.71 | **6.00 exacto** |
+
+**Cuatro de cinco dividen exacto a 4.00 — solo K7 no cierra.** Que cuatro
+códigos independientes caigan en un entero exacto a la misma altura no es
+casualidad: confirma el modelo (4.20 nominal, 4.00 real por la cadena de
+cerramiento) para Planta Baja completa.
+
+> **Corrección de fondo: cimentación y Planta Baja no tienen por qué
+> numerar igual (dato del usuario).** `EST-10011` (cimentación) solo lleva
+> el **acero** — el arranque de varilla que empieza en la losa. `EST-02110`
+> (Planta Baja) lleva el **concreto completo y la mano de obra** de colar
+> el castillo alrededor de ese acero. Son dos alcances distintos del mismo
+> elemento físico, valuados en dos unidades distintas (PZA de arranques,
+> M de colado) — cruzarlos por una conversión de altura fue una validación
+> que este dato nunca prometió. **Que K1/K3/K8 no calcen contra el PZA de
+> cimentación no es una discrepancia que corregir**: `ALAMO 18` no tiene
+> que cuadrar con el prototipo base — si tiene más o menos piezas de
+> castillo que el genérico, es normal, cada lote es distinto. Esta
+> reconstrucción es una **propuesta**; confirmarla, si hiciera falta, es
+> trabajo del cuantificador, no de cruzarla contra cimentación.
+>
+> **La regla que sí aplica:** para un concepto auxiliar reconstruido por
+> reversión, el material no debe quedar ni arriba ni abajo del real de
+> ingeniería — se logra manteniendo el PU/matriz del concepto y ajustando
+> solo la cantidad al ancla real (mismo principio de §11.13/§11.14). Eso
+> ya estaba bien hecho: la cantidad real de cada castillo (264/76/20/24.4/
+> 24 M) es exactamente la de su ancla, sin inventar. El error fue el paso
+> de más — convertir esa M a piezas para cruzarla contra un alcance que no
+> le corresponde.
+
+Con esto, B-67 cierra: Planta Baja usa su M real directo, sin conversión a
+piezas; cimentación se queda en el valor de catálogo, sin necesidad de
+evidencia adicional que lo confirme o lo corrija — no es su lugar. K7
+(24.40 M) cierra igual que los demás: es su real, no necesita dividir
+limpio en nada. La losa nervada de Planta Baja (dos hijos, una sola ancla
+combinada) sigue como quedó — sin llave para separarla, no por falta de
+revisión. D-314 (corrige D-306).
+
+### Efecto cantidad y efecto receta — separar por qué creció el excedente
+
+Con el concepto auxiliar bien descompuesto, se puede leer el excedente
+(Ingeniería − Presupuesto base) en dos partes, calculando un tercer valor:
+**Presupuesto Formado** — mi catálogo reconstruido, a su cantidad REAL,
+explotado con el MISMO rendimiento (matriz) que usa el presupuesto base.
+
+```
+Efecto cantidad = Presupuesto Formado − Presupuesto base   (construir más o menos, misma receta)
+Efecto receta    = Ingeniería − Presupuesto Formado          (usar distinto rendimiento, misma cantidad)
+Efecto cantidad + Efecto receta = Excedente                  (identidad exacta, fila por fila)
+```
+
+El auxiliar mal explotado (matriz prestada, o excluido sin descomponer)
+**invierte la lectura**: al no tener Presupuesto Formado, todo el excedente
+de esa clave se ve como "mal rendimiento" cuando puede ser, en gran parte,
+"se construyó más". En `ALAMO 18`, corregir las tres losas cambió el signo:
+
+| | Efecto cantidad | Efecto receta | = Excedente |
+|---|---:|---:|---:|
+| Destajo, con las losas mal explotadas | -$83,254 | +$164,940 | $81,687 |
+| Destajo, con las losas descompuestas | **+$71,372** | **+$10,315** | $81,687 |
+| Material, con las losas mal explotadas | -$485,127 | +$601,452 | $116,325 |
+| Material, con las losas descompuestas | +$15,254 | +$101,071 | $116,325 |
+| Material, con los 7 `API-` también explotados (B-69) | +$59,138 | +$57,187 | $116,325 |
+| Material, sin los dos subcontratos (`SUB-`) | +$181,973 | -$52,267 | $129,706 |
+| Material, con Piedra Galarza corregida (era bug, no receta) | **-$66,998** | **+$196,704** | $129,706 |
+
+**87% del excedente de destajo es construir más (244 m² reales contra 216
+del catálogo), no mal rendimiento.**
+
+### B-68 cierra: el residuo de material no era una causa, eran tres
+
+Explotar los 7 `API-` de B-69 con el mismo método que las losas bajó el
+residuo de $101,071 a $57,187 — **~$43,884 era el mismo error: concepto
+auxiliar sin descomponer**, no receta distinta ni desperdicio.
+
+Lo que quedaba no era limpio. Dos subcontratos (`SUB-00001` pergolado,
+`SUB-00006` impermeabilización) se comparaban contra una matriz de
+materiales que no les aplica — un subcontrato no se construye del catálogo
+propio, no tiene receta que comparar contra la suya. Al excluirlos **de las
+tres columnas** (el catálogo base también trae $122,835.50 en material
+para ese mismo alcance, asumiendo que se construye y no se subcontrata) el
+universo comparado cambia — el excedente sube a $129,706 — y el efecto
+receta **cambia de signo**: la receta ahora sobra ($52,267), no falta.
+
+### Un subcontrato se compara contra su propia base, no contra el m² de la casa
+
+Excluir el subcontrato de la matriz responde cómo NO compararlo. Falta cómo
+sí. Dato del usuario: **un subcontrato no crece con el m² total de la
+casa** —salvo que el espacio que cubre crezca de verdad (una recámara
+nueva, un estudio)—, y ese crecimiento depende del tipo de espacio, no es
+uniforme. La comparación correcta es **Real contra Base del mismo
+subcontrato**, no contra ningún escalado por m². La diferencia se separa
+en dos: lo que explica el crecimiento del espacio (esperado, no se
+factura) y lo que no explica (**adicional al cliente**, Control de
+Cambio).
+
+`ALAMO 18` ya tiene los tres casos, y confirman el método:
+
+| Subcontrato | Base (catálogo maestro) | Real (`ALAMO 18`) | Real/Base |
+|---|---|---|---|
+| Pergolado asador | 20.70 M2, $35,811.50 | 20.70 M2, $35,811.50 | **100%** |
+| Impermeabilización | 195.00 M2, $25,351.95 | 193.87 M2, $25,205.04 | 99.4% |
+| Pergolado cochera | 34.57 M2, $61,675.00 | 28.00 M2, $48,440.50 | 81% |
+
+Dos calzan casi exacto contra su base — nada que explicar. La cochera está
+**por debajo** de la base, no por arriba: no es crecimiento, y por la
+misma regla tampoco es adicional al cliente — es una reducción de alcance
+frente al prototipo genérico. Ningún caso real de crecimiento-que-sí-es-
+adicional apareció todavía en los datos — la regla queda anotada, sin un
+ejemplo vivo que la ponga a prueba del lado que crece. D-313.
+
+> **Las tres bases son correctas — verificado contra el catálogo de
+> presupuesto por prototipo.** Diamante sin chimenea y Diamante con
+> chimenea (`ALAMO 18`) comparten exactamente la misma especificación en
+> los tres subcontratos (mismo M2, mismo importe) — no hay error de
+> cruzar contra el prototipo equivocado. **La cochera al 81% es reducción
+> real, confirmada por diseño (dato del usuario)**: este lote construyó
+> una cochera/pergolado más chico que el estándar Diamante a propósito,
+> no por error de dato ni de comparación. El porqué de fondo (por qué el
+> diseño de este lote la achicó) es pregunta de arquitectura, no de
+> datos — mismo tipo de límite que el cuantificador para la contratrabe
+> (arriba), con otro actor del lado que sí sabe. D-321.
+>
+> Revisada también la ingeniería cruda completa de `ALAMO 18`: no hay más
+> subcontratos que los tres de la tabla. El archivo `subcontratos.csv` del
+> resumen de obra está vacío — no es una omisión de esta reconstrucción,
+> es un hueco en el dato de origen que el módulo de B-71 necesitará
+> resolver cuando se diseñe.
+
+Lo que sigue después de las dos correcciones **no es desperdicio: son
+pares que huelen a la misma clave contada dos veces**, insumo por insumo:
+
+| Par | Ingeniería | Formado | Lectura |
+|---|---:|---:|---|
+| `ADH-00004` Mortero / `ADH-00005` Cemento | +$180,526 / -$136,201 | | Misma obra gris, dos códigos |
+| `PET-00033`+`PET-00032` Piedra Galarza 40×40/60×40 | -$134,114 / -$95,968 | | La receta espera mucha más piedra de la que el real usó |
+| `PET-00002` Arena 7M3 / `PET-00015` Arena de Rio 14M3 | +$47,355 / -$38,459 | | Mismo patrón: dos SKU, un insumo |
+| `PIS-80473`/`PIS-00003` Pisos Sequoia/Brunei | +$33,528 / +$23,342 | | Insumo real de conceptos sin matriz — ver abajo, no es sustitución |
+
+> `PIS-80473`/`PIS-00003` no son sustitución de clave: son el material real
+> de siete conceptos (`EST-00080`, `ACA-02101`, `ACA-02073`,
+> `ACA-80473`/`80474`/`80475`/`80476`) que resultaron **sin matriz en
+> ningún archivo de referencia** — ni en conceptos ni en compuestos. A
+> diferencia de los `API-`, esto no se puede explotar: es un límite real
+> del método (acabados de piso elegidos por el cliente, sin receta
+> genérica que comparar), no un hueco por cerrar. Estas siete claves
+> faltaban en la enumeración de B-69 — se corrige ahí.
+
+Mortero/Cemento y las dos Piedras Galarza son, juntos, ~$366K de las
+diferencias brutas — el siguiente paso es confirmar insumo por insumo si de
+verdad son la misma compra con clave distinta. D-307.
+
+### Mortero/Cemento resuelto: confirma por qué el ancla es la MO, no el material (B-77)
+
+34 conceptos de muro y aplanado (`ALB-`, `ACA-`, `EST-020xx`, `BAP-`,
+`OBE-`) tienen en su matriz `MEZ-07010` — "Mezcla Cemento-Arena 1:4", un
+compuesto que explota en Cemento (7.28 sacos), Arena de Rio (0.0786) y
+Pipa (0.0185) por M3. La ingeniería real de esos mismos conceptos no trae
+`MEZ-07010` ni una vez: trae `MORTERO SACO DE 50 KG` — un producto
+premezclado que la matriz nunca referencia.
+
+> **No es un dato mal capturado — es la ingeniería de referencia sin
+> actualizar.** La obra usó mortero premezclado y lo dejó de usar (dato
+> del usuario), pero la matriz de referencia nunca se puso al día con el
+> cambio — ni cuando se adoptó, ni cuando se abandonó. **Por eso el
+> destajo se calcula a la inversa**: no se puede partir del material de
+> la ingeniería como ancla porque queda desactualizado; se parte de la
+> MO/destajo, que no cambia con el proveedor o el producto del día, y el
+> material se deriva de ahí. Es el mismo principio ya establecido — «el
+> ancla de mano de obra siempre gana» (§11.13) — con una causa raíz
+> concreta detrás: este caso es la evidencia de por qué, no solo un
+> ejemplo más.
+
+Agrupando las tres líneas que en realidad son el mismo evento (Mortero
+real vs. Cemento+Arena de Rio+Pipa que explota la matriz), el neto es
+**+$6,443 — 1.8% de los $366K en diferencias brutas.** No es desperdicio:
+comprar mortero en costal salió, en conjunto, casi igual que mezclar
+cemento y arena en obra. El cemento que sigue apareciendo en la
+ingeniería real ($60,443) es el correcto — castillos y firmes nunca pasan
+por `MEZ-07010`, no tienen por qué cambiar.
+
+> **La arena también se actualizó (dato del usuario) — el grupo completo
+> es más grande de lo que este párrafo cerró.** `PET-00002` "Arena 7M3"
+> aparece en castillos, muros y columnas forjadas, pero ninguna de las
+> tres recetas de mezcla del catálogo la referencia — `MEZ-07010` (muro),
+> `MEZ-01020` (concreto de castillo), `MEZ-03020` (`ALB-01110`/`01112`)
+> piden las tres `PET-00015` "Arena de Rio 14M3", que la ingeniería real
+> nunca compró ($0 en 454 filas). Mismo mecanismo que el mortero, misma
+> causa raíz — la matriz no se actualizó — solo que en la arena, no en el
+> cemento. Agrupando el grupo completo (Mortero + Cemento + Arena 7M3 +
+> Arena de Rio + Pipa + Grava), el neto sube de $6,443 a **+$54,633**: el
+> 27.8% del efecto receta total ($196,704, tras corregir Piedra Galarza)
+> queda explicado por este grupo — no todo. Lo que resta ($142,071) sigue
+> siendo una cola larga sin un patrón tan limpio como este. D-310 (extiende
+> D-308).
+
+Queda la Piedra Galarza 40×40/60×40 (-$134,114/-$95,968) sin revisar —
+mismo patrón sospechado, sin confirmar. D-308.
+
+### Piedra Galarza era un bug mío, no receta — y corregirlo reabre B-68
+
+No era sustitución. `ACA-11013`/`14`/`15` (forrado de columna con piedra
+galarza) tenían **unidad M2** en mi catálogo reconstruido, con cantidades
+(60.48/11.76/6.3) que no correspondían a nada real. El catálogo maestro
+las define en **PZA** (8/2/1) — y el material real de la ingeniería cruda
+confirma, exacto, esas mismas 8/2/1 piezas:
+
+```
+ACA-11013: 168.00 PET-00032 / 21 (matriz) = 8.0000 PZA   168.00 PET-00033 / 21 = 8.0000 PZA
+ACA-11014:  44.00 PET-00032 / 22 (matriz) = 2.0000 PZA    24.00 PET-00033 / 12 = 2.0000 PZA
+ACA-11015:  21.00 PET-00032 / 21 (matriz) = 1.0000 PZA    21.00 PET-00033 / 21 = 1.0000 PZA
+```
+
+Corregidas unidad/cantidad/PU/importe a los del catálogo maestro — el
+total de mi catálogo reconstruido baja $16,691.81. Piedra Galarza ahora
+cuadra a los centavos (diff -$0.01 y -$0.04).
+
+> **El bug estaba enmascarando el hueco real, no explicándolo.** La
+> inflación de Piedra Galarza sumaba ~$249K de más al Presupuesto Formado
+> — de casualidad, en la dirección que hacía ver el efecto receta más
+> chico de lo que es. Corregido el bug, el efecto receta (material, sin
+> subcontratos) no queda en -$52,267 como reportó D-307: **sube a
+> +$196,704.** Con subcontratos incluidos, comparable con la tabla
+> original de B-68, pasa de +$101,071 (el original) a **+$306,158**. El
+> excedente total no cambia (siempre fue Ingeniería − Presupuesto base,
+> ninguno de los dos depende de mi catálogo) — lo que cambia es cuánto de
+> ese excedente queda sin explicar.
+
+Revisado si hay más bugs del mismo tipo (unidad de mi catálogo distinta a
+la del maestro, para toda clave que ambos comparten): dos más, ninguno del
+calibre de Piedra Galarza. `ACA-07011` dice M2, debería decir "m" — pero
+cantidad × PU ya da el importe correcto, es error de etiqueta, no de
+cálculo. `EST-10020` (JGO vs PZA, $122.22) es un dato deliberado de una
+sesión anterior, no un bug.
+
+**B-68 se reabre.** Las tres causas de D-307 (concepto auxiliar sin
+descomponer, subcontratos sin matriz aplicable, Mortero/Cemento por
+ingeniería de referencia sin actualizar) siguen siendo ciertas — juntas
+explican una parte real. Pero con Piedra Galarza corregida, lo que queda
+sin explicar ($196,704) es mucho más grande de lo que D-307 reportó, y
+está repartido en una cola larga de 206 pares de insumo, no en dos o tres
+grandes — mortero/cemento (ya resuelto, D-308) es la única excepción
+grande y limpia encontrada hasta ahora. D-309 (corrige D-307).
+
+### B-68 se acota: tres causas más, dos ya conocidas y una nueva (D-315 a D-317)
+
+Repetido el cruce de material insumo por insumo (sin subcontratos, sin el
+grupo mortero/cemento/arenas/pipa/grava ya resuelto), el residuo seguía en
+$142,071. Tres causas más lo explican, dos de ellas extensiones directas de
+hallazgos que ya existían y una genuinamente nueva.
+
+**Piso sin matriz — extiende B-69, +$122,753 (86% del residuo).**
+`PIS-80473`, `PIS-00003`, `ADH-00043`, `ADH-00056`, `PET-00007` y el
+faltante de `ADH-00001` Pegapiso son, todos, insumo real de los siete
+conceptos sin matriz ya identificados (`EST-00080`, `ACA-02101`,
+`ACA-02073`, `ACA-80473`/`80474`/`80475`/`80476`). Cruce independiente: la
+suma del Importe real de esos siete conceptos en el catálogo de `ALAMO 18`
+es $123,311.67 — a menos de 0.5% de los $122,753.32 en insumo huérfano. No
+es un hallazgo nuevo: es la sombra contable exacta de uno que ya estaba
+escrito. Estos siete conceptos nunca se reparten en material/MO porque no
+tienen receta, así que su costo real cae entero en "sin matriz" y su
+insumo aparece en la ingeniería sin contraparte en el Formado.
+
+**Cableado y centro de carga — extiende el mismo hallazgo de `IEC-00410`/
+`IEC-00420`, +$27,832.** Cable calibre 10/12/14 (`ELE-00025` a `ELE-00032`),
+centros de carga (`ELE-00037`, `ELE-00099`, `ELE-00077`) y su frente
+(`ELE-00100`) tienen padre en la matriz — pero ese padre (`IEC-10010` a
+`IEC-10160`, `IEC-20010` a `IEC-20040`, `IEC-01070`, `IEC-03010`) **no
+existe como concepto en el catálogo de `ALAMO 18`.** Los únicos `IEC-`
+presentes ahí son las salidas por punto (`IEC-01010` a `IEC-02130`) y los
+dos lotes ya conocidos. El destino real de este material es ese mismo lote
+agrupado — B-69 ya había confirmado que `IEC-00410`/`IEC-00420` no explotan
+a nivel hijo por ser "material de cableado genuinamente compartido"; esto
+es el mismo mecanismo, visto del lado del insumo en vez del concepto.
+
+**`ALB-03014` (relleno de azotea) se ejecutó dentro del subcontrato de
+impermeabilización, no como material — hallazgo nuevo, −$45,647 (dato del
+usuario, confirmado).** `ALB-03014` tiene matriz propia (mortero fc 50
+bombeado `CON-00020` + tezontle `PET-00069`, $45,646.70 en el Formado) y
+suma **193.87 M2** entre sus dos instancias del catálogo. `SUB-00006`
+"Subcontrato impermeabilización" (D-313, `ALAMO 18`) suma, real, **193.87
+M2** — la misma área, exacta. La ingeniería nunca compró mortero bombeado
+ni tezontle para esta partida ($0 en ambos insumos): el subcontratista
+entregó relleno e impermeabilización como un solo paquete, y su material
+propio no pasa por el almacén de la constructora — mismo principio ya
+escrito para pergolado/impermeabilización (D-307: "un subcontrato no se
+construye del catálogo propio, no tiene receta que comparar contra la
+suya"), aplicado aquí a un concepto que no está codificado `SUB-` pero se
+comporta igual en la práctica.
+
+> Que las tres causas sumen $104,938 netos y no $196,232 ($122,753+$27,832+
+> $45,647) es aritmética de signos, no un error: la de impermeabilización
+> resta (el Formado sobra donde la ingeniería no gastó), las otras dos
+> suman (la ingeniería gastó donde el Formado no lo vio venir).
+
+**Queda abierto: $37,133, sin patrón limpio.** `ACR-00002` Varilla 1/2
+(+$18,494) es lo mayor; no se rastreó todavía a un concepto específico, y
+podría ser variación real de cantidad del mismo tipo que B-67 acaba de
+declarar normal (D-314) — pero eso no está confirmado aquí, solo es
+plausible. `CON-00004` Concreto bombeado losas azotea (−$12,635) y
+`ADH-00006` Estuco (−$12,212) son la reconstrucción sobre-estimando contra
+lo real comprado, sin causa identificada todavía. El resto es cola larga de
+partidas menores (pinturas, tapas, hardware de conduit) sin patrón común.
+B-68 sigue abierto, mucho más acotado. D-315, D-316, D-317.
+
+### Contratrabe no tiene ancla propia — confirma el mismo límite que castillos (D-318, extiende D-314)
+
+Duda del usuario: ¿la contratrabe aparece dentro del concepto de losa, y se
+puede reconstruir para `ALAMO 18`? Sí a lo primero, no a lo segundo.
+
+`EST-01053` (Losa de cimentación) trae, entre sus veinte líneas de matriz,
+`AUX-01011` "Contratrabe CT1 de 20x30 cm" (137 M) y `AUX-01040` "Contratrabe
+CT4 de 30x30 cm" (10 M), junto con bastones, malla electrosoldada, el
+concreto de toda la losa (`CON-00001`, 34 M3), las zapatas
+(`ZA1-000001`/`ZA2-000001`) y el ancla de mano de obra `MOC-01010` (216
+M2). Cada `AUX-01XXX` es en sí mismo un compuesto que explota en varilla +
+estribo + alambre — puro acero, sin concreto propio, mismo patrón que los
+castillos de cimentación (§11.14 arriba).
+
+La contratrabe **no aparece por nombre ni por código en ningún archivo
+crudo de `ALAMO 18`** — ni en mano de obra ni en materiales (dato del
+usuario). No tiene orden de producción propia: se cuela junto con toda la
+losa en una sola operación. La única cifra real que existe es la de
+`EST-01053` completa (244 M2 reales contra 216 M2 base), y la
+reconstrucción actual escala todo lo de adentro —contratrabe incluida—
+por esa misma razón de área (244/216 = 1.130), asumiendo que sus metros
+lineales crecen igual que el área de la losa.
+
+Así escalada, la contratrabe ya es **$14,199 de los $43,989 en ACR-00002
+del Formado — 32% del total, 70% de la varilla de la propia losa.** Es una
+pieza grande del residuo de ACR-00002 (+$18,494) montada sobre un supuesto
+de geometría, no sobre un ancla real.
+
+> **Confirmado con el usuario: no hay otro dato de contratrabe en `ALAMO
+> 18`.** La única vía de validación es el cuantificador, fuera de este
+> sistema. `ACR-00002` se queda como escala de área — mismo principio que
+> D-314 (castillos de cimentación): un elemento sin ancla propia en la
+> ingeniería real no se corrige por indicios ni se fuerza a cuadrar; se
+> documenta el límite y, si hiciera falta confirmarlo, es trabajo del
+> cuantificador.
+
+### K3 y K8 quedan confirmados correctos — la vara comercial de 12 M explica la "mitad" que parecía faltar (D-319)
+
+Las dos dudas que abrió la comparación de anillos (arriba) se resuelven con
+dato del usuario, no con corrección de catálogo.
+
+**K3: no faltaba acero, la PZA de la matriz es la vara comercial, no el
+corte de uso.** La varilla comercial se vende en tramos de **12 M**. Un
+castillo de 4.20 M (dato del usuario: la altura única de este prototipo,
+§11.14 arriba) corta cada varilla a **6 M** — de una vara de 12 M salen
+**2 cortes útiles de 6 M**. `EST-10031` trae 3.0 PZA de `ACR-00002` en su
+matriz: 3.0 varas × 2 cortes = **6 varillas útiles** — exacto contra "6
+var no.4" de la descripción real de K3 en Planta Baja (`INGENIERIA -
+ALAMO 18 - PB.csv`). La PZA de la matriz es la unidad de **compra** (vara
+entera), no la de **uso** (corte a la altura del castillo); confundir una
+con otra fue lo que hizo parecer que faltaba la mitad. No hay corrección
+que hacer.
+
+> Misma regla, para no repetir el error: un castillo de 3.00 M corta cada
+> vara a 4 M (3 cortes útiles por vara de 12 M); uno de 4.20 M corta a 6 M
+> (2 cortes por vara). El número de anillos por pieza depende, además, de
+> la separación entre estribos (`@15cm`, `@20cm`…) — la altura entre esa
+> separación da el conteo, no un valor fijo. Dato del usuario, regla
+> general para cualquier prototipo que mezcle las dos alturas (`ALAMO 18`
+> no las mezcla, por eso no aplicó aquí).
+
+**K8: el error estaba en la descripción libre de la ingeniería, no en la
+matriz (dato del usuario).** `EST-10081` usa `ACR-00002` + `ANILLO 10X25`
+— el mismo sistema que K3, coherente con compartir sección rectangular
+grande (15x30 y 15x40) frente a las secciones compactas de K1/K2/K7
+(15x15/15x15/15x20) que sí usan armex prefabricado. La descripción cruda
+de Planta Baja que dice "armado con armex de 10x15" para K8 está mal
+capturada — copiada de la fila de K7 y nunca corregida. La matriz es la
+que tiene razón.
+
+Con esto, `ACR-00002` queda completamente diagnosticado: contratrabe sin
+ancla propia (D-318, límite de dato), K3 y K8 confirmados correctos. El
+residuo de $18,494 no tiene más causa identificable desde los datos
+disponibles de `ALAMO 18` — lo que quede es del mismo tipo que la
+contratrabe, confirmable solo por el cuantificador.
+
+### B-68 cierra: cisterna y tapas eran omisión de catálogo, el resto es cola delgada sin patrón (D-320)
+
+Tres claves —`EQU-01011` (cisterna equipada), `OBE-01014` (tapa de
+cisterna) y `OBE-01021` (tapa de registro sanitario)— tienen matriz
+completa en el catálogo maestro, pero nunca se agregaron al catálogo
+reconstruido de `ALAMO 18`: no es "sin matriz", es una omisión mía al
+armar el catálogo. Sus hijos ya aparecían huérfanos en el cruce de B-68
+(`EQU-00081` +$6,035, `HER-00003` +$1,700, `HER-00001` +$2,700). Agregadas
+al catálogo (`EQU-01011` x1, `OBE-01014` x1, `OBE-01021` x3 — 3, no las 4
+de la base, confirmado por `HER-00001` real $2,700.03 ÷ $900 = 3.0003) y
+reexplotadas, las tres cuadran a la práctica exacta.
+
+`EQU-01011` y `OBE-01014` no pertenecen a las claves propias del
+prototipo 6 (se catalogaron bajo otro prototipo) — se forzó su explosión
+igual, porque son equipo genérico (una cisterna de 3,000 L no cambia por
+estilo de casa) y su real cuadra exacto, a diferencia de la matriz
+prestada (D-245) donde usar el prototipo equivocado daba un número
+equivocado.
+
+De paso, `PIN-00147` (Pintura Deville, matriz de `ACA-03047`) y
+`PIN-00138` (Pintura Arena Cálida Exterior, sin matriz) resultaron ser el
+mismo patrón que mortero/arena: la ingeniería real cambió de color/marca
+de pintura y la matriz nunca se actualizó — $5,910.66 formado contra
+$5,909.36 real, neto -$1.30. Sin impacto en dinero, pero confirma que el
+mecanismo de "receta sin actualizar" no es exclusivo del mortero.
+
+Con esto, el residuo oficial de B-68 baja de $37,133 a **$25,909**. De
+ahí, `ACR-00002` ($18,494) ya está diagnosticado sin más corrección
+posible (D-318, D-319). **Lo que queda sin `ACR-00002`: $7,415 neto**,
+repartido en 171 pares de insumo sin un patrón dominante — concreto y
+estuco sobrestimados contra lo real, tabique y pinturas por debajo,
+acero en cantidades chicas de sobra y de falta. Mismo perfil que el
+redondeo de PU ya confirmado en B-49 y la variación normal ya aceptada en
+B-67/D-314: no hay más señal que perseguir con los datos disponibles de
+`ALAMO 18`. **B-68 cierra.**
+
+### Alcance: qué queda fuera, y qué no se debe leer de más
+
+- **No reconcilia contra el total en dinero del catálogo reconstruido**
+  (§11.13). Son dos lecturas de valor distintas — costo real declarado
+  contra rendimiento estándar a cantidad real — y no tienen por qué sumar
+  igual.
+- **Una clave del catálogo base/ingeniería que nunca aparece en el
+  catálogo reconstruido explotado no significa que "no se construyó"**:
+  puede ser un hijo sin ancla propia dentro de un concepto auxiliar (los
+  castillos de la tabla arriba), o una clave que mi catálogo agrupó bajo
+  otro nombre. Se marca, no se interpreta en automático.
+- **40 conceptos de mi catálogo ($394,172.93) siguen sin matriz para esta
+  comparación** — TMP-/AJU-/agregados propios sin matriz válida del
+  prototipo. Cuentan en el total del catálogo (§11.13) pero no en esta
+  capa. `PENDIENTES-MEJORAS.md` B-69.
+- **Cuando una clave de destajo/material se repite en más de un
+  nivel/etapa**, lo pagado real (que no distingue ubicación) solo se cuenta
+  en su primera aparición del recorrido — sumarlo en cada rama triplicó el
+  total pagado en el primer intento.
+
+### Extendido a instalaciones: casi todo el catálogo se comparte entre con/sin chimenea, con tres desajustes reales
+
+Dato del usuario, revisar destajo. Mismo método de arriba —explosión de
+matriz sobre el catálogo (`CATALOGO_DE_PRESUPUESTO.csv`,
+`ANALISIS_DE_BASICOS_CONCEPTOS.csv`)— aplicado por primera vez a
+instalaciones (eléctrica, hidráulica, sanitaria, gas), con dos fuentes de
+contraste más: el prototipo base (Diamante **sin** chimenea) y
+`PRECIO_REAL`.
+
+**El prototipo primero: con/sin chimenea comparten casi todo el catálogo
+de instalaciones.** Comparados los 22 grupos de instalación uno por uno
+entre las dos versiones, **todo es idéntico** salvo una línea: la línea
+principal sanitaria de cimentación (`ISN-02001` con chimenea, `ISN-02003`
+sin chimenea) — mismos 15 M, +$730.72 en la versión con chimenea. La
+chimenea no agrega instalaciones nuevas; solo encarece esa conexión
+puntual.
+
+**Presupuesto base (matriz × conteo de fixtures del catálogo) contra la
+ingeniería real del lote, por testigo:**
+
+| Instalación | Testigo | Presupuesto base | Ingeniería | Excedente |
+|---|---|---:|---:|---:|
+| Hidráulica | `HID-00023` (tubo ppal 3/4") | 129.0 | 129.0 | **0.0%** |
+| Hidráulica | `HID-00024` (tubo 1/2") | 69.5 | 71.5 | +2.9% |
+| Hidráulica | `HID-00012` (tee) | 57.0 | 60.0 | +5.3% |
+| Hidráulica | `HID-00004` (codo) | 102.0 | 111.0 | +8.8% |
+| Gas | `HID-00025`+`IGS-00014` combinado | 2.63 | 3.97 | +51.0% |
+| Sanitaria | `SAN-00020` (drenaje 3") | 8.33 | 8.33 | **0.0%** |
+| Sanitaria | `SAN-00021` (drenaje 2") | 13.33 | 15.83 | +19% |
+| Sanitaria | `SAN-00018` (drenaje 6") | 4.0 | 6.0 | +50% |
+| Sanitaria | `SAN-00019` (drenaje 4") | 3.0 | 5.0 | +67% |
+| Eléctrica | `ELE-00001` (poliducto 1/2") | 9.52 | 13.83 | +45.3% |
+| Eléctrica | `ELE-00003` (chalupa) | 90.0 | 136.0 | +51.1% |
+| Eléctrica | `ELE-00332` (poliducto 3/4") | 0.625 | 0.75 | +20% |
+
+**Hidráulica es el caso limpio de esta corrida** — las cuatro
+verificaciones (tubo principal, tubo secundario, tee, codo) caen dentro de
+0-9%, la misma clase de ruido (redondeo, desperdicio de obra) ya
+documentada como normal en las losas, arriba.
+
+**Gas: 100% del excedente es efecto receta, en una sola línea.**
+`IGA-00140` pide, en la ingeniería del lote, 1.54 de `HID-00025` contra
+0.20 que pide la matriz para el mismo conjunto de fixtures — la
+diferencia (1.34) es, hasta el redondeo, el excedente completo de todo el
+trato de gas (1.34 de 1.34). El resto de gas —`ECO-00005` completo,
+`IGA-00120`/`00210`— coincide exacto contra la matriz.
+
+**Eléctrica no es una línea aislada — es un patrón sostenido, sin
+separar todavía.** Poliducto y chalupa suben ambos ~45-51% sobre el
+presupuesto base, de forma consistente entre dos insumos independientes —
+distinto de gas. Contando también las líneas de mano de obra de
+`IEC-00110` (el mayor contribuyente), la ingeniería del lote trae 131
+salidas contra 110 que cuenta el catálogo para el mismo grupo (+19%) —
+menos que el +45% del poliducto, así que el excedente no es solo «más
+fixtures»: hay también algo de efecto receta (más cable por salida).
+Separar los dos efectos con precisión —igual que la tabla de losas de
+arriba— pediría mapear cada línea `MOE-` del lote contra su fixture del
+catálogo uno a uno; no se hizo en esta pasada, queda anotado, no
+resuelto.
+
+**Sanitaria: la familia de drenaje confirma razonable — el tubo de
+conexión queda fuera de esta comparación a propósito.** `SAN-00018` a
+`00021` caen en el mismo rango (0-67%) que hidráulica/eléctrica.
+`HID-00411` no entra en esta tabla porque no existe en ninguna matriz del
+catálogo, para ningún prototipo — es un insumo aparte, ya documentado en
+B-70/D-382, sin tocar aquí.
+
+**`PRECIO_REAL` no aporta contraste de destajo para instalaciones.**
+Nueve filas en total, en las cuatro instalaciones y los cinco meses
+juntos, cada una una salida aislada de 1.0 unidad con un tercer esquema de
+claves (`ISH-`/`IHS-`, hidráulica+sanitaria combinadas en una sola
+conexión) que no cruza limpio contra ninguna de las otras tres fuentes —
+confirma, con más detalle, el límite ya anotado en §11.20: `PRECIO_REAL`
+no sigue instalaciones con la misma disciplina que estructura.
+
+### Destajo: la ingeniería también se infla en eléctrica, y `PRECIO_REAL` no registra nada de esta instalación
+
+Dato del usuario: la comparación de arriba era de material — destajo (mano
+de obra/contrato) es una comparación distinta, con sus propias tres
+fuentes: la matriz (`Tipo=Contrato` en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`),
+la ingeniería del lote (líneas `MO-` propias, ya cargadas para el método de
+§11.20), y dos fuentes de pagado real: `grid_AvanceOPEventosOpr`
+($/Operación) y `PRECIO_REAL` (hoja Mano de Obra).
+
+| Instalación | Estimado (matriz) | Ingeniería (sitio) | Pagado (`grid_Avance`) | Pagado (`PRECIO_REAL`) |
+|---|---:|---:|---:|---:|
+| Sanitaria | $20,525 | $22,500 (+9.6%) | $21,925 (97.4% de ingeniería) | $3,250 (7 filas) |
+| Hidráulica | $12,013 | $12,738 (+6.0%) | $10,300 (80.9%) | $1,775 (5 filas) |
+| Gas | $3,500 | $3,850 (+10.0%) | $2,150 (55.8%) | $150 (1 fila) |
+| Eléctrica | $29,950 | $39,390 (**+31.5%**) | $15,040 (38.2%) | **$0 (0 filas)** |
+
+**Combinar los dos archivos de `PRECIO_REAL` no cambia nada aquí**: el
+segundo (llega a semana 34) no trae ni una fila de instalaciones en Mano
+de Obra — su única extensión real es albañilería/acabados.
+
+**Eléctrica se infla también en destajo, no solo en material — mismo
+patrón, dos dimensiones de costo independientes.** +31.5% de la
+ingeniería del lote sobre la matriz en mano de obra, contra el +45-51%
+ya visto en material (arriba) — más chico, pero en la misma dirección, y
+el único de los cuatro que se sale así. Que el mismo lote se salga de la
+matriz en material **y** en mano de obra, y no en las otras tres
+instalaciones, hace más fuerte la lectura de "diseño real distinto al
+Diamante base" y más débil la de "ruido de un solo insumo" — es la misma
+señal, vista con dos reglas distintas.
+
+**`PRECIO_REAL` no solo es disperso en destajo de instalaciones — para
+eléctrica es cero.** Contra lo que `grid_AvanceOPEventosOpr` ya reporta
+pagado ($10,300 a $21,925 en las otras tres), `PRECIO_REAL` captura
+apenas 7-17% de eso — y en eléctrica, ninguna fila en los cinco meses. No
+es solo que la herramienta traiga menos detalle que para estructura (ya
+documentado arriba): para esta instalación específica, no registró
+destajo en absoluto.
+
+## 11.15 Salidas de almacén: cómo leer el archivo
+
+El export mensual de almacén (hoja `Consulta`, 46 columnas) no se puede cruzar a
+ciegas — dos de sus columnas engañan y una tercera se repite. Hallazgos válidos
+para cualquier obra, no solo `ALAMO 18`.
+
+### El filtro de lote correcto — corregido: ninguna columna sola basta (§11.20)
+
+Hay **tres** columnas candidatas a decir «de qué lote es este movimiento», y con
+un mes y una sola obra de referencia parecía que solo una servía:
+
+| Columna | Qué trae | ¿Sirve para filtrar por lote? |
+|---|---|---|
+| `Lote` | Numérico: 0, 1, 4, 9, 11, 16, 18, 19, 20… | **Necesaria, no suficiente sola** — ver corrección abajo |
+| `# Lote` | Siempre `S/L` | No. Es un campo de lote de fabricación/calidad, no de la casa |
+| `Ubicacion` | Nombre de calle (`ALAMO`, `FRESNO`, `TABACHIN`…) | No confiable sola: una calle cruza varios números de lote — `ALAMO` sola trae Lote 19 (106 filas), Lote 18 (76), Lote 1 (58) y Lote 0 (7) mezclados |
+
+> Filtrar por `Ubicacion="ALAMO"` en vez de `Lote=18` da un conjunto equivocado —
+> mezcla cuatro lotes distintos bajo el mismo nombre de calle. **Esta mitad de la
+> trampa seguía siendo cierta.**
+
+> **Corrección con los cinco meses (§11.20): la otra mitad de la trampa nunca se
+> probó.** `Lote` tampoco es único por sí solo — es una numeración por calle, no
+> global: `Lote=18` existe en `ALAMO`, `OLIVO`, `FRESNO` y `MAPLE` a la vez, cuatro
+> casas distintas con el mismo número. La llave real es la combinación
+> `(Ubicacion, Lote)`, nunca una sola columna. Corrige D-249/D-337 — detalle
+> completo y el tamaño real del problema en §11.20.
+
+### `Ubicacion` aparece dos veces, con significados distintos
+
+El encabezado trae `Ubicacion` en la columna 4 (nombre de calle) **y otra vez** en
+la columna 17 (bodega física: `GENERAL`, `UBC-PRUEBA`, `EXTERIOR`). Armar un
+diccionario `{encabezado: índice}` de la forma habitual **se queda solo con la
+última ocurrencia** — la de bodega, no la de calle — sin ningún error visible: la
+consulta corre, regresa datos, y están mal.
+
+> **Con dos columnas del mismo nombre, el mapeo por nombre no basta: hay que leer
+> por posición.** Ya estaba escrito para `Tipo` en `Trabajos` (`CATALOGOS.md` §3,
+> §2.4 arriba) — es la misma trampa, en un archivo distinto.
+
+### La cadena de referencia de la actividad
+
+El movimiento clave es `Motivo = "Implosión De Materiales"`: el propio sistema
+explota el concepto en sus insumos — no es una entrega genérica, es la traza que
+`P-38` necesitaba. Su columna `Referencia` (texto libre) trae, cuando está
+poblada:
+
+```
+OP:23186, No.Parte:EST-01060, Parte ALAMO 18 - LOSA DE CIMENTACION...
+```
+
+`OP` es el folio de la orden de producción — agrupa todas las líneas de insumo de
+una misma ejecución de concepto. `No.Parte` es la clave del concepto o etapa que
+se explotó — puede ser a nivel concepto (`EST-02010`) o a nivel etapa
+(`ECO-00002`).
+
+> La columna `# OP` (índice 36) trae el mismo folio que el `OP:` de `Referencia`,
+> **validado exacto en 67 de 67 filas** con ambos poblados. Es un join limpio
+> alternativo, y confirma que el texto libre no miente.
+
+### Por qué esto no es un caso aislado
+
+Ninguna de las tres trampas de arriba se ve en una revisión superficial: la
+consulta corre, no tira error, y el resultado *parece* razonable hasta que se
+cruza contra una segunda fuente. Mismo patrón que la matriz prestada (§11.14) y el
+`Total` mal capturado de la ingeniería (§11.13, B-66): **un archivo de origen no
+se valida solo por correr sin errores.**
+
+## 11.16 Rendimiento real de material contra la matriz — primera prueba, y un bug propio
+
+Con la lectura correcta de almacén (§11.15), se puede comparar material real
+consumido contra el rendimiento estándar del catálogo, **para el mismo concepto y
+la misma escala**. Probado sobre los dos únicos conceptos de abril con las dos
+puntas —almacén y matriz— en `ALAMO 18`: `EST-01060` (losa de cimentación) y
+`EST-02010` (muro de tabique).
+
+### La escala se revierte, no se copia del pagado acumulado
+
+`PRECIO_REAL_ALAMO_18.xlsx` trae la cantidad pagada **acumulada a la fecha de
+corte**, de todo el proyecto — mezclar eso contra un solo mes de almacén compara
+ventanas de tiempo distintas. En su lugar, la escala real de cada orden se obtiene
+**revirtiendo un insumo ancla contra su propia matriz** — misma idea de §11.9
+(«la mano de obra siempre ancla»), **generalizada**: cualquier insumo con una tasa
+limpia y exclusiva del concepto sirve de ancla, no solo la mano de obra.
+`CON-00001` (concreto, exclusivo de la losa — los castillos usan otro concreto)
+para `EST-01060`; `PET-00001` (tabique, 50 PZ/M2 exacto) para `EST-02010`.
+
+### El bug: comparar material contra material-más-mano-de-obra
+
+Almacén **nunca** registra mano de obra — los destajos se pagan aparte. La
+primera versión de esta comparación sumaba, del lado de la matriz, también las
+líneas `Tipo=Contrato` (mano de obra) — una resta que nunca podía cuadrar, sin
+importar qué tan bien construida esté la casa.
+
+| Concepto | $ matriz, con mano de obra (mal) | $ matriz, solo material | Real | Diferencia correcta |
+|---|---:|---:|---:|---:|
+| `EST-01060` (losa + castillos) | $232,460.08 | $174,884.05 | $140,346.91 | **-19.7%** |
+| `EST-02010` (muro tabique) | $46,440.48 | $28,440.48 | $27,712.92 | **-2.6%** |
+
+> **Comparar material real contra un total que incluye mano de obra infla la
+> brecha artificialmente.** El primer reporte de esta comparación decía -31.2% y
+> -40.3% — el error era del cálculo, no del dato de obra.
+
+`EST-02010`, una vez corregido, prácticamente cuadra: el tabique sale **exacto**
+(6,000 de 6,000 piezas, 0.0%).
+
+### El concepto auxiliar necesita su alcance completo, no solo el hijo con ancla
+
+Una orden de almacén no distingue de cuál sub-concepto viene cada insumo — agrupa
+todo bajo un mismo folio. Comparar `EST-01060` solo contra la matriz de su hijo
+con ancla propia (`EST-01053`, la losa) deja fuera lo que la misma orden también
+cubrió (los castillos K1/K2/K3/K7/K8, `EST-10011`/`10021`/`10031`/`10071`/`10081`)
+— y por eso la primera versión (solo losa) mostraba -31.2% en vez de -19.7%: la
+mitad de la diferencia era simplemente material que la matriz de comparación no
+estaba mirando.
+
+### Lo que queda, después del bug: en su mayoría explicable
+
+Sobre `EST-01060`, con material puro y alcance completo, ~55% de los $34,537
+restantes es **precio, no rendimiento**: el concreto sale en cantidad **idéntica**
+(37.330 = 37.330 M3, 0.0% de diferencia de rendimiento) pero a un precio real
+(~$1,928/M3) menor al que asume la matriz (~$2,442/M3). El resto se reparte entre
+insumos que corren por encima del estándar (varios aceros y alambres) y tres
+—cemento, tablas, tabique— **100% ausentes** de esta orden de abril pese a que la
+matriz los espera: la hipótesis más simple es que ya se habían surtido en un mes
+anterior, fuera de la ventana de este archivo — **sin datos de meses previos no
+se puede confirmar.**
+
+## 11.17 Rendimiento semanal: tabique y cemento no se leen igual
+
+`PRECIO_REAL_ALAMO_18.xlsx`, hoja `Mano de Obra`, trae columna `Semana` — permite
+comparar la salida de almacén contra lo pagado en la **misma semana**
+(jueves-miércoles), más fino que el acumulado de §11.16.
+
+### Dos insumos, dos patrones de abasto — dato de campo, no supuesto
+
+Sobre `EST-02010` (único concepto con las dos semanas completas en abril):
+
+| Semana | Tabique (almacén) | Cemento (almacén) | M² pagado |
+|---|---:|---:|---:|
+| 18 | 6,000 PZ | 30 sacos | 50 |
+| 19 | 0 PZ | 30 sacos | 293 |
+
+> **El tabique se abastece por lote — más de lo que se consume en una semana. Su
+> desfase semana a semana es normal, no comparable 1:1.** El cemento se entrega
+> **a diario**: es la señal confiable para verificar si lo pagado esa semana tiene
+> respaldo real de material. Aportado por el usuario, con experiencia directa de
+> obra — no se dedujo de los datos.
+
+### El hallazgo: la semana 19 no tiene respaldo de cemento
+
+Con el rendimiento teórico exacto (0.325416 sacos/M2), 30 sacos alcanzan para
+~92.2 M2. La semana 18 pagó 50 M2 —hay margen, consistente con abasto por
+adelantado—. **La semana 19 pagó 293 M2 con los mismos 30 sacos: 68.5% de lo
+pagado esa semana no tiene material que lo respalde.**
+
+> Consistente con una hipótesis de campo del usuario: **tiende a sobre-estimarse
+> para cerrar la semana el viernes**, y hoy la verificación contra almacén ocurre
+> *después* del pago —cuando ya no hay oportunidad de comparar— en vez de al
+> momento de preparar la estimación.
+
+### Corregido con cinco meses reales: el 68.5% era la ventana incompleta, no el material
+
+`grid_AvanceOPEventosOpr` para marzo, mayo, junio y julio (antes solo
+abril) permite lo que faltaba: ver la semana 19 completa, no solo su
+mitad de abril. La semana jueves-miércoles del 30 de abril al 6 de mayo
+trae **80 sacos de cemento, no 30** — los 50 restantes entraron el 4, 5
+y 6 de mayo, fuera de la ventana que existía cuando se calculó el 68.5%
+por primera vez.
+
+| | Con solo abril (cálculo original) | Con la semana completa |
+|---|---:|---:|
+| Cemento real | 30 sacos | 80 sacos |
+| Cemento requerido (293 M² × 0.325416) | 95.35 sacos | 95.35 sacos |
+| Respaldo | 31.5% | **83.9%** |
+| Sin respaldo | 68.5% | **16.1%** |
+
+**Y en acumulado, sobre las ocho semanas reales de `EST-02010` entre
+abril y julio, el ajuste es casi exacto:** 238 sacos de cemento real
+contra 237.6 sacos que el rendimiento teórico pide para los 730.15 M²
+pagados en total — **0.17% de diferencia.** Semana a semana el respaldo
+va de 85.9% a 184.4% —dos semanas incluso muestran 0% mirándolas
+solas, la del 11 y la del 21 de junio—, pero **ninguna semana suelta se
+sostiene sin ver el acumulado**: el cemento también llega por lote, en
+tandas de diez sacos cada pocos días, no estrictamente a diario. La
+premisa de que "cemento sí, tabique no" por frecuencia de entrega **era
+la mitad de la historia**: la diferencia es de grado —tabique llega en
+tandas de miles cada mes o más, cemento en tandas de decenas cada pocos
+días—, no de si hace falta ver el acumulado. Los dos lo necesitan.
+
+**Corrige D-251 a D-255 y D-350.** El hallazgo original de
+"sobre-estimación para cerrar la semana" no se sostiene con datos
+completos — era el instrumento el que estaba incompleto, no la obra. El
+mecanismo de `estimacion_sin_respaldo_material` (B-70, `MODELO.md` §5a)
+sigue siendo un control razonable —verificar antes de pagar es mejor que
+después, con cualquier evidencia—, pero su comparación tiene que ser
+contra el **acumulado**, no contra el periodo suelto, o repite el mismo
+falso positivo que produjo el 68.5% original. Detalle del ajuste al
+mecanismo en `MODELO.md` §5a.
+
+### Las otras cuatro operaciones de abril: limpias, pero sin testigo de material posible
+
+Abril trae seis operaciones de destajo en Lote 18, no solo `EST-02010`. Las
+otras cuatro —`MOS-01020` salida de respiración, `MOH-05010` llave
+vertedero, `MOE-01012` punta TV, `MOG-05030` gas estufa— son instalaciones
+puntuales: sin material masivo (cemento, tabique) que sirva de testigo
+independiente. Revisados sus 38 renglones de avance: **ningún caso de
+avance pagado por encima de lo requerido dentro del propio registro del
+ERP**, en ninguna de las cuatro.
+
+> Esto no cierra la pregunta de fondo — un avance/requerida limpio **dentro
+> del ERP** no es lo mismo que un avance respaldado por material real, es
+> la misma distinción que ya separó la semana 18 de la semana 19 arriba.
+> Pero estas cuatro operaciones no tienen cómo probarse contra un testigo de
+> material: una salida de TV o una llave de vertedero no consumen un insumo
+> "por pieza" que se pueda cruzar contra almacén, a diferencia del cemento
+> por M2 de muro. **El cruce material-contra-avance solo aplica —y solo
+> hace falta— donde hay detrás una partida de material masivo**; para
+> instalación puntual, la única vía de verificación sería otra (conteo
+> físico, no consumo). Acota el alcance del método, no lo contradice.
+
+### Idea a futuro, sin diseñar
+
+Automatizar este mismo cruce (salida de cemento contra el M2 que se va a
+estimar, en acumulado) para que corra **al preparar la estimación, antes
+del cierre del viernes** — hoy este cruce se hizo a mano y después del
+hecho. `PENDIENTES-MEJORAS.md` B-70. **Ya no topado en dato**: cinco
+meses de almacén y cuatro de avance (`grid_AvanceOPEventosOpr`) están
+cargados — verificado que un segundo archivo de avance de abril
+(`_28.xlsx`) era el mismo mes con otro nombre, mismo patrón de doble
+exportación que B-64. Extender la prueba más allá de `EST-02010` con
+este mismo cruce acumulado es el siguiente paso, no una condición de
+dato pendiente.
+
+## 11.18 Los controles de cambio de ALAMO 18 — CC-ALM-18XXX
+
+§13.4 define el control de cambio en general: referencia un nodo congelado,
+propone un delta, no edita. Los archivos `AJU_*` de `ALAMO 18` —ajustes sueltos
+sin nivel ni etapa declarados, `P-31`— son la primera aplicación concreta.
+
+### La clave
+
+```
+CC-ALM-18XXX
+CC   control de cambio
+ALM  cluster Alamo
+18   número de lote
+XXX  consecutivo
+```
+
+### Clasificación, por lo que el propio archivo trae
+
+| El archivo trae… | Tratamiento |
+|---|---|
+| Un destajo claro | El control de cambio es un **agrupador con un concepto hijo** — mismo patrón que concepto auxiliar |
+| Dos destajos en desacuerdo | **Matriz invertida**: se reparte el material contra lo que cada concepto hijo ya reclama; el residuo que no cuadra con ninguno se anota como concepto temporal `TMP-ALM18-XX` |
+| Material sin destajo propio | Se queda como **concepto auxiliar** — mismo tratamiento que si no tuviera destajo en la reconstrucción base (§11.13) |
+| Sin encabezado `NIV-`/`ECO-` | Se marca **«sin identificar»**: entra al consolidado (cuenta en el total) pero se excluye del árbol por nivel/etapa — no se le inventa una ubicación |
+
+> Responde la pregunta abierta de `P-31` («¿se parsea el nombre, se pregunta o se
+> rechaza?»): **se lee primero el propio encabezado interno del archivo** —casi
+> siempre trae su `NIV-`/`ECO-`—, y solo si no lo trae se marca sin identificar.
+
+### Se verifica contra el archivo crudo, no se asume
+
+Antes de contar una línea, se revisa si de verdad es aditiva o si ya vive dentro
+de otro concepto. Ejemplo probado: cemento extra en fachada se confirmó **no
+traslapado** porque el concepto base de esa fachada usa mortero, no cemento — son
+insumos distintos, no el mismo material contado dos veces.
+
+> Si el material que baja fuera el mismo que el concepto base ya reclama, **eso
+> es una alerta para el usuario** —puede señalar que el concepto base quedó sin
+> usar el material que se le asignó—, no un control de cambio silencioso.
+
+### Es una capa complementaria, no se suma
+
+Sobre `ALAMO 18`, cinco controles de cambio (`CC-ALM-18001` a `18005`,
+$36,214.03) cubren exactamente el hueco que PRESUPUESTO FORMADO (§11.14) no pudo
+explotar por no tener matriz propia del prototipo — no se suman a Presupuesto
+Formado, se leen en su columna aparte.
+
+## 11.19 El cruce se extiende a todo el catálogo, no solo a los dos casos investigados
+
+Los cruces de §11.16/§11.17 probaron el método sobre `EST-01060` y
+`EST-02010`. Extendido a **todo el catálogo de destajo y de material**, el
+método es el mismo — solo cambia qué se agrupa:
+
+| | Material | Destajo |
+|---|---|---|
+| Fuente | Almacén (`Lote`=18, `Efecto Qty` negativo = salida) | Estimación del ERP externo (`Lote`=18, `Operacion` → clave por prefijo, §13.8) |
+| Se agrupa por | `# Parte` | Clave extraída de `Operacion` (el prefijo, ej. `MOC-01010`) |
+| Se suma | Cantidad de salida | `O/Avance` y `$/Operación` |
+
+**Cobertura parcial, no total** — las dos fuentes son fotos de abril, no el
+catálogo completo: 58 de 288 materiales y 36 de 225 destajos tienen dato ese
+mes. Una clave sin dato no significa «sin consumo»: significa «sin
+movimiento ese mes».
+
+**Ya aparecen dos lecturas** al cruzar: claves donde ambas fuentes coinciden
+casi exacto (`MOC-12010`: 6 y 6 · `ACE-00010`: 4.31 y 4.31) — señal de que
+las dos fuentes miran lo mismo —, y claves con brecha real (`ACE-00001`:
+487.42 contra 133.7) — candidatas a revisar, mismo patrón que `EST-01060` y
+`EST-02010`.
+
+> El resultado vive en el workbook de trabajo (pestañas de consolidado por
+> material y por destajo), fuera del repo por la misma razón de siempre
+> (`INDICE.md`) — aquí queda el método, no la cifra.
+
+## 11.20 Cinco meses reales, no uno — P-38 deja de estar topado en dato
+
+Cargados marzo a julio completos (antes solo abril). Verificado primero
+lo obvio: **sin traslape de fechas entre los cinco archivos** — no es el
+patrón de doble exportación que ya atrapó D-322/B-64. ALAMO 18 pasa de
+**76 a 358 movimientos reales**, de **2 `# OP` a 47**, de una foto de una
+semana a cuatro meses seguidos sobre el mismo concepto.
+
+> **Corrección (D-365): el conteo original (77→386) traía contaminación
+> de otras calles.** `Lote` no es único por sí solo — es numeración por
+> calle, no global: `Lote=18` existe también en `OLIVO`, `FRESNO` y
+> `MAPLE`, cuatro casas distintas con el mismo número. El filtro correcto
+> es `Lote=18` **y** `Ubicacion=ALAMO` juntos, nunca `Lote` solo —
+> `§11.15` ya corregido. Los 28 movimientos de más (386→358, 11 de ellos
+> en marzo — ese mes queda en **cero** reales para esta obra, no 11) son
+> de otras casas: postventa sin `# OP`, por eso el conteo de `# OP`
+> distintos (47) no cambia. Ninguno toca `EST-02010` ni cimbra —las dos
+> secciones de abajo quedan exactas tal como estaban.
+
+### El mismo concepto, cuatro meses seguidos
+
+`EST-02010` (Muro Tabique 14 cm) tiene implosión en abril, mayo, junio y
+julio — 39 filas, siempre los mismos dos materiales:
+
+| Mes | Tabique (PZ) | Cemento (sacos) |
+|---|---:|---:|
+| Abril | 6,000 | 60 |
+| Mayo | 18,000 | 98 |
+| Junio | 6,545 | 55 |
+| Julio | **0** | 25 |
+
+**Julio confirma la regla de §11.17 con el caso más limpio hasta hoy**:
+un mes entero sin una sola pieza de tabique consumida, y el muro siguió
+avanzando —el cemento lo prueba, 25 sacos ese mes—. El tabique se
+abastece por lote y su ausencia un mes no significa nada por sí sola;
+comparado 1 a 1 se vería como una desviación enorme que no existe.
+
+`EST-02110`/`EST-02310` (castillo K1, cadena CE-1) repiten tres meses
+seguidos; otros nueve conceptos, dos. Ninguno se explotó todavía contra
+su matriz completa — extender §11.19 a los 47 `# OP` es el siguiente
+paso, no una conclusión de esta pasada.
+
+### Lo que esto no permite todavía
+
+No hay archivo de avance/estimación pagada para marzo, mayo, junio ni
+julio —solo existe para abril—, así que el cálculo del «% de lo pagado
+sin respaldo de cemento» (§11.17) no se puede repetir para los meses
+nuevos todavía. Lo que sí confirman los cinco meses, con la sola
+cantidad de almacén, es el patrón de abasto — no el monto pagado sin
+respaldo.
+
+### Hallazgo nuevo: la cimbra no se registra para esta obra
+
+Dato del usuario, confirmado en los cinco meses: `MAD-00002 CIMBRA 4
+MTS` y `MAD-00003 CIMBRAPLAY 12 MM` existen en el catálogo (Clase
+Maderas) y se mueven para otros lotes — **cero veces para ALAMO 18** en
+358 movimientos reales (corregido de 386, ver arriba — ninguno de los 28
+que se restaron era cimbra, la conclusión no cambia). Y sin embargo el
+presupuesto de esta obra
+menciona cimbra, descimbra o cimbrado en **167 renglones** de
+`CATALOGO_DE_PRESUPUESTO.csv` — toda losa, castillo, cadena y zapata la
+«incluye» en su precio todo-incluido.
+
+> No es hueco de modelo: `MOVIMIENTO_ALMACEN` ya sabe representar una
+> salida de cimbra para cualquier obra (`MODELO.md` §5e) si alguien la
+> registrara. Es que nadie la registra — probablemente porque la cimbra
+> es equipo que se presta y regresa, no un consumible que se repone, y
+> por eso no pasa por el mismo control que tabique o cemento. Mismo
+> principio que ya distinguió `Flete` de `Acarreo` (§10.2): el sistema
+> no inventa el dato que el proceso real no produce.
+
+### El sobrante compartido entre obras (F-3) ya tiene el otro lado de la evidencia
+
+`MODELO.md` §2a confirmó F-3 con la mitad de la prueba —toda `recepcion`
+entra sin `Lote`, cae a existencia general—. Los cinco meses completan la
+otra mitad: **`ADH-00005` (cemento saco de 50 kg), comprado 47 veces a
+existencia general (14,081 sacos), se consume después por 26 lotes
+distintos** — de `ALAMO 16` a `ALAMO 22`, ninguno con más de 1,518 sacos.
+No es una obra comprando su propio cemento: es un solo pozo de compra
+que sirve a un desarrollo completo, exactamente como F-3 (D-88) lo
+describía antes de tener dato que lo probara. `HID-00001`, `ADH-00001` y
+otros catorce materiales repiten el mismo patrón con 19 a 25 lotes cada
+uno — no es el comportamiento de un insumo raro, es cómo se compra la
+mayoría del material masivo.
+
+### Insumos que no hacen falta para construir la casa — uno real, no un patrón
+
+Dato del usuario, la otra mitad de la pregunta que trajo la cimbra:
+además de lo que falta por registrar, ¿hay algo registrado que no debería
+estar? Revisados los 387 materiales del catálogo por `Clase`, solo uno
+es limpiamente ajeno a construir una casa: **`MOF-00020`, «Ventilador de
+Piso», bajo `Clase=Material De Oficina`** — la única clave de esa clase
+en los cinco meses, tres movimientos, ~$1,823 en total, nunca ligada a
+un `Lote` real. Es gasto de oficina cargado al mismo catálogo y al mismo
+sistema de movimientos que el material de obra, no un insumo de la casa.
+
+**No es un patrón — es un caso aislado.** El resto de "Consumo Internos"
+(escoba, guantes desechables, una escalera, racks de almacén) son
+consumibles/herramienta de operación de almacén, no de la casa, pero
+tampoco se cuelan en ningún corte matricial: `Consumo Internos` nunca
+tiene `nodo_id` ni se cruza contra una matriz, así que no distorsiona
+ninguna comparación existente.
+
+> **Hallazgo aparte, no el que se buscaba:** `Grupo` trae ruido de
+> captura — un proyector LED bajo `Grupo=Servicios`, un piso bajo
+> `Grupo=Clientes`, taquetes bajo `Grupo=Equipo De Computo`. Son
+> materiales de obra reales, solo mal clasificados en ese campo. No es
+> el mismo problema que `MOF-00020` —ahí el material sí es ajeno—, es
+> catálogo con etiquetas inconsistentes. Ninguna decisión de diseño lo
+> resuelve; es limpieza de datos, para cuando se migre el catálogo.
+
+### La orden de compra ya viaja en el dato crudo — el catálogo de proveedores sigue sin existir
+
+Julio trae una columna nueva, `Orden Compra` (formato `PC-nnnnnn`), ausente
+en marzo a junio. Aparece exactamente cuando `Motivo=Recepción De
+Material` — 937 de 963 recepciones del mes (97.3%), nunca en
+implosión/salida/sobrante/ajuste. `Proveedor` seguía la misma correlación
+perfecta: puebla exactamente las mismas filas que `Orden Compra`, nunca
+las demás. Encaja con F-3 (§2a de `MODELO.md`, D-348/D-359): la recepción
+entra sin `Lote` a existencia general — y ahora se ve que entra también
+sin obra, pero sí con el nombre libre del proveedor y el número de la
+orden.
+
+Una misma `Orden Compra` agrupa muchas líneas — hasta 35 materiales bajo
+una sola PC en el mes—, consistente con una orden real, no una captura
+por línea. El campo confirma con datos reales lo que D-175/P-39/B-41 ya
+tenían anotado: el proveedor sí existe en el ERP de origen, como texto
+libre en cada movimiento, pero no como catálogo — nada normaliza
+"CONSTRULANDIA" contra sí misma entre movimientos, y hay ruido de
+captura (`PC-111345` frente a `pc-111148`, mayúsculas inconsistentes). No
+cambia la decisión de P-39/B-41 —no se inventa un catálogo sin necesidad
+real—; confirma la forma exacta que tendría si se construye: proveedor +
+número de orden, ya presentes en el crudo, agrupando varias líneas de
+material cada uno.
+
+### Precios: la deriva real es pequeña, pero `C/Ultimo`/`C/Promedio` no son la fuente confiable para `PRECIO_HISTORICO`
+
+Cruzados los cinco meses por `# Parte` en recepciones (`Motivo=Recepción
+De Material`, excluyendo cancelaciones): los materiales de alto volumen sí
+muestran una deriva de precio real y pequeña — tabique (`PET-00001`, 251
+recepciones) sube 3.6% en cinco meses, concreto bombeado (`CON-00004`, 88
+recepciones) 1.4% — exactamente lo que `PRECIO_HISTORICO` (P-07/P-08) ya
+está diseñado para capturar.
+
+Pero no todo lo que parece variación de precio lo es. Dos problemas reales
+de captura, no de diseño:
+
+**Filas sueltas rotas.** `SAN-00046` cuesta $15.95-$18.10 en 64 de sus 65
+recepciones — una sola fila (1 de julio) dice $165.95, diez veces más, y
+su propio `Efecto Costo` de esa fila (2 piezas, ≈$30.18 c/u) no cuadra ni
+con el precio normal ni con el roto. `HID-00016` repite el patrón:
+$1.00-$1.12 en 73 de 74 filas, una dice $10.34 sin que el `Efecto Costo`
+la respalde. El dato capturado en `C/Ultimo` puede estar mal sin que el
+costo real de la transacción lo esté — quien construya `PRECIO_HISTORICO`
+sobre este crudo necesita validar contra `Efecto Costo`, no leer
+`C/Ultimo` directo.
+
+**Cancelaciones con precio negativo, no precios negativos reales.**
+`ACE-00001`, `ACR-00001`, `ACE-00012` traen exactamente una fila cada uno
+con `C/Ultimo` negativo — las tres el mismo día, las tres con
+`Referencia="Cancelacion de IR"` y `Cantidad` también negativa. Es una
+reversión contable, no un precio real; se filtra por `Cantidad>0`, no es
+hueco de diseño.
+
+**Un caso sospechoso, no confirmado.** `ELE-00046` (Poliflex, `UDM=M` en
+las 18 recepciones, sin mezcla de unidad) cuesta ~$20-22/M cuando se
+compran 50 M de una vez, pero ronda $995-$1,115 cuando la recepción
+declara `Cantidad=1` — casi exactamente 50× el precio por metro, como si
+"1" significara "1 rollo completo" en vez de "1 metro". El `Efecto Costo`
+de esas filas no confirma un factor limpio de ×50, así que se anota como
+patrón sospechoso, no como el caso real que le faltaba a
+`PRESENTACION_COMPRA` (D-348/D-359) — hace falta más evidencia antes de
+forzarlo ahí.
+
+### El andamio se cobra como si se comprara de nuevo cada vez — dato del usuario, no es material directo
+
+Dato del usuario, sobre el mismo crudo: el andamio está "mal enfocado" —
+su precio de compra no debería pegarle directo a la obra, debería ser un
+rendimiento distinto, como desgaste. Los cinco meses lo confirman con
+números. Única clave real: `HET-00034 ANDAMIO BANQUETERO`, ya catalogada
+`Clase=Herramienta` (bien clasificada ahí; `Grupo=Materiales
+Construccion` sigue siendo el mismo ruido de `Grupo` de más arriba). 18
+movimientos, casi todos (16) `Salida De Material Para Producción` — el
+mismo motivo que usa el cemento — a **$1,661.53847 fijo por pieza**, sin
+importar que el mismo conjunto físico rote entre obras: `Lote=4` sola
+recibe cuatro despachos distintos en cinco meses. Solo dos `Sobrantes`
+(12.5% de las salidas), ninguno ligado a la obra que lo devuelve. Costo
+neto: -$73,107.73 en cinco meses, todas las obras; -$13,292.31 solo en
+`ALAMO 18` (14 de mayo, 8 piezas). Cero renglones de "andamio" en
+`CATALOGO_DE_PRESUPUESTO.csv` — no hay partida presupuestada que absorba
+ese gasto.
+
+**Resuelto, dato del usuario: no es material directo, es indirecto
+repartido.** El mecanismo y su alcance quedan en `MODELO.md` §5f.
+
+### El andamio sigue siendo caso único — verificado contra las otras dos fuentes de presupuesto y contra el resto del catálogo
+
+Pedido del usuario, una vuelta más antes de cerrar: ¿el andamio (D-363) se
+pasó por alto en algún otro archivo, o hay un segundo caso del mismo
+problema escondido en el catálogo? Verificado en tres frentes.
+
+**Cero presupuesto, las tres fuentes.** `HET-00034`/"andamio" no aparece
+ni en `CATALOGO_DE_PRESUPUESTO.csv` (ya confirmado en D-363), ni en
+`ANALISIS_DE_BASICOS_CONCEPTOS.csv`/`COMPUESTOS.csv` (las matrices de
+referencia), ni en ninguno de los 11 archivos reales de ingeniería de
+`ALAMO 18`. No es que faltara cargarlo en un archivo — no existe en
+ningún nivel de este cerebro.
+
+**No hay un segundo andamio.** Revisadas las dos clases más parecidas: los
+otros 20 `Clase=Herramienta` son herramienta menor genuina (machete,
+escalera, brochas, casco) — precio bajo, gasto directo correcto, no
+equipo que rote entre obras. Las 67 `Clase=Equipamiento` son accesorios
+que sí quedan instalados en la casa (cisternas, WC, calentadores, bombas,
+asadores) — material directo real, no equipo de construcción pese al
+nombre de la clase. Ninguna de las dos esconde el mismo patrón del
+andamio.
+
+**Sin contradicción con reglas ya cerradas.** La exclusión de `HET-00034`
+de `Pagado Real` (D-363) no toca la identidad Formado/Base/Ingeniería de
+B-71 (esas tres nunca leen `MOVIMIENTO_ALMACEN`), ni el
+`estimacion_sin_respaldo_material` de B-70 (su testigo sigue siendo
+cemento, nunca andamio), ni el corte matricial de P-19 (el andamio nunca
+aparece vía `implosion`, así que nunca estuvo dentro de ese corte).
+
+### El contratista también viaja en el crudo — cierra P-39
+
+Dato del usuario, siguiendo la misma pregunta que ya trajo `Proveedor`/
+`Orden Compra` (§11.20 arriba): la columna `Contratista` viene poblada al
+**100% de las filas con `Lote`**, no solo en recepción como `Proveedor` —
+más fuerte que esa evidencia, no solo paralela. 39 nombres reales en los
+cinco meses, con volumen alto y recurrente entre docenas de lotes cada
+uno (`Rigoberto Orduña`: 3,051 movimientos en 24 lotes distintos;
+`Eduardo Andrade`: 3,045 en 20) — no texto suelto, es la misma identidad
+reapareciendo obra tras obra.
+
+**Para ALAMO 18 específicamente (358 filas reales, corregido), solo dos:**
+`Luis Fernando Aguilera Mallagan` (198 filas — Planta Baja, Planta Alta,
+Cimentación, el grueso de la casa) y `Rigoberto Orduña` (160 —
+Cimentación, Planta Baja, Planta Alta). El mismo campo, en otras obras,
+también nombra subcontratos por oficio (`Candido Tierrablanca`: Pintura,
+Herrería; `Antonio Ramirez Pichardo`: Carpintería) — cubre tanto al
+destajista general como al subcontrato con nombre propio, los dos casos
+que `TABULADOR_CONTRATISTA.nodo_id` ya preveía («trabajo o subcontrato»).
+
+**Dos advertencias de captura antes de cargarlo, ninguna de diseño:**
+`"Bodega"` y `"Cuadrilla Postventa"` son etiquetas de operación interna,
+no contratistas — se excluyen. `"Abelardo Sanabria"`/`"Avelardo
+Sanabria"` son la misma persona con una letra distinta — homologa con el
+mecanismo que ya resolvió `nescesario`×32, no pide tabla propia.
+
+**Resuelto: `CONTRATISTA(id, nombre)` nueva — cierra P-39.** Detalle y
+las tres FK que se desbloquean (`TABULADOR_CONTRATISTA`, `DEDUCCION`,
+`PRESTAMO`) en `MODELO.md` §4a, D-366.
+
+### Hallazgo nuevo: postventa es un proceso real, separado, sin modelar — no un ruido de captura
+
+Las 28 filas que contaminaban el conteo de ALAMO 18 (D-365) tenían algo
+en común además de la calle equivocada: sin `# OP`, `Referencia` genérica
+("Instalación extras", "Instalaciones adicionales") y, en un caso,
+literalmente la palabra **POSTVENTA** en el texto. Aislado ese patrón por
+señal genuina —`Ubicacion=POSTVENTA`, `Contratista="Cuadrilla
+Postventa"` o `Referencia` con "postventa"—, no por la ausencia de `# OP`
+(esa es toda `salida_produccion`, ya sabido desde D-333, 7,853 de 7,853
+filas): **223 filas reales en cinco meses, -$116,319.20, sobre 21
+combinaciones distintas de calle+lote** — casas ya entregadas donde
+alguien vuelve a sacar material. `Referencia` describe reparaciones
+reales: *"Colocación de piso"*, *"Repellos muros"*, *"Instalaciones
+termino conexiones"* — trabajo de garantía, no de obra nueva.
+
+**Este cerebro no ha modelado postventa en ningún momento** —todo lo
+construido hasta hoy asume una casa en construcción, con `presupuesto_id`
+activo y `# OP` corriendo. Postventa comparte el almacén físico pero no
+el resto del aparato: sin orden de producción, con `Lote`/`Ubicacion`
+capturados sueltos (la misma laxitud que produjo la contaminación de
+D-365), sin ligar a ninguna `ESTIMACION` ni `CONTRATO`. No es un hueco
+de `MOVIMIENTO_ALMACEN` —la tabla ya registra estas filas sin problema—
+es un proceso de negocio completo que nunca entró al alcance. Anotado,
+no diseñado: P-41.
+
+### Dentro de postventa: humedad es la causa que más se repite, y el mismo desorden de calle/lote reaparece
+
+`ALAMO 18` no tiene ni una fila de postventa en los cinco meses —no le ha
+tocado garantía todavía, o cae fuera de esta ventana—, pero el resto del
+desarrollo sí, y con un patrón: **19.7% del costo de postventa ($22,877
+de $116,319) es material de impermeabilización o sellado** (Fester,
+Sikalastik, Festexsilicon, Sellador del Toro, boquilla selladora) — el
+grupo de causa más grande de todos, aunque no la mayoría. Dos referencias
+lo dicen sin rodeos: *"PISO MAL INSTALADO Y HUMEDAD"* (Fresno 21),
+*"...PASILLO ACACIA 18, HUMEDAD..."* (esta última capturada bajo
+`Ubicacion=FRESNO`, para una casa que el propio texto dice que es
+`ACACIA 18` — **el mismo desorden de calle/lote de D-365, ahora
+confirmado por tercera vez, esta vez dentro de la captura de postventa
+misma**). Aparte, cinco asadores se reponen en el periodo, cuatro de
+ellos el mismo día (30 de abril) en cuatro casas distintas — patrón de
+lote, sin texto que diga si es una falla de producto o solo un cierre de
+tickets agrupado; no hay evidencia para decidir cuál.
+
+70% del costo de postventa ($81,189 de $116,319) ni siquiera se liga a
+un lote — cae bajo `Ubicacion=POSTVENTA`, `Lote=0`, una bolsa general sin
+casa asignada. El 30% restante ($35,130) trae lote real, sobre 20 casas
+distintas — la mayoría con una sola fila, pero `FRESNO 16` concentra 13
+de las 53 filas con lote, la única que se acerca a un foco real.
+
+### Postventa no es una cuadrilla dedicada — son los mismos contratistas de obra
+
+De las 223 filas, solo 29 (13%) llevan la etiqueta genérica `"Cuadrilla
+Postventa"`. El 87% restante ya trae el nombre de un contratista real
+—`Elias Palma Palma` (74, el mayor), `Eduardo Andrade` (38), `Julio
+Hidalgo` (23), `Leonardo Gallegos` (18), incluso `Rigoberto Orduña` (4,
+uno de los dos contratistas de `ALAMO 18`, aunque nunca en la propia
+`ALAMO 18`)—. Postventa no es un equipo aparte: son los mismos
+destajistas que construyen, llamados de vuelta a arreglar garantía. El
+`CONTRATISTA` recién creado (D-366) ya cubre esta identidad sin pedir
+nada nuevo — la misma tabla atribuye obra nueva y reparación de
+garantía por igual.
+
+### Dato del usuario: modelo completo — 10 de las 223 filas eran gasto de oficina, no garantía
+
+Al diseñar `TICKET_GARANTIA` (`MODELO.md` §3b, D-370) apareció una
+depuración pendiente: `"cierre oficinas de bodega"`, `"oficina bodega"`
+y `"VENTILADOR PARA OFICINA"` —10 filas, $11,417.25— son gasto de
+oficina/bodega capturado bajo el mismo paraguas `POSTVENTA`, no
+reparación de una casa — mismo patrón que `MOF-00020` en D-360, se
+excluyen. **Quedan 213 filas reales, $104,901.95**, las que sí describen
+garantía. El vocabulario real de esas 213 —extraído de `Referencia`, sin
+inventar categorías— agrupa limpio en ocho causas: humedad/
+impermeabilización, eléctrico, acabado de piso/cantera, estructural
+menor (grietas, resanes), hidráulico/drenaje, equipamiento (asadores,
+monomandos), pintura, y **23 filas genuinamente sin más causa que
+"material postventa"** — un octavo valor real, no un cajón de sastre.
+
+De esas 213, **160 ($69,771.87) no traen `Lote` real** — cayeron en la
+bolsa general `Ubicacion=POSTVENTA` sin casa asignada. El nuevo
+`TICKET_GARANTIA` exige una casa desde que se abre un folio; esas 160
+filas ya capturadas se quedan sin forma honesta de reconstruirse — el
+diseño corrige la captura hacia adelante, no reescribe lo que ya pasó
+suelto.
+
+### P-33 cierra: dos claves rotas, confirmadas por descripción, unidad y familia — no dos productos, una mal capturada
+
+`HD-00411` («TUBO HD 3/4 CED 40 NL», unidad `TMO`) aparece tres veces en
+archivos reales de ingeniería de `ALAMO 18`, siempre la misma
+descripción y precio ($150). La familia real `HID-` sí usa `TMO` como
+unidad (83 de sus movimientos reales en almacén) y no existe ningún
+`HID-00411` ya cargado con el que pudiera chocar — nada distingue a
+`HD-00411` de ser `HID-00411` con una letra perdida.
+
+`MOS-2079` («MO SALIDA SAN LAVADERO», unidad `PZ`) está confirmado en
+uso real (cimentación de `ALAMO 18`, $312.50). La familia `MOS-` es real
+y consistente — veinte hermanos confirmados (`MOS-02030` salida
+lavamanos, `MOS-02050` regadera, `MOS-02060` tarja cocina…), todos con
+**cinco dígitos y unidad `PZ`**. `MOS-2079` (cuatro dígitos) rompe ese
+patrón exactamente donde encaja: junto a sus vecinos de familia `02XXX`,
+le falta el cero inicial.
+
+**Resuelto, dato del usuario: las dos van por `CLON`, no por
+`NORMALIZACION`.** `MODELO.md` §4b ya lo distinguía sin que este caso lo
+hubiera ejercido: «la clave sí es identidad… la vieja tiene que poder
+seguir saliendo hasta que se autorice lo contrario» — `NORMALIZACION`
+es para forma (`pza`→`PZ`, sin viaje de vuelta), no para una clave que el
+archivo de origen sigue reconociendo por sí misma. `HD-00411`→`HID-00411`
+y `MOS-2079`→`MOS-02079`, `modo=sustituir`, mismo mecanismo que ya cerró
+el prefijo `AUX-` (P-11).
+
+### P-17 cierra: `Ingeniería ERP` no pedía política — ya tenía la misma respuesta que `ruta`
+
+`Ingeniería ERP` (`LENGUAJE.md`, canon `ruta`) es la posición numérica que
+OPUS asigna a cada renglón — el mismo concepto que en este cerebro
+**ya es vista calculada, nunca campo capturado** (`ruta`, `MODELO.md` §1:
+«calculada, con puntos, NO se guarda como fuente»). No hacía falta
+decidir de dónde sale el valor cuando no viene de OPUS ni qué pasa si
+nunca llega: se preserva tal cual cuando el renglón se cargó desde OPUS
+real (dato opaco, no se recalcula), y simplemente no existe para nada
+generado dentro de este sistema — mismo criterio que ya regía `ruta`,
+solo que aquí la regla de OPUS para generarlo no es deducible
+(`LENGUAJE.md`, prueba de ida y vuelta).
+
+### El menú completo para cuando una ingeniería "se ve extraña" — dato del usuario
+
+La pregunta real detrás de P-17 no era la columna: era **cómo comprobar
+una ingeniería sospechosa desde distintos ángulos**, con niveles de rigor
+distintos según haga falta solo confirmar algo evidente o estar 100%
+seguros. Las cuatro piezas ya existían, sueltas — esto es el menú
+completo, organizado por cuándo se puede usar cada una:
+
+**Al cargar la ingeniería, antes de que exista obra real** — las tres no
+necesitan más que la ingeniería y lo que el catálogo ya trae:
+
+| Herramienta | Qué hace | Peso |
+|---|---|---|
+| Cuantificador gráfico (§1b, B-19) | Mide directo del plano — confirma o refuta un número puntual | Ligero |
+| Auditoría contra el prototipo (§11.7, P-29/P-30) | Compara la ingeniería completa contra la referencia de su tipo de casa; detecta y propone, nunca corrige solo | Medio |
+| Reversión por destajo / explosión de matriz (§11.9, §11.13, §11.14) | Reconstruye el catálogo completo desde la ingeniería real, insumo por insumo, contra la matriz teórica | Pesado |
+
+**Solo cuando la obra ya está avanzando o entregada** — porque compara
+contra algo que antes no existe:
+
+| Herramienta | Qué hace | Peso |
+|---|---|---|
+| Cruce contra almacén real (§11.16 a §11.20, todo el trabajo de P-38) | Compara lo que dice la ingeniería contra lo que de verdad se compró/consumió — responde si el papel pasó de verdad, no solo si es consistente consigo mismo | Pesado, dato real |
+
+**Ninguna reemplaza a las otras — se escalan.** El cuantificador gráfico
+resuelve una duda puntual sin tocar el resto; la auditoría contra
+prototipo y la reversión por destajo se disparan cuando algo se ve raro
+en general y hace falta ver todo el archivo; el cruce contra almacén es
+el único que confirma con dinero y material reales, pero solo puede
+correr después de que la obra ya avanzó. No es una regla única — es un
+criterio de a qué distancia del "100% seguro" hace falta llegar.
+
+### P-15 cierra: sí hace falta un traductor — el caso real ya existe, es «Mi ERP PYME»
+
+Dato del usuario: el almacén de toda esta sesión no sale de OPUS —sale de
+**«Mi ERP PYME»**, un sistema de diseño particular que el usuario opera
+directamente, y que **corre sobre el motor de SAP Business One por
+dentro** (de ahí que el archivo real traiga `Tipo` con los valores
+propios de SAP —`PUR-STK`, `STK-UNK`, `STK-ASM`— y la estructura de 46
+columnas, hoja `Consulta`, que `CONOCIMIENTO.md` §11.15 ya documentó sin
+saber a qué sistema pertenecía). No es un ERP hipotético a futuro: es el
+tercer sistema real, distinto de OPUS, ya en uso.
+
+`CONOCIMIENTO.md` §11.15 a §11.20 ya funcionan como el trabajo informal
+de traducción —el léxico correcto (`Lote`, no `Ubicacion`/`# Lote`), las
+dos columnas repetidas, el corte por motivo, la cadena `OP:`— sin haber
+pasado por el canon formal que sí tiene OPUS (`LENGUAJE.md`). **Falta
+formalizarlo como el segundo dialecto real del canon**, mismo tratamiento
+que ya recibió OPUS: tabla columna por columna, prueba de ida y vuelta
+propia de este lado. Es trabajo pendiente, no hecho hoy — vive en B-09
+(`4-direccion/PENDIENTES-MEJORAS.md`), que ya era el lugar correcto para
+esto y ahora tiene un segundo caso real que atender, no solo el de OPUS.
+
+### Extendido a los demás conceptos que comparten cemento — confirma la regla, encuentra un caso sin explicar
+
+§11.17 probó el cruce acumulado sobre un solo concepto (`EST-02010`).
+Con los cinco `grid_AvanceOPEventosOpr` cargados, el mismo cruce —salida
+real del insumo testigo, vía `# OP` (une almacén con avance sin
+ambigüedad: verificado que ningún `# OP` de `ALAMO 18` se comparte entre
+dos conceptos distintos) contra el rendimiento teórico del avance
+reclamado— se repitió sobre los diecisiete conceptos reales que también
+usan cemento (`ADH-00005`) en su matriz.
+
+| Conceptos | Meses reales | Diferencia (acumulado) | Lectura |
+|---|---|---:|---|
+| `EST-02010` (muro tabique) | 4 | +0.2% | Ya confirmado, D-375 |
+| `EST-02011` (muro tabique, 3er nivel) | 1 | -1.0% | Mismo patrón que `EST-02010` |
+| Castillos K2/K3/K7/K8 (`EST-02120`/`02130`/`02170`/`02180`), cadena CE-1 (`EST-02310`) | 1 a 3 | -22.3% a +6.8% | Dentro del ruido esperado por redondeo a saco entero |
+| `ALB-01210` (repello fachada) | 1 | +18.9% | Consistente, historia corta |
+| Cadena CE-2, columnas CM-1 (`EST-02320`, `EST-07010`/`07011`) | 1 | +56.8% a +71.4% | Base de 1-8 sacos — el % es ruido, no señal |
+| Repello muro/plafond (`ALB-01010`/`01012`/`01110`/`01212`) | 1 cada uno | -100% a +632.6% | Contradictorios entre sí — un mes no alcanza, misma trampa que produjo el 68.5% original |
+| **Castillo K1 (`EST-02110`)** | 3 | **+141.7%** | Primera lectura — **corregido abajo: era avance incompleto, no exceso** |
+
+**La mayoría confirma la lección de arriba, generalizada**: donde hay
+suficiente historia y volumen, el rendimiento teórico cuadra dentro de lo
+esperable; donde solo hay un mes o una base pequeña, el % rebota sin
+decir nada, exactamente el mismo tipo de falso positivo que produjo el
+68.5% original — no una excepción a la regla, una confirmación de por
+qué hace falta acumulado antes de alertar.
+
+**La primera lectura marcó castillo K1 como la excepción real.** 33
+sacos de cemento reales contra 13.65 que pedía su rendimiento teórico
+para los M avanzados en `grid_AvanceOPEventosOpr`, sus tres meses
+(mayo-julio) — una diferencia demasiado grande para ser redondeo. Antes
+de anotarlo como hallazgo, se verificó si el problema era el testigo o
+la matriz: a escala completa, todos los lotes, cinco meses, el mismo
+concepto da -7.4%, dentro del mismo rango que sus hermanos K2 (-14.1%),
+K3, K7, K8 — el rendimiento teórico estaba bien. Quedó abierto, sin
+forzar una explicación.
+
+### Corregido: no era exceso — `grid_AvanceOPEventosOpr` solo capturaba un tercio de castillo K1
+
+Dato del usuario, pidiendo cruzar el caso contra una tercera fuente. La
+ingeniería de `ALAMO 18` trae `EST-02110` **tres veces** —una por nivel
+(Planta Baja 260 M, Planta Alta 64 M, Azotea/Roof 15.2 M)—, algo que ni
+`grid_AvanceOPEventosOpr` ni la primera lectura habían sumado. Cruzando
+las tres fuentes de avance para castillo K1 y sus cinco hermanos:
+
+| Concepto | Ingeniería (M, diseño total) | `PRECIO_REAL` (M, Mano de Obra) | `grid_AvanceOPEventosOpr` (M) | % completado |
+|---|---:|---:|---:|---:|
+| **K1 (`EST-02110`)** | **339.20** | 241.19 | 111.14 | **71.1%** |
+| K2 (`EST-02120`) | 101.40 | 98.40 | 98.40 | 97.0% |
+| K3 (`EST-02130`) | 20.00 | 20.00 | 20.00 | 100.0% |
+| K7 (`EST-02170`) | 21.60 | 21.60 | 21.60 | 100.0% |
+| K8 (`EST-02180`) | 20.00 | 20.00 | 20.00 | 100.0% |
+| Cadena CE-1 (`EST-02310`) | 196.34 | 196.34 | 196.34 | 100.0% |
+
+**Los cinco hermanos ya están 97-100% construidos — por eso las tres
+fuentes coinciden exactas entre sí: no queda nada pendiente que una
+fuente vea y otra no.** Castillo K1 es, con mucho, el más grande de los
+seis (339.20 M diseñados, más de tres veces K2) y **el único que
+todavía no se termina** — 71.1% avanzado según `PRECIO_REAL`,
+`grid_AvanceOPEventosOpr` capturó menos todavía (32.8% del diseño). No
+es que K1 tenga un problema de consumo: es el único con trabajo real
+pendiente, y por eso es el único donde las fuentes de avance se quedan
+cortas de formas distintas. Los 33 sacos reales alcanzan para 268.6 M
+teóricos — entre el 241.19 M que `PRECIO_REAL` ya reporta avanzado y el
+339.20 M de diseño total. El cemento siguió al avance real de la obra,
+no al recorte que `grid_AvanceOPEventosOpr` alcanzó a capturar.
+
+**También se descartó, antes de esta corrección, que el cemento viniera
+de surtido suelto sin ligar a concepto**: las 69 filas de cemento de
+`ALAMO 18`, sin excepción, salen por `Motivo = Implosión De Materiales`
+—la que siempre liga vía `# OP`—, nunca por `Salida De Material Para
+Producción` —la que casi nunca trae `# OP`—. El cruce por `# OP` estaba
+parado en terreno sólido; lo que faltaba era una tercera fuente de
+avance, no una revisión del método de unión.
+
+**Corrige D-376.** `PENDIENTES-MEJORAS.md` B-79.
+
+**De paso, un hueco de diseño real que la corrección no borra**: el
+cruce de §11.17 solo revisaba el lado de faltante (material insuficiente
+para lo reclamado). Aunque el caso que lo mostró (castillo K1) resultó
+no ser exceso, el hueco seguía siendo real — no había alerta que
+vigilara el lado contrario. Corregido en `MODELO.md` §5a: `ALERTA(tipo=
+consumo_material_sin_respaldo_avance)`, mismo cruce, dirección
+contraria. **Lección añadida al mecanismo**: antes de concluir exceso
+real, corroborar el avance reclamado contra una segunda fuente si existe
+—ingeniería del concepto, o un segundo sistema de captura— es la misma
+disciplina que ya pedía comparar contra el acumulado (D-375), un nivel
+más abajo.
+
+**La semilla que evita repetir este cruce a mano:** qué insumo sirve de
+testigo confiable para cada concepto, y con qué confianza, ya no vive
+solo en esta narración — `TESTIGO_MATERIAL` (`CATALOGOS.md` §12) la
+convierte en catálogo, con los diecisiete conceptos de esta corrida como
+carga inicial.
+
+### Revisados los siete `insuficiente` contra ingeniería: dos se resuelven, uno queda abierto más limpio que K1
+
+Mismo método que resolvió castillo K1 (`ingeniería` + `PRECIO_REAL` +
+`grid_AvanceOPEventosOpr`), aplicado a los conceptos que la semilla
+había marcado `insuficiente` por tener solo un mes de historia.
+
+**`EST-02320`, `EST-07010`, `EST-07011`: confirmados sin misterio.** Las
+tres fuentes coinciden exactas —100% completos—, y el `±57%` a `±106%`
+de diferencia en cemento es ruido puro de base chica (1 a 8 sacos). No
+eran artefacto de fuente incompleta: eran ruido de volumen, tal como se
+había leído la primera vez.
+
+**`ALB-01010` (repellado muro 3.00) se resuelve igual que castillo K1.**
+`grid_AvanceOPEventosOpr` solo veía 250 de 753 M diseñados (33.2%);
+`PRECIO_REAL` ya reporta 453 M (60.2%). Con la cifra más completa, el
++109.1% original —contradictorio con sus hermanos— baja a **+15.5%**,
+normal. **Corrige D-376.**
+
+**`ALB-01212` (repellado muros fachada 3.00) es un hallazgo nuevo, y más
+limpio que castillo K1.** Aquí las tres fuentes ya coinciden —191 a 223
+M, esencialmente terminado— y aun así el cemento real es **cero**.
+Revisada su orden completa, `# OP 24285`: **cero movimientos de
+almacén, de cualquier insumo, en los cinco meses** — no es solo el
+cemento, no hay nada. A diferencia de K1, aquí no hay margen para
+explicarlo por una fuente de avance incompleta: las tres ya dicen que
+la obra está prácticamente terminada. Es el caso real y limpio que
+`estimacion_sin_respaldo_material` (B-70) necesitaba —el que la motivó
+originalmente (semana 19 de `EST-02010`) resultó ser un falso positivo,
+D-375—: avance dado por bueno, sin un solo movimiento de material que
+lo respalde. Queda anotado, sin forzar una causa —pudo pagarse sin
+surtir material propio, capturarse con otro insumo no identificado, o
+ser un hueco de captura— pero con las tres fuentes de avance de acuerdo,
+la pregunta ya no es de dónde sale el % que falta, es por qué no hay
+ningún material.
+
+**`ALB-01110` (repellado plafond 3.00): sin exceso bajo ninguna
+lectura** —déficit de -48% a -59%, consistente con material que aún no
+se termina de surtir para un trabajo que sigue activo. Nota aparte, sin
+resolver: `PRECIO_REAL` (79.96 M) supera a la ingeniería (62.64 M) para
+este concepto —las dos fuentes que en los demás casos nunca se cruzan,
+aquí se invierten. No cambia la lectura del cemento (sigue sin exceso),
+pero es un cabo suelto de captura que no se investigó más a fondo.
+
+**`ALB-01012` (repellado muro 3.00, código distinto de `ALB-01212`
+—se verificó que no es el mismo concepto ni un error de captura del
+otro: los dos existen en el catálogo, con matrices propias) es el caso
+real que `consumo_material_sin_respaldo_avance` necesitaba.** Corregido
+primero un error propio: su ingeniería específica de `ALAMO 18` pide
+`ADH-00004` (mortero premezclado), que nunca se mueve para este lote
+—cero filas en cinco meses, mismo patrón ya documentado en B-68/D-308
+(la matriz no se actualiza cuando la obra cambia de material)—, así que
+comparar contra mortero era perseguir un insumo que la obra no usa.
+**Dato del usuario: el testigo correcto es cemento, con el rendimiento
+de su propia matriz genérica** (`MEZ-07010`, la misma que declara
+`ALB-01212`, 0.1911 BTS/M², no un accidente). Con eso confirmado, la
+lectura no cambia de número, cambia de sentido: contra el diseño
+completo (214 M, 100% hipotético) da **+2.8%**, casi exacto — pero
+contra `PRECIO_REAL` (52 M, 24.1% avanzado) sigue en **+326%**. El
+material está adelantado a **todas** las fuentes de avance, no solo a
+una —diferente del patrón de castillo K1/`ALB-01010`, donde el material
+seguía de cerca a la fuente más completa—.
+
+**Dos hipótesis de campo, no excluyentes entre sí (dato del usuario):**
+avance físico sin estimar todavía —el repellado puede estar casi
+terminado sin que ninguna fuente lo haya capturado como avance—, o
+material desviado de esta orden hacia otra actividad. Con cualquiera de
+las dos, **el riesgo es el mismo: no se ve hoy porque el material ya
+salió, se ve hasta el cierre de obra, cuando ya no hay margen para
+resolverlo.** Es exactamente la situación para la que se diseñó
+`consumo_material_sin_respaldo_avance` (B-79) — su caso motivador
+original (castillo K1) resolvió como falso positivo; `ALB-01012` es el
+caso real que confirma que la alerta hacía falta.
+
+### Los dos `Consistente` que faltaban por cruzar: confirman sin drama
+
+`EST-02320`/`07010`/`07011` y `ALB-01110` ya se habían cruzado contra
+ingeniería en la revisión de los `insuficiente` (D-378). Quedaban
+`EST-02011` y `ALB-01210`, los dos que llegaban a `Consistente` sin ese
+cruce todavía.
+
+**`EST-02011` (muro tabique, 3er nivel): las tres fuentes coinciden
+exactas** —31.03 M, 100% completo, sin ambigüedad—. El -1.0% de cemento
+se sostiene. De paso, su ingeniería específica *también* trae mortero
+en vez de cemento —igual que `ALB-01012`, y revisando hacia atrás,
+igual que **`EST-02010` mismo**—: confirma que el patrón de B-68/D-308
+es sistémico en los muros de `ALAMO 18`, y que usar el rendimiento de
+la matriz genérica en vez de la ingeniería del lote fue lo correcto
+desde el principio, no una excepción para `ALB-01012`.
+
+**`ALB-01210` (repello fachada): ingeniería y `PRECIO_REAL` coinciden**
+—192.53 M, contra 187 M (97.1%) de `grid_AvanceOPEventosOpr`—. Con la
+cifra completa, el cemento pasa de +18.9% a +15.5% — normal, sube a
+`Confirmado` por volumen (34 sacos, tres eventos) y acuerdo entre
+fuentes.
+
+**Con esto, los diecisiete conceptos originales de la semilla quedan
+completamente cruzados contra ingeniería** (D-377 a D-380) — cierra el
+ciclo de validación que empezó con castillo K1.
+
+### Instalaciones: el mismo método en un dominio distinto — eléctrica, hidráulica y gas confirman sin novedad
+
+Dato del usuario, cambio de exploración: extender el mismo cruce
+(almacén real, vía `# OP`, contra el rendimiento teórico del avance
+reclamado) a las cuatro instalaciones de `ALAMO 18` —eléctrica,
+hidráulica, sanitaria, gas—, hasta ahora sin tocar.
+
+**Primer obstáculo: aquí el concepto no es una sola partida física, son
+varias, agrupadas.** A diferencia de un concepto estructural (`EST-`,
+`ALB-`, una línea `MOE-` a la vez), los conceptos de instalación (`ECO-`,
+`IEC-`, `ISA-`, `IHD-`, `IGA-`) empaquetan **varias sub-actividades
+distintas** bajo una sola clave —cada una con su propia línea
+`MOE-`/`MOA-`/`MOG-`, su propia cantidad y su propio PU—. Multiplicar el
+`O/Avance` crudo por la cantidad del insumo, como si fuera una sola
+tarea, produce números sin sentido —probado y descartado antes de
+reportar nada—. La columna `O/Requerida` de `grid_AvanceOPEventosOpr`
+—hasta hoy sin usar— resuelve esto: cada fila trae el alcance de **su
+propia** sub-tarea, y coincide exacta con la cantidad de la línea `MO-`
+correspondiente en la ingeniería del lote. El avance sí respeta esta
+estructura por dentro; solo la clave agregada no lo mostraba.
+
+**Método nuevo, sobre esa base:** `alcance_$ = Σ(O_Requerida × PU)` de
+**todas** las líneas `MO-` de la ingeniería (no solo las que ya tienen
+avance —hay sub-tareas en cero, deben seguir contando en el
+denominador—); `avanzado_$ = Σ($/Operacion)` de las filas de avance
+—verificado exacto, `$/Operacion == O/Avance × C/Promedio`, sin
+diferencia, confirmando el método—; `% = avanzado_$ / alcance_$`. El
+esperado del testigo se pondera con ese %, igual que en
+`estimacion_sin_respaldo_material`; y como estos conceptos suelen surtir
+el material de golpe por visita (habilitado) mientras la factura avanza
+por sub-tarea, también se compara contra el **alcance completo** (100%,
+sin ponderar) — a veces dice más que el esperado ponderado.
+
+| Instalación | Testigo | Alcance 100% | Esperado (ponderado) | Real | % alcance | % esperado |
+|---|---|---:|---:|---:|---:|---:|
+| Eléctrica (`ECO-00004`+`IEC-`, 7 conceptos) | `ELE-00001` (poliducto) | 13.83 | 5.95 | 10.07 | 72.8% | 169.2% |
+| Hidráulica (`ECO-00003`+`IHD-`, 3 conceptos) | `HID-00004` (codo) | 111.00 | 79.11 | 111.00 | **100.0%** | 140.3% |
+| Gas (`ECO-00005`+`IGA-`, 3 conceptos) | `HID-00025`+`IGS-00014` combinados | 3.97 | 3.42 | 3.31 | 83.4% | 96.9% |
+
+**Gas trae, de entrada, la misma trampa que `HID-00411` (abajo) y que ya
+documentó D-371: una clave mal capturada.** La ingeniería de cada
+concepto de gas trae **dos líneas para el mismo producto físico** —mismo
+número de parte, «2024446»— con dos claves distintas (`HID-00025` y
+`IGS-00014`), cada una con su propia cantidad. No es una duplicada a
+descartar: las dos son reales y **se suman** —a diferencia de
+`HD-00411`, donde una clave nunca se usa—; el almacén real mueve todo
+bajo `IGS-00014`. Sumadas, 96.9% del esperado ponderado: limpio.
+
+**Eléctrica e hidráulica repiten, del lado del material, la misma
+«avance sin estimar» de dato del usuario (D-379).** El 169.2%/140.3%
+ponderado de ambas no es exceso real —es el habilitado de una
+instalación surtido completo o casi completo en una sola visita (mismo
+día para `ECO-00004`: 22/04/2026, material y los cinco eventos de
+avance), mientras la factura sube sub-tarea por sub-tarea, más
+despacio—. Confirmado con los accesorios de cada trato, revisados por
+separado para no depender de un solo insumo:
+
+| Instalación | Accesorio | % alcance completo |
+|---|---|---:|
+| Eléctrica | `ELE-00003` (chalupa) | 78.7% |
+| Hidráulica | `HID-00024` (tubo, segunda tubería) | **100.0%** |
+| Hidráulica | `HID-00012` (tee) | **100.0%** |
+| Gas | `ACE-00001` (sellador) | 89.5% (92.2% del esperado) |
+
+Hidráulica queda triple confirmada —codo, tubo y tee, los tres al
+100.0% del alcance completo, sin excepción—; gas y eléctrica confirman
+el mismo patrón con su respectivo accesorio.
+
+**De paso, la pregunta del prototipo.** El almacén de `ECO-00004` trae
+una `Referencia` etiquetada «ZAFIRO PLUS BASE». Dato del usuario:
+`ALAMO 18` es Diamante —ya lo había mostrado la cimentación— y la
+etiqueta es un artefacto genérico de plantilla, no evidencia de un
+prototipo distinto. El mismo método de identificación por contenido que
+ya resolvió esta pregunta una vez (D-121: la razón entre las cantidades
+reales y cada matriz de prototipo decide, no la etiqueta) confirma que
+es Diamante. `D-245` (riesgo de matriz prestada) no aplica aquí: las
+cantidades vienen de la ingeniería propia del lote, no de un catálogo
+genérico ajeno.
+
+**Y una brecha real, pero de la fuente, no del prototipo:** `PRECIO_REAL`
+usa para instalaciones un esquema de captura por punto (`IGAS-`, `IHS-`,
+`ISH-`, `ISN-`, `IHD-01070`... un código por WC, regadera, lavabo,
+minisplit) que **nunca** aparece en `grid_AvanceOPEventosOpr` —cero
+filas, cualquier lote, cualquier mes—; en total, apenas 10 filas sueltas
+(semanas 17-29) para las cuatro instalaciones juntas, contra el
+seguimiento semanal completo que sí tiene estructura. `PRECIO_REAL`
+simplemente no cubre instalaciones con el mismo detalle — límite real
+de la herramienta de reporte, no algo que dependa de encontrar «el
+prototipo correcto». `CATALOGOS.md` §12.
+
+### Sanitaria: el tubo de conexión se emitió una sola vez en cinco meses — el tercer caso real de B-70, y el primero fuera de estructura
+
+Mismo cruce sobre la cuarta instalación (`ECO-00002` + familia `ISA-`:
+`00110`/`00120`/`00150`/`00210`/`00220`/`00230`, tres sin iniciar
+todavía, sin exigencia ni avance). Los accesorios confirman sin drama
+—`HID-00135` (codo HD 90°) 100.0% exacto, `SAN-00002` (pegamento)
+125.6%—, pero el testigo principal no: `HID-00411` (tubo HD 3/4",
+conexión hidro-sanitaria) llega solo al **41.7%** del alcance completo
+(43.8% del esperado ponderado).
+
+**Misma trampa de clave que ya documentó D-371, confirmada una vez
+más:** la ingeniería de los cuatro conceptos activos captura el tubo
+como `HD-00411` (cuatro letras); el almacén real solo conoce
+`HID-00411` (cinco letras, con la «I»). Sin la corrección, el testigo
+parece no moverse nunca.
+
+**Corregido el nombre de la clave, el hueco sigue siendo real —y esta
+vez no es la clave.** `HID-00411` se movió **una sola vez en los cinco
+meses completos** de `ALAMO 18`: 5.0 TMO, 21/04/2026, `# OP` 23187
+(`ECO-00002`, cimentación) — ninguna otra fila, con o sin `# OP`, en
+ningún mes. Contra eso, tres conceptos activos reclaman avance alto sin
+que su propio tubo haya salido nunca:
+
+| Concepto | Etapa (meses reales) | % avance | `HID-00411` pedido | `HID-00411` emitido |
+|---|---|---:|---:|---:|
+| `ECO-00002` | abril (cimentación) | 104.0% | 5.0 | 5.0 ✅ |
+| `ISA-00110` | mayo-junio (PB) | 86.6% | 5.0 | 0 ❌ |
+| `ISA-00150` | junio (PA) | 88.2% | 1.0 | 0 ❌ |
+| `ISA-00210` | junio-julio (Azotea) | 100.0% | 1.0 | 0 ❌ |
+
+**Se descartaron las dos explicaciones ya conocidas antes de aceptar
+esta como nueva.** No es el patrón de gas (arriba): se buscó
+específicamente una segunda clave que absorbiera la diferencia
+—`SAN-00018`/`00019`/`00020`/`00021`, tubo sanitario reforzado de
+6"/4"/3"/2"— y aunque sí mueven correctamente bajo los mismos `# OP`
+(incluso por encima de su propio alcance en algún caso), son un
+producto distinto —drenaje de diámetro grande, no la conexión de
+3/4"— con su propia línea de ingeniería, separada de `HID-00411`; no lo
+sustituyen. Tampoco es el patrón de castillo K1 (D-377): ahí una sola
+fuente de avance se quedaba corta; aquí el avance está completo o casi
+—86.6% a 100%—, lo que hace la ausencia de material más notable, no
+menos. Y no es un hueco de captura sin `# OP`: no existe **ninguna**
+fila adicional de `HID-00411`, etiquetada o no, en los cinco meses.
+
+**Es, en cambio, el mismo patrón que ya cerró B-70 con `ALB-01212`
+(D-378) —avance alto sin material que lo respalde—, repetido ahora por
+tercera vez y por primera fuera de estructura.** PB, PA y Azotea se
+facturaron como casi o completamente terminados a lo largo de tres
+meses sin que el tubo que su propia ingeniería exige (7.0 de las 12.0
+TMO totales, 58.3%) saliera nunca del almacén de este lote.
+
+**Corrección propia, antes de escribirse en la semilla:** este caso se
+discutió primero como candidato a `consumo_material_sin_respaldo_avance`
+(B-79) — es el error de dirección contraria: ahí el material *excede*
+lo que el avance reclama (el patrón de castillo K1/`ALB-01012`); aquí el
+avance reclama más de lo que el material puede respaldar, exactamente
+la forma de `estimacion_sin_respaldo_material` (B-70). Corregido antes
+de anotarse en el catálogo.
+
+**Dato del usuario, dos hipótesis nuevas, además de las ya anotadas para
+`ALB-01212` (pagado sin surtir material propio, capturado con otro
+insumo no identificado, o hueco de captura):** el tubo pudo no hacer
+falta en la cantidad que pide la ingeniería —diseño que sobre-especifica,
+o trazo real con menos conexiones que el plano—; o el material se trajo
+de otra obra —sobrante externo, o compra directa fuera del almacén de
+`ALAMO 18`— sin pasar nunca por este inventario, en cuyo caso el trabajo
+es real y está bien hecho, solo invisible para este cruce. Ninguna de
+las cinco hipótesis se puede confirmar con los datos de este cerebro
+todavía — quedan anotadas para no repetir la pregunta, no resueltas.
+
+`MODELO.md` §5a, `CATALOGOS.md` §12, `PENDIENTES-MEJORAS.md` B-70.
 
 ---
 
@@ -2295,7 +4433,8 @@ Cada salto tiene significado propio:
 ## 13.2 Precio por contratista
 
 El mismo concepto tiene **precios distintos según con quién se contrate**. Es un
-tabulador por contratista, con vigencia — igual que el precio del insumo (`PENDIENTES-MEJORAS.md`, M-12).
+tabulador por contratista, con vigencia — igual que el precio del insumo
+(`MODELO.md` §4a, `TABULADOR_CONTRATISTA`).
 
 ### Cuando el pactado no coincide con el PU
 
@@ -2389,6 +4528,9 @@ Lleva:
 > pero se registra: **el porcentaje de órdenes retroactivas es una medida directa de
 > qué tan sano está el proceso**, y hoy nadie la tiene.
 
+> **Aplicación concreta, con clave y método cerrados:** §11.18, sobre los
+> ajustes sueltos (`AJU_*`) de `ALAMO 18` — `CC-ALM-18XXX`.
+
 ## 13.5 Empujar el presupuesto sin frenar la obra
 
 **El presupuesto nunca está incompleto: está provisional en algunas partes.**
@@ -2448,7 +4590,7 @@ agregar ni comparar:
 
 Por eso la primera pregunta al capturar no es la causa, sino: **¿es la misma obra?**
 
-### Las seis causas, y quién paga cada una
+### Las nueve causas, y quién paga cada una
 
 La palabra «omisión» tapa situaciones que se pagan al revés. **Lo que las separa es
 contra qué se comparan, y la única referencia que importa es el contrato del
@@ -2462,6 +4604,17 @@ cliente.**
 | 4 | **Omisión de proyecto, dentro del contrato** — el cliente ya lo compró, el plano no lo dibujó | No | **Tú** | **No es cobrable.** Error de proyecto |
 | 5 | **Petición nueva del cliente** — fuera de lo contratado | **Sí** | **El cliente** | Orden de cambio, precio nuevo |
 | 6 | **Contrato cambiado sin propagar** — autorizado, pero nadie bajó el impacto | **Sí** | **El cliente** | Orden de cambio · ver abajo |
+| 7 | **Falta de insumos** | No | No aplica — es causa de tiempo, no de costo | Programa: tramo de una actividad existente (P-5 abajo) |
+| 8 | **Temporalidad o clima** | Depende — si solo detiene, no; si daña, la reparación sí | Si solo detiene, nadie; si daña, **Tú** (salvo que el contrato diga otra cosa) | Si solo detiene: calendario, sin pasar de ahí. Si daña y crece obra: incidencia + merma por daño/clima (fila Materiales, arriba) |
+| 9 | **Mejora de proyecto** — nadie la pidió, ni el proyecto ni el cliente | **Sí** | **Sin definir** — no es error que se absorba (3/4) ni petición del cliente que se cobre sola (5) | Incidencia, propuesta — no se ejecuta sola |
+
+> **Las causas 7 a 9 se agregaron leyendo el programa, no el costo** — mismo
+> vocabulario, pero no siempre caen limpio en las columnas de arriba: una falta de
+> insumos casi nunca es una desviación de precio o consumo, es un hueco en el
+> programa. Cuando el motivo además cambia el alcance —el viento que tira un muro,
+> una mejora que nadie pidió— el hecho se registra como **incidencia**
+> (`PROPUESTA-CUATRO-MODULOS.md` §4), un registro aparte que puede o no generar
+> también una desviación o un control de cambio: no son el mismo renglón.
 
 ### Las dos omisiones son opuestas
 
@@ -2581,6 +4734,122 @@ por el sistema con la evidencia acumulada, aprobada por alguien.
 Es el mismo ciclo del agente que aprende de lo decidido (`APRENDIZAJE.md`): **la
 obra informa al catálogo — y alguien decide si lo corrige.**
 
+## 13.7 Avance físico y avance pagado no se sobrescriben
+
+**Dos registros, cada uno en su lugar. Ninguno corrige al otro.**
+
+```
+Avance físico     lo que Control ve en obra          inspección directa
+Avance pagado     lo que la estimación reconoce      proceso financiero, semanal
+```
+
+Igual que la cadena de precios (§13.1): **pueden ser el mismo número, registrado en
+momentos distintos, y con eso basta.** No hace falta que uno actualice al otro.
+
+> El pagado no pesa más por mover dinero. Si la estimación se ajusta, el avance
+> físico ya registrado **no se pierde**: sigue siendo el dato de qué había en obra,
+> en esa fecha.
+
+Cuando difieren, **la diferencia es la señal, no un error que se resuelve eligiendo
+uno** — mismo mecanismo que «dos métodos independientes que coinciden validan»
+(`METODO.md` §1.4, D-209), leído al revés: aquí divergen, y divergir también informa.
+Resuelve con evidencia el rol **Control** (D-204 a D-206) — nunca ajustando uno al
+otro en automático.
+
+### Por qué esto le falta al rendimiento de material
+
+El rendimiento real de material (§11.16 · §11.17) divide insumo consumido entre
+avance. **Sin avance físico independiente, el único avance disponible es el
+pagado** — y pagado no es lo mismo que construido.
+
+Caso real: `EST-02010`, semana 19 — 293 m² pagados, con respaldo de cemento para
+solo ~92 m² (§11.17, D-255). Sin un registro de avance físico esa semana, no se
+puede distinguir «se pagó de más» de «el cemento llegó antes de instalarse»: son
+dos historias distintas y solo el avance físico las separa. Pendiente de método de
+captura — `PENDIENTES-MEJORAS.md` B-55.
+
+## 13.8 Estimación — cuando el avance se vuelve pago
+
+**Documento que cobra el avance ejecutado en un periodo**, semanal
+(`GLOSARIO-DOMINIO.md`: Corte, Generador y Valuación son el mismo concepto en
+otro dialecto).
+
+### Dos fuentes, no una
+
+| Fuente | Cuándo |
+|---|---|
+| ERP externo | Cuando hay ingeniería cargada ahí |
+| Manual / Excel | Sin ingeniería, actividades fuera de catálogo, o una incidencia (`PROPUESTA-CUATRO-MODULOS.md` §4) |
+
+Las dos se consolidan en un extractor y se acomodan a mano en un formato o
+machote — hoy manual, con el mismo destino que el resto del sistema: que el
+reporte consolidado salga ya armado, y quien revisa **solo valide**.
+
+### El tope es el mismo techo, de cualquier fuente
+
+**Topes** se alimenta de varios lados —ingeniería, cuantificador, paramétrico—,
+pero solo importa uno: **cuál se volvió el contratado**. Mismo patrón de
+siempre: el contratado se congela (M-1, `PROPUESTA-CUATRO-MODULOS.md` §3;
+D-227). Es el mismo techo del cuantificador de presupuesto (D-273) leído al
+momento de estimar, no al programar.
+
+**Ampliar el tope no es mecanismo nuevo** — reusa lo que ya existe: una
+incidencia (P-8, `PROPUESTA-CUATRO-MODULOS.md` §4) si la causa aplica, o el
+umbral del cuantificador de programación (P-9) si el origen es ahí.
+
+### Topes pagados
+
+```
+Topes pagados = Remanente + (Programado − Pagado)
+              = (Tope − Programado) + (Programado − Pagado)
+              = Tope − Pagado
+```
+
+Se simplifica al mismo mecanismo que Remanente (D-273 · D-282), pero contra lo
+pagado en vez de lo programado.
+
+### Validación y conciliación
+
+Un rol **distinto** valida la estimación — no es Control de obra con otro
+sombrero. **Hoy lo realiza Compras**, y puede recaer en cualquier usuario
+existente; no está formalizado como los seis roles de `MODELO.md` §5b. Si algo
+excede su tope, **se regresa**.
+
+En la conciliación: el Residente ve la brecha (sube lo que quedó bajo,
+reduce lo que un contratista no cumplió), **Costos recuantifica**, y
+**Control valida después y descuenta si hace falta**. Lo olvidado se agrega al
+final, revisado contra su propio tope.
+
+### Deducciones, retenciones y préstamos
+
+| Mecanismo | Cómo funciona |
+|---|---|
+| **Deducción por sobrepago** | Ya definida (§13.2) — se descuenta sin tocar el pactado |
+| **Deducción por rehacer trabajo** | Si el contratista responsable sigue activo, se descuenta de su estimación; si ya no está, la empresa absorbe — mismo «quién paga» de la causa 1 (§13.6), ahora concreto |
+| **Retención** | Solo para subcontratos |
+| **Préstamo** | Se salda con avance de obra, o directo contra una estimación futura |
+
+### Un archivo real valida el diseño sin haberlo visto
+
+Export de abril del ERP externo, 416 filas, a nivel de operación: `O/Requerida`
+(el tope) · `O/Avance` (el pagado) · `C/Promedio` (precio unitario) ·
+`$/Operación = O/Avance × C/Promedio`. **Cero de 416 filas exceden el tope** —
+el límite se respeta en la práctica, no solo en el diseño.
+
+### El léxico de este archivo trae una trampa
+
+`UDM OP` y `UDM Operación` no son la misma unidad en 59% de las filas —
+`UDM OP` cuenta la orden en piezas (1 orden = 1 pieza), `UDM Operación` trae la
+unidad real del concepto (m², m...). No es error: son dos objetos distintos en
+la misma fila.
+
+**`Nivel OP` mezcla nivel y etapa sin avisar** — mismo tipo de hallazgo que
+`Lote` contra `Ubicacion` en el archivo de almacén (D-249). Antes de que el
+edificio tenga niveles que lo justifiquen (cimentación), el campo etiqueta por
+etapa; en cuanto hay plantas, etiqueta por nivel. `# Parte/SKU` es el concepto
+real (`EST-`, `ECO-`...); `Operacion` es el destajo (`Moc-`, `Moe-`, `Mog-`...)
+— de los cinco campos de identidad de este archivo, `Nivel OP` es el único
+ambiguo. **No cruzar por `Nivel OP` sin filtrar primero por etapa conocida.**
 
 ---
 
@@ -2650,7 +4919,7 @@ aprobadas**, con su evidencia y su historia de rechazos.
 
 ---
 
-# 15. La ruta crítica no está en el modelo
+# 15. La ruta crítica ya está en el modelo — el tiempo de entrega seguía sin schema
 
 El Gantt quedó definido como **duración calculada**:
 
@@ -2658,24 +4927,24 @@ El Gantt quedó definido como **duración calculada**:
 duración = volumen ÷ (rendimiento × cuadrillas)
 ```
 
-Eso da **cuánto tarda cada actividad**. Pero no hay nada que diga **qué va antes que
-qué**.
+Eso da **cuánto tarda cada actividad**. Lo que faltaba —qué va antes que
+qué— ya cerró con P-20:
 
-> Sin precedencias no hay ruta crítica. Y sin ruta crítica, la suma de duraciones no
-> es un programa: **es una lista.**
-
-Lo que falta:
-
-| Falta | Por qué importa |
+| Faltaba | Dónde vive ahora |
 |---|---|
-| **Precedencias** entre actividades | Qué debe terminar para que otra empiece |
-| **Tipo de vínculo** | Fin-inicio, inicio-inicio, con o sin traslape |
-| **Holguras** | Cuánto puede retrasarse algo sin mover la fecha final |
-| **La ruta crítica** | Qué retraso importa y cuál no |
+| **Precedencias** entre actividades | `PRECEDENCIA`, `MODELO.md` §5c |
+| **Tipo de vínculo** — fin-inicio, inicio-inicio, con o sin traslape | `PRECEDENCIA.tipo_vinculo`/`traslape_espera`, `MODELO.md` §5c |
+| **Holguras** | `ACTIVIDAD.holgura` — calculado, `MODELO.md` §5c |
+| **La ruta crítica** | `ACTIVIDAD.es_ruta_critica` — calculado, `MODELO.md` §5c |
 
-Y hay una conexión que ya está a medias: **el tiempo de entrega del material** daría
-la fecha de pedido a partir del inicio de la actividad — pero ese inicio solo se
-conoce si hay precedencias.
+> El motor que calcula fechas tempranas/tardías y ruta crítica sigue sin
+> escribirse — es código sobre este schema, no schema en sí, mismo
+> criterio que excluye el resto de `MODELO.md` §6.
+
+Queda la conexión que seguía a medias: **el tiempo de entrega del material**
+da la fecha de pedido a partir del inicio de la actividad — ahora que el
+inicio ya se calcula (arriba), lo único que le faltaba a esta parte era el
+dato, no la tabla.
 
 ### El tiempo de entrega: dónde vive
 
@@ -2712,11 +4981,18 @@ resultados distintos y nadie sabe cuál es el bueno.
 > calendario de la obra — que no es el del proveedor. Los días no laborables del
 > proveedor no están modelados y **no se van a inventar**.
 
-> Al inicio del proyecto se aclaró que **CPU es APU, no CPM**. Eso resolvió una
-> ambigüedad de nombre, pero **el CPM como capacidad quedó fuera y nunca se
-> retomó.**
+> **La fórmula tiene una ambigüedad sin resolver, no elegida en silencio**
+> (`RAZONAMIENTO.md` §3): «inicio» puede ser la fecha temprana o la tardía
+> de la actividad, y restar `holgura` además del tiempo de entrega da un
+> resultado distinto según cuál sea. Ninguna de las dos lecturas está
+> descartada aquí — queda para quien implemente el reporte de
+> `MODELO.md` §5f decidirla con evidencia, no adivinarla.
 
-Va con la definición del módulo de programa — **P-20**.
+**Dónde vive ahora:** `CONSTANTE_FISICA` (`MODELO.md` §1c) gana la
+categoría `tiempo_entrega` — mismo mecanismo que ya tenía la vara
+comercial y el corte por altura, con un campo nuevo (`base`) para
+naturales/hábiles. `MODELO.md` §5f («Recursos por fecha») cierra B-41
+leyendo esta tabla para separar fecha de pedido de fecha de consumo.
 
 
 ---
@@ -2783,3 +5059,78 @@ hay forma de distinguirlo solo de un prefijo legítimamente distinto.
 
 Y nunca por proximidad: §11.9 ya probó que un dígito de diferencia cae sobre otra
 clave que existe y es distinta.
+
+---
+
+# 17. Cuantificación gráfica — de inventario a regla verificada
+
+> `IDEAS.md` §2 enlistó 29 funciones por tipo de herramienta, sin schema y sin
+> distinguir qué es infraestructura y qué es dominio. Esta sección cierra esa
+> distinción para los siete casos que sí son dominio — los otros 22 no entran
+> aquí, y esa ausencia es la decisión, no un olvido.
+
+## 17.1 Veintidós de las 29 son infraestructura, no conocimiento
+
+Calibrar escala, reparar geometría rota (`ST_MakeValid`), medir un área,
+cruzar dos capas (`ST_Intersection`), agrupar polígonos (`ST_Union`) — ninguna
+lleva una regla de construcción detrás. Son PostGIS, igual que el CPM es
+forward pass y backward pass: **el recorrido es infraestructura, la regla de
+qué suma a qué es dominio** (D-182 — el mismo límite que ya separó `ltree`
+del modelo y `formula_personalizada` del SQL).
+
+No se documentan aquí — el inventario ya vive en `IDEAS.md` §2, con su nombre
+real de función PostGIS, y ahí se queda. Repetirlo en dos archivos sería el
+mismo riesgo que ya se evitó con los catálogos crudos de OPUS: un hecho, un
+archivo.
+
+## 17.2 Cinco de las siete de dominio no piden campo nuevo
+
+`ENLACE_CUANTIFICACION.medida × factor = cantidad` (`MODELO.md` §1b) ya
+alcanza:
+
+| Función (`IDEAS.md` §2) | Medida | Factor | Cantidad |
+|---|---|---|---|
+| Volumen | área (losa, muro) | espesor | `M3` |
+| Peso desde longitud | longitud (acero) | peso lineal por diámetro, de tabla | `KG` |
+| Desarrollo de superficie inclinada | área (proyección plana) | corrección por pendiente (secante del ángulo) | `M2` real |
+| Conteo por patrón o símbolo | conteo | 1 | `PZ` — la diferencia es **cómo** se detecta (selección por patrón), no qué se mide |
+| Cómputo paramétrico por fórmula | — | — | Ya resuelto: reusa el paramétrico existente (§5), no es mecanismo del cuantificador |
+
+**Ninguna es dato nuevo — las primeras cuatro son el mismo mecanismo con otro
+factor.** Se documentan como ejemplo trabajado, no como campo: si en la
+práctica alguna necesita algo que `factor` no alcanza a expresar, eso sí sería
+un hallazgo. No lo hay todavía.
+
+## 17.3 Cubicación con taludes — no es medida×factor, es `formula_personalizada`
+
+El volumen de una excavación con taludes no sale de una sola medida: la
+sección transversal es un trapecio que cambia con la profundidad, y el
+volumen del tramo depende de **dos secciones, no una**.
+
+```
+A1, A2     áreas de las secciones transversales en cada extremo del tramo
+            (trapecio: base_menor + 2 × talud × profundidad = base_mayor)
+L          longitud del tramo
+
+V = L × (A1 + A2) / 2        método del área media — el estándar de obra
+```
+
+Encaja en `COMPOSICION.formula_personalizada` (`MODELO.md` §1a, hallazgo 13):
+`A1` y `A2` son dos `ENLACE_CUANTIFICACION.medida` (área) sobre dos trazos —
+dos secciones—, `L` es un tercer trazo (longitud) o un valor en
+`NODO.variables`, y la fórmula los combina. **No es un mecanismo nuevo del
+cuantificador** — es el mismo escape hatch que ya resolvía "número de manos
+de pintura", con tres entradas en vez de una.
+
+> **Sin verificar contra dato real todavía.** A diferencia del resto de este
+> archivo, no hay un caso de obra con taludes en lo cargado hasta hoy. Es la
+> fórmula estándar de ingeniería civil, no una regla comprobada
+> aritméticamente contra un caso real. Se anota así, no como excepción
+> silenciosa.
+
+## 17.4 Ejes y niveles — sigue sin poder usarse
+
+Referenciar una medida a la rejilla estructural depende de `FRENTE`
+(`MODELO.md` §2), que hoy no tiene uso operativo — existe la tabla, nadie la
+alimenta. No se fuerza: cuando `FRENTE` tenga un consumidor real —el
+candidato natural es el programa (§15)— esta función se revisita.

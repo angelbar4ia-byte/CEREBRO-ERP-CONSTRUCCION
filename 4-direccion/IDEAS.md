@@ -5,8 +5,8 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se pensó y aún no se diseña?
 tiempo:     vamos aquí
-corte:      2026-09-15
-verificado: 7 ideas · ninguna diseñada
+corte:      2026-09-21
+verificado: 8 ideas · una con tabla propia (§2), ninguna de las demás diseñada
 ```
 
 > **Sólo las ideas del modelo que aún no se diseñan.** Todo pendiente de datos, de
@@ -20,12 +20,13 @@ verificado: 7 ideas · ninguna diseñada
 | Idea | Sección |
 |---|---|
 | La matriz a partir de la descripción | §1 |
-| Módulo de cuantificación gráfica | §2 |
+| Módulo de cuantificación gráfica — 🔶 mecanismo con tabla, solo queda la aspiración de un agente que trace solo | §2 |
 | Clasificar los materiales: dos ejes | §3 |
 | Constructor de matrices | §4 |
 | Cambiar la unidad de un insumo | §5 |
 | Corregir el prefijo `AUX-` | §6 |
 | Sustitución de insumo dentro de una matriz | §7 |
+| El agente interno sugiere tramos, aprendiendo de la salida de almacén | §8 |
 
 ## 1 Idea: la matriz a partir de la descripción
 
@@ -84,6 +85,18 @@ Es el mismo principio del diccionario: **los rechazos se conservan**, porque tam
 enseñan.
 
 ## 2 Idea: módulo de cuantificación gráfica
+
+> **El mecanismo (trazo → medida → cantidad) ya no es idea: tiene tabla aprobada**
+> en `MODELO.md` §1b (hallazgo 11, 2026-09-15).
+>
+> **Actualización 2026-09-18:** de las 7 funciones de dominio (grupo H), 5 ya
+> cierran en `CONOCIMIENTO.md` §17 como ejemplo de `medida × factor`, y
+> cubicación con taludes cierra vía `formula_personalizada`. Las 22 de
+> infraestructura (A-G) siguen aquí a propósito — son PostGIS genérico, no
+> entran a conocimiento (D-182, `CONOCIMIENTO.md` §17.1). Sigue sin diseñar:
+> ejes y niveles (bloqueado por `FRENTE`) y la aspiración al final de esta
+> sección — un agente que trace solo. **B-45 (quién traza) cierra en
+> `MODELO.md` §1b**, reusando roles que ya existían.
 
 Crear el presupuesto **trazando sobre el plano**, al estilo de PlanSwift o
 Navisworks.
@@ -144,6 +157,118 @@ No hay «cuantificador de PU», «paramétrico» ni «alzado».
 
 Así **el mismo polígono alimenta los tres a la vez**, y cada uno toma lo que le
 sirve. La mezcla por renglón sale sola, sin declararla en ningún lado.
+
+### Inventario de funciones, por tipo de herramienta — solo enlistadas, sin diseñar
+
+`ENLACE_CUANTIFICACION.medida` hoy cubre cuatro casos (`area · perimetro ·
+longitud · conteo`). El usuario pidió enlistar todo lo que hace falta —
+ampliado con un lote de funciones de PostGIS, ya con nombre real y caso de uso
+de construcción— y clasificarlo por **tipo de herramienta**, no como lista
+plana. **Esto sigue siendo inventario, no schema**: nada de esto entró todavía
+a `MODELO.md`.
+
+**A · Escalas y mediciones** — antes de medir cualquier cosa, hay que saber a
+qué corresponde una unidad del dibujo:
+
+1. Calibración de escala — el factor dibujo→real, por plano y por versión
+2. Unidades nativas del plano (DWG/PDF/IFC) contra unidades reales
+
+**B · Limpieza y corrección de planos** — un trazo importado casi nunca es
+válido de entrada; PostGIS lo resuelve antes de medir:
+
+3. Reparar geometría rota — `ST_MakeValid`: un polígono cuyos bordes se cruzan
+   a sí mismos, típico al importar DXF
+4. Cerrar vértices casi-coincidentes — `ST_SnapToGrid`: un muro que "casi"
+   cierra por una fracción de milímetro
+5. Simplificar sin deformar — `ST_SimplifyPreserveTopology`: menos puntos
+   redundantes, mismo contorno, renderiza más rápido
+
+**C · Primitivas de dibujo** — lo que se traza:
+
+6. Punto
+7. Línea (segmento)
+8. Polilínea (cadena abierta)
+9. Polígono (cadena cerrada)
+10. Círculo / arco
+
+**D · Medidas directas** de esas primitivas:
+
+11. Longitud
+12. Área
+13. Perímetro
+14. Conteo
+15. Radio / diámetro
+
+**E · Cuantificación por cruce de capas** — cruzar dos trazos entre sí, no solo
+medir uno:
+
+16. Intersección entre capas — `ST_Intersection`: losas × área de pintura
+    epóxica = m² exactos de aplicación
+17. Resta entre geometrías — `ST_Difference`: losa menos los huecos de ductos
+    = área neta real de vaciado. Es la forma concreta de "área neta con
+    descuento de aberturas"
+18. Zona de influencia — `ST_Buffer`: eje de tubería + diámetro = volumen real
+    de excavación. Es la forma concreta de "volumen" para elementos lineales
+
+**F · Agrupación y estructura:**
+
+19. Fusión de polígonos — `ST_Union`: los cuartos de un departamento → área
+    habitable total
+20. Centro geométrico — `ST_Centroid`: para colocar la etiqueta de área en el
+    medio del cuarto
+
+**G · Relación espacial** — cómo interactúan los elementos entre sí:
+
+21. Proximidad — `ST_DWithin`: distancia mínima normativa entre contactos y
+    salidas de agua
+22. Adyacencia — `ST_Touches`: qué muros colindan con el exterior, para
+    impermeabilización o aislamiento térmico
+
+**H · Especializadas de dominio** — sin una función PostGIS de una sola línea,
+necesitan una regla propia de construcción:
+
+23. **Volumen** — general, sólido 3D o área × espesor. `M3` ya es unidad
+    canónica; el concreto de `CASO-TRABAJADO.md` se mide así. Es la más
+    urgente: sin ella, el cuantificador no alimenta ni el ejemplo que el
+    cerebro ya usa de referencia
+24. **Peso desde longitud** — acero de refuerzo, se mide en `KG`: longitud ×
+    tabla de peso lineal por diámetro
+25. **Desarrollo de superficie inclinada** — techos, rampas, escaleras; la
+    proyección plana subestima
+26. **Cómputo paramétrico por fórmula** — cantidad = f(variables). Reusa el
+    módulo paramétrico existente (D-15), no crea uno nuevo
+27. **Conteo por patrón o símbolo** — bloques repetidos: contactos, luminarias,
+    columnas
+28. **Cubicación con taludes** — secciones trapezoidales de movimiento de
+    tierras
+29. **Ejes y niveles** — referenciar la medida a la rejilla estructural; cruza
+    con `FRENTE` (`MODELO.md` §2), hoy sin uso operativo
+
+> **Que la mitad de esta lista tenga nombre real de PostGIS (`ST_*`) es
+> evidencia fuerte para la pregunta que `MODELO.md` §1b dejó abierta a
+> propósito** —cómo se guarda la geometría—: un tipo espacial de Postgres,
+> no GeoJSON ni WKT sueltos. No lo cierro solo: es infraestructura (hay que
+> habilitar la extensión PostGIS donde corra la base), y esa decisión la
+> tiene que confirmar el usuario, no quedar implícita en una lista.
+
+### Aspiración, no diseño: un agente interno que trace solo
+
+El usuario lo planteó así: que el módulo tenga **herramientas propias**, y de ser
+posible, que **algún agente interno cuantifique por su cuenta** — quizás trazando
+sobre el plano él mismo. No está claro todavía cómo se daría.
+
+Dos cosas lo distinguen de cualquier otra propuesta de este archivo:
+
+- **Depende de que el cuantificador exista primero.** No hay nada que automatizar
+  sobre un mecanismo que todavía es solo tabla (`MODELO.md` §1b).
+- **Es una capacidad distinta, no un detector más.** Los detectores de
+  `gravity-obra.md` §6 leen texto y números — Consulta, Equivalencias, Desviación,
+  Conversión. Interpretar un plano para producir un `TRAZO` es geometría sobre una
+  imagen o un archivo CAD, no una consulta sobre la base.
+
+> **Se anota para no perderla**, no para diseñarla. Inventar el mecanismo ahora
+> sería la misma trampa que un campo provisional: una vez que algo dependa de él,
+> deja de poder cambiarse sin costo.
 
 ## 3 Clasificar los materiales: dos ejes que faltan
 
@@ -438,3 +563,28 @@ de un factor de rendimiento (ligaría con el factorizador, D-86 a D-92).
 > **No es más que una idea todavía.** Necesita el mismo tratamiento que las otras
 > seis: evidencia de casos reales, y que el arquitecto la revise antes de agregarla
 > a `CONOCIMIENTO.md` §12.
+
+## 8 Idea: el agente interno sugiere tramos, aprendiendo de la salida de almacén
+
+Que `gravity-obra`, con el tiempo, observe patrones de salida de almacén que se
+parecen a un tramo —una salida que se corta y luego retoma— y **proponga** marcar
+la actividad como partida, con la evidencia que lo sostiene. Nunca la aplica sola:
+mismo principio de siempre, «propone, no aplica».
+
+### Por qué hay que ser especialmente cuidadoso acá
+
+Se probó, sobre `EST-02010` (el mismo caso que motivó P-5 — el muro de tabique),
+si el patrón real confirmaba la hipótesis. **No la confirma.** No hay ninguna
+actividad de cadena o cerramiento visible en el almacén durante esa ventana, y la
+explicación más simple del hueco de tabique en la semana 19 es que **todavía
+había existencia** de la entrega grande de la semana 18 —6,000 piezas alcanzan
+para ~120 m², más del doble de lo pagado esa semana— no que la obra se detuvo.
+`CONOCIMIENTO.md` §11.17.
+
+> Es exactamente el tipo de caso que un detector de tramos mal construido
+> confundiría con un tramo real. La evidencia tiene que distinguir «no llegó
+> material nuevo» de «la actividad se detuvo» — son cosas distintas, y solo la
+> segunda es un tramo.
+
+**No es más que una idea todavía.** Necesita casos reales que sí confirmen el
+patrón antes de proponerse como detector formal en `gravity-obra.md` §6.

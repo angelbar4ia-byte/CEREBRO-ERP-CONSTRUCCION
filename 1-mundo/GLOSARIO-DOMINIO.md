@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
-corte:      2026-09-10
-verificado: 78 términos · 25 ambigüedades
+corte:      2026-09-26
+verificado: 79 términos · 25 ambigüedades
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 78 términos · 25 ambigüedades
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 78 términos · 25 ambigüedades · 2026-09-12
+> 79 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -50,7 +50,7 @@ verificado: 78 términos · 25 ambigüedades
 
 **Tiempo y ejecución** — Rendimiento calculado · Rendimiento teórico · Rendimiento real · Gantt · Actividad · Asignación · Avance · Estimación
 
-**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Orden de cambio · Desviación · Ejecutado sin respaldo
+**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Desviación · Ejecutado sin respaldo
 
 **Operaciones** — Fusión · División · Extracción · Composición · Procedencia
 
@@ -327,7 +327,7 @@ La forma comercial en que se compra un material, con su factor y su mínimo. Cam
 - **No confundir con:** Unidad (la de medida)
 - **Se usa con:** Material; Unidad; Factor
 - **Ejemplo:** Arena: se consume en m³, se compra por camión de 14 m³
-- **Hoy vive en:** `— aún no existe`
+- **Hoy vive en:** `PRESENTACION_COMPRA` — `MODELO.md` §2a, D-348
 
 ### Flete
 
@@ -448,8 +448,8 @@ Análisis de Precio Unitario. La explosión de un concepto en sus insumos con su
 
 Cuánto se consume. Significa cosas distintas según dónde esté.
 
-- **También:** Consumo; Coeficiente
-- **No confundir con:** Volumen de obra; Rendimiento
+- **También:** Consumo; Coeficiente; Rendimiento de matriz (alias en fórmulas del paramétrico — D-217)
+- **No confundir con:** Volumen de obra; Rendimiento (de cuadrilla, en `§Tiempo y ejecución`)
 - **Se usa con:** APU; Insumo; Volumen
 - **Ejemplo:** 0.13125 PZ de estuco por m² de aplanado
 - **Hoy vive en:** `Columna `Cantidad``
@@ -740,7 +740,7 @@ Documento que cobra el avance ejecutado en un periodo.
 - **No confundir con:** Presupuesto (eso es lo planeado)
 - **Se usa con:** Avance; Presupuesto; Contratista
 - **Ejemplo:** — aún no modelado
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `CONOCIMIENTO.md` §13.8
 
 
 ## Precios y cambios
@@ -775,6 +775,18 @@ Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Ant
 - **Ejemplo:** Cobró a $55, se le deduce $5
 - **Hoy vive en:** `— pendiente`
 
+### Presupuesto Formado
+
+El catálogo reconstruido a cantidad real (Paso 1), explotado con el mismo
+rendimiento (matriz) que usa el presupuesto base. Aísla si el excedente es por
+construir más (efecto cantidad) o por usar distinto rendimiento (efecto receta).
+
+- **También:** Presupuesto reformado (variante hablada — no canónica, se resuelve igual)
+- **No confundir con:** Presupuesto Base; Ingeniería; Control de Cambio
+- **Se usa con:** Efecto cantidad; Efecto receta; Concepto auxiliar
+- **Ejemplo:** 244 m² reales de losa, explotados con el rendimiento del catálogo base
+- **Hoy vive en:** `CONOCIMIENTO.md` §11.14
+
 ### Orden de cambio
 
 Documento que referencia un nodo congelado y propone un delta. No edita: agrega.
@@ -783,7 +795,7 @@ Documento que referencia un nodo congelado y propone un delta. No edita: agrega.
 - **No confundir con:** Desviación
 - **Se usa con:** Contrato; Causa; Autorización
 - **Ejemplo:** Con causa, impacto y si se autorizó antes o después de ejecutar
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `PROPUESTA(tipo=orden_cambio)` — `MODELO.md` §5f, D-334
 
 ### Desviación
 
@@ -793,7 +805,7 @@ La misma obra a otro precio o consumo. Se descompone en desviación de precio y 
 - **No confundir con:** Cambio de alcance (ese se cobra)
 - **Se usa con:** Causa; Almacén; Explosión
 - **Ejemplo:** Se absorbe; el cambio de alcance se factura
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `DESVIACION` — `MODELO.md` §5g, D-343
 
 ### Ejecutado sin respaldo
 
@@ -876,7 +888,7 @@ es decisión, no vocabulario.**
 |---|---|---|
 | Consumo de insumo por unidad de concepto | ``ANALISIS_DE_BASICOS_*`` | 0.13125 PZ de estuco por m² |
 | Volumen de obra a ejecutar | ``CATALOGO_DE_PRESUPUESTO`` | 279 m² de muro |
-| Receta del ensamble | `Paramétrico` | 1 regadera de las 3 |
+| Receta del ensamble, alias **rendimiento de matriz** en fórmulas | `Paramétrico` | 1 regadera de las 3 — no confundir con el rendimiento de cuadrilla |
 
 ### «Tipo» — 4 significados
 
@@ -1149,5 +1161,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 
 - **No confundir con:** Versión; Prototipo
 - **Se usa con:** Presupuesto; Paramétrico; Programa
-- **Hoy vive en:** `PENDIENTES-MEJORAS.md` B-39 y B-42 — ninguno diseñado
+- **Hoy vive en:** Escenario de presupuesto — `PRESUPUESTO(tipo=escenario)`,
+  `MODELO.md` §3a, D-335. Escenario de prueba — `PENDIENTES-MEJORAS.md`
+  B-42, sin diseñar (no aplica: son casos de prueba, no schema)
 

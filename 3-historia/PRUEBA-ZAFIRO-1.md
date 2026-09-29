@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿el camino de diseño aguanta a fondo?
 tiempo:     fue así
-corte:      2026-09-13
-verificado: 8 etapas · 5 pasan · 3 se rompen
+corte:      2026-09-26
+verificado: 8 etapas · 7 pasan · 1 diseñada sin caso real que la ejercite
 ```
 
 > **Segunda prueba (B-42).** `PRUEBA-ALAMO-18.md` recorrió el flujo entero y pasó el
@@ -24,13 +24,13 @@ verificado: 8 etapas · 5 pasan · 3 se rompen
 | # | Etapa | Resultado |
 |---|---|---|
 | 1 | El árbol y su rollup | ✅ Pasa |
-| 2 | Reconstrucción independiente (el artefacto) | ⚠️ **Δ $4.30 sin explicar del todo** |
+| 2 | Reconstrucción independiente (el artefacto) | ✅ **Δ $4.30 explicado y confirmado (B-49)** |
 | 3 | Participación sobre el total | ✅ Pasa |
 | 4 | Reuso de conceptos | ✅ Pasa |
-| 5 | Unidades | ⛔ **Se rompe: sin normalizar** |
+| 5 | Unidades | 🔶 **Normalización diseñada (B-50)** — sin recargar este caso con la regla puesta |
 | 6 | Estructura por subcapítulo | ✅ Pasa |
 | 7 | Identificación del prototipo por contenido | ✅ Pasa — y es el caso fuerte |
-| 8 | Clasificación del concepto | ⛔ **Se rompe: 8% sin derivar** |
+| 8 | Clasificación del concepto | ✅ **Nunca fue un bloqueo real (B-51)** |
 
 ---
 
@@ -41,7 +41,7 @@ verificado: 8 etapas · 5 pasan · 3 se rompen
 
 ---
 
-## 2 · La reconstrucción independiente — ⚠️
+## 2 · La reconstrucción independiente — ✅
 
 El artefacto reconstruyó el presupuesto desde los datos y dio **$1,842,430.31**
 contra **$1,842,426.01** declarado. **Δ $4.30**, sobre 1.84 millones: 0.00023%.
@@ -68,6 +68,13 @@ consistente consigo mismo.
 **Hallazgo: una invariante decía estar explicada sin decir por qué.** Ahora tiene
 hipótesis y forma de falsarla. **B-49.**
 
+> **Actualización 2026-09-26 — la predicción se cumplió.** `explosion_recursiva.py`
+> reprodujo el artefacto: ocho conceptos de subcontrato con matriz de relleno
+> distorsionaban la prueba (mismo patrón que `SUB-` de `ALAMO 18`) — excluidos, el
+> drift es -$4.59 en `Zafiro 1.0` (casi exacto al original) y se repite, siempre
+> negativo, en los otros seis prototipos. Es redondeo acumulado del PU, confirmado
+> con dato real, no solo la magnitud esperada. `CONOCIMIENTO.md` §5.7, D-311
+
 ---
 
 ## 3 · Participación sobre el total — ✅
@@ -91,7 +98,7 @@ mantener en vez de 471.
 
 ---
 
-## 5 · Unidades — ⛔ se rompe
+## 5 · Unidades — 🔶
 
 ```
 sal 827 · pza 798 · m2 421 · m 337 · act 52 · m3 8 · ser 2
@@ -111,6 +118,14 @@ mientras los catálogos usan las 17 canónicas sin una sola variante.
 **Hallazgo: falta normalizar la unidad del presupuesto al cargar.** Resuelto en
 B-50: se normaliza al cargar contra el catálogo cerrado de 17, y lo que no mapea
 entra marcado por validar.
+
+> **Actualización 2026-09-26 — diseñado, y el catálogo ya se revisó, pero no se ha
+> vuelto a correr sobre este caso.** `erp-importacion.md` §4b especifica la regla
+> de carga y B-50 confirmó que los 17 canónicos están limpios (no existe un `M²`
+> fantasma). Falta lo único que probaría si de verdad funciona: recargar
+> `Zafiro 1.0` con la regla puesta y ver si `pza`/`ser` resuelven a `PZ`/`SERV`
+> sin fricción. Por eso queda en `🔶`, no en `✅` — mecanismo cerrado, caso real
+> sin correr encima todavía.
 
 ---
 
@@ -150,7 +165,7 @@ etapa que se sale, así que es la candidata a mirar — no ruido, señal.
 
 ---
 
-## 8 · Clasificación del concepto — ⛔ se rompe
+## 8 · Clasificación del concepto — ✅
 
 El 92% de los conceptos se clasifica solo con el trabajo que usa. **El 8% restante no
 tiene de dónde derivarse** y hay que clasificarlo a mano.
@@ -164,23 +179,37 @@ tiene de dónde derivarse** y hay que clasificarlo a mano.
 
 **Hallazgo: falta la regla del concepto no clasificable. B-51.**
 
+> **Actualización 2026-09-26 — nunca fue un bloqueo real.** `subfamilia_id` ya era
+> nullable en `MODELO.md` desde antes de esta prueba: el 8% sin derivar se clasifica
+> después, a mano, y no bloquea la carga. Tercera vez que un pendiente ya tenía
+> respuesta sin releerse.
+
 ---
 
 # Resultado
 
-**Cinco pasan, tres se rompen.** Y las tres roturas son de la misma familia: **el
-modelo supone que el dato de entrada viene limpio.**
+**Siete pasan, una queda diseñada sin caso real que la ejercite.** Cuando se corrió
+esta prueba (2026-09-13) el resumen era otro —cinco pasan, tres se rompen— y las
+tres roturas eran de la misma familia: **el modelo suponía que el dato de entrada
+venía limpio.**
 
-| Se rompe | Porque el modelo supone |
-|---|---|
-| Δ $4.30 sin explicar | Que «explicada» significa que alguien la explicó |
-| Unidades sin normalizar | Que la unidad del catálogo es confiable |
-| 8% sin clasificar | Que todo concepto tiene de dónde derivar su clase |
+| Rompía en 2026-09-13 | Porque el modelo suponía | Hoy |
+|---|---|---|
+| Δ $4.30 sin explicar | Que «explicada» significa que alguien la explicó | ✅ Confirmado en los siete (B-49) |
+| Unidades sin normalizar | Que la unidad del catálogo es confiable | 🔶 Mecanismo listo, sin recargar este caso (B-50) |
+| 8% sin clasificar | Que todo concepto tiene de dónde derivar su clase | ✅ Nunca fue bloqueo real (B-51) |
 
-> **Lo que distingue esta prueba de la de ALAMO 18:** allá el flujo se cortaba por
-> **falta de datos** (salidas de almacén). Aquí no falta nada — **los datos están y
-> traen suciedad que el modelo no contempla.** Son dos modos de fallo distintos y
-> conviene no confundirlos.
+> **Lo que distinguía esta prueba de la de ALAMO 18 sigue siendo cierto:** allá el
+> flujo se corta por **falta de datos** (salidas de almacén, todavía así hoy). Aquí
+> no faltaba dato — **la suciedad estaba en cómo se leía**, y leerlo distinto
+> alcanzó para cerrar dos de los tres sin esperar dato nuevo.
+
+> **Actualización 2026-09-26.** Cuando se corrió esta prueba, cinco de ocho etapas
+> pasaban. Los tres hallazgos ya tienen respuesta en `PENDIENTES-MEJORAS.md`: B-49
+> y B-51 quedaron confirmados con evidencia real, B-50 tiene la regla escrita y el
+> catálogo verificado limpio, pero nadie ha vuelto a cargar `Zafiro 1.0` con ella
+> puesta para confirmar que `pza`/`ser` resuelven a `PZ`/`SERV` sin fricción — de
+> ahí que quede en `🔶` y no en `✅`.
 
 ## Lo que validó
 

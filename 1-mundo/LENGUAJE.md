@@ -5,7 +5,7 @@
 capa:       I — Mundo
 pregunta:   ¿cómo se nombra en cada sistema?
 tiempo:     es así
-corte:      2026-09-10
+corte:      2026-09-26
 verificado: Canon 1.0 · prueba de ida y vuelta ejecutada
 ```
 
@@ -188,8 +188,10 @@ de formato.
 | `ruta` | `Ingenieria ERP` | Numérico, ancho fijo. **No se importa — y tampoco se puede generar**: la regla no es deducible (`CATALOGOS.md` §11) |
 | nivel de construcción | `Nivel ERP` | Llave al catálogo de niveles |
 
-**Reportes de salida:** Cabeceras · Materiales · Operaciones. *Columnas por
-definir.*
+**Reportes de salida:** Cabeceras · Materiales · Operaciones. Columnas
+confirmadas contra especímenes reales de `ALAMO 18` — `CONOCIMIENTO.md` §4.3.
+Cabeceras reutiliza estas mismas dos columnas de esta tabla (`Nivel ERP` e
+`Ingenieria ERP`).
 
 ---
 
@@ -285,7 +287,7 @@ PRUEBA
 | Dialecto | Canon | Conexión | Estado |
 |---|---|---|---|
 | **OPUS 2025** | 1.0 | Fuente | ✅ Mapeado y probado |
-| **ERP externo** | 1.0 | B · correspondencia | ⏸️ Solo dos campos conocidos |
+| **ERP externo** | 1.0 | B · correspondencia | 🔶 Dos campos de entrada + tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3, D-331/D-332); falta `Flete`, archivo-vs-API y los 4 catálogos que se volvieron salida |
 | **Árbol de ingeniería** | — | — | ⏸️ P-16, no prioritario |
 
 ---
