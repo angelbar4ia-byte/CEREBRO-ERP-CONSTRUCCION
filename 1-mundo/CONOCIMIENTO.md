@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2537 | 32 |
+| §11 | Los flujos entre sistemas | 2575 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3217,6 +3217,44 @@ claves (`ISH-`/`IHS-`, hidráulica+sanitaria combinadas en una sola
 conexión) que no cruza limpio contra ninguna de las otras tres fuentes —
 confirma, con más detalle, el límite ya anotado en §11.20: `PRECIO_REAL`
 no sigue instalaciones con la misma disciplina que estructura.
+
+### Destajo: la ingeniería también se infla en eléctrica, y `PRECIO_REAL` no registra nada de esta instalación
+
+Dato del usuario: la comparación de arriba era de material — destajo (mano
+de obra/contrato) es una comparación distinta, con sus propias tres
+fuentes: la matriz (`Tipo=Contrato` en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`),
+la ingeniería del lote (líneas `MO-` propias, ya cargadas para el método de
+§11.20), y dos fuentes de pagado real: `grid_AvanceOPEventosOpr`
+($/Operación) y `PRECIO_REAL` (hoja Mano de Obra).
+
+| Instalación | Estimado (matriz) | Ingeniería (sitio) | Pagado (`grid_Avance`) | Pagado (`PRECIO_REAL`) |
+|---|---:|---:|---:|---:|
+| Sanitaria | $20,525 | $22,500 (+9.6%) | $21,925 (97.4% de ingeniería) | $3,250 (7 filas) |
+| Hidráulica | $12,013 | $12,738 (+6.0%) | $10,300 (80.9%) | $1,775 (5 filas) |
+| Gas | $3,500 | $3,850 (+10.0%) | $2,150 (55.8%) | $150 (1 fila) |
+| Eléctrica | $29,950 | $39,390 (**+31.5%**) | $15,040 (38.2%) | **$0 (0 filas)** |
+
+**Combinar los dos archivos de `PRECIO_REAL` no cambia nada aquí**: el
+segundo (llega a semana 34) no trae ni una fila de instalaciones en Mano
+de Obra — su única extensión real es albañilería/acabados.
+
+**Eléctrica se infla también en destajo, no solo en material — mismo
+patrón, dos dimensiones de costo independientes.** +31.5% de la
+ingeniería del lote sobre la matriz en mano de obra, contra el +45-51%
+ya visto en material (arriba) — más chico, pero en la misma dirección, y
+el único de los cuatro que se sale así. Que el mismo lote se salga de la
+matriz en material **y** en mano de obra, y no en las otras tres
+instalaciones, hace más fuerte la lectura de "diseño real distinto al
+Diamante base" y más débil la de "ruido de un solo insumo" — es la misma
+señal, vista con dos reglas distintas.
+
+**`PRECIO_REAL` no solo es disperso en destajo de instalaciones — para
+eléctrica es cero.** Contra lo que `grid_AvanceOPEventosOpr` ya reporta
+pagado ($10,300 a $21,925 en las otras tres), `PRECIO_REAL` captura
+apenas 7-17% de eso — y en eléctrica, ninguna fila en los cinco meses. No
+es solo que la herramienta traiga menos detalle que para estructura (ya
+documentado arriba): para esta instalación específica, no registró
+destajo en absoluto.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
