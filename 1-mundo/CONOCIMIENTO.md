@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2256 | 32 |
+| §11 | Los flujos entre sistemas | 2274 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4019,17 +4019,35 @@ este concepto —las dos fuentes que en los demás casos nunca se cruzan,
 aquí se invierten. No cambia la lectura del cemento (sigue sin exceso),
 pero es un cabo suelto de captura que no se investigó más a fondo.
 
-**`ALB-01012` (repellado plafond 3.00, código distinto de `ALB-01212`
+**`ALB-01012` (repellado muro 3.00, código distinto de `ALB-01212`
 —se verificó que no es el mismo concepto ni un error de captura del
-otro: los dos existen en el catálogo, con matrices propias) sigue sin
-explicarse, y es una anomalía distinta.** Contra `PRECIO_REAL` (52 M,
-24.1% avanzado), el cemento real (42 sacos) sigue siendo **+326%** de
-exceso. Contra el diseño completo —214 M, 100% hipotético— da **+2.8%**,
-casi exacto. El material parece haberse surtido pensando en la obra ya
-terminada, muy por delante de lo que **todas** las fuentes de avance
-reportan — no es el mismo patrón que castillo K1 (ahí el material seguía
-de cerca a la fuente más completa; aquí va adelante de todas). **Sigue
-en investigación, sin conclusión todavía.**
+otro: los dos existen en el catálogo, con matrices propias) es el caso
+real que `consumo_material_sin_respaldo_avance` necesitaba.** Corregido
+primero un error propio: su ingeniería específica de `ALAMO 18` pide
+`ADH-00004` (mortero premezclado), que nunca se mueve para este lote
+—cero filas en cinco meses, mismo patrón ya documentado en B-68/D-308
+(la matriz no se actualiza cuando la obra cambia de material)—, así que
+comparar contra mortero era perseguir un insumo que la obra no usa.
+**Dato del usuario: el testigo correcto es cemento, con el rendimiento
+de su propia matriz genérica** (`MEZ-07010`, la misma que declara
+`ALB-01212`, 0.1911 BTS/M², no un accidente). Con eso confirmado, la
+lectura no cambia de número, cambia de sentido: contra el diseño
+completo (214 M, 100% hipotético) da **+2.8%**, casi exacto — pero
+contra `PRECIO_REAL` (52 M, 24.1% avanzado) sigue en **+326%**. El
+material está adelantado a **todas** las fuentes de avance, no solo a
+una —diferente del patrón de castillo K1/`ALB-01010`, donde el material
+seguía de cerca a la fuente más completa—.
+
+**Dos hipótesis de campo, no excluyentes entre sí (dato del usuario):**
+avance físico sin estimar todavía —el repellado puede estar casi
+terminado sin que ninguna fuente lo haya capturado como avance—, o
+material desviado de esta orden hacia otra actividad. Con cualquiera de
+las dos, **el riesgo es el mismo: no se ve hoy porque el material ya
+salió, se ve hasta el cierre de obra, cuando ya no hay margen para
+resolverlo.** Es exactamente la situación para la que se diseñó
+`consumo_material_sin_respaldo_avance` (B-79) — su caso motivador
+original (castillo K1) resolvió como falso positivo; `ALB-01012` es el
+caso real que confirma que la alerta hacía falta.
 
 ---
 

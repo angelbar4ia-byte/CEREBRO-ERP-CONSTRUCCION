@@ -1429,6 +1429,21 @@ varias rondas y dos fuentes adicionales — corriendo dentro de
 `validar_estimacion`, con la corroboración de arriba, se hace en una
 sola pasada en vez de a mano, meses después.
 
+**Y ya apareció el caso real que confirma que hacía falta.**
+`ALB-01012` (repellado muro, `ALAMO 18`) consume 42 sacos de cemento
+—rendimiento de su propia matriz genérica, no de la ingeniería
+específica del lote, que pide mortero y nunca lo mueve (mismo patrón
+que B-68/D-308)— contra 9.86 que pide `PRECIO_REAL` a su 24.1%
+avanzado: **+326%**. A diferencia de castillo K1, corroborarlo contra
+la ingeniería no lo resuelve —contra el diseño completo da +2.8%, casi
+exacto—: el material está adelantado a **todas** las fuentes de avance
+a la vez, no solo a una que se haya quedado corta. Dos hipótesis de
+campo, dato del usuario, no excluyentes: avance físico sin estimar
+todavía, o material desviado de esta orden hacia otra actividad. Con
+cualquiera de las dos, el faltante no se ve mientras la obra sigue —se
+ve hasta el cierre, cuando ya no hay margen para resolverlo.
+`CONOCIMIENTO.md` §11.20, D-379.
+
 ### `subcontrato_fuera_de_base` cierra B-78 — no hay umbral por %, hay alerta y criterio
 
 `CONOCIMIENTO.md` §11.14/D-313 ya separaba Real-vs-Base de un

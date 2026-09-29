@@ -532,6 +532,23 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > patrón distinto al que sí se resolvió en los demás.
 > `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, D-378.
 
+> **Un día después — `ALB-01012` cierra, y es el caso real de B-79.**
+> Corregido un error propio primero: su ingeniería del lote pide mortero
+> (`ADH-00004`), que nunca se mueve para `ALAMO 18` en cinco meses —mismo
+> patrón que B-68/D-308—, así que compararlo contra mortero perseguía un
+> insumo que la obra no usa. **Dato del usuario: el testigo es cemento,
+> con el rendimiento de su propia matriz genérica** —confirma el mismo
+> número, +2.8% contra el diseño completo—. El +326% contra `PRECIO_REAL`
+> no se explica con ninguna fuente adicional, a diferencia de castillo
+> K1/`ALB-01010`: el material está adelantado a todas las fuentes de
+> avance a la vez. **Dato del usuario, dos hipótesis no excluyentes:
+> avance físico sin estimar todavía, o material desviado de esta orden
+> hacia otra actividad — con cualquiera de las dos, el faltante no se ve
+> hoy porque el material ya salió, se ve hasta el cierre de obra.** Es
+> el caso real que `consumo_material_sin_respaldo_avance` (B-79)
+> necesitaba — su caso motivador, castillo K1, había resuelto como falso
+> positivo. `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, D-379.
+
 ---
 
 # Resultado de la prueba
@@ -568,6 +585,7 @@ caso real corriendo encima.
 | 9 | **Verificar solo el lado de faltante deja ciego el lado de exceso** — el mismo cruce que corrigió el 68.5% encontró, al extenderse, un concepto (castillo K1) consumiendo 141.7% de más — sin alerta que lo vigilara hasta hoy | D-376, B-79 |
 | 10 | **Una sola fuente de avance puede quedarse corta sin que se note — corregido: castillo K1 no consumía de más, `grid_AvanceOPEventosOpr` capturaba de menos.** Cruzado contra ingeniería y `PRECIO_REAL`, era el único de seis hermanos sin terminar, y la única fuente que no lo reflejaba. Antes de tomar un exceso como real, corroborar contra una segunda fuente | D-377 |
 | 11 | **El mismo cruce de tres fuentes no siempre resuelve la anomalía — a veces la confirma más limpia.** `ALB-01010` se resolvió igual que K1; `ALB-01212`, con las tres fuentes ya de acuerdo en que el trabajo terminó, resultó tener cero material — el caso real que la alerta necesitaba. `ALB-01012` no se resolvió: quedó adelantado a las tres fuentes a la vez, distinto de todo lo visto antes | D-378 |
+| 12 | **Confirmar el testigo correcto puede cambiar el sentido del hallazgo sin cambiar el número.** `ALB-01012` comparaba contra mortero, que la obra nunca usa; con cemento (dato del usuario, la matriz genérica) el +2.8% contra diseño completo se sostuvo — pero adelantado a todas las fuentes de avance a la vez es el caso real de `consumo_material_sin_respaldo_avance`, con un riesgo de fondo que no se ve hasta el cierre de obra | D-379 |
 
 ## Lo que la prueba validó
 

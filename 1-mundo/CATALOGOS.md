@@ -1210,27 +1210,21 @@ conceptos; nunca se recalcula desde cero ni se repite este cruce a mano.
 | `ALB-01010` (repello muro 3.00) | `ADH-00005` | **Confirmado** | +15.5% cruzado contra `PRECIO_REAL` (60.2% avanzado) — el +109.1% original era `grid_AvanceOPEventosOpr` viendo solo 33.2% del avance real, mismo patrón que castillo K1. **Corrige D-376** (§11.20, D-378) |
 | `ALB-01212` (repello muros fachada 3.00) | `ADH-00005` | **Confirmado** | Rate correcto —el testigo funciona—, pero **anomalía real sin resolver**: las tres fuentes de avance coinciden en ~100% completado y la orden no tiene un solo movimiento de almacén, de ningún insumo. Caso limpio para `estimacion_sin_respaldo_material` (§11.20, D-378) |
 | `ALB-01110` (repello plafond 3.00) | `ADH-00005` | Consistente | Déficit -48% a -59% bajo cualquier lectura, nunca exceso — consistente con material aún por surtir. Nota sin resolver: `PRECIO_REAL` supera a la ingeniería para este concepto, único caso así (§11.20, D-378) |
-| `ALB-01012` (repello plafond 3.00, código distinto de `ALB-01212`) | `ADH-00005` | **En investigación** | +326% contra `PRECIO_REAL` (24.1% avanzado), +2.8% contra el diseño completo — el material parece adelantado a **todas** las fuentes de avance, no solo a una. No es el patrón de castillo K1; sigue sin explicarse (§11.20, D-378) |
+| `ALB-01012` (repello muro 3.00, código distinto de `ALB-01212`) | `ADH-00005` | **Confirmado** | Rate confirmado, dato del usuario: es cemento, el de su propia matriz genérica (`MEZ-07010`) — no el mortero de la ingeniería específica del lote, desactualizada (mismo patrón que B-68/D-308). +2.8% contra el diseño completo, casi exacto. El +326% contra `PRECIO_REAL` (24.1% avanzado) **no es ruido — es el caso real de `consumo_material_sin_respaldo_avance`** (B-79, D-379): material adelantado a todas las fuentes de avance a la vez (§11.20, D-379) |
 
 **Cómo se usa:** `estimacion_sin_respaldo_material` y `consumo_material_sin_respaldo_avance`
 (`MODELO.md` §5a) solo corren en automático sobre pares marcados `Confirmado` o
 `Consistente`. Los `Insuficiente` quedan documentados —para no repetir el cruce a
 mano la próxima vez— pero no disparan alerta sola todavía: hace falta historia, no
 solo una lectura, mismo criterio que ya frenó una regla automática de tamaño de
-ventana en `MODELO.md` §5a. **`En investigación` es un cuarto estado, distinto de
-`Insuficiente`**: aquí sí hay historia suficiente —cruzada contra tres fuentes,
-caso de `ALB-01012` (D-378)— pero el resultado no cuadra con ninguna explicación
-disponible todavía. Tampoco dispara alerta sola: si el propio testigo resultara
-la causa, generalizar la regla con él encima repetiría el problema en vez de
-detectarlo.
+ventana en `MODELO.md` §5a.
 
 ```
 TESTIGO_MATERIAL
   id
   concepto_id           FK Nodo (rol=concepto)                                firme — nuevo
   insumo_id             FK Nodo (rol=material) — el insumo testigo            firme — nuevo
-  confiabilidad         enum: confirmado · consistente ·                     firme — nuevo
-                         insuficiente · en_investigacion                     firme — nuevo
+  confiabilidad         enum: confirmado · consistente · insuficiente         firme — nuevo
   evidencia             texto — de qué corrida y con qué cifra sale           firme — nuevo
 ```
 
