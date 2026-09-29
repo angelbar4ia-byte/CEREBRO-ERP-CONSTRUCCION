@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2630 | 32 |
+| §11 | Los flujos entre sistemas | 2676 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3310,6 +3310,52 @@ sobrecontar). `EST-00090` (2872% al sumar ambos estados contra
 `PRECIO_REAL`) es un fenómeno distinto, ya conocido: `PRECIO_REAL` solo
 registró 1 de sus 9 operaciones —el mismo hueco de cobertura que
 castillo K1 e instalaciones—, no una reducción de tarifa.
+
+### `SEMILLA-cuadrilla-rendimiento.xlsx` contra ejecución real: castillo K1 cierra exacto
+
+Dato del usuario, verificar el rendimiento teórico (`CATALOGOS.md` §10)
+contra las duraciones reales que este mismo §11.14 ya había reconstruido
+(D-385). Método: `días_teóricos = cantidad_de_la_línea_MO- / rendimiento_
+teórico` (una cuadrilla), contra `días_activos = span_de_calendario −
+huecos_ya_encontrados`.
+
+| Concepto | Días teóricos (1 cuadrilla) | Días reales activos | Cuadrillas implícitas |
+|---|---:|---:|---:|
+| **Castillo K1 (`EST-02110`)** | 28.0 | 28 (84 de calendario − 56 de huecos) | **1.00 — exacto** |
+| Losa PB (`EST-00090`) | 50.7 | 42 (sin huecos) | 1.21 |
+| `ALB-01212` | 14.9 | 14 | 1.06 |
+| Muro tabique (`EST-02010`) | 69.9 | 43 | 1.62 |
+| `ALB-01010` | 40.6 | 14 | **2.90** |
+| `EST-00100` (losa azotea) | 10.0 | 14 | 0.71 |
+| `ALB-01210` | 10.4 | 14 | 0.74 |
+| Castillo K7 (`EST-02170`) | 1.9 | 14 | 0.14 |
+| `IEC-00110` | 83.0 | 7 | 11.85 — no cuadra |
+
+**Castillo K1 cierra exacto: 1.00 cuadrilla.** Los 28.0 días teóricos
+(339.20 M de sus tres niveles ÷ 12.12 M/día) coinciden con los 28 días
+reales activos que quedan al descontar del span de calendario (84 días)
+los dos huecos que D-385 ya había encontrado (56 días). Confirma, con
+el mismo caso, el rendimiento de la semilla y el método de huecos a la
+vez — ninguno de los dos se prueba en aislado.
+
+**`ALB-01010` necesitó ~3 cuadrillas — y D-385 ya explica por qué: es
+multi-nivel.** 40.6 días teóricos para una sola cuadrilla, comprimidos
+en 14 días reales — el número (2.90) encaja con sus tres niveles
+(Planta Baja/Alta/Azotea, confirmados por `Nivel OP` en D-385)
+trabajando en paralelo, una cuadrilla por nivel.
+
+**`IEC-00110` no cuadra —y no es el rendimiento el que falla.** Su
+patrón de facturación (un evento el 3 de junio, los otros cuatro todos
+el 8 de julio) rompe el supuesto de "huecos por semana completa": la
+ventana "activa" de 7 días que da ese método no es trabajo real
+comprimido, es una sola fecha de facturación tardía. Queda marcado, sin
+resolver — mismo tipo de límite que ya reconoce D-385 para este
+concepto.
+
+**La semilla queda guardada en `CATALOGOS.md` §10** —con las 26 claves
+ya cruzadas aquí, mismo criterio que `TESTIGO_MATERIAL` (§12): crece
+fila por fila conforme se usa, no un volcado de las 265 filas
+completas.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

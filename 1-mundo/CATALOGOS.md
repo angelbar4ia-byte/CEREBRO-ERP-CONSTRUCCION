@@ -1051,6 +1051,53 @@ cada vez; este llega una vez.
 rendimiento teórico. No hace falta tabla aparte: son dos campos más — exactamente
 como los tenía el catálogo anterior.
 
+### La semilla, guardada — mismo criterio que `TESTIGO_MATERIAL`
+
+`SEMILLA-cuadrilla-rendimiento.xlsx` llega como archivo aparte de este cerebro;
+dato del usuario, se guarda aquí para no depender de que el archivo original
+siga disponible. Mismo principio que `TESTIGO_MATERIAL` (§12): **se carga con lo
+ya cruzado contra ejecución real, y crece fila por fila** — no un volcado
+mecánico de las 265 filas completas.
+
+| Clave | Descripción | Cuadrilla | Rendimiento teórico | Unidad | Costo unitario |
+|---|---|---|---:|---|---:|
+| `MOA-00001` | MO repellado muro 0-3.00 | `MOCU-005` | 18.53 | M2 | $85.00 |
+| `MOA-00020` | MO repellado muro fachada 0-3.00 | `MOCU-005` | 18.53 | M2 | $85.00 |
+| `MOA-00022` | MO repellado muro fachada +3.00 | `MOCU-005` | 15.00 | M2 | $105.00 |
+| `MOC-10040` | MO gualdra chica | `MOCU-033` | 4.77 | PZ | $330.00 |
+| `MOE-01008` | MO ranura acometida voz y datos | `MOCU-009` | 30.00 | PZ | $50.00 |
+| `MOE-01013` | MO ranura TV | `MOCU-009` | 2.50 | PZ | $50.00 |
+| `MOE-01015` | MO salida spot muro | `MOCU-009` | 0.96 | PZ | $130.00 |
+| `MOE-01041` | MO ranura acometida principal a 220V | `MOCU-009` | 1.56 | PZ | $160.00 |
+| `MOE-01111` | MO ranura eléctrica contacto | `MOCU-009` | 1.56 | PZ | $80.00 |
+| `MOE-01121` | MO ranura eléctrica apagador | `MOCU-009` | 1.56 | PZ | $80.00 |
+| `MOE-02010` | MO muro de tabique - hilo | `MOCU-005` | 10.50 | M2 | $150.00 |
+| `MOE-02020` | MO castillos K1 (15x15) | `MOCU-005` | 12.12 | M | $130.00 |
+| `MOE-02021` | MO castillos K2 (15x15) | `MOCU-005` | 12.12 | M | $130.00 |
+| `MOE-02027` | MO castillos K7 (15x20) | `MOCU-005` | 11.25 | M | $140.00 |
+| `MOE-02102` | MO cadena CE2 (15x20) | `MOCU-005` | 10.50 | M | $150.00 |
+| `MOE-02211` | MO armado de losa nervada | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02212` | MO descimbrado de losa nervada | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOE-02213` | MO armado de losa maciza | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02214` | MO descimbrado de losa maciza | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOE-02217` | MO armado y cimbrado losa 4.20 | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02311` | MO armado y colado escalera | `MOCU-005` | 6.19 | PZ | $254.50 |
+| `MOE-02312` | MO descimbra escalera | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOS-01030` | MO bajadas sanitarias | `MOCU-010` | 1.39 | PZ | $225.00 |
+| `MOS-02040` | MO conexión san minisplit | `MOCU-025` | 0.78 | PZ | $1,000.00 |
+| `MOS-07030` | MO conexión san lavamanos | `MOCU-010` | 2.50 | PZ | $50.00 |
+| `MOS-07060` | MO conexión san tarja cocina | `MOCU-010` | 2.50 | PZ | $50.00 |
+
+**Las 26 son `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
+1.085 de `MOCU-023`/`MOCU-005`) se ha cruzado todavía contra ejecución real.
+
+**Primera validación: castillo K1 (`ALAMO 18`) cierra exacto, 1.00 cuadrilla.**
+`MOE-02020` a 12.12 M/día contra las 339.20 M de sus tres niveles da 28.0 días
+teóricos — que coinciden con los 28 días reales activos que quedan una vez
+descontados los dos huecos que `CONOCIMIENTO.md` §11.14/D-385 ya había
+encontrado (56 de los 84 días de calendario). Confirma el rendimiento de la
+semilla y el método de huecos, los dos a la vez, con el mismo caso.
+`CONOCIMIENTO.md` §11.14.
 
 ## 10b El prefijo no determina la familia — segunda prueba
 
