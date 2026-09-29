@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2462 | 32 |
+| §11 | Los flujos entre sistemas | 2537 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3142,6 +3142,81 @@ B-67/D-314: no hay más señal que perseguir con los datos disponibles de
   nivel/etapa**, lo pagado real (que no distingue ubicación) solo se cuenta
   en su primera aparición del recorrido — sumarlo en cada rama triplicó el
   total pagado en el primer intento.
+
+### Extendido a instalaciones: casi todo el catálogo se comparte entre con/sin chimenea, con tres desajustes reales
+
+Dato del usuario, revisar destajo. Mismo método de arriba —explosión de
+matriz sobre el catálogo (`CATALOGO_DE_PRESUPUESTO.csv`,
+`ANALISIS_DE_BASICOS_CONCEPTOS.csv`)— aplicado por primera vez a
+instalaciones (eléctrica, hidráulica, sanitaria, gas), con dos fuentes de
+contraste más: el prototipo base (Diamante **sin** chimenea) y
+`PRECIO_REAL`.
+
+**El prototipo primero: con/sin chimenea comparten casi todo el catálogo
+de instalaciones.** Comparados los 22 grupos de instalación uno por uno
+entre las dos versiones, **todo es idéntico** salvo una línea: la línea
+principal sanitaria de cimentación (`ISN-02001` con chimenea, `ISN-02003`
+sin chimenea) — mismos 15 M, +$730.72 en la versión con chimenea. La
+chimenea no agrega instalaciones nuevas; solo encarece esa conexión
+puntual.
+
+**Presupuesto base (matriz × conteo de fixtures del catálogo) contra la
+ingeniería real del lote, por testigo:**
+
+| Instalación | Testigo | Presupuesto base | Ingeniería | Excedente |
+|---|---|---:|---:|---:|
+| Hidráulica | `HID-00023` (tubo ppal 3/4") | 129.0 | 129.0 | **0.0%** |
+| Hidráulica | `HID-00024` (tubo 1/2") | 69.5 | 71.5 | +2.9% |
+| Hidráulica | `HID-00012` (tee) | 57.0 | 60.0 | +5.3% |
+| Hidráulica | `HID-00004` (codo) | 102.0 | 111.0 | +8.8% |
+| Gas | `HID-00025`+`IGS-00014` combinado | 2.63 | 3.97 | +51.0% |
+| Sanitaria | `SAN-00020` (drenaje 3") | 8.33 | 8.33 | **0.0%** |
+| Sanitaria | `SAN-00021` (drenaje 2") | 13.33 | 15.83 | +19% |
+| Sanitaria | `SAN-00018` (drenaje 6") | 4.0 | 6.0 | +50% |
+| Sanitaria | `SAN-00019` (drenaje 4") | 3.0 | 5.0 | +67% |
+| Eléctrica | `ELE-00001` (poliducto 1/2") | 9.52 | 13.83 | +45.3% |
+| Eléctrica | `ELE-00003` (chalupa) | 90.0 | 136.0 | +51.1% |
+| Eléctrica | `ELE-00332` (poliducto 3/4") | 0.625 | 0.75 | +20% |
+
+**Hidráulica es el caso limpio de esta corrida** — las cuatro
+verificaciones (tubo principal, tubo secundario, tee, codo) caen dentro de
+0-9%, la misma clase de ruido (redondeo, desperdicio de obra) ya
+documentada como normal en las losas, arriba.
+
+**Gas: 100% del excedente es efecto receta, en una sola línea.**
+`IGA-00140` pide, en la ingeniería del lote, 1.54 de `HID-00025` contra
+0.20 que pide la matriz para el mismo conjunto de fixtures — la
+diferencia (1.34) es, hasta el redondeo, el excedente completo de todo el
+trato de gas (1.34 de 1.34). El resto de gas —`ECO-00005` completo,
+`IGA-00120`/`00210`— coincide exacto contra la matriz.
+
+**Eléctrica no es una línea aislada — es un patrón sostenido, sin
+separar todavía.** Poliducto y chalupa suben ambos ~45-51% sobre el
+presupuesto base, de forma consistente entre dos insumos independientes —
+distinto de gas. Contando también las líneas de mano de obra de
+`IEC-00110` (el mayor contribuyente), la ingeniería del lote trae 131
+salidas contra 110 que cuenta el catálogo para el mismo grupo (+19%) —
+menos que el +45% del poliducto, así que el excedente no es solo «más
+fixtures»: hay también algo de efecto receta (más cable por salida).
+Separar los dos efectos con precisión —igual que la tabla de losas de
+arriba— pediría mapear cada línea `MOE-` del lote contra su fixture del
+catálogo uno a uno; no se hizo en esta pasada, queda anotado, no
+resuelto.
+
+**Sanitaria: la familia de drenaje confirma razonable — el tubo de
+conexión queda fuera de esta comparación a propósito.** `SAN-00018` a
+`00021` caen en el mismo rango (0-67%) que hidráulica/eléctrica.
+`HID-00411` no entra en esta tabla porque no existe en ninguna matriz del
+catálogo, para ningún prototipo — es un insumo aparte, ya documentado en
+B-70/D-382, sin tocar aquí.
+
+**`PRECIO_REAL` no aporta contraste de destajo para instalaciones.**
+Nueve filas en total, en las cuatro instalaciones y los cinco meses
+juntos, cada una una salida aislada de 1.0 unidad con un tercer esquema de
+claves (`ISH-`/`IHS-`, hidráulica+sanitaria combinadas en una sola
+conexión) que no cruza limpio contra ninguna de las otras tres fuentes —
+confirma, con más detalle, el límite ya anotado en §11.20: `PRECIO_REAL`
+no sigue instalaciones con la misma disciplina que estructura.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
