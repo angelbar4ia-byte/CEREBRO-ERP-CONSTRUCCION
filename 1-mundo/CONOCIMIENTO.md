@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2575 | 32 |
+| §11 | Los flujos entre sistemas | 2630 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3255,6 +3255,61 @@ apenas 7-17% de eso — y en eléctrica, ninguna fila en los cinco meses. No
 es solo que la herramienta traiga menos detalle que para estructura (ya
 documentado arriba): para esta instalación específica, no registró
 destajo en absoluto.
+
+### Antes de confiar `F/Inicio`/`F/Fin` para un programa: qué son las demás columnas de `grid_AvanceOPEventosOpr`
+
+Dato del usuario, explorar más antes de tomar fecha de inicio/fin como
+dato de programa. El resto de columnas del archivo, sin usar hasta hoy:
+
+**`H/Inicio` = `H/Final` en las 138 filas, y `Operador` es una sola
+persona en las 138.** Confirma que estas fechas/horas son de **captura
+administrativa** —cuándo se tecleó el registro, siempre por la misma
+persona— no de trabajo físico en obra. `Estatus` (137 de 138 en "En
+Especificación") es del mismo tipo: un estado del flujo de captura, no
+de si la obra ya se terminó.
+
+**`Nivel OP` (nivel de construcción, directo del dato) confirma D-377 de
+forma independiente, y encuentra un caso más.** Castillo K1
+(`EST-02110`) trae Planta Baja, Planta Alta **y** Azotea/Roof en esta
+columna —el mismo hallazgo de tres niveles que D-377 dedujo cruzando la
+ingeniería, ahora confirmado por un campo distinto—. Y `ALB-01010`
+(repellado muro 3.00, resuelto en D-378) resulta ser **igual de
+multi-nivel** (Planta Baja, Planta Alta, Azotea/Roof) — no se había
+notado antes; explica de forma más directa por qué se resolvió con el
+mismo patrón que castillo K1.
+
+### `C/Liberada`: no es "ya revisado" — la reducción real está en la tarifa, no en esta bandera
+
+**Dato del usuario, una teoría a confirmar:** que la estimación se
+captura y luego se reduce en la revisión, y que por eso el 34% de las
+filas en `C/Liberada=0` (frente a 66% en `=1`) carga el 66.6% del dinero
+total ($312,697 de $469,735) — parecía apuntar a que esas filas son
+estimación sin corregir todavía.
+
+**Confirmado, pero acotado a un caso, y con un giro:** cruzando contra
+`PRECIO_REAL` (la tarifa realmente pagada) en los diez conceptos que
+tienen ambas fuentes, la reducción real solo aparece limpia en
+`EST-01060` (losa cimentación) — 244 unidades a $230/unidad en
+`grid_AvanceOPEventosOpr` (`C/Promedio`), las mismas 244 pagadas a
+**$161/unidad** en `PRECIO_REAL` (`P.U.`): -30%. En los otros nueve
+(castillos K1-K8, cadenas CE-1/CE-2, columnas CM-1, `EST-02011`), la
+tarifa es **idéntica** entre las dos fuentes, sin excepción.
+
+**Y en esos mismos nueve, sumar `Liberada=0` + `Liberada=1` da el 100.0%
+exacto de `PRECIO_REAL` — filtrar solo por `Liberada=1` los deja entre
+14.9% y 76.7%, muy por debajo.** `C/Liberada` no distingue "ya
+revisado/reducido" de "estimación cruda": las dos banderas usan la
+misma tarifa original, y **las dos hacen falta** para llegar al total
+real. Cuando la reducción existe, se ve en la tarifa completa del
+concepto (`C/Promedio` contra `P.U.`), no en una porción de sus filas.
+
+**Consecuencia práctica: todo lo calculado en D-376 a D-384 con
+`$/Operacion`, sin filtrar por `C/Liberada`, queda validado** — filtrar
+habría introducido el error contrario al que se temía (subcontar, no
+sobrecontar). `EST-00090` (2872% al sumar ambos estados contra
+`PRECIO_REAL`) es un fenómeno distinto, ya conocido: `PRECIO_REAL` solo
+registró 1 de sus 9 operaciones —el mismo hueco de cobertura que
+castillo K1 e instalaciones—, no una reducción de tarifa.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
