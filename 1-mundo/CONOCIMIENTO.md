@@ -26,9 +26,9 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2676 | 32 |
+| §11 | Los flujos entre sistemas | 2717 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 449 | 8 |
+| §13 | Contratación, cambios y obra en marcha | 456 | 8 |
 | §14 | La propuesta | 66 | 5 |
 | §15 | La ruta crítica ya está en el modelo | 80 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
@@ -3357,6 +3357,47 @@ ya cruzadas aquí, mismo criterio que `TESTIGO_MATERIAL` (§12): crece
 fila por fila conforme se usa, no un volcado de las 265 filas
 completas.
 
+### Precedencia técnica encontrada, y violada: instalaciones de muro antes de la cadena de cerramiento
+
+Dato del usuario, regla de campo: eléctrica, hidráulica, sanitaria y
+gas en muro **deben** pasar antes de colar la cadena de cerramiento
+—para que la tubería atraviese el elemento antes de que el concreto ya
+esté colado, no después—. `B-43` ya había resuelto el mecanismo general
+(una actividad que se detiene para colar cadena es una pausa **técnica**,
+se deduce sola en `TRAMO.origen`); esto es la primera vez que se
+contrasta contra un caso real.
+
+**En `ALAMO 18`, la ejecución real no siguió la regla.** Las dos
+cadenas de cerramiento de este prototipo son las únicas de toda su
+ingeniería —no hay una tercera para Planta Alta—:
+
+| Elemento | Inicio real |
+|---|---|
+| Cadena CE-1 (`EST-02310`) | 6 mayo |
+| Cadena CE-2 (`EST-02320`) | 20 mayo |
+| Sanitaria muros PB (`ISA-00110`) | 20 mayo — mismo día que CE-2, 14 días *después* de CE-1 |
+| Hidráulica muros PB (`IHD-00110`) | 3 junio — 28 días *después* de CE-1, 14 *después* de CE-2 |
+| Eléctrica muros PB (`IEC-00110`) | 3 junio — igual que hidráulica |
+| Gas muros (`IGA-00120`) | nunca empezó en los cinco meses de dato |
+
+**Ninguna de las tres instalaciones que sí arrancaron lo hizo antes de
+las cadenas — las tres llegan el mismo día o después.** Con la
+salvedad ya establecida en D-385 (estas fechas son de captura/
+facturación, no de trabajo físico hora por hora), la brecha —14 a 28
+días— es demasiado grande para explicarse solo por retraso de
+captura: el patrón ya conocido es que el material se factura *después*
+de instalarse, nunca antes, así que si la cadena se facturó cerca de su
+colado real y la instalación 2-4 semanas más tarde, lo más simple es
+que también pasó después en la realidad.
+
+**Dato del usuario: esto es una deficiencia de calidad operativa, no
+solo un dato de programa.** Cae en la causa 1 de `CONOCIMIENTO.md`
+§13.6 (**error de ejecución** — misma obra, no cambia alcance, la paga
+quien la ejecutó) y en la fila de mano de obra/destajo de esa misma
+tabla (**retrabajo**): colar la cadena antes de que pase la instalación
+obliga a picar el concreto ya colado para abrir paso a la tubería
+después. `PENDIENTES-MEJORAS.md` B-43.
+
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
 El export mensual de almacén (hoja `Consulta`, 46 columnas) no se puede cruzar a
@@ -4716,6 +4757,13 @@ cliente.**
 > una mejora que nadie pidió— el hecho se registra como **incidencia**
 > (`PROPUESTA-CUATRO-MODULOS.md` §4), un registro aparte que puede o no generar
 > también una desviación o un control de cambio: no son el mismo renglón.
+
+**Caso real de causa 1 (error de ejecución), encontrado leyendo el programa de
+`ALAMO 18`:** las cadenas de cerramiento se colaron antes de que pasara la
+instalación de muro (eléctrica/hidráulica/sanitaria), no después como pide la
+regla de campo — obliga a picar concreto ya colado para abrir paso a la
+tubería, exactamente el retrabajo de la fila de mano de obra/destajo, arriba.
+`CONOCIMIENTO.md` §11.14, `PENDIENTES-MEJORAS.md` B-43.
 
 ### Las dos omisiones son opuestas
 
