@@ -1211,11 +1211,20 @@ conceptos; nunca se recalcula desde cero ni se repite este cruce a mano.
 | `ALB-01212` (repello muros fachada 3.00) | `ADH-00005` | **Confirmado** | Rate correcto —el testigo funciona—, pero **anomalía real sin resolver**: las tres fuentes de avance coinciden en ~100% completado y la orden no tiene un solo movimiento de almacén, de ningún insumo. Caso limpio para `estimacion_sin_respaldo_material` (§11.20, D-378) |
 | `ALB-01110` (repello plafond 3.00) | `ADH-00005` | Consistente | Déficit -48% a -59% bajo cualquier lectura, nunca exceso — consistente con material aún por surtir. Nota sin resolver: `PRECIO_REAL` supera a la ingeniería para este concepto, único caso así (§11.20, D-378) |
 | `ALB-01012` (repello muro 3.00, código distinto de `ALB-01212`) | `ADH-00005` | **Confirmado** | Rate confirmado, dato del usuario: es cemento, el de su propia matriz genérica (`MEZ-07010`) — no el mortero de la ingeniería específica del lote, desactualizada (mismo patrón que B-68/D-308). +2.8% contra el diseño completo, casi exacto. El +326% contra `PRECIO_REAL` (24.1% avanzado) **no es ruido — es el caso real de `consumo_material_sin_respaldo_avance`** (B-79, D-379): material adelantado a todas las fuentes de avance a la vez (§11.20, D-379) |
+| `ECO-00004` + familia `IEC-` (habilitado eléctrico) | `ELE-00001` (poliducto) | Consistente | 72.8% del alcance completo (13.83→10.07), 169.2% del esperado ponderado — patrón «avance sin estimar» (D-379) del lado del material adelantado; confirmado con accesorio `ELE-00003` (chalupa, 78.7%). Prototipo verificado: es Diamante pese a etiqueta «Zafiro Plus» en almacén — método de identificación por contenido, D-121 (§11.20, D-381) |
+| `ECO-00003` + familia `IHD-` (habilitado hidráulico) | `HID-00004` (codo) | **Confirmado** | 100.0% exacto del alcance completo (111.00/111.00) — triple confirmado con `HID-00024` (tubo, 100.0%) y `HID-00012` (tee, 100.0%) (§11.20, D-381) |
+| `ECO-00005` + familia `IGA-` (habilitado gas) | `HID-00025`+`IGS-00014` combinados | **Confirmado** | 96.9% del esperado ponderado (83.4% del alcance completo) — dos claves de ingeniería para el mismo producto físico («2024446»), ambas reales, se suman (distinto de `HID-00411`, donde una clave nunca se usa); confirmado con accesorio `ACE-00001` (sellador, 92.2%) (§11.20, D-381) |
+| `ECO-00002` + familia `ISA-` (habilitado sanitario) | `HID-00411` (la ingeniería lo captura como `HD-00411`, misma trampa de D-371) | **Confirmado** | Testigo confiable —accesorios `HID-00135`/`SAN-00002` al 100.0%/125.6%— pero **anomalía real, tercer caso de `estimacion_sin_respaldo_material` (B-70)**: solo 41.7% del alcance completo; se emitió una sola vez (21/04/2026, `ECO-00002`) y nunca para `ISA-00110`/`00150`/`00210`, pese a que facturan 86.6%-100% de avance (§11.20, D-382) |
 
-**Los diecisiete conceptos originales ya quedaron cruzados contra ingeniería, uno
-por uno** (D-377 a D-380). Ninguno queda pendiente de esa validación — lo que
-sigue abierto (`ALB-01012` como caso real de B-79) es interpretación de campo, no
-falta de dato.
+**Los diecisiete conceptos originales (estructura) ya quedaron cruzados contra
+ingeniería, uno por uno** (D-377 a D-380). Ninguno queda pendiente de esa
+validación — lo que sigue abierto (`ALB-01012` como caso real de B-79) es
+interpretación de campo, no falta de dato. **Extendido a instalaciones (D-381/
+D-382):** eléctrica, hidráulica y gas confirman con el mismo método sobre un
+dominio compuesto (concepto con varias sub-actividades, alcance en $ ponderado
+por `O/Requerida`); sanitaria repite, por tercera vez y por primera fuera de
+estructura, el patrón que cierra B-70 — avance alto sin el material que lo
+respalde.
 
 **Cómo se usa:** `estimacion_sin_respaldo_material` y `consumo_material_sin_respaldo_avance`
 (`MODELO.md` §5a) solo corren en automático sobre pares marcados `Confirmado` o

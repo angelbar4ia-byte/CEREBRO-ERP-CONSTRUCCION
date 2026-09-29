@@ -1381,6 +1381,18 @@ fuentes ya están de acuerdo en que el trabajo se dio por terminado.
 Exactamente el patrón que esta alerta existe para atrapar antes de
 aprobar, no meses después con un cruce manual.
 
+**Y un tercer caso, el primero fuera de estructura.** Extendido el
+mismo cruce a instalaciones (`CONOCIMIENTO.md` §11.20, D-381/D-382),
+sanitaria repite el patrón: `HID-00411` (tubo de conexión hidro-
+sanitaria, 3/4") se emitió una sola vez en los cinco meses de
+`ALAMO 18` —para el primero de cuatro conceptos activos—, mientras los
+otros tres (`ISA-00110`/`00150`/`00210`, mayo a julio) facturan 86.6% a
+100% de avance sin que su propio tubo saliera nunca del almacén. Dos
+hipótesis de campo nuevas, dato del usuario, junto a las ya anotadas
+para `ALB-01212`: el material pudo no hacer falta en la cantidad que
+pide la ingeniería, o se trajo de otra obra sin pasar por este almacén
+— ninguna confirmable todavía con los datos de este cerebro.
+
 ### `consumo_material_sin_respaldo_avance` cierra B-79 — el mismo cruce, vigilando el otro lado
 
 Extender el cruce de `CONOCIMIENTO.md` §11.17 a los demás conceptos que

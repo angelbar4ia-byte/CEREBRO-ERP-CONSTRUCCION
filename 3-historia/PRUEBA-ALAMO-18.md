@@ -549,6 +549,30 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 > necesitaba — su caso motivador, castillo K1, había resuelto como falso
 > positivo. `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, D-379.
 
+> **Cambio de exploración, dato del usuario — instalaciones.** Extendido
+> el mismo método (almacén real vía `# OP` contra rendimiento teórico) a
+> eléctrica, hidráulica, sanitaria y gas, hasta ahora sin tocar. Primer
+> obstáculo, propio: el concepto de instalación empaqueta varias
+> sub-actividades bajo una sola clave —la columna `O/Requerida`, sin usar
+> hasta hoy, lo confirma— así que el alcance se pondera en $ sobre todas
+> las líneas `MO-`, no se multiplica la cantidad del insumo por el avance
+> crudo. **Eléctrica (72.8%), hidráulica (100.0%, triple confirmada) y
+> gas (96.9%, con su propia clave doble —mismo patrón que D-371, pero
+> aquí las dos claves se suman en vez de descartarse una—) confirman sin
+> novedad**, con sus respectivos accesorios. De paso, dato del usuario:
+> confirmado que `ALAMO 18` sigue siendo Diamante pese a una etiqueta de
+> almacén que dice «Zafiro Plus» — el método de D-121 (identificación por
+> contenido, no por etiqueta) lo resuelve igual que la primera vez.
+> **Sanitaria no confirma**: `HID-00411` —mismo error de clave que D-371,
+> `HD-00411` en la ingeniería— se emitió una sola vez en cinco meses, y
+> nunca para los tres conceptos que facturan 86.6%-100% de avance
+> después. Descartadas las dos explicaciones ya conocidas (clave
+> duplicada, fuente de avance incompleta), es el mismo patrón que ya
+> cerró B-70 con `ALB-01212` —no B-79, dirección contraria, corregido
+> antes de anotarse en la semilla—, el tercero, y el primero fuera de
+> estructura. Dos hipótesis nuevas, dato del usuario: el material no era
+> necesario en esa cantidad, o se trajo de otra obra. Ver `CONOCIMIENTO.md` §11.20, `MODELO.md` §5a, `CATALOGOS.md` §12, D-381, D-382.
+
 ---
 
 # Resultado de la prueba
@@ -586,6 +610,7 @@ caso real corriendo encima.
 | 10 | **Una sola fuente de avance puede quedarse corta sin que se note — corregido: castillo K1 no consumía de más, `grid_AvanceOPEventosOpr` capturaba de menos.** Cruzado contra ingeniería y `PRECIO_REAL`, era el único de seis hermanos sin terminar, y la única fuente que no lo reflejaba. Antes de tomar un exceso como real, corroborar contra una segunda fuente | D-377 |
 | 11 | **El mismo cruce de tres fuentes no siempre resuelve la anomalía — a veces la confirma más limpia.** `ALB-01010` se resolvió igual que K1; `ALB-01212`, con las tres fuentes ya de acuerdo en que el trabajo terminó, resultó tener cero material — el caso real que la alerta necesitaba. `ALB-01012` no se resolvió: quedó adelantado a las tres fuentes a la vez, distinto de todo lo visto antes | D-378 |
 | 12 | **Confirmar el testigo correcto puede cambiar el sentido del hallazgo sin cambiar el número.** `ALB-01012` comparaba contra mortero, que la obra nunca usa; con cemento (dato del usuario, la matriz genérica) el +2.8% contra diseño completo se sostuvo — pero adelantado a todas las fuentes de avance a la vez es el caso real de `consumo_material_sin_respaldo_avance`, con un riesgo de fondo que no se ve hasta el cierre de obra | D-379 |
+| 13 | **El mismo patrón se repite fuera de estructura — B-70 no era un caso aislado de repellado.** Extendido a instalaciones con un método nuevo (alcance ponderado en $, para conceptos que agrupan varias sub-actividades bajo una clave), eléctrica/hidráulica/gas confirman; sanitaria repite, por tercera vez, avance facturado sin material que lo respalde — ahora en un dominio distinto al que lo motivó | D-381, D-382 |
 
 ## Lo que la prueba validó
 

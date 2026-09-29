@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2300 | 32 |
+| §11 | Los flujos entre sistemas | 2462 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4074,6 +4074,168 @@ fuentes.
 **Con esto, los diecisiete conceptos originales de la semilla quedan
 completamente cruzados contra ingeniería** (D-377 a D-380) — cierra el
 ciclo de validación que empezó con castillo K1.
+
+### Instalaciones: el mismo método en un dominio distinto — eléctrica, hidráulica y gas confirman sin novedad
+
+Dato del usuario, cambio de exploración: extender el mismo cruce
+(almacén real, vía `# OP`, contra el rendimiento teórico del avance
+reclamado) a las cuatro instalaciones de `ALAMO 18` —eléctrica,
+hidráulica, sanitaria, gas—, hasta ahora sin tocar.
+
+**Primer obstáculo: aquí el concepto no es una sola partida física, son
+varias, agrupadas.** A diferencia de un concepto estructural (`EST-`,
+`ALB-`, una línea `MOE-` a la vez), los conceptos de instalación (`ECO-`,
+`IEC-`, `ISA-`, `IHD-`, `IGA-`) empaquetan **varias sub-actividades
+distintas** bajo una sola clave —cada una con su propia línea
+`MOE-`/`MOA-`/`MOG-`, su propia cantidad y su propio PU—. Multiplicar el
+`O/Avance` crudo por la cantidad del insumo, como si fuera una sola
+tarea, produce números sin sentido —probado y descartado antes de
+reportar nada—. La columna `O/Requerida` de `grid_AvanceOPEventosOpr`
+—hasta hoy sin usar— resuelve esto: cada fila trae el alcance de **su
+propia** sub-tarea, y coincide exacta con la cantidad de la línea `MO-`
+correspondiente en la ingeniería del lote. El avance sí respeta esta
+estructura por dentro; solo la clave agregada no lo mostraba.
+
+**Método nuevo, sobre esa base:** `alcance_$ = Σ(O_Requerida × PU)` de
+**todas** las líneas `MO-` de la ingeniería (no solo las que ya tienen
+avance —hay sub-tareas en cero, deben seguir contando en el
+denominador—); `avanzado_$ = Σ($/Operacion)` de las filas de avance
+—verificado exacto, `$/Operacion == O/Avance × C/Promedio`, sin
+diferencia, confirmando el método—; `% = avanzado_$ / alcance_$`. El
+esperado del testigo se pondera con ese %, igual que en
+`estimacion_sin_respaldo_material`; y como estos conceptos suelen surtir
+el material de golpe por visita (habilitado) mientras la factura avanza
+por sub-tarea, también se compara contra el **alcance completo** (100%,
+sin ponderar) — a veces dice más que el esperado ponderado.
+
+| Instalación | Testigo | Alcance 100% | Esperado (ponderado) | Real | % alcance | % esperado |
+|---|---|---:|---:|---:|---:|---:|
+| Eléctrica (`ECO-00004`+`IEC-`, 7 conceptos) | `ELE-00001` (poliducto) | 13.83 | 5.95 | 10.07 | 72.8% | 169.2% |
+| Hidráulica (`ECO-00003`+`IHD-`, 3 conceptos) | `HID-00004` (codo) | 111.00 | 79.11 | 111.00 | **100.0%** | 140.3% |
+| Gas (`ECO-00005`+`IGA-`, 3 conceptos) | `HID-00025`+`IGS-00014` combinados | 3.97 | 3.42 | 3.31 | 83.4% | 96.9% |
+
+**Gas trae, de entrada, la misma trampa que `HID-00411` (abajo) y que ya
+documentó D-371: una clave mal capturada.** La ingeniería de cada
+concepto de gas trae **dos líneas para el mismo producto físico** —mismo
+número de parte, «2024446»— con dos claves distintas (`HID-00025` y
+`IGS-00014`), cada una con su propia cantidad. No es una duplicada a
+descartar: las dos son reales y **se suman** —a diferencia de
+`HD-00411`, donde una clave nunca se usa—; el almacén real mueve todo
+bajo `IGS-00014`. Sumadas, 96.9% del esperado ponderado: limpio.
+
+**Eléctrica e hidráulica repiten, del lado del material, la misma
+«avance sin estimar» de dato del usuario (D-379).** El 169.2%/140.3%
+ponderado de ambas no es exceso real —es el habilitado de una
+instalación surtido completo o casi completo en una sola visita (mismo
+día para `ECO-00004`: 22/04/2026, material y los cinco eventos de
+avance), mientras la factura sube sub-tarea por sub-tarea, más
+despacio—. Confirmado con los accesorios de cada trato, revisados por
+separado para no depender de un solo insumo:
+
+| Instalación | Accesorio | % alcance completo |
+|---|---|---:|
+| Eléctrica | `ELE-00003` (chalupa) | 78.7% |
+| Hidráulica | `HID-00024` (tubo, segunda tubería) | **100.0%** |
+| Hidráulica | `HID-00012` (tee) | **100.0%** |
+| Gas | `ACE-00001` (sellador) | 89.5% (92.2% del esperado) |
+
+Hidráulica queda triple confirmada —codo, tubo y tee, los tres al
+100.0% del alcance completo, sin excepción—; gas y eléctrica confirman
+el mismo patrón con su respectivo accesorio.
+
+**De paso, la pregunta del prototipo.** El almacén de `ECO-00004` trae
+una `Referencia` etiquetada «ZAFIRO PLUS BASE». Dato del usuario:
+`ALAMO 18` es Diamante —ya lo había mostrado la cimentación— y la
+etiqueta es un artefacto genérico de plantilla, no evidencia de un
+prototipo distinto. El mismo método de identificación por contenido que
+ya resolvió esta pregunta una vez (D-121: la razón entre las cantidades
+reales y cada matriz de prototipo decide, no la etiqueta) confirma que
+es Diamante. `D-245` (riesgo de matriz prestada) no aplica aquí: las
+cantidades vienen de la ingeniería propia del lote, no de un catálogo
+genérico ajeno.
+
+**Y una brecha real, pero de la fuente, no del prototipo:** `PRECIO_REAL`
+usa para instalaciones un esquema de captura por punto (`IGAS-`, `IHS-`,
+`ISH-`, `ISN-`, `IHD-01070`... un código por WC, regadera, lavabo,
+minisplit) que **nunca** aparece en `grid_AvanceOPEventosOpr` —cero
+filas, cualquier lote, cualquier mes—; en total, apenas 10 filas sueltas
+(semanas 17-29) para las cuatro instalaciones juntas, contra el
+seguimiento semanal completo que sí tiene estructura. `PRECIO_REAL`
+simplemente no cubre instalaciones con el mismo detalle — límite real
+de la herramienta de reporte, no algo que dependa de encontrar «el
+prototipo correcto». `CATALOGOS.md` §12.
+
+### Sanitaria: el tubo de conexión se emitió una sola vez en cinco meses — el tercer caso real de B-70, y el primero fuera de estructura
+
+Mismo cruce sobre la cuarta instalación (`ECO-00002` + familia `ISA-`:
+`00110`/`00120`/`00150`/`00210`/`00220`/`00230`, tres sin iniciar
+todavía, sin exigencia ni avance). Los accesorios confirman sin drama
+—`HID-00135` (codo HD 90°) 100.0% exacto, `SAN-00002` (pegamento)
+125.6%—, pero el testigo principal no: `HID-00411` (tubo HD 3/4",
+conexión hidro-sanitaria) llega solo al **41.7%** del alcance completo
+(43.8% del esperado ponderado).
+
+**Misma trampa de clave que ya documentó D-371, confirmada una vez
+más:** la ingeniería de los cuatro conceptos activos captura el tubo
+como `HD-00411` (cuatro letras); el almacén real solo conoce
+`HID-00411` (cinco letras, con la «I»). Sin la corrección, el testigo
+parece no moverse nunca.
+
+**Corregido el nombre de la clave, el hueco sigue siendo real —y esta
+vez no es la clave.** `HID-00411` se movió **una sola vez en los cinco
+meses completos** de `ALAMO 18`: 5.0 TMO, 21/04/2026, `# OP` 23187
+(`ECO-00002`, cimentación) — ninguna otra fila, con o sin `# OP`, en
+ningún mes. Contra eso, tres conceptos activos reclaman avance alto sin
+que su propio tubo haya salido nunca:
+
+| Concepto | Etapa (meses reales) | % avance | `HID-00411` pedido | `HID-00411` emitido |
+|---|---|---:|---:|---:|
+| `ECO-00002` | abril (cimentación) | 104.0% | 5.0 | 5.0 ✅ |
+| `ISA-00110` | mayo-junio (PB) | 86.6% | 5.0 | 0 ❌ |
+| `ISA-00150` | junio (PA) | 88.2% | 1.0 | 0 ❌ |
+| `ISA-00210` | junio-julio (Azotea) | 100.0% | 1.0 | 0 ❌ |
+
+**Se descartaron las dos explicaciones ya conocidas antes de aceptar
+esta como nueva.** No es el patrón de gas (arriba): se buscó
+específicamente una segunda clave que absorbiera la diferencia
+—`SAN-00018`/`00019`/`00020`/`00021`, tubo sanitario reforzado de
+6"/4"/3"/2"— y aunque sí mueven correctamente bajo los mismos `# OP`
+(incluso por encima de su propio alcance en algún caso), son un
+producto distinto —drenaje de diámetro grande, no la conexión de
+3/4"— con su propia línea de ingeniería, separada de `HID-00411`; no lo
+sustituyen. Tampoco es el patrón de castillo K1 (D-377): ahí una sola
+fuente de avance se quedaba corta; aquí el avance está completo o casi
+—86.6% a 100%—, lo que hace la ausencia de material más notable, no
+menos. Y no es un hueco de captura sin `# OP`: no existe **ninguna**
+fila adicional de `HID-00411`, etiquetada o no, en los cinco meses.
+
+**Es, en cambio, el mismo patrón que ya cerró B-70 con `ALB-01212`
+(D-378) —avance alto sin material que lo respalde—, repetido ahora por
+tercera vez y por primera fuera de estructura.** PB, PA y Azotea se
+facturaron como casi o completamente terminados a lo largo de tres
+meses sin que el tubo que su propia ingeniería exige (7.0 de las 12.0
+TMO totales, 58.3%) saliera nunca del almacén de este lote.
+
+**Corrección propia, antes de escribirse en la semilla:** este caso se
+discutió primero como candidato a `consumo_material_sin_respaldo_avance`
+(B-79) — es el error de dirección contraria: ahí el material *excede*
+lo que el avance reclama (el patrón de castillo K1/`ALB-01012`); aquí el
+avance reclama más de lo que el material puede respaldar, exactamente
+la forma de `estimacion_sin_respaldo_material` (B-70). Corregido antes
+de anotarse en el catálogo.
+
+**Dato del usuario, dos hipótesis nuevas, además de las ya anotadas para
+`ALB-01212` (pagado sin surtir material propio, capturado con otro
+insumo no identificado, o hueco de captura):** el tubo pudo no hacer
+falta en la cantidad que pide la ingeniería —diseño que sobre-especifica,
+o trazo real con menos conexiones que el plano—; o el material se trajo
+de otra obra —sobrante externo, o compra directa fuera del almacén de
+`ALAMO 18`— sin pasar nunca por este inventario, en cuyo caso el trabajo
+es real y está bien hecho, solo invisible para este cruce. Ninguna de
+las cinco hipótesis se puede confirmar con los datos de este cerebro
+todavía — quedan anotadas para no repetir la pregunta, no resueltas.
+
+`MODELO.md` §5a, `CATALOGOS.md` §12, `PENDIENTES-MEJORAS.md` B-70.
 
 ---
 
