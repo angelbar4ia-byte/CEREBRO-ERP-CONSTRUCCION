@@ -1203,14 +1203,19 @@ conceptos; nunca se recalcula desde cero ni se repite este cruce a mano.
 | `EST-02010` (muro tabique 14cm) | `PET-00001` (tabique) | **Confirmado** | Exacto — 6,000/6,000 PZ, abril (`CONOCIMIENTO.md` §11.16) |
 | `EST-02010` (muro tabique 14cm) | `ADH-00005` (cemento) | **Confirmado** | 0.2% de diferencia en acumulado, 4 meses, 8 eventos reales (§11.17, D-375) |
 | `EST-01060` (losa de cimentación) | `CON-00001` (concreto premezclado) | **Confirmado** | Exacto — 37.330/37.330 M3, abril (§11.16) |
-| `EST-02011` (muro tabique, 3er nivel) | `ADH-00005` | Consistente | -1.0% — mismo patrón que `EST-02010`, un solo evento (§11.20) |
+| `EST-02011` (muro tabique, 3er nivel) | `ADH-00005` | Consistente | -1.0%. Cruzado contra ingeniería (D-380): las tres fuentes coinciden exactas —31.03 M, 100% completo—, sin ambigüedad; base chica (10 sacos, un evento) es lo único que lo deja en `Consistente` y no `Confirmado`, mismo criterio que `EST-02320`/`07010`/`07011` (§11.20, D-380) |
 | `EST-02110`/`02120`/`02130`/`02170`/`02180` (castillos K1-K8), `EST-02310` (cadena CE-1) | `ADH-00005` | **Confirmado** | -22.3% a +6.8% por concepto en `ALAMO 18`; a escala completa (todos los lotes, 5 meses) -7.4% a -14.1% — dentro de lo esperado. Castillo K1 mostró +141.7% en una primera lectura — **corregido: era avance incompleto en una sola fuente (`grid_AvanceOPEventosOpr`, 32.8% de un diseño de 339.20 M), no exceso de material** (`CONOCIMIENTO.md` §11.20) |
-| `ALB-01210` (repello fachada) | `ADH-00005` | Consistente | +18.9%, un mes, tres eventos (§11.20) |
+| `ALB-01210` (repello fachada) | `ADH-00005` | **Confirmado** | +15.5% cruzado contra ingeniería/`PRECIO_REAL` (192.53 M, ambas coinciden) — el +18.9% original usaba solo la escala de `grid_AvanceOPEventosOpr` (187 M, 97.1%). Volumen decente (34 sacos, tres eventos), tres fuentes de acuerdo — sube de `Consistente` (§11.20, D-380) |
 | `EST-02320` (cadena CE-2), `EST-07010`/`07011` (columnas CM-1) | `ADH-00005` | Consistente | Un solo evento, base pequeña (1-8 sacos) — el % es ruido de redondeo a saco entero, **confirmado, no artefacto de fuente incompleta: las tres fuentes de avance coinciden 100%** (§11.20, D-378) |
 | `ALB-01010` (repello muro 3.00) | `ADH-00005` | **Confirmado** | +15.5% cruzado contra `PRECIO_REAL` (60.2% avanzado) — el +109.1% original era `grid_AvanceOPEventosOpr` viendo solo 33.2% del avance real, mismo patrón que castillo K1. **Corrige D-376** (§11.20, D-378) |
 | `ALB-01212` (repello muros fachada 3.00) | `ADH-00005` | **Confirmado** | Rate correcto —el testigo funciona—, pero **anomalía real sin resolver**: las tres fuentes de avance coinciden en ~100% completado y la orden no tiene un solo movimiento de almacén, de ningún insumo. Caso limpio para `estimacion_sin_respaldo_material` (§11.20, D-378) |
 | `ALB-01110` (repello plafond 3.00) | `ADH-00005` | Consistente | Déficit -48% a -59% bajo cualquier lectura, nunca exceso — consistente con material aún por surtir. Nota sin resolver: `PRECIO_REAL` supera a la ingeniería para este concepto, único caso así (§11.20, D-378) |
 | `ALB-01012` (repello muro 3.00, código distinto de `ALB-01212`) | `ADH-00005` | **Confirmado** | Rate confirmado, dato del usuario: es cemento, el de su propia matriz genérica (`MEZ-07010`) — no el mortero de la ingeniería específica del lote, desactualizada (mismo patrón que B-68/D-308). +2.8% contra el diseño completo, casi exacto. El +326% contra `PRECIO_REAL` (24.1% avanzado) **no es ruido — es el caso real de `consumo_material_sin_respaldo_avance`** (B-79, D-379): material adelantado a todas las fuentes de avance a la vez (§11.20, D-379) |
+
+**Los diecisiete conceptos originales ya quedaron cruzados contra ingeniería, uno
+por uno** (D-377 a D-380). Ninguno queda pendiente de esa validación — lo que
+sigue abierto (`ALB-01012` como caso real de B-79) es interpretación de campo, no
+falta de dato.
 
 **Cómo se usa:** `estimacion_sin_respaldo_material` y `consumo_material_sin_respaldo_avance`
 (`MODELO.md` §5a) solo corren en automático sobre pares marcados `Confirmado` o

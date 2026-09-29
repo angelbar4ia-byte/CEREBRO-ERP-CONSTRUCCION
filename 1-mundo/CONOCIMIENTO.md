@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2274 | 32 |
+| §11 | Los flujos entre sistemas | 2300 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 449 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4048,6 +4048,32 @@ resolverlo.** Es exactamente la situación para la que se diseñó
 `consumo_material_sin_respaldo_avance` (B-79) — su caso motivador
 original (castillo K1) resolvió como falso positivo; `ALB-01012` es el
 caso real que confirma que la alerta hacía falta.
+
+### Los dos `Consistente` que faltaban por cruzar: confirman sin drama
+
+`EST-02320`/`07010`/`07011` y `ALB-01110` ya se habían cruzado contra
+ingeniería en la revisión de los `insuficiente` (D-378). Quedaban
+`EST-02011` y `ALB-01210`, los dos que llegaban a `Consistente` sin ese
+cruce todavía.
+
+**`EST-02011` (muro tabique, 3er nivel): las tres fuentes coinciden
+exactas** —31.03 M, 100% completo, sin ambigüedad—. El -1.0% de cemento
+se sostiene. De paso, su ingeniería específica *también* trae mortero
+en vez de cemento —igual que `ALB-01012`, y revisando hacia atrás,
+igual que **`EST-02010` mismo**—: confirma que el patrón de B-68/D-308
+es sistémico en los muros de `ALAMO 18`, y que usar el rendimiento de
+la matriz genérica en vez de la ingeniería del lote fue lo correcto
+desde el principio, no una excepción para `ALB-01012`.
+
+**`ALB-01210` (repello fachada): ingeniería y `PRECIO_REAL` coinciden**
+—192.53 M, contra 187 M (97.1%) de `grid_AvanceOPEventosOpr`—. Con la
+cifra completa, el cemento pasa de +18.9% a +15.5% — normal, sube a
+`Confirmado` por volumen (34 sacos, tres eventos) y acuerdo entre
+fuentes.
+
+**Con esto, los diecisiete conceptos originales de la semilla quedan
+completamente cruzados contra ingeniería** (D-377 a D-380) — cierra el
+ciclo de validación que empezó con castillo K1.
 
 ---
 
