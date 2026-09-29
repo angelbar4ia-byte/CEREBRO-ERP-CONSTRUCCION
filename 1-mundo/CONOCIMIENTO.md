@@ -26,9 +26,9 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2717 | 32 |
+| §11 | Los flujos entre sistemas | 2737 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 456 | 8 |
+| §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
 | §15 | La ruta crítica ya está en el modelo | 80 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
@@ -3390,13 +3390,33 @@ de instalarse, nunca antes, así que si la cadena se facturó cerca de su
 colado real y la instalación 2-4 semanas más tarde, lo más simple es
 que también pasó después en la realidad.
 
-**Dato del usuario: esto es una deficiencia de calidad operativa, no
-solo un dato de programa.** Cae en la causa 1 de `CONOCIMIENTO.md`
-§13.6 (**error de ejecución** — misma obra, no cambia alcance, la paga
-quien la ejecutó) y en la fila de mano de obra/destajo de esa misma
-tabla (**retrabajo**): colar la cadena antes de que pase la instalación
-obliga a picar el concreto ya colado para abrir paso a la tubería
-después. `PENDIENTES-MEJORAS.md` B-43.
+**Corregido: la regla no aplica igual a las cuatro instalaciones —
+dato del usuario.** Hidráulica y sanitaria en muro **no necesitan**
+cruzar la cadena de cerramiento salvo en las líneas que suben a Planta
+Alta; el resto de su tubería se queda por debajo de esa altura y puede
+instalarse después sin problema. Revisando el material candidato a
+"la línea que sube" en almacén, por fecha:
+
+| Instalación | Material candidato | Fechas de salida | Contra las cadenas (6/20 mayo) |
+|---|---|---|---|
+| Sanitaria | `HID-00411` (única salida, `ECO-00002`) | 21 abril | **antes de ambas — limpio** |
+| Hidráulica | `HID-00023` (tubo troncal 3/4") | 22 abril (`ECO-00003`) y 2 junio (`IHD-00110`) | la primera antes; la segunda después — pero Planta Alta nunca vuelve a sacar este material, así que la del 2 de junio probablemente no es para la cadena: coincide con la ventana de colado de la losa de entrepiso (`EST-00090`, 13 mayo-24 junio, sin huecos — D-385), no con la cadena. Dato del usuario. |
+
+**Sanitaria queda exonerada — su tubería que sube salió tres semanas
+antes de la primera cadena.** **Hidráulica, con esta lectura, también
+—** su segunda salida de material troncal aterriza dentro de la propia
+ventana de colado de la losa, no después de ella, así que no hay
+evidencia de que haya llegado tarde a *ningún* elemento que deba
+esperarla.
+
+**Lo que queda como deficiencia de calidad real es solo eléctrica**
+(gas nunca arrancó, no se puede evaluar). Cae en la causa 1 de
+`CONOCIMIENTO.md` §13.6 (**error de ejecución** — misma obra, no
+cambia alcance, la paga quien la ejecutó) y en la fila de mano de
+obra/destajo de esa misma tabla (**retrabajo**): colar la cadena antes
+de que pase la instalación eléctrica obliga a picar el concreto ya
+colado para abrir paso al poliducto después. **Corrige D-387.**
+`PENDIENTES-MEJORAS.md` B-43.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
@@ -4759,11 +4779,13 @@ cliente.**
 > también una desviación o un control de cambio: no son el mismo renglón.
 
 **Caso real de causa 1 (error de ejecución), encontrado leyendo el programa de
-`ALAMO 18`:** las cadenas de cerramiento se colaron antes de que pasara la
-instalación de muro (eléctrica/hidráulica/sanitaria), no después como pide la
-regla de campo — obliga a picar concreto ya colado para abrir paso a la
-tubería, exactamente el retrabajo de la fila de mano de obra/destajo, arriba.
-`CONOCIMIENTO.md` §11.14, `PENDIENTES-MEJORAS.md` B-43.
+`ALAMO 18`:** la cadena de cerramiento se coló antes de que pasara la
+instalación eléctrica de muro, no después como pide la regla de campo —
+obliga a picar concreto ya colado para abrir paso al poliducto, exactamente
+el retrabajo de la fila de mano de obra/destajo, arriba. Hidráulica y
+sanitaria, revisadas con la misma fecha, quedan exoneradas (D-388, corrige
+D-387): su tubería que sube a Planta Alta salió a tiempo. `CONOCIMIENTO.md`
+§11.14, `PENDIENTES-MEJORAS.md` B-43.
 
 ### Las dos omisiones son opuestas
 
