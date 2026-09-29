@@ -1087,8 +1087,24 @@ mecánico de las 265 filas completas.
 | `MOS-02040` | MO conexión san minisplit | `MOCU-025` | 0.78 | PZ | $1,000.00 |
 | `MOS-07030` | MO conexión san lavamanos | `MOCU-010` | 2.50 | PZ | $50.00 |
 | `MOS-07060` | MO conexión san tarja cocina | `MOCU-010` | 2.50 | PZ | $50.00 |
+| `MOC-01010` | MO losa de cimentación | `MOCU-005` | 6.85 | M2 | $230.00 |
+| `MOC-12010` | MO zapata ZA-1 (100x100x25) | `MOCU-005` | 3.42 | PZ | $460.00 |
+| `MOE-02022` | MO castillos K3 (15x30) | `MOCU-005` | 10.50 | M | $150.00 |
+| `MOE-02028` | MO castillos K8 (15x40) | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOE-02101` | MO cadena CE1 (15x20) | `MOCU-005` | 11.25 | M | $140.00 |
+| `MOC-02010` | MO firme de concreto de 10 cm | `MOCU-005` | 15.75 | M2 | $100.00 |
+| `MOA-09020` | MO columna forrada | `MOCU-005` | 1.89 | PZ | $835.00 |
+| `MOE-05010` | MO zapata aislada (60x60x20) pérgola | `MOCU-005` | 2.63 | PZ | $600.00 |
+| `MOA-01510` | MO fabricación de asador | `MOCU-005` | 0.63 | PZ | $2,500.00 |
+| `MOA-02510` | MO forrado de asador con cantera | `MOCU-008` | 0.68 | PZ | $2,300.00 |
+| `MOA-00115` | MO finas en muros exteriores 0-3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOA-05021` | MO chaflán teja | `MOCU-005` | 26.25 | M | $60.00 |
+| `MOE-02016` | MO muro de sillar - hilo | `MOCU-005` | 8.29 | M2 | $190.00 |
+| `MOE-02025` | MO castillos K9 (15x25) aparente | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOE-02103` | MO cadena CE1 aparente (20x25) | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOE-02202` | MO cadena CD-1 aparente (20x25) | `MOCU-005` | 9.84 | M | $160.00 |
 
-**Las 26 son `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
+**42 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
 1.085 de `MOCU-023`/`MOCU-005`) se ha cruzado todavía contra ejecución real.
 
 **Primera validación: castillo K1 (`ALAMO 18`) cierra exacto, 1.00 cuadrilla.**
@@ -1098,6 +1114,13 @@ descontados los dos huecos que `CONOCIMIENTO.md` §11.14/D-385 ya había
 encontrado (56 de los 84 días de calendario). Confirma el rendimiento de la
 semilla y el método de huecos, los dos a la vez, con el mismo caso.
 `CONOCIMIENTO.md` §11.14.
+
+**Segundo uso: primer programa completo de prototipo, 30 semanas para
+Diamante.** Las 16 filas nuevas (cimentación, K3/K8/CE-1, firme, zapatas,
+barda perimetral, asador) reconstruyen Cimentación→Azotea en 21 semanas
+y encuentran que eléctrica en muro PB necesita 2 cuadrillas —no 1— para
+no repetir la deficiencia de calidad de D-387/D-388. `CONOCIMIENTO.md`
+§11.14.
 
 ## 10b El prefijo no determina la familia — segunda prueba
 

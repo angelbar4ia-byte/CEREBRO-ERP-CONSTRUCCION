@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2737 | 32 |
+| §11 | Los flujos entre sistemas | 2822 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3417,6 +3417,91 @@ obra/destajo de esa misma tabla (**retrabajo**): colar la cadena antes
 de que pase la instalación eléctrica obliga a picar el concreto ya
 colado para abrir paso al poliducto después. **Corrige D-387.**
 `PENDIENTES-MEJORAS.md` B-43.
+
+### El programa del prototipo: 30 semanas para Diamante, reconstruido de abajo hacia arriba
+
+Dato del usuario, primer caso real para `ACTIVIDAD.modo_duracion=calculada_
+rendimiento` (`MODELO.md` §5c) — un programa por **prototipo**, no por lote:
+duración teórica (rendimiento × cantidad del prototipo) y cuadrillas
+explícitas, no fechas reales de una obra concreta.
+
+**El objetivo, por tamaño de prototipo:**
+
+| Grupo | Prototipos | Semanas objetivo |
+|---|---|---:|
+| 1 planta | Rubí, Zafiro, Jade | 20 |
+| 2 plantas | Diamante, Zafiro Plus, Oro | 30 |
+
+`ALAMO 18` (Diamante) cae en 30 semanas.
+
+**Cimentación → Azotea, reconstruido con rendimiento (`CATALOGOS.md` §10)
+y cuadrillas explícitas — sin dejar huecos sin explicar:**
+
+| Etapa | Cuadrillas | Semanas |
+|---|---|---:|
+| Cimentación (losa, `MOC-01010`/`MOC-12010`) | 2 × `MOCU-033` | 2.67 |
+| Planta Baja — muro+castillos+cadena (`MOCU-005`) | 1.8 | 7.41 |
+| — Eléctrica muro PB, antes de cadena | **2 × `MOCU-009`** | 5.93 (cabe antes de que cierre la cadena) |
+| — Losa PB | 1.21 | 5.99 |
+| Planta Alta — muro+castillos+cadena | 1.8 | 2.76 |
+| — Losa PA (proporcional al peso $, 12.1% de losa PB) | 1.21 | 0.72 |
+| Azotea — losa | 1.21 | 1.18 |
+| **Total Cimentación → Azotea** | | **20.74 ≈ 21 semanas** |
+
+**Cierra casi exacto contra el objetivo implícito (30 − 9 de Acabados = 21).**
+El hueco no era un vacío real — era que cimentación, estructura PB/PA y las
+dos losas todavía no tenían su propio rendimiento puesto; al ponerlo, se
+llenan solas.
+
+**El hallazgo que amarra esto con D-387/D-388: eléctrica en muro PB
+necesita 2 cuadrillas, no 1, para terminar antes de que la cadena esté
+lista.** Con 1 sola cuadrilla, eléctrica tarda 83.0 días — muy por encima
+de cuándo la estructura+cadena ya estarían listas para colar (44.6+7.3=
+51.9 días). Con 2 cuadrillas, 41.5 días, cabe. Es, con datos, la causa más
+probable de la deficiencia de calidad real que se encontró en `ALAMO 18`
+(D-387): lo más probable es que ahí solo hubiera una cuadrilla eléctrica
+trabajando ese muro.
+
+**Acabados → Entrega llave en mano: 9 semanas, dato del usuario:**
+
+| Semana (desde inicio de Acabados) | Actividad |
+|---|---|
+| 0 – 2 | Pisos (remate final de `Acabados`, no el monto completo) + Obra exterior, en paralelo |
+| 0 – 1.33 | Barda perimetral — después de Obra exterior, antes de que termine Pisos |
+| 2 – 4 | Cancelería — 2 semanas completas (~1.6 fabricación + 3 días instalación) |
+| 2 – ~2.9 | Asador, estructura/acabados — después de Pisos |
+| 4 – 7 | Carpintería (3 semanas) — arranca al terminar cancelería |
+| 4 – 5/6 | Pérgola Cochera (1 a 2 semanas) — arranca al terminar cancelería, en paralelo con carpintería |
+| 7 – 9 | Cierre (2 semanas): segunda mano de pintura + limpiezas + sellado, en paralelo con muebles + iluminación + herrería |
+
+**Barda y Asador, con rendimiento:**
+
+| Elemento | Días teóricos (1 cuadrilla, secuencial) | Semanas |
+|---|---:|---:|
+| Barda perimetral (cadena desplante → muro sillar → castillo → cadena cerramiento) | 9.34 | 1.33 |
+| Asador, estructura/acabados (muro, castillo, firme, zapata, columna, repellado, forjado, cantera, finas, chaflán) | 6.43 | 0.92 |
+
+**Dos límites del método, marcados, no forzados:** `Pérgola Asador`
+(`CAR-11050`, $35,811.50) no tiene líneas `MO-` propias en el catálogo —a
+diferencia de todo lo demás, no se puede derivar su duración de
+rendimiento; si se parece a Pérgola Cochera (1-2 semanas), Asador completo
+terminaría bien antes de la semana 7, pero es analogía, no cálculo. Y el
+rendimiento de mano de obra no incluye curado de concreto —Asador
+encadena firme, zapata y castillo, cada uno normalmente necesita fraguado
+antes del siguiente paso, que las 0.92 semanas no cuentan.
+
+**Total: 21 (estructura) + 9 (acabados) = 30 semanas — reconcilia con el
+objetivo del prototipo.**
+
+**Verificación de ritmo contra `ALAMO 18` real:** lleva 15.6 semanas
+(13-22 abril a 31 julio) y todavía no registra ni una fila de Acabados en
+`Nivel OP` — dentro del presupuesto de 21 semanas para llegar ahí (le
+quedarían 5.4 semanas de margen), pero más tarde que las cuatro obras de
+comparación revisadas (`Cluster Alamo` Lote 1, `Fresno` Lote 4, `Olmo`
+Lote 20, `Olivo` Lote 1), donde Acabados siempre arranca en paralelo con
+estructura, no después. No es alarmante todavía — es la misma señal
+mixta ya anotada, ahora con presupuesto de semanas explícito para
+medirla.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

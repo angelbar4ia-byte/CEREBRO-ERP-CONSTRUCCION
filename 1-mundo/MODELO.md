@@ -1809,6 +1809,17 @@ cargada» y «se contrata terminado» resultaron ejes independientes, no el
 mismo (`CONOCIMIENTO.md` §11.13). Muebles/Iluminación no entra aquí: se
 programa como el resto, con `modo_duracion` calculada o capturada.
 
+### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
+
+Dato del usuario, primer programa completo por **prototipo** (no por
+lote): cimentación, muros, castillos, cadenas, losas, barda perimetral y
+la estructura del asador se programan con `calculada_rendimiento`
+—cantidad del prototipo ÷ rendimiento de la cuadrilla, ver `CATALOGOS.md` §10— y reconstruyen Cimentación→Azotea en 21 semanas. Cancelería,
+Carpintería, Herrería y Pérgola Cochera se quedan en
+`preestablecida_nivel` (B-48, arriba): sus semanas son dato del usuario,
+no derivadas de rendimiento — confirma que las dos formas de duración
+coexisten en el mismo programa sin pisarse. `CONOCIMIENTO.md` §11.14.
+
 ### ⚠ Precedencia, calendario y tramo comparten el mismo eje de confianza
 
 Precedencia (P-1), tramo (P-5) y el origen de una duración (arriba) usan
