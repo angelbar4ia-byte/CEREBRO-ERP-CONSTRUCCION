@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2822 | 32 |
+| §11 | Los flujos entre sistemas | 2863 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3502,6 +3502,47 @@ Lote 20, `Olivo` Lote 1), donde Acabados siempre arranca en paralelo con
 estructura, no después. No es alarmante todavía — es la misma señal
 mixta ya anotada, ahora con presupuesto de semanas explícito para
 medirla.
+
+### `PROGRAMA_ZAFIRO.xlsx` llega: es el plan manual del residente, no la ejecución real — y no coincide con rendimiento
+
+Dato del usuario: de los siete prototipos en el archivo (3,231 filas, un
+capítulo por prototipo, mismo catálogo de presupuesto ya conocido),
+**solo Zafiro 1.0 tiene programa terminado**; los otros seis
+muestran 9-15 días de calendario sin importar el prototipo —plantillas sin
+empezar, no programas reales—. Y el de Zafiro tampoco es la ejecución
+real: **es el plan armado a mano, con la experiencia del residente** —un
+tercer tipo de dato, distinto de los dos que ya usa este cerebro:
+`calculada_rendimiento` (cantidad ÷ rendimiento, D-389) y la ejecución
+real (`grid_AvanceOPEventosOpr`/`PRECIO_REAL`/almacén, D-376 a D-388).
+**El real es el que marque la ejecución a su momento** —dato del
+usuario—, y éste no lo es todavía.
+
+**La brecha de ese plan manual contra rendimiento, medida:** decodificando
+cada concepto de Zafiro a su(s) clave(s) `MO-` (misma ingeniería que ya usa
+este cerebro para Diamante —el catálogo de conceptos se comparte entre
+variantes, D-383, y aquí se confirma que también entre prototipos
+distintos— salvo cimentación, propia de cada huella) y cruzándolas contra
+la semilla (`CATALOGOS.md` §10), salen 50 pares concepto×`MO-`
+comparables. **Cuadrillas implícitas** (días teóricos a 1 cuadrilla ÷ días
+que el plan manual asignó): mediana 0.83 en las 50, sube a 1.25
+excluyendo las cantidades que el teórico ya resuelve en menos de día y
+medio —ahí el piso de "1 día" del programa (nunca baja de un día entero)
+infla la variación sin que signifique nada—. Incluso filtrando ese ruido,
+solo 33% cae entre 0.7 y 1.3 cuadrillas. La misma clave varía fuerte entre
+sus propias apariciones: castillo K-1 (`EST-02110`/`MOE-02020`) sale dos
+veces en Zafiro, 0.35 y 1.50 cuadrillas implícitas. **La causa: hoy la
+duración de cada concepto la decide la experiencia del planeador, uno por
+uno, sin pasar por rendimiento × cuadrillas de forma sistemática** — y
+`Unidades ejecutoras` no ayuda a explicarlo: vale 1.0 en las 317 filas de
+Zafiro, sin excepción, así que el plan nunca registró cuántas cuadrillas
+asumía.
+
+**Dato del usuario, todavía conocimiento, no definición en `MODELO.md` §5c:**
+los días teóricos de `calculada_rendimiento` sí deberían poder
+quedar fraccionarios cuando así es la operación real —no forzar entero—,
+y el redondeo (si hace falta uno) debería ser un parámetro editable, no
+algo implícito en la fórmula. Queda anotado aquí para cuando se defina el
+módulo. `PENDIENTES-MEJORAS.md` B-80.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

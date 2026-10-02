@@ -1103,8 +1103,32 @@ mecánico de las 265 filas completas.
 | `MOE-02025` | MO castillos K9 (15x25) aparente | `MOCU-005` | 9.84 | M | $160.00 |
 | `MOE-02103` | MO cadena CE1 aparente (20x25) | `MOCU-005` | 9.84 | M | $160.00 |
 | `MOE-02202` | MO cadena CD-1 aparente (20x25) | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOA-00002` | MO repellado muro +3.00 | `MOCU-005` | 15.00 | M2 | $105.00 |
+| `MOA-00010` | MO repellado plafón 0-3.00 | `MOCU-005` | 15.00 | M2 | $105.00 |
+| `MOA-00011` | MO repellado plafón +3.00 | `MOCU-005` | 14.32 | M2 | $110.00 |
+| `MOA-00112` | MO finas interiores en muros 0-3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOA-00113` | MO finas interiores en muros +3.00 | `MOCU-005` | 27.16 | M2 | $58.00 |
+| `MOA-00114` | MO finas en muros de fachada 0-3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOA-00120` | MO finas en plafón 0-3.00 | `MOCU-005` | 30.29 | M2 | $52.00 |
+| `MOA-00121` | MO finas en plafón +3.00 | `MOCU-005` | 26.25 | M2 | $60.00 |
+| `MOA-00211` | MO boquillas interiores | `MOCU-005` | 39.38 | M | $40.00 |
+| `MOA-00212` | MO boquilla fina estuco vanos | `MOCU-005` | 315.00 | M | $5.00 |
+| `MOA-00213` | MO boquilla gruesa pretil | `MOCU-005` | 39.38 | M | $40.00 |
+| `MOA-01010` | MO muro chapeado piedra | `MOCU-005` | 2.72 | M2 | $580.00 |
+| `MOA-02010` | MO pórfido en cocheras | `MOCU-005` | 19.69 | M2 | $80.00 |
+| `MOA-02020` | MO boquilla pórfido | `MOCU-005` | 52.50 | M2 | $30.00 |
+| `MOA-02030` | MO rodapié cantera 60 cm | `MOCU-005` | 8.56 | M | $184.00 |
+| `MOA-02031` | MO rodapié cantera 20 cm | `MOCU-005` | 35.00 | M | $45.00 |
+| `MOA-02070` | MO columna de cantera | `MOCU-005` | 1.58 | PZ | $1,000.00 |
+| `MOA-02080` | MO forjado de jardinera | `MOCU-024` | 21.00 | M | $75.00 |
+| `MOA-02081` | MO zoclo pórfido en laja | `MOCU-008` | 35.00 | M | $45.00 |
+| `MOA-05020` | MO chaflán azotea | `MOCU-005` | 39.38 | M | $40.00 |
+| `MOE-02201` | MO cadena CD-1 (15x25) | `MOCU-005` | 11.25 | M | $140.00 |
+| `MOE-31010` | MO registros sanitarios | `MOCU-005` | 4.50 | PZ | $350.00 |
+| `MOE-31110` | MO tapa registros sanitarios/cisterna | `MOCU-005` | 15.75 | PZ | $100.00 |
+| `MOP-00301` | MO murete de instalaciones | `MOCU-005` | 0.55 | PZ | $2,850.00 |
 
-**42 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
+**66 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
 1.085 de `MOCU-023`/`MOCU-005`) se ha cruzado todavía contra ejecución real.
 
 **Primera validación: castillo K1 (`ALAMO 18`) cierra exacto, 1.00 cuadrilla.**
@@ -1121,6 +1145,17 @@ barda perimetral, asador) reconstruyen Cimentación→Azotea en 21 semanas
 y encuentran que eléctrica en muro PB necesita 2 cuadrillas —no 1— para
 no repetir la deficiencia de calidad de D-387/D-388. `CONOCIMIENTO.md`
 §11.14.
+
+**Tercer uso: contra el plan manual de Zafiro 1.0, no contra ejecución
+real.** Las 24 filas nuevas (acabados, boquillas, pórfido, registros
+sanitarios, murete) salen al cruzar las 317 líneas de
+`PROGRAMA_ZAFIRO.xlsx` contra esta semilla — 50 pares concepto×`MO-` en
+total. A
+diferencia de castillo K1, este cruce no cierra limpio: mediana 0.83-1.25
+cuadrillas implícitas según el filtro, con 67-74% fuera de una banda
+razonable. No es que el rendimiento esté mal — es que un plan manual no
+pasa por rendimiento × cuadrillas de forma sistemática, que es justo la
+brecha que un programa calculado cerraría. `CONOCIMIENTO.md` §11.14.
 
 ## 10b El prefijo no determina la familia — segunda prueba
 
