@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2863 | 32 |
+| §11 | Los flujos entre sistemas | 2927 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3543,6 +3543,70 @@ quedar fraccionarios cuando así es la operación real —no forzar entero—,
 y el redondeo (si hace falta uno) debería ser un parámetro editable, no
 algo implícito en la fórmula. Queda anotado aquí para cuando se defina el
 módulo. `PENDIENTES-MEJORAS.md` B-80.
+
+### Vínculos: la hoja ya habla el mismo lenguaje que `PRECEDENCIA` — y encuentra un hueco real
+
+Dato del usuario, revisar la columna `Vínculos` de `PROGRAMA_ZAFIRO.xlsx`.
+Formato MS Project: `<fila_predecesora><tipo>[±traslape]`, hasta dos
+predecesoras por coma. **Coincide, sin ajuste, con lo que `PRECEDENCIA`
+(`MODELO.md` §5c) ya tenía cerrado antes de ver este archivo:**
+`tipo_vinculo` (fin_inicio/inicio_inicio/fin_fin) es `FS`/`SS`/`FF`, y
+`traslape_espera` (negativo traslape, positivo espera) es el `±N` de la
+hoja.
+
+**Un hueco real, no cubierto por el enum de tres valores:** 4 de los 78
+vínculos (en 74 de las 317 filas) son `SF` —inicio_fin—, que no está en
+`tipo_vinculo`. Minoría (5%) y tipo poco común en la práctica, pero está
+en el dato real: `CAR-01011`, `IEC-01070` (dos veces, una de ellas con
+dos predecesoras `SF` a la vez), `EST-03020`. `PENDIENTES-MEJORAS.md`
+B-81.
+
+**Cobertura baja, y el orden de la hoja no es el de ejecución:** solo 74
+de 317 conceptos (23%) traen vínculo explícito; `FS` domina (61/78,
+78%). 18 de los 74 (24%) apuntan a una fila que aparece *después* en la
+hoja —`ALB-01010` cita a `ALB-01012`, un renglón más abajo, como su
+predecesora—: el catálogo lista por código, no por secuencia real;
+`Vínculos` es la única fuente de secuencia cuando existe.
+
+**La cadena de cerramiento, otra vez.** Zafiro (1 planta) solo tiene una
+—`EST-02310`—. Ningún concepto, ni las instalaciones de muro, la cita
+como predecesora. Ni el planeador con experiencia la amarró a mano,
+aunque D-387/D-388 ya mostraron que es una restricción física real en
+`ALAMO 18`. Apoya la decisión ya tomada: `TRAMO.origen=tecnica` se
+deduce sola (`MODELO.md` §5c) precisamente porque no se puede confiar en
+que alguien la capture a mano.
+
+### Cómo leer `PROGRAMA_ZAFIRO.xlsx` — guardado para no depender de que vuelva a llegar
+
+Dato del usuario: Hoja2 (490 filas) no es nada, se descarta. Lo que
+importa vive todo en Hoja1 (3,231 filas × 222 columnas):
+
+- **Columnas A-AC**: la jerarquía de presupuesto ya conocida (`Tipo`:
+  Capítulo/Subcapítulo/Nivel 2/Nivel 3/Concepto) más el programa:
+  `Fecha de inicio`/`Fecha de término`, `Días laborables`/`Días
+  calendario`, `Esfuerzo`, `Unidades ejecutoras`, `% Programado`,
+  `Cantidad programada`, `Vínculos`.
+- **Columnas AD-HN (193 columnas)**: `Cantidad` día por día —una
+  columna por cada día calendario del proyecto completo (9 jun-18 dic
+  2025)—, sin decodificar todavía.
+- **Siete `Capítulo`, uno por prototipo** —mismo orden que el catálogo
+  de presupuesto—. **Solo el primero (Zafiro 1.0) es programa
+  terminado**; los otros seis son plantilla sin empezar, 9-15 días de
+  calendario sin importar el prototipo. Dato del usuario: no asumir
+  ninguno de los seis como dato real.
+- **`Esfuerzo` no es dato nuevo, es derivado**: `Días laborables ×
+  Unidades ejecutoras × 8` (horas/jornada) — confirmado exacto en
+  decenas de filas, nunca falla.
+- **`Días laborables` = `Días calendario` menos sábados y domingos**
+  —semana de 5 días—, confirmado exacto sobre el span completo del
+  proyecto (139 de 193 días).
+- **`Vínculos`**: `<fila_excel_predecesora><FS|SS|FF|SF>[±traslape]`,
+  hasta dos predecesoras por coma. La fila predecesora es el número de
+  fila de Excel en Hoja1, no la columna `Indice`.
+
+Se guarda esta lectura —no el archivo completo— para no tener que
+redescubrirla si vuelve a llegar una versión nueva o un prototipo
+distinto con programa terminado.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
