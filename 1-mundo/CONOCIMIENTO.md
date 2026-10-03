@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3107 | 32 |
+| §11 | Los flujos entre sistemas | 3146 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3787,6 +3787,45 @@ de un dato estructurado—. Coincide con lo que `CATALOGOS.md` ya decía
 de `Frente`: "no valida, no impide, no calcula" — ahora se ve que le
 falta el enganche, no solo el cálculo. `PENDIENTES-MEJORAS.md` B-82,
 extendido.
+
+### Confirmado con números: muro y losa de cimentación sí necesitan más de una cuadrilla
+
+Dato del usuario: probar con `cantidad necesaria en una semana ÷
+rendimiento de la cuadrilla` que cimentación y muro de tabique
+necesitan más de 1 cuadrilla para el tiempo que el programa les dio.
+**Muro de tabique, con datos propios de Zafiro:** el primer tramo (279
+m², 23 jun-29 jul, 16 días laborables) pide 279÷3.2 semanas = 87.19
+m²/semana contra 10.5×5 = 52.5 m²/semana de 1 cuadrilla —**1.66
+cuadrillas**—; el segundo tramo (62 m², 6 días) cierra en 0.98, casi
+exacto con 1 sola. No es que el muro siempre necesite 2 —es ese primer
+tramo, el más grande y más apretado—. **Losa de cimentación, con los
+números ya validados de Diamante (D-389):** 37.37 días teóricos a 1
+cuadrilla ÷ 18.7 días objetivo = **2.00 cuadrillas exactas** — mismo
+número que D-389 ya usó, ahora reconfirmado con la fórmula pedida en
+vez de solo citado. **Hueco señalado, no resuelto todavía en este
+punto:** `EST-01040` en `PROGRAMA_ZAFIRO.xlsx` está en unidad "act",
+sin los m² propios de Zafiro —se resuelve en el siguiente hallazgo—.
+
+### La ingeniería base de cualquier prototipo ya existe — es la explosión de la matriz de cada concepto, no un archivo aparte
+
+Dato del usuario: se puede crear la ingeniería base de cualquier
+prototipo explotando los insumos de la matriz de cada concepto —y debe
+correr más limpio que con una ingeniería de lote, porque es
+exactamente el mismo mecanismo que el programa cargado (D-394)—.
+**Confirmado, y cierra el hueco de arriba.**
+`ANALISIS_DE_BASICOS_CONCEPTOS.csv` no es del lote —a diferencia de los
+cuatro archivos "INGENIERIA - ALAMO 18"—, es la matriz por prototipo:
+trae `EST-01040` con su propio desglose, y `MOC-01010` (MO losa de
+cimentación) ahí mismo da **172 M2** —coincide exacto con la etiqueta del prototipo,
+"ZAFIRO 1.0 (172 M2)"—. Con el rendimiento de la semilla (6.85 M2/día):
+172÷6.85 = 25.11 días teóricos ÷ 11 días reales que el programa le dio
+= **2.28 cuadrillas** — cierra el mismo patrón que D-389 (Diamante,
+2.00) y D-397 (muro, 1.66), ahora con el 100% de los datos propios de
+Zafiro, sin pedir un archivo de ingeniería de lote que no existe para
+un prototipo. Confirma D-394: la matriz de cada concepto, ya escalada
+al prototipo, **es** la ingeniería base — no hace falta nada aparte
+para tenerla. Generalizable a cualquiera de los siete prototipos del
+catálogo, no solo a Zafiro.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
