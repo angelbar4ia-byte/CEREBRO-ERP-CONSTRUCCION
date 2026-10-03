@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3512 | 32 |
+| §11 | Los flujos entre sistemas | 3514 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4286,8 +4286,10 @@ días sin trabajo. La cimentación real de Rubí, que ya venía en el
 archivo, sigue la misma convención (57 de 57; 9 sábados y 9 domingos).
 Los ceros de fin de semana caen en sábado y domingo (132 y 132 en
 Zafiro, contra 146 ceros en días hábiles que son parón), igual que
-D-393 ya había encontrado: cero actividad en sábado y domingo. Rubí
-cumple las siete: 0 violaciones en sus 208 conceptos con 417 ceros
+D-393 ya había encontrado: cero actividad en sábado y domingo. **Dato
+del usuario, confirmado (D-417):** los días sin trabajo son sábado y
+domingo — un "viernes y sábado" dicho antes fue un desliz, no una
+regla distinta. Rubí cumple las siete: 0 violaciones en sus 208 conceptos con 417 ceros
 explícitos (137 sábados, 137 domingos, 143 de parón), y la proporción
 de tramos con parón es parecida (Zafiro 13 de 315, Rubí 11 de 208).
 Castillo K1 tramo 1: Zafiro corre 5 días, para 17, retoma 2; Rubí
