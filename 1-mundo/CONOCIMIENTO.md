@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3399 | 32 |
+| §11 | Los flujos entre sistemas | 3453 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4201,6 +4201,60 @@ planeador no las captura con la misma disciplina que a la obra gruesa.
 instalaciones necesita revisarse — no es solo que el dato disperse al
 compararlo, puede que el dato mismo esté desactualizado.
 `PENDIENTES-MEJORAS.md` B-83.
+
+### Completar los otros seis prototipos: primer método, escalar los días de Zafiro — piloto en Rubí
+
+Dato del usuario: Zafiro es el único prototipo con programa completo;
+en los otros seis, solo cimentación tiene fechas reales —confirmado,
+exactamente 1 de 14-15 Subcapítulo por prototipo tiene `Días
+calendario` > 0, y siempre es cimentación—. Todo lo demás (Planta
+Baja, Azotea, Acabados…) es el stub de 0 días. Dato del usuario:
+empezar con un piloto de un solo prototipo antes de replicar a los
+otros cinco, y con el método más simple primero —escalar los días que
+ya tiene Zafiro, sin pasar todavía por rendimiento × cuadrillas—.
+
+**Por qué Rubí primero.** Zafiro es de una sola planta; tres de los
+seis prototipos restantes (Zafiro Plus, Diamante sin/con chimenea,
+Oro) tienen Planta Alta — dato del usuario: adaptar a dos plantas es
+lo interesante, pero "paso a paso". De los dos de una planta que
+quedan (Rubí 207m², Jade 230m²), Rubí es el más cercano en tamaño a
+Zafiro (172m²).
+
+**El método, mecánico, sin dato nuevo:**
+
+```
+1. Emparejar cada concepto de Rubí con el mismo Clave de Zafiro,
+   TRAMO A TRAMO —no por Clave sola—: varios conceptos (castillo K1,
+   muro tabique) tienen 2-3 tramos con la misma Clave, y cruzarlos
+   sin respetar su posición relativa multiplica mal (3×3=9 en vez
+   de 3). Primer intento cayó en esto — corregido con
+   groupby('Clave').cumcount() antes de cruzar.
+2. factor = Cantidad_Rubí ÷ Cantidad_Zafiro (del mismo tramo)
+3. Días laborables_Rubí = redondear(Días laborables_Zafiro × factor)
+4. Días calendario_Rubí = redondear(Días calendario_Zafiro × factor)
+5. Fecha de inicio_Rubí = fin de cimentación_Rubí (real, 19-jun) +
+   el mismo desfase en días que ese tramo tenía en Zafiro respecto
+   al fin de SU cimentación (23-jun) — el desfase no se escala, solo
+   la duración: conserva el orden y la concurrencia que Zafiro ya
+   tenía, ajusta cuánto tarda cada quien
+```
+
+**Resultado: 295 conceptos de Rubí, tres grupos.** 57 ya tenían fecha
+real (cimentación). 209 se lograron escalar así. **29 no tienen
+ningún tramo con la misma Clave en Zafiro** —mayoría son salidas
+sanitarias/hidráulicas/eléctricas/gas específicas de Rubí que Zafiro
+no necesita en ese layout— y se quedan sin escalar, marcadas, no
+inventadas. Coincide con D-408/D-412: instalaciones es la categoría
+que menos se presta a copiar de un prototipo a otro.
+
+**Lo que este primer método no resuelve, a propósito, dato del
+usuario:** no toca `Vínculos` —se necesitaría remapear cada
+referencia de precedencia a las filas de Rubí, más riesgo de error
+que valor en un piloto—; no calcula las fechas de resumen de
+Capítulo/Subcapítulo/Nivel (esas se derivan de sus hijos, no se
+escalan); y no pasa por rendimiento × cuadrillas —el método "mixto"
+que sí lo haría queda para después de validar este, dato del
+usuario—. `PENDIENTES-MEJORAS.md` B-84.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
