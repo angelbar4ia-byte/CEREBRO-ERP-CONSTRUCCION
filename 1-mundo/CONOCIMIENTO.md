@@ -21,7 +21,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §3 | Notas de implementación | 129 | 5 |
 | §4 | Estados del nodo y exportación | 144 | 3 |
 | §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
-| §6 | Destajos: precio, cuadrilla y fusión | 230 | 4 |
+| §6 | Destajos: precio, cuadrilla y fusión | 300 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
@@ -1263,6 +1263,76 @@ cuadrillas del catálogo con más datos: `MOCU-005`/`008`/`023`
 misma dispersión sin factor único que arriba se reporta para
 instalaciones (0.03 a 4.9 en eléctrico). Este mismo archivo, §11.14.
 `CATALOGOS.md` §10. `PENDIENTES-MEJORAS.md` B-82.
+
+### El margen no depende solo del precio — depende de a qué ritmo se avanza
+
+Dato del usuario. El precio del destajo nunca cambia, pero cuánto gana
+la cuadrilla **por día** sí, porque eso depende del ritmo, no del
+precio: `ingreso por día` = `Precio del destajo` × `Rendimiento` **al
+que de verdad se avanza ese día**. Con castillo K1 ($130/M, cuadrilla
+real $1,452/jornada):
+
+| Si el rendimiento es… | Ingreso/día | vs. costo real |
+|---|---:|---:|
+| 14.00 (más rápido que el teórico) | $1,820.00 | **+25.3%** |
+| 12.12 (el teórico) | $1,575.60 | +8.5% (el 1.085 de siempre) |
+| 12.00 (apenas debajo del teórico) | $1,560.00 | **+7.4%** |
+
+El 1.085 solo describe el punto medio —cuando se avanza justo al ritmo
+teórico—. En cuanto el ritmo real se aleja de ahí, el mismo precio por
+metro se convierte en más ganancia o en menos, sin que el destajo se
+haya movido. Y si el ritmo cae lo bastante, deja de ser "menos
+ganancia" y pasa a ser pérdida real: el punto exacto donde eso ocurre
+es `Rendimiento calculado` (`Costo de la cuadrilla` ÷ `Precio del
+destajo`) — por definición, el rendimiento al que el ingreso del día
+iguala el costo del día, ni gana ni pierde.
+
+### Justificar al contratista: tres alertas nuevas, no dos
+
+Dato del usuario. Falta una pieza simétrica a `estimacion_sin_respaldo_
+material`/`consumo_material_sin_respaldo_avance` (B-70/B-79), pero del
+lado de mano de obra: nada compara el Rendimiento Real de una
+actividad contra lo que su propio destajo necesita para no perder.
+Búsqueda en todo el cerebro de "contratista" + "rendimiento": sin
+resultado — es un hueco real, no uno ya cerrado. `ALERTA` gana tres
+filas (`MODELO.md` §5a):
+
+```
+rendimiento_bajo_para_destajo   Real cae, contra Teórico × Unidades
+                                 ejecutoras, más del umbral_pct
+                                 — aviso temprano, todavía no es pérdida
+rendimiento_excede_destajo       mismo cruce, dirección contraria
+                                 — gana más de lo normal
+rendimiento_en_perdida           Real cae por debajo de Calculado ×
+                                 Unidades ejecutoras — SIN umbral,
+                                 cualquier margen negativo ya es pérdida
+```
+
+**Por qué tres y no dos, dato del usuario:** las dos primeras comparan
+contra el Teórico —el punto "normal" del catálogo, igual para
+cualquiera que tenga ese destajo— y sirven de aviso temprano. La
+tercera compara contra el Calculado —el costo real de ESA cuadrilla,
+hoy— y no necesita umbral: cruzar esa línea, por poco que sea, ya es
+perder dinero por definición, el mismo criterio sin umbral que
+`subcontrato_fuera_de_base` (B-78).
+
+**El lado del material ya estaba resuelto — no es hueco, dato del
+usuario lo confirma.** `estimacion_sin_respaldo_material` (B-70) y
+`consumo_material_sin_respaldo_avance` (B-79) ya comparan, en las dos
+direcciones, la salida real de almacén del insumo testigo contra lo
+que el avance reclama —y ya se probó fuera de estructura, en eléctrica,
+hidráulica, gas y sanitaria (D-381, D-382)—. Es exactamente "si la
+salida del material cubre el avance o no"; no hacía falta nada nuevo.
+
+**Depende de `Unidades ejecutoras` estar bien capturado — mismo hueco
+que B-82.** El Rendimiento Real de mano de obra ya se define como
+`Cuadrillas × avance físico ÷ tiempo` (arriba): es una tasa de equipo,
+no de una sola cuadrilla. Las tres alertas nuevas multiplican por
+`Unidades ejecutoras` para que la comparación siga siendo válida con
+más de una cuadrilla — pero hoy ese campo vive sin que nadie lo toque
+nunca (D-403), así que en la práctica actual las tres comparan contra
+una sola cuadrilla, que es el caso universal que hay. `CONOCIMIENTO.md`
+§11.14, `MODELO.md` §5a, `PENDIENTES-MEJORAS.md` B-70, B-78, B-79, B-82.
 
 ## 6.3 Es un APU de un solo insumo
 

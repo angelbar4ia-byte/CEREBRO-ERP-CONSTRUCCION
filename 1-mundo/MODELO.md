@@ -1318,6 +1318,9 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `subcontrato_fuera_de_base` | El Real de un subcontrato (D-313) difiere de su Base, en cualquier dirección — sin umbral por %, dato del usuario | B-78 |
 | `pago_sin_respaldo_avance` | El % pagado (`ESTIMACION_LINEA`) excede, contra el `% avance físico` calculado de `TRAMO`, lo que la actividad realmente lleva — más del `umbral_pct` de adelanto | D-395 |
 | `avance_sin_respaldo_pago` | Mismo cruce, dirección contraria: el avance físico real excede, contra lo pagado, más del `umbral_pct` | D-395 |
+| `rendimiento_bajo_para_destajo` | El Rendimiento Real (mano de obra) de la actividad cae, contra (`Rendimiento teórico` × `Unidades ejecutoras`), más del `umbral_pct` | D-408 |
+| `rendimiento_excede_destajo` | Mismo cruce, dirección contraria: el Rendimiento Real excede ese mismo punto más del `umbral_pct` | D-408 |
+| `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
