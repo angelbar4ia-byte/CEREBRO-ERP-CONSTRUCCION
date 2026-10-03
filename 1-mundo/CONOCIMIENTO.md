@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2927 | 32 |
+| §11 | Los flujos entre sistemas | 2960 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3607,6 +3607,39 @@ importa vive todo en Hoja1 (3,231 filas × 222 columnas):
 Se guarda esta lectura —no el archivo completo— para no tener que
 redescubrirla si vuelve a llegar una versión nueva o un prototipo
 distinto con programa terminado.
+
+### `Esfuerzo` es redundante con `Días laborables` — y expone que nadie guarda cuántas cuadrillas se usaron
+
+Dato del usuario, seguir explorando. Verificado sin excepción en las 415
+filas de Zafiro —cualquier nivel, Concepto o rollup—: **`Esfuerzo` =
+`Días laborables` × 8, siempre.** Explica lo que antes parecía
+inconsistente (el Esfuerzo de un rollup no es la suma del de sus hijos):
+no es que falte sumar bien, es que `Esfuerzo` nunca fue un acumulado de
+trabajo real. Cada fila convierte **su propio** span de calendario a
+horas con una constante fija; no mide cuántas cuadrillas trabajaron ni
+cuánta mano de obra se gastó. El 1,112 del capítulo completo es solo
+139 días laborables del proyecto × 8, nada más.
+
+**No es solo un defecto de este archivo — expone un hueco propio.**
+`ACTIVIDAD.duracion_dias` (`MODELO.md` §5c) guarda el resultado de
+`calculada_rendimiento` (cantidad ÷ rendimiento ÷ cuadrillas), pero
+**el número de cuadrillas usado para llegar ahí no se guarda en
+ningún lado** — se usa una vez, en la fórmula, y se descarta. Las
+cuadrillas de D-389 a D-391 (1.8, 1.21, 2.0...) vivieron solo en texto
+y en cálculo de esta sesión, nunca en un campo.
+
+**Propuesta, no decisión: `TRAMO.cuadrillas`** (NUMERIC, fraccionario
+—mismo espíritu que B-80—), la otra mitad de `calculada_rendimiento`
+que hoy se pierde. Con eso, `esfuerzo_real = Σ(tramo.días ×
+tramo.cuadrillas)` sí sería acumulable de abajo hacia arriba —son
+cuadrillas-día reales, no calendario—, a diferencia de lo que mide este
+archivo. Dos usos concretos, no solo teóricos: le daría a
+`FRENTE_TOPE_CUADRILLA` (`MODELO.md` §5c) el dato que hoy le falta para
+comparar el tope declarado contra lo realmente programado —hoy "se
+declara, no se calcula", a propósito—; y le daría a B-41 (recursos por
+fecha) el mecanismo concreto para mano de obra, en vez de la afirmación
+sin detalle de que "no pide nada nuevo". `PENDIENTES-MEJORAS.md` B-82,
+abierto a propósito para cuando se decida.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
