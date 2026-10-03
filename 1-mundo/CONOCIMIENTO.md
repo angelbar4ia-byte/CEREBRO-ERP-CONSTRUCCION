@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3350 | 32 |
+| §11 | Los flujos entre sistemas | 3369 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4152,6 +4152,25 @@ Cantidad − Cantidad programada`, entonces `% Programado = 1 −
 cantidad sobrante. Mismo patrón que `Esfuerzo` (D-392) y `Holgura`
 (D-409): la plantilla trae una columna que parece nueva, pero es una
 vista derivada de un dato que ya existe.
+
+### `Programa según rendimiento`: la causa común de cuatro columnas "sin usar"
+
+Dato del usuario, cerrar la exploración columna por columna con la
+que faltaba. `Programa según rendimiento` = "No" en las 3,231 filas de
+los siete prototipos, sin excepción — pero a diferencia de las demás,
+esta no es solo otra columna trivial: **es el interruptor mismo de
+`modo_duracion=calculada_rendimiento`** (`MODELO.md` §5c). "No"
+significa que la duración se escribió a mano (`capturada`), nunca se
+calculó como cantidad÷rendimiento÷cuadrillas — y esa es la causa raíz
+de cuatro hallazgos que esta misma exploración fue encontrando uno por
+uno, sin verlos todavía como una sola cosa: `Rendimiento` en 0 (nunca
+se activó el modo que lo usaría), `Unidades ejecutoras` siempre en 1
+(D-403, sin ese modo no hay para qué tocarlo), `Esfuerzo` trivial
+(D-392, no hay cuadrillas reales que acumular) y `Holgura` en 0
+(D-409, el motor de CPM tampoco corrió). Si alguna fila dijera "Sí"
+aquí, sería la señal de que esa actividad sí pasó por el cálculo —y
+ahí las otras cuatro empezarían a tener contenido real—. `MODELO.md`
+§5c.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
