@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3286 | 32 |
+| §11 | Los flujos entre sistemas | 3308 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3966,6 +3966,28 @@ prototipos, lo tocó nunca. No hay nada que le diga a quien captura
 mano, concepto por concepto. El hueco es de comportamiento —falta la
 mitad de "el sistema propone"—, no de esquema. `PENDIENTES-MEJORAS.md`
 B-82, extendido.
+
+### La fórmula que le faltaba a `Rendimiento calculado` — y por qué `Unidades ejecutoras` importa más de lo que parecía
+
+Dato del usuario, aclarar la relación completa. `CATALOGOS.md` §10 ya
+listaba `Rendimiento calculado` entre los 19 campos derivables, sin
+decir cómo —y "la razón entre teórico y calculado" quedaba igual de
+suelto—. **Fórmula, dato del usuario: `Rendimiento calculado` =
+`Rendimiento teórico` × `Unidades ejecutoras`.** La "casilla de
+programa con rendimiento" es `modo_duracion=calculada_rendimiento`
+(`MODELO.md` §5c) — fuera de ese modo, `Unidades ejecutoras` no
+multiplica nada, porque la duración no sale de ahí.
+
+**Dos límites de alcance, dato del usuario:** `Rendimiento calculado`
+solo existe cuando el destajo tiene su propia línea de mano de obra en
+la matriz —los conceptos `preestablecida_nivel` (Cancelería, Domos,
+B-48, D-400) no tienen `Rendimiento teórico` que escalar—; y el mismo
+mecanismo aplica igual a maquinaria, no solo a cuadrillas de personas.
+
+**Cierra, con fórmula, lo que D-397 a D-400 hicieron a mano.** Cada vez
+que calculamos "cuadrillas necesarias" dividiendo días teóricos entre
+días reales, estábamos despejando `Unidades ejecutoras` de esta misma
+fórmula al revés. `CATALOGOS.md` §10, `PENDIENTES-MEJORAS.md` B-82.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

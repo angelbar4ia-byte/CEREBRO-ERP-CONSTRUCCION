@@ -1030,6 +1030,27 @@ calculado, jornadas por unidad, la razón entre teórico y calculado.
 **Los únicos dos que no existen en ningún lado son `Cuadrilla` y `Rendimiento
 teórico`.**
 
+### `Rendimiento calculado` ya tiene fórmula — dato del usuario
+
+`Rendimiento calculado` quedaba en la lista de los 19 derivables sin
+decir cómo se derivaba. Dato del usuario: **`Rendimiento calculado` =
+`Rendimiento teórico` × `Unidades ejecutoras`** —el mismo número de
+cuadrillas que `PROGRAMA_ZAFIRO.xlsx` nunca tocó (D-403)—. `Rendimiento
+teórico` es el de **una** cuadrilla; `Rendimiento calculado` es el
+ritmo real una vez que se sabe cuántas trabajan. "La razón entre
+teórico y calculado" (también en la lista de los 19) resulta ser el
+mismo número de cuadrillas visto al revés — no es un tercer dato, es el
+mismo cociente.
+
+**Solo existe cuando el destajo tiene su propia línea de mano de obra
+en la matriz** —dato del usuario—: si un concepto se contrata completo
+(`preestablecida_nivel`, B-48, sin línea `MO-` propia, como Cancelería
+o Domos, D-400), no hay `Rendimiento teórico` que escalar, y
+`Rendimiento calculado` no aplica. **Mismo mecanismo para maquinaria**
+—dato del usuario—: el rendimiento de un equipo (no solo de una
+cuadrilla de personas) se calcula igual, escalando su teórico por
+cuántas unidades de esa maquinaria trabajan a la vez.
+
 ### Es una semilla, no un cargador
 
 > OPUS no entrega esos dos datos **y nunca los va a entregar.**
