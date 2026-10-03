@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3497 | 32 |
+| §11 | Los flujos entre sistemas | 3512 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4243,7 +4243,9 @@ Zafiro (172m²).
    − inicio + 1, DERIVADO de las fechas, no escalado aparte;
    Esfuerzo = Días laborables × 8 (D-392)
 6. Cuadrícula AD:HN: `Cantidad` ÷ `Días laborables` (redondeado a 2
-   decimales) en cada día activo, vacío en el resto
+   decimales) en cada día activo; un `0` explícito en TODO día sin
+   trabajo entre el primer y el último día activo (fines de semana y
+   parón) — fuera del tramo, vacío (D-416)
 ```
 
 **Corrige D-414 (primera versión de este método).** Escalaba `Días
@@ -4273,10 +4275,23 @@ resúmenes van vacíos); solo lunes a viernes, sin excluir feriados
 exactamente `Días laborables` (314 de 314); cada uno vale `Cantidad`
 ÷ `Días laborables` a 2 decimales (312 de 314); el primer y el último
 día con valor son `Fecha de inicio` y `Fecha de término` (313 de
-314). Rubí cumple las seis: 0 violaciones en sus 208 conceptos, y la
-proporción de tramos con parón es parecida (Zafiro 13 de 315, Rubí
-11 de 208). Castillo K1 tramo 1: Zafiro corre 5 días, para 17,
-retoma 2; Rubí corre 6, para 22, retoma 3.
+314). **Y la séptima, que la primera versión de este piloto se saltó
+(D-416): los ceros.** Entre el primer y el último día activo, todo
+día sin trabajo lleva un `0` explícito —410 ceros contra ninguna celda
+vacía ahí dentro— y fuera del tramo las celdas van vacías (59,035
+contra un solo cero suelto). El número de ceros de cada fila es
+exactamente `Días calendario − Días laborables` (313 de 314): los
+ceros no son relleno, **miden cuánto dura cada parón** y marcan los
+días sin trabajo. La cimentación real de Rubí, que ya venía en el
+archivo, sigue la misma convención (57 de 57; 9 sábados y 9 domingos).
+Los ceros de fin de semana caen en sábado y domingo (132 y 132 en
+Zafiro, contra 146 ceros en días hábiles que son parón), igual que
+D-393 ya había encontrado: cero actividad en sábado y domingo. Rubí
+cumple las siete: 0 violaciones en sus 208 conceptos con 417 ceros
+explícitos (137 sábados, 137 domingos, 143 de parón), y la proporción
+de tramos con parón es parecida (Zafiro 13 de 315, Rubí 11 de 208).
+Castillo K1 tramo 1: Zafiro corre 5 días, para 17, retoma 2; Rubí
+corre 6, para 22, retoma 3.
 
 **La cuadrícula se extendió 8 columnas (HO:HV), a propósito.** El
 horizonte de 193 columnas lo fijó el programa de Zafiro (9-jun a
