@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3266 | 32 |
+| §11 | Los flujos entre sistemas | 3286 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3946,6 +3946,26 @@ obsoleto sin que nada lo marque; uno que se deduce solo
 (`origen=técnica`) se recalcula siempre y no puede envejecer así. Es la
 razón de fondo detrás de que `confianza` ya se derive de `origen` en
 vez de declararse aparte (`MODELO.md` §5c).
+
+### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
+
+Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las
+3,231 filas, los siete prototipos completos, no solo Zafiro:
+`Unidades ejecutoras` = 1.0 en las 2,452 filas de Concepto, sin una
+sola excepción; `NaN` en las 779 que no son Concepto —misma división
+limpia por `Tipo` que `Remanente`—. No es un comportamiento de Zafiro,
+es el default del archivo entero.
+
+**Esto cambia cómo se lee el hueco de B-82.** El campo se llama
+"Unidades ejecutoras", en plural, acepta cualquier número —el ERP sí
+puede representar más de una cuadrilla—. El hueco no es que falte el
+campo: es que nadie, en ninguna de las 2,452 filas de los siete
+prototipos, lo tocó nunca. No hay nada que le diga a quien captura
+"esta cantidad, contra este tiempo y este rendimiento, necesita más de
+1" — exactamente el cálculo que D-397 a D-400 tuvieron que hacer a
+mano, concepto por concepto. El hueco es de comportamiento —falta la
+mitad de "el sistema propone"—, no de esquema. `PENDIENTES-MEJORAS.md`
+B-82, extendido.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
