@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3009 | 32 |
+| §11 | Los flujos entre sistemas | 3076 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3689,6 +3689,73 @@ muros") son solo 2 días activos de 38 en su rango, 0.5+0.5 de una sola
 unidad total, separados 52 días —una tarea casi trivial repartida a la
 mitad al principio y al final de una ventana que no le pertenece, no un
 patrón físico—.
+
+### El programa hereda las cuatro capas de presupuesto — Base, Diseño, Formado, Real
+
+Dato del usuario, al explorar `PROGRAMA_ZAFIRO.xlsx`: no hay "programa
+de ingeniería" como capa separada —corrige mi primera lectura—. Zafiro
+es **Programa Base**, por prototipo, igual que `PRESUPUESTO.tipo=
+plantilla`; los otros seis capítulos se completan con su información.
+El resto se alinea exacto con B-71:
+
+| Presupuesto | Programa | Dónde vive |
+|---|---|---|
+| Base (`tipo=plantilla`) | Programa Base, por prototipo | Zafiro ya lo tiene |
+| Ingeniería (`tipo=obra`) | Programa de Diseño, por lote | `ACTIVIDAD.origen_captura=manual_con_diseño` + `modo_duracion=capturada` |
+| Formado (calculado) | Programa formado con predicción | `modo_duracion=calculada_rendimiento` |
+| Pagado Real | Programa Real | `fecha_inicio_real`/`fecha_fin_real` |
+
+**¿El programa de diseño de un lote arranca en blanco o se carga desde
+la base?** Dato del usuario: **las dos cosas son válidas** — no es una
+regla obligatoria como `matriz_generada` ("copia y escala, nunca
+genera"). No hace falta campo nuevo: `origen_captura=manual_con_diseño`
+ya cubre ambos casos, porque lo que lo define no es de dónde salió el
+número sino que un humano con criterio lo decidió. Cargar la base,
+cuando existe, es el sistema *proponiendo* un punto de partida —mismo
+principio que todo el resto de este cerebro—, nunca una obligación.
+
+### Tres preguntas quedan cerradas: avance físico real, origen de cantidad, programa contratado
+
+**Avance físico real es un cuarto uso de "declarado menos calculado".**
+Dato del usuario: el sistema propone el % de avance físico —derivado de
+`TRAMO`/fechas reales, mismo cálculo que ya decodificó el día-por-día de
+Zafiro (cantidad ejecutada ÷ cantidad total a la fecha, D-393)—, y quien
+captura **valida o corrige, solo si algo se ve raro**. Mismo mecanismo
+que ya tiene tres usos (`MEMORIA.md`: fusión, extracción, precio alzado)
+— ahora un cuarto. La comparación contra lo pagado (`ESTIMACION_LINEA`)
+reusa `ALERTA`, con la misma forma de dos direcciones que ya tienen
+B-70/B-79: puede pagarse más de lo que se avanzó, o avanzarse más de lo
+que se ha pagado.
+
+**Origen de cantidad (ingeniería real, paramétrico, PU) no pide campo
+nuevo.** Dato del usuario, confirmado: "ingeniería" y "paramétrico" son
+el mismo `calculada_rendimiento` —la procedencia de la cantidad ya vive
+en el `Nodo`/`TRAZO` que la originó (cuantificación directa o
+`ENSAMBLE_PARAMETRO`, B-53), no hace falta duplicarla en `ACTIVIDAD`—.
+"PU" (sin desglose de insumos, como un subcontrato) ya es
+`preestablecida_nivel` (B-48), no un tercer modo. **Dato del usuario,
+nuevo:** cuando una `PROPUESTA(tipo=orden_cambio)` se aprueba, también
+debe propagarse al programa, no solo al presupuesto —las `ACTIVIDAD`
+afectadas se ajustan, no solo las líneas de costo—. Y la intención es
+doble salida, no solo una: **programa de presupuesto** (costo en el
+tiempo) y **programa de insumos** (material en el tiempo, consultable
+individual, general o combinado) — misma explosión de B-41 ("se lee por
+fecha, sin tabla nueva"), ahora con las dos vistas nombradas.
+
+**"Programa contratado" ya existe, disperso — dato del usuario,
+confirmado.** `disparador_fecha=contractual` ya marca que una actividad
+arranca por anticipo o junta de arranque; lo que falta no es tabla
+nueva, es el momento de aprobar el programa de diseño completo de un
+lote como el que se pacta —mismo mecanismo de `PROPUESTA`+roles que ya
+resolvió B-45—, y el control de cambio de siempre para lo que se edite
+después. **Dato del usuario: ojo con las incidencias que adelantan o
+atrasan el programa, marcando ruta crítica — un material puede
+atrasarlo.** Esto ya está cerrado, no es hueco nuevo: la causa 7 de
+§13.6 ("falta de insumos") ya dice que es causa de tiempo, no de costo,
+y que se resuelve como tramo de una actividad existente (P-5) — ese
+tramo, al moverse, ya dispara el recálculo de `es_ruta_critica`
+("recalcula siempre", `MODELO.md` §5c). La cadena ya estaba completa,
+solo faltaba nombrarla de principio a fin.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

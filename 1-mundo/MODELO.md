@@ -1316,6 +1316,8 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `estimacion_sin_respaldo_material` | Al correr `validar_estimacion`, la salida de almacén del insumo testigo (`MOVIMIENTO_ALMACEN`, `motivo` ∈ {`salida_produccion`, `implosion`}) del periodo no alcanza, contra el rendimiento teórico, para los m² que la estimación reclama — más del `umbral_pct` de faltante | B-70 |
 | `consumo_material_sin_respaldo_avance` | Mismo cruce, dirección contraria: el insumo testigo consumido excede, contra el rendimiento teórico, lo que el avance reclamado necesita — más del `umbral_pct` de exceso | B-79 |
 | `subcontrato_fuera_de_base` | El Real de un subcontrato (D-313) difiere de su Base, en cualquier dirección — sin umbral por %, dato del usuario | B-78 |
+| `pago_sin_respaldo_avance` | El % pagado (`ESTIMACION_LINEA`) excede, contra el `% avance físico` calculado de `TRAMO`, lo que la actividad realmente lleva — más del `umbral_pct` de adelanto | D-395 |
+| `avance_sin_respaldo_pago` | Mismo cruce, dirección contraria: el avance físico real excede, contra lo pagado, más del `umbral_pct` | D-395 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
