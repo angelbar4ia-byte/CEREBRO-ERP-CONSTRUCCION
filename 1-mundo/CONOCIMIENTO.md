@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2960 | 32 |
+| §11 | Los flujos entre sistemas | 3009 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3640,6 +3640,55 @@ declara, no se calcula", a propósito—; y le daría a B-41 (recursos por
 fecha) el mecanismo concreto para mano de obra, en vez de la afirmación
 sin detalle de que "no pide nada nuevo". `PENDIENTES-MEJORAS.md` B-82,
 abierto a propósito para cuando se decida.
+
+### El día-por-día (AD-HN) decodificado: la concurrencia real, y los huecos que sí son `TRAMO`
+
+Dato del usuario, seguir explorando. Cuatro validaciones mecánicas, sin
+una sola excepción: columna AD = 2025-06-09 (día 0) hasta HN = 2025-12-18
+(día 192), una por cada día calendario; `SUMA(AD:HN)` de cada fila
+coincide con su `Cantidad programada` (269/317 exacto, el resto dentro
+de ruido de redondeo); los días no-cero de cada fila caen siempre dentro
+de su propio `Fecha de inicio`/`Fecha de término` (314/314); y cero
+actividad en sábado y domingo, en los 193 días, sin excepción —confirma
+la semana de 5 días hasta el nivel más fino posible.
+
+**La concurrencia real vive aquí, no en `Esfuerzo` (D-392).** Contando
+oficios distintos (prefijo de `Clave`) activos el mismo día: de 1 a 6,
+media 2.25, mediana 2 —pico el 20 de octubre, con estructura, acabados
+y cuatro instalaciones a la vez—. Por semana, la forma es clara: baja en
+cimentación/estructura temprana, sube a 2-3 de media (pico de 6) en las
+semanas 18-27, el mismo traslape fuerte de Acabados/Obras
+Exteriores/Pintura que D-390 ya había visto por otro lado. Refuerza
+B-82 con evidencia, no solo con teoría: hay días reales de hasta 6
+oficios simultáneos que `Esfuerzo`/`Unidades ejecutoras` ocultaban por
+completo.
+
+**Los huecos internos son `TRAMO`, y uno se pudo verificar a fondo.**
+Solo 13 de 317 conceptos tienen un día laborable en cero dentro de su
+propio rango —casi todos con un solo bloque de hueco, dos sesiones de
+trabajo separadas—. `EST-02110` (castillo K-1) trabaja 26-27 jun y
+30 jun-2 jul, se detiene 17 días laborables y retoma 28-29 jul; en ese
+hueco cae exacto `EST-02310` (cadena CE-1, 3-9 jul) —la cadena se cuela
+*dentro* de la pausa del castillo—. El hueco (17 días) excede la ventana
+de colado (5 días): la diferencia es fraguado, el mismo límite que
+D-389 ya había señalado sin poder medirlo. Confirma el mecanismo de B-43
+—técnica se deduce sola— con un segundo caso real, independiente de
+`ALAMO 18`.
+
+Mismo patrón, sin verificar uno por uno con el mismo detalle: `EST-02010`
+(muro tabique, ×2) y `EST-02110` otra vez —estructura, misma historia
+probable—; `EST-21011`/`EST-21031` (losa maciza y nervada, hueco de 6-8
+días) —armado→colado→fraguado→descimbrado, que la semilla ya distingue
+como líneas `MO-` separadas—; `IEC-01210/01220/01260/03010` (centro,
+arbotante, spot, minisplit "LOSA ELEC", hueco de 5 días) —cajas ahogadas
+en la losa, mismo fraguado—; `ALB-01210`/`ALB-01212` (repellado de
+fachada, hueco de 12-13 días) —acabado exterior, sin causa tan clara—.
+
+**Uno no es pausa real, es ruido:** `IEC-02130` ("acometida cable
+muros") son solo 2 días activos de 38 en su rango, 0.5+0.5 de una sola
+unidad total, separados 52 días —una tarea casi trivial repartida a la
+mitad al principio y al final de una ventana que no le pertenece, no un
+patrón físico—.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
