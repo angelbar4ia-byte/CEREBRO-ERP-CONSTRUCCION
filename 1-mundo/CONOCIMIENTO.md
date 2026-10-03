@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3076 | 32 |
+| §11 | Los flujos entre sistemas | 3107 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3756,6 +3756,37 @@ y que se resuelve como tramo de una actividad existente (P-5) — ese
 tramo, al moverse, ya dispara el recálculo de `es_ruta_critica`
 ("recalcula siempre", `MODELO.md` §5c). La cadena ya estaba completa,
 solo faltaba nombrarla de principio a fin.
+
+### A `FRENTE_TOPE_CUADRILLA` le falta `frente_id` en `ACTIVIDAD`, no solo `cuadrillas` en `TRAMO`
+
+Dato del usuario, seguir con cuadrillas/`FRENTE_TOPE_CUADRILLA`. Buscar
+en Zafiro días con ≥2 conceptos *sustanciales* (≥3 días laborables) del
+mismo oficio activos a la vez —la situación que `tope` vigilaría—
+encontró que **el archivo no distingue una tarea repartida en varias
+líneas de catálogo de dos tareas físicas en paralelo: se ven
+idénticas**. Los tres casos grandes resultaron falsos positivos, cada
+uno por una razón distinta: estructura (10 conceptos el 23 de junio) es
+una sola tarea de armado de acero repartida por tamaño de varilla, las
+9 líneas con fechas idénticas; carpintería (9 conceptos, 17 nov-5 dic)
+es un solo subcontrato (`preestablecida_nivel`, B-48) fabricando varias
+piezas en el mismo periodo; obra exterior (7 conceptos, misma semana)
+es una cuadrilla de jardinería recorriendo una lista. **Un caso sí es
+plausible:** `ACA-01010` (finas interiores) y `ACA-20011` (finas en
+fachada) se traslapan —18-30 sep. y 19 sep.-2 oct.— y son zonas físicas
+distintas (dentro/fuera de la casa), el único de los revisados donde la
+explicación no es "es la misma tarea" o "es un solo contrato".
+
+**El hueco real no es solo `TRAMO.cuadrillas` (B-82) — también falta
+`frente_id`.** `FRENTE_TOPE_CUADRILLA` ya tiene `frente_id` y declara su
+tope por frente+oficio, pero ni `ACTIVIDAD` ni `TRAMO` tienen `frente_id`
+propio. Aunque existiera `TRAMO.cuadrillas`, no habría manera de saber
+en qué frente cae cada actividad para comparar contra el tope declarado
+de ese frente —por eso esta búsqueda tuvo que adivinar "frente" desde
+el texto libre de la descripción (RECÁMARA 1/2/3, FACHADA/interior), no
+de un dato estructurado—. Coincide con lo que `CATALOGOS.md` ya decía
+de `Frente`: "no valida, no impide, no calcula" — ahora se ve que le
+falta el enganche, no solo el cálculo. `PENDIENTES-MEJORAS.md` B-82,
+extendido.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
