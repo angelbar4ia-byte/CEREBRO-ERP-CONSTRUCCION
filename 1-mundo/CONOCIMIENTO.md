@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3146 | 32 |
+| §11 | Los flujos entre sistemas | 3197 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3826,6 +3826,57 @@ un prototipo. Confirma D-394: la matriz de cada concepto, ya escalada
 al prototipo, **es** la ingeniería base — no hace falta nada aparte
 para tenerla. Generalizable a cualquiera de los siete prototipos del
 catálogo, no solo a Zafiro.
+
+### Aplicado a los siete prototipos: la losa no escala con el m² de la casa
+
+Dato del usuario: aplicar el mismo método a los otros seis. Clave de
+losa por prototipo y su m² en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`:
+Zafiro (`EST-01040`, 172 M2), Rubí (`EST-01030`, 200), Zafiro Plus
+(`EST-01060`, 137), Jade (`EST-01020`, 230), Diamante sin chimenea
+(`EST-01054`, 216), Diamante con chimenea (`EST-01053`, 216), Oro
+(`EST-01013`, 160). **El m² de losa no escala con el m² de la casa**:
+Zafiro Plus (224 m² de casa) tiene menos losa (137) que Zafiro 1.0 (172
+m² de casa, 172 de losa); Oro, la casa más grande (300 m²), tiene de
+las losas más chicas (160) — en los prototipos de 2 plantas la losa
+solo cubre la huella de planta baja, no la suma de ambas. Explotar la
+matriz de cada uno, en vez de estimar por proporción, era necesario.
+
+**Dos cosas distintas, para no mezclar lo medido con lo proyectado.**
+Con rendimiento 6.85 M2/día, días teóricos a 1 cuadrilla: Zafiro 25.11,
+Rubí 29.20, Zafiro Plus 20.00, Jade 33.58, Diamante (las dos) 31.53,
+Oro 23.36. **Medido/confirmado:** solo Zafiro (2.28 cuadrillas contra
+sus 11 días reales, D-398) y Diamante (2.00 contra el objetivo de 18.7
+días, D-389) tienen un target real o ya validado. **Proyectado, no
+confirmado:** los otros cinco no tienen programa real ni objetivo
+propio todavía —solo la plantilla sin empezar, D-390—; dividir entre 2
+cuadrillas (Rubí 14.60 días, Zafiro Plus 10.00, Jade 16.79, Diamante
+15.77, Oro 11.68) es la misma cuadrilla ya repetida dos veces, aplicada
+por consistencia, no un tercer dato medido.
+
+### Comprobado para cada concepto: los seis "act" de Zafiro, uno por uno
+
+Dato del usuario: comprobarlo para cada concepto, no solo losa de
+cimentación. Los conceptos en unidad "act" (lump sum) de Zafiro son
+seis, y el método aplica distinto a cada uno:
+
+| Clave | Concepto | m² (matriz) | Días teóricos 1 cuadrilla | Días reales | Cuadrillas necesarias |
+|---|---|---:|---:|---:|---:|
+| `EST-01040` | Losa cimentación | 172 | 25.11 | 11 | **2.28** |
+| `EST-21011` | Losa maciza 3.00 | 125 | 26.41 (armado+descimbrado) | 9 | **2.93** |
+| `EST-21031` | Losa nervada 4.20 | 40 | 8.45 (armado+descimbrado) | 7 | 1.21 |
+
+**Tres no aplican, por razones distintas, no por descuido:**
+`ACC-00001` (material adicional de consumo) no tiene una sola línea
+`MO-` en la matriz —es consumible, no mano de obra—; `CAN-01002`/
+`CAN-01003` (cancelería, domos) son `preestablecida_nivel` (B-48), se
+contratan terminados, `calculada_rendimiento` no les aplica.
+
+**El patrón se sostiene:** las losas grandes (cimentación 172 m²,
+maciza 125 m²) piden 2 a 3 cuadrillas; la losa chica (nervada, 40 m²) y
+el tramo chico de muro (D-397) cierran cerca de 1. No es que las losas
+siempre necesiten más de 1 cuadrilla — es el tamaño contra el tiempo
+que el programa les dio, igual en los seis casos. `CATALOGOS.md` §10
+—`MOE-02215`/`MOE-02216`/`MOE-02218`, nuevas—.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

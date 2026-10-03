@@ -1127,8 +1127,11 @@ mecánico de las 265 filas completas.
 | `MOE-31010` | MO registros sanitarios | `MOCU-005` | 4.50 | PZ | $350.00 |
 | `MOE-31110` | MO tapa registros sanitarios/cisterna | `MOCU-005` | 15.75 | PZ | $100.00 |
 | `MOP-00301` | MO murete de instalaciones | `MOCU-005` | 0.55 | PZ | $2,850.00 |
+| `MOE-02215` | MO armado y cimbrado losa 3.00 | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02216` | MO descimbrado de losa 3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOE-02218` | MO descimbrado de losa 4.20 | `MOCU-005` | 31.50 | M2 | $50.00 |
 
-**66 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
+**69 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
 1.085 de `MOCU-023`/`MOCU-005`) se ha cruzado todavía contra ejecución real.
 
 **Primera validación: castillo K1 (`ALAMO 18`) cierra exacto, 1.00 cuadrilla.**
@@ -1156,6 +1159,13 @@ cuadrillas implícitas según el filtro, con 67-74% fuera de una banda
 razonable. No es que el rendimiento esté mal — es que un plan manual no
 pasa por rendimiento × cuadrillas de forma sistemática, que es justo la
 brecha que un programa calculado cerraría. `CONOCIMIENTO.md` §11.14.
+
+**Cuarto uso: completar los conceptos "act" que el tercer uso no pudo
+ver.** `MOE-02215`/`MOE-02216` (losa maciza 3.00) y `MOE-02218` (losa
+nervada 4.20) llegan al comprobar cuadrillas concepto por concepto
+—`MOE-02217` ya estaba—: los conceptos en unidad "act" (lump sum) no
+tienen unidad que coincida con ninguna línea `MO-`, así que el tercer
+uso los dejó fuera sin darse cuenta. `CONOCIMIENTO.md` §11.14.
 
 ## 10b El prefijo no determina la familia — segunda prueba
 
