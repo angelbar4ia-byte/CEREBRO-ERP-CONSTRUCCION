@@ -21,12 +21,12 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §3 | Notas de implementación | 129 | 5 |
 | §4 | Estados del nodo y exportación | 144 | 3 |
 | §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
-| §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
+| §6 | Destajos: precio, cuadrilla y fusión | 230 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3308 | 32 |
+| §11 | Los flujos entre sistemas | 3321 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -1211,6 +1211,58 @@ El teórico **nunca se sobrescribe** con ninguno de los dos reales — misma cad
 el precio (§13.1). Si el real de mano de obra diverge, el programa gana una
 **segunda proyección que convive con la teórica**, no un reemplazo —
 `PROPUESTA-CUATRO-MODULOS.md` §4.
+
+### El `$1,452/jornada` del ejemplo tiene fuente — no era anónimo
+
+Dato del usuario, buscar si existe un catálogo de cuadrillas con precio
+propio. El ejemplo de arriba nunca decía de dónde salía ese número.
+Existe, trazable: `ANALISIS_DE_BASICOS_CONCEPTOS.csv`, filas
+`Origen=ManoDeObra` (`CATALOGOS.md` §8, §10) — tres niveles que no
+estaban conectados con esta sección: rol/oficio con su jornal
+(`MOCA-xxx`: Albañil $760, Ayudante $560…) compone una cuadrilla
+(`MOCU-xxx`/`CUAD-`, 39 en total) que la semilla liga a un destajo.
+`MOCU-005` suma exacto 760 + 560 + 132 (10% contratista) = **$1,452.00
+— el mismo número del ejemplo.** `CATALOGOS.md` §10.
+
+### Castillo K1 conecta, con un caso real, lo que vivía separado entre destajo y programa
+
+Dato del usuario, comprobar si el costo del destajo es correcto contra
+la duración de diseño y la duración real. Los cuatro rendimientos de
+arriba, con números reales del mismo concepto (`MOE-02020`, castillo K1):
+
+| Rendimiento | Fórmula | Valor | Fuente |
+|---|---|---:|---|
+| Teórico | constante de catálogo | 12.12 M/día | semilla |
+| Calculado | costo cuadrilla ÷ precio destajo | 1,452.00 ÷ 130.00 = **11.17** | `MOCU-005` arriba |
+| Real de mano de obra | cantidad ÷ días reales (`Unidades ejecutoras`=1, D-403) | 339.20 ÷ 28 = **12.11** | `ALAMO 18`, D-386 |
+| Requerido (diseño, tramo 1) | cantidad ÷ días capturados a mano | 126.90 ÷ 7 = **18.13** | `PROGRAMA_ZAFIRO.xlsx` |
+| Requerido (diseño, tramo 2) | cantidad ÷ días capturados a mano | 25.20 ÷ 6 = **4.20** | `PROGRAMA_ZAFIRO.xlsx` |
+
+**El caso real cierra los tres a la vez.** Teórico, Calculado y Real de
+mano de obra caen entre 11.17 y 12.12 — la comparación de arriba
+("si el calculado y el teórico difieren…") no dispara ninguna alerta,
+y confirma otra vez el 1.085 ya documentado aquí mismo (22/22 pintor,
+58/78 albañil): 12.12 ÷ 11.17 = 1.085 exacto.
+
+**El diseño no cierra, y en direcciones opuestas.** Aplicando la tabla
+de "acortar la duración" de arriba (requerido vs. calculado): el tramo
+1 (Requerido 18.13 > Calculado 11.17) leería "la fecha exige más de lo
+pactado, o el destajo está barato"; el tramo 2 (Requerido 4.20 <
+Calculado 11.17) leería "hay holgura, o el destajo está caro". Las dos
+lecturas literales serían contradictorias para el mismo concepto en el
+mismo prototipo. La lectura real, ya establecida en D-397 con el
+tercer uso de la semilla contra `PROGRAMA_ZAFIRO.xlsx`, es que el plan
+manual de Zafiro no pasa por esta tabla en absoluto — no que el
+destajo esté mal fijado en ningún tramo.
+
+**No se repite igual fuera de mano de obra gruesa — dato que esta
+misma sección ya anotaba.** Cruzando Calculado contra Teórico para las
+cuadrillas del catálogo con más datos: `MOCU-005`/`008`/`023`
+(albañilería y acabado) dan 1.085 limpio; `MOCU-009`/`010`/`021`/
+`024`/`025`/`027`/`029` (eléctrico y variado) dan de 0.14 a 0.91 — la
+misma dispersión sin factor único que arriba se reporta para
+instalaciones (0.03 a 4.9 en eléctrico). Este mismo archivo, §11.14.
+`CATALOGOS.md` §10. `PENDIENTES-MEJORAS.md` B-82.
 
 ## 6.3 Es un APU de un solo insumo
 
@@ -3967,27 +4019,40 @@ mano, concepto por concepto. El hueco es de comportamiento —falta la
 mitad de "el sistema propone"—, no de esquema. `PENDIENTES-MEJORAS.md`
 B-82, extendido.
 
-### La fórmula que le faltaba a `Rendimiento calculado` — y por qué `Unidades ejecutoras` importa más de lo que parecía
+### `Rendimiento calculado` no necesitaba fórmula nueva — ya la tenía, en §6.2
 
-Dato del usuario, aclarar la relación completa. `CATALOGOS.md` §10 ya
-listaba `Rendimiento calculado` entre los 19 campos derivables, sin
-decir cómo —y "la razón entre teórico y calculado" quedaba igual de
-suelto—. **Fórmula, dato del usuario: `Rendimiento calculado` =
-`Rendimiento teórico` × `Unidades ejecutoras`.** La "casilla de
-programa con rendimiento" es `modo_duracion=calculada_rendimiento`
-(`MODELO.md` §5c) — fuera de ese modo, `Unidades ejecutoras` no
-multiplica nada, porque la duración no sale de ahí.
+**Corrige lo que esta misma sección decía unas líneas arriba.** La
+fórmula que se propuso aquí (`Rendimiento teórico` × `Unidades
+ejecutoras`) nunca hacía falta: `Rendimiento calculado` ya estaba
+definido, desde antes de esta sesión, en §6.2 —`Costo de la cuadrilla`
+÷ `Precio del destajo`—, sin pasar por `Unidades ejecutoras` en
+absoluto. Esa sección distingue cuatro rendimientos (Calculado,
+Teórico, Real, Requerido); lo que aquí se escribió no coincidía con
+ninguno de los cuatro.
 
-**Dos límites de alcance, dato del usuario:** `Rendimiento calculado`
-solo existe cuando el destajo tiene su propia línea de mano de obra en
-la matriz —los conceptos `preestablecida_nivel` (Cancelería, Domos,
-B-48, D-400) no tienen `Rendimiento teórico` que escalar—; y el mismo
-mecanismo aplica igual a maquinaria, no solo a cuadrillas de personas.
+**Lo que de verdad hacía falta nombrar era otra fórmula, para otro
+campo:** la duración de `modo_duracion=calculada_rendimiento`
+(`MODELO.md` §5c) es `Cantidad` ÷ (`Rendimiento teórico` ×
+`Unidades ejecutoras`) — ahí sí entra `Unidades ejecutoras`, y no
+pasa por `Rendimiento calculado`. Y lo que `PROGRAMA_ZAFIRO.xlsx`
+aporta (cantidad entre duración capturada a mano) ya tenía nombre en
+§6.2 sin un caso real que lo probara: es `Rendimiento Requerido`.
 
-**Cierra, con fórmula, lo que D-397 a D-400 hicieron a mano.** Cada vez
-que calculamos "cuadrillas necesarias" dividiendo días teóricos entre
-días reales, estábamos despejando `Unidades ejecutoras` de esta misma
-fórmula al revés. `CATALOGOS.md` §10, `PENDIENTES-MEJORAS.md` B-82.
+**Los dos límites de alcance siguen de pie, dato del usuario —solo
+cambian de fórmula—:** solo existe cuando el destajo tiene su propia
+línea de mano de obra en la matriz —los conceptos
+`preestablecida_nivel` (Cancelería, Domos, B-48, D-400) no tienen nada
+que escalar—; y el mismo mecanismo aplica igual a maquinaria, no solo
+a cuadrillas de personas.
+
+**Con números reales, no solo con la fórmula corregida.** Castillo K1
+conecta, por primera vez, el lado del destajo (§6.2) con el lado del
+programa que D-397 a D-400 ya habían trabajado a mano aquí mismo: el
+caso real cierra los tres rendimientos entre 11.17 y 12.12; los dos
+tramos de diseño de Zafiro se disparan en direcciones opuestas (18.13
+y 4.20) — confirma por el lado del dinero lo que ya se sabía por el
+lado del tiempo. Tabla completa en §6.2. `CATALOGOS.md` §10,
+`PENDIENTES-MEJORAS.md` B-82.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 

@@ -1030,26 +1030,34 @@ calculado, jornadas por unidad, la razón entre teórico y calculado.
 **Los únicos dos que no existen en ningún lado son `Cuadrilla` y `Rendimiento
 teórico`.**
 
-### `Rendimiento calculado` ya tiene fórmula — dato del usuario
+### `Rendimiento calculado` ya tenía fórmula — D-404 la inventó mal
 
-`Rendimiento calculado` quedaba en la lista de los 19 derivables sin
-decir cómo se derivaba. Dato del usuario: **`Rendimiento calculado` =
-`Rendimiento teórico` × `Unidades ejecutoras`** —el mismo número de
-cuadrillas que `PROGRAMA_ZAFIRO.xlsx` nunca tocó (D-403)—. `Rendimiento
-teórico` es el de **una** cuadrilla; `Rendimiento calculado` es el
-ritmo real una vez que se sabe cuántas trabajan. "La razón entre
-teórico y calculado" (también en la lista de los 19) resulta ser el
-mismo número de cuadrillas visto al revés — no es un tercer dato, es el
-mismo cociente.
+**Corrige D-404.** La fórmula que D-404 propuso (`Rendimiento teórico`
+× `Unidades ejecutoras`) nunca hacía falta: `Rendimiento calculado` ya
+estaba definido, desde antes de esta sesión, en `CONOCIMIENTO.md` §6.2
+— `Costo de la cuadrilla` ÷ `Precio del destajo` —. No pasa por
+`Unidades ejecutoras` en absoluto: es el precio ya negociado visto al
+revés, para **una** cuadrilla tal como cuesta hoy. D-404 lo redefinió
+sin cruzarlo contra esa sección, y el resultado no coincidía con
+ninguno de los cuatro rendimientos que §6.2 ya distingue (Calculado,
+Teórico, Real, Requerido).
 
-**Solo existe cuando el destajo tiene su propia línea de mano de obra
-en la matriz** —dato del usuario—: si un concepto se contrata completo
-(`preestablecida_nivel`, B-48, sin línea `MO-` propia, como Cancelería
-o Domos, D-400), no hay `Rendimiento teórico` que escalar, y
-`Rendimiento calculado` no aplica. **Mismo mecanismo para maquinaria**
-—dato del usuario—: el rendimiento de un equipo (no solo de una
-cuadrilla de personas) se calcula igual, escalando su teórico por
-cuántas unidades de esa maquinaria trabajan a la vez.
+**Lo que D-404 de verdad necesitaba nombrar era otra fórmula, para otro
+campo:** cómo entra `Unidades ejecutoras` en la *duración* de
+`calculada_rendimiento` — `Duración` = `Cantidad` ÷ (`Rendimiento
+teórico` × `Unidades ejecutoras`) —, que no toca `Rendimiento
+calculado`. Y el lado que motivó la confusión (`PROGRAMA_ZAFIRO.xlsx`,
+cantidad entre duración capturada a mano) ya tenía nombre en §6.2 sin
+un caso real que lo probara: es `Rendimiento Requerido`. Con números
+reales de los dos lados, `CONOCIMIENTO.md` §6.2 (D-406).
+
+**Los dos límites de alcance, dato del usuario, siguen de pie —solo
+cambia a qué fórmula se atan—:** `Rendimiento calculado` solo existe
+cuando el destajo tiene su propia línea de mano de obra en la matriz
+—si un concepto se contrata completo (`preestablecida_nivel`, B-48,
+sin línea `MO-` propia, como Cancelería o Domos, D-400), no hay nada
+que dividir—; y el mismo mecanismo aplica a maquinaria, no solo a
+cuadrillas de personas.
 
 ### Es una semilla, no un cargador
 
@@ -1155,6 +1163,27 @@ mecánico de las 265 filas completas.
 **69 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
 1.085 de `MOCU-023`/`MOCU-005`) se ha cruzado todavía contra ejecución real.
 
+### El costo de la cuadrilla no era anónimo — tres niveles en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`
+
+Dato del usuario, buscar si existe un catálogo de cuadrillas con precio
+propio. Existe, y ya estaba cargado: §8 ya lo señalaba en una fila
+(`Origen=ManoDeObra`, 112 filas, 39 padres, "Las cuadrillas") sin
+desarrollarla. Son tres niveles, no uno:
+
+```
+MOCA-xxx         rol/oficio con su jornal     Albañil $760, Ayudante $560,
+  ↓ compone                                   Fierrero $760… (44 roles)
+MOCU-xxx/CUAD-   cuadrilla (39 en total)      MOCU-005 = 1 Albañil + 1
+  ↓ liga (semilla, tabla de arriba)            Ayudante + 10% contratista
+MOA-/MOE-/MOC-…  destajo con su teórico       MOE-02020 (castillo K1) → MOCU-005
+```
+
+`MOCU-005` suma **$1,452.00/jornada** exacto (760 + 560 + 132 de
+contratista) — el mismo número que el ejemplo de `CONOCIMIENTO.md` §6.2
+ya usaba sin decir de dónde salía. De las 39 cuadrillas con composición
+propia, solo 14 están ligadas hoy a algún destajo en la semilla
+cargada; **25 existen y nadie las usa todavía.**
+
 **Primera validación: castillo K1 (`ALAMO 18`) cierra exacto, 1.00 cuadrilla.**
 `MOE-02020` a 12.12 M/día contra las 339.20 M de sus tres niveles da 28.0 días
 teóricos — que coinciden con los 28 días reales activos que quedan una vez
@@ -1187,6 +1216,17 @@ nervada 4.20) llegan al comprobar cuadrillas concepto por concepto
 —`MOE-02217` ya estaba—: los conceptos en unidad "act" (lump sum) no
 tienen unidad que coincida con ninguna línea `MO-`, así que el tercer
 uso los dejó fuera sin darse cuenta. `CONOCIMIENTO.md` §11.14.
+
+**Quinto uso: el costo del destajo, comprobado contra duración real y
+de diseño a la vez, con el mismo concepto.** Dato del usuario. Castillo
+K1 conecta, con números reales, el costo y el tiempo —
+`CONOCIMIENTO.md` §6.2 trae la tabla completa. El caso real
+(`ALAMO 18`) cierra los tres rendimientos entre 11.17 y 12.12; los dos
+tramos de diseño (`PROGRAMA_ZAFIRO.xlsx`) se disparan en direcciones
+opuestas (18.13 y 4.20) — confirma por el lado del dinero lo que D-397
+ya probaba por el lado del tiempo: el plan manual no pasa
+sistemáticamente por esta tabla, el destajo no está mal fijado.
+`CONOCIMIENTO.md` §6.2 (D-406).
 
 ## 10b El prefijo no determina la familia — segunda prueba
 
