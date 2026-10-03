@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3197 | 32 |
+| §11 | Los flujos entre sistemas | 3231 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3877,6 +3877,40 @@ el tramo chico de muro (D-397) cierran cerca de 1. No es que las losas
 siempre necesiten más de 1 cuadrilla — es el tamaño contra el tiempo
 que el programa les dio, igual en los seis casos. `CATALOGOS.md` §10
 —`MOE-02215`/`MOE-02216`/`MOE-02218`, nuevas—.
+
+### `Remanente`: confirmado al 100%, y el usuario distingue tres causas, no una
+
+Dos validaciones exhaustivas, sin excepción: `Remanente` = `Cantidad` −
+`Cantidad programada` en las 317 filas de Concepto; y `Remanente` es
+`NaN` en las 98 filas que no son Concepto (42 Nivel 2, 41 Nivel 3, 14
+Subcapítulo, 1 Capítulo) — nunca aparece en un rollup. **El único caso
+con `Remanente` distinto de cero es `ACA-01080`** — confirma, sin que
+el usuario lo contradijera al presentarlo, que es la actividad sin
+programar a propósito de D-390.
+
+**Dato del usuario: `Remanente` no es una sola causa, son tres.**
+
+1. **De diseño** —la que ya cerró arriba—: nunca se programó, o falta
+   una fracción, desde el inicio. `Cantidad` − `Cantidad programada` >
+   0 antes de que arranque cualquier trabajo. Sin hueco: es justo lo
+   que este campo mide.
+2. **Por posposición en ejecución**: la actividad ya arrancó, se
+   posterga por una causa real (material, clima), y el remanente
+   —dato del usuario— se reprograma. No es hueco nuevo: es
+   `PENDIENTES-MEJORAS.md` B-72 con motivación concreta —antes era
+   una idea sin caso que la sostuviera; ahora hay un campo real, en un
+   archivo real, que mide exactamente lo que B-72 quería detectar.
+3. **Por actividad inconclusa**: dato del usuario, propuesta nueva —
+   termina su ventana sin acabar, sin que haya una causa identificada
+   todavía, y también debe reprogramarse. **No es lo mismo que B-72:**
+   B-72 detecta por corte de salida de almacén (una señal de
+   *material*); esta tercera causa no tiene esa señal —nadie cortó
+   nada, la cuadrilla simplemente no terminó—. La señal que sí
+   existe es la misma `Remanente` > 0, pero leída en el momento en
+   que la actividad llega a su `fecha_fin` (o `fecha_fin_real`), no
+   en el momento en que se abre. Queda como extensión de B-72, no
+   resuelta todavía: hace falta decidir si es el mismo mecanismo con
+   otra señal de entrada, o uno aparte.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
