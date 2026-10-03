@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3336 | 32 |
+| §11 | Los flujos entre sistemas | 3350 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4138,6 +4138,20 @@ xlsx` es un plan capturado a mano, nunca pasó por ningún motor de CPM,
 así que la columna se queda en su default — mismo patrón que `Esfuerzo`
 (D-392): la plantilla la trae, pero solo la llena un cálculo que hoy
 nadie corre sobre este archivo. §15, `MODELO.md` §5c.
+
+### `% Programado` es `Remanente` visto al revés, no una columna nueva
+
+Dato del usuario, seguir explorando, ahora `% Programado`. Confirmado
+en los 317 Concepto de Zafiro: `% Programado` = `Cantidad programada`
+÷ `Cantidad`, exacto en 315 de 317 —las otras 2 son `Cantidad`=0, sin
+nada que programar, no son casos reales—. 314 de 317 están al 100%; el
+único en 0% es `ACA-01080` — el mismo y único caso real que D-401 ya
+había encontrado con `Remanente`, no uno nuevo. Si `Remanente =
+Cantidad − Cantidad programada`, entonces `% Programado = 1 −
+(Remanente ÷ Cantidad)` — la misma resta, como cobertura en vez de
+cantidad sobrante. Mismo patrón que `Esfuerzo` (D-392) y `Holgura`
+(D-409): la plantilla trae una columna que parece nueva, pero es una
+vista derivada de un dato que ya existe.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
