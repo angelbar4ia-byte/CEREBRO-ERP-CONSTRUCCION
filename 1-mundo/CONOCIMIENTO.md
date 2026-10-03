@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3231 | 32 |
+| §11 | Los flujos entre sistemas | 3266 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3911,6 +3911,41 @@ programar a propósito de D-390.
    en el momento en que se abre. Queda como extensión de B-72, no
    resuelta todavía: hace falta decidir si es el mismo mecanismo con
    otra señal de entrada, o uno aparte.
+
+### Vínculos múltiples: un solo caso en 317, y revela que los vínculos pueden quedar obsoletos
+
+Dato del usuario, explorar las dos predecesoras. **Solo `IEC-01070`**
+("murete instalaciones accesorios") tiene dos predecesoras entre los
+317 conceptos de Zafiro —`OBE-02030` (zoclo de pórfido) y `OBE-02020`
+(jardinera de pórfido), las dos tipo `SF`, la misma rareza que B-81—.
+
+**Las fechas reales no respetan esa precedencia.** `IEC-01070` corre
+20-21 oct; sus dos "predecesoras" empiezan después de que ya terminó
+—`OBE-02030` el 27 oct, `OBE-02020` el 30 oct—. Bajo cualquier lectura
+de `SF` (la finalización de la sucesora depende del inicio de la
+predecesora) esto es físicamente imposible: la predecesora no puede
+empezar después de que la sucesora ya acabó. No es una relación
+rara-pero-real, es un vínculo que quedó obsoleto —probablemente se fijó
+una vez y alguien movió las fechas a mano después, sin tocarlo—.
+
+**No es un caso aislado — es la mayoría de los `SF` del archivo.** De
+los 4 vínculos `SF` encontrados en D-391, `EST-03020` (zapata, 22-23
+oct) declara como predecesora a `OBE-02020` (30 oct) — misma
+inconsistencia. Solo `CAR-01011`→`EST-00010` (las dos el 14 de julio,
+lag 0) cuadra con sus fechas reales —y es contra un rollup de Nivel 3
+("Losa Zafiro 3.00" completa), no contra un concepto específico—. **3
+de 4 vínculos `SF` reales están obsoletos**, no son relaciones físicas
+genuinas. `PENDIENTES-MEJORAS.md` B-81, con esta evidencia nueva.
+
+**La estructura en sí no tiene hueco.** Dos predecesoras para una
+misma actividad ya se modela sin campo nuevo —dos filas en
+`PRECEDENCIA`, mismo `sucesora_id`, distinto `predecesora_id`—. El
+hueco real es de confianza del dato, no de esquema: un vínculo
+capturado a mano (`origen=decisión`, baja confianza) puede quedar
+obsoleto sin que nada lo marque; uno que se deduce solo
+(`origen=técnica`) se recalcula siempre y no puede envejecer así. Es la
+razón de fondo detrás de que `confianza` ya se derive de `origen` en
+vez de declararse aparte (`MODELO.md` §5c).
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
