@@ -2422,6 +2422,49 @@ lo esconde una proyección por fecha.
 > silencio — queda para cuando haya un caso real que la fuerce a
 > decidirse.
 
+### Programa de suministro — un reporte, dos mecanismos que vivían separados
+
+Dato del usuario: lo que OPUS ya hace, y este sistema también debe
+hacer. `B-41` (arriba) ya proyecta cuánto material se necesita, por
+fecha. `TESTIGO_MATERIAL` (`CATALOGOS.md` §12) ya mide cuánto salió
+realmente de almacén. Nunca se pidieron como una sola tabla — este
+reporte es esa tabla, sin dato nuevo que capturar:
+
+```
+PROGRAMA_SUMINISTRO (reporte, no tabla — mismo principio que el resto de §5f)
+  escala         enum: dia · semana · mes
+                 agrupa TRAMO.reparto_material (§5c, P-5) en baldes de
+                 ese tamaño — el reparto ya es diario, agrupar es sumar
+  agregacion     enum: insumo · familia · total
+                 agrupa la explosión de COMPOSICION (§1) por ese nivel
+  utilizacion    enum: necesario · real · comparado
+                 necesario = Material por fecha (B-41, arriba)
+                 real      = salida de almacén (TESTIGO_MATERIAL, CATALOGOS.md §12)
+                 comparado = las dos columnas, lado a lado
+  por período:   cantidad del período + arrastre
+                 arrastre = acumulado hasta ese período, no solo el balde
+```
+
+**El arrastre no es cosmético — es el que de verdad se sostiene.**
+`CONOCIMIENTO.md` §11.17 ya lo probó con cemento: semana por semana el
+respaldo erró de 0% a 184% ("ninguna semana suelta se sostiene sin ver
+el acumulado"), pero el acumulado de ocho semanas cerró en 99.83%. El
+reporte muestra el balde porque se pide, no porque sea el dato
+confiable — el arrastre es la columna que sí lo es.
+
+**Nada de esto pide dato nuevo.** Las tres escalas leen la misma fecha
+diaria que ya tiene `TRAMO`; los tres niveles de agregación leen la
+misma `COMPOSICION` que ya tiene cada concepto; `necesario`/`real` son
+`B-41`/`TESTIGO_MATERIAL`, ya decididos los dos. Lo único nuevo es el
+reporte que los junta.
+
+**Ajustes pendientes, dato del usuario — no se deciden aquí todavía:**
+el corte exacto de cada balde (semana de lunes a domingo, o de jueves
+a miércoles como trae `PRECIO_REAL_ALAMO_18.xlsx`; mes calendario o
+mes de cuatro semanas) y qué hacer cuando un `TRAMO` cruza el límite de
+un balde. Mismo criterio que la ambigüedad de «inicio» de arriba:
+quedan para cuando haya un caso real que fuerce la decisión.
+
 ---
 
 ## 5g. Desviación — la comprobación más fuerte, con causa opcional y patrones que se leen sin ella
