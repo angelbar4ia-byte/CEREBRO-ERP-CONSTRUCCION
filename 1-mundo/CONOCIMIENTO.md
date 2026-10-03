@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3321 | 32 |
+| §11 | Los flujos entre sistemas | 3336 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4123,6 +4123,21 @@ tramos de diseño de Zafiro se disparan en direcciones opuestas (18.13
 y 4.20) — confirma por el lado del dinero lo que ya se sabía por el
 lado del tiempo. Tabla completa en §6.2. `CATALOGOS.md` §10,
 `PENDIENTES-MEJORAS.md` B-82.
+
+### `Holgura`: confirma un hueco ya conocido, no abre uno nuevo
+
+Dato del usuario, seguir explorando `PROGRAMA_ZAFIRO.xlsx`, ahora
+`Holgura`. Igual que `Rendimiento` y `Programa según rendimiento`:
+siempre 0, en las 3,231 filas de los siete prototipos, sin excepción.
+No es un hallazgo nuevo — es exactamente lo que §15 ya tenía anotado:
+`ACTIVIDAD.holgura` existe en el modelo como campo **calculado**
+(`MODELO.md` §5c, P-20), pero "el motor que calcula fechas tempranas/
+tardías y ruta crítica sigue sin escribirse" —exclusión de alcance
+deliberada, código sobre el schema, no el schema—. `PROGRAMA_ZAFIRO.
+xlsx` es un plan capturado a mano, nunca pasó por ningún motor de CPM,
+así que la columna se queda en su default — mismo patrón que `Esfuerzo`
+(D-392): la plantilla la trae, pero solo la llena un cálculo que hoy
+nadie corre sobre este archivo. §15, `MODELO.md` §5c.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
