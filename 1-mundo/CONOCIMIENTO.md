@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3369 | 32 |
+| §11 | Los flujos entre sistemas | 3399 | 32 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4171,6 +4171,36 @@ se activó el modo que lo usaría), `Unidades ejecutoras` siempre en 1
 aquí, sería la señal de que esa actividad sí pasó por el cálculo —y
 ahí las otras cuatro empezarían a tener contenido real—. `MODELO.md`
 §5c.
+
+### `Fecha de inicio`/`Fecha de término`/`Días`: confirma D-393 con otro método, y encuentra que instalaciones también se dispersa en calendario
+
+Dato del usuario, cerrar la exploración columna por columna con las
+fechas. `Días calendario` = (`Fecha de término` − `Fecha de inicio` +
+1), exacto en 315 de 317 —las 2 excepciones son `ACA-01080` y la fila
+vacía de cierre, ya conocidas—. `Días calendario` − `Días laborables`
+(los días no laborables dentro del propio tramo): 231 de 317 (73%) en
+0, un grupo en 2-4 que parece fin de semana simple, y una cola larga
+hasta 50.
+
+**La cola larga confirma D-393, no la contradice.** Castillo K1 y muro
+tabique —las dos actividades que D-393 ya marcó con el parón de 17
+días esperando la cadena CE-1— tienen los huecos más grandes de toda
+la obra gruesa: castillo K1 sus dos tramos en 18 y 27; muro tabique
+los suyos en 17 y 21. Mismo caso, confirmado ahora por fecha-menos-
+fecha en vez del día-por-día de la cuadrícula AD-HN.
+
+**Nuevo: instalación eléctrica se dispersa también en calendario, no
+solo en rendimiento.** Cuatro destajos `IEC-` (arbotante, spot, centro,
+minisplit) comparten el mismo tramo de 11 días con solo 4 laborables
+cada uno. El caso más extremo del archivo entero es `IEC-02130`
+(ranura para voz y datos): 52 días calendario, 2 laborables — un
+tramo 25 veces más largo que lo que de verdad trabaja. Mismo patrón
+que la razón de rendimiento dispersa de instalaciones (D-408): el
+planeador no las captura con la misma disciplina que a la obra gruesa.
+**Idea sin resolver, dato del usuario:** el rendimiento teórico de
+instalaciones necesita revisarse — no es solo que el dato disperse al
+compararlo, puede que el dato mismo esté desactualizado.
+`PENDIENTES-MEJORAS.md` B-83.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
