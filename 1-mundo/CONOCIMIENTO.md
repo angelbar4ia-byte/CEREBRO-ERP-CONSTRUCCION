@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3784 | 20 |
+| §11 | Los flujos entre sistemas | 3869 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4124,7 +4124,92 @@ heredar los vínculos sanos a otro prototipo: de los 52 que se cumplen, 38
 tienen ambos extremos con equivalente por `Clave` en Rubí y 37 en Jade;
 los otros 14 o 15 cuelgan de los grupos de losa y de las pérgolas, que no
 se llaman igual en cada prototipo y se mapearían por altura y por rol,
-como el programa. `PENDIENTES-MEJORAS.md` B-86.
+como el programa (D-425: ya se heredaron, 46 en Rubí y 42 en Jade).
+`PENDIENTES-MEJORAS.md` B-86.
+
+### Los 52 vínculos se heredan, y la red mínima es la ruta crítica de Zafiro (D-425)
+
+Dato del usuario: "hereda los 52 y propón tú la red mínima".
+
+**Herencia: 46 en Rubí y 42 en Jade.** Un vínculo se escribe solo si sus dos
+extremos existen en el prototipo y se cumple con las fechas del propio
+prototipo. Cada extremo se mapea a su equivalente: la partida, por su
+gemelo (misma `Clave`, mismo tramo); los bloques de Nivel 2 y 3, por
+`Clave`; las losas, por altura (Jade tiene una sola); las pérgolas, por ser
+el único concepto de su bloque. La predecesora se cita por la fila de Excel
+del propio prototipo y con el mismo formato que Zafiro (`498FF-72.00000`).
+No pasan 6 en Rubí y 10 en Jade: partidas que el prototipo no tiene o que
+trae distintas —la pintura de dos manos unificada, los marcos de cantera
+interior, la piedra laja en muro, la columna forrada de la pérgola de
+cochera, el acero K7 y el ojo de buey en Jade—, la gualdra —en Zafiro era
+hija del grupo de la losa y en los otros dos queda en la estructura, así que
+su vínculo no se cumple— y, en Jade, dos que cuelgan de la losa de 3.00 y no
+se cumplen porque su losa única no separa las alturas. Tres de los de Rubí y
+dos de los de Jade tienen como predecesora el grupo de su propia sucesora:
+son parte de los 52 y se heredaron tal cual, marcados para el planeador. La
+validación se hizo leyendo solo el libro: formato, predecesora dentro del
+bloque del prototipo, 0 vínculos que no se cumplen, y solo cambiaron 88
+celdas, todas en la columna `Vínculos` de Rubí y Jade.
+
+**La red mínima es una cadena de 28 pasos.** En las fechas de Zafiro cada
+partida de esa cadena arranca el día hábil en que termina la anterior
+—holgura 0 en los 27 relevos, verificado contra el archivo original—, del 9-jun
+(losa de cimentación) al 18-dic (limpieza y sellado final), y sus ventanas
+cubren 138 de los 139 días hábiles del programa: el único sin ningún paso es
+el lunes 6-oct. Es lo que se propone como red a nivel de bloque, 18 vínculos
+entre 17 bloques y partidas, todos con holgura 0 en Zafiro, 16 de 16 en
+Rubí y 15 de 15 en Jade en los que tienen equivalente. Un `FF` con desfase
+equivale a "termina N días hábiles después" y sirve para compactar una
+cadena de partidas en un solo vínculo; la cadena partida concepto por
+concepto es el respaldo. 14 son de origen técnico y 4 de decisión: la
+cancelería arranca al terminar el piso de áreas comunes (`SS` +19 desde el
+arranque de acabados, dos bloques) y la carpintería entra cuando terminan
+las dos cancelerías (dos bloques), ambas de contrato terminado.
+
+| Tramo | Relevos (tipo y desfase, en días hábiles) |
+|---|---|
+| Estructura y losas | cimentación → muro tabique (`FS` −1) → gualdra (`SS` +15) → losa de 3.00 (`FS`) → losa de 4.20 (`SS` +9) |
+| Azotea | losa de 4.20 → pretiles (`FF` +3) y losa de 3.00 → pretiles (`SS` +7); pretiles → albañilería de azotea (`FF` +15) → impermeabilización (`FS`) |
+| Obra gris | impermeabilización → obra gris de PB (`FF` +15) → acabados de PB (`FS` +1) |
+| Cola | acabados → cancelería de PB y de azotea (`SS` +19) → carpintería (`FS`) → pintura de PB (`FF` +5) → limpieza y sellado (`FF` +4); carpintería → cubierta de cocina (`FS`) → equipamientos (`FF`) |
+
+**Lo que se encontró al leerla.** (1) Las instalaciones no están en la
+cadena: las de muros —sanitaria, hidráulica y gas— terminan de 17 a 22 días
+hábiles antes del repellado y las de losa viven dentro de las ventanas de
+armado de las losas. (2) El vínculo de la gualdra en Zafiro va al revés: la
+gualdra se coloca antes de la losa y el `SF` dice lo contrario; la red lo
+corrige (`FS` de la gualdra a la losa). (3) Hay una segunda ruta igual de
+ajustada, de cuadrilla y no de física, entre el 3-oct y el 3-nov: cableado →
+barda → instalaciones del asador y pergolado de cochera → arranque del
+3-nov; no se propone vincularla a la espina. (4) El único relevo con espera
+es obra gris → acabados: un día (el lunes 6-oct), que la red declara
+(`FS` +1) para que 10 días insertados antes lleguen completos al cierre. (5)
+La estructura sí está unida al cierre, pero por las fechas y no por un
+vínculo: la obra gris espera la impermeabilización de la azotea, que espera
+los pretiles, que esperan la losa.
+
+**Las 2 semanas de las dos plantas.** Con la red, 10 días hábiles insertados
+en cualquier punto de la cadena corren todo lo que cuelga de ese punto y
+llevan el cierre del 18-dic al 1-ene (149 días hábiles, 29.8 semanas): lo que
+cambia según la ventana es cuántos pasos se corren —16 si fuera en la
+cimentación, 1 si fuera en la limpieza—. Cancelería, carpintería,
+impermeabilización y cubiertas son niveles de duración fija (D-421): no
+admiten los días extra. Propuesta del sistema, sin decidir: la ventana de la
+estructura y losa de la planta alta, entre la losa de 4.20 y los pretiles de
+la azotea (18 al 29-ago en el calendario de Zafiro). Es lo único que una
+planta más agrega antes de la azotea y corre 12 pasos. D-389 calculó esa
+estructura en 3.5 semanas para Diamante (muro, castillos y cadena 2.76 más
+losa 0.72); como el plazo solo crece 2, parte se traslapa con la planta baja
+o se compensa en acabados, y eso lo decide el planeador. Si prefiere repartir
+los 10 días con la obra gris o los pisos, la cadena lo permite.
+
+**Pendiente de validar (B-86).** (a) La cadena, en especial los relevos de
+origen recurso o decisión: el orden de los pisos, la cancelería tras el piso
+de áreas comunes, la carpintería tras la cancelería. (b) Dónde se escriben
+los vínculos entre bloques: la propuesta es en la fila del bloque; hoy todos
+los de Zafiro están en partidas (`MODELO.md` §5c). (c) Si se aprueba: 16
+celdas en Zafiro, 14 en Rubí y 13 en Jade, y los cuatro prototipos de dos
+plantas nacen con la red. (d) La ventana.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

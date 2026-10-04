@@ -1903,6 +1903,21 @@ TRAMO
                              menos calculado»)                                firme — P-5
 ```
 
+### ⏸ Un vínculo entre bloques: el modelo no dice si `ACTIVIDAD` existe en Nivel 2 y 3 (D-425)
+
+La red mínima propuesta en D-425 (`CONOCIMIENTO.md` §11.14) liga bloques
+—Nivel 2 y 3, y a veces una partida con un bloque—, y que el bloque se mueva
+entero como una ventana es lo que la hace corta: 18 vínculos en lugar de
+varias decenas. `PRECEDENCIA` apunta a `ACTIVIDAD` y esta a un `Nodo`, pero
+nada dice si un nodo de Nivel 2 o 3 puede tener `ACTIVIDAD`: hoy son filas de
+resumen, con fechas que son el mínimo y el máximo de sus hijos, y todas las
+sucesoras de `PROGRAMA_ZAFIRO.xlsx` son partidas. Dos lecturas, sin decidir
+(`PENDIENTES-MEJORAS.md` B-86): (a) `ACTIVIDAD` resumen en Nivel 2 y 3, con
+fechas derivadas de sus hijos —`modo_duracion` no tiene hoy un valor para
+eso— y vínculos que la mueven completa; (b) vínculos solo entre partidas, y
+cada vínculo de bloque se expande a las partidas de cabecera de ese bloque.
+La primera es más corta de capturar y la segunda no toca el esquema.
+
 ### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
 
 `PROPUESTA-CUATRO-MODULOS.md` §4 ya distinguía los dos sin tabla: el
