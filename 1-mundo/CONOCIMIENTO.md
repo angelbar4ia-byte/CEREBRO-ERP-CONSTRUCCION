@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3869 | 20 |
+| §11 | Los flujos entre sistemas | 3905 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4209,7 +4209,43 @@ de áreas comunes, la carpintería tras la cancelería. (b) Dónde se escriben
 los vínculos entre bloques: la propuesta es en la fila del bloque; hoy todos
 los de Zafiro están en partidas (`MODELO.md` §5c). (c) Si se aprueba: 16
 celdas en Zafiro, 14 en Rubí y 13 en Jade, y los cuatro prototipos de dos
-plantas nacen con la red. (d) La ventana.
+plantas nacen con la red. (d) La ventana. (D-426 resolvió las cuatro, abajo.)
+
+### La red se escribe en las partidas, como Zafiro, y la ventana de la planta alta queda decidida (D-426)
+
+Dato del usuario sobre las cuatro preguntas de D-425: la cadena de 28 pasos
+**es la ruta real**; los vínculos van **por ahora como en Zafiro, en las
+partidas**, y la pregunta de si un bloque puede ser sucesora —"no estoy
+seguro de la pregunta"— se resuelve después; a la tercera, si escribirla,
+respondió "no sé qué responder", así que el sistema la escribió, en un libro
+nuevo que deja intacto el anterior; y la ventana de las 2 semanas es la
+propuesta.
+
+**Cómo se escribe.** En Zafiro la sucesora de un vínculo es siempre una
+partida y la predecesora puede ser partida o bloque (52 de las 75 son
+partidas, 23 son bloques o grupos). Los 18 vínculos entre bloques se vuelven
+30 vínculos de red (P01 a P30) que viven en la partida que arranca o termina
+por ellos: la gualdra cuelga del muro tabique, la cancelería del piso de
+áreas comunes, las 10 partidas de carpintería de las dos cancelerías, la
+segunda mano de pintura de la carpintería (`FF`, que vale igual en los
+prototipos donde las dos manos son una sola partida). Un vínculo se escribe
+solo si se cumple con las fechas del propio programa.
+
+**Resultado.** Zafiro 42 celdas (54 vínculos), Rubí 42 (56) y Jade 34 (43).
+En Zafiro se conservan los vínculos que había y se cumplían y se quitan 5
+que se contradecían y que la red reemplaza en la misma partida —el chaflán,
+las dos finas interiores, el sardinel de regaderas y el mármol travertino—:
+los que no se cumplen bajan de 22 a 17, más el autovínculo; esos 18 quedan
+para el planeador. Con lo heredado en D-425, Rubí queda con 81 celdas y 102
+vínculos y Jade con 70 y 85, ninguno incumplido. No se escribe lo que
+depende de la cubierta de cocina —ni Rubí ni Jade la tienen programada— ni,
+en Jade, el vínculo entre las dos losas.
+
+**La ventana.** Los 10 días hábiles de la planta alta van entre la losa de
+4.20 y los pretiles de la azotea (18 al 29-ago en el calendario de Zafiro):
+todo lo que cuelga de ahí se corre con ella y el cierre pasa del 18-dic al
+1-ene. Con eso los cuatro prototipos de dos plantas ya tienen su regla;
+falta programarlos (`PENDIENTES-MEJORAS.md` B-84).
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

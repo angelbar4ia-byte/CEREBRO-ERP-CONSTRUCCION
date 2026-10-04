@@ -1916,7 +1916,9 @@ sucesoras de `PROGRAMA_ZAFIRO.xlsx` son partidas. Dos lecturas, sin decidir
 fechas derivadas de sus hijos —`modo_duracion` no tiene hoy un valor para
 eso— y vínculos que la mueven completa; (b) vínculos solo entre partidas, y
 cada vínculo de bloque se expande a las partidas de cabecera de ese bloque.
-La primera es más corta de capturar y la segunda no toca el esquema.
+La primera es más corta de capturar y la segunda no toca el esquema. Dato del
+usuario (D-426): por ahora los vínculos se escriben como en Zafiro, en las
+partidas, con la predecesora partida o bloque; la pregunta se resuelve después.
 
 ### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
 
