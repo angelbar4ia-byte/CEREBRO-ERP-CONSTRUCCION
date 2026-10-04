@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3732 | 20 |
+| §11 | Los flujos entre sistemas | 3784 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3679,18 +3679,19 @@ predecesoras por coma. **Coincide, sin ajuste, con lo que `PRECEDENCIA`
 (`MODELO.md` §5c) ya tenía cerrado antes de ver este archivo:**
 `tipo_vinculo` (fin_inicio/inicio_inicio/fin_fin) es `FS`/`SS`/`FF`, y
 `traslape_espera` (negativo traslape, positivo espera) es el `±N` de la
-hoja.
+hoja —en horas de 8 por día, no en días: D-424—.
 
-**Un hueco real, no cubierto por el enum de tres valores:** 4 de los 78
-vínculos (en 74 de las 317 filas) son `SF` —inicio_fin—, que no está en
+**Un hueco real, no cubierto por el enum de tres valores:** 4 de los 75
+vínculos (en 74 de las 317 filas; D-424 corrige el 78 que decía antes)
+son `SF` —inicio_fin—, que no está en
 `tipo_vinculo`. Minoría (5%) y tipo poco común en la práctica, pero está
 en el dato real: `CAR-01011`, `IEC-01070` (dos veces, una de ellas con
 dos predecesoras `SF` a la vez), `EST-03020`. `PENDIENTES-MEJORAS.md`
 B-81.
 
 **Cobertura baja, y el orden de la hoja no es el de ejecución:** solo 74
-de 317 conceptos (23%) traen vínculo explícito; `FS` domina (61/78,
-78%). 18 de los 74 (24%) apuntan a una fila que aparece *después* en la
+de 317 conceptos (23%) traen vínculo explícito; `FS` domina (62/75,
+83%). 19 de los 75 (25%) apuntan a una fila que aparece *después* en la
 hoja —`ALB-01010` cita a `ALB-01012`, un renglón más abajo, como su
 predecesora—: el catálogo lista por código, no por secuencia real;
 `Vínculos` es la única fuente de secuencia cuando existe.
@@ -4073,6 +4074,57 @@ obsoleto sin que nada lo marque; uno que se deduce solo
 (`origen=técnica`) se recalcula siempre y no puede envejecer así. Es la
 razón de fondo detrás de que `confianza` ya se derive de `origen` en
 vez de declararse aparte (`MODELO.md` §5c).
+
+### Los vínculos, revisados uno por uno (D-424): solo Zafiro los tiene, y no unen la estructura con el cierre
+
+Dato del usuario, antes de definir las dos plantas: "revisa los vínculos
+y si ya están definidos". **No lo están.** De los siete prototipos, solo
+Zafiro trae la columna `Vínculos` con datos —74 de 317 conceptos, 23%—;
+Rubí, Jade y los otros cuatro tienen 0 celdas. Los programas de Rubí y de
+Jade (D-418 a D-423) copian las fechas de Zafiro pero no escriben ningún
+vínculo: la comprobación de que los de Zafiro se siguen cumpliendo en
+ellos es una lectura, no una definición.
+
+**Contados uno por uno son 75, no 78 (corrige D-391):** 74 celdas, una con
+dos predecesoras (`IEC-01070`); `FS` 62 (83%), `SS` 8, `SF` 4, `FF` 1. Diez
+llevan desfase, en horas de 8 por día (−72, −8, +8, +16, +24 y +40;
+`PRECEDENCIA.traslape_espera` va en días). Todas las sucesoras son
+conceptos; las predecesoras son 52 conceptos, 12 bloques (Nivel 2) y 11
+grupos (Nivel 3). La predecesora se cita por número de fila de Excel, que
+cambia con cualquier fila que se inserte; `PRECEDENCIA` la guarda por id.
+
+**Calidad, contra las fechas del propio Zafiro (74 evaluables):** 52 se
+cumplen y 22 se contradicen —13 obsoletos, con predecesora propia, y 9
+cuya predecesora es el bloque o grupo al que pertenece la propia
+sucesora, que no puede terminar antes de que ella empiece—. De los 52,
+solo 11 están ajustados (la sucesora arranca justo cuando el vínculo lo
+permite) y esos sí mandan la fecha: losa → repellado de plafond (3.00 y
++3.00), impermeabilización → finas de plafond (3.00 y 4.20), cisterna →
+losa de cisterna, las dos pérgolas → chaflán y cuatro acomodos del acero
+y la gualdra a las losas; en los otros 41 hay holgura y la fecha la
+decidió el planeador. Además: 1 vínculo que se cita a sí mismo
+(`EST-01151`), 1 ciclo de dos filas (`ICA-01030` y `BAP-01100`: cada una
+espera a la otra), 14 con el grupo de la propia sucesora como predecesora
+(5 se cumplen) y 4 `SF`, de los que solo 1 se cumple (D-402).
+
+**Dónde no hay vínculos:** cimentación (56 conceptos), Cancelería (2),
+Carpintería (10), Herrería (3) y la estructura de Planta Baja (8); en
+Muebles/Iluminación hay 2%, en Planta Baja 21% y en Pintura 23%. Y
+ninguno de los 16 conceptos que terminan del 15 al 18-dic, el cierre que
+fija las 28 semanas, tiene un solo vínculo. De la losa de 3.00 cuelgan por
+vínculos 6 actividades (hasta el 25-ago) y de la de 4.20, 4 (hasta el
+29-ago); de ahí en adelante nada cuelga de la estructura.
+
+**Lo que esto significa para dos plantas.** Con esta red no se puede
+calcular dónde cae una ampliación de 2 semanas en la estructura: solo esas
+10 actividades se moverían por vínculos, y finas, pisos, pintura,
+carpintería y cierre están por fecha, no por precedencia. La ventana la
+decide el planeador, o se define antes una red mínima entre bloques. Para
+heredar los vínculos sanos a otro prototipo: de los 52 que se cumplen, 38
+tienen ambos extremos con equivalente por `Clave` en Rubí y 37 en Jade;
+los otros 14 o 15 cuelgan de los grupos de losa y de las pérgolas, que no
+se llaman igual en cada prototipo y se mapearían por altura y por rol,
+como el programa. `PENDIENTES-MEJORAS.md` B-86.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
