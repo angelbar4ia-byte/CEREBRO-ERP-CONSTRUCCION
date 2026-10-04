@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3635 | 20 |
+| §11 | Los flujos entre sistemas | 3670 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4262,7 +4262,9 @@ anterior es un candado.** Las duraciones fijas valen como punto de
 partida para todos los prototipos —eso es lo que fija este ejercicio—,
 pero en cualquier programa el planeador puede cambiar cualquier
 duración, y **decide si el cambio se hereda a los demás prototipos o
-solo vale en ese programa.** Es el principio del resto del cerebro: el
+solo vale en ese programa** —dato del usuario, D-422: el alcance se elige
+entre todos los prototipos, los de 1 planta, los de 2 plantas, o los
+prototipos que el planeador señale—. Es el principio del resto del cerebro: el
 sistema propone el valor, el humano decide el alcance —y ya estaba dicho
 para el programa de un lote, que cargar la base es proponer un punto de
 partida, nunca una obligación (más arriba, "El programa hereda las
@@ -4317,8 +4319,10 @@ pérgolas—, 4 de bloque de una ventana —tres eléctricos y la lavanda— y
 ni cantidad, igual que en Zafiro. El programa cierra el 18-dic, el
 mismo día que Zafiro** (139 días laborables, 27.8 semanas, las 28), y
 el Capítulo queda al 100% programado. Los 208 gemelos tienen fechas,
-días y ceros idénticos a los de su tramo en Zafiro (208 de 208), y los
-14 por rol, idénticos a los de su partida de origen (14 de 14). Contra
+días y ceros idénticos a los de su tramo en Zafiro (208 de 208), y 11
+de los 14 por rol, idénticos a los de su partida de origen; los otros 3
+son ajustes con dato del usuario (las dos losas de 4.20 y el muro de 21
+cm, abajo). Contra
 Zafiro, 59 de los 208 tramos llevan más de 5% de cantidad extra
 (mediana 1.00, media 1.13): ahí sube la cantidad por día, que es más
 cuadrillas y no más tiempo —castillo K1, tramo 1: 18.13 m/día en
@@ -4346,13 +4350,13 @@ escrito en palabras:
 |---|---|---|
 | Losa maciza 3.00 (`EST-30012`) | losa maciza 3.00 de Zafiro (`EST-21011`) | 15-jul a 4-ago, 9 días |
 | Losa nervada 3.00 (`EST-30040`) | la misma losa de 3.00: Zafiro no tiene una nervada de 3.00 | 15-jul a 4-ago, 9 días |
-| Losa maciza 4.20 (`EST-30013`) | la misma losa de 4.20: Zafiro no tiene una maciza de 4.20 | 28-jul a 15-ago, 7 días |
-| Losa nervada 4.20 (`EST-30041`) | losa nervada 4.20 de Zafiro (`EST-21031`) | 28-jul a 15-ago, 7 días |
+| Losa maciza 4.20 (`EST-30013`) | la misma losa de 4.20: Zafiro no tiene una maciza de 4.20 | 28-jul a 15-ago, 9 días (ajuste del planeador, abajo) |
+| Losa nervada 4.20 (`EST-30041`) | losa nervada 4.20 de Zafiro (`EST-21031`) | 28-jul a 15-ago, 9 días (ajuste del planeador, abajo) |
 | Pintura de muro, 2 manos (`ACA-03025`) | 1ª y 2ª mano de muro (`ACA-30011`, `ACA-30012`) | 11 a 13-nov y 8 a 10-dic, 6 días |
 | Pintura de plafond, 2 manos (`ACA-03026`) | 1ª y 2ª mano de plafond (`ACA-30021`, `ACA-30022`) | 13 a 14-nov y 11 a 12-dic, 4 días |
 | Pintura de fachada, 2 manos (`ACA-03047`) | 1ª y 2ª mano de fachada (`ACA-30031`, `ACA-30032`) | 4 a 7-nov y 2 a 5-dic, 8 días |
 | Pintura de azotea, 2 manos (`ACA-03047`) | 1ª y 2ª mano de azotea (`ACA-30031`, `ACA-30032`) | 3 a 4-nov y 1 a 2-dic, 4 días |
-| Muro tabique de 21 cm (`EST-02020`) | muro tabique de 14 cm (`EST-02010`) | 23-jun a 29-jul, 16 días |
+| Muro de 21 cm (`EST-02020`) | no tiene gemelo: oculta la respiración de la lavandería, va después de instalarla (abajo) | 7-jul, 1 día |
 | Cadena `CE-2` (`EST-02320`) | cadena `CE-1` (`EST-02310`) | 3 a 9-jul, 5 días |
 | Gualdra (`CAR-01012`) | gualdra (`CAR-01011`) | 14-jul, 1 día |
 | Ventilación sanitaria de 3.00 m (`ISN-10011`) | ventilación sanitaria de 1.00 m (`ISN-10010`) | 3 a 4-jul, 2 días |
@@ -4366,15 +4370,46 @@ Zafiro es consistente con eso —losa de 3.00 el 15-jul, muro de tabique
 del nivel de azotea el 24-jul, losa de 4.20 el 28-jul— y Rubí copia esa
 secuencia: sus dos losas de 3.00 (93 y 24 m², 117 en total) en los 9
 días de la de Zafiro (125 m²), y sus dos de 4.20 (46 y 40 m², 86 en
-total) en los 7 días que Zafiro le dio a una de 40 m²: las de 4.20 de
-Rubí cargan más del doble, que es la cuadrilla extra de la regla de
-fondo y la primera candidata a que el planeador la alargue. D-420 las agrupaba por tipo, maciza o
-nervada, y dejaba la nervada de 3.00 en la ventana de 4.20 y la maciza
-de 4.20 en la de 3.00: al revés de la secuencia física. Las pinturas de
-"2 manos" juntan en una sola partida lo que Zafiro tiene en dos, con las
-semanas de parón de por medio —los ceros de la cuadrícula las miden,
-como el castillo K1—. Los demás siguen a Zafiro; `ACA-01080`, el último
-de la tabla, es la única propuesta sin dato detrás.
+total) en la ventana de la de Zafiro (40 m²). D-420 las agrupaba por
+tipo, maciza o nervada, y dejaba la nervada de 3.00 en la ventana de
+4.20 y la maciza de 4.20 en la de 3.00: al revés de la secuencia física.
+Las pinturas de "2 manos" juntan en una sola partida lo que Zafiro tiene
+en dos, con las semanas de parón de por medio —los ceros de la cuadrícula
+las miden, como el castillo K1—. Los demás siguen a Zafiro; `ACA-01080`,
+el último de la tabla, es la única propuesta sin dato detrás.
+
+**Primer ajuste del planeador (D-422): la losa de 4.20 de Rubí sube a 9
+días, y nada más se mueve.** Las de 4.20 de Rubí cargan 86 m² contra los
+40 de Zafiro, más del doble; la regla de fondo lo absorbería con más
+cuadrillas en los mismos 7 días, y el usuario, haciendo de planeador,
+decide otra cosa: "para este ejercicio debería subir a 9 días y buscar
+cómo acomodar las demás actividades para no aumentar la duración de 28
+semanas". Se acomoda sin mover ninguna otra actividad. La losa de 4.20 de
+Zafiro tiene dos tramos de trabajo —5 días de armado (28-jul a 1-ago) y 2
+de descimbrado (14 y 15-ago)— con 8 días hábiles de espera en medio, que
+se lee como el fraguado; las dos jornadas nuevas se toman del principio
+de esa espera (4 y 5-ago, más armado), que queda en 6 días hábiles, los
+mismos 6 que tiene la losa de 3.00. El inicio (28-jul) y el fin (15-ago) no cambian, así
+que lo que cuelga de ella —el repellado de plafond +3.00 arranca el
+18-ago— se cumple igual y el programa sigue cerrando el 18-dic, 139 días
+hábiles. Comprobado contra los vínculos de precedencia de Zafiro (75;
+58 con ambos extremos programados y equivalentes en Rubí; 38 se cumplen
+en Zafiro y esos mismos 38 en Rubí, ninguno se rompe; los otros 20 ya no
+se cumplían en Zafiro, B-81). Lo deja el sistema resuelto y el planeador
+valida o ajusta: es el primer caso de B-85, y a la vista quedan otros
+tramos con el doble o más de cantidad que Zafiro que siguen con los días
+de Zafiro —castillo K-3 ×7, sellado de marco de cantera ×5.8, acero de
+K7 y BAP ×4, y el repellado y las finas de plafond de 4.20 ×2.2—.
+
+**El muro de 21 cm no es un muro de tabique más (dato del usuario,
+D-422; corrige D-420).** "Los muros de tabique son 14 cm; el de 21 solo
+es para ocultar la respiración de la lavandería y no está en todos los
+prototipos." D-420 lo había copiado de la ventana del muro de 14 cm
+—16 días con parón para 6.30 m²—, que lo pone a trabajar antes de que la
+respiración exista. Como oculta la tubería, va después de instalarla: 1
+día, el 7-jul, el siguiente a la instalación sanitaria en muros (3 y
+4-jul). Una partida que no está en todos los prototipos es justo la que
+no se hereda a ciegas.
 
 **Las filas de resumen se recalculan de sus hijos, no se copian
 (D-418).** Las 77 filas de Capítulo, Subcapítulo, Nivel 2 y Nivel 3 de
@@ -4414,9 +4449,9 @@ encontrado: cero actividad en sábado y domingo. **Dato del usuario,
 confirmado (D-417):** los días sin trabajo son sábado y domingo — un
 "viernes y sábado" dicho antes fue un desliz, no una regla distinta.
 Rubí cumple las siete: 0 violaciones en sus 294 conceptos programados,
-con 565 ceros explícitos (163 sábados, 163 domingos, 239 de parón en 20
-tramos —las cuatro losas, las cuatro pinturas y el muro de 21 cm lo
-heredan de su partida de origen—; Zafiro tiene parón en 13 de 315).
+con 540 ceros explícitos (158 sábados, 158 domingos, 224 de parón en 19
+tramos —las cuatro losas y las cuatro pinturas lo heredan de su partida
+de origen—; Zafiro tiene parón en 13 de 315).
 
 **La cuadrícula no cambia de tamaño con una planta; con dos, sí.** Las
 193 columnas de Zafiro (9-jun a 18-dic) son exactamente las 28

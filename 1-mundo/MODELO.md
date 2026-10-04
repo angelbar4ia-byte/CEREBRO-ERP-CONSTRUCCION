@@ -1830,14 +1830,18 @@ cualquier programa el planeador puede cambiar cualquier duración
 —también la de estos seis niveles— y **decide si el cambio se hereda a
 los demás prototipos o solo vale en ese programa.** Hoy `ACTIVIDAD`
 guarda `duracion_dias` y `modo_duracion`, pero no de dónde viene el
-valor ni a quién alcanza un cambio. Propuesta del sistema, sin decidir
-(B-85): que cada duración lleve su origen —`heredada`, la lee de un
-programa de referencia, Zafiro por defecto, o `propia`, la fijó el
-planeador ahí— y que al editarla el sistema pregunte una sola cosa,
-¿solo este programa o todos los prototipos? «Solo este» la marca
-`propia`; «todos» cambia el valor de referencia y la siguen las que
-sigan `heredada`. Las que ya eran `propia` no se pisan: se avisan con
-`ALERTA` para que el planeador decida.
+valor ni a quién alcanza un cambio. El alcance se elige entre cuatro
+opciones, dato del usuario (D-422): todos los prototipos, los de 1
+planta, los de 2 plantas, o los prototipos que el planeador señale.
+Propuesta del sistema, sin decidir (B-85): que cada duración lleve su
+origen —`heredada`, la lee de un programa de referencia, Zafiro por
+defecto, o `propia`, la fijó el planeador ahí— y que al editarla el
+sistema pregunte una sola cosa, ¿a quién alcanza? Si a ningún otro
+prototipo, la marca `propia`; si a un grupo —todos, 1 planta, 2 plantas o
+los elegidos—, cambia el valor de referencia para ese grupo y la siguen
+las que sigan `heredada` dentro de él. Las que ya eran `propia` no se
+pisan: se avisan con `ALERTA` para que el planeador decida. Primer caso aplicado: la losa de 4.20 de Rubí,
+que el planeador sube de 7 a 9 días (`CONOCIMIENTO.md` §11.14).
 
 ### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
 
