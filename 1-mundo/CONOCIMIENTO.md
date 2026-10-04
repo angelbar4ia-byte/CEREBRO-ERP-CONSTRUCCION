@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3670 | 20 |
+| §11 | Los flujos entre sistemas | 3732 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4452,6 +4452,68 @@ Rubí cumple las siete: 0 violaciones en sus 294 conceptos programados,
 con 540 ceros explícitos (158 sábados, 158 domingos, 224 de parón en 19
 tramos —las cuatro losas y las cuatro pinturas lo heredan de su partida
 de origen—; Zafiro tiene parón en 13 de 315).
+
+**Jade, el segundo prototipo de una planta (D-423): las mismas reglas, y
+nada queda sin programar.** 290 filas de concepto, 289 con programa y la
+vacía de cierre: 59 de cimentación (la que traía el archivo ya tenía la
+estructura en 11 días, pero con las instalaciones el 9 y 10-jun, como
+Rubí), 197 con gemelo por Clave, 8 de nivel de tiempo fijo —2 de
+cancelería, 3 de carpintería, 1 de herrería y las dos pérgolas—, 7 de
+bloque de una ventana —tres de cableado eléctrico y cuatro de
+iluminación— y 18 por rol. El programa cierra el 18-dic, el mismo día
+que Zafiro (139 días laborables, las 28 semanas) y el Capítulo queda al
+100% programado. Los 197 gemelos tienen fechas, días y ceros idénticos a
+los de Zafiro (197 de 197) y los 17 por rol con partida de origen,
+idénticos a ella (17 de 17). De los 75 vínculos de precedencia de Zafiro,
+57 tienen ambos extremos programados y equivalentes en Jade: 37 se
+cumplen en Zafiro y esos mismos 37 en Jade, ninguno se rompe. La
+cuadrícula cumple las siete reglas en los 289 conceptos, con 500 ceros
+explícitos (146 sábados, 146 domingos, 208 de parón en 16 tramos). Una
+fila con cantidad 0 —`PRB-01001`, material para pruebas, $0— lleva un
+cero en cada día de su tramo, como `CAR-02100` de Zafiro.
+
+**La losa de Jade cubre las dos alturas en un solo concepto.**
+`EST-30010`, "losa maciza Jade (230 m²)", sustituye a las dos losas de
+Zafiro: bajo ella hay 113 m² de plafond a 3.00 y 85 a 4.20 —los mismos 85
+que las losas de 4.20 de Rubí, más del doble de los 36 de Zafiro—. Por
+altura, toma la unión de las dos ventanas de Zafiro (15-jul a 15-ago), y
+a la parte de 4.20 se le aplica el ajuste que el planeador ya hizo en
+Rubí: 2 jornadas más de armado tomadas de la espera, que queda en 6 días
+hábiles (8 en Zafiro). Son 16 jornadas con el inicio y el fin de siempre,
+así que nada más se mueve. Mismo criterio sin preguntar de nuevo: queda
+para que el planeador valide o ajuste.
+
+Las 18 partidas de Jade por rol, una por una:
+
+| Partida de Jade | Copia las fechas de | Fechas |
+|---|---|---|
+| Losa maciza de 230 m² (`EST-30010`) | las losas de 3.00 y de 4.20 de Zafiro (`EST-21011`, `EST-21031`), con +2 jornadas en la de 4.20 | 15-jul a 15-ago, 16 días |
+| Pintura de muro, 2 manos (`ACA-03025`) | 1ª y 2ª mano de muro (`ACA-30011`, `ACA-30012`) | 11 a 13-nov y 8 a 10-dic, 6 días |
+| Pintura de plafond, 2 manos (`ACA-03026`) | 1ª y 2ª mano de plafond (`ACA-30021`, `ACA-30022`) | 13 a 14-nov y 11 a 12-dic, 4 días |
+| Pintura de fachada, 2 manos (`ACA-03047`) | 1ª y 2ª mano de fachada (`ACA-30031`, `ACA-30032`) | 4 a 7-nov y 2 a 5-dic, 8 días |
+| Pintura de azotea, 2 manos (`ACA-03047`) | 1ª y 2ª mano de azotea (`ACA-30031`, `ACA-30032`) | 3 a 4-nov y 1 a 2-dic, 4 días |
+| Limpieza, entintado y sellado de durmiente (`ACA-08060`) | la de gualdra (`ACA-08061`) | 9 a 10-dic, 2 días |
+| Castillo K-5 de 15x45 (`EST-02150`) | castillo K-3 de 15x30 (`EST-02130`), la sección más cercana — propuesta | 1-jul, 1 día |
+| Cadena `CE-2` (`EST-02320`) | cadena `CE-1` (`EST-02310`) | 3 a 9-jul, 5 días |
+| Gualdra 6x12x6 (`CAR-01014`) | gualdra 6x12x8 (`CAR-01011`) | 14-jul, 1 día |
+| Vigas de cantera 10x20x6 (`ICA-03010`) | muro de sillar (`EST-02080`) — propuesta | 2 a 8-jul, 5 días |
+| Regadera en corte sanitario (`ISN-02050`) | vertedero en corte sanitario (`ISN-02010`) | 3 a 4-jul, 2 días |
+| Paneles solares en losa, 12 m (`IEC-01100`) | los de 4 m (`IEC-01110`) | 21 a 22-jul, 2 días |
+| Salida de gas del estudio (`IGAS-02090`) | la de la estancia (`IGAS-02070`) | 25 a 27-jun, 3 días |
+| Caja de válvulas de Jade (`IGAS-02132`) | la de Zafiro (`IGAS-02130`) | 25 a 27-jun, 3 días |
+| Poyos de cocina (`ACA-01080`) | repellado de muro (`ALB-01010`) — propuesta: Zafiro nunca lo programó | 11 a 25-ago, 11 días |
+| Fachaleta de cantera (`ACA-10010`) | marcos de cantera interior (`ACA-07012`) — propuesta | 27 a 29-ago, 3 días |
+| Tejas sobre losa (`ACA-06010`) | las dos ventanas del bloque de acabados de fachada (`ACA-01052`, `ACA-01071`) — propuesta | 7 y 10-nov, 2 días |
+| Vigas de 60 cm de fachada (`ICA-01060`) | las mismas del bloque de acabados de fachada — propuesta | 7 y 10-nov, 2 días |
+
+Seis de ellas no tienen un gemelo claro —el castillo K-5, los dos juegos
+de vigas de cantera, la fachaleta, las tejas y los poyos de cocina—:
+suman $34,462, el 1.6% del costo de Jade, y son lo primero que el
+planeador debería mirar. Los 197 gemelos de Jade llevan más de 5% de
+cantidad extra en 77 tramos (mediana 1.00, media 1.24) y 17 con el doble
+o más —el repellado y las finas de plafond de 4.20, ×2.4 como en Rubí;
+el acero de K1, ×5; el sellado de marco de cantera, ×4.1…— que siguen con
+los días de Zafiro.
 
 **La cuadrícula no cambia de tamaño con una planta; con dos, sí.** Las
 193 columnas de Zafiro (9-jun a 18-dic) son exactamente las 28
