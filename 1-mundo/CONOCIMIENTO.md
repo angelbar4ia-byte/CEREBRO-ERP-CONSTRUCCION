@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4061 | 20 |
+| §11 | Los flujos entre sistemas | 4129 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4401,7 +4401,75 @@ planeador los ajuste, como la losa de 4.20 de Rubí (D-422).
 **Validado leyendo solo los libros**, con las mismas pruebas de Plus más que
 ninguna partida cae en un día sin trabajo —sábado, domingo, 25-dic o 1-ene— y que
 ninguna otra celda del libro cambió. Libro de revisión de cada prototipo, con las
-reglas, los 12 supuestos para validar, la red y la ruta crítica. Falta Oro.
+reglas, los 12 supuestos para validar, la red y la ruta crítica. Oro, abajo (D-431).
+
+### Oro programado: los siete prototipos ya tienen programa (D-431)
+
+Oro es el último de los cuatro prototipos de dos plantas y se programa con el
+mismo motor y el calendario de D-428. **Cierra el lunes 5-ene-2026, 149 días
+hábiles, con las 402 partidas programadas** —Oro no trae la fila de cierre en
+blanco, así que no queda nada sin programar—, la cimentación con la ventana de
+sus bloques de Zafiro (51 de 51) y 232 gemelos de `Clave` con el patrón de
+Zafiro más los 10 días de la ventana.
+
+**Las losas de planta baja, por su orden.** El grupo de losas de Oro trae dos
+—`LOSA NERVADA ENTREPISO` y `LOSA NERVADA AZOTEA` de planta baja— y no dice la
+altura de ninguna, pero sí tiene instalaciones embebidas de 3.00 y de 4.20, así
+que existen las dos alturas. Con la regla del planeador, primero la de 3.00 y
+luego la de 4.20, la primera losa toma la ventana de la de 3.00 de Zafiro (15-jul
+al 4-ago) y la segunda la de 4.20 (28-jul al 15-ago); el acero de arranque, el
+escalón forjado y la cadena intermedia siguen a la primera y la gualdra va el
+14-jul. Si las dos fueran de 4.20 tomarían las ventanas unidas, como Diamante.
+
+**Lo que Oro trae distinto.** El muro tabique de planta alta son 246 m² en 7
+días, 2.0 veces la cantidad por día del de planta baja de Zafiro (la cadena CE-1,
+2.1; los castillos, entre 0.2 y 0.9). Las 2 piezas de ojo de buey vienen dentro
+de la estructura de planta alta y no son estructura: caen el 1-sep, corridas con
+la ventana. El tanque estacionario de gas de la losa de azotea va los dos primeros
+días del colado, como la eléctrica. El plafón +3.00 de planta alta, que Plus y
+Diamante no tienen, se repella tras descimbrar la losa de azotea, igual que el de
+3.00 (15-sep). El bloque de instalaciones del asador (`ECO-00044`) existe en Zafiro
+y se empareja directo. Los emparejamientos por rol propios son cuatro: vertedero
+y regadera en corte sanitario con el vertedero de Zafiro, el apagador de losa con
+el centro de losa (la misma clave en Zafiro es del asador y caería en noviembre)
+y la salida de gas del estudio con la de la estancia, como en Jade.
+
+**Un solo motor para los cuatro.** Las instalaciones embebidas en las losas se
+reconocen por la descripción de su grupo («losa entrepiso 3.00» o «4.20») y no por
+la clave, porque Oro numera distinto las de hidráulica; con eso Plus y los dos
+Diamante dan exactamente el mismo programa que antes. Las losas se configuran por
+prototipo: por altura en Plus, por su orden en Oro, una sola ventana en Diamante.
+
+**La red.** 109 celdas y 133 vínculos, todos con holgura mayor o igual a 0; la
+ruta crítica son 31 pasos del 9-jun al 5-ene, los mismos de Plus. Como Oro tiene
+dos losas, el vínculo que las separa (P04) sí aplica, y los vínculos de Zafiro que
+cuelgan del grupo de la losa de 3.00 o de la de 4.20 usan la losa de su altura
+cuando el grupo, que junta las dos, no los cumple.
+
+**Piden más cuadrilla.** 15 partidas piden 2 o más veces la cantidad por día de su
+gemela de Zafiro; los extremos son la limpieza y el entintado del durmiente (5.4
+veces), el castillo K-3 (5) y las finas y el repellado de fachada +3.00 (4.1).
+Candidatos a que el planeador los ajuste, como en Diamante.
+
+**Con Oro quedan programados los siete prototipos** (`RESUMEN_7_PROTOTIPOS.xlsx`):
+
+| Prototipo | Plantas | Cierre | Días hábiles | Partidas | Celdas con vínculos | Vínculos |
+|---|---|---|---|---|---|---|
+| Zafiro | 1 | 18-dic | 139 | 314 de 315 | 102 | 124 |
+| Rubí | 1 | 18-dic | 139 | 294 de 294 | 81 | 102 |
+| Jade | 1 | 18-dic | 139 | 288 de 288 | 70 | 85 |
+| Zafiro Plus | 2 | 5-ene | 149 | 388 de 388 | 110 | 132 |
+| Diamante sin chimenea | 2 | 5-ene | 149 | 377 de 377 | 106 | 130 |
+| Diamante con chimenea | 2 | 5-ene | 149 | 380 de 380 | 107 | 131 |
+| Oro | 2 | 5-ene | 149 | 402 de 402 | 109 | 133 |
+
+Cuentan las partidas con cantidad (Jade programa además `MATERIAL PARA PRUEBAS`,
+que no trae cantidad, y por eso D-423 habla de 289). Los vínculos de Zafiro
+incluyen los 18 que quedaron sin cumplirse para el planeador (D-426); en los
+otros seis no hay ninguno. Validado leyendo solo los
+libros, con las mismas pruebas de Plus y los Diamante. Queda lo que sigue
+abierto en `PENDIENTES-MEJORAS.md` B-84 y B-87: el método mixto, el horizonte de la
+cuadrícula y el plazo medido en semanas de calendario.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
