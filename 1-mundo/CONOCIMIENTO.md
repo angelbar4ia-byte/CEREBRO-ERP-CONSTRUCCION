@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3905 | 20 |
+| §11 | Los flujos entre sistemas | 3978 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4246,6 +4246,79 @@ en Jade, el vínculo entre las dos losas.
 todo lo que cuelga de ahí se corre con ella y el cierre pasa del 18-dic al
 1-ene. Con eso los cuatro prototipos de dos plantas ya tienen su regla;
 falta programarlos (`PENDIENTES-MEJORAS.md` B-84).
+
+### Zafiro Plus, la primera versión de las dos plantas: la ventana, la red y lo que se valida (D-427)
+
+Con la ventana y la red decididas (D-426) se programa el primero de los cuatro
+prototipos de dos plantas. **Cierra el 1-ene-2026: 149 días hábiles, 29.8
+semanas, 207 días calendario**, con 388 de sus 389 partidas programadas —la que
+falta es la fila de cierre en blanco, sin cantidad— y la cuadrícula ampliada
+14 columnas (`HO:IB`, 236 en total) con el encabezado `Cantidad` como las demás.
+
+**Cómo se programó.** Es el programa de Zafiro con 10 días hábiles insertados el
+18-ago: lo anterior queda igual, lo posterior se corre 10 días hábiles, lo que
+cruza el 18-ago queda con un hueco de 10 días y lo ligado por `FF` se alarga.
+Cada partida anota la regla que la programó: 204 por gemelo de `Clave` dentro de
+su bloque equivalente de Zafiro y 10 por la misma `Clave` en otro bloque, 43 de
+cimentación con la ventana de su bloque de Zafiro (D-418), 49 de losas por
+altura —la de 3.00 con la ventana de la de 3.00 de Zafiro, la de 4.20 con la de
+4.20, y el acero y las instalaciones embebidas dentro de su corrida de
+armado—, 44 de la planta alta, 15 por rol explícito, 16 con la ventana de su
+bloque y 7 de nivel de duración fija (cancelería, carpintería y herrería duran
+lo de Zafiro, D-421). Los metros de más no suman días (D-419): 7 partidas piden
+2 o más veces la cantidad por día de su gemela de Zafiro.
+
+**La planta alta cabe en la ventana.** Estructura del 18 al 26-ago (muro tabique
+y castillos los 7 días, la cadena el 25 y 26), colado de la losa de azotea del
+27 al 29-ago, fraguado de 8 días hábiles y segunda corrida el 11 y 12-sep. El
+muro tabique de PA son 197 m² en 7 días, 1.6 veces la cantidad por día del de
+Zafiro; la cadena, 1.6; los castillos, entre 0.2 y 0.7. Las instalaciones en
+muros de PA arrancan en su hueco de la ventana con los días de su gemela de PB.
+
+**Dos correcciones de secuencia sobre la primera versión.** Los pretiles de la
+azotea quedaban en julio, antes de que existiera la losa que los carga, y el
+plafón de PA se repellaba el mismo día que se colaba su losa. Ahora los pretiles
+van sobre la losa de azotea, del 1 al 3-sep, y los 6 días de Zafiro bajan a 3 con
+más cuadrilla (1.2 y 1.6 veces la cantidad por día); el plafón de PA se repella
+tras descimbrar (15 al 19-sep) y el muro +3.00 de PA después (22 y 23-sep). Si
+los pretiles esperaran el descimbrado, la cadena se correría 10 días hábiles y
+el cierre pasaría al 15-ene: no cabría en 30 semanas.
+
+**La red, con piso.** Se hereda con las reglas de Rubí y Jade y una más: cada
+sucesora se enlaza con la predecesora **de su piso** —PB con PB, PA con PA,
+azotea con azotea— y, si la predecesora solo existe en un piso, con esa. Quedan
+110 celdas con 132 vínculos, todos con holgura mayor o igual a 0 con las fechas
+de Plus: 47 de los 52 sanos de D-425, 26 de los 30 de la red de D-426 (P05 y P06
+no aplican, porque los pretiles de Plus cuelgan de la losa de azotea) y cuatro
+eslabones propios de las dos plantas, PX01 a PX04: la estructura de PA arranca
+el día hábil siguiente de terminar la losa de 4.20, la cadena termina con el
+muro, la losa de azotea se cuela el día siguiente de la cadena y los pretiles
+arrancan 3 días hábiles después de colarla. No se escriben los que dependen de
+partidas que Plus no tiene —cubierta de cocina, tanque estacionario en losa,
+marcos de cantera interior, piedra laja en muro, lijado y sellado de muro
+interior, limpieza de piedra laja— ni el orden entre las dos manos de pintura,
+que en Plus es una sola partida.
+
+**La ruta crítica de Plus son 31 pasos**, del 9-jun al 1-ene, todos los relevos
+con holgura 0: la cadena de Zafiro con tres pasos de planta alta en medio
+—muro, cadena y losa de azotea— y los pretiles colgando de la losa de azotea. La
+ventana de 10 días llega entera al cierre.
+
+**Cómo se verificó.** Validación independiente leyendo solo los libros: forma
+(236 columnas, autofiltro hasta `IB`), solo cambia el bloque de Plus, reglas de
+la cuadrícula (lunes a viernes, ceros explícitos, cantidad entre días), cierre
+con 149 días hábiles, 208 gemelos con el patrón de Zafiro más los 10 días, la
+cimentación con la ventana de su bloque, las losas por altura iguales a las de
+Zafiro y los resúmenes consistentes; de la red, formato, predecesora dentro del
+bloque, cumplimiento con las fechas y que solo cambie la columna `Vínculos`.
+
+**Pendiente de validar (B-84).** Once supuestos, en la hoja «A validar» del libro
+de revisión: la ventana, la cuadrilla de la estructura de PA, el colado y
+descimbrado de la losa de azotea (8 días de fraguado), los pretiles antes del
+descimbrado, el plafón de PA, las instalaciones de PA, los acabados de PA con
+las ventanas de PB, el ojo de buey en la estructura de PB, lo que Plus no
+tiene, el calendario (se trabaja el 25-dic y el 1-ene) y la red. Faltan
+Diamante sin chimenea, Diamante con chimenea y Oro.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
