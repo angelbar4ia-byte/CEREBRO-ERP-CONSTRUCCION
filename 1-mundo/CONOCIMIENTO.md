@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3604 | 20 |
+| §11 | Los flujos entre sistemas | 3577 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3547,14 +3547,19 @@ rendimiento` (`MODELO.md` §5c) — un programa por **prototipo**, no por lote:
 duración teórica (rendimiento × cantidad del prototipo) y cuadrillas
 explícitas, no fechas reales de una obra concreta.
 
-**El objetivo, por tamaño de prototipo:**
+**El objetivo, por tamaño de prototipo — corregido (D-419):**
 
 | Grupo | Prototipos | Semanas objetivo |
 |---|---|---:|
-| 1 planta | Rubí, Zafiro, Jade | 20 |
+| 1 planta | Rubí, Zafiro, Jade | 28 |
 | 2 plantas | Diamante, Zafiro Plus, Oro | 30 |
 
-`ALAMO 18` (Diamante) cae en 30 semanas.
+`ALAMO 18` (Diamante) cae en 30 semanas. **Corrige D-389, que registró 20
+para una planta:** son 28 —dato del usuario, "ya lo habíamos
+definido"—, y es lo que el plan manual de Zafiro ya cumple: 9-jun a
+18-dic, 139 días hábiles, 27.8 semanas. El plazo lo fija el número de
+plantas, no los metros cuadrados (más abajo, en el programa de los otros
+seis prototipos).
 
 **Cimentación → Azotea, reconstruido con rendimiento (`CATALOGOS.md` §10)
 y cuadrillas explícitas — sin dejar huecos sin explicar:**
@@ -4202,7 +4207,7 @@ instalaciones necesita revisarse — no es solo que el dato disperse al
 compararlo, puede que el dato mismo esté desactualizado.
 `PENDIENTES-MEJORAS.md` B-83.
 
-### Completar los otros seis prototipos: primer método, escalar los días de Zafiro — piloto en Rubí
+### Completar los otros seis prototipos: el programa de Zafiro se copia, no se escala — el plazo lo fija el número de plantas
 
 Dato del usuario: Zafiro es el único prototipo con programa completo;
 en los otros seis, solo cimentación tiene fechas —confirmado,
@@ -4210,146 +4215,125 @@ exactamente 1 de 14-15 Subcapítulo por prototipo tiene `Días
 calendario` > 0, y siempre es cimentación—. Todo lo demás (Planta
 Baja, Azotea, Acabados…) es el stub de 0 días. **Y esas fechas de
 cimentación no sirven — dato del usuario, D-418: "ya están editados de
-origen, pero están mal, solo la Zafiro es confiable".** El método no
-las hereda: las rehace desde Zafiro (paso 0, abajo). Dato del usuario:
-empezar con un piloto de un solo prototipo antes de replicar a los
-otros cinco, y con el método más simple primero —escalar los días que
-ya tiene Zafiro, sin pasar todavía por rendimiento × cuadrillas—.
+origen, pero están mal, solo la Zafiro es confiable".** En Rubí, las
+instalaciones caían el 9 y 10-jun, los dos primeros días, cuando en
+Zafiro van en la segunda semana, y la estructura cerraba el 19-jun
+contra el 23-jun de Zafiro. El método no hereda nada de eso: lo rehace
+desde Zafiro. Dato del usuario: empezar con un piloto de un solo
+prototipo antes de replicar a los otros cinco; las dos plantas, "paso a
+paso", después.
 
-**Por qué Rubí primero.** Zafiro es de una sola planta; tres de los
-seis prototipos restantes (Zafiro Plus, Diamante sin/con chimenea,
-Oro) tienen Planta Alta — dato del usuario: adaptar a dos plantas es
-lo interesante, pero "paso a paso". De los dos de una planta que
+**Por qué Rubí primero.** Zafiro es de una sola planta; cuatro de los
+seis prototipos restantes (Zafiro Plus, los dos Diamante, sin y con
+chimenea, y Oro) tienen Planta Alta — dato del usuario: adaptar a dos
+plantas es lo interesante, pero "paso a paso". De los dos de una planta que
 quedan (Rubí 207m², Jade 230m²), Rubí es el más cercano en tamaño a
 Zafiro (172m²).
 
-**El método, mecánico, sin dato nuevo — versión corregida (D-415, D-418):**
+**La regla de fondo, dato del usuario (D-419): el plazo lo fija el
+número de plantas, no los metros cuadrados.** Una planta cierra en 28
+semanas, dos plantas en 30 (la tabla de más arriba, corregida: decía
+20). Zafiro cumple las 28 con 172 m² —9-jun a 18-dic, 139 días hábiles,
+27.8 semanas—; Rubí tiene 207, y lo razonable parecería que tardara
+más, "pero esto no aplica": los metros de más no agregan días. Se
+absorben con más gente al mismo tiempo, y eso solo se ve en un lugar:
+la cantidad por día de la cuadrícula. **Corrige D-414 y D-418:** el
+primer método escalaba los días de cada tramo por la razón de
+cantidades (Rubí cerraba el 1-ene-2026, 149 días hábiles contra 139) y
+la cimentación por la razón de las losas (200 contra 172 m², 13 días en
+vez de 11). Las dos cosas quedan fuera.
+
+**Segunda regla del mismo dato: cancelería, carpintería y herrería
+duran lo mismo que en Zafiro, en todos los prototipos.** Es
+`modo_duracion=preestablecida_nivel` (`MODELO.md` §5c, B-48, D-353) con
+sus valores a la vista por primera vez: Cancelería 10 días hábiles (3 a
+14-nov, 2 semanas), Carpintería 15 (17-nov a 5-dic, 3 semanas) y
+Herrería 5 (24 a 28-nov, 1 semana) —las mismas 2 y 3 semanas que D-389
+ya había anotado para Cancelería y Carpintería del Diamante—.
+
+**El método, versión de D-419:**
 
 ```
-0. Cimentación: se DESCARTA la que trae el prototipo y se rehace desde
-   Zafiro (D-418). En Zafiro son cinco bloques (Nivel 2), cada uno con
-   UNA ventana que comparten todos sus conceptos; se escalan como
-   unidades, no concepto por concepto: la estructura por el área de la
-   losa de cimentación (matriz, MOC-01010), cada instalación por la
-   razón de Σ cantidad; y cada bloque conserva el desfase de inicio
-   que tiene en Zafiro (las instalaciones van en la segunda semana,
-   no al arranque)
-1. Emparejar cada concepto de Rubí con el mismo Clave de Zafiro,
-   TRAMO A TRAMO —no por Clave sola—: varios conceptos (castillo K1,
-   muro tabique) tienen 2-3 tramos con la misma Clave, y cruzarlos
-   sin respetar su posición relativa multiplica mal (3×3=9 en vez
-   de 3). Primer intento cayó en esto — corregido con
-   groupby('Clave').cumcount() antes de cruzar.
-2. factor = Cantidad_Rubí ÷ Cantidad_Zafiro (del mismo tramo)
-3. Todo se calcula en DÍAS HÁBILES (lunes a viernes), no naturales:
-   el tramo de Zafiro se lee como "corre N días, se detiene M,
-   retoma K…" y Rubí repite esa misma forma con los días activos
-   escalados por el factor (Días laborables = redondear(Zafiro ×
-   factor)) y los días de parón escalados por el mismo factor
-4. Inicio_Rubí = fin de la cimentación NUEVA de Rubí (25-jun, paso 0)
-   + el mismo desfase en días hábiles que el tramo tenía en Zafiro
-   respecto al fin de SU cimentación (23-jun) — el desfase no se
-   escala, solo la duración
-5. Fecha de término = último día activo; Días calendario = término
-   − inicio + 1, DERIVADO de las fechas, no escalado aparte;
-   Esfuerzo = Días laborables × 8 (D-392)
-6. Cuadrícula AD:HN: `Cantidad` ÷ `Días laborables` (redondeado a 2
-   decimales) en cada día activo; un `0` explícito en TODO día sin
-   trabajo entre el primer y el último día activo (fines de semana y
-   parón) — fuera del tramo, vacío (D-416)
+0. Se descarta todo lo que el prototipo trae programado: su
+   cimentación está mal (D-418)
+1. Cimentación: los cinco bloques de Zafiro (Nivel 2), cada uno con
+   UNA ventana que comparten todos sus conceptos —estructura 9 a
+   23-jun (11 días hábiles), sanitarias 16-17, hidráulicas 17-18,
+   eléctricas 18-19, gas 20-jun—. Cada concepto del prototipo toma
+   la ventana de su bloque, sin escalar
+2. Cada concepto con la misma Clave que uno de Zafiro, TRAMO A TRAMO
+   —no por Clave sola: varios conceptos (castillo K1, muro tabique)
+   tienen 2-3 tramos con la misma Clave, y cruzarlos sin respetar su
+   posición relativa multiplica mal (3×3=9 en vez de 3; se corrige
+   con groupby('Clave').cumcount())—, copia las fechas y los días de
+   ese tramo, idénticos: misma forma (corre N días, se detiene M,
+   retoma K)
+3. Cantidad por día = Cantidad del prototipo ÷ Días laborables de
+   Zafiro, a 2 decimales, en cada día activo; un `0` explícito en
+   TODO día sin trabajo entre el primer y el último día activo
+   (fines de semana y parón); fuera del tramo, vacío (D-416)
+4. Sin gemelo en Cancelería, Carpintería o Herrería: la ventana más
+   frecuente de ese nivel en Zafiro
+5. Sin gemelo en un bloque que Zafiro programa como UNA ventana
+   (cableado eléctrico, iluminación, jardinería, cada pérgola):
+   esa ventana
+6. Lo demás queda sin programar hasta que el usuario apruebe a qué
+   se parece
+7. Término = último día activo; Días calendario = término − inicio
+   + 1; Esfuerzo = Días laborables × 8 (D-392); las filas de
+   resumen se recalculan de sus hijos (abajo)
 ```
 
-**Corrige D-414 (primera versión de este método).** Escalaba `Días
-laborables` y `Días calendario` por separado, en días naturales, y
-corría el inicio con un desfase en días naturales. Rubí termina
-cimentación un jueves y Zafiro un lunes: el desfase de 4 días naturales
-rompió la semana de lunes a viernes. Descubierto al llenar la
-cuadrícula, no antes: **105 de 209 inicios caían en sábado o domingo,
-64 de los cierres también, y 135 filas pedían más días laborables de
-los que caben en su propio tramo.** Ninguna se veía mal en la tabla de fechas;
-solo la cuadrícula —donde Zafiro nunca pone un valor en fin de
-semana— lo hizo imposible de ignorar.
+**Resultado en Rubí: 295 conceptos.** 57 de cimentación (paso 1), 208
+con gemelo por Clave (paso 2), 9 por nivel preestablecido —2 de
+cancelería y 7 de carpintería— y 6 por bloque de una ventana —las dos
+pérgolas, tres eléctricos y la lavanda—: **280 programados, y el
+programa cierra el 18-dic, el mismo día que Zafiro** (139 días
+laborables, 27.8 semanas, las 28). Los 208 gemelos tienen fechas, días
+y ceros idénticos a los de su tramo en Zafiro (208 de 208). Contra
+Zafiro, 59 de esos tramos llevan más de 5% de cantidad extra (mediana
+1.00, media 1.13): ahí sube la cantidad por día, que es más cuadrillas
+y no más tiempo —castillo K1, tramo 1: 18.13 m/día en Zafiro, 23.4 en
+Rubí; contra el rendimiento teórico de 12.12, 1.50 cuadrillas implícitas
+y 1.93—.
 
-**Corrige D-414 otra vez (D-418): la cimentación que traía el archivo
-estaba mal, y todo el programa se había anclado a ella.** Dato del
-usuario: la cimentación de Zafiro termina después que la de Rubí, las
-instalaciones de Rubí están al inicio y por eso se adelantan las demás
-actividades; la de Rubí y la de los demás prototipos "ya están editados
-de origen, pero están mal, solo la Zafiro es confiable". Comprobado en
-el archivo: la estructura de Rubí cerraba el 19-jun (Zafiro, 23-jun) y
-sus 48 conceptos de instalaciones (sanitarias 18, hidráulicas 17,
-eléctricas 7, gas 6) caían todos el 9 y 10-jun, los dos primeros días
-—en Zafiro van en la segunda semana—. D-414 tomó ese cierre como ancla de
-todo lo demás, así que Rubí entero arrancaba 4 días hábiles antes de lo
-que su propia cimentación, hecha como la de Zafiro, permite.
+**Los 30 sin programar de la primera versión no eran "mayoría
+instalaciones" — corrige D-414 y D-415 (D-418).** Eran 28 sin gemelo por
+Clave en Zafiro, `ACA-01080` y la fila vacía de cierre; por familia, 10
+de carpintería, 6 de estructura (las cuatro losas, más un muro y una
+cadena), 5 de acabados, 5 de instalaciones, 2 de cancelería, 1 de obras
+exteriores y la fila vacía: $615,148, el 30.1% del costo de Rubí, de los
+cuales las cinco instalaciones sumaban $1,204. La causa era la `Clave`,
+no el oficio: el concepto específico de Rubí lleva el nombre del
+prototipo (`COCINA RUBÍ`, `LOSA MACIZA RUBÍ 3.00`) y Zafiro tiene su
+gemelo por rol bajo otra clave (`COCINA ZAFIRO`, `LOSA MACIZA ZAFIRO
+3.00`). Con las reglas de arriba, 15 de esos 28 sin gemelo por Clave se
+resuelven —2 de cancelería, 7 de carpintería, las dos pérgolas, tres
+eléctricos y la lavanda— y quedan **15 sin programar: `ACA-01080`, que
+Zafiro tampoco programó (D-401), la fila vacía de cierre, y 13 sin
+gemelo que necesitan decisión del usuario, $274,601 (13.5% del costo
+de Rubí):** las cuatro losas (`EST-30012`, `EST-30013`, `EST-30040`,
+`EST-30041`, $224,546; Zafiro solo tiene dos, maciza 3.00 y nervada
+4.20), las cuatro pinturas "2 manos" (`ACA-03025`, `ACA-03026` y
+`ACA-03047` dos veces, $40,115; en Zafiro la primera y la segunda mano
+son conceptos separados, con semanas de por medio) y cinco partidas
+chicas (muro de 21 cm, cadena `CE-2`, gualdra, ventilación sanitaria y
+caja de válvulas de gas, $9,940). `PENDIENTES-MEJORAS.md` B-84.
 
-Los cinco bloques de cimentación de Zafiro (`ECO-00001` a `ECO-00005`)
-tienen cada uno UNA ventana que comparten todos sus conceptos: no hay
-ritmo propio por concepto, y emparejar concepto contra concepto da
-razones de 0.33 a 7.0 sin sentido. Por eso cada bloque se escala como
-unidad:
-
-| Bloque (conceptos de Rubí) | Zafiro | Rubí en el archivo (descartado) | Rubí rehecho |
-|---|---|---|---|
-| Estructura (9) | 9 → 23-jun, 11 días | 9 → 19-jun, 9 días | 9 → 25-jun, 13 días (×1.163) |
-| Sanitarias (18) | 16 → 17-jun, 2 días | 9 → 10-jun | 16 → 17-jun, 2 días (×1.032) |
-| Hidráulicas (17) | 17 → 18-jun, 2 días | 9 → 10-jun | 17 → 18-jun, 2 días (×1.038) |
-| Eléctricas (7) | 18 → 19-jun, 2 días | 9 → 10-jun | 18 → 19-jun, 2 días (×1.123) |
-| Gas (6) | 20-jun, 1 día | 9 → 10-jun | 20-jun, 1 día (×1.143) |
-
-La estructura va por el área de la losa de cimentación —el `MOC-01010` de
-la matriz: 200 m² en `EST-01030` de Rubí contra 172 m² en `EST-01040` de
-Zafiro, ×1.163, y 11 días × 1.163 = 12.8 → 13—. Cada instalación va por
-la razón de la suma de sus cantidades (1.03 a 1.14: sus días, 2, 2, 2 y
-1, no cambian) y arranca el mismo día hábil que en Zafiro (5, 6, 7 y 9
-contados desde el 9-jun). **Alternativa no elegida:** copiar la
-cimentación de Zafiro tal cual (cierra 23-jun, sin escalar la estructura
-por la losa más grande) correría todo 2 días hábiles más temprano; se
-escaló porque es el mismo criterio que D-414 usa para el resto.
-
-Con la estructura cerrando el 25-jun, los 208 tramos posteriores se
-corren exactamente 4 días hábiles —misma forma, mismos días, mismos
-valores: 208 de 208, comprobado contra la versión anterior del archivo—.
-El programa de Rubí termina ahora el 1-ene-2026 (antes, 26-dic), con 149
-días laborables contra 139 de Zafiro. Solo `ACA-08030` (sellado con
-silicón, 12 días activos del 17-dic al 1-ene) cruza el 25-dic y el 1-ene:
-el calendario de Zafiro no excluye feriados —hay actividad el 16-sep y
-el 17-nov—, así que se deja igual.
-
-**Las filas de resumen se recalculan de sus hijos, no se escalan
-(D-418).** Las 68 filas de Capítulo, Subcapítulo, Nivel 2 y Nivel 3 de
-Rubí con hijos programados traían las fechas de la cimentación vieja. La
-regla sale de Zafiro y se comprobó ahí primero, en sus 82 filas de
-resumen con hijos programados: inicio = el primer inicio de sus
+**Las filas de resumen se recalculan de sus hijos, no se copian
+(D-418).** Las 73 filas de Capítulo, Subcapítulo, Nivel 2 y Nivel 3 de
+Rubí con hijos programados traían, a lo más, las fechas de la
+cimentación vieja. La regla sale de Zafiro y se comprobó ahí primero,
+en sus 82 filas de resumen con hijos programados: inicio = el primer inicio de sus
 conceptos, término = el último término, `Días calendario` = término −
-inicio + 1 (82 de 82), `Días laborables` = los días hábiles de ese rango
-(81 de 82; la excepción es una fila con un solo hijo que tiene un parón,
-y ahí el resumen copia los días del hijo), `Esfuerzo` = `Días
-laborables` × 8, y `% Programado` = el promedio de los `% Programado` de
-sus conceptos ponderado por `Total` (82 de 82, a 4 decimales). Con esa
-regla el Capítulo de Rubí queda del 9-jun al 1-ene, 149 días laborables,
-70% programado por costo —el 30% restante son los 30 del párrafo
-siguiente—.
-
-**Resultado: 295 conceptos de Rubí, tres grupos.** 57 de cimentación,
-rehechos desde Zafiro (D-418). **208 escalados.** 30 se quedan sin
-programar: 28 sin ningún tramo equivalente por `Clave` en Zafiro,
-`ACA-01080` (Zafiro tampoco lo programó, D-401 — se replica, no se
-inventa) y la fila vacía de cierre (igual que en Zafiro). **Corrige
-D-414 y D-415, que llamaron a esos 28 "mayoría instalaciones" y los
-pusieron junto a D-408/D-412: no lo son.** Por familia, los 30 son 10 de
-carpintería, 6 de estructura (las cuatro losas `EST-30012`, `EST-30013`,
-`EST-30040` y `EST-30041`, más un muro y una cadena), 5 de acabados, 5 de
-instalaciones, 2 de cancelería, 1 de obras exteriores y la fila vacía.
-Por costo pesan $615,148, el 30.1% de los $2,040,946 de Rubí: carpintería
-$270,294, estructura $229,771 —las cuatro losas, $224,546—, cancelería
-$71,456, acabados $42,062, y las cinco instalaciones juntas $1,204. La
-causa es la `Clave`, no el oficio: el concepto específico de Rubí lleva
-el nombre del prototipo (`LOSA MACIZA RUBÍ 3.00`, `CANCELERÍA RUBÍ`,
-`COCINA RUBÍ`, `PÉRGOLA ASADOR RUBÍ`) y Zafiro tiene su gemelo por rol
-bajo otra clave (`EST-21011`, `CAN-01002`, `CAR-03020`, `CAR-10011`), que
-el paso 1 no ve. Emparejar por rol en vez de por `Clave` cubriría la
-mayoría — propuesta, sin aplicar, `PENDIENTES-MEJORAS.md` B-84.
+inicio + 1 (82 de 82), `Días laborables` = los días hábiles de ese
+rango (81 de 82; la excepción es una fila con un solo hijo que tiene un
+parón, y ahí el resumen copia los días del hijo), `Esfuerzo` = `Días
+laborables` × 8, y `% Programado` = el promedio de los `% Programado`
+de sus conceptos ponderado por `Total` (82 de 82, a 4 decimales). Con
+esa regla el Capítulo de Rubí queda del 9-jun al 18-dic, 139 días
+laborables, 86% programado por costo —el 14% restante son los 15 de
+arriba—.
 
 **Reglas de la cuadrícula AD:HN que salen de Zafiro, comprobadas en
 sus 314 conceptos programados:** solo conceptos llevan valores (los
@@ -4367,44 +4351,33 @@ exactamente `Días calendario − Días laborables` (313 de 314): los
 ceros no son relleno, **miden cuánto dura cada parón** y marcan los
 días sin trabajo. La cimentación de Rubí que venía en el archivo —con
 las fechas equivocadas, D-418, pero con la convención de ceros bien
-puesta— la sigue igual (57 de 57; 9 sábados y 9 domingos).
-Los ceros de fin de semana caen en sábado y domingo (132 y 132 en
-Zafiro, contra 146 ceros en días hábiles que son parón), igual que
-D-393 ya había encontrado: cero actividad en sábado y domingo. **Dato
-del usuario, confirmado (D-417):** los días sin trabajo son sábado y
-domingo — un "viernes y sábado" dicho antes fue un desliz, no una
-regla distinta. Rubí cumple las siete: 0 violaciones en sus 265
-conceptos programados (57 de cimentación y 208 posteriores) con 499
-ceros explícitos (178 sábados, 178 domingos, 143 de parón), y la
-proporción de tramos con parón es parecida (Zafiro 13 de 315, Rubí 11
-de 208).
-Castillo K1 tramo 1: Zafiro corre 5 días, para 17, retoma 2; Rubí
-corre 6, para 22, retoma 3.
+puesta— la sigue igual (57 de 57; 9 sábados y 9 domingos). Los ceros de
+fin de semana caen en sábado y domingo (132 y 132 en Zafiro, contra 146
+ceros en días hábiles que son parón), igual que D-393 ya había
+encontrado: cero actividad en sábado y domingo. **Dato del usuario,
+confirmado (D-417):** los días sin trabajo son sábado y domingo — un
+"viernes y sábado" dicho antes fue un desliz, no una regla distinta.
+Rubí cumple las siete: 0 violaciones en sus 280 conceptos programados,
+con 390 ceros explícitos (129 sábados, 129 domingos, 132 de parón en 11
+tramos; Zafiro tiene parón en 13 de 315).
 
-**La cuadrícula se extendió 14 columnas (HO:IB), a propósito.** El
-horizonte de 193 columnas lo fijó el programa de Zafiro (9-jun a
-18-dic); Rubí, 20% más grande, lo desborda: 11 conceptos terminan
-después del 18-dic, y `ACA-08030` tiene 12 días activos que corren
-hasta el 1-ene (la versión de D-415, anclada a la cimentación vieja,
-llegaba al 26-dic con 8 columnas, HO:HV). Se agregaron las columnas, con
-el mismo encabezado y estilo, en vez de truncar cantidad. El horizonte
-no es parte del formato —lo fija el programa más largo—, y los
-prototipos de dos plantas lo desbordarán más.
+**La cuadrícula no cambia de tamaño con una planta; con dos, sí.** Las
+193 columnas de Zafiro (9-jun a 18-dic) son exactamente las 28
+semanas, así que Rubí cabe en `AD:HN` sin columnas nuevas. Un prototipo
+de dos plantas cierra en 30 semanas —10 días hábiles más, 14 columnas
+(`HO:IB`)— y es donde el horizonte dejará de alcanzar.
 
-**Lo que este primer método no resuelve, a propósito, dato del
-usuario:** no toca `Vínculos` —se necesitaría remapear cada
-referencia de precedencia a las filas de Rubí, más riesgo de error
-que valor en un piloto—; no programa los 30 conceptos de arriba, los
-de nombre propio del prototipo (el emparejamiento por rol queda
-propuesto, sin aplicar); y no pasa por rendimiento × cuadrillas —el
-método "mixto" que sí lo haría queda para después de validar este,
-dato del usuario—. (Las fechas de resumen ya no están en esta lista:
-se recalculan de sus hijos, D-418.) **Y hereda el ritmo de Zafiro tal
-cual, con sus
-inconsistencias:** como los días escalan con la cantidad, el ritmo
-por día se queda casi igual (castillo K1: 18.13 m/día en Zafiro, 18.20
-en Rubí; el tramo 2, 4.20 contra 4.40) — las mismas dos lecturas
-opuestas que D-406 ya encontró contra el rendimiento calculado.
+**Lo que este método no resuelve, a propósito, dato del usuario:** no
+toca `Vínculos` —se necesitaría remapear cada referencia de
+precedencia a las filas de Rubí, más riesgo de error que valor en un
+piloto—; no programa los 13 conceptos sin gemelo hasta que el usuario
+apruebe a qué se parecen; no resuelve las dos plantas, donde Zafiro no
+tiene Planta Alta que copiar y las 28 semanas pasan a 30; y no pasa por
+rendimiento × cuadrillas —el método "mixto" que sí lo haría queda para
+después de validar este—. Esto último pesa más ahora: como la
+cantidad extra se absorbe con cuadrillas, el ritmo por día ya no se
+hereda de Zafiro sino que sube con la cantidad, y cuántas cuadrillas
+implica cada prototipo es justo lo que ese método respondería.
 `PENDIENTES-MEJORAS.md` B-84.
 
 ## 11.15 Salidas de almacén: cómo leer el archivo

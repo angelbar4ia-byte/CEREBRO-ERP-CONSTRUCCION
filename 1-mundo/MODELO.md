@@ -1814,6 +1814,14 @@ cargada» y «se contrata terminado» resultaron ejes independientes, no el
 mismo (`CONOCIMIENTO.md` §11.13). Muebles/Iluminación no entra aquí: se
 programa como el resto, con `modo_duracion` calculada o capturada.
 
+**El valor de esa duración ya tiene fuente (dato del usuario, D-419).**
+«La misma para ese nivel en cualquier obra» no decía de dónde sale el
+número: sale de Zafiro 1.0. Cancelería, Carpintería y Herrería duran lo
+mismo que en Zafiro en todos los prototipos —Cancelería 10 días hábiles
+(2 semanas), Carpintería 15 (3 semanas), Herrería 5 (1 semana)—, aunque
+el prototipo tenga más metros cuadrados u otra cantidad de piezas.
+`CONOCIMIENTO.md` §11.14.
+
 ### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
 
 Dato del usuario, primer programa completo por **prototipo** (no por
