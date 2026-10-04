@@ -1903,6 +1903,37 @@ TRAMO
                              menos calculado»)                                firme — P-5
 ```
 
+### El calendario de obra es configurable: los fines de semana y los días no laborables se agregan o se quitan (D-428)
+
+Dato del usuario (D-428): el 25-dic y el 1-ene no se trabajan —en este
+ejercicio—, pero el sistema debe dejar como **opción** agregar o quitar días no
+laborables y también los fines de semana, "solo como opción, no para este
+ejercicio". `CALENDARIO_OBRA.dias_no_habiles` ya existía como "definición"; así
+se concreta:
+
+```
+CALENDARIO_OBRA
+  dias_laborables_semana   los días de la semana que se trabajan, de lunes a
+                           domingo; por defecto lunes a viernes. El sábado y el
+                           domingo se agregan o se quitan como cualquier otro   firme — D-428
+
+CALENDARIO_DIA_NO_HABIL
+  calendario_obra_id       FK CALENDARIO_OBRA
+  fecha                    DATE — un día que no se trabaja (feriado, paro,
+                           lluvia); se agrega o se quita sin tocar el resto     firme — D-428
+  motivo                   texto libre
+```
+
+Todo cálculo con días hábiles —el número de día hábil de una fecha, la fecha de
+un día hábil, `Días laborables`, el `0` explícito de cada día sin trabajo dentro
+de un tramo— pasa por este calendario y por ningún otro; `CALENDARIO_EXCEPCION`
+sigue siendo el override por cuadrilla. En el ejercicio la configuración es lunes
+a viernes sin el 25-dic y el 1-ene (el 16-sep y el 17-nov se trabajan, como en
+Zafiro): los dos feriados mueven la fecha de cierre, no la cantidad de trabajo
+(`CONOCIMIENTO.md` §11.14). Queda abierto (`PENDIENTES-MEJORAS.md` B-87) si el
+plazo de 28 o de 30 semanas se mide en días hábiles o en semanas de calendario
+cuando el calendario cambia.
+
 ### ⏸ Un vínculo entre bloques: el modelo no dice si `ACTIVIDAD` existe en Nivel 2 y 3 (D-425)
 
 La red mínima propuesta en D-425 (`CONOCIMIENTO.md` §11.14) liga bloques

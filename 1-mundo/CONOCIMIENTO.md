@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3978 | 20 |
+| §11 | Los flujos entre sistemas | 4061 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4253,7 +4253,9 @@ Con la ventana y la red decididas (D-426) se programa el primero de los cuatro
 prototipos de dos plantas. **Cierra el 1-ene-2026: 149 días hábiles, 29.8
 semanas, 207 días calendario**, con 388 de sus 389 partidas programadas —la que
 falta es la fila de cierre en blanco, sin cantidad— y la cuadrícula ampliada
-14 columnas (`HO:IB`, 236 en total) con el encabezado `Cantidad` como las demás.
+14 columnas (`HO:IB`, 236 en total) con el encabezado `Cantidad` como las demás. *(El calendario de este apartado se corrigió en
+D-428, abajo: el 25-dic y el 1-ene no se trabajan, Plus cierra el lunes 5-ene y la
+cuadrícula llega a `IF`.)*
 
 **Cómo se programó.** Es el programa de Zafiro con 10 días hábiles insertados el
 18-ago: lo anterior queda igual, lo posterior se corre 10 días hábiles, lo que
@@ -4319,6 +4321,87 @@ descimbrado, el plafón de PA, las instalaciones de PA, los acabados de PA con
 las ventanas de PB, el ojo de buey en la estructura de PB, lo que Plus no
 tiene, el calendario (se trabaja el 25-dic y el 1-ene) y la red. Faltan
 Diamante sin chimenea, Diamante con chimenea y Oro.
+
+### Los feriados: el 25-dic y el 1-ene no se trabajan, y el calendario será una opción del sistema (D-428)
+
+Dato del usuario: se continúa con los dos Diamante; **el 25 de diciembre y el 1
+de enero no se trabajan**, pero el sistema debe dejar como opción agregar o
+quitar días no laborables y también los fines de semana, "solo como opción, no
+para este ejercicio" (`MODELO.md` §5c). Responde la pregunta de feriados que
+D-419 había dejado abierta para los programas de 30 semanas.
+
+**El calendario del ejercicio.** Lunes a viernes sin el 25-dic y el 1-ene. El
+16-sep y el 17-nov se siguen trabajando, como en Zafiro, que es el confiable.
+Zafiro, Rubí y Jade cierran el 18-dic, antes de los dos feriados, y no cambian.
+
+**Qué cambia.** El trabajo no cambia —149 días hábiles, con la ventana de 10 días—,
+cambia el calendario: el cierre de los programas de dos plantas pasa del jueves
+1-ene al **lunes 5-ene-2026**, 30 semanas y un día hábil; la cuadrícula crece
+hasta el 5-ene (columna `IF`, 240 en total, 18 columnas más que Zafiro); y el
+25-dic y el 1-ene llevan un `0` explícito dentro de los tramos que los cruzan, que
+es la misma regla de los fines de semana (34 ceros en Plus y 29 en cada Diamante). Todo lo que
+Plus tenía programado desde el 25-dic se corre; antes de esa fecha el programa es
+idéntico al de D-427 (probado: los 388 conceptos conservan su patrón de días
+hábiles). La ruta crítica de Plus sigue siendo de 31 pasos y termina el 5-ene.
+
+**Si el plazo se mide en semanas de calendario.** Cerrar el viernes 2-ene, el
+último día de la semana 30, exigiría una ventana de 9 días en vez de 10: se
+acorta un día la estructura de la planta alta. Queda como opción del planeador y
+como pregunta de modelo, no como decisión (`PENDIENTES-MEJORAS.md` B-87).
+
+### Diamante sin y con chimenea programados con el mismo método de las dos plantas (D-429, D-430)
+
+Los dos Diamante usan el motor de Plus —el programa de Zafiro con 10 días hábiles
+insertados el 18-ago, la planta alta emparejada por rol— con el calendario de
+D-428. **Los dos cierran el lunes 5-ene-2026, 149 días hábiles**: Diamante sin
+chimenea con 377 de 378 partidas programadas y Diamante con chimenea con 380 de
+381 (la que falta es la fila de cierre en blanco, sin cantidad), y la
+cimentación con la ventana de su bloque de Zafiro, 49 de 49 y 48 de 48.
+
+**Lo que cambia respecto de Plus: una sola altura.** La planta baja de Diamante
+es toda de 4.20 y no hay losa de 3.00. Las cuatro losas (208 m²: dos macizas de
+11 y 12 cm y dos nervadas) toman las ventanas de las dos losas de Zafiro unidas,
+del 15-jul al 15-ago (16 días hábiles), que da 13.0 m² por día, el ritmo de la
+losa maciza de 3.00 de Zafiro (13.9); con solo la ventana de 4.20 (7 días) serían
+29.7 m² por día. La gualdra va el 14-jul, el acero de arranque y las
+instalaciones embebidas en las losas siguen la corrida de 4.20, y el vínculo que
+separa las dos losas (P04) no aplica. Es lo mismo que se hizo con la losa única
+de Jade (D-423).
+
+**Emparejamientos por rol propios de Diamante.** Lo que Zafiro no tiene toma la
+ventana de lo que hace el mismo trabajo: el castillo de sección extra con el de
+la sección más cercana, las columnas con el castillo K-1, la cadena CE-2 con la
+CE-1, los paneles solares de 12 m con los de 4 m, el muro, el castillo y el
+acero del asador con el forjado y la zapata del asador, y su repellado y fina
+con el forrado de cantera. Están explicados uno por uno en la hoja «Por rol
+(propuestas)» de cada libro de revisión.
+
+**Con y sin chimenea.** Difieren en pocos conceptos: la losa de cimentación, el
+acero K3 (7 piezas contra 5), un ramal sanitario, una losa nervada de 84 m² en
+vez de la de 83 m², la columna C-1 que solo tiene la de sin chimenea, un muro, un
+castillo K-7 y un repellado de la chimenea en la estructura de planta baja, las
+galarzas de 40x40 y 60x40 y el relleno de azotea (195 contra 110). Con
+chimenea el castillo de sección extra es un K-7 de 15x21, no un K-8 de 15x40.
+
+**La red.** Se hereda con las mismas reglas que en Plus —cada sucesora con la
+predecesora de su piso—: 106 celdas y 130 vínculos en Diamante sin chimenea y 107
+y 131 en Diamante con chimenea, todos con holgura mayor o igual a 0 con las fechas
+del propio programa. La ruta crítica son 30 pasos del 9-jun al 5-ene, uno menos que
+Plus porque no hay una segunda losa. No se escriben los vínculos que dependen de
+partidas que Diamante no tiene (cubierta de cocina, boquilla en fachada, ojo de
+buey, marcos de cantera interior, piedra laja, lijado y sellado de muro) ni los
+pretiles (P05 y P06) ni P04.
+
+**Piden más cuadrilla.** 19 partidas en Diamante sin chimenea y 18 en Diamante con
+chimenea piden 2 o más veces la cantidad por día de su gemela de Zafiro: los
+extremos son boquilla fina en fachada (9.8 veces), repellado de muro +3.00 (6.2),
+acero K1 de 1.50 (6) y castillos K-3 y K-8 (5.3). Son los candidatos a que el
+planeador los ajuste, como la losa de 4.20 de Rubí (D-422).
+
+**Validado leyendo solo los libros**, con las mismas pruebas de Plus más que
+ninguna partida cae en un día sin trabajo —sábado, domingo, 25-dic o 1-ene— y que
+ninguna otra celda del libro cambió. Libro de revisión de cada prototipo, con las
+reglas, los 12 supuestos para validar, la red y la ruta crítica. Falta Oro.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
