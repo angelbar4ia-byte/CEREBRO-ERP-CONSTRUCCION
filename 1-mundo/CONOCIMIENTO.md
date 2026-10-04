@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 3608 | 20 |
+| §11 | Los flujos entre sistemas | 3635 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4243,16 +4243,33 @@ cantidades (Rubí cerraba el 1-ene-2026, 149 días hábiles contra 139) y
 la cimentación por la razón de las losas (200 contra 172 m², 13 días en
 vez de 11). Las dos cosas quedan fuera.
 
-**Segunda regla del mismo dato, ampliada con las pérgolas (D-420):
-cancelería, carpintería, herrería y pérgolas duran lo mismo que en
-Zafiro, en todos los prototipos.** Es `modo_duracion=preestablecida_nivel`
-(`MODELO.md` §5c, B-48, D-353) con sus valores a la vista por primera
-vez: Cancelería 10 días hábiles (3 a 14-nov, 2 semanas), Carpintería 15
-(17-nov a 5-dic, 3 semanas), Herrería 5 (24 a 28-nov, 1 semana), Pérgola
-Asador 4 (7 a 12-nov) y Pérgola Cochera 5 (5 a 11-nov) —las mismas 2 y 3
+**Segunda regla del mismo dato, ampliada (D-420, D-421): cancelería,
+carpintería, herrería, cubiertas, pérgolas e impermeabilización duran lo
+mismo que en Zafiro, en todos los prototipos** —los seis niveles que
+D-353 manda por la ruta de contratación terminada—. Es
+`modo_duracion=preestablecida_nivel` (`MODELO.md` §5c, B-48, D-353) con
+sus valores a la vista por primera vez: Cancelería 10 días hábiles (3 a
+14-nov, 2 semanas), Carpintería 15 (17-nov a 5-dic, 3 semanas), Herrería
+5 (24 a 28-nov, 1 semana), Pérgola Asador 4 (7 a 12-nov), Pérgola
+Cochera 5 (5 a 11-nov), Cubiertas partida por partida —sencilla 5, doble
+2, de cocina 8— e Impermeabilización 2 (11 a 12-sep) —las mismas 2 y 3
 semanas que D-389 ya había anotado para Cancelería y Carpintería del
 Diamante—. Una pérgola de 14.50 m² dura lo que una de 14.80, y una de 34
 m² lo que una de 29.92.
+
+**Y una regla sobre las reglas, dato del usuario (D-421): nada de lo
+anterior es un candado.** Las duraciones fijas valen como punto de
+partida para todos los prototipos —eso es lo que fija este ejercicio—,
+pero en cualquier programa el planeador puede cambiar cualquier
+duración, y **decide si el cambio se hereda a los demás prototipos o
+solo vale en ese programa.** Es el principio del resto del cerebro: el
+sistema propone el valor, el humano decide el alcance —y ya estaba dicho
+para el programa de un lote, que cargar la base es proponer un punto de
+partida, nunca una obligación (más arriba, "El programa hereda las
+cuatro capas de presupuesto")—. Lo que no existe todavía es el
+mecanismo: `ACTIVIDAD` guarda la duración pero no de dónde viene ni a
+quién alcanza un cambio. Propuesta, sin decidir:
+`PENDIENTES-MEJORAS.md` B-85.
 
 **El método, versión de D-420:**
 
@@ -4328,9 +4345,9 @@ escrito en palabras:
 | Partida de Rubí | Copia las fechas de | Fechas |
 |---|---|---|
 | Losa maciza 3.00 (`EST-30012`) | losa maciza 3.00 de Zafiro (`EST-21011`) | 15-jul a 4-ago, 9 días |
-| Losa maciza 4.20 (`EST-30013`) | la misma losa maciza: Zafiro no tiene una de 4.20 | 15-jul a 4-ago, 9 días |
+| Losa nervada 3.00 (`EST-30040`) | la misma losa de 3.00: Zafiro no tiene una nervada de 3.00 | 15-jul a 4-ago, 9 días |
+| Losa maciza 4.20 (`EST-30013`) | la misma losa de 4.20: Zafiro no tiene una maciza de 4.20 | 28-jul a 15-ago, 7 días |
 | Losa nervada 4.20 (`EST-30041`) | losa nervada 4.20 de Zafiro (`EST-21031`) | 28-jul a 15-ago, 7 días |
-| Losa nervada 3.00 (`EST-30040`) | la misma losa nervada: Zafiro no tiene una de 3.00 | 28-jul a 15-ago, 7 días |
 | Pintura de muro, 2 manos (`ACA-03025`) | 1ª y 2ª mano de muro (`ACA-30011`, `ACA-30012`) | 11 a 13-nov y 8 a 10-dic, 6 días |
 | Pintura de plafond, 2 manos (`ACA-03026`) | 1ª y 2ª mano de plafond (`ACA-30021`, `ACA-30022`) | 13 a 14-nov y 11 a 12-dic, 4 días |
 | Pintura de fachada, 2 manos (`ACA-03047`) | 1ª y 2ª mano de fachada (`ACA-30031`, `ACA-30032`) | 4 a 7-nov y 2 a 5-dic, 8 días |
@@ -4342,12 +4359,22 @@ escrito en palabras:
 | Caja de válvulas de Rubí (`IGAS-02131`) | caja de válvulas de Zafiro (`IGAS-02130`) | 25 a 27-jun, 3 días |
 | Poyos de cocina (`ACA-01080`) | repellado de muro (`ALB-01010`) — propuesta: Zafiro nunca lo programó | 11 a 25-ago, 11 días |
 
-Las losas van por tipo, maciza o nervada, porque lo que cambia el modo
-de colar es el tipo y no la altura; y las pinturas de "2 manos" juntan
-en una sola partida lo que Zafiro tiene en dos, con las semanas de
-parón de por medio —los ceros de la cuadrícula las miden, como el
-castillo K1—. Los 13 primeros siguen a Zafiro; el último, `ACA-01080`,
-es la única propuesta sin dato detrás.
+**Las losas van por altura, no por tipo — dato del usuario, D-421, que
+corrige a D-420.** Primero las de 3.00 m, porque sobre ellas se levanta
+el muro de tabique que enrasa la losa de 4.20; después las de 4.20.
+Zafiro es consistente con eso —losa de 3.00 el 15-jul, muro de tabique
+del nivel de azotea el 24-jul, losa de 4.20 el 28-jul— y Rubí copia esa
+secuencia: sus dos losas de 3.00 (93 y 24 m², 117 en total) en los 9
+días de la de Zafiro (125 m²), y sus dos de 4.20 (46 y 40 m², 86 en
+total) en los 7 días que Zafiro le dio a una de 40 m²: las de 4.20 de
+Rubí cargan más del doble, que es la cuadrilla extra de la regla de
+fondo y la primera candidata a que el planeador la alargue. D-420 las agrupaba por tipo, maciza o
+nervada, y dejaba la nervada de 3.00 en la ventana de 4.20 y la maciza
+de 4.20 en la de 3.00: al revés de la secuencia física. Las pinturas de
+"2 manos" juntan en una sola partida lo que Zafiro tiene en dos, con las
+semanas de parón de por medio —los ceros de la cuadrícula las miden,
+como el castillo K1—. Los demás siguen a Zafiro; `ACA-01080`, el último
+de la tabla, es la única propuesta sin dato detrás.
 
 **Las filas de resumen se recalculan de sus hijos, no se copian
 (D-418).** Las 77 filas de Capítulo, Subcapítulo, Nivel 2 y Nivel 3 de

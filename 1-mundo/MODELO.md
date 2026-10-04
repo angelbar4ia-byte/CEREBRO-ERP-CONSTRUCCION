@@ -1814,15 +1814,30 @@ cargada» y «se contrata terminado» resultaron ejes independientes, no el
 mismo (`CONOCIMIENTO.md` §11.13). Muebles/Iluminación no entra aquí: se
 programa como el resto, con `modo_duracion` calculada o capturada.
 
-**El valor de esa duración ya tiene fuente (dato del usuario, D-419 y
-D-420).** «La misma para ese nivel en cualquier obra» no decía de dónde
-sale el número: sale de Zafiro 1.0. Cancelería, Carpintería, Herrería y
-Pérgolas duran lo mismo que en Zafiro en todos los prototipos
+**El valor de esa duración ya tiene fuente (dato del usuario, D-419, D-420
+y D-421).** «La misma para ese nivel en cualquier obra» no decía de dónde
+sale el número: sale de Zafiro 1.0. Los seis niveles que D-353 manda por
+esta ruta —Cancelería, Carpintería, Herrería, Cubiertas, Pérgolas e
+Impermeabilización— duran lo mismo que en Zafiro en todos los prototipos
 —Cancelería 10 días hábiles (2 semanas), Carpintería 15 (3 semanas),
-Herrería 5 (1 semana), Pérgola Asador 4 y Pérgola Cochera 5—, aunque el
-prototipo tenga más metros cuadrados u otra cantidad de piezas. De los
-seis niveles que D-353 manda por esta ruta, faltan por confirmar
-Cubiertas e Impermeabilizante. `CONOCIMIENTO.md` §11.14.
+Herrería 5 (1 semana), Pérgola Asador 4, Pérgola Cochera 5, Cubiertas
+partida por partida (sencilla 5, doble 2, de cocina 8) e
+Impermeabilización 2—, aunque el prototipo tenga más metros cuadrados u
+otra cantidad de piezas. `CONOCIMIENTO.md` §11.14.
+
+**Es un punto de partida, no un candado (dato del usuario, D-421).** En
+cualquier programa el planeador puede cambiar cualquier duración
+—también la de estos seis niveles— y **decide si el cambio se hereda a
+los demás prototipos o solo vale en ese programa.** Hoy `ACTIVIDAD`
+guarda `duracion_dias` y `modo_duracion`, pero no de dónde viene el
+valor ni a quién alcanza un cambio. Propuesta del sistema, sin decidir
+(B-85): que cada duración lleve su origen —`heredada`, la lee de un
+programa de referencia, Zafiro por defecto, o `propia`, la fijó el
+planeador ahí— y que al editarla el sistema pregunte una sola cosa,
+¿solo este programa o todos los prototipos? «Solo este» la marca
+`propia`; «todos» cambia el valor de referencia y la siguen las que
+sigan `heredada`. Las que ya eran `propia` no se pisan: se avisan con
+`ALERTA` para que el planeador decida.
 
 ### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
 
