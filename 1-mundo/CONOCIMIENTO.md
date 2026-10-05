@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4129 | 20 |
+| §11 | Los flujos entre sistemas | 4167 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4470,6 +4470,44 @@ otros seis no hay ninguno. Validado leyendo solo los
 libros, con las mismas pruebas de Plus y los Diamante. Queda lo que sigue
 abierto en `PENDIENTES-MEJORAS.md` B-84 y B-87: el método mixto, el horizonte de la
 cuadrícula y el plazo medido en semanas de calendario.
+
+### El redondeo del día a día se corrige: el último día absorbe el residuo (D-433)
+
+Dato del usuario, con un ejemplo concreto: `EST-10010` de Zafiro, 37 pza en 11
+días hábiles, `round(37/11, 2) = 3.36` repetido los 11 días suma **36.96, no
+37** —0.04 pza de residuo que el reparto uniforme pierde—. Es el mismo "ruido
+de redondeo" que §11.14 ya había visto en Zafiro (`SUMA(AD:HN)` exacta en 269
+de 317 filas, D-390-ish): ahí se dejó como ruido porque Zafiro es el programa
+original, intacto. En los seis prototipos que el sistema escribe, no hay razón
+para dejarlo: el **último día activo de cada partida absorbe el residuo** —en
+el ejemplo, diez días de 3.36 y el último de **3.40**— para que la suma cierre
+exacto contra `Cantidad programada`.
+
+**Se corrigió en los seis prototipos derivados, no en Zafiro.** Zafiro es el
+original y es el que se tomó como confiable desde D-414: sus 415 filas quedan
+exactamente como estaban, residuo de redondeo incluido. Rubí, Jade, Zafiro
+Plus, Diamante sin y con chimenea y Oro sí se corrigen, usando los planes ya
+validados de cada uno (fila, cantidad, fechas) —nada se reconstruye—: el
+prefijo (todos los días salvo el último) ya era el valor uniforme en el 100%
+de las partidas revisadas, así que la corrección es una sola celda por
+partida, la del último día.
+
+| Prototipo | Partidas revisadas | Último día corregido |
+|---|---|---|
+| Rubí | 294 | 68 |
+| Jade | 289 | 59 |
+| Zafiro Plus | 388 | 78 |
+| Diamante sin chimenea | 377 | 86 |
+| Diamante con chimenea | 380 | 85 |
+| Oro | 402 | 90 |
+
+466 celdas en total (D-433). Validación independiente leyendo solo los dos libros
+(antes y después): fuera de los seis bloques —Zafiro incluido— ninguna celda
+cambia; dentro, solo la cuadrícula, nunca más de una celda por partida; la
+suma de los días activos de cada partida cierra exacto contra su `Cantidad
+programada` en las 2,130 partidas de los seis prototipos. La regla queda en
+`escribir_dos_plantas.py`, así que cualquier reconstrucción futura —un ajuste
+del planeador, por ejemplo— ya nace sin el residuo.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
