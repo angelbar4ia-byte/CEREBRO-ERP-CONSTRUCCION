@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4167 | 20 |
+| §11 | Los flujos entre sistemas | 4258 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4508,6 +4508,97 @@ suma de los días activos de cada partida cierra exacto contra su `Cantidad
 programada` en las 2,130 partidas de los seis prototipos. La regla queda en
 `escribir_dos_plantas.py`, así que cualquier reconstrucción futura —un ajuste
 del planeador, por ejemplo— ya nace sin el residuo.
+
+### Pretiles después de la losa completa, y las cuatro losas de azotea de Plus escalonadas (D-434)
+
+Dato del usuario, tres instrucciones sobre Zafiro Plus y Oro. **(1)** Zafiro
+Plus no puede terminar el muro de pretiles antes que la losa de azotea: los
+pretiles tienen que terminar *después* de que la losa completa esté lista,
+no antes ni durante su curado. **(2)** Las cuatro losas de azotea de Zafiro
+Plus (`MZ-01` a `MZ-04`) van escalonadas: `MZ-01` es el ancla (sin cambio),
+`MZ-02` y `MZ-03` arrancan 7 días hábiles después de `MZ-01`, y `MZ-04` 7
+días hábiles después de esas dos (14 desde el ancla). **(3)** En Oro, que
+tiene losa plana e inclinada, solo la inclinada se mueve: 7 días hábiles
+*antes* que la plana, que se queda de ancla.
+
+**La lectura de "antes que la losa de azotea".** El dato tal como llegó es
+gramaticalmente ambiguo (「no puedes terminar primero... que... tiene que
+terminar hasta después」 admite más de una lectura). Se resolvió a favor de
+la única lectura compatible con la física de la obra: los pretiles se
+cuelan sobre la losa, así que no pueden ni empezar hasta que esté colada;
+"terminar después" solo puede referirse a la losa **completa** —todos sus
+paneles, no solo el primero—, porque un pretil que arrancara apenas colado
+un panel estaría parado sobre losa fresca sin terminar. Zafiro ya tenía los
+pretiles después del descimbrado (D-426); D-434 los mueve más tarde todavía,
+al día hábil siguiente de que el último panel de losa de azotea quede listo.
+
+| Prototipo | Pretiles antes (D-426) | Pretiles ahora (D-434) | Losa de azotea completa |
+|---|---|---|---|
+| Zafiro Plus | 01-sep → 03-sep | 03-oct → 07-oct | 02-oct |
+| Diamante sin chimenea | 01-sep → 03-sep | 15-sep → 17-sep | 12-sep |
+| Diamante con chimenea | 01-sep → 03-sep | 15-sep → 17-sep | 12-sep |
+| Oro | 01-sep → 03-sep | 15-sep → 17-sep | 12-sep |
+
+Zafiro Plus se mueve más que los otros tres porque sus cuatro paneles ahora
+están escalonados 14 días hábiles de punta a punta (regla 2): la losa no
+queda "completa" hasta que termina el último panel (`MZ-04`), y los pretiles
+esperan a ese cierre, no al de `MZ-01`. Los tres prototipos de una sola losa
+—o losa única para Diamante, dos alturas fijas para Oro— no tienen ese
+escalonamiento y por eso su losa completa (y sus pretiles) se mueven menos.
+
+**El escalonamiento de Plus y la inclinada de Oro, en fechas.** Antes de
+D-434, los cuatro paneles (o la plana y la inclinada de Oro) compartían la
+misma ventana —colado el 27 al 29-ago, descimbrado el 11 al 12-sep, sin
+distinguir un panel de otro—:
+
+| Prototipo | Panel | Antes (D-426/431) | Ahora (D-434): colado | Ahora: descimbrado |
+|---|---|---|---|---|
+| Zafiro Plus | MZ-01 (ancla) | 27-ago→29-ago / 11-sep→12-sep | 27-ago→29-ago | 11-sep→12-sep |
+| Zafiro Plus | MZ-02, MZ-03 | 27-ago→29-ago / 11-sep→12-sep | 05-sep, 08-sep→09-sep | 22-sep→23-sep |
+| Zafiro Plus | MZ-04 | 27-ago→29-ago / 11-sep→12-sep | 16-sep→18-sep | 01-oct→02-oct |
+| Oro | plana (ancla) | 27-ago→29-ago / 11-sep→12-sep | 27-ago→29-ago | 11-sep→12-sep |
+| Oro | inclinada | 27-ago→29-ago / 11-sep→12-sep | 18-ago→20-ago | 02-sep→03-sep |
+
+Implementado en `dos_plantas.py`, el motor compartido por los cuatro
+prototipos de dos plantas: ramas por `Clave` dentro de la misma función
+`asignar()`, en vez de un motor nuevo, para que el resto del programa —que
+no cambia— siga saliendo por el mismo camino ya validado. Diferencia
+quirúrgica confirmada contra el libro anterior: cambian exactamente 5
+conceptos en Plus (los 4 paneles de losa más el bloque de pretiles) y 2 en
+cada Diamante y 3 en Oro (pretiles, más la inclinada y, en Oro, un vínculo
+que dependía de ella).
+
+**Consecuencia real, no error: la red escrita se encoge.** El motor de este
+cerebro no resuelve fechas por CPM a partir de los vínculos escritos —asigna
+casi todo por "gemelo por Clave" (copia la posición relativa de Zafiro,
+desplazada) y los vínculos son una anotación posterior de lo que se cumple,
+no un insumo de cálculo (ver D-427 y la validación de este mismo apartado).
+Por eso mover los pretiles más tarde no empuja el resto del programa, pero
+sí rompe vínculos que antes se cumplían, con `heredar_dos_plantas.py`
+registrando el déficit exacto en cada caso: `P07` (repellado de muro de
+azotea, que seguía la fecha vieja de los pretiles) deja de cumplirse en
+los cuatro prototipos; `P08` (repellado de fachada +3.00) deja de cumplirse
+en Plus y Oro, y en los dos Diamante se queda sin gemelo directo por la
+misma causa; Plus pierde además `V07` (déficit de 14 días), y Oro además
+`PX03` (un emparejamiento propio que colgaba de la inclinada en su posición
+vieja, déficit de 7). Ninguno de estos se reescribe solo —quedan en la hoja
+«Red sin escribir» de cada libro de revisión, para que el planeador
+decida—, así que la red final sigue sin ningún vínculo con holgura negativa
+(`validar_red_dos_plantas.py`: OK), pero
+la ruta crítica se acorta de 31/30 pasos a **22 pasos** en los cuatro
+prototipos, y deja de arrancar en la cimentación: ahora empieza en el
+repellado de fachada +3.00 (04-ago) y nunca vuelve a pasar por estructura ni
+por la losa. Esto es correcto —ya no hay una cadena de holgura 0 que llegue
+desde la estructura, porque el cierre del programa (5-ene) ya no depende de
+ella—, pero es una pérdida de información real que el planeador tiene que
+resolver a mano. Vínculos totales después de D-434
+(`RESUMEN_7_PROTOTIPOS.xlsx`): Zafiro Plus 107 celdas / 129 vínculos,
+Diamante sin chimenea 104 / 128, Diamante con chimenea 105 / 129, Oro 106 /
+130 —todos con 0 vínculos que no se cumplen en la red escrita—.
+
+Validado con la misma batería que D-426/427/428: `validar_dos_plantas.py`
+(0 violaciones en los cuatro, incluida la fórmula de residuo de D-433) y
+`validar_red_dos_plantas.py` (red consistente, ruta crítica reconstruida).
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
