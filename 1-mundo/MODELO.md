@@ -2038,10 +2038,13 @@ Reglas (sin tabla nueva, `ACTIVIDAD` y `PRECEDENCIA` de arriba):
   · fin_inicio y fin_fin leen el máximo de las fechas de fin de sus partidas;
     inicio_inicio e inicio_fin, el mínimo de las de inicio; la ruta crítica
     sigue por la partida que de verdad fija esa fecha, no por el bloque
+  · una predecesora que es el bloque de su propia sucesora se lee SIN la
+    sucesora: la ventana es la de las demás partidas del bloque, «después de
+    lo demás del grupo» (D-443 corrige D-442, que la rechazaba: 39 de los 832
+    vínculos son así y 32 se cumplen tal como están escritos)
   · al cargar un vínculo se rechazan los que no se pueden calcular: una
-    actividad como su propia predecesora, una predecesora que es el bloque
-    de su propia sucesora (no puede esperar a que termine lo que ella misma
-    contiene) y cualquier ciclo — el motor del CPM no los resuelve
+    actividad como su propia predecesora y cualquier ciclo, calculado con esa
+    lectura — el motor del CPM no los resuelve
 ```
 
 **Un vínculo cuya intención es un hecho físico concreto cita la partida, no el
@@ -2053,7 +2056,8 @@ alta en Oro), así que ahí esa ventana termina en su fecha (18-ago, 26-ago,
 esos bloques, así que no hay efecto; la regla evita que lo tenga.
 
 **Un vínculo cuyas fechas lo contradicen no se rechaza: se avisa.** En el
-programa de Zafiro, hecho a mano, hay 18 (D-424, D-426); nadie hizo mal el
+programa de Zafiro, hecho a mano, hay 16 (18 en D-442, corregido en D-443;
+D-424, D-426); nadie hizo mal el
 vínculo ni la fecha, el plan no pasa por ningún CPM (D-409). `ALERTA` gana
 `vinculo_incumplido`, sin umbral, y la propuesta de corrección es de quien
 programa (`CONOCIMIENTO.md` §11.14, D-442).

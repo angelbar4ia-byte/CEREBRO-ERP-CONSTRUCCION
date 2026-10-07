@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4941 | 20 |
+| §11 | Los flujos entre sistemas | 4993 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5187,6 +5187,10 @@ prototipo, alcance de las 34 `Clave` propias, las 38 heredadas que piden
 
 ### B-86 se cierra: un bloque puede ser predecesora, los 18 vínculos rotos de Zafiro ya tienen propuesta, y lo que queda es del planeador (D-442)
 
+*(Dos cosas de este apartado se corrigen en D-443, abajo: la regla de los
+bloques que contienen a su propia sucesora —no se rechazan, se leen sin
+ella— y el conteo de los vínculos de Zafiro que no se cumplen, 18 → 16.)*
+
 Dato del usuario: retomar B-86. De sus ocho puntos, la mitad ya estaba
 hecha (heredar los 52, la red mínima, las dos plantas, las correcciones de
 D-435 a D-437); quedaban la pregunta de modelo sobre los bloques (D-425), el
@@ -5282,6 +5286,54 @@ deducirla.
 Libro de reporte: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (los 18 con su propuesta,
 confianza y motivo; los pendientes; los bloques como predecesora por prototipo;
 la red por prototipo). `MODELO.md` §5a, §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### Corrige D-442: un bloque que contiene a su sucesora se lee sin ella, y los rotos de Zafiro son 16, no 18 — y los 8 `SF` del libro se cumplen todos al revés (D-443)
+
+Al empezar los pendientes de B-86 se simuló qué pasa con la red de Zafiro si
+se aplican las propuestas de D-442, y la simulación encontró un error mío en
+D-442: la regla nueva rechazaba «una predecesora que es el bloque de su propia
+sucesora». **39 de los 832 vínculos (4.7%) tienen esa forma, y 32 se cumplen
+tal como están escritos** —Rubí 3, Jade 2, Zafiro Plus 8, cada Diamante 6,
+Oro 2, Zafiro 5—. Son relaciones naturales de obra, como «el acero del K1
+termina 9 días antes de que acabe la losa que lo contiene» (`EST-10013` FF−9
+contra `LOSA ZAFIRO 3.00`): rechazarlas habría tirado el 4.7% de la red que el
+usuario validó.
+
+**La lectura correcta: el bloque sin la sucesora —«después de lo demás del
+grupo»—.** La ventana del bloque se calcula con sus otras partidas, de modo
+que no hay ciclo (el bloque ya no espera a lo que contiene) y el vínculo
+conserva su sentido. Se rechazan solo el autovínculo y los ciclos reales. Con
+esa lectura, de los 39: 30 se cumplen y 9 no —los 4 de Zafiro que ya estaban
+rotos y los 5 vínculos `SF` de la gualdra (Zafiro y los cuatro de dos plantas),
+que quedan en −1 leídos normal (abajo)—.
+
+**Efecto sobre los 18 de Zafiro (D-442): 3 dejan de estar rotos y 1 pasa a
+estarlo.** Se cumplen con holgura 0 `ACA-01050` (boquilla interior tras las
+albañilerías de PB), `ACA-01072` (boquilla fina exterior tras la obra gris de
+azotea) y `ACA-01071` (boquilla fina en fachada tras los acabados de fachada):
+quien programó escribió «después de lo demás del grupo», y D-442 los leyó como
+«después de sí mismo». `CAR-01011` (`SF`, la gualdra) pasa de 0 a −1 leído
+normal. **Los incumplidos de Zafiro son 16:**
+
+| Propuesta | Vínculos | Qué es |
+|---|---:|---|
+| Reasignar a hermanas | 5 | 4 con el grupo de su propia sucesora (aun sin ella, sus demás partidas terminan después: `OBE-01012`, `BAP-01010`, `ACA-30011`, `ACA-30020`) y 1 con un bloque que termina después (`ACA-02510`, piso del asador → firme) |
+| Invertir | 4 | las fechas respaldan el orden contrario (baja confianza) |
+| Descartar | 3 | autovínculo, ciclo, uno obsoleto (sin cambio) |
+| Leer `SF` al revés | 4 | ver abajo (B-81) |
+
+**Evidencia fuerte para B-81 (`SF`): 0 de los 8 `SF` del libro se cumplen
+leídos normal, 8 de 8 se cumplen leídos al revés.** «Al revés» es un FS de la
+sucesora a la predecesora (la predecesora empieza después de que la sucesora
+termina). Holguras leídas al revés: 0 en los cinco que la lectura normal daba
+por buenos o por −1 (`CAR-01011` y los cuatro heredados), +1 y +6 en los tres
+que parecían rotos. El plan de origen parece escribir `SF` con el sentido
+invertido. No se cambia nada en B-81 todavía: es una decisión del usuario
+(abajo).
+
+Libro corregido: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (hojas «16 de Zafiro -
+propuesta», «Cambios vs D-442», «39 con bloque que contiene»).
+`MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
