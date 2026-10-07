@@ -690,6 +690,11 @@ PRESUPUESTO
   id, nombre, estado (por SUBÁRBOL, ver hallazgo 6)                    firme
   raiz_id            FK Nodo                                            firme
   tipo               enum: plantilla · obra                             nuevo — cierra P-40, ver abajo
+  plantas            INTEGER, nullable — solo si tipo=plantilla: cuántas
+                      plantas tiene el prototipo. Ya decidía el plazo
+                      (28 semanas una, 30 dos, D-419) y es el filtro del
+                      alcance «1 planta» / «2 plantas» de una duración
+                      editada (§5c)                                      nuevo — D-441, cierra B-85
 
 ESTADO_CONGELAMIENTO   (por nodo, no por presupuesto)
   nodo_id            FK Nodo
@@ -1321,6 +1326,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `rendimiento_bajo_para_destajo` | El Rendimiento Real (mano de obra) de la actividad cae, contra (`Rendimiento teórico` × `Unidades ejecutoras`), más del `umbral_pct` | D-408 |
 | `rendimiento_excede_destajo` | Mismo cruce, dirección contraria: el Rendimiento Real excede ese mismo punto más del `umbral_pct` | D-408 |
 | `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
+| `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -1781,6 +1787,13 @@ ACTIVIDAD
                          es «manual sin diseño»: no hay días ni rendimiento,
                          se derivan de fecha_fin − fecha_inicio              firme
   duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas   firme
+  duracion_origen       enum: heredada · propia — `heredada`: el valor sigue
+                         al de su referencia; `propia`: la fijó el planeador
+                         en este programa, o no tiene referencia              firme — D-441, cierra B-85
+  duracion_referencia_id  FK ACTIVIDAD, nullable — la actividad de la que
+                         hereda (o de la que se apartó, si es `propia`, para
+                         mostrar la diferencia y poder volver a heredar).
+                         Explícita, no se deduce por `Clave`                  firme — D-441
   disparador_fecha      enum: precedencia · recurso · contractual — el
                          contractual lo fija el anticipo o la junta de
                          arranque, no una precedencia técnica ni una
@@ -1833,7 +1846,7 @@ guarda `duracion_dias` y `modo_duracion`, pero no de dónde viene el
 valor ni a quién alcanza un cambio. El alcance se elige entre cuatro
 opciones, dato del usuario (D-422): todos los prototipos, los de 1
 planta, los de 2 plantas, o los prototipos que el planeador señale.
-Propuesta del sistema, sin decidir (B-85): que cada duración lleve su
+Propuesta del sistema (B-85), decidida en D-441 —mecanismo abajo—: que cada duración lleve su
 origen —`heredada`, la lee de un programa de referencia, Zafiro por
 defecto, o `propia`, la fijó el planeador ahí— y que al editarla el
 sistema pregunte una sola cosa, ¿a quién alcanza? Si a ningún otro
@@ -1842,6 +1855,41 @@ los elegidos—, cambia el valor de referencia para ese grupo y la siguen
 las que sigan `heredada` dentro de él. Las que ya eran `propia` no se
 pisan: se avisan con `ALERTA` para que el planeador decida. Primer caso aplicado: la losa de 4.20 de Rubí,
 que el planeador sube de 7 a 9 días (`CONOCIMIENTO.md` §11.14).
+
+### La herencia de una duración: referencia explícita, y el que edita pasa a ser la referencia de su alcance (D-441, cierra B-85)
+
+Dos campos en `ACTIVIDAD` (arriba), sin tabla nueva. **La referencia es una
+`ACTIVIDAD` concreta, no "Zafiro":** Zafiro es la referencia por defecto
+—el Programa Base—, pero puede ser cualquier otra actividad de otro
+programa, y es una llave explícita, no se deduce por `Clave`: 478 de las
+2,130 duraciones de los seis derivados no tienen gemela por `Clave`
+(las losas por altura, las piezas de carpintería con nombre de prototipo,
+la planta alta), y a esas se les empareja por rol o por nivel
+(`CONOCIMIENTO.md` §11.14, D-441).
+
+**Al editar una duración, el sistema pregunta una sola cosa —¿a quién
+alcanza?— y las opciones son las cuatro de D-422 más una que ya estaba
+implícita:**
+
+| Alcance | Qué pasa en el programa que edita | Qué pasa en los demás |
+|---|---|---|
+| Solo este programa | La actividad queda `propia`; conserva su referencia para mostrar la diferencia | Nada |
+| Todos / 1 planta / 2 plantas / los que el planeador señale | Igual: `propia` | En cada programa del alcance, la gemela que sea `heredada` toma el valor nuevo y **su referencia pasa a ser la actividad editada** (hereda de quien la cambió, no de Zafiro); la que sea `propia` **no se pisa**: se avisa con `ALERTA(tipo=duracion_propia_en_herencia)` |
+
+Que el editor pase a ser la referencia de su alcance es lo que hizo Jade con
+la losa de 4.20 de Rubí (D-423): la referencia de esa parte no es Zafiro,
+es Rubí. La cadena (Jade → Rubí → Zafiro) se corta donde alguien es
+`propia`, y no puede formar ciclos.
+
+**«1 planta» y «2 plantas» necesitan saber cuántas plantas tiene cada
+prototipo** — `PRESUPUESTO.plantas` (INTEGER, nullable, solo `tipo=plantilla`;
+nuevo, D-441): el mismo dato que ya decide el plazo (28 semanas una planta,
+30 dos, D-419) y que hasta hoy vivía solo como convención. El alcance
+«señalados» no lo necesita.
+
+En el ejercicio, Zafiro queda de raíz de solo lectura (regla vigente:
+nunca se modifica); en el sistema la raíz de la cadena es la que el
+planeador elija.
 
 ### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
 

@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4747 | 20 |
+| §11 | Los flujos entre sistemas | 4843 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5088,6 +5088,102 @@ Libro de reporte: `ESFUERZO_REAL_Y_CONCURRENCIA_B82.xlsx` (esfuerzo real
 por prototipo y familia, picos de concurrencia por oficio, el detalle de
 acabados con y sin frente de fachada). `MODELO.md` §5c,
 `PENDIENTES-MEJORAS.md` B-82.
+
+### B-85 se cierra: la herencia de una duración tiene referencia explícita y el que edita pasa a ser la referencia de su alcance — con los 6 derivados ya clasificados (D-441)
+
+Dato del usuario: retomar B-85. La regla ya estaba dada (D-421, D-422) —el
+planeador cambia cualquier duración y decide a quién alcanza— y lo que
+faltaba era el mecanismo y tres preguntas: si la referencia es siempre
+Zafiro, si bastan las cuatro opciones de alcance, y si lo que el planeador
+hizo en Rubí se hereda. Los seis programas derivados ya existen, así que
+se contestó con datos, no con teoría: cada una de sus 2,130 duraciones se
+comparó contra su gemela de Zafiro.
+
+**Cómo se clasificó.** Gemela por `Clave` cuando es única, o por posición
+cuando Zafiro la repite igual número de veces que el prototipo. `heredada`
+si los días laborables coinciden, `propia` si no, `sin referencia` si no hay
+gemela clara. Resultado (`HERENCIA_DE_DURACIONES_B85.xlsx`):
+
+| Origen | Duraciones | % |
+|---|---:|---:|
+| `heredada` | 1,520 | 71.4% |
+| `propia` | 132 | 6.2% |
+| `sin referencia` | 478 | 22.4% |
+
+Rubí no tiene ninguna `propia` y Jade una; los cuatro de dos plantas
+concentran las otras 131 (Plus 43, Diamante 33 y 32, Oro 23). Los seis
+niveles de duración fija revisados (cancelería, carpintería, herrería e
+impermeabilización: 121 duraciones) no tienen ninguna `propia`: 46 son
+heredadas y 75 sin referencia (piezas con nombre de prototipo, como
+«COCINA RUBÍ»); cubiertas y pérgolas no se revisaron por separado. Un caso se reclasificó a
+mano: `ACA-01080` (poyos de cocina) figura con 11 días en los seis, pero
+Zafiro nunca la programó (0 días) — es la regla de D-420, no una duración
+que el planeador cambiara.
+
+**Pregunta 1 — ¿la referencia es siempre Zafiro? No.** Dos razones en el
+dato. (a) La losa de 4.20 de Jade hereda el ajuste que el planeador hizo
+en Rubí (D-423): su referencia es Rubí. (b) 478 duraciones (22.4%) no
+tienen gemela por `Clave` — las losas (`EST-30012` en Rubí, `EST-30010` en
+Jade, cada una con su clave propia por altura), la carpintería con nombre
+de prototipo, la planta alta — y se emparejan por rol, altura o nivel. La
+referencia tiene que ser una llave explícita a una actividad, no algo que
+se deduzca por `Clave`.
+
+**Pregunta 2 — ¿bastan «todos», «1 planta», «2 plantas» y «los que el
+planeador señale»? Sí, y la cuarta se usa de verdad.** Las 132 duraciones
+`propias` son 34 `Clave` distintas, por el conjunto de prototipos que
+comparten el cambio:
+
+| Alcance real | Claves | Ejemplos |
+|---|---:|---|
+| 2 plantas (los 4) | 14 | la cadena de acabados comprimida (D-436, D-437): boquilla exterior 3→2, finas interiores 9→3, relleno 3→2, chaflán 2→1 |
+| Solo este | 12 | el acero de cimentación de Plus (K-6.00, D-436, D-437): 11→7; la mayoría del resto son partidas sueltas de Plus, Oro, Diamante con y Jade |
+| Subconjunto señalado | 8 | Diamante con + sin + Plus (6): instalación eléctrica de losa (4→2) y de muros y cableado (2→3, 4 y 5); Diamante con + sin (1): gas del asador; Oro + Plus (1): gas de recámara |
+| 1 planta (Rubí + Jade) | 0 | — |
+| Todos los derivados | 0 | — |
+
+Ocho de 34 (24%) no son ni un grupo por plantas ni uno solo: sin «señalados»
+no se podrían expresar. «1 planta» y «todos» no aparecen todavía entre las
+`propias` porque Rubí y Jade casi no se apartaron de Zafiro (D-419: toman
+sus fechas y días tal cual).
+
+**Pregunta 3 — lo de Rubí.** La losa de 4.20 de Rubí (7→9 días, D-422) ya
+la lleva Jade (D-423), que queda marcada «para validar»: de hecho es el
+alcance «1 planta», pero sin tocar Zafiro, que es el original. La
+validación sigue siendo del planeador.
+
+**El mecanismo (`MODELO.md` §5c).** Dos campos en `ACTIVIDAD`:
+`duracion_origen` (`heredada` · `propia`) y `duracion_referencia_id` (FK a
+otra `ACTIVIDAD`, nullable). Al editar, el sistema pregunta solo a quién
+alcanza. El programa que edita queda `propia`, conserva su referencia para
+mostrar la diferencia y poder volver a heredar; en cada programa del
+alcance, la gemela `heredada` toma el valor nuevo y **su referencia pasa a
+ser la actividad editada** —así se cuenta lo de Jade—; la `propia` no se
+pisa y dispara `ALERTA(tipo=duracion_propia_en_herencia)`, sin umbral. Para
+los alcances por plantas hace falta `PRESUPUESTO.plantas` (nuevo), el
+mismo dato que ya decide el plazo de 28 o 30 semanas (D-419). Sin tabla
+nueva, sin ciclos: la cadena se corta en la primera `propia`.
+
+**Se conecta con el método mixto.** Cuando una duración se hereda pero la
+cantidad cambia, lo que absorbe la diferencia son las cuadrillas
+(`TRAMO.cuadrillas`, D-440). De las 287 duraciones `heredadas` con
+cuadrillas calculables (obra gruesa/acabados, D-438), 38 (13%) piden dos o
+más: Diamante 11 y 11, Oro 6, Jade 5, Rubí 4, Plus 1 — encabezadas por el
+repellado +3.00 de los dos Diamante (6.77× y 6.49×). Son las candidatas
+naturales a que el planeador las vuelva `propias`: la lista queda en la
+hoja «Heredadas con 2+ cuadrillas». No se cambia ninguna duración en los
+libros: es una lista de revisión, no una corrección.
+
+**Lo que esto no resuelve.** Las 478 `sin referencia` siguen sin
+emparejar: hace falta que el planeador (o una regla de rol/altura, como las
+de D-420/D-421) las ligue a su actividad de referencia; hasta entonces son
+`propia` con referencia nula. Tampoco se carga el campo en los libros de
+programa: el formato de `PROGRAMA_ZAFIRO.xlsx` no tiene columna para él.
+
+Libro de reporte: `HERENCIA_DE_DURACIONES_B85.xlsx` (resumen por
+prototipo, alcance de las 34 `Clave` propias, las 38 heredadas que piden
+2+ cuadrillas, las 478 por emparejar y el detalle de las 2,130).
+`MODELO.md` §5, §5a, §5c, `PENDIENTES-MEJORAS.md` B-85.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
