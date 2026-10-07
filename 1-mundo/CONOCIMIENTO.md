@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4258 | 20 |
+| §11 | Los flujos entre sistemas | 4362 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4599,6 +4599,110 @@ Diamante sin chimenea 104 / 128, Diamante con chimenea 105 / 129, Oro 106 /
 Validado con la misma batería que D-426/427/428: `validar_dos_plantas.py`
 (0 violaciones en los cuatro, incluida la fórmula de residuo de D-433) y
 `validar_red_dos_plantas.py` (red consistente, ruta crítica reconstruida).
+
+### P07/P08/V07/PX03 se reconectan sin romper las 30 semanas: castillo, plafón, cadena de acabados y losas de Plus (D-435, D-436)
+
+El usuario pidió revisar si había alguna duda sobre el programa después de
+D-434. Sí había una, y resultó más grande de lo esperado: P07, P08 (§11.14
+arriba), `V07` (el plafón de planta alta de Plus) y `PX03` (la inclinada de
+Oro) no eran solo anotaciones rotas —dos de los tres eran conflictos reales
+de secuencia física—.
+
+**D-435, tres correcciones, todas con dato del usuario.** **(1)** La
+inclinada de Oro, adelantada 7 días (D-434), arrancaba el 18-ago —antes de
+que su propia estructura (la cadena CE-1 de planta alta) terminara el
+26-ago—: literalmente se colaría sobre estructura sin terminar. El usuario
+confirmó el tope físico: la inclinada no puede empezar antes del día
+siguiente a que la cadena termine (27-ago), que es exactamente cuándo ya
+arranca la losa maciza —cero margen—, así que el adelanto queda en 0 y las
+dos losas de Oro coinciden. **(2)** El plafón de planta alta de Zafiro Plus
+(bajo la losa de azotea, repellado tras descimbrar) tenía el mismo problema
+que los pretiles, en un concepto que D-434 no tocó: seguía anclado al
+12-sep, cuando la losa completa de Plus ya cierra el 02-oct. Se corrigió
+igual que los pretiles —arranca el día siguiente a que la losa esté
+completa—. **(3)** `ALB-01010` (repellado muro 3.00, P07) y `ALB-01212`
+(repellado fachada +3.00, P08) seguían la fecha vieja del castillo de
+pretiles; ahora se corren con él, en su nueva posición.
+
+**El hallazgo: reconectar P07/P08 reabre el inicio de la ruta crítica de 22
+pasos de D-434, con holgura 0 de punta a punta.** El castillo corregido
+empuja `ALB-01212` más tarde, y de ahí cuelgan `ACA-01051` (boquilla
+exterior) y `ALB-03014`/`ALB-03020` (relleno, chaflán) —el arranque exacto
+de la cadena que ya se documentó en D-434 llega hasta el cierre—. Sin
+margen, arrastrarla entera movería el cierre a **06-feb-2026** en Zafiro
+Plus (+24 días hábiles) y a **19-ene-2026** en Diamante sin/con chimenea y
+Oro (+10), rompiendo las 30 semanas fijas desde D-419.
+
+**Se exploró si cimentación o la estructura de planta baja tenían margen
+real antes de tocar nada más —no lo hay, de forma limpia.** La cantidad por
+partida de Oro y Plus contra Zafiro va de 0.02× a 23× en cimentación y de
+0.43× a 5× en estructura PB: hay partidas más ligeras, pero también mucho
+más pesadas que Zafiro (el castillo K-3 de Oro ya pide 5 cuadrillas por
+una), compartiendo una sola ventana por bloque (D-418/419). Acortar esa
+ventana compartida solo empeora a la partida más pesada, nunca libera
+margen. Tampoco hay un hueco ocioso entre el fin de la estructura de PB y
+el 18-ago: Zafiro trae trabajo real corriendo ahí (un segundo tramo de
+castillo y muro hasta el 20-ago, instalación eléctrica hasta el 20-ago,
+repellados activos a través del 18-ago) —el margen, si existe, hay que
+construirlo, no estaba escondido—.
+
+**D-436: la palanca que sí funciona es la misma que ya se usó para los
+pretiles —más cuadrilla, menos días— aplicada a la cadena de acabados.**
+Boquilla exterior, relleno, chaflán, finas +3.00, finas 3.00 y boquilla
+fina interior se comprimen a la mitad (3→2, 3→2, 2→1, 4→2, 9→5, 3→2); la
+impermeabilización (nivel de duración fija) y finas de plafond 4.20 solo se
+recorren detrás, sin comprimirse. Eso recupera exactamente 10 días
+hábiles —ni uno de más— en los cuatro prototipos.
+
+| Prototipo | Déficit (D-434/435) | Compresión de la cadena | Residual |
+|---|---|---|---|
+| Diamante sin chimenea | 10 | −10 | 0 — cierra 05-ene-2026 exacto |
+| Diamante con chimenea | 10 | −10 | 0 — cierra 05-ene-2026 exacto |
+| Oro | 10 | −10 | 0 — cierra 05-ene-2026 exacto |
+| Zafiro Plus | 24 | −10 | 14 |
+
+**Zafiro Plus necesitaba más, y el usuario aportó dos datos nuevos para
+cerrarlo.** Dato 1: los 7 días hábiles entre `MZ-01` y `MZ-02`/`MZ-03` (y
+otros 7 hasta `MZ-04`, D-434) no eran una necesidad real —"realmente las
+losas van escalonadas, no es que realmente se necesita 7 días"—; el usuario
+los bajó a 5, que recorta el escalonamiento total de 14 a 10 días hábiles y
+recupera 4 más del déficit. Dato 2: revisar si la losa de cimentación podía
+bajar 4 días. Zafiro Plus no tiene un concepto propio de "losa de
+cimentación" en su catálogo, pero el acero de los castillos de cimentación
+que sí llega al día 11 de la ventana (`EST-10010/11`, `EST-10020/21`,
+`EST-10070/71` —K1, K2, K7—) se comprime de 11 a 7 días con más cuadrilla
+(la misma partida que en Zafiro necesitaba 1 pieza pasa a necesitar hasta 23
+en Plus: tender más acero en paralelo es de lo más escalable que hay en
+obra). El vínculo ya escrito (P01, "el muro de planta baja arranca el día
+siguiente de la losa de cimentación") dice que si cimentación cierra antes,
+todo el resto del programa de Plus puede arrancar antes: se recorrieron los
+4 días hábiles completos, el mismo mecanismo que ya inserta los 10 días el
+18-ago (D-426), aquí restando al principio en vez de sumando después.
+
+**El resultado, calculado por el motor, no a mano, sobrepasó el déficit.**
+Las tres palancas juntas (cadena −10, escalonamiento −4, cimentación −4+
+arrastre) no se compensan por simple suma debido a cómo caen los fines de
+semana entremedio: Zafiro Plus termina cerrando el **29-dic-2025, 145 días
+hábiles (29.0 semanas)** —4 días hábiles *antes* del 05-ene-2026 original,
+no después—. La ruta crítica que antes llegaba hasta el cierre
+(estufa `EQU-02010`, 26-dic→29-dic) ya no pasa por acabados de PB: la
+compresión le quitó holgura 0 a todo ese tramo.
+
+**Quedan tres vínculos menores pendientes, el mismo patrón de siempre.**
+`V09` (finas plafond 3.00 tras el bloque de impermeabilización completo),
+`P02` (la gualdra tras el muro, solo en Plus) y `P16` (vertedero tras la
+boquilla fina interior, que lleva un día de espera además del FS) no
+alcanzan a cumplirse —entre 2 y 17 días de déficit, ninguno en la ruta
+crítica final—. `heredar_dos_plantas.py` no los escribe; quedan en «Red sin
+escribir» para el planeador, igual que los 17 de Zafiro o los 22 de D-424:
+no es un defecto nuevo, es la misma convención de todo el proyecto.
+
+Validado con la misma batería de siempre, extendida donde D-436 lo exige:
+`validar_dos_plantas.py` (0 violaciones en los cuatro, incluida una
+verificación dedicada de que el acero de cimentación de Plus cierra en 7
+días y de que P07/P08 siguen al castillo en su nueva fecha) y
+`validar_red_dos_plantas.py` (red escrita sin holgura negativa; ruta
+crítica de 13 pasos en los tres de 10 días, de 1 paso en Plus).
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
