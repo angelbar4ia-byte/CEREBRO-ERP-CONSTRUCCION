@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4531 | 20 |
+| §11 | Los flujos entre sistemas | 4669 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4872,6 +4872,144 @@ Libro de reporte: `METODO_MIXTO_CUADRILLAS.xlsx` (hojas Resumen, Cadena
 D-436-437, Top 20, Detalle completo —339 pares—, Referencia Zafiro,
 Cobertura). `CONOCIMIENTO.md` §6.2, `CATALOGOS.md` §10,
 `PENDIENTES-MEJORAS.md` B-83, B-84.
+
+### B-83 se cierra: el teórico heredado de instalaciones no se puede confirmar con dato de campo, se adopta el Calculado — y el hueco de instalaciones en el método mixto se cierra de paso (D-439)
+
+Dato del usuario: cerrar B-83. El cruce de D-438 había dejado
+instalaciones fuera —"la semilla solo tiene destajos genéricos, nunca
+emparejados contra una `Clave` de catálogo"—, apoyado en la semilla
+*curada* de `CATALOGOS.md` §10 (69 de 265 filas, "las que ya se usaron",
+D-386). Ese supuesto era el límite equivocado: existen dos fuentes
+completas, sin tocar hasta hoy.
+
+**La semilla completa (265 filas, no 69) tiene 123 destajos de
+instalación —eléctrica, gas, hidráulica, sanitaria—, no un puñado.**
+`SEMILLA-cuadrilla-rendimiento.xlsx` original (`CATALOGOS.md` §10) solo
+había cargado al cerebro las filas "ya cruzadas contra ejecución real";
+las otras 196 —migradas igual, nunca con caso real que las citara—
+seguían completas en el archivo, sin leerse. 123 de ellas son `MOE-01`
+(eléctrica, 38), `MOG-` (gas, 17), `MOH-` (hidráulica, 23) y `MOS-`
+(sanitaria, 45) — cada una con su `Cuadrilla` y `Rendimiento teórico` de
+catálogo, igual que las de obra gruesa.
+
+**`ANALISIS_DE_BASICOS_CONCEPTOS.csv` ya tenía el cruce clave↔destajo
+determinístico, para las cuatro instalaciones, sin necesidad de
+emparejar por descripción como D-406.** Sus filas `Tipo=Contrato` son
+`Clave Padre` (el concepto, `IEC-`/`IHD-`/`ISN-`/`IGAS-`) → `Clave Hijo`
+(el destajo, `MOE-`/`MOH-`/`MOS-`/`MOG-`) uno a uno —exactamente la
+misma estructura que D-438 ya usó para obra gruesa, solo que ahí se
+armó a mano (49 pares) por no saber que este archivo ya la daba
+completa—. 167 conceptos de instalación cruzan así; 166 de 167 tienen
+además su rendimiento teórico en la semilla completa (falta solo
+`IEC-01070`, que liga a `MOP-00302`, fuera de las cuatro instalaciones).
+Solo 1 concepto (de 167) liga a más de un destajo a la vez y se excluye,
+mismo criterio de D-438.
+
+**El costo real de cada cuadrilla de instalación también estaba
+cargado, sin usar para esto.** Las filas `Origen=ManoDeObra` del mismo
+CSV (D-406) dan `MOCU-009` (eléctrica) $1,452.00/jornada, `MOCU-010`
+(hidráulica/sanitaria) $1,303.63, `MOCU-021`/`024`/`025` (gas y
+minisplit) $1,452.00 — con esto, `Rendimiento Calculado` (§6.2: costo de
+la cuadrilla ÷ precio del destajo) se puede calcular para los 123
+destajos, no solo citarse en genérico ("0.03 a 4.9 en eléctrico") como
+hasta D-406/D-408.
+
+**La dispersión que B-83 reportaba con un puñado de casos se confirma, a
+escala, y es peor de lo que parecía.** Con los 123 destajos completos
+—no los 7-10 que alcanzaba a cruzar la semilla curada—, la razón
+Calculado÷Teórico:
+
+| Instalación | Destajos | Mediana | Media | Mínimo | Máximo |
+|---|---:|---:|---:|---:|---:|
+| Eléctrica | 38 | 8.47× | 9.57× | 0.83× | 29.04× |
+| Gas | 17 | 3.84× | 3.41× | 0.83× | 5.81× |
+| Hidráulica | 23 | 1.74× | 4.27× | 0.83× | 10.43× |
+| Sanitaria | 45 | 1.86× | 3.82× | 0.26× | 10.86× |
+
+Solo 2 de 123 (1.6%) caen en una banda razonable (0.9×-1.3×, la que
+describiría un factor limpio como el 1.085 de albañil/pintor, §6.2). No
+hay un solo factor que corrija las cuatro instalaciones —ni una por
+separado—: eléctrica es la peor (mediana 8.47×) pero ninguna familia se
+acerca a 1.0×. **Confirma B-83 con un sustento 12× más grande que el
+que tenía (de ~10 casos genéricos a 123 destajos reales), no un hallazgo
+distinto.**
+
+**Por qué no es el precio el que está mal, ni la cuadrilla: es el
+teórico migrado.** Un ejemplo de los extremos —`MOS-06010` (línea
+principal sanitaria), teórico 0.06/día— aplicado a una partida real
+(`ISN-02001`/`02003`, 1 pieza en 2 días de catálogo) pide 8.33
+cuadrillas por el teórico y solo 0.77 por el Calculado: el teórico dice
+que ni una cuadrilla entera le alcanzaría en una jornada completa para
+una sola conexión, algo que no es físicamente creíble para esta partida;
+el Calculado, apoyado en lo que el destajo realmente cuesta, da un
+número que sí cabe en el programa. El patrón se repite en los diez
+multiplicadores más altos del método mixto aplicado a instalaciones
+(abajo): todos entre 7.2× y 9.8× por el teórico, todos por debajo de
+0.85× por el Calculado.
+
+**No hay dato de campo que arbitre, y no es por falta de buscar —ya se
+intentó, dos veces, y las dos fallaron por razones distintas a la del
+rendimiento.** `PRECIO_REAL` no tiene ninguna fila de destajo eléctrico
+en los cinco meses de `ALAMO 18` (D-384); el único intento de bajar
+`grid_AvanceOPEventosOpr` al nivel de una sola línea `MO-` para
+reconstruir días reales (`IEC-00110`, D-386) dio un número imposible
+(11.85 cuadrillas) no por un teórico equivocado sino porque su
+facturación —un evento en junio, cuatro el mismo día de julio— rompe el
+supuesto de huecos por semana completa que el método necesita. Hidráulica,
+sanitaria y gas sí tienen algo de pagado real agregado por concepto
+(D-384: 55.8%-97.4% de la ingeniería), pero no al nivel de una línea
+`MO-` individual —la granularidad que el método de D-386 exige—, y no se
+intentó reconstruir de nuevo con la misma técnica: el caso ya probado
+(`IEC-00110`) muestra que el obstáculo es el patrón de facturación, no
+la instalación, así que repetirlo en las otras tres no tendría por qué
+salir distinto.
+
+**Decisión de cierre, dato del usuario: se adopta `Rendimiento
+Calculado` como referencia para instalaciones, sin dejar de anotar su
+límite.** Es la misma salida que §6.2 ya apuntaba desde antes de esta
+sesión ("ahí el teórico heredado no es confiable y conviene tomar el
+calculado") — ahora con 123 destajos y el contraste del método mixto
+detrás, no una frase suelta. El límite se queda anotado, no se oculta:
+Calculado es el rendimiento al que el precio ya negociado iguala el
+costo real de la cuadrilla hoy —una cifra económica, no una medida de
+campo de cuánto rinde la cuadrilla—; sigue sin ser lo que B-83 pedía
+("evidencia de campo"), solo la mejor disponible cuando el teórico ya
+está descartado y no hay real que lo sustituya. Si aparece dato de campo
+real para instalaciones —otro lote, otra fuente— se compara contra los
+dos, igual que castillo K1 lo hizo contra obra gruesa (D-386).
+
+**Con esto, el hueco de instalaciones del método mixto (D-438) se cierra
+de paso, no aparte.** Aplicado el cruce completo a los siete prototipos:
+997 de 1,108 filas de instalación del programa (90.0%) ya tienen
+cuadrillas implícitas calculables —contra 0 en D-438—, por los dos
+rendimientos:
+
+| Prototipo | Filas de instalación | Con rendimiento | Cobertura | Mediana (Teórico) | Mediana (Calculado) | Máximo (Teórico) | Máximo (Calculado) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Zafiro | 140 | 130 | 92.9% | 0.20 | 0.07 | 7.21 | 1.38 |
+| Rubí | 128 | 116 | 90.6% | 0.20 | 0.10 | 8.49 | 1.38 |
+| Zafiro Plus | 182 | 163 | 89.6% | 0.30 | 0.08 | 7.67 | 0.88 |
+| Jade | 128 | 115 | 89.8% | 0.24 | 0.10 | 9.78 | 1.72 |
+| Diamante sin chimenea | 165 | 147 | 89.1% | 0.24 | 0.07 | 8.33 | 1.45 |
+| Diamante con chimenea | 165 | 147 | 89.1% | 0.24 | 0.07 | 8.33 | 1.45 |
+| Oro | 200 | 179 | 89.5% | 0.20 | 0.09 | 8.33 | 1.03 |
+
+**Instalaciones no pide más cuadrillas que obra gruesa — pide muchas
+menos, por los dos rendimientos, en los siete prototipos por igual.**
+Mediana entre 0.20 y 0.30 cuadrillas por el teórico, 0.07-0.10 por el
+Calculado: consistente con D-412 (los huecos de calendario más grandes
+del programa son de instalaciones) — es trabajo repartido en visitas
+cortas, no una partida que se comprima a un solo frente. Pero el
+teórico sí dispara extremos irreales (7.2×-9.8×, una partida pidiendo
+casi diez cuadrillas) que el Calculado nunca repite (máximo 0.88×-1.72×
+en los siete) — la misma razón, con datos de programa real en vez de
+solo del catálogo, por la que se adopta Calculado arriba.
+
+Libro de reporte: `B83_INSTALACIONES_RENDIMIENTO.xlsx` (Dispersión por
+familia, Cobertura, Método mixto -resumen y detalle-, Top 20, los 123
+destajos Calculado-vs-Teórico, el cruce completo de 167 conceptos).
+`CONOCIMIENTO.md` §6.2, `CATALOGOS.md` §8, §10, `PENDIENTES-MEJORAS.md`
+B-83, B-84.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
