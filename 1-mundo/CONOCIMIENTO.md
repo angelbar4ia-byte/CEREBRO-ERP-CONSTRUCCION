@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4362 | 20 |
+| §11 | Los flujos entre sistemas | 4438 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4703,6 +4703,82 @@ verificación dedicada de que el acero de cimentación de Plus cierra en 7
 días y de que P07/P08 siguen al castillo en su nueva fecha) y
 `validar_red_dos_plantas.py` (red escrita sin holgura negativa; ruta
 crítica de 13 pasos en los tres de 10 días, de 1 paso en Plus).
+
+### Dos bugs propios, un hueco real en cimentación, y Plus cierra a las 30 semanas, no antes (D-437)
+
+El usuario pidió revisar los tres vínculos que quedaron pendientes de
+D-436 (`V09`, `P02`, `P16`). Dos resultaron ser bugs del propio trabajo de
+D-436, no hallazgos nuevos del programa; el tercero destapó un hueco real
+en la compresión de cimentación; y al cerrarlo todo, Plus terminó cerrando
+*antes* de las 30 semanas —4 días hábiles antes—, algo que D-436 presentó
+como resultado pero que el usuario corrigió: Plus tiene que cerrar a las
+30 semanas, igual que los otros tres, ni antes ni después.
+
+**`P02` (la gualdra tras el muro de planta baja): bug de límite.** Solo
+fallaba en Plus. La corrección de D-436 que recorre "todo lo que no es
+cimentación" 4 días decidía qué es cimentación por fecha (`bd ≤ 10`), y el
+muro de planta baja (`EST-02010`) arranca *exactamente* el día 11 (23-jun,
+bd 10) —coincidencia de fecha con cimentación, no porque sea cimentación—.
+Con `≤` en vez de `<`, el muro se quedó sin recorrer mientras la gualdra
+(su sucesora, 15 días después) sí se recorría, rompiendo la relación entre
+las dos por los mismos 4 días. Corregido decidiendo por el campo real
+(`fuente == 'cimentación (bloque de Zafiro)'`), no por coincidencia de fecha.
+
+**`V09` (finas de plafond 3.00 tras la impermeabilización): bug de
+alcance.** La corrección de D-436 movió "la partida `ACA-04010`" al lugar
+correcto (tras el chaflán, D-434), pero esa Clave solo tiene una partida
+real por prototipo —la del bloque `ECO-00050`, la misma que pide `P12`—,
+no dos. El bug no era mover la partida equivocada: era no haber corrido
+también a `ACA-01030` (finas de plafond 3.00), que en Zafiro arranca el
+mismo día que `ACA-01040` (finas de plafond 4.20, sí corregida), las dos
+en paralelo tras la impermeabilización. Corregido corriendo las dos juntas.
+
+**`P01` (la estructura de planta baja tras la losa de cimentación): un
+hueco real, no un bug de alcance.** Al revisar `P02` apareció `P01` roto
+con el mismo patrón, déficit 4. La causa: Zafiro Plus **sí tiene** su
+propia losa de cimentación —`EST-01060`, con otra Clave, no `EST-01040`
+como se dijo por error en D-436—, y D-436 solo había comprimido el acero
+de los castillos, no la losa ni la plomería (`IHD-`), eléctrico (`IEC-`) y
+gas (`IGAS-`) de cimentación, que corren en paralelo con ella, no después.
+El bloque completo seguía cerrando en 11 días por esas partidas, aunque el
+acero ya cerrara en 7. Corregido comprimiendo también la losa (misma
+lógica: más cuadrilla, de 11 a 7 días) y corriendo plomería/eléctrico/gas
+los mismos 4 días hábiles junto con ella, para que el bloque completo de
+cimentación cierre en 7 días, no solo una parte.
+
+**`P16` (vertedero tras boquilla fina interior): se acercó, no se cerró —
+y ahí aparece el límite real.** Comprimir 2 días más la cadena (finas 3.00
+de 5 a 3 días, con más cuadrilla) cerró el déficit completo en Diamante
+sin/con chimenea y Oro (de 2 a 0) sin tocar nada más. En Plus bajó de 12 a
+10, no a 0: cerrarlo del todo necesitaba correr vertedero y todo lo que
+sigue (mármoles, pisos, cancelería, pintura, limpieza) más tarde,
+devolviendo parte de los días que D-436 había ganado. El usuario preguntó
+si esos mismos días podían salir de cimentación en vez de devolverse —se
+revisó y no hay margen: el castillo K1-4.00, la partida más pesada, ya
+necesita **36 cuadrillas** de la de Zafiro solo para caber en los 7 días
+actuales; comprimir más (a 5 días, como finas 3.00) pediría más de 50 —ya
+no es "más cuadrilla razonable".
+
+**Decisión final, dato del usuario: Plus cierra a las 30 semanas.** No 4
+días antes (lo que D-436 reportó) ni más tarde por cerrar `P16` del todo.
+Los 4 días que cimentación comprimida le ganaba al programa se quedan
+hasta donde llega la cadena corregida a mano (de los pretiles a boquilla
+fina interior); de vertedero en adelante no se recorre nada, para que esa
+cola cierre en la misma fecha que Diamante y Oro —no antes—. `P16` queda
+con déficit 10 en «Red sin escribir», el único vínculo pendiente en los
+cuatro prototipos (los otros tres no tienen ninguno).
+
+| Prototipo | Cierre final | Días hábiles | Vínculos sin cumplirse |
+|---|---|---|---|
+| Zafiro Plus | 05-ene-2026 | 149 (30 semanas) | 1 (`P16`, déficit 10) |
+| Diamante sin chimenea | 05-ene-2026 | 149 (30 semanas) | 0 |
+| Diamante con chimenea | 05-ene-2026 | 149 (30 semanas) | 0 |
+| Oro | 05-ene-2026 | 149 (30 semanas) | 0 |
+
+Validado con la misma batería: `validar_dos_plantas.py` (0 violaciones en
+los cuatro; cimentación completa —losa, acero, plomería, eléctrico y
+gas— verificada contra el nuevo recorte de 7 días) y
+`validar_red_dos_plantas.py` (red sin holgura negativa en los cuatro).
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
