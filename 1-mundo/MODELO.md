@@ -1901,6 +1901,17 @@ TRAMO
   reparto_material             NUMERIC o % — calculado por default,
                              editable (`MEMORIA.md` D-259, «declarado
                              menos calculado»)                                firme — P-5
+  cuadrillas                   NUMERIC, fraccionario — la otra mitad de
+                             `calculada_rendimiento` que se perdía
+                             (`duracion_dias` = cantidad ÷ rendimiento ÷
+                             cuadrillas, pero el divisor nunca se guardaba,
+                             D-392). El sistema la propone —método mixto,
+                             `CONOCIMIENTO.md` §11.14, D-438/D-439— y el
+                             planeador la confirma o la corrige, mismo
+                             principio que el resto del cerebro; con ella,
+                             `esfuerzo_real = Σ(tramo.días × cuadrillas × 8)`
+                             es acumulable de abajo hacia arriba, a
+                             diferencia de `Esfuerzo` (D-392)                  firme — D-440, cierra B-82
 ```
 
 ### El calendario de obra es configurable: los fines de semana y los días no laborables se agregan o se quitan (D-428)
@@ -2698,7 +2709,7 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
-| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad) |
+| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |
 

@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4669 | 20 |
+| §11 | Los flujos entre sistemas | 4747 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5010,6 +5010,84 @@ familia, Cobertura, Método mixto -resumen y detalle-, Top 20, los 123
 destajos Calculado-vs-Teórico, el cruce completo de 167 conceptos).
 `CONOCIMIENTO.md` §6.2, `CATALOGOS.md` §8, §10, `PENDIENTES-MEJORAS.md`
 B-83, B-84.
+
+### B-82 se cierra a la mitad: `TRAMO.cuadrillas` ya tiene dato real y `esfuerzo_real` se calcula por primera vez; `frente_id` se intenta de nuevo, con más evidencia, y sigue sin resolverse (D-440)
+
+Dato del usuario: cerrar B-82. Dos huecos distintos, de D-392/D-396, con
+destino distinto hoy.
+
+**`TRAMO.cuadrillas` deja de ser propuesta: D-438 y D-439 ya la
+calculaban, sin saber que alimentaban esto.** La «otra mitad» de
+`calculada_rendimiento` que D-392 decía perdida —el número de cuadrillas
+usado para llegar a una duración— es exactamente `cuadrillas_implícitas`
+(obra gruesa/acabados, D-438, 339 pares) y `cuadrillas_calculado`
+(instalaciones, D-439, 997 filas): 1,382 filas de los siete prototipos
+ya tienen el dato que B-82 pedía, calculado, no inventado. Se formaliza
+en `MODELO.md` §5c como `TRAMO.cuadrillas` (NUMERIC, fraccionario): el
+sistema la propone con este método, el planeador la confirma o la
+corrige, mismo principio de siempre.
+
+**`esfuerzo_real` existe por primera vez, y corrige `Esfuerzo` en
+direcciones opuestas según la familia.** `esfuerzo_real =
+Σ(tramo.días × cuadrillas × 8)`, contra el `Esfuerzo` = días × 8 de
+D-392 (que no pesa por cuadrilla):
+
+| Familia | Filas | Esfuerzo (naive) | Esfuerzo real | Razón |
+|---|---:|---:|---:|---:|
+| Obra gruesa / acabados | 385 | 11,096 h | 13,697 h | **1.23×** |
+| Instalaciones | 997 | 25,776 h | 2,868 h | **0.11×** |
+
+**Obra gruesa pide más esfuerzo del que `Esfuerzo` registra —consistente
+con D-397/D-398/D-419 (muro y losa ya necesitaban más de una
+cuadrilla)—; instalaciones pide una fracción, no por error: trabaja en
+visitas cortas dentro de una ventana larga (D-412), así que contar cada
+día de calendario completo a 8 horas, cuadrilla completa, infla el real
+casi 9 veces.** Por prototipo, la razón combinada va de 0.36× (Zafiro
+Plus) a 0.51× (Diamante sin chimenea) — dominada por el peso de
+instalaciones en filas (72% del total), no por un patrón de dos plantas.
+
+**`frente_id` se vuelve a intentar, con lo que D-396 no tenía: cuadrillas
+reales, no supuestas en 1, y los siete prototipos, no solo Zafiro.**
+Mismo método que `FRENTE_TOPE_CUADRILLA` necesitaría: por oficio
+(prefijo de `Clave`) y día, suma de `cuadrillas` de los conceptos cuyo
+rango de fechas lo cubre. Los picos son grandes —hasta 22.3 cuadrillas
+de `ACA-` el mismo día en Oro, con 11 conceptos activos a la vez— pero
+revisados concepto por concepto, **confirman D-396 a mayor escala, no lo
+contradicen:**
+
+- **Estructura (`EST-`):** el pico de 17.4 en Diamante con chimenea (3-jul)
+  son muro tabique, cuatro tipos de castillo, dos columnas y dos cadenas
+  —la misma pared, por tipo de elemento, no cinco cuadrillas en paralelo—.
+  Mismo patrón que D-396 ya había visto en el armado de acero por calibre.
+- **Carpintería (`CAR-`):** el pico de 12.0 en Rubí (18-nov) son doce
+  muebles distintos (cocina, alacena, clósets, puertas) del mismo
+  subcontrato —un solo `preestablecida_nivel` fabricando piezas, no doce
+  frentes—. Mismo patrón que D-396 ya había visto en carpintería.
+- **Acabados (`ACA-`/`ALB-`):** aquí sí hay una señal real —"FACHADA" en
+  la descripción separa un frente exterior de uno interior, el mismo par
+  que D-396 encontró una vez (`ACA-01010`/`ACA-20011`)—, pero **separarlos
+  no alcanza:** el pico de "interior" se queda en 16.6-20.8 de los
+  19.4-22.3 originales (reducción de 0%-20% según el prototipo, 0% en dos
+  de los siete) — la gran mayoría de lo que queda adentro de "interior"
+  sigue sin frente propio (no hay recámara, baño o zona en la
+  descripción de estos conceptos, solo la altura del muro).
+
+**Conclusión, con más evidencia que D-396, no una distinta: `frente_id`
+sigue sin poder deducirse del dato que existe.** Ni `TRAMO.cuadrillas`
+real ni el texto de la descripción alcanzan — falta el dato estructurado
+mismo (`CATALOGOS.md`: `Frente` "no valida, no impide, no calcula", y
+ahora tampoco se puede inferir). Dos causas distintas detrás de los
+picos grandes, que `frente_id` no resolvería igual: catálogo partido por
+tipo de elemento o por pieza de un subcontrato (estructura, carpintería
+— no es un problema de frente, es de granularidad de catálogo) contra
+acabados, donde sí podría haber paralelismo real sin dato para
+confirmarlo. `PENDIENTES-MEJORAS.md` B-82 queda abierto solo en esta
+mitad.
+
+Libro de reporte: `ESFUERZO_REAL_Y_CONCURRENCIA_B82.xlsx` (esfuerzo real
+por prototipo y familia, picos de concurrencia por oficio, el detalle de
+acabados con y sin frente de fachada). `MODELO.md` §5c,
+`PENDIENTES-MEJORAS.md` B-82.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
