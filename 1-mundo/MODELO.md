@@ -695,6 +695,10 @@ PRESUPUESTO
                       (28 semanas una, 30 dos, D-419) y es el filtro del
                       alcance «1 planta» / «2 plantas» de una duración
                       editada (§5c)                                      nuevo — D-441, cierra B-85
+  plazo_semanas      NUMERIC, nullable — el plazo prometido del programa, en
+                      semanas. El sistema lo propone desde plantas (una 28,
+                      dos 30, D-419) y el planeador lo edita; cómo se cuenta
+                      lo dice CALENDARIO_OBRA.plazo_medido_en (§5c)      nuevo — D-447, cierra B-87
 
 ESTADO_CONGELAMIENTO   (por nodo, no por presupuesto)
   nodo_id            FK Nodo
@@ -1327,6 +1331,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `rendimiento_excede_destajo` | Mismo cruce, dirección contraria: el Rendimiento Real excede ese mismo punto más del `umbral_pct` | D-408 |
 | `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
 | `vinculo_incumplido` | Las fechas de la sucesora contradicen un vínculo (holgura negativa, según `tipo_vinculo` y `traslape_espera`; las cuatro fórmulas, en §5c) — sin umbral, el plan hecho a mano puede no pasar por el CPM (D-409); la corrección la propone quien programa | B-86 |
+| `plazo_excedido` | El cierre del programa pasa del límite del plazo, contado como diga `CALENDARIO_OBRA.plazo_medido_en` (§5c) — sin umbral, y sin alerta por cerrar antes: «ni antes ni después» (D-437) es regla de diseño de este ejercicio, no del sistema | B-87 |
 | `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
@@ -1997,12 +2002,21 @@ CALENDARIO_OBRA
   sentido_redondeo         enum: cercano · arriba · abajo — hacia dónde se
                            acomoda una duración que no cae en un múltiplo del
                            paso. Por defecto cercano                            firme — D-446
+  plazo_medido_en          enum: dias_habiles · semanas_calendario — cómo se
+                           cuenta PRESUPUESTO.plazo_semanas. Por defecto
+                           dias_habiles                                         firme — D-447
 
 CALENDARIO_DIA_NO_HABIL
   calendario_obra_id       FK CALENDARIO_OBRA
   fecha                    DATE — un día que no se trabaja (feriado, paro,
                            lluvia); se agrega o se quita sin tocar el resto     firme — D-428
   motivo                   texto libre
+
+FERIADO_PLANTILLA          semilla editable que el sistema ofrece y nunca aplica
+  nombre                   texto — «Independencia»
+  regla                    texto — «16 de septiembre», «tercer lunes de
+                           noviembre»; se expande al año de cada programa
+  origen                   enum: ley · costumbre                                firme — D-447
 ```
 
 Todo cálculo con días hábiles —el número de día hábil de una fecha, la fecha de
@@ -2011,9 +2025,47 @@ de un tramo— pasa por este calendario y por ningún otro; `CALENDARIO_EXCEPCIO
 sigue siendo el override por cuadrilla. En el ejercicio la configuración es lunes
 a viernes sin el 25-dic y el 1-ene (el 16-sep y el 17-nov se trabajan, como en
 Zafiro): los dos feriados mueven la fecha de cierre, no la cantidad de trabajo
-(`CONOCIMIENTO.md` §11.14). Queda abierto (`PENDIENTES-MEJORAS.md` B-87) si el
-plazo de 28 o de 30 semanas se mide en días hábiles o en semanas de calendario
-cuando el calendario cambia.
+(`CONOCIMIENTO.md` §11.14). Cómo se cuenta el plazo de 28 o de 30 semanas cuando
+el calendario cambia, y qué pasa con la cantidad por día, abajo (D-447).
+
+### ✅ El plazo se cuenta en días hábiles, el calendario mueve la fecha y no el trabajo, y la cantidad por día se deriva (D-447, cierra B-87)
+
+El plazo —28 semanas una planta, 30 dos, D-419— vivía solo como convención. Se
+define con dos cuentas, y `CALENDARIO_OBRA.plazo_medido_en` decide cuál manda:
+
+```
+dias_habiles          límite = plazo_semanas × días laborables por semana, contados en el
+                      calendario de la obra desde el arranque (140 y 150 de lunes a viernes)
+semanas_calendario    límite = el último día hábil en o antes del domingo de la semana N,
+                      contada desde el arranque (vie 19-dic y vie 2-ene en el ejercicio)
+```
+
+```
+Reglas (sin tabla nueva salvo FERIADO_PLANTILLA, arriba)
+  · el programa muestra siempre las dos cuentas («149 de 150 días hábiles; un día hábil
+    después del último de la semana 30»); plazo_medido_en decide cuál dispara
+    ALERTA(tipo=plazo_excedido). Por defecto dias_habiles
+  · con dias_habiles el calendario mueve la fecha de cierre y no el trabajo: los feriados
+    no cuentan y el límite sigue a la semana laboral (28 × 6 = 168 con sábado). Con
+    semanas_calendario cada feriado se come un día del plazo
+  · el sistema ofrece una plantilla de feriados (FERIADO_PLANTILLA) y nunca la aplica: un
+    calendario nuevo sale de lunes a viernes sin ningún feriado, como Zafiro. «Agregar los
+    feriados del año» los expande al rango del programa y el planeador acepta los que
+    quiera, uno por uno
+  · la cantidad por día no se guarda: es cantidad ÷ días hábiles del tramo en el calendario
+    vigente (uniforme; el último día absorbe el residuo, D-433). Si el calendario cambia,
+    lo que se conserva depende de lo que se capturó: una duración (capturada,
+    calculada_rendimiento, preestablecida_nivel, heredada) conserva sus días hábiles, las
+    fechas se mueven y la cantidad por día no cambia; las fechas (derivada_fechas, lo que
+    se carga de Zafiro) se conservan, los días hábiles cambian y la cantidad por día se
+    redistribuye
+```
+
+**Con los siete programas** (`CONOCIMIENTO.md` §11.14, D-447): los de una planta
+cierran el jueves 18-dic con 139 de 140 días hábiles y los de dos el lunes 5-ene con
+149 de 150, un día hábil antes del límite de `dias_habiles` en todos; contados en
+semanas de calendario, los de una planta sobran un día hábil y los de dos se pasan
+uno (el viernes 2-ene era el último). No cambia nada en los programas.
 
 ### ✅ Los días teóricos quedan fraccionarios y el redondeo es del calendario, no de la fórmula (D-446, cierra B-80)
 

@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5262 | 20 |
+| §11 | Los flujos entre sistemas | 5374 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4363,6 +4363,10 @@ hábiles). La ruta crítica de Plus sigue siendo de 31 pasos y termina el 5-ene.
 acorta un día la estructura de la planta alta. Queda como opción del planeador y
 como pregunta de modelo, no como decisión (`PENDIENTES-MEJORAS.md` B-87).
 
+*(Resuelto en D-447: el plazo se cuenta en días hábiles por defecto, con la cuenta
+de semanas de calendario a la vista; los dos tipos de plazo y la regla de la cantidad
+por día están abajo.)*
+
 ### Diamante sin y con chimenea programados con el mismo método de las dos plantas (D-429, D-430)
 
 Los dos Diamante usan el motor de Plus —el programa de Zafiro con 10 días hábiles
@@ -4483,7 +4487,7 @@ incluyen los 18 que quedaron sin cumplirse para el planeador (D-426); en los
 otros seis no hay ninguno. Validado leyendo solo los
 libros, con las mismas pruebas de Plus y los Diamante. Queda lo que sigue
 abierto en `PENDIENTES-MEJORAS.md` B-84 y B-87: el método mixto, el horizonte de la
-cuadrícula y el plazo medido en semanas de calendario.
+cuadrícula y el plazo medido en semanas de calendario (B-87 se cierra en D-447).
 
 ### El redondeo del día a día se corrige: el último día absorbe el residuo (D-433)
 
@@ -5603,6 +5607,114 @@ Libro: `REDONDEO_DE_DIAS_B80.xlsx` (13 hojas: la decisión, la distribución de 
 días teóricos, las reglas contra el plan de Zafiro, el efecto y el sesgo por regla,
 la herencia contra el recálculo, ejemplos, la tolerancia, los siete programas y
 los 1,382 pares). `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-80.
+
+### B-87 se cierra: el plazo se cuenta en días hábiles con la otra cuenta a la vista, los feriados se sugieren y no se aplican, y la cantidad por día se deriva del calendario (D-447)
+
+Dato del usuario: seguir con el siguiente, B-87. D-428 dejó el calendario como
+opción del sistema y tres preguntas sin responder: si el plazo de 28 o de 30
+semanas se mide en días hábiles o en semanas de calendario, si el sistema trae
+una plantilla de feriados para quitar y poner, y qué pasa con la cantidad por
+día de un programa cuando se agrega el sábado.
+
+**El plazo de los siete programas, en las dos cuentas.** Los siete cierran un día
+hábil antes del último que permite el plazo contado en días hábiles; en semanas de
+calendario, los de dos plantas se pasan un día hábil:
+
+| Programas | Plazo | Cierre | Días hábiles | Límite N × 5 | Contra la semana N de calendario |
+|---|---:|---|---:|---:|---|
+| Zafiro, Rubí, Jade | 28 semanas | jueves 18-dic | 139 | 140 (sobra 1) | el último día hábil es el viernes 19-dic: sobra 1 día hábil |
+| Zafiro Plus, Diamante sin, Diamante con, Oro | 30 semanas | lunes 5-ene | 149 | 150 (sobra 1) | el último día hábil es el viernes 2-ene: se pasa 1 día hábil |
+
+Los dos feriados explican la diferencia: sin ellos los de dos plantas cerrarían el
+jueves 1-ene, con un día de sobra en las dos cuentas. Cerrar el 2-ene exigiría la
+ventana de la planta alta en 9 días y no en 10 (D-426), opción del planeador que no
+se cambia:
+
+| Ventana de la planta alta | Días hábiles | Cierre | Contra N × 5 | Contra la semana 30 de calendario |
+|---|---:|---|---:|---:|
+| 9 días | 148 | viernes 2-ene | +2 | 0 |
+| 10 días (la del ejercicio) | 149 | lunes 5-ene | +1 | −1 |
+| 11 días | 150 | martes 6-ene | 0 | −2 |
+
+**Por qué días hábiles por defecto.** Es la cuenta que el usuario ya usó: D-419 dio
+139 días hábiles como 27.8 semanas, y D-437 aceptó 149 días hábiles y el cierre del
+5-ene como «las 30 semanas, ni antes ni después»; D-428 había dicho que los
+feriados mueven la fecha y no el trabajo. Y es la única cuenta que no reacciona a
+cada feriado: si además se dejaran de trabajar el 16-sep y el 17-nov, el trabajo no
+cambia —139 y 149 días— pero todos los cierres se corren 2 días hábiles, los de una
+planta al lunes 22-dic y los de dos al miércoles 7-ene; contra N × 5 siguen
+cabiendo con 1 día de sobra, y contra la semana de calendario pasan a 1 y a 3 días
+hábiles tarde. Un contrato en días naturales necesita `semanas_calendario`, por eso
+es una opción y las dos cuentas se muestran siempre.
+
+**Los feriados: se sugieren, no se aplican.** En la ventana de los siete programas
+caen cuatro feriados oficiales, y dos se trabajan en todos:
+
+| Feriado oficial | Partidas con cantidad ese día | Calendario del ejercicio |
+|---|---|---|
+| martes 16-sep | de 1 a 5 en cada programa (Zafiro 3) | se trabaja |
+| lunes 17-nov | de 7 a 12 en cada programa (Zafiro 9) | se trabaja |
+| jueves 25-dic | ninguna | no se trabaja |
+| jueves 1-ene | ninguna | no se trabaja |
+
+Aplicar una plantilla por su cuenta contradiría a Zafiro, que es el confiable
+(D-428). La plantilla existe como semilla editable (`FERIADO_PLANTILLA`: nombre,
+regla, origen ley o costumbre), el sistema la ofrece al armar el calendario y el
+planeador acepta los feriados que quiera, uno por uno; un calendario nuevo sale
+de lunes a viernes sin ninguno. Qué feriados trae es dato de carga, no de este
+cerebro.
+
+**El sábado y la cantidad por día.** La cantidad por día no se guarda: se deriva
+de la cantidad del tramo y de los días hábiles del calendario vigente (uniforme, y
+el último día absorbe el residuo, D-433). Lo que pasa al agregar el sábado
+depende de lo que se capturó. Con duraciones fijas (los seis derivados, que
+heredan los días de Zafiro) se conservan los días hábiles, se mueven las fechas y
+la cantidad por día no cambia: Rubí y Jade cerrarían el lunes 17-nov en lugar del
+jueves 18-dic (31 días naturales antes) y los cuatro de dos plantas el viernes
+28-nov en lugar del lunes 5-ene (38 antes). Con fechas fijas (Zafiro, cargado con fechas,
+`modo_duracion=derivada_fechas`) se conservan las fechas, los días hábiles cambian
+y la cantidad por día se redistribuye:
+
+| Zafiro con fechas fijas (301 partidas sin pausas) | Valor |
+|---|---:|
+| Partidas con al menos un sábado en su rango | 72 (24%) |
+| Días hábiles de lunes a viernes → con sábado | 1,079 → 1,173 |
+| Baja de la cantidad por día, ponderada por días | 8.0% |
+| Entre las afectadas: baja mediana / máxima | 15.4% / 33.3% |
+| Programa completo (9-jun a 18-dic), días hábiles | 139 → 166 |
+
+Las 14 partidas cuyo conteo de días no cubre todo su rango (pausas, D-393) quedan
+fuera: sus días son solo los activos y el sábado de una pausa no es trabajo.
+
+**Decisión (cierra B-87):**
+
+1. `PRESUPUESTO.plazo_semanas` (NUMERIC, nullable): el sistema lo propone desde
+   `plantas` (una 28, dos 30, D-419) y el planeador lo edita.
+2. `CALENDARIO_OBRA.plazo_medido_en`: `dias_habiles` (por defecto; límite =
+   `plazo_semanas` × días laborables por semana) o `semanas_calendario` (límite =
+   el último día hábil en o antes del domingo de la semana N). El programa muestra
+   siempre las dos cuentas.
+3. `ALERTA(tipo=plazo_excedido)` cuando el cierre pasa del límite según
+   `plazo_medido_en`, sin umbral. No hay alerta por cerrar antes: «ni antes ni
+   después» (D-437) es regla de diseño de este ejercicio.
+4. `FERIADO_PLANTILLA`: sugerencia editable, nunca aplicada; un calendario nuevo
+   sale de lunes a viernes sin feriados.
+5. La cantidad por día se deriva del calendario vigente; al cambiar el calendario,
+   una duración conserva los días y mueve las fechas, y las fechas conservan las
+   fechas y redistribuyen la cantidad.
+6. En el ejercicio no cambia nada: el calendario sigue siendo lunes a viernes sin
+   el 25-dic ni el 1-ene, y los siete programas se quedan como están.
+
+**Lo que no cierra.** Qué feriados trae la plantilla y para qué país es dato de
+carga; la ventana de 9 días sigue siendo opción del planeador; y cómo se
+reprograma un plan de fechas fijas cuando el calendario cambia a mitad de obra
+—cuáles actividades se mueven y cuáles se quedan— no se define hasta que un
+programa lo pida.
+
+Libro: `PLAZO_Y_CALENDARIO_B87.xlsx` (8 hojas: la decisión, el plazo de los siete
+programas, los escenarios de calendario, los feriados en la ventana, la ventana de
+la planta alta y el sábado con fechas fijas). `MODELO.md` §5c,
+`PENDIENTES-MEJORAS.md` B-87.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
