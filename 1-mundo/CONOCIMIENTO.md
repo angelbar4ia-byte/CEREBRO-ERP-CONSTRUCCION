@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5374 | 20 |
+| §11 | Los flujos entre sistemas | 5445 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5031,6 +5031,10 @@ B-83, B-84.
 
 ### B-82 se cierra a la mitad: `TRAMO.cuadrillas` ya tiene dato real y `esfuerzo_real` se calcula por primera vez; `frente_id` se intenta de nuevo, con más evidencia, y sigue sin resolverse (D-440)
 
+*(Los picos de concurrencia de este apartado se corrigen en D-448, abajo: el cruce
+duplicaba 472 filas y los de dos plantas estaban inflados entre 33% y 44%. El
+`esfuerzo_real` no cambia.)*
+
 Dato del usuario: cerrar B-82. Dos huecos distintos, de D-392/D-396, con
 destino distinto hoy.
 
@@ -5715,6 +5719,73 @@ Libro: `PLAZO_Y_CALENDARIO_B87.xlsx` (8 hojas: la decisión, el plazo de los sie
 programas, los escenarios de calendario, los feriados en la ventana, la ventana de
 la planta alta y el sábado con fechas fijas). `MODELO.md` §5c,
 `PENDIENTES-MEJORAS.md` B-87.
+
+### Corrige D-440: los picos de concurrencia estaban inflados por un cruce que duplicaba filas, y «frente» se usa en el cerebro con tres sentidos (D-448)
+
+Dato del usuario: seguir con lo que sigue. Lo que seguía era la segunda mitad de
+B-82 (`frente_id`). Al volver a medir la concurrencia para retomarla apareció un
+error propio en D-440.
+
+**El error.** D-440 cruzó las partidas programadas con sus cuadrillas efectivas
+por (prototipo, `Clave`, `Días laborables`). Cuando dos filas de cuadrillas
+comparten esa llave —la misma `Clave` con otra cantidad y los mismos días, 431 de
+las 1,382—, cada partida se copiaba una vez por cada una: las 2,446 partidas con
+fechas se volvieron 2,918, 472 de más (106 en Diamante con chimenea, 98 en Diamante sin,
+126 en Zafiro Plus, 126 en Oro, 6 en Zafiro, 6 en Rubí y 4 en Jade). Las copias
+contaban doble en la carga de cada día y llevaban cuadrillas que no eran suyas.
+
+**Qué cambia.** Con el cruce por prototipo, `Clave`, días y cantidad, una fila por
+partida, los picos de los cuatro prototipos de dos plantas bajan entre 33% y 44%:
+
+| Prototipo | Pico máximo en D-440 | Corregido |
+|---|---:|---:|
+| Oro | 22.33 (`ACA-`) | 12.43 (`ACA-`) |
+| Diamante con chimenea | 20.38 (`ALB-`) | 13.27 (`EST-`) |
+| Diamante sin chimenea | 19.35 (`ACA-`) | 12.95 (`EST-`) |
+| Zafiro Plus | 16.60 (`ACA-`) | 10.80 (`ACA-`) |
+| Jade | 12.64 (`EST-`) | 12.64 |
+| Rubí | 12.00 (`CAR-`) | 12.00 |
+| Zafiro | 10.66 (`EST-`) | 10.66 |
+
+**Lo que no cambia.** El `esfuerzo_real` de D-440 (1.23× en obra gruesa y acabados,
+0.11× en instalaciones) se calcula directo sobre los 1,382 pares y no pasa por ese
+cruce; tampoco D-438 ni D-439. Y las lecturas de D-440 se sostienen: los picos
+grandes son catálogo partido —el acero por calibre en estructura, las doce piezas de
+un mismo subcontrato en carpintería— y separar «fachada» por el texto de la
+descripción casi no los baja (0% en cuatro prototipos y 12-13% en tres; D-440 decía
+0%-20%).
+
+**Lo que sí cambia de la lectura.** Con las cifras corregidas, los cuatro programas
+de dos plantas piden cuadrillas simultáneas por oficio del mismo orden que el propio
+Zafiro, el confiable: de 10.8 a 13.3 contra 10.7 (y Rubí 12.0, Jade 12.6), no el
+doble. La «cola» de D-440 era del error. Y la medida es gruesa: 1,063 de las 2,445 partidas (43%) no
+tienen rendimiento emparejado y cuentan como 1.0 cuadrilla cada una, así que el
+pico cuenta líneas de catálogo, no cuadrillas; el nivel correcto para comparar es la
+ventana de trabajo (D-449).
+
+**«Frente» tiene tres sentidos en el cerebro, y D-396 y D-440 buscaron solo uno.**
+
+| Lectura | Qué es | De dónde sale | Qué implica para `frente_id` |
+|---|---|---|---|
+| A. Agrupación de conceptos por organización del trabajo | Instalaciones · Estructura · Acabados, transversal a niveles y etapas; las cuadrillas se referencian a frentes; informativo | `GLOSARIO-DOMINIO.md` «Frente» («Hoy vive en: Catálogo de conceptos-frentes»), `CATALOGOS.md` | Es un atributo del concepto: si el catálogo trae el frente de cada concepto, `frente_id` se deduce y no se captura |
+| B. Etapa donde conviven oficios | Cimentación, planta baja…; el tope es por oficio dentro del frente; el cierre al 90% de avance | `PROPUESTA-CUATRO-MODULOS.md` P-6 y «Cierre de frente» (D-261, D-270) | La etapa ya está en el árbol (Nivel 2); agrupar por etapa y oficio baja el pico máximo de 0% a 27% (0% en tres de los siete), porque los picos son catálogo partido dentro de una misma etapa |
+| C. Zona física | Recámara, fachada, azotea; lo que D-396 y D-440 buscaron en el texto | `CONOCIMIENTO.md` D-396, D-440 | No hay dato estructurado ni se deduce del texto |
+
+D-396 y D-440 concluyeron que falta «el dato estructurado mismo». Eso es cierto de
+la lectura C; de la A, el glosario dice que existe un catálogo de conceptos-frentes
+y no se ha visto.
+
+**Qué se necesita para cerrar B-82.** Una definición del usuario: qué es un frente.
+Si es la A, el catálogo de conceptos-frentes (no está en este entorno) da el frente
+de cada concepto y `ACTIVIDAD.frente_id` se deduce de `concepto_id`; el tope de
+cuadrillas (`FRENTE_TOPE_CUADRILLA`) pasaría a medirse por frente y oficio. Si es la
+B, no hace falta `frente_id`: la etapa del árbol cumple. Si es la C, se captura. No se
+agrega ningún campo mientras tanto.
+
+Libro: `CONCURRENCIA_CORREGIDA_B82.xlsx` (8 hojas: qué estaba mal, las filas
+duplicadas, los picos por oficio corregidos contra D-440, el máximo por prototipo,
+acabados con y sin fachada, por etapa y oficio, las etapas con más cuadrillas y las
+tres lecturas de «frente»). `MODELO.md` §2, §5c, `PENDIENTES-MEJORAS.md` B-82.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
