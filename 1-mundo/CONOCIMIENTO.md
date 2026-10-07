@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5163 | 20 |
+| §11 | Los flujos entre sistemas | 5262 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3671,6 +3671,9 @@ y el redondeo (si hace falta uno) debería ser un parámetro editable, no
 algo implícito en la fórmula. Queda anotado aquí para cuando se defina el
 módulo. `PENDIENTES-MEJORAS.md` B-80.
 
+*(Definido en D-446: la fórmula no redondea, el redondeo es del calendario de la
+obra y no cambia el esfuerzo.)*
+
 ### Vínculos: la hoja ya habla el mismo lenguaje que `PRECEDENCIA` — y encuentra un hueco real
 
 Dato del usuario, revisar la columna `Vínculos` de `PROGRAMA_ZAFIRO.xlsx`.
@@ -5504,6 +5507,102 @@ aviso):
 Libro: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (12 hojas: las correcciones, los 8
 `SF`, las fórmulas, los dos vínculos de Rubí y Jade y, con las cifras corregidas,
 lo que traía el de D-444). `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### B-80 se cierra: los días teóricos quedan fraccionarios, el redondeo es un parámetro del calendario y no cambia el esfuerzo (D-446)
+
+Dato del usuario: seguir con el que sigue, B-80. El dato original (D-390) decía
+que los días teóricos de `calculada_rendimiento` pueden quedar fraccionarios
+cuando así es la operación, y que el redondeo, si hace falta uno, es un
+parámetro editable y no algo implícito en la fórmula; faltaba bajarlo a
+`MODELO.md` §5c. Se midió con los 1,382 pares concepto × `MO-` de los siete
+prototipos: 385 de obra gruesa y acabados con el `Rendimiento Teórico` (D-438) y
+997 de instalaciones con el `Rendimiento Calculado` (D-439), la referencia
+interina de esa familia.
+
+**Los días teóricos son fraccionarios de verdad, y casi siempre de menos de un
+día.** A una cuadrilla:
+
+| Días teóricos | Instalaciones (997) | Obra gruesa y acabados (385) |
+|---|---:|---:|
+| menos de 0.25 | 70.2% | 2.9% |
+| 0.25 a 0.5 | 12.4% | 12.7% |
+| 0.5 a 1 | 7.9% | 16.6% |
+| 1 a 2 | 7.0% | 19.5% |
+| 2 a 5 | 2.4% | 21.6% |
+| 5 o más | 0% | 26.7% |
+
+La mediana es 0.17 día en instalaciones —hora y media de una jornada de 8— y
+1.82 en obra gruesa y acabados; 74% de los 1,382 pares dura menos de un día, y
+solo 20% y 11% caen en un entero (a ±0.05). Forzarlos a días enteros, con un
+mínimo de uno, triplica los días de instalaciones (3.1×) y suma 11% a obra
+gruesa; si esos días se cobraran como cuadrilla completa, el esfuerzo se
+inflaría lo mismo —es lo que D-440 ya había visto con las ventanas del plan,
+9×—.
+
+**El plan de Zafiro no sigue una regla de redondeo: sigue las cuadrillas.** En
+sus 46 partidas de obra gruesa y acabados con rendimiento, a una cuadrilla,
+ninguna regla reproduce los días del plan: coinciden en 33% con `arriba` y con
+`cercano` y en 46% con `abajo`, y a ±1 día en 65-67%. La causa se ve en las
+cuadrillas efectivas: las partidas de menos de medio día llevan 0.36 de
+cuadrilla (el plan les da 1 día, algunas hasta 3) y las de 10 días teóricos o
+más llevan 1.7 (el plan las comprime). En las 130 de instalaciones la mediana
+del plan es 2 días contra 0.14 teóricos, unas 14 veces: ventanas de visita, no
+redondeo (D-412). El planeador no redondea, ajusta cuadrillas, y eso es lo que
+D-440 ya formalizó en `TRAMO.cuadrillas`.
+
+**Por qué `cercano` por defecto.** Los datos del plan no distinguen una regla de
+otra, así que se decide por lo que cada una le hace a una cadena. En las 355
+actividades de un día o más a una cuadrilla, el sesgo medio contra el exacto es
+de +0.52 día con `arriba`, +0.03 con `cercano` y −0.45 con `abajo`. En una cadena
+de 28 pasos como la ruta crítica de Zafiro, calculada y redondeada paso por
+paso, son +14.6, +0.8 y −12.6 días hábiles: con `arriba`, casi tres semanas de
+un plazo de 28; con `abajo`, otro tanto en sentido contrario. Las 1,027 de menos
+de un día quedan en 1 con cualquiera de los tres (mínimo de un paso). `arriba`
+puede ser lo que el planeador quiera —no promete terminar antes de lo que la
+cuadrilla puede—, pero como valor por defecto le agrega holgura a cada paso.
+
+**Los siete programas no cambian.** 2,443 partidas programadas, todas de días
+enteros, ninguna de menos de 1 (337 con exactamente 1) y ninguna de más de 16.
+Las 1,382 con rendimiento ya traen cuadrillas efectivas (D-438, D-439), así que
+`cantidad ÷ (rendimiento × cuadrillas)` devuelve sus días tal cual y el paso 1
+no mueve ninguna; las otras 1,061 no tienen rendimiento emparejado (D-438,
+D-439) y no hay qué calcular. El redondeo solo actúa cuando la duración se calcula de nuevo —un
+prototipo nuevo, o una cantidad o unas cuadrillas editadas—. Recalcular por
+proporción las 825 duraciones de los derivados que heredaron los días de Zafiro
+cambiaría entre 42% y 44% con cualquier sentido, porque la cantidad es otra en
+442 de ellas (D-419): la herencia (D-441) sigue siendo el camino de los
+derivados y `calculada_rendimiento` el de lo nuevo.
+
+**Decisión (cierra B-80):**
+
+1. La fórmula no redondea: `duracion_dias` es NUMERIC y los días teóricos se
+   calculan y se muestran siempre, sin redondear.
+2. El redondeo es del calendario de la obra: `CALENDARIO_OBRA.paso_dias` (por
+   defecto 1, el día hábil completo; también 0.5, 0.125 o nulo) y
+   `CALENDARIO_OBRA.sentido_redondeo` (por defecto `cercano`; también `arriba` y
+   `abajo`). Ninguna actividad lleva el suyo: una duración concreta se captura.
+3. Nunca menos de un paso, y en `arriba` y `abajo` un excedente menor a 0.01 día
+   no mueve la duración (4 de los 1,382: 183.83 ÷ 26.25 = 7.003 días se programan
+   en 7, no en 8).
+4. El redondeo mueve las cuadrillas, no el esfuerzo: `TRAMO.cuadrillas` guarda las
+   efectivas, `cantidad ÷ (rendimiento × días programados)`, y `días × cuadrillas
+   × 8` sigue siendo `cantidad ÷ rendimiento × 8`.
+5. Con `cercano` o `abajo` las efectivas pueden pasar de las pedidas
+   (`ACA-01040` de Zafiro: 36 m² ÷ 26.25 = 1.37 días, que `cercano` programa en
+   1: 1.37 cuadrillas). El sistema las muestra junto a las pedidas y las compara
+   con el tope declarado de `FRENTE_TOPE_CUADRILLA`; decide el planeador.
+6. Con paso 1 bastan las fechas; con un paso menor el tramo necesitaría hora de
+   inicio y de fin, que no se define hasta que un programa lo pida.
+
+**Lo que no cierra.** Con paso 1, las instalaciones —90% de las cuales dura menos
+de un día— siguen programadas en ventanas de un día o más. Un programa de
+instalaciones por horas pediría el paso menor y la hora del tramo; queda dicho,
+sin definir.
+
+Libro: `REDONDEO_DE_DIAS_B80.xlsx` (13 hojas: la decisión, la distribución de los
+días teóricos, las reglas contra el plan de Zafiro, el efecto y el sesgo por regla,
+la herencia contra el recálculo, ejemplos, la tolerancia, los siete programas y
+los 1,382 pares). `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-80.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

@@ -1791,7 +1791,10 @@ ACTIVIDAD
                          bloque (Nivel 2 o 3), que solo existe como
                          predecesora: sus fechas son el mínimo y el máximo
                          de las de sus partidas, nunca se capturan (D-442)    firme
-  duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas   firme
+  duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas —
+                         la duración que usa el plan: en calculada_rendimiento,
+                         cantidad ÷ (rendimiento × cuadrillas) puesta en el paso
+                         del calendario (D-446)                               firme
   duracion_origen       enum: heredada · propia — `heredada`: el valor sigue
                          al de su referencia; `propia`: la fijó el planeador
                          en este programa, o no tiene referencia; nulo si
@@ -1968,7 +1971,10 @@ TRAMO
                              principio que el resto del cerebro; con ella,
                              `esfuerzo_real = Σ(tramo.días × cuadrillas × 8)`
                              es acumulable de abajo hacia arriba, a
-                             diferencia de `Esfuerzo` (D-392)                  firme — D-440, cierra B-82
+                             diferencia de `Esfuerzo` (D-392). Son las
+                             efectivas: cantidad ÷ (rendimiento × días
+                             programados), así que redondear la duración
+                             no cambia el esfuerzo (D-446)                     firme — D-440, cierra B-82
 ```
 
 ### El calendario de obra es configurable: los fines de semana y los días no laborables se agregan o se quitan (D-428)
@@ -1984,6 +1990,13 @@ CALENDARIO_OBRA
   dias_laborables_semana   los días de la semana que se trabajan, de lunes a
                            domingo; por defecto lunes a viernes. El sábado y el
                            domingo se agregan o se quitan como cualquier otro   firme — D-428
+  paso_dias                NUMERIC, nullable — la resolución del plan: 1 = día
+                           hábil completo (los siete programas), 0.5 = medios
+                           días, 0.125 = horas (la jornada es de 8); nulo = sin
+                           redondeo. Por defecto 1                              firme — D-446
+  sentido_redondeo         enum: cercano · arriba · abajo — hacia dónde se
+                           acomoda una duración que no cae en un múltiplo del
+                           paso. Por defecto cercano                            firme — D-446
 
 CALENDARIO_DIA_NO_HABIL
   calendario_obra_id       FK CALENDARIO_OBRA
@@ -2001,6 +2014,60 @@ Zafiro): los dos feriados mueven la fecha de cierre, no la cantidad de trabajo
 (`CONOCIMIENTO.md` §11.14). Queda abierto (`PENDIENTES-MEJORAS.md` B-87) si el
 plazo de 28 o de 30 semanas se mide en días hábiles o en semanas de calendario
 cuando el calendario cambia.
+
+### ✅ Los días teóricos quedan fraccionarios y el redondeo es del calendario, no de la fórmula (D-446, cierra B-80)
+
+Dato del usuario, que `CONOCIMIENTO.md` §11.14 guardaba como conocimiento: los
+días teóricos de `calculada_rendimiento` pueden quedar fraccionarios cuando así es
+la operación, y el redondeo, si hace falta uno, es un parámetro editable y no algo
+implícito en la fórmula (`PENDIENTES-MEJORAS.md` B-80). Se define así:
+
+```
+días teóricos         = cantidad ÷ (rendimiento × cuadrillas)       fraccionarios, sin redondear
+duración programada   = acomodar(días teóricos, paso_dias, sentido_redondeo)
+                        — lo que guarda ACTIVIDAD.duracion_dias; nunca menos de un paso
+cuadrillas efectivas  = cantidad ÷ (rendimiento × duración programada)
+                        — lo que guarda TRAMO.cuadrillas
+esfuerzo              = duración programada × cuadrillas efectivas × 8
+                      = cantidad ÷ rendimiento × 8, sea cual sea el paso
+```
+
+```
+Reglas (sin tabla nueva: `CALENDARIO_OBRA` gana dos campos, arriba)
+  · la fórmula no redondea: `duracion_dias` ya era NUMERIC; los días teóricos se
+    calculan y se muestran siempre, aunque el plan use otro número
+  · el paso y el sentido son del calendario de la obra, editables; ninguna
+    actividad lleva su propio redondeo. Si el planeador quiere una duración
+    concreta la captura (`modo_duracion=capturada`) y las cuadrillas se acomodan;
+    el paso aplica igual a una duración capturada que a una calculada
+  · por defecto, paso 1 (día hábil completo, como están los siete programas) y
+    sentido cercano (el medio va hacia arriba); un múltiplo exacto no se mueve.
+    En arriba y abajo, un excedente menor a 0.01 día no sube ni baja un paso:
+    183.83 ÷ 26.25 = 7.003 días se programan en 7, no en 8
+  · el redondeo mueve las cuadrillas, no el esfuerzo. Con cercano o abajo las
+    efectivas pueden pasar de las que pidió el planeador (36 m² ÷ 26.25 = 1.37
+    días, que cercano programa en 1: 1.37 cuadrillas): el sistema las muestra
+    junto a las pedidas y las compara con el tope de FRENTE_TOPE_CUADRILLA; decide
+    el planeador
+  · con paso 1 bastan las fechas: la cantidad por día es uniforme y el último día
+    absorbe el residuo (D-433). Con un paso menor el tramo necesitaría hora de
+    inicio y de fin; no se define hasta que un programa lo pida (la convención de
+    instantes de D-445 ya admite fracciones: un tramo es [inicio, inicio + duración])
+```
+
+**Por qué `cercano`, y por qué el redondeo no puede tocar el esfuerzo** (1,382 pares
+concepto × `MO-` de los siete prototipos, `CONOCIMIENTO.md` §11.14, D-446). El 74%
+dura menos de un día a una cuadrilla: 90% de las instalaciones (mediana 0.17 día) y
+32% de la obra gruesa y los acabados (mediana 1.82). Llevarlos a días enteros
+triplica los días de instalaciones (3.1×) y suma 11% a obra gruesa con `arriba`, y
+si esos días se cobraran como cuadrilla completa el esfuerzo se inflaría igual. En
+las actividades de un día o más, el sesgo medio contra el exacto es de +0.52 día con
+`arriba`, +0.03 con `cercano` y −0.45 con `abajo`: calculada y redondeada paso por
+paso, la ruta crítica de 28 pasos de Zafiro ganaría 14.6 días hábiles con `arriba`
+—casi tres semanas de un plazo de 28— o perdería 12.6 con `abajo`; `cercano` suma
+0.8. Los siete programas no cambian: 2,443 partidas programadas, todas de días
+enteros y ninguna de menos de 1; las 1,382 con rendimiento ya traen cuadrillas
+efectivas (D-438, D-439), y la fórmula devuelve sus días tal cual.
 
 ### ✅ Un vínculo entre bloques: `ACTIVIDAD` resumen en Nivel 2 y 3, solo como predecesora (D-425, cierra en D-442)
 
