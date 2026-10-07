@@ -1333,6 +1333,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
 | `vinculo_incumplido` | Las fechas de la sucesora contradicen un vínculo (holgura negativa, según `tipo_vinculo` y `traslape_espera`; las cuatro fórmulas, en §5c) — sin umbral, el plan hecho a mano puede no pasar por el CPM (D-409); la corrección la propone quien programa | B-86 |
 | `plazo_excedido` | El cierre del programa pasa del límite del plazo, contado como diga `CALENDARIO_OBRA.plazo_medido_en` (§5c) — sin umbral, y sin alerta por cerrar antes: «ni antes ni después» (D-437) es regla de diseño de este ejercicio, no del sistema | B-87 |
+| `ritmo_sobre_referencia` | En una ventana de actividades que heredan sus días (`ACTIVIDAD.duracion_origen=heredada`), las cuadrillas efectivas son al menos `razon` veces las de la ventana de su referencia y al menos `cuadrillas_mas` más —por defecto 2 y 1, en `ALERTA.parametro_usado`—; ventana = las actividades del mismo oficio con las mismas fechas de inicio y término (§5c) | B-84 |
 | `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
@@ -1906,6 +1907,21 @@ En el ejercicio, Zafiro queda de raíz de solo lectura (regla vigente:
 nunca se modifica); en el sistema la raíz de la cadena es la que el
 planeador elija.
 
+**Heredar los días no hereda el ritmo (D-449).** Cuando un programa hereda los días
+de su referencia con otra cantidad, las cuadrillas efectivas cambian en la misma
+proporción (D-419: los m² de más se absorben con más gente). `ALERTA(tipo=
+ritmo_sobre_referencia)` lo avisa **por ventana de trabajo y no por línea de
+catálogo**: una línea comparte los días de las demás de su oficio (el acero K1-6.00
+pasa de 6 a 61 piezas, 10×, pero es una de las líneas de una misma tarea de 11
+días). Una ventana es el conjunto de actividades del mismo oficio (prefijo de
+`Clave`) con las mismas fechas de inicio y término; sus cuadrillas son la suma de las
+`TRAMO.cuadrillas` de las que tienen rendimiento emparejado, así que es una cota
+inferior y lo que no tiene rendimiento no lo ve la alerta. La propuesta del sistema
+son dos: conservar los días con las cuadrillas que la ventana pide, o alargar a los
+días que tendría con las cuadrillas de la referencia (acomodados al paso del
+calendario, D-446); el planeador decide o captura otros días y las cuadrillas se
+acomodan.
+
 ### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
 
 Dato del usuario, primer programa completo por **prototipo** (no por
@@ -2106,6 +2122,8 @@ Reglas (sin tabla nueva: `CALENDARIO_OBRA` gana dos campos, arriba)
     absorbe el residuo (D-433). Con un paso menor el tramo necesitaría hora de
     inicio y de fin; no se define hasta que un programa lo pida (la convención de
     instantes de D-445 ya admite fracciones: un tramo es [inicio, inicio + duración])
+  · la cuadrícula día por día es una vista, no un dato: va del primer día del programa
+    más temprano que muestra al último del más tardío, y no se fija (D-449)
 ```
 
 **Por qué `cercano`, y por qué el redondeo no puede tocar el esfuerzo** (1,382 pares

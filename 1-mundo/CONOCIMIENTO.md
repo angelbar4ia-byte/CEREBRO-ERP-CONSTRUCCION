@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5445 | 20 |
+| §11 | Los flujos entre sistemas | 5521 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5787,6 +5787,79 @@ duplicadas, los picos por oficio corregidos contra D-440, el máximo por prototi
 acabados con y sin fachada, por etapa y oficio, las etapas con más cuadrillas y las
 tres lecturas de «frente»). `MODELO.md` §2, §5c, `PENDIENTES-MEJORAS.md` B-82.
 
+### B-84 se cierra: el horizonte de la cuadrícula sigue al programa más largo, y heredar los días no hereda el ritmo —la alerta va por ventana de trabajo, no por línea de catálogo— (D-449)
+
+Dato del usuario: seguir con lo que sigue. B-84 conservaba dos puntos abiertos: el
+horizonte de la cuadrícula (4) y los tramos con mucha más cantidad que Zafiro (8);
+el (5), los emparejamientos por rol, es del planeador.
+
+**(4) El horizonte no se fija: sigue al programa más largo.** La cuadrícula día por
+día no se guarda (D-447), es una vista; va del primer día del programa más temprano
+que muestra al último del más tardío. En el libro de los siete son 211 columnas
+(9-jun a 5-ene): los cuatro de dos plantas llegan al 5-ene y los tres de una dejan
+18 vacías después del 18-dic. Con el sábado trabajado (D-447) el más largo cerraría
+el 28-nov y serían 173.
+
+**(8) Heredar los días no hereda el ritmo.** D-419 fijó que los m² de más no agregan
+días sino gente, y D-422 contó los tramos con el doble o más de cantidad que su
+gemela de Zafiro (10 de 208 en Rubí, 17 de 197 en Jade) para que el planeador los
+revisara. Con la referencia explícita de D-441, 1,502 líneas de los seis derivados
+tienen gemela y los mismos días que Zafiro, y 140 tienen el doble o más de su
+cantidad. **Pero por línea la razón engaña:** una línea comparte los días de las
+demás de su oficio (D-396). El acero K1-6.00 pasa de 6 a 61 piezas en los dos
+Diamante (10×) y, a las cuadrillas de Zafiro, pediría 112 días, cuando el acero de la
+cimentación es una sola tarea de 11 días; el acero del K3 de 6.00 m pediría 77.
+
+**Por ventana sale una lista que se puede revisar.** Una ventana es el conjunto de
+actividades del mismo oficio con las mismas fechas de inicio y término; sus
+cuadrillas son la suma de las de sus líneas con rendimiento (D-438, D-439). Se
+comparan 355 ventanas de los seis derivados (890 líneas con rendimiento en los dos
+lados y los mismos días que Zafiro) contra la ventana de su gemela. Zafiro tiene 76
+ventanas con rendimiento: mediana de 0.61 cuadrillas, p90 de 1.67 y máximo de 3.4. **17
+ventanas piden al menos el doble de cuadrillas y al menos una más** (Rubí 2, Jade 2,
+Zafiro Plus 0, Diamante sin chimenea 5, Diamante con chimenea 5, Oro 3), y 7 pasan
+de lo más que Zafiro llegó a usar en una ventana:
+
+| Prototipo | Ventana | Cuadrillas en Zafiro → hoy | Días a las cuadrillas de Zafiro |
+|---|---|---|---|
+| Los dos Diamante | repellado de muro +3.00 (`ALB-01012`), 20-21 ago | 2.2 → 7.5 | 7, en vez de 2 |
+| Los dos Diamante | repellado de plafond +3.00 (`ALB-01112`), 18-19 ago | 1.3 → 6.5 | 10, en vez de 2 |
+| Los dos Diamante | finas de plafond 4.20 (`ACA-01040`), 15-16 sep | 0.7 → 3.5 | 10, en vez de 2 |
+| Oro | repellado de muro +3.00 (`ALB-01012`), 20-21 ago | 2.2 → 4.6 | 4, en vez de 2 |
+| Rubí | castillo K-3 (`EST-02130`), 1-jul | 0.4 → 2.7 | 7, en vez de 1 |
+| Oro | repellado de muros de fachada +3.00 (`ALB-01212`), 4-29 ago | 0.6 → 2.5 | 33, en vez de 8 |
+
+Las primeras cuatro filas (siete ventanas) son las que pasan de lo probado; las
+otras dos muestran por qué hay dos propuestas y no una: en `ALB-01212` conservar los
+8 días con 2.5 cuadrillas está dentro de lo que Zafiro llegó a usar, y alargarlo a 33
+no tiene sentido. Las 17 están en el libro con sus propuestas.
+
+**Lo que la alerta no ve.** Solo cuenta lo que tiene rendimiento emparejado (57% de las
+partidas); 53 líneas sin él tienen el doble o más de su gemela —las finas de fachada
+de Oro, ×4.1, entre ellas— y van en una hoja aparte para que las mire el planeador.
+La ventana es una aproximación (mismo oficio, mismas fechas) y sus cuadrillas son una
+cota inferior.
+
+**Decisión (cierra B-84):**
+
+1. El horizonte de la cuadrícula es el del programa más largo que se muestra; no se
+   fija.
+2. `ALERTA(tipo=ritmo_sobre_referencia)`: en una ventana de actividades que heredan
+   sus días, las cuadrillas efectivas son al menos `razon` veces las de la ventana
+   de su referencia y al menos `cuadrillas_mas` más; por defecto 2 y 1, editables en
+   `ALERTA.parametro_usado`.
+3. El sistema propone dos salidas —conservar los días con las cuadrillas que pide, o
+   alargar a los días que tendría con las de la referencia, acomodados al paso del
+   calendario (D-446)— y el planeador decide.
+4. Ninguno de los siete programas cambia: las 17 ventanas, las 53 líneas y los
+   emparejamientos por rol de Rubí y Jade (28 y 18, en especial los poyos de cocina)
+   quedan para el planeador.
+
+Libro: `RITMO_HEREDADO_B84.xlsx` (10 hojas: la decisión, el horizonte, las 17
+ventanas, línea contra ventana, las líneas que engañan, las 53 sin rendimiento, las
+ventanas de Zafiro, la cuenta por umbral y las 355 comparables). `MODELO.md` §5a,
+§5c, `PENDIENTES-MEJORAS.md` B-84.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las
@@ -6113,6 +6186,9 @@ valida o ajusta: es el primer caso de B-85, y a la vista quedan otros
 tramos con el doble o más de cantidad que Zafiro que siguen con los días
 de Zafiro —castillo K-3 ×7, sellado de marco de cantera ×5.8, acero de
 K7 y BAP ×4, y el repellado y las finas de plafond de 4.20 ×2.2—.
+
+*(D-449 revisa esos casos por ventana de trabajo y no por línea: 17 ventanas, no
+todas las líneas de arriba.)*
 
 **El muro de 21 cm no es un muro de tabique más (dato del usuario,
 D-422; corrige D-420).** "Los muros de tabique son 14 cm; el de 21 solo
