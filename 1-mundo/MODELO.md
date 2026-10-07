@@ -1326,7 +1326,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `rendimiento_bajo_para_destajo` | El Rendimiento Real (mano de obra) de la actividad cae, contra (`Rendimiento teórico` × `Unidades ejecutoras`), más del `umbral_pct` | D-408 |
 | `rendimiento_excede_destajo` | Mismo cruce, dirección contraria: el Rendimiento Real excede ese mismo punto más del `umbral_pct` | D-408 |
 | `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
-| `vinculo_incumplido` | Las fechas de la sucesora contradicen un vínculo (holgura negativa, según `tipo_vinculo` y `traslape_espera`) — sin umbral, el plan hecho a mano puede no pasar por el CPM (D-409); la corrección la propone quien programa | B-86 |
+| `vinculo_incumplido` | Las fechas de la sucesora contradicen un vínculo (holgura negativa, según `tipo_vinculo` y `traslape_espera`; las cuatro fórmulas, en §5c) — sin umbral, el plan hecho a mano puede no pasar por el CPM (D-409); la corrección la propone quien programa | B-86 |
 | `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
@@ -1923,7 +1923,9 @@ PRECEDENCIA
   predecesora_id        FK ACTIVIDAD                                        firme
   sucesora_id            FK ACTIVIDAD — siempre una partida, nunca un
                           bloque (D-442)                                     firme
-  tipo_vinculo            enum: fin_inicio · inicio_inicio · fin_fin         firme
+  tipo_vinculo            enum: fin_inicio · inicio_inicio · fin_fin ·
+                          inicio_fin — uno por cada FS · SS · FF · SF del
+                          formato fuente, sin conversión (D-445)             firme
   traslape_espera         NUMERIC — días; negativo es traslape, positivo
                           es espera                                          firme
   origen                  enum: tecnica · recurso · decision                 firme — P-1
@@ -2056,12 +2058,46 @@ alta en Oro), así que ahí esa ventana termina en su fecha (18-ago, 26-ago,
 esos bloques, así que no hay efecto; la regla evita que lo tenga.
 
 **Un vínculo cuyas fechas lo contradicen no se rechaza: se avisa.** En el
-programa de Zafiro, hecho a mano, hay 16 (18 en D-442, corregido en D-443;
-D-424, D-426); nadie hizo mal el
+programa de Zafiro, hecho a mano, hay 15 (18 en D-442 y 16 en D-443, corregidos
+en D-445; D-424, D-426); nadie hizo mal el
 vínculo ni la fecha, el plan no pasa por ningún CPM (D-409). `ALERTA` gana
 `vinculo_incumplido`, sin umbral, y la propuesta de corrección es de quien
 programa (`CONOCIMIENTO.md` §11.14, D-442). En Zafiro se quedan tal cual: el
 usuario decidió que el original no se toca y solo se anota (D-444).
+
+### ✅ `inicio_fin` entra al enum y la holgura se mide en instantes (D-445, cierra B-81)
+
+`PROGRAMA_ZAFIRO.xlsx` usa los cuatro tipos del formato de MS Project —`FS`,
+`SS`, `FF` y `SF`— y el enum solo tenía tres. **Decisión: el enum gana
+`inicio_fin`.** La importación es uno a uno (`FS`→`fin_inicio`,
+`SS`→`inicio_inicio`, `FF`→`fin_fin`, `SF`→`inicio_fin`) y no convierte ni
+descarta ningún vínculo: el usuario decidió que Zafiro, el original, no se
+toca (D-444). Los 832 vínculos de los siete prototipos son 680 `FS`, 91 `SS`,
+53 `FF` y 8 `SF`.
+
+```
+Holgura de un vínculo (negativa = no se cumple). abre(x) = inicio del primer día
+hábil de x; cierra(x) = fin de su último día. Un bloque abre con su primera
+partida y cierra con la última (si contiene a la sucesora, sin ella, D-443).
+  fin_inicio     abre(sucesora)   − (cierra(predecesora) + desfase)    bc(fin_p, ini_s) − 1 − desfase
+  inicio_inicio  abre(sucesora)   − (abre(predecesora)   + desfase)    bc(ini_p, ini_s)     − desfase
+  fin_fin        cierra(sucesora) − (cierra(predecesora) + desfase)    bc(fin_p, fin_s)     − desfase
+  inicio_fin     cierra(sucesora) − (abre(predecesora)   + desfase)    bc(ini_p, fin_s) + 1 − desfase
+  (bc = días hábiles entre dos fechas del calendario de obra; la columna de
+   la derecha es lo mismo con fechas)
+```
+
+`inicio_fin` es el «a tiempo» de MS Project: la sucesora no termina antes de que
+empiece la predecesora. Como `fin_fin`, le pone el piso al *término* de la
+sucesora y no a su inicio (para el CPM: término ≥ inicio de la predecesora +
+desfase). Con fechas, los dos tipos que comparan un cierre contra una apertura
+llevan una corrección de un día —`fin_inicio` un `− 1`, `inicio_fin` un `+ 1`— y
+los dos que comparan igual con igual no llevan ninguna; D-424 a D-444 midieron
+`inicio_fin` sin ella y contaron 1 de menos. Una holgura negativa es una sucesora que
+terminó antes de lo que el vínculo pide, no una contradicción física:
+`ALERTA(tipo=vinculo_incumplido)` la avisa como a cualquier otra. En el libro, 5
+de los 8 se cumplen con holgura 0 (las gualdras, que terminan la víspera de que
+empiece el resto de su losa) y 3, de Zafiro, no (`CONOCIMIENTO.md` §11.14, D-445).
 
 ### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
 

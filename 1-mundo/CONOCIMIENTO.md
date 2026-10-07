@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5046 | 20 |
+| §11 | Los flujos entre sistemas | 5163 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -3689,6 +3689,8 @@ en el dato real: `CAR-01011`, `IEC-01070` (dos veces, una de ellas con
 dos predecesoras `SF` a la vez), `EST-03020`. `PENDIENTES-MEJORAS.md`
 B-81.
 
+*(Cerrado en D-445: `inicio_fin` entra al enum.)*
+
 **Cobertura baja, y el orden de la hoja no es el de ejecución:** solo 74
 de 317 conceptos (23%) traen vínculo explícito; `FS` domina (62/75,
 83%). 19 de los 75 (25%) apuntan a una fila que aparece *después* en la
@@ -4065,6 +4067,10 @@ lag 0) cuadra con sus fechas reales —y es contra un rollup de Nivel 3
 de 4 vínculos `SF` reales están obsoletos**, no son relaciones físicas
 genuinas. `PENDIENTES-MEJORAS.md` B-81, con esta evidencia nueva.
 
+*(D-445 matiza esto: «obsoletos» y «físicamente imposible» exageran. Los 3 no se
+cumplen, pero la sucesora solo terminó antes de lo que un vínculo «a tiempo»
+pide; no hay nada físico que se contradiga.)*
+
 **La estructura en sí no tiene hueco.** Dos predecesoras para una
 misma actividad ya se modela sin campo nuevo —dos filas en
 `PRECEDENCIA`, mismo `sucesora_id`, distinto `predecesora_id`—. El
@@ -4187,6 +4193,11 @@ es obra gris → acabados: un día (el lunes 6-oct), que la red declara
 La estructura sí está unida al cierre, pero por las fechas y no por un
 vínculo: la obra gris espera la impermeabilización de la azotea, que espera
 los pretiles, que esperan la losa.
+
+*(D-445 corrige el punto (2) y lo que se dijo arriba de la gualdra en Rubí y Jade:
+con la lectura estándar, el `SF` de la gualdra dice que termina cuando empieza la
+losa, lo mismo que el `FS` de la red, y se cumple con holgura 0 en los dos
+prototipos, así que no iba al revés ni «no se cumplía».)*
 
 **Las 2 semanas de las dos plantas.** Con la red, 10 días hábiles insertados
 en cualquier punto de la cadena corren todo lo que cuelga de ese punto y
@@ -5289,6 +5300,11 @@ la red por prototipo). `MODELO.md` §5a, §5c, `PENDIENTES-MEJORAS.md` B-81, B-8
 
 ### Corrige D-442: un bloque que contiene a su sucesora se lee sin ella, y los rotos de Zafiro son 16, no 18 — y los 8 `SF` del libro se cumplen todos al revés (D-443)
 
+*(Las cifras de `SF` de este apartado se corrigen en D-445, abajo: la holgura de
+`SF` se medía sin el «+ 1». Leídos normal se cumplen 5 de los 8, no 0; los rotos
+de Zafiro son 15, no 16; y de los 39 vínculos con el bloque de su sucesora se
+cumplen 35, no 30.)*
+
 Al empezar los pendientes de B-86 se simuló qué pasa con la red de Zafiro si
 se aplican las propuestas de D-442, y la simulación encontró un error mío en
 D-442: la regla nueva rechazaba «una predecesora que es el bloque de su propia
@@ -5336,6 +5352,10 @@ propuesta», «Cambios vs D-442», «39 con bloque que contiene»).
 `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
 
 ### Los pendientes de B-86: Zafiro queda de origen y solo se anota, `P16` sigue pendiente, la segunda ruta queda en borrador (D-444)
+
+*(D-445, abajo, corrige las cifras de `SF` de este apartado y cierra B-81:
+`inicio_fin` entra al enum. En la tabla de lecturas, Zafiro es 18 y 15, y los
+otros seis, 0 y 0.)*
 
 Dato del usuario, sobre los cuatro pendientes que dejaban D-442 y D-443,
 después de ver que aplicar todas las propuestas dejaba a Zafiro en 0 vínculos
@@ -5387,6 +5407,103 @@ cambios contra D-442, los pendientes con la decisión de cada uno, los 39 con
 bloque que contiene, los bloques como predecesora, la red por prototipo en
 las tres lecturas y la segunda ruta). `MODELO.md` §5c,
 `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### B-81 se cierra: `inicio_fin` entra al enum, y la holgura de `SF` no sumaba 1 — se corrigen D-443 y D-444 (D-445)
+
+Dato del usuario: «B-81». La pregunta llevaba abierta desde D-391 —¿`PRECEDENCIA.tipo_vinculo`
+cubre `inicio_fin`?— y D-442, D-443 y D-444 le habían ido sumando una evidencia
+que parecía inclinarla hacia «el plan de origen escribe `SF` al revés». Al ir a
+cerrarla se revisó cómo se mide la holgura de un `SF` y apareció un error propio.
+
+**El error: la holgura de `SF` no sumaba 1.** Un plan de días hábiles completos
+abre cada tramo al empezar su primer día y lo cierra al terminar el último: el
+inicio del día hábil `d` es el instante `n(d)` y su fin es `n(d)+1`. Con eso, las
+cuatro holguras (`MODELO.md` §5c):
+
+| Tipo | Holgura en instantes | Con días hábiles entre fechas |
+|---|---|---|
+| `fin_inicio` (FS) | abre(s) − (cierra(p) + desfase) | bc(fin_p, ini_s) − 1 − desfase |
+| `inicio_inicio` (SS) | abre(s) − (abre(p) + desfase) | bc(ini_p, ini_s) − desfase |
+| `fin_fin` (FF) | cierra(s) − (cierra(p) + desfase) | bc(fin_p, fin_s) − desfase |
+| `inicio_fin` (SF) | cierra(s) − (abre(p) + desfase) | bc(ini_p, fin_s) **+ 1** − desfase |
+
+La función que medía los vínculos desde D-424, y con ella la lectura de D-442 y
+D-443, tenía la cuarta sin el «+ 1»: comparaba el cierre de un día con la apertura
+de otro como si fueran el mismo instante. Reimplementada por instantes y sin
+mirar la anterior, la nueva coincide con la vieja en las 824 holguras de `FS`
+(680), `SS` (91) y `FF` (53), y da exactamente 1 más en los 8 `SF`: el error era
+solo de `SF`.
+
+**Qué cambia:**
+
+| Decían D-443 y D-444 | Es |
+|---|---|
+| 0 de los 8 `SF` se cumplen leídos normal | **5 de 8**, los cinco con holgura 0: la gualdra termina el día hábil anterior al que empieza el resto de su losa. Los 3 que no se cumplen son de Zafiro: −5, −6 y −6 |
+| 8 de 8 se cumplen leídos al revés: «el plan de origen parece escribir `SF` con el sentido invertido» | Al revés también se cumplen 8 de 8, pero en 5 las dos lecturas dan la misma holgura 0; solo en 3 (`IEC-01070` dos veces, `EST-03020`) se separan. Con tres casos no se distingue un `SF` escrito al revés de un vínculo que las fechas ya no siguen: la inferencia era más débil de lo que se dijo |
+| Zafiro: 16 vínculos que no se cumplen (12 con `SF` al revés) | **15**: 10 `FS`, 2 `SS` y 3 `SF`. Con la ventana completa del bloque (D-442) siguen siendo 18 |
+| Plus, Diamante sin, Diamante con y Oro: 1 cada uno | **0 cada uno**: el «1» era la gualdra. Rubí y Jade, 0 |
+| `CAR-01011` «pasa a estar roto» (de 0 a −1) | Se cumple: holgura 0 sin la sucesora y +1 con ella |
+| De los 39 vínculos cuyo bloque contiene a la sucesora, 30 se cumplen y 9 no | **35 y 4** (los 4 de Zafiro que ya estaban rotos); «32 se cumplen tal como están escritos» no cambia |
+
+**Qué es un `SF` en el libro.** Es la definición de MS Project: la sucesora no
+puede terminar antes de que empiece la predecesora, más el desfase; su uso
+típico es «a tiempo», que la sucesora termine justo cuando la otra arranca. Los
+8 del libro son de dos clases. **Cinco gualdras** —la de Zafiro y las de los
+cuatro prototipos de dos plantas, que la heredaron— con su losa: la gualdra se
+coloca la víspera de que empiece el resto de la losa (en Zafiro termina el lunes
+14-jul y el martes 15 arranca el grupo), holgura 0, y es también lo que dice el
+`FS` de la gualdra a la losa maciza (`EST-21011`) que Zafiro ya trae. **Tres de
+Zafiro** (`IEC-01070` tras el zoclo y la jardinera de pórfido, `EST-03020` tras
+la jardinera) en que la sucesora terminó de 3 a 6 días hábiles antes de que la
+predecesora empezara: el vínculo «a tiempo» no se siguió. Nada físico se
+contradice —un murete o una zapata no se deshacen por terminarse antes—; es el
+mismo tipo de incumplimiento que los otros 12 de Zafiro, aunque 3 de 4 es una
+proporción alta. Un `SF` «a tiempo» se incumple en cuanto la sucesora se
+adelanta, así que no sorprende, pero tampoco descarta que estén escritos al
+revés.
+
+**Decisión (cierra B-81), con la regla de D-444 —Zafiro queda de origen, solo se
+anota—:**
+
+1. `PRECEDENCIA.tipo_vinculo` gana `inicio_fin`: cuatro valores, uno por cada
+   tipo del formato fuente (`FS`, `SS`, `FF`, `SF`). El cargador no convierte
+   ni descarta nada: es la regla de D-444 llevada al modelo, porque importar
+   Zafiro tal cual exige poder decir `inicio_fin`.
+2. Definición y holgura, las de arriba (`MODELO.md` §5c). Para el CPM, un
+   `inicio_fin` le pone un piso al término de la sucesora (como `fin_fin`) y no
+   a su inicio.
+3. Una holgura negativa en un `SF` es una sucesora que terminó antes de lo que
+   el vínculo pide; `ALERTA(tipo=vinculo_incumplido)` la avisa como a cualquier
+   otra y no se trata como imposible.
+4. Los 3 `SF` de Zafiro que no se cumplen se anotan: no se invierten ni se
+   convierten. Si algún día se quiere probar la hipótesis del sentido invertido,
+   los 3 casos que la separan están en la hoja «SF - los 8 vínculos».
+5. Los 4 `SF` de los prototipos de dos plantas se quedan: se cumplen con
+   holgura 0.
+
+**Lo que esto corrige de otras decisiones** (sin reescribirlas; cada una lleva su
+aviso):
+
+- **D-402:** «3 de 4 `SF` están obsoletos, físicamente imposible» → no se
+  cumplen, pero no es imposible (arriba).
+- **D-425 (2):** «el `SF` de la gualdra va al revés» → con la lectura estándar
+  dice lo mismo que el `FS`. Y la razón por la que no se heredó a Rubí y Jade
+  («su vínculo no se cumple») era este mismo error: se cumple con holgura 0 en
+  los dos. **Faltan dos vínculos:** `498SF` en la gualdra de Rubí (`CAR-01012`) y
+  `1401SF` en la de Jade (`CAR-01014`), junto al `SS` +15 que ya tienen; no pasan
+  5 en Rubí y 9 en Jade, no 6 y 10. No se escriben mientras el usuario no lo
+  diga: los libros de Rubí y Jade están validados y un `SF` no mueve ninguna
+  fecha (el motor asigna por gemelo de `Clave`, no por CPM, D-427). Rubí pasaría
+  de 102 a 103 vínculos y Jade de 85 a 86, en las mismas celdas.
+- **D-424:** «4 `SF`, de los que solo 1 se cumple» sigue siendo cierto en Zafiro.
+- **D-442 y D-443:** las cifras de `SF` (arriba).
+
+**Estado:** B-81 cerrado. B-86 sigue cerrado, con 15 rotos en Zafiro y no 16. Lo
+único por decidir es si se escriben los dos `SF` de Rubí y Jade.
+
+Libro: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (12 hojas: las correcciones, los 8
+`SF`, las fórmulas, los dos vínculos de Rubí y Jade y, con las cifras corregidas,
+lo que traía el de D-444). `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
