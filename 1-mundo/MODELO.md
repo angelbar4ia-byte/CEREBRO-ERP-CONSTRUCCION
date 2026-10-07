@@ -2060,7 +2060,8 @@ programa de Zafiro, hecho a mano, hay 16 (18 en D-442, corregido en D-443;
 D-424, D-426); nadie hizo mal el
 vínculo ni la fecha, el plan no pasa por ningún CPM (D-409). `ALERTA` gana
 `vinculo_incumplido`, sin umbral, y la propuesta de corrección es de quien
-programa (`CONOCIMIENTO.md` §11.14, D-442).
+programa (`CONOCIMIENTO.md` §11.14, D-442). En Zafiro se quedan tal cual: el
+usuario decidió que el original no se toca y solo se anota (D-444).
 
 ### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
 

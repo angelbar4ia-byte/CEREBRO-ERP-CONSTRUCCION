@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4993 | 20 |
+| §11 | Los flujos entre sistemas | 5046 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5334,6 +5334,59 @@ invertido. No se cambia nada en B-81 todavía: es una decisión del usuario
 Libro corregido: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (hojas «16 de Zafiro -
 propuesta», «Cambios vs D-442», «39 con bloque que contiene»).
 `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### Los pendientes de B-86: Zafiro queda de origen y solo se anota, `P16` sigue pendiente, la segunda ruta queda en borrador (D-444)
+
+Dato del usuario, sobre los cuatro pendientes que dejaban D-442 y D-443,
+después de ver que aplicar todas las propuestas dejaba a Zafiro en 0 vínculos
+incumplidos:
+
+| Pendiente | Decisión del usuario |
+|---|---|
+| Descartes (3) y reasignaciones (5) en Zafiro | **No tocar Zafiro.** |
+| Inversiones (4) | **Ninguna.** Con lo anterior, tampoco se descartan: los vínculos se quedan como están |
+| `SF` (B-81) | **«Zafiro queda desde origen, solo anotar todo lo encontrado».** No se convierte `SF` al revés ni se agrega al enum; B-81 sigue abierto con la evidencia anotada |
+| `P16` y la segunda ruta | `P16` sigue pendiente (D-437); la segunda ruta se arma como borrador, sin escribirla |
+
+**Zafiro es el original y no se corrige: la lista de D-442/D-443 pasa de
+«pendiente de aplicar» a «registro de lo que se encontró».** Los vínculos de
+Zafiro se quedan como el residente los hizo, y lo mismo los 4 `SF` que
+heredaron los prototipos de dos plantas. El número de «no se cumplen» depende
+de cómo se lea, y las tres lecturas quedan en el libro (hoja «Red por
+prototipo»):
+
+| Prototipo | Ventana completa del bloque (D-442) | Sin la sucesora (D-443) | Sin la sucesora y `SF` al revés |
+|---|---:|---:|---:|
+| Zafiro | 18 | 16 | 12 |
+| Zafiro Plus, Diamante sin, Diamante con, Oro | 0 cada uno | 1 cada uno | 0 cada uno |
+| Rubí, Jade | 0 | 0 | 0 |
+
+**La segunda ruta de cuadrilla, en borrador.** Tres eslabones `recurso`, todos
+con holgura 0 en Zafiro, que no están en la espina de 28 pasos: (R1) la barda
+(`ECO-00046`) arranca el día hábil siguiente al cableado (`ECO-00028`); (R2)
+las instalaciones del asador (`ECO-00044`) arrancan el día siguiente a la
+barda; (R3) el pergolado de cochera (`ECO-00053`) también. No es una ruta que
+todos los prototipos compartan: R1 se cumple en 4 de 7 (Zafiro, Jade y los dos
+Diamante; en Rubí, Zafiro Plus y Oro el bloque de cableado incluye partidas de
+diciembre y su ventana llega al 12 o 29-dic, holgura −45), R2 se cumple en los
+2 prototipos que tienen asador (Zafiro y Oro) y R3 en los 7. Después de las
+instalaciones del asador (31-oct) arrancan el 3-nov siete partidas —zoclo
+Brunei, tapa de registro, cancelería, domos, coladera de jardín, pintura de
+fachada 1.ª mano, columna forrada— y después del pergolado (12-nov), el chaflán
+y la pintura de plafón 1.ª mano: el sistema no puede saber cuáles dependen de
+la cuadrilla y cuáles de otra cosa (varias ya cuelgan de la red), así que no
+las propone; quedan listadas en la hoja «Segunda ruta - lo que sigue». Por
+`PRECEDENCIA.origen` un vínculo de recurso se captura a mano, y no se escribe
+ninguno.
+
+**Estado: B-86 queda cerrado en diseño y en datos; no queda nada por aplicar.**
+`P16` y la segunda ruta se quedan como están por decisión, y B-81 abierto.
+
+Libro: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (8 hojas: las 16 con su propuesta, los
+cambios contra D-442, los pendientes con la decisión de cada uno, los 39 con
+bloque que contiene, los bloques como predecesora, la red por prototipo en
+las tres lecturas y la segunda ruta). `MODELO.md` §5c,
+`PENDIENTES-MEJORAS.md` B-81, B-86.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
