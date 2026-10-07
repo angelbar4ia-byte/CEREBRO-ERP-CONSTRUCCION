@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4438 | 20 |
+| §11 | Los flujos entre sistemas | 4531 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -4779,6 +4779,99 @@ Validado con la misma batería: `validar_dos_plantas.py` (0 violaciones en
 los cuatro; cimentación completa —losa, acero, plomería, eléctrico y
 gas— verificada contra el nuevo recorte de 7 días) y
 `validar_red_dos_plantas.py` (red sin holgura negativa en los cuatro).
+
+### Método mixto (B-84, 3): cuántas cuadrillas implica cada prototipo derivado (D-438)
+
+Dato del usuario: retomar el método mixto que B-84 dejó pendiente desde
+D-419 — con esa regla los m² de más no suben los días, suben la
+cantidad por día, y eso es más cuadrillas, no más tiempo; faltaba
+responder cuántas.
+
+**El cálculo.** `Unidades ejecutoras implícitas` = `Rendimiento
+Requerido` ÷ `Rendimiento Teórico` (§6.2), con `Rendimiento Requerido`
+= `Cantidad` ÷ `Días laborables` del propio prototipo y `Rendimiento
+Teórico` el de la semilla (`CATALOGOS.md` §10). No hay cruce nuevo que
+inventar: es el mismo cruce clave↔`MO-` de 49 pares que D-406 ya
+validó contra Zafiro (castillo K1 cierra en 1.50 en el tramo 1, el
+mismo número que D-419 ya citaba) — 3 claves compuestas de dos
+operaciones con rendimiento distinto (`OBE-01020`, `OBE-02011`,
+`ACA-07060`) se excluyen sin promediarlas, mismo criterio de "no
+inventar". Se aplica tal cual a los seis prototipos derivados, con su
+propia cantidad y sus propios días, leídos de
+`PROGRAMA_ZAFIRO_con_los_7_prototipos.xlsx`.
+
+**Alcance real, antes de los números: 15%, no más.** De los 2,135
+conceptos de los seis derivados, solo 339 (15.2%-17.3% según el
+prototipo) tienen una línea `MO-` propia en la semilla — el mismo
+límite que ya fijaban D-404/D-405 (solo existe donde el destajo tiene
+mano de obra propia en la matriz), ahora contado prototipo por
+prototipo. El resto —cancelería, carpintería, herrería
+(`preestablecida_nivel`), subcontratos, y casi todas las
+instalaciones— sigue sin un solo dato para responder esta pregunta; no
+es un hueco nuevo, es la cobertura real de uno ya conocido.
+
+**La mediana no confirma la apuesta de B-84, la cola sí.** B-84 (3)
+apostaba a que "instalaciones y los prototipos de dos plantas son los
+candidatos más probables a necesitarlo primero". En la mediana no se
+cumple: los cuatro de dos plantas (0.62-0.99) no piden más cuadrillas
+que Zafiro (0.92) ni que Rubí/Jade (1.03-1.05). Pero los 15
+multiplicadores más altos de toda la tabla —de 3.40× a 6.77×— son los
+cuatro de dos plantas sin una sola excepción; ni Rubí, ni Jade, ni
+Zafiro entran ahí, y sus propios máximos se quedan en 2.16-2.97×. No
+hay más cuadrillas en promedio, pero cuando un concepto de dos plantas
+se dispara, se dispara mucho más fuerte que cualquiera de Rubí, Jade o
+Zafiro.
+
+**El hallazgo más grande no es la cadena comprimida — es "+3.00" en
+los dos Diamante.** `ALB-01012` (repellado muro +3.00) y `ALB-01112`
+(repellado plafond +3.00) llegan a 6.77× y 6.49× — los dos
+multiplicadores más altos de toda la tabla, y ninguno tocado por las
+compresiones de D-434 a D-437. La causa es física, no un error: los
+dos Diamante son de una sola altura, construidos enteros al módulo de
+4.20 m (D-429, D-430), así que casi toda su pared cae en el destajo
+"+3.00" que en Zafiro es solo un remate chico (33-36 m² en 2 días);
+Diamante hereda la misma ventana de 2 días de Zafiro (D-419: los días
+no cambian con el m²) con 186-203 m² — seis veces la cantidad en el
+mismo tiempo. Es la regla de D-419 llevada a su caso más extremo: aquí
+"se absorbe con más gente" significaría casi 7 cuadrillas de albañil
+repellando lo mismo a la vez, algo que el método solo puede señalar,
+no validar — queda para el planeador, mismo criterio que los "tramos
+con mucha más cantidad" ya señalados en B-84 (8). No es solo acabados:
+`EST-02310` (cadena intermedia CE-1, obra gruesa) entra al mismo podio
+en Oro (4.52×) y Zafiro Plus (3.47×) — la misma regla de D-419, aplicada
+esta vez a una partida de estructura.
+
+**La cadena comprimida de D-436/D-437, cuantificada por primera vez.**
+De las 9 claves que D-436/D-437 comprimieron "a la mitad" (misma
+lógica que los pretiles), 7 tienen rendimiento teórico en la semilla;
+2 no (`ALB-03014` relleno, `ACA-04010` impermeabilización — fuera de
+alcance, no hay con qué calcular, mismo límite de siempre). De las 7,
+tres llegan a multiplicadores grandes: `ACA-01010` (finas interiores
+3.00) a 4.0× en la instancia de planta baja de los dos Diamante y de
+Oro (1.3× en Zafiro; Zafiro Plus se queda en 2.6×, también por encima
+de Zafiro pero lejos del extremo), `ACA-01040` (finas plafond 4.20) a
+3.5× en los dos Diamante y `ACA-01020` (finas interiores +3.00) a
+2.95× en los mismos dos Diamante. Las otras cuatro (`ACA-01051`,
+`ALB-03020`, `ACA-01030`, `ACA-01060`) se quedan entre 0.05× y 2.5×,
+dentro de lo que ya se veía en Zafiro. Ninguno de estos números cambia
+una fecha ya decidida —D-437 ya cerró que Plus cierra a las 30
+semanas—: es el costo en personal de una decisión que ya se tomó, no
+una corrección sobre ella.
+
+**Lo que esto no resuelve.** Instalaciones (B-83) sigue sin un cruce
+clave↔`MO-` propio —la semilla solo tiene 7 destajos de
+electricidad/sanitario, genéricos, nunca emparejados contra una
+`Clave` de catálogo—, así que la mitad de la hipótesis de B-84 (3)
+queda exactamente donde estaba: abierta, no cerrada ni descartada.
+Tampoco se escribe ningún valor en la columna `Unidades ejecutoras` de
+los libros de programa —sigue en 1.0 (D-403)—: el sistema propone, el
+planeador decide si una fecha se corrige con esta evidencia, mismo
+principio que B-85.
+
+Libro de reporte: `METODO_MIXTO_CUADRILLAS.xlsx` (hojas Resumen, Cadena
+D-436-437, Top 20, Detalle completo —339 pares—, Referencia Zafiro,
+Cobertura). `CONOCIMIENTO.md` §6.2, `CATALOGOS.md` §10,
+`PENDIENTES-MEJORAS.md` B-83, B-84.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
