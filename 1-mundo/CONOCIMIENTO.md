@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 4843 | 20 |
+| §11 | Los flujos entre sistemas | 4941 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5184,6 +5184,104 @@ Libro de reporte: `HERENCIA_DE_DURACIONES_B85.xlsx` (resumen por
 prototipo, alcance de las 34 `Clave` propias, las 38 heredadas que piden
 2+ cuadrillas, las 478 por emparejar y el detalle de las 2,130).
 `MODELO.md` §5, §5a, §5c, `PENDIENTES-MEJORAS.md` B-85.
+
+### B-86 se cierra: un bloque puede ser predecesora, los 18 vínculos rotos de Zafiro ya tienen propuesta, y lo que queda es del planeador (D-442)
+
+Dato del usuario: retomar B-86. De sus ocho puntos, la mitad ya estaba
+hecha (heredar los 52, la red mínima, las dos plantas, las correcciones de
+D-435 a D-437); quedaban la pregunta de modelo sobre los bloques (D-425), el
+formato del desfase y de la predecesora (3), el ojo de buey de Rubí (4), los
+vínculos que no se cumplen, la segunda ruta de cuadrilla y `P16`. Con los
+siete programas ya escritos, se leyeron los 832 vínculos del libro de los
+siete prototipos:
+
+| Prototipo | Vínculos | Celdas | No se cumplen |
+|---|---:|---:|---:|
+| Zafiro | 124 | 102 | **18** |
+| Rubí | 102 | 81 | 0 |
+| Jade | 85 | 70 | 0 |
+| Zafiro Plus | 130 | 108 | 0 |
+| Diamante sin chimenea | 129 | 105 | 0 |
+| Diamante con chimenea | 130 | 106 | 0 |
+| Oro | 132 | 108 | 0 |
+
+**Los seis derivados no tienen ningún vínculo incumplido porque solo se
+escribe el que se cumple (D-425); los 18 son los de Zafiro, el plan hecho a
+mano.** Las 832 sucesoras son partidas, ninguna es un bloque.
+
+**La pregunta de modelo se decide: un bloque puede ser predecesora, con
+`ACTIVIDAD` resumen en Nivel 2 y 3 (lectura (a) de D-425).** 263 de los 832
+vínculos (32%) tienen un bloque como predecesora —201 de Nivel 2 y 62 de
+Nivel 3—. En 219 la ventana del bloque la fija una sola partida, pero en 44
+la fijan entre 2 y 12 que empatan el mismo día (carpintería de planta baja,
+hasta 12; estructura de cimentación, hasta 10). La lectura (b), vínculos solo
+entre partidas, convertiría los 263 en 468 (+78%) y los dejaría atados al
+contenido de cada prototipo: en 18 de los 35 casos comparables entre
+prototipos las partidas que fijan la ventana son otras (la que cierra la
+cancelería de planta baja es `CAN-01008` en un Diamante, `CAN-01004` en Jade,
+`CAN-01001` en Oro; la carpintería lleva el nombre del prototipo), mientras
+que «cuando termine toda esta etapa» dice lo mismo en los siete. Las
+reglas están en `MODELO.md` §5c: el bloque solo es predecesora, solo existe
+si algún vínculo lo cita, sus fechas son el mínimo y el máximo de sus
+partidas, y se rechazan al cargar los vínculos que el CPM no puede calcular
+(una actividad como su propia predecesora, una predecesora que es el bloque
+de su propia sucesora, y los ciclos).
+
+**(3) El desfase y la predecesora ya estaban bien en el modelo; faltaba
+escribir la regla de importación.** Los 832 desfases son múltiplos de 8
+horas —de −9 a +15 días enteros, ninguno fraccionario—, así que la
+conversión es horas ÷ 8 sin pérdida (y `traslape_espera` ya es NUMERIC, por
+si algún día llega medio día). La predecesora viene como número de fila del
+libro, que cambia si se inserta una fila; el libro trae además `Oid` en las
+3,231 filas, sin nulos ni repetidos, así que el cargador resuelve fila →
+`Oid` → `Nodo` → `ACTIVIDAD` y guarda la llave, nunca el número de fila.
+`PRECEDENCIA.predecesora_id` ya era una FK: no cambia el esquema.
+
+**(4) El ojo de buey de Rubí no afecta ningún vínculo.** `ACA-07050` es obra
+gris en Zafiro y va dentro de la estructura de planta baja en Rubí (18-ago) y
+Zafiro Plus (26-ago), y de planta alta en Oro (1-sep): en esos tres, la
+ventana del bloque termina en la fecha del ojo de buey y no cuando termina la
+estructura. Ninguno de los 832 vínculos cita esos bloques como predecesora.
+Se queda la regla —un vínculo cuya intención es un hecho físico concreto cita
+la partida, no el bloque—, para que no llegue a tenerlo.
+
+**Los 18 vínculos de Zafiro, con la propuesta del sistema para cada uno.**
+Zafiro es el original y no se toca; lo que sigue es una lista para el
+planeador, no una corrección:
+
+| Propuesta | Vínculos | Confianza | Qué es |
+|---|---:|---|---|
+| Reasignar a hermanas | 8 | media | 7 tienen como predecesora el grupo de su propia sucesora (no puede esperar a terminar lo que ella misma contiene) y 1 un bloque que termina después de que la sucesora ya empezó; se propone la última partida del bloque que sí termina antes |
+| Invertir | 7 | baja | las fechas de Zafiro respaldan el orden contrario, pero solo las fechas — es plan manual (D-390) |
+| Descartar | 3 | alta (2), media (1) | un autovínculo (`EST-01151`), el ciclo `ICA-01030`/`BAP-01100` (queda el que sí se cumple) y `ALB-01010` tras `ALB-01012`, que se traslapan y solo cumplen FF |
+
+Las 8 reasignaciones incluyen algunas que se leen bien (el piso del asador
+tras el firme, la primera mano de pintura tras el lijado y sellado) y otras
+dudosas (la boquilla interior tras el repellado de fachada): el sistema elige
+la última partida que termina antes, no la que tiene sentido físico — por eso
+la confianza es media, no alta. **Siete de los 18 tienen como causa común que
+la predecesora es un bloque que contiene a su sucesora, y un validador al
+cargar los habría rechazado:** la regla nueva de `MODELO.md` los detecta sola.
+Para los demás, `ALERTA` gana `vinculo_incumplido`, sin umbral —el plan hecho
+a mano no pasa por ningún CPM (D-409), así que no es error de nadie—.
+
+**Evidencia nueva para B-81 (`SF`), sin cerrarla.** De los 7 «invertir», 3 son
+vínculos `SF` de Zafiro (`IEC-01070` dos veces, `EST-03020`), y los 3 se
+cumplen con el orden contrario con holgura de 3 a 6 días: parece que en el
+plan de origen «SF» se escribió con el sentido invertido. El único `SF` que sí
+se cumple con el sentido normal (`CAR-01011`) es el que heredaron los cuatro
+prototipos de dos plantas (4 de los 8 `SF` del libro, todos con holgura 0).
+
+**Lo que queda es del planeador, y ya no es un hueco de diseño:** los 18 de
+Zafiro, con propuesta; `P16` (vertedero tras la boquilla fina interior, déficit
+de 10 días en Plus), por decisión del usuario en D-437; y la segunda ruta de
+cuadrilla (cableado, barda, asador y pergolado, 3-nov), que es
+`origen=recurso`: por `PRECEDENCIA.origen` se captura a mano, no hay de dónde
+deducirla.
+
+Libro de reporte: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (los 18 con su propuesta,
+confianza y motivo; los pendientes; los bloques como predecesora por prototipo;
+la red por prototipo). `MODELO.md` §5a, §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

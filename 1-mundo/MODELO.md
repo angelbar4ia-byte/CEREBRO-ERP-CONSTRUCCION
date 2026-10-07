@@ -1326,6 +1326,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `rendimiento_bajo_para_destajo` | El Rendimiento Real (mano de obra) de la actividad cae, contra (`Rendimiento teórico` × `Unidades ejecutoras`), más del `umbral_pct` | D-408 |
 | `rendimiento_excede_destajo` | Mismo cruce, dirección contraria: el Rendimiento Real excede ese mismo punto más del `umbral_pct` | D-408 |
 | `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
+| `vinculo_incumplido` | Las fechas de la sucesora contradicen un vínculo (holgura negativa, según `tipo_vinculo` y `traslape_espera`) — sin umbral, el plan hecho a mano puede no pasar por el CPM (D-409); la corrección la propone quien programa | B-86 |
 | `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
@@ -1783,13 +1784,18 @@ ACTIVIDAD
                          patrón en los dos orígenes: Control de obra edita
                          estructura, Residente edita fechas                 firme
   modo_duracion         enum: capturada · calculada_rendimiento ·
-                         preestablecida_nivel · derivada_fechas — la cuarta
-                         es «manual sin diseño»: no hay días ni rendimiento,
-                         se derivan de fecha_fin − fecha_inicio              firme
+                         preestablecida_nivel · derivada_fechas ·
+                         derivada_de_hijos — la cuarta es «manual sin
+                         diseño»: no hay días ni rendimiento, se derivan de
+                         fecha_fin − fecha_inicio; la quinta es la de un
+                         bloque (Nivel 2 o 3), que solo existe como
+                         predecesora: sus fechas son el mínimo y el máximo
+                         de las de sus partidas, nunca se capturan (D-442)    firme
   duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas   firme
   duracion_origen       enum: heredada · propia — `heredada`: el valor sigue
                          al de su referencia; `propia`: la fijó el planeador
-                         en este programa, o no tiene referencia              firme — D-441, cierra B-85
+                         en este programa, o no tiene referencia; nulo si
+                         modo_duracion=derivada_de_hijos                      firme — D-441, cierra B-85
   duracion_referencia_id  FK ACTIVIDAD, nullable — la actividad de la que
                          hereda (o de la que se apartó, si es `propia`, para
                          mostrar la diferencia y poder volver a heredar).
@@ -1915,7 +1921,8 @@ del árbol. Un solo enum se reutiliza en las tres tablas.
 PRECEDENCIA
   id
   predecesora_id        FK ACTIVIDAD                                        firme
-  sucesora_id            FK ACTIVIDAD                                       firme
+  sucesora_id            FK ACTIVIDAD — siempre una partida, nunca un
+                          bloque (D-442)                                     firme
   tipo_vinculo            enum: fin_inicio · inicio_inicio · fin_fin         firme
   traslape_espera         NUMERIC — días; negativo es traslape, positivo
                           es espera                                          firme
@@ -1993,7 +2000,7 @@ Zafiro): los dos feriados mueven la fecha de cierre, no la cantidad de trabajo
 plazo de 28 o de 30 semanas se mide en días hábiles o en semanas de calendario
 cuando el calendario cambia.
 
-### ⏸ Un vínculo entre bloques: el modelo no dice si `ACTIVIDAD` existe en Nivel 2 y 3 (D-425)
+### ✅ Un vínculo entre bloques: `ACTIVIDAD` resumen en Nivel 2 y 3, solo como predecesora (D-425, cierra en D-442)
 
 La red mínima propuesta en D-425 (`CONOCIMIENTO.md` §11.14) liga bloques
 —Nivel 2 y 3, y a veces una partida con un bloque—, y que el bloque se mueva
@@ -2009,6 +2016,47 @@ cada vínculo de bloque se expande a las partidas de cabecera de ese bloque.
 La primera es más corta de capturar y la segunda no toca el esquema. Dato del
 usuario (D-426): por ahora los vínculos se escriben como en Zafiro, en las
 partidas, con la predecesora partida o bloque; la pregunta se resuelve después.
+
+**Decisión (D-442, con los siete programas ya escritos): la lectura (a).** De
+los 832 vínculos de los siete prototipos, 263 (32%) tienen un bloque como
+predecesora —201 de Nivel 2, 62 de Nivel 3— y los 832 tienen una partida como
+sucesora. En 219 de los 263 la ventana la fija una sola partida, pero en 44
+la fijan entre 2 y 12 empatadas el mismo día (carpintería de planta baja,
+hasta 12; estructura de cimentación, hasta 10): la lectura (b) convertiría los
+263 en 468 vínculos entre partidas (+78%) que además cambian con cada
+prototipo —en 18 de los 35 casos comparables entre prototipos las partidas
+que fijan la ventana son otras: la que cierra la cancelería de planta baja es
+`CAN-01008` en un Diamante, `CAN-01004` en Jade, `CAN-01001` en Oro—, mientras que el
+vínculo a un bloque sigue diciendo lo mismo en todos: «cuando termine toda
+esta etapa».
+
+```
+Reglas (sin tabla nueva, `ACTIVIDAD` y `PRECEDENCIA` de arriba):
+  · un nodo de Nivel 2 o 3 tiene `ACTIVIDAD` con modo_duracion=derivada_de_hijos
+    solo si algún vínculo lo cita; no se captura nada de ella
+  · un bloque solo puede ser predecesora; la sucesora es siempre una partida
+  · fin_inicio y fin_fin leen el máximo de las fechas de fin de sus partidas;
+    inicio_inicio e inicio_fin, el mínimo de las de inicio; la ruta crítica
+    sigue por la partida que de verdad fija esa fecha, no por el bloque
+  · al cargar un vínculo se rechazan los que no se pueden calcular: una
+    actividad como su propia predecesora, una predecesora que es el bloque
+    de su propia sucesora (no puede esperar a que termine lo que ella misma
+    contiene) y cualquier ciclo — el motor del CPM no los resuelve
+```
+
+**Un vínculo cuya intención es un hecho físico concreto cita la partida, no el
+bloque** (D-442): la ventana de un bloque es lo que el catálogo mete adentro,
+y a veces mete de más. El ojo de buey (`ACA-07050`) es obra gris en Zafiro y
+va dentro de la estructura de planta baja en Rubí y Zafiro Plus (y de planta
+alta en Oro), así que ahí esa ventana termina en su fecha (18-ago, 26-ago,
+1-sep) y no cuando termina la estructura. Hoy ningún vínculo de los 832 cita
+esos bloques, así que no hay efecto; la regla evita que lo tenga.
+
+**Un vínculo cuyas fechas lo contradicen no se rechaza: se avisa.** En el
+programa de Zafiro, hecho a mano, hay 18 (D-424, D-426); nadie hizo mal el
+vínculo ni la fecha, el plan no pasa por ningún CPM (D-409). `ALERTA` gana
+`vinculo_incumplido`, sin umbral, y la propuesta de corrección es de quien
+programa (`CONOCIMIENTO.md` §11.14, D-442).
 
 ### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
 
