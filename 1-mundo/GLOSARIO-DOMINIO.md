@@ -187,6 +187,11 @@ de más. Solo se comprobó que ese catálogo no está en este entorno; no se sab
 el usuario lo revisará (B-89). Hasta entonces ni se da por inexistente ni por innecesario,
 y el «Hoy vive en» de arriba sigue siendo la pista original.*
 
+*D-452, dato del usuario: **no existe el «Catálogo de conceptos-frentes»**; el «Hoy vive en» de
+arriba no tenía respaldo. El **frente es por obra** —(obra, nivel), el nodo de Nivel 1 de su
+presupuesto— y el **sub-frente es la etapa** (Nivel 2) del frente; agruparlas por gremio es
+una forma de leer. Un sub-frente con dos contratistas se divide en uno por contratista.*
+
 ### Especialidad
 
 Oficio que domina un contratista. Uno puede tener varias.

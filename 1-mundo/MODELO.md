@@ -564,6 +564,9 @@ FRENTE
                                                                          dentro, una vista del árbol y no una tabla; sin `frente_id` en ACTIVIDAD*
                                                                          *D-451: si FRENTE es este catálogo de niveles o el «Catálogo de conceptos-frentes»
                                                                          del usuario queda en revisión (B-89)*
+                                                                         *D-452: no existe tal catálogo (B-89 cerrado). El frente es por obra: el nodo de Nivel 1 del
+                                                                         presupuesto de esa obra; el sub-frente es la etapa (Nivel 2). Un sub-frente con dos contratistas
+                                                                         se divide en uno por contratista; dónde vive el contratista queda abierto (B-90)*
 
 CLASE_TRABAJO
   id, nombre        destajo · acarreo · subcontrato…                    firme — nuevo (P-02/P-03), ver hallazgo 7

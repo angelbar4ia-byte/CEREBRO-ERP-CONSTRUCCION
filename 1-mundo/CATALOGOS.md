@@ -631,6 +631,8 @@ frente. Esta relación cuadrilla–frente es la del gremio de arriba y sigue sie
 informativa. D-451: cómo queda este catálogo ahora que «frente» cambió de significado
 se revisa con el usuario (B-89); no se renombra ni se reinterpreta mientras tanto.*
 
+*D-452: el usuario aclara que no existe catálogo de conceptos-frentes. Esta relación queda como la intención de filtrar cuadrillas por lo que se ejecuta —el sub-frente—, a definir cuando se programe.*
+
 ### La unidad `%MO`
 
 96 registros en `JOR`; uno en `%MO` — `MOCA-110 Contratista`, hoy en costo cero.

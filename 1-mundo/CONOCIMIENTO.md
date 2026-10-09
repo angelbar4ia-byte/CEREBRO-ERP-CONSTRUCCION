@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5644 | 20 |
+| §11 | Los flujos entre sistemas | 5712 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5982,6 +5982,74 @@ sin ese catálogo.
    ese catálogo.
 
 `GLOSARIO-DOMINIO.md` «Frente», `CATALOGOS.md`, `MODELO.md` §2, `PENDIENTES-MEJORAS.md` B-88 y B-89.
+
+*Respondido por D-452: el catálogo de conceptos-frentes no existe (dato del usuario) y B-89 se cierra.*
+
+### Frentes por obra, sub-frentes como etapas, división por contratista; el catálogo de conceptos-frentes no existe (D-452)
+
+Dato del usuario, respondiendo a D-451: **no tiene catálogo de conceptos-frentes**; los
+frentes son por obra, que son los niveles; los sub-frentes son las etapas de construcción;
+los contratistas ejecutan los sub-frentes y, si hay dos contratistas en un sub-frente, **el
+sub-frente se divide para tenerlo por contratista**. Pidió ver si con eso queda más claro
+o abre aclaraciones.
+
+**Qué cierra.**
+
+- **B-89.** No hay catálogo que revisar: la línea del glosario «Hoy vive en: Catálogo de
+  conceptos-frentes» no tenía respaldo. D-448 anotó que no se había visto, D-450 lo dio por
+  innecesario y D-451 lo dejó en revisión; ahora es dato. Tampoco hay una fuente externa del gremio de cada etapa: el
+  mapa de B-88 sigue siendo propuesta del sistema.
+- **El frente es por obra:** (obra, nivel). En el modelo es el nodo de Nivel 1 del
+  presupuesto de esa obra (`PRESUPUESTO.tipo=obra`); el catálogo de 15 niveles es la
+  plantilla, no el frente. Por eso un cierre de frente (`CIERRE_FRENTE`, al 90% de avance)
+  es siempre de un frente de una obra.
+- **El sub-frente es la etapa** (Nivel 2) del frente. Esto matiza D-450 y D-451, que lo
+  llamaron «la etapa agrupada por gremio»: el nodo es la etapa y la agrupación por gremio
+  es una forma de leer (en Cimentación, 5 etapas son 2 grupos). Cuál de las dos se cuenta
+  y se controla queda como pregunta (B-88).
+- **La división por contratista** es regla del usuario: un sub-frente con dos
+  contratistas se parte en uno por contratista.
+
+**Lo que dice el dato.** Las 2,890 operaciones de avance de mano de obra de marzo a julio
+de 2026 con lote (`avance-TODAS-obras-5meses.csv`) traen obra (cluster y lote, p. ej.
+Alamo 18), nivel, etapa o partida y contratista: 34 obras, 13 niveles, 146 frentes, 21
+contratistas. La etapa se identifica en el 69% de las operaciones (el resto son partidas
+que no están en los siete prototipos o caen en más de una etapa).
+
+| Qué | Resultado |
+|---|---|
+| Cimentación como frente | 19 obras, mediana de 9 días entre la primera y la última operación: las «dos semanas» |
+| Contratistas por sub-frente (etapa) | 287 de 292 con uno (98.3%); 5 con dos |
+| Contratistas por sub-frente (grupo de gremio) | 257 de 266 con uno; 9 con dos (3.4%) |
+| Una partida con dos contratistas | 1 de 1,036 (obra × nivel × partida): **la división es por partida, no por cantidad** |
+| Instalaciones | las ejecuta un solo contratista en los 56 casos (frente × grupo); los dos contratistas de instalaciones (894 operaciones) no hacen otra cosa |
+| Un contratista en un frente | ejecuta 1 etapa en 78 casos, 2 en 24, 3 en 37 y 4 en 15: el grupo es lo que ejecuta una persona |
+| Los 9 con dos | 4 paralelos reales (13% a 32% del monto al segundo), 3 incidentales (1% a 4%, una operación), 2 secuenciales (no coinciden en el tiempo) |
+| Una semana, una obra | promedio 2.1 frentes, máximo 7; hasta 8 sub-frentes por grupo y 12 etapas |
+| Un residente (suposición: el operador que más registra la obra, 95%) | promedio 3.0 obras, 6.3 frentes y 8.1 sub-frentes por semana; máximo 7 obras, 23 frentes y 31 sub-frentes |
+
+Coincide con la descripción del usuario —uno o varios frentes y varios sub-frentes por
+residente— y muestra que contar no basta: con 31 sub-frentes en una semana la atención
+se reparte por peso (B-88).
+
+**Qué abre.** Tres aclaraciones, sin decidir:
+
+1. **La unidad que se cuenta y controla:** la etapa (5 en Cimentación) o el grupo de etapas
+   del mismo gremio (2). Propuesta del sistema: la etapa es el nodo y el gremio agrupa.
+   Cambia los conteos (semana 23 de Zafiro: 13 etapas o 9 sub-frentes por grupo). B-88.
+2. **Dónde vive el contratista:** el modelo lo liga al precio pactado, las deducciones,
+   los préstamos y los tickets de garantía, pero no a una actividad ni a un sub-frente.
+   Propuesta: asignarlo por partida, y que la división del sub-frente salga sola de las
+   partidas de cada contratista. Falta saber si el plan lo asigna antes de ejecutar o lo
+   revela el primer avance. B-90.
+3. **Cuándo un segundo contratista divide:** todo segundo, o solo el que pesa. Propuesta:
+   un umbral editable del 10% del monto, que deja fuera los 3 incidentales. B-90.
+
+Libro: `FRENTES_POR_OBRA_Y_CONTRATISTA.xlsx` (14 hojas: lo que quedó claro, las preguntas
+nuevas, cómo se midió, frentes por nivel y por obra, contratistas por sub-frente, los
+sub-frentes divididos, etapas por contratista, contratista por gremio, la carga por obra
+y por operador, y la cobertura de etapas). `GLOSARIO-DOMINIO.md` «Frente»,
+`MODELO.md` §2 y §5c, `PENDIENTES-MEJORAS.md` B-88, B-89 y B-90.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
