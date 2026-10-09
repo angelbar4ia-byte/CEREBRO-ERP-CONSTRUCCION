@@ -1391,6 +1391,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `frente_listo_para_cierre` | El avance del frente (ejecutado ÷ ingeniería, ponderado por costo) llega al porcentaje de `solicitar_cierre_frente` —90%, D-261— y no se ha solicitado el cierre; la evidencia lista los sub-frentes que siguen pendientes. Avisa, no cierra: `CIERRE_FRENTE` pregunta, no impide | B-88 |
 | `subfrente_detenido` | Un sub-frente (etapa) con avance mayor que 0 y menor que 100% lleva al menos `dias_sin_avance` sin una operación de avance —por defecto 21, en `ALERTA.parametro_usado`—. Es un aviso: el avance puede no haberse capturado | B-88 |
 | `ejecutado_sobre_ingenieria` | En una línea de destajo, el ejecutado valuado excede el costo de la ingeniería del lote — sin umbral, cualquier excedente | B-88 |
+| `subfrente_atrasado` | Un sub-frente (etapa) cuyo avance está por debajo del programa de la obra, en tres casos: su término planeado ya pasó y no llega a `porcentaje_terminado` (90% por defecto); debía haber arrancado y no arrancó; o va en curso `puntos_rezago` puntos o más por debajo de lo planeado (20 por defecto). Se ordena por valor rezagado, (planeado − ejecutado) × ingeniería | D-456 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -2420,6 +2421,14 @@ las de sus partidas, y se lee a cualquier fecha.
 - **Sin marca de paquete:** un frente contratado terminado ya es `modo_duracion=preestablecida_nivel`.
 - Probado sobre `ALAMO 18` (`CONOCIMIENTO.md` §11.14): 45.2% de su mano de obra, 38 sub-frentes, 8 filas en
   la cola.
+
+*D-456 completa el tablero:* el atraso sale de comparar el avance con el programa de la obra (`subfrente_atrasado`,
+§5a), y los parámetros de las alertas de sub-frente viven en `ALERTA.parametro_usado`:
+`{"dias_sin_avance": 21, "porcentaje_terminado": 90, "puntos_rezago": 20}`; el cierre es el 90% de
+`solicitar_cierre_frente`. Las alertas de sub-frente llevan su evidencia —material surtido después de la última
+operación, avance del frente siguiente, contratista en otras obras— y el residente las resuelve con una causa en
+`nota_resolucion` (terminado sin capturar · detenido de verdad · esperando un predecesor · contratista reasignado);
+sin campo nuevo.
 
 ### ⏸ Lo que esto sigue sin resolver
 

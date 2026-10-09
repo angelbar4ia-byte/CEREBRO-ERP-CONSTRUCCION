@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5837 | 20 |
+| §11 | Los flujos entre sistemas | 5903 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6175,6 +6175,72 @@ detenido; el porcentaje del cierre es el de `solicitar_cierre_frente`, 90% (D-26
 Libro: `TABLERO_DE_FRENTES_ALAMO18_B88.xlsx` (7 hojas: la respuesta, los frentes, los sub-frentes,
 la cola de atención, qué frente es paquete o detalle, las 280 líneas y cómo se calcula).
 `MODELO.md` §4a, §5a y §5c, `PENDIENTES-MEJORAS.md` B-88 y B-90.
+
+*D-456 resuelve los tres límites de arriba: el atraso contra programa (`subfrente_atrasado`), el «detenido» con diagnóstico y los parámetros.*
+
+### El atraso contra programa, el «detenido» con diagnóstico y los parámetros calibrados (D-456)
+
+Dato del usuario: «vamos con esto», sobre los tres límites que D-455 dejó dichos: no hay atraso
+contra programa, «detenido» es un aviso y no un diagnóstico, y dos parámetros editables (21 días y 90%).
+
+**1. Atraso contra programa.** `ALAMO 18` no tiene `ACTIVIDAD` cargada. Se usó el programa de su
+prototipo (Diamante con chimenea, §11.11) corrido al arranque real, el 22-abr-2026, en días hábiles de
+lunes a viernes y sin feriados (D-447): es lo que haría el CPM de la obra con las duraciones
+heredadas (D-441). Al corte del 29-jul-2026:
+
+| Frente | Planeado | Ejecutado | Valor rezagado |
+|---|---|---|---|
+| Planta baja | 87.3% | 55.7% | $155,139 |
+| Cimentación | 100% | 92.1% | $6,950 |
+| Planta alta | 56.5% | 57.1% | — |
+| Azotea | 3.1% | 16.4% | — (adelantada) |
+| **Obra** | **59.8%** | **45.2%** | **$162,089** (14.6 puntos) |
+
+La alerta nueva `subfrente_atrasado` avisa en tres casos: el término planeado pasó y el sub-frente no
+llega al 90%, debía haber arrancado y no arrancó, o va en curso 20 puntos o más por debajo de lo
+planeado. En `ALAMO 18` son 10 sub-frentes. Ordenada por valor rezagado, la cola cambia de lugar el
+problema: los tres primeros no son instalaciones detenidas sino la obra negra de Planta baja —Albañilerías
+($67,208), Obra gris, que debía arrancar el 15-jul ($39,955), y Estructura ($30,762)—, que suman $137,925
+(Albañilerías y Estructura siguen avanzando; Obra gris no ha arrancado); las instalaciones detenidas pesan
+de $150 a $12,730 cada una.
+
+**2. «Detenido» con diagnóstico.** El sistema no puede saber si un sub-frente está detenido o terminado
+sin capturar, pero sí reunir lo que lo distingue y preguntar. Tres pistas, con su alcance:
+
+| Pista | Qué dice en `ALAMO 18` | Alcance |
+|---|---|---|
+| Material surtido después de la última operación | Cimentación: ninguno | Sirve donde el material sale por partida. Las instalaciones lo reciben todo al abrir la orden de la etapa, así que «sin material posterior» no dice nada |
+| Avance del frente siguiente | Planta baja va al 56% | Cimentación no suele quedar a medias con el nivel de arriba al 56%: apunta a terminado sin capturar |
+| Contratista en otras obras | 8 a 15 obras | **No distingue nada:** los contratistas de más volumen promedian 2 a 4 obras por semana (este, 3.5) |
+
+El residente responde en la nota de resolución de la alerta con una de cuatro causas —terminado sin
+capturar, detenido de verdad, esperando un predecesor, contratista reasignado (D-453)— y, si es la
+primera, el sistema propone corregir el avance. **Sin campo nuevo:** el vocabulario vive en
+`nota_resolucion` hasta que haga falta contarlo. Hay además un patrón por contratista: siete de los diez
+sub-frentes atrasados son instalaciones del mismo contratista, y en las otras obras las 26 pausas
+registradas de instalaciones llegan a 14 días como máximo; aquí van 91 a 98. El sistema lo muestra
+agrupado y la causa la decide el residente.
+
+**3. Parámetros.**
+
+| Parámetro | Valor | Cómo se decidió |
+|---|---|---|
+| `dias_sin_avance` | 21 | **Se queda.** Es el percentil 90 de las pausas normales entre dos avances del mismo sub-frente (511 pausas de 292 sub-frentes de 34 obras; mediana 7, percentil 75 en 13, percentil 95 en 28). De los casos con 21 días sin avance (pausas pasadas más sub-frentes abiertos), el 37% terminó con avance; con 28, el 31%; con 35, el 20% |
+| `porcentaje_cierre` | 90% | **Se queda.** Es regla del usuario (D-261) y no hay registros de cierre con que calibrarla. Avisaría 39 de los 132 frentes con avance de las 34 obras; con 95%, 23 |
+| `porcentaje_terminado` | 90% | **Nuevo.** Un sub-frente con 90% o más no se avisa como atrasado: evita avisar por residuos (Cimentación sanitarias en 92%, $988) |
+| `puntos_rezago` | 20 | **Nuevo, sin calibrar:** solo hay una obra con programa; sale de leer los 8 casos de `ALAMO 18` (B-92) |
+
+Viven en `ALERTA.parametro_usado`. El libro trae las pausas por gremio (pocas en instalaciones, 26) y la
+sensibilidad del 90%.
+
+**Dos precisiones.** El archivo de almacén del lote 18 trae 358 filas de `ALAMO 18` y 28 de otros
+clusters (D-365); se usaron las 358. Y el atraso es contra el programa de la plantilla corrido al
+arranque: si el planeador lo edita o lo reancla, la alerta se mueve con él.
+
+Libro: `ATRASO_Y_DETENIDOS_ALAMO18_D456.xlsx` (11 hojas: la respuesta, la cola de atención, planeado contra
+real por frente, el programa anclado, el diagnóstico de detenidos, la calibración, las pausas normales y por
+gremio, la sensibilidad del 90%, los parámetros y cómo se calcula). `MODELO.md` §5a y §5c,
+`PENDIENTES-MEJORAS.md` B-88 y B-92.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
