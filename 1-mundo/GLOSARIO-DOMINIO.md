@@ -181,6 +181,12 @@ física (recámara, sala, fachada). Se lee del árbol del presupuesto —frente 
 (Nivel 1), sub-frente = las etapas (Nivel 2) del frente agrupadas por gremio—; no hay
 «catálogo de conceptos-frentes».*
 
+*D-451, dato del usuario: **sub-frente = la etapa agrupada por gremio**, confirmado. Lo del
+«Catálogo de conceptos-frentes» **no queda resuelto**: la frase anterior («no hay…») iba
+de más. Solo se comprobó que ese catálogo no está en este entorno; no se sabe qué trae y
+el usuario lo revisará (B-89). Hasta entonces ni se da por inexistente ni por innecesario,
+y el «Hoy vive en» de arriba sigue siendo la pista original.*
+
 ### Especialidad
 
 Oficio que domina un contratista. Uno puede tener varias.

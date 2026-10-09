@@ -562,6 +562,8 @@ FRENTE
                                                                          *Decidido (D-450): es el nivel constructivo —Subcapítulo, Nivel 1,
                                                                          catálogo de 15 niveles—; sus sub-frentes son los gremios que trabajan
                                                                          dentro, una vista del árbol y no una tabla; sin `frente_id` en ACTIVIDAD*
+                                                                         *D-451: si FRENTE es este catálogo de niveles o el «Catálogo de conceptos-frentes»
+                                                                         del usuario queda en revisión (B-89)*
 
 CLASE_TRABAJO
   id, nombre        destajo · acarreo · subcontrato…                    firme — nuevo (P-02/P-03), ver hallazgo 7

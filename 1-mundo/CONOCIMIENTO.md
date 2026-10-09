@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5604 | 20 |
+| §11 | Los flujos entre sistemas | 5644 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5916,6 +5916,10 @@ prototipos, así que el costo y la ejecución se pueden comparar en el mismo nod
 - El **sub-frente no es una tabla**: es el agrupamiento de las etapas de un frente por
   gremio, una vista.
 
+*D-451 corrige dos frases de arriba: el «Catálogo de conceptos-frentes» no se da por
+innecesario ni por inexistente (solo se comprobó que no está en este entorno), y que `FRENTE`
+sea el catálogo de niveles queda en revisión con el usuario (B-89).*
+
 **Qué deja sin decidir** (B-88, el sistema propone y el usuario decide):
 
 1. **El gremio de cada etapa.** Hay 52 claves de etapa (55 con variantes de nombre) y
@@ -5942,6 +5946,42 @@ Libro: `FRENTES_Y_SUBFRENTES.xlsx` (10 hojas: lo que se entendió, los dos casos
 etapas con su gremio propuesto, el árbol de Zafiro, los activos por semana de los siete,
 el valor programado semana a semana, la conciliación con el costo y la propuesta).
 `MODELO.md` §2 y §5c, `GLOSARIO-DOMINIO.md` «Frente», `PENDIENTES-MEJORAS.md` B-82 y B-88.
+
+### Sub-frente confirmado, y el «Catálogo de conceptos-frentes» queda en revisión (D-451)
+
+Dato del usuario, respondiendo a D-450: **sí, el sub-frente es la etapa agrupada por
+gremio**, y **lo del catálogo de conceptos-frentes se va a revisar**.
+
+**Lo confirmado.** La definición de D-450 queda firme en sus tres niveles: frente =
+nivel constructivo (Subcapítulo, Nivel 1); sub-frente = las etapas (Nivel 2) del frente
+agrupadas por gremio; detalle = la etapa y, debajo, sus partidas. De B-88 sigue abierto
+el mapa de qué gremio es cada etapa y la marca de los frentes que son paquete.
+
+**Lo que D-450 dio por resuelto de más.** Dijo que el «Catálogo de conceptos-frentes» «no
+hace falta» y el glosario que «no hay» tal catálogo. Lo único que se comprobó es que **no
+está en este entorno**; no se sabe qué trae. Lo que sí hay escrito:
+
+| Dónde | Qué dice |
+|---|---|
+| `GLOSARIO-DOMINIO.md` «Frente» | «Hoy vive en: Catálogo de conceptos-frentes»; el ejemplo es Instalaciones · Estructura · Acabados, o sea gremios |
+| `CATALOGOS.md` «Las cuadrillas se referencian a frentes» | Relación muchos a muchos cuadrilla–frente, informativa; sirve para filtrar 39 cuadrillas por frente en vez de recorrer 97 |
+
+En ese catálogo «frente» se usa en el sentido que D-450 llama **sub-frente**. Por eso lo
+que D-450 sí dejó firme no depende de él: `ACTIVIDAD` no necesita `frente_id`, porque el
+frente y el sub-frente se leen del árbol (de la partida a su etapa y a su nivel) con o
+sin ese catálogo.
+
+**Qué se pone a revisión (B-89)**, sin decidir nada hasta ver el catálogo:
+
+1. Si el catálogo es la **fuente del gremio de cada concepto** y, por tanto, de cada
+   etapa. Es una hipótesis del sistema: entonces el mapa por nombre y prefijo de B-88
+   pasaría a ser la verificación y no la fuente.
+2. Cómo se llama ahora que «frente» cambió de significado: el nombre y las relaciones
+   que hoy lo usan para el gremio (cuadrilla–frente, `FRENTE_TOPE_CUADRILLA` por oficio).
+3. Si la entidad `FRENTE` de `MODELO.md` es el catálogo de niveles (como asumió D-450) o
+   ese catálogo.
+
+`GLOSARIO-DOMINIO.md` «Frente», `CATALOGOS.md`, `MODELO.md` §2, `PENDIENTES-MEJORAS.md` B-88 y B-89.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

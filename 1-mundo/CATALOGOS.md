@@ -618,16 +618,18 @@ ayudante sirve a Estructura y a Obra Exterior; un frente ocupa varias cuadrillas
 > Debe quedar marcada como informativa **desde el principio**. Si no, alguien la
 > tomará como restricción y construirá encima algo que no la soporta.
 
-*Nota (D-450): «frente» quedó definido como el nivel constructivo de la obra
-(Cimentación, Planta baja…), no como la agrupación por gremio de arriba. El gremio es
-el **sub-frente**: lo que trabaja dentro de un frente. La relación cuadrilla–frente se
-lee ahora como cuadrilla–gremio; sigue siendo informativa.*
 
 Sirve para filtrar 39 cuadrillas por frente al programar, en vez de recorrer 97
 registros. **Las relaciones operativas se definen después.**
 
 > Dónde se definen: `PROPUESTA-CUATRO-MODULOS.md` §4 · P-6, el tope de cuadrillas
 > por oficio dentro del frente.
+
+*Nota (D-450): «frente» quedó definido como el nivel constructivo de la obra
+(Cimentación, Planta baja…); el gremio es el **sub-frente**, lo que trabaja dentro de un
+frente. Esta relación cuadrilla–frente es la del gremio de arriba y sigue siendo
+informativa. D-451: cómo queda este catálogo ahora que «frente» cambió de significado
+se revisa con el usuario (B-89); no se renombra ni se reinterpreta mientras tanto.*
 
 ### La unidad `%MO`
 
