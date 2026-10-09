@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5521 | 20 |
+| §11 | Los flujos entre sistemas | 5604 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5782,6 +5782,10 @@ cuadrillas (`FRENTE_TOPE_CUADRILLA`) pasaría a medirse por frente y oficio. Si 
 B, no hace falta `frente_id`: la etapa del árbol cumple. Si es la C, se captura. No se
 agrega ningún campo mientras tanto.
 
+*Respondido por D-450: el usuario definió el frente como el nivel constructivo, con los
+gremios como sub-frentes y sin zona física; la A pasa a sub-frente, la B a frente, la C
+se descarta, y B-82 cierra sin `frente_id`.*
+
 Libro: `CONCURRENCIA_CORREGIDA_B82.xlsx` (8 hojas: qué estaba mal, las filas
 duplicadas, los picos por oficio corregidos contra D-440, el máximo por prototipo,
 acabados con y sin fachada, por etapa y oficio, las etapas con más cuadrillas y las
@@ -5859,6 +5863,85 @@ Libro: `RITMO_HEREDADO_B84.xlsx` (10 hojas: la decisión, el horizonte, las 17
 ventanas, línea contra ventana, las líneas que engañan, las 53 sin rendimiento, las
 ventanas de Zafiro, la cuenta por umbral y las 355 comparables). `MODELO.md` §5a,
 §5c, `PENDIENTES-MEJORAS.md` B-84.
+
+### B-82 se cierra: «frente» es el nivel constructivo de la obra y sus sub-frentes son los gremios que trabajan dentro de él —el árbol ya lo trae, no hace falta `frente_id`— (D-450)
+
+Dato del usuario: la definición que pedía D-448. En sus palabras, resumidas: el frente de
+una obra es amplio; el frente principal es una etapa que corresponde a un nivel
+constructivo, y los gremios son parte de él —la etapa de estructura en el nivel de
+cimentación abarca los gremios de Estructura y de Instalaciones—. **No es una zona
+física** como recámara, sala o fachada: son las actividades programadas para ejecutar
+una obra. Un residente con «n» obras tiene uno o varios frentes y varios sub-frentes.
+Caso 1: arranca Álamo 08, el frente es Cimentación (dos semanas) y los sub-frentes son
+Estructura e Instalaciones. Caso 2: más adelante hay varios frentes a la vez, y en la
+semana 23 pueden juntarse seis sub-frentes o más. Lo que se busca: controlar de forma
+sencilla a partir de la ejecución, y que se pueda comparar con el costo de construcción
+—«como ensamble y subensamble, pero sin perder el detalle»—.
+
+**La definición ya está en el árbol del presupuesto.**
+
+| Concepto | Dónde vive | Zafiro, Cimentación |
+|---|---|---|
+| Frente | Subcapítulo (Nivel 1): catálogo de niveles (`Nivel ERP`, 15 claves `NIV-xxxxx`) | 9 a 23 de junio, 11 días hábiles (dos semanas), 9.6% del costo de la obra |
+| Sub-frente | El gremio dentro del frente: las etapas (Nivel 2, `ECO-xxxxx`) del frente agrupadas por gremio | Estructura (1 etapa) e Instalaciones (4: sanitarias, hidráulicas, eléctricas, gas) |
+| Detalle | La etapa y, debajo, sus partidas: no se pierde nada al subir | 5 etapas y 56 partidas (9 de Estructura, 47 de Instalaciones) |
+| Zona física | No es frente | — |
+
+Contra los siete programas, los dos casos del usuario salen del dato sin tocarlo:
+**semana 2 de Zafiro** —1 frente (Cimentación), 2 sub-frentes, Estructura con 65% del
+valor de la semana e Instalaciones con 35%— es el Caso 1; **semana 23** —7 frentes, 9
+sub-frentes, 6 gremios distintos— es el Caso 2. El pico de Zafiro es la semana 22 (7
+frentes, 10 sub-frentes, 14 etapas; Rubí y Jade igual o uno más) y el de los programas de
+dos plantas las semanas 23 y 24 (hasta 8 frentes, 12 sub-frentes, 17 etapas). Contar etapas
+infla (14 a 17) y contar sub-frentes (10 a 12) es lo que el usuario llama sub-frentes; pero
+contar cuántos hay engaña, porque pesan distinto: en la semana 22 de Zafiro 3 de los 10 sub-frentes cargan
+el 72% del valor y 5 el 86% (semana 23: 4 de 9 cargan el 94%), y los pesados son
+paquetes contratados —cancelería, pérgola de cochera, pintura—. El valor programado
+(cuadrícula × precio) cuadra con el costo del capítulo entre 0.0% y 0.3% en los siete
+prototipos, así que el costo y la ejecución se pueden comparar en el mismo nodo.
+
+**Qué cierra.** La segunda mitad de B-82, sin campo nuevo:
+
+- De las tres lecturas de D-448, la A (gremio) pasa a ser el **sub-frente**, la B
+  (nivel constructivo) es el **frente**, y la C (zona física) queda descartada por el
+  usuario. El «Catálogo de conceptos-frentes» que el glosario daba como hogar del
+  frente no hace falta: el frente y el sub-frente se leen subiendo por el árbol desde la
+  partida.
+- **`ACTIVIDAD` no gana `frente_id`.** Cada actividad ya cuelga de un concepto con su
+  etapa y su nivel por ancestros; guardarlo sería una copia que se desactualiza.
+- `FRENTE` queda como el catálogo de niveles (el mismo hueco anotado en
+  `MODELO.md` §4: el catálogo `NIVEL`/`ETAPA` formal); `FRENTE_TOPE_CUADRILLA` y
+  `CIERRE_FRENTE` siguen apuntando a un frente, y el tope se mide por frente y oficio
+  como decía P-6 —por ventana de trabajo, D-449—.
+- El **sub-frente no es una tabla**: es el agrupamiento de las etapas de un frente por
+  gremio, una vista.
+
+**Qué deja sin decidir** (B-88, el sistema propone y el usuario decide):
+
+1. **El gremio de cada etapa.** Hay 52 claves de etapa (55 con variantes de nombre) y
+   la propuesta las reparte así: Instalaciones 19, Albañilería 8, Estructura 7, Acabados 7,
+   Cancelería 4, Carpintería 3, Muebles y equipamiento 3, mixtas 2, Herrería 1, Obra
+   exterior 1. 40 no ofrecen duda y 15 piden mirar con el prefijo de sus partidas en la
+   mano: «Obra gris» tiene prefijo de acabados pero es muro y aplanado (se propone
+   Albañilería); las etapas del asador y de la pérgola de cochera mezclan estructura y
+   acabados; el cableado cuelga del frente Acabados siendo eléctrico. Falta decidir dónde
+   vive el gremio: el catálogo de etapas es el lugar natural.
+2. **El Nivel 1 mezcla dos cosas:** 6 niveles constructivos (Cimentación, Planta baja,
+   Planta alta, Azotea, Acabados, Obras exteriores) y 8 paquetes que se contratan
+   terminados (Cancelería, Carpintería, Muebles / Iluminación, Herrería, Asador, Barda,
+   Pintura, Pergolado cochera), más Consumibles. En el programa pesan mucho en las
+   semanas de más trabajo; falta decidir si una marca `paquete` los distingue.
+3. **Cómo se controla,** que el usuario pidió mejorar: un árbol de control con una
+   cifra ponderada por costo en cada nodo y semana; captura abajo (partida o tramo) y
+   lectura arriba (sub-frente y frente se calculan, no se capturan); una cola de
+   atención semanal ordenada por atraso, ruta crítica, cierre cercano, desviación de
+   costo e incidencias; la carga del residente en todas sus obras. Nada de esto se
+   construye hasta que el usuario lo elija.
+
+Libro: `FRENTES_Y_SUBFRENTES.xlsx` (10 hojas: lo que se entendió, los dos casos, las 55
+etapas con su gremio propuesto, el árbol de Zafiro, los activos por semana de los siete,
+el valor programado semana a semana, la conciliación con el costo y la propuesta).
+`MODELO.md` §2 y §5c, `GLOSARIO-DOMINIO.md` «Frente», `PENDIENTES-MEJORAS.md` B-82 y B-88.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

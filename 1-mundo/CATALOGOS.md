@@ -618,6 +618,11 @@ ayudante sirve a Estructura y a Obra Exterior; un frente ocupa varias cuadrillas
 > Debe quedar marcada como informativa **desde el principio**. Si no, alguien la
 > tomará como restricción y construirá encima algo que no la soporta.
 
+*Nota (D-450): «frente» quedó definido como el nivel constructivo de la obra
+(Cimentación, Planta baja…), no como la agrupación por gremio de arriba. El gremio es
+el **sub-frente**: lo que trabaja dentro de un frente. La relación cuadrilla–frente se
+lee ahora como cuadrilla–gremio; sigue siendo informativa.*
+
 Sirve para filtrar 39 cuadrillas por frente al programar, en vez de recorrer 97
 registros. **Las relaciones operativas se definen después.**
 

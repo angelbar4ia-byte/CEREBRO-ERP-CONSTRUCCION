@@ -173,6 +173,14 @@ Agrupación de conceptos por organización del trabajo en obra, transversal a ni
 - **Ejemplo:** Instalaciones · Estructura · Acabados
 - **Hoy vive en:** `Catálogo de conceptos-frentes`
 
+*Corregido por D-450, dato del usuario: **frente** es el nivel constructivo de la obra
+(Cimentación, Planta baja, Azotea…): las actividades programadas para ejecutar la obra en
+ese nivel, con costo y fechas propios. Los **gremios** (Estructura, Instalaciones,
+Albañilería…) son sus **sub-frentes**: lo que trabaja dentro de él. No es una zona
+física (recámara, sala, fachada). Se lee del árbol del presupuesto —frente = Subcapítulo
+(Nivel 1), sub-frente = las etapas (Nivel 2) del frente agrupadas por gremio—; no hay
+«catálogo de conceptos-frentes».*
+
 ### Especialidad
 
 Oficio que domina un contratista. Uno puede tener varias.
@@ -1123,6 +1131,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Subcapítulo | Nivel de construcción |
 | Subcontrato | **Subcontrato** |
 | Subfamilia | **Subfamilia** |
+| Sub-frente | Frente |
 | Suministro | Material |
 | Tarea | Actividad |
 | Tarjeta | APU |
