@@ -42,6 +42,8 @@ siguen siendo referenciados**:
 | `CATALOGO_DE_FAMILIAS` (35) | Es el vocabulario maestro, con prefijo. **Desactualizado:** 20 de 35 coinciden con las familias vigentes, y sin acentos |
 | `CATALOGO_DE_CONTRATISTAS` (29) | Sin equivalente en OPUS 2025 |
 
+*D-453: las etapas de instalaciones se quedan separadas; solo Hidráulicas y Sanitarias se fusionarán después en Hidrosanitarias, con claves nuevas y sin reescribir las actuales (B-91). `ECO-00039` «HIDRO-SANITARIOS» ya existe, en Muebles / Iluminación.*
+
 ### Lo que OPUS tiene y aún no está en este proyecto
 
 Se pueden agregar más adelante. **No hacen falta por ahora:**

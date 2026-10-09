@@ -567,6 +567,8 @@ FRENTE
                                                                          *D-452: no existe tal catálogo (B-89 cerrado). El frente es por obra: el nodo de Nivel 1 del
                                                                          presupuesto de esa obra; el sub-frente es la etapa (Nivel 2). Un sub-frente con dos contratistas
                                                                          se divide en uno por contratista; dónde vive el contratista queda abierto (B-90)*
+                                                                         *D-453: el sub-frente es la etapa, sin agrupar por gremio; el contratista se asigna de lo general
+                                                                         a lo particular y la división se calcula, ver ASIGNACION_CONTRATISTA (§4a)*
 
 CLASE_TRABAJO
   id, nombre        destajo · acarreo · subcontrato…                    firme — nuevo (P-02/P-03), ver hallazgo 7
@@ -1029,6 +1031,47 @@ lectura de `DESVIACION` por contratista (§5g) también se desbloquea: se
 agrupa uniendo `nodo_id` contra `TABULADOR_CONTRATISTA.contratista_id`,
 sin campo nuevo en `DESVIACION` — mismo criterio de «se calcula al
 preguntar» que ya evitó una tabla de comparación en `MODELO.md` §5f.
+
+### `ASIGNACION_CONTRATISTA` — quién ejecuta qué, de lo general a lo particular (D-453)
+
+La regla es del usuario: el contratista se asigna por obra y tipo de trabajo, de ahí por
+etapa, salvo que un concepto o una actividad se asigne a otro; se reasigna en cualquier
+momento por abandono de obra o por logística, y se puede dividir hasta el concepto y la
+cantidad. Los campos son propuesta del sistema.
+
+```
+ASIGNACION_CONTRATISTA
+  id
+  presupuesto_id     FK PRESUPUESTO — la obra (tipo=obra)                    propuesta — D-453
+  alcance            enum: obra_tipo · etapa · concepto                       propuesta
+  familia_id         FK Familia — el tipo de trabajo (el oficio); solo si
+                      alcance=obra_tipo                                       propuesta
+  nodo_id            FK Nodo — la etapa o el concepto; nulo si obra_tipo       propuesta
+  cantidad           NUMERIC, nullable — solo si alcance=concepto: la parte
+                      del concepto que se asigna; nulo es toda                propuesta
+  contratista_id     FK CONTRATISTA                                           propuesta
+  vigente_desde      DATE                                                     propuesta
+  vigente_hasta      DATE, nullable                                           propuesta
+  motivo             enum: inicial · abandono · logistica · otro              propuesta
+  reemplaza_id       FK ASIGNACION_CONTRATISTA, nullable — la cadena          propuesta
+```
+
+- **Quién ejecuta una partida en una fecha:** la asignación vigente más particular —concepto,
+  luego etapa, luego obra × tipo de trabajo—. Una de concepto con `cantidad` toma esa
+  cantidad y el resto sigue el siguiente nivel.
+- **Reasignar:** se cierra la vigente en esa fecha y se abre otra con su motivo; nada se
+  borra. Lo avanzado hasta la fecha se queda con quien lo hizo y lo que falta pasa al nuevo, así
+  que un concepto puede partir su cantidad en el tiempo.
+- **La división de un sub-frente no se guarda:** son las partidas de la etapa agrupadas por su
+  contratista a la fecha. Con uno no se divide; con dos o más aparecen sub-frentes por
+  contratista, a cualquier fecha.
+- **Quien avanza distinto del asignado es un aviso**, no un cambio: el avance registra al
+  contratista real y el sistema lo compara con el asignado.
+- **El sistema propone** al contratista con la especialidad del tipo de trabajo
+  (`CATALOGO_DE_CONTRATISTAS`); el humano decide.
+
+El frente y el sub-frente no se guardan: son el nodo de Nivel 1 y el de Nivel 2 de la obra
+(D-450 a D-452). `CONOCIMIENTO.md` §11.14.
 
 ### Lo que ya quedaba resuelto por otro lado
 

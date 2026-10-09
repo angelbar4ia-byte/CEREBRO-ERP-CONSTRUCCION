@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5712 | 20 |
+| §11 | Los flujos entre sistemas | 5781 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6050,6 +6050,75 @@ nuevas, cómo se midió, frentes por nivel y por obra, contratistas por sub-fren
 sub-frentes divididos, etapas por contratista, contratista por gremio, la carga por obra
 y por operador, y la cobertura de etapas). `GLOSARIO-DOMINIO.md` «Frente»,
 `MODELO.md` §2 y §5c, `PENDIENTES-MEJORAS.md` B-88, B-89 y B-90.
+
+*Corregido por D-453: la división sí llega a la cantidad, y no hay umbral del 10%.*
+
+### El contratista se asigna de lo general a lo particular hasta el concepto y la cantidad, las etapas de instalaciones se quedan separadas (D-453)
+
+Dato del usuario, respondiendo a las tres aclaraciones de D-452:
+
+1. **Las etapas de instalaciones se separan** en cimentación y en los demás niveles. La
+   única fusión, más adelante, es Hidráulicas y Sanitarias en **Hidrosanitarias**.
+2. **El contratista se asigna por obra y por tipo de trabajo, de ahí por etapa de
+   construcción**, salvo que una actividad o un concepto se asigne a otro contratista: de
+   lo general a lo particular. Se puede **reasignar en cualquier momento** por abandono de
+   obra o por logística. Pregunta si así se deduce el frente y se puede dividir en cualquier
+   momento.
+3. **Debe poder dividirse en lo particular por concepto y por cantidad.**
+
+**Qué cierra.**
+
+- **La pregunta 1 de D-452:** el sub-frente es la etapa, sin agrupar por gremio. Cimentación
+  son 5 sub-frentes (4 cuando se fusionen Hidráulicas y Sanitarias). El mapa etapa → gremio de
+  B-88 ya no hace falta para definir sub-frentes.
+- **Sí se deduce.** El frente (obra, nivel) y el sub-frente (etapa) salen del árbol. El
+  contratista de una partida sale de la asignación más particular que esté vigente. Y la
+  división de un sub-frente es el reparto de sus partidas por contratista, que se calcula a
+  cualquier fecha siempre que cada reasignación guarde su vigencia: no se captura ni se
+  guarda.
+- **Corrige D-452:** dije que «la división es por partida, no por cantidad» porque una
+  partida con dos contratistas era 1 de 1,036. Ese caso es justo una división por cantidad
+  (ACA-20020 en la azotea de Alamo 19: de 185.74 m² requeridos, 19.10 m² los hizo un contratista
+  en abril y 44.00 m² otro en julio), y 612 de las 1,036 partidas se ejecutan en varios avances,
+  que es donde una reasignación por abandono parte la cantidad. Por eso la asignación llega
+  hasta concepto **y cantidad**.
+- **Retira el umbral del 10% de D-452.** Con la asignación, la división la decide quien
+  asigna, no el peso. Lo que antes era «segundo contratista incidental» pasa a ser un aviso: el
+  avance registra al contratista real y el sistema lo compara con el asignado.
+
+**Lo que dice el dato** (2,890 avances reales de 34 obras). La asignación por obra y tipo de
+trabajo, con el tipo de trabajo como la Familia del concepto (el oficio), explica casi todo:
+
+| Nivel de la asignación | Cuántas pide | Operaciones que explica |
+|---|---|---|
+| Obra × tipo de trabajo | 215 (6.3 por obra) | 98.4% de las 2,890; 205 de 215 grupos con un solo contratista |
+| + Etapa | 6 de 292 etapas con otro contratista principal | de 98.6% a 99.8% en las 1,996 con etapa identificada |
+| + Concepto y cantidad | 24 de 1,036 partidas con ejecutor distinto del de su obra × tipo | el resto; entre las que tienen etapa quedan 3 partidas (0.2% del monto) |
+
+Es lo que se *ejecutó*, no lo que se asignó: en los datos no hay asignaciones, y muestran que
+una asignación por obra × tipo habría acertado el 98.4%. Tampoco hay un relevo por abandono
+(en los 10 pares de contratistas del mismo tipo y obra, 6 trabajan en paralelo y 4 son un
+segundo contratista con el 5% o menos del monto): esa parte del diseño viene de la regla del
+usuario, no del dato.
+
+**Cómo queda** (la regla es del usuario; los campos son propuesta del sistema, `MODELO.md`
+§4a): una `ASIGNACION_CONTRATISTA` con obra, alcance (obra × tipo · etapa · concepto), la
+Familia o el nodo, la cantidad (solo en el concepto; vacía es toda), el contratista, su
+vigencia y el motivo (inicial, abandono, logística, otro). Al reasignar se cierra la vigente y
+se abre otra; lo avanzado hasta esa fecha se queda con quien lo hizo. El sistema propone al
+contratista que tenga la especialidad del tipo de trabajo (el catálogo de contratistas
+trae 29) y el humano decide.
+
+**Hidráulicas + Sanitarias = Hidrosanitarias (B-91), anotado sin fecha.** En las 17
+combinaciones obra × nivel del dato donde hay las dos, las ejecuta el mismo contratista, así que
+la fusión no crea divisiones, y no cambia los picos de etapas activas de los siete programas.
+Se haría con claves de etapa nuevas por nivel y una equivalencia para leer las obras
+anteriores, sin reescribir las claves (`clave` nunca se reescribe). Hay un **choque de nombre**:
+`ECO-00039` «HIDRO-SANITARIOS» ya existe en Muebles / Iluminación y es de muebles sanitarios.
+
+Libro: `ASIGNACION_DE_CONTRATISTA_D453.xlsx` (8 hojas: la respuesta, la cascada, los pares con
+dos contratistas, el concepto dividido por cantidad, las hidrosanitarias y la propuesta de campos
+y reglas). `MODELO.md` §4a, `PENDIENTES-MEJORAS.md` B-88, B-90 y B-91.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

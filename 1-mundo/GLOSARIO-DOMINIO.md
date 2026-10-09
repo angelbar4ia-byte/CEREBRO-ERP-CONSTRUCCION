@@ -192,6 +192,11 @@ arriba no tenía respaldo. El **frente es por obra** —(obra, nivel), el nodo d
 presupuesto— y el **sub-frente es la etapa** (Nivel 2) del frente; agruparlas por gremio es
 una forma de leer. Un sub-frente con dos contratistas se divide en uno por contratista.*
 
+*D-453, dato del usuario: el sub-frente es la etapa **sin agrupar por gremio** (las etapas de
+instalaciones se quedan separadas; solo Hidráulicas y Sanitarias se fusionarán después en
+Hidrosanitarias). El contratista se asigna por obra y tipo de trabajo, de ahí por etapa, salvo
+que un concepto se asigne a otro, y se puede dividir hasta la cantidad.*
+
 ### Especialidad
 
 Oficio que domina un contratista. Uno puede tener varias.
