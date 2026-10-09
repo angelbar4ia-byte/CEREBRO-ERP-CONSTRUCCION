@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5781 | 20 |
+| §11 | Los flujos entre sistemas | 5837 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5942,6 +5942,8 @@ sea el catálogo de niveles queda en revisión con el usuario (B-89).*
    costo e incidencias; la carga del residente en todas sus obras. Nada de esto se
    construye hasta que el usuario lo elija.
 
+*D-455 corrige el punto 2 de arriba: los «8 paquetes» eran un conteo por nombre; solo tres frentes se ejecutan de golpe en el dato y la marca `paquete` no hace falta.*
+
 Libro: `FRENTES_Y_SUBFRENTES.xlsx` (10 hojas: lo que se entendió, los dos casos, las 55
 etapas con su gremio propuesto, el árbol de Zafiro, los activos por semana de los siete,
 el valor programado semana a semana, la conciliación con el costo y la propuesta).
@@ -6119,6 +6121,60 @@ anteriores, sin reescribir las claves (`clave` nunca se reescribe). Hay un **cho
 Libro: `ASIGNACION_DE_CONTRATISTA_D453.xlsx` (8 hojas: la respuesta, la cascada, los pares con
 dos contratistas, el concepto dividido por cantidad, las hidrosanitarias y la propuesta de campos
 y reglas). `MODELO.md` §4a, `PENDIENTES-MEJORAS.md` B-88, B-90 y B-91.
+
+*Confirmado por D-454: el usuario aceptó los campos de `ASIGNACION_CONTRATISTA`.*
+
+### Los campos de la asignación quedan firmes, el frente no necesita marca de paquete y el tablero se calcula con lo que ya se captura (D-454, D-455)
+
+Dato del usuario: **confirma los campos** de `ASIGNACION_CONTRATISTA` (D-453) y pide seguir con
+lo que sigue, que es B-88.
+
+**D-454: los campos pasan de propuesta a firmes** (`MODELO.md` §4a). Cierra B-90.
+
+**D-455: B-88 se cierra.** Se probó el control completo sobre `ALAMO 18` (138 operaciones de
+avance de mano de obra del 22-abr al 29-jul-2026, cuatro niveles con avance, dos contratistas) contra
+su ingeniería y el presupuesto base, explotados a destajo.
+
+1. **Sin marca de paquete.** Contratar un frente terminado ya tiene su mecanismo:
+   `modo_duracion=preestablecida_nivel` con `disparador_fecha=contractual` (B-48, D-353). Los
+   avances reales de las 34 obras dicen que solo Cancelería, Carpintería y Muebles / Iluminación se
+   ejecutan de golpe (una o dos operaciones por frente, de $20,000 a $65,000 cada una); Asador, Pintura,
+   Barda y Pergolado cochera se ejecutan en detalle (2 a 5 operaciones por frente, de $1,300 a
+   $2,500 cada una) y Herrería no tiene operaciones. **Esto corrige D-450**, que contó 8 «paquetes» por el
+   nombre. Muebles / Iluminación tiene un solo frente en el dato y no basta para cambiar D-353, que dice
+   que se programa como el resto.
+2. **El control no pide captura nueva.** La operación de avance ya trae obra, nivel, destajo,
+   cantidad y contratista; el frente, el sub-frente, su avance y su contratista salen de ahí hacia
+   arriba y no se guardan.
+3. **Una cifra por nodo, comparable con el costo.** Por frente y por sub-frente: presupuesto base,
+   ingeniería del lote, ejecutado valuado (cantidad avanzada × precio pactado), ejecutado (%) y
+   pendiente, primera y última operación, días sin avance, contratista(s) y lo ejecutado por encima
+   de la ingeniería. El porcentaje pesa por costo sin hacer nada más: es ejecutado ÷ ingeniería.
+   Si un destajo cae en dos etapas del mismo nivel, lo ejecutado se reparte en proporción a su costo
+   (14 de 263 pares nivel × destajo).
+4. **La cola de atención son tres alertas** (`MODELO.md` §5a): un frente listo para solicitar su
+   cierre, un sub-frente iniciado y detenido, y un sub-frente ejecutado por encima de su ingeniería.
+
+| `ALAMO 18`, corte 29-jul-2026 | Resultado |
+|---|---|
+| Mano de obra de ingeniería | $1,031,773; ejecutado $466,385 (**45.2%**) |
+| Cimentación / Planta baja / Planta alta / Azotea | 92.1% / 55.7% / 57.1% / 16.4%; los otros seis frentes sin arrancar |
+| Sub-frentes | 38; 22 con avance; ninguno dividido (un contratista cada uno) |
+| Cola de atención | 8 filas: Cimentación lista para cierre y siete sub-frentes de instalaciones detenidos (18% de los 38) |
+| Lo que el 90% deja pasar | Cimentación llega al 92% con tres instalaciones pendientes y detenidas 91, 97 y 98 días (eléctricas en 28%, hidráulicas en 80% y sanitarias en 92%); el cierre pregunta, no impide |
+| Sobre la ingeniería | $2,838 (0.3%), en tres instalaciones de Cimentación |
+| Sin línea en la ingeniería | $512.50, dos destajos de Cimentación |
+
+**Lo que no hace.** Marcar atraso contra programa: el programa de `ALAMO 18` no está en los datos.
+Con un programa, la fecha de término del sub-frente da una cuarta alerta sin campo nuevo. «Detenido»
+es un aviso, no un diagnóstico: el avance puede no haberse capturado.
+
+**Parámetros que se proponen** (editables, en `ALERTA.parametro_usado`): 21 días sin avance para marcar
+detenido; el porcentaje del cierre es el de `solicitar_cierre_frente`, 90% (D-261).
+
+Libro: `TABLERO_DE_FRENTES_ALAMO18_B88.xlsx` (7 hojas: la respuesta, los frentes, los sub-frentes,
+la cola de atención, qué frente es paquete o detalle, las 280 líneas y cómo se calcula).
+`MODELO.md` §4a, §5a y §5c, `PENDIENTES-MEJORAS.md` B-88 y B-90.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

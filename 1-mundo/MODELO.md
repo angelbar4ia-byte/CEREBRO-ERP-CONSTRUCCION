@@ -1073,6 +1073,8 @@ ASIGNACION_CONTRATISTA
 El frente y el sub-frente no se guardan: son el nodo de Nivel 1 y el de Nivel 2 de la obra
 (D-450 a D-452). `CONOCIMIENTO.md` §11.14.
 
+*D-454: el usuario confirmó los campos de arriba; pasan de propuesta a firmes.*
+
 ### Lo que ya quedaba resuelto por otro lado
 
 «Prototipo» es una convención de nombre, no un campo (P-40) — resuelto:
@@ -1386,6 +1388,9 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `plazo_excedido` | El cierre del programa pasa del límite del plazo, contado como diga `CALENDARIO_OBRA.plazo_medido_en` (§5c) — sin umbral, y sin alerta por cerrar antes: «ni antes ni después» (D-437) es regla de diseño de este ejercicio, no del sistema | B-87 |
 | `ritmo_sobre_referencia` | En una ventana de actividades que heredan sus días (`ACTIVIDAD.duracion_origen=heredada`), las cuadrillas efectivas son al menos `razon` veces las de la ventana de su referencia y al menos `cuadrillas_mas` más —por defecto 2 y 1, en `ALERTA.parametro_usado`—; ventana = las actividades del mismo oficio con las mismas fechas de inicio y término (§5c) | B-84 |
 | `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
+| `frente_listo_para_cierre` | El avance del frente (ejecutado ÷ ingeniería, ponderado por costo) llega al porcentaje de `solicitar_cierre_frente` —90%, D-261— y no se ha solicitado el cierre; la evidencia lista los sub-frentes que siguen pendientes. Avisa, no cierra: `CIERRE_FRENTE` pregunta, no impide | B-88 |
+| `subfrente_detenido` | Un sub-frente (etapa) con avance mayor que 0 y menor que 100% lleva al menos `dias_sin_avance` sin una operación de avance —por defecto 21, en `ALERTA.parametro_usado`—. Es un aviso: el avance puede no haberse capturado | B-88 |
+| `ejecutado_sobre_ingenieria` | En una línea de destajo, el ejecutado valuado excede el costo de la ingeniería del lote — sin umbral, cualquier excedente | B-88 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -2398,6 +2403,23 @@ existe:**
 > en todo el módulo: aprobar/validar/ejecutar una incidencia, solicitar o
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
+
+### El tablero del frente se calcula, no se guarda (D-455, cierra B-88)
+
+El frente (obra, nivel) y el sub-frente (etapa) son el nodo de Nivel 1 y el de Nivel 2; su
+contratista sale de `ASIGNACION_CONTRATISTA` (§4a) y su avance de `REGISTRO_AVANCE`
+(`fuente=fisico`). **No hay tabla nueva ni captura nueva:** cada cifra de un nodo es la suma de
+las de sus partidas, y se lee a cualquier fecha.
+
+- **Por nodo:** presupuesto base, ingeniería del lote, ejecutado valuado, ejecutado (%) ponderado por
+  costo (ejecutado ÷ ingeniería), pendiente, primera y última operación, días sin avance,
+  contratista(s) y lo ejecutado sobre la ingeniería.
+- **Cola de atención:** las alertas `frente_listo_para_cierre`, `subfrente_detenido` y
+  `ejecutado_sobre_ingenieria` (§5a), ordenadas por cuántos motivos tiene el nodo y por lo que falta.
+  Con un programa de la obra, la fecha de término del sub-frente da además el atraso, sin campo nuevo.
+- **Sin marca de paquete:** un frente contratado terminado ya es `modo_duracion=preestablecida_nivel`.
+- Probado sobre `ALAMO 18` (`CONOCIMIENTO.md` §11.14): 45.2% de su mano de obra, 38 sub-frentes, 8 filas en
+  la cola.
 
 ### ⏸ Lo que esto sigue sin resolver
 
