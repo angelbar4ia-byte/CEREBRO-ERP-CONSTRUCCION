@@ -44,8 +44,14 @@ TOLERANCIA_REDONDEO = Fraction(1, 100)
 class CicloError(Exception):
     """Las precedencias forman un ciclo: no hay orden posible.
 
-    MODELO.md §5c: se rechazan solo el autovínculo y los ciclos reales (D-443).
+    MODELO.md §5c: se rechazan solo el autovínculo y los ciclos reales (D-443). Cuando el ciclo
+    pasa por un bloque como predecesora y el cálculo no converge, `vinculos` trae los vínculos
+    que lo forman, para que quien carga el programa decida cuál rechazar.
     """
+
+    def __init__(self, mensaje: str = "", vinculos: Iterable["Vinculo"] = ()) -> None:
+        super().__init__(mensaje)
+        self.vinculos = tuple(vinculos)
 
 
 class VinculoInvalido(ValueError):
@@ -311,6 +317,21 @@ class ResultadoCPM:
         return self.fin_proyecto - self.origen
 
 
+def _ciclo_de_causas(movidas: Sequence[str], causa: Mapping[str, Tuple["Vinculo", str]]) -> List["Vinculo"]:
+    """Sigue, desde las partidas que aún se movían, quién las empujó: el cuerpo del ciclo que se alarga."""
+    for s in movidas:
+        visto: Dict[str, int] = {}
+        camino: List["Vinculo"] = []
+        x = s
+        while x not in visto and x in causa:
+            visto[x] = len(camino)
+            v, x = causa[x]
+            camino.append(v)
+        if x in visto:
+            return camino[visto[x] :]
+    return []
+
+
 def _descendientes(id_: str, por_id: Mapping[str, Actividad], memo: Dict[str, Tuple[str, ...]]) -> Tuple[str, ...]:
     if id_ in memo:
         return memo[id_]
@@ -408,8 +429,10 @@ def calcular_cpm(
     EF: Dict[str, Fraction] = {i: ES[i] + D[i] for i in ES}
 
     maxbarridos = len(partidas) + 5
+    causa: Dict[str, Tuple[Vinculo, str]] = {}  # quién subió el arranque de cada partida, por último
     for _ in range(maxbarridos):
         cambio = False
+        movidas: List[str] = []
         for s in orden:
             piso = ES[s]
             for orig, _, v in entrantes[s]:
@@ -425,14 +448,18 @@ def calcular_cpm(
                     c = p_abre + v.desfase - D[s]
                 if c > piso:
                     piso = c
+                    o_fija = max(orig, key=lambda o: EF[o]) if v.tipo in ("FS", "FF") else min(orig, key=lambda o: ES[o])
+                    fija = (v, o_fija)
             if piso > ES[s]:
                 ES[s] = piso
                 EF[s] = piso + D[s]
+                causa[s] = fija
+                movidas.append(s)
                 cambio = True
         if not cambio:
             break
     else:
-        raise CicloError("las precedencias no convergen: hay un ciclo que se alarga")
+        raise CicloError("las precedencias no convergen: hay un ciclo que se alarga", _ciclo_de_causas(movidas, causa))
 
     fin = max(EF.values()) if EF else origen
     limite = origen + _fr(plazo_dias) if plazo_dias is not None else fin

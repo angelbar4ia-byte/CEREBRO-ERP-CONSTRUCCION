@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 6148 | 20 |
+| §11 | Los flujos entre sistemas | 6167 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6486,6 +6486,25 @@ antes en este archivo:
   escrito y se cumple.
 
 `PROGRAMA-CPM.md`, `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-13 y B-95.
+
+### El programa se carga, la cadena de relevos se calcula y el Gantt es un dato (D-462)
+
+Dato del usuario: «vamos con el que sigue». Las reglas de carga que D-442 y D-443 dejaron escritas son código
+(`backend/core/programa.py`); el detalle, las tablas y las pruebas están en `PROGRAMA-CPM.md` §4.5, §8. Lo que
+cambia lo dicho antes en este archivo:
+
+- **De los 124 vínculos de Zafiro, 6 no se pueden cargar** y los otros 9 de sus 15 incumplidos cargan y avisan.
+  Los seis son el autovínculo `EST-01151`, el ciclo de `BAP-01100` y `ICA-01030` (D-424: se queda el `SS`, que se
+  cumple), y cuatro de partidas hermanas que esperan cada una al resto de su grupo, ciclos que D-443 no
+  distinguía porque leer el bloque sin la sucesora solo evita el autovínculo. Los otros seis programas cargan
+  todos sus vínculos.
+- **La cadena de relevos de D-425 se calcula**, y reproduce fila por fila las cinco que se tenían. Rubí tiene una
+  de 28 pasos y Jade una de 27, que D-425 solo daba por cumplidas dentro de la red mínima.
+- **El Gantt de D-432 ya es un dato**: 388 partidas y 90 resúmenes de Nivel 2 y 3 (D-432 contó también la fila
+  de cierre en blanco, 479), 130 flechas y las marcas del calendario. Lo que decide la pantalla sigue siendo de
+  B-95.
+
+`PROGRAMA-CPM.md`, `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-95.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

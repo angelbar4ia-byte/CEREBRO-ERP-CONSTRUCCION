@@ -6,14 +6,14 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 76 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 104 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
 > vivían (`MODELO.md` §5c, `CONOCIMIENTO.md` §11.14); aquí vive lo que **solo existía en libros de
 > Excel y en el código**: los siete programas completos, la red con sus identificadores, las
-> listas del planeador, el motor que calcula fechas y ruta crítica, y las cifras con que se
-> comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
+> listas del planeador, el motor que calcula fechas y ruta crítica, el cargador que lee un programa
+> y la vista del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
 > `1-mundo/programas/` son la fuente, y `cd backend && python3 -m unittest discover` la prueba.
 
 ---
@@ -34,6 +34,7 @@ verificado: 76 pruebas · los siete programas reales (832 vínculos) reproducen 
 | El retraso por obra, por contratista y por residente | `CONOCIMIENTO.md` §11.14 (D-456 a D-459) |
 | **Los datos de los siete programas, el catálogo de la red, las rutas, las listas del planeador** | **§2 a §7 de este archivo y `1-mundo/programas/`** |
 | **El motor y su contrato** | **§4 y `backend/core/motor_cpm.py`** |
+| **El cargador del programa, la cadena de relevos y el Gantt como dato** | **§4.5 y `backend/core/programa.py`** |
 | **Las reglas de visualización del Gantt** | **§8** |
 
 ---
@@ -55,7 +56,7 @@ se regeneran desde Excel**: si cambia un programa, se cambia aquí, con una deci
 | `EMPAREJAMIENTOS-POR-ROL.csv` | Las partidas de los cuatro de dos plantas que no tienen gemela por `Clave`, con la gemela de Zafiro que se les asignó y por qué | 205 |
 | `ESTRUCTURA-PLANTA-ALTA-VS-BAJA.csv` | La estructura de la planta alta contra la de la planta baja de Zafiro | 25 |
 | `SUPUESTOS-A-VALIDAR.csv` | Los doce supuestos que el planeador debe validar en cada programa de dos plantas | 48 |
-| `ZAFIRO-15-INCUMPLIDOS.csv` | El registro de los 15 vínculos de Zafiro que no se cumplen, con la propuesta del sistema | 15 |
+| `ZAFIRO-15-INCUMPLIDOS.csv` | El registro de los 15 vínculos de Zafiro que no se cumplen, con la propuesta del sistema y qué pasa con cada uno al cargarlo | 15 |
 | `SF-LOS-OCHO.csv` | Los ocho `SF` del libro, leídos como `SF` y al revés | 8 |
 | `SEGUNDA-RUTA-BORRADOR.csv` | La segunda ruta de cuadrilla (D-444), en borrador | 21 |
 | `SEGUNDA-RUTA-LO-QUE-SIGUE.csv` | Lo que arranca justo después de que termina esa ruta | 9 |
@@ -109,7 +110,8 @@ segundo; el original está intacto en cuanto a sus fechas.
 tipos; los 8 `SF` (5 se cumplen con holgura 0, todos las gualdras); Zafiro 15 incumplidos (10 `FS`, 2
 `SS`, 3 `SF`) y 18 si el bloque se lee completo; 0 incumplidos en los otros seis; los 39 vínculos
 cuyo bloque contiene a su sucesora, 35 cumplidos; el cierre en 139 o 149 días hábiles; la herencia de
-duraciones 1,520 / 132 / 478 (D-441).
+duraciones 1,520 / 132 / 478 (D-441); las cadenas de relevos de los cinco programas que las tenían, fila por
+fila (§6.4); y los seis vínculos de Zafiro que el cargador no deja pasar (§4.5).
 
 ---
 
@@ -189,10 +191,48 @@ detalle que se pueda dejar sin escribir sin que el CPM lo note, y por eso queda 
 hueco de la red de Plus (§6.5). *(Corrige D-460, que lo daba como incumplido de los cuatro de dos
 plantas: en Diamante sin chimenea, Diamante con chimenea y Oro está escrito y se cumple.)*
 
-## 4.5 Cómo se prueba
+## 4.5 El cargador, la cadena de relevos y el Gantt como dato: `backend/core/programa.py`
 
-`cd backend && python3 -m unittest discover` corre 76 pruebas. Las del CPM están en
-`backend/core/tests/test_motor_cpm.py` y siguen el principio del repositorio —datos reales del
+Une las filas del libro con el motor. Lee un programa tal como lo traen los siete prototipos, resuelve sus
+vínculos y entrega actividades al CPM; no dibuja y no toca la base de datos.
+
+| Pieza | Qué hace |
+|---|---|
+| `Fila` · `filas_desde_csv(ruta, prototipo)` | Una fila del libro con su `oid`, su número de fila, sus fechas y el texto de sus vínculos; el CSV de `programas/` es entrada de primera clase |
+| `leer_vinculos(texto)` | Separa `<fila><tipo>[±horas]`, con el tipo `FS`, `SS`, `FF` o `SF`, en fila, tipo y desfase en días; un token que no cumple el formato no se pierde, se rechaza |
+| `cargar_programa(filas, calendario)` → `Programa` | Actividades, vínculos aceptados, `rechazados` con su motivo, las ventanas del plan y las partidas de cada bloque |
+| `Programa.calcular()` · `.incumplidos()` | El CPM de la red cargada y los vínculos que las fechas del plan contradicen |
+| `Programa.referencias(v)` | La partida que fija el extremo de la predecesora de un vínculo; si es un bloque, todas las que empatan |
+| `cadena_de_relevos(programa, calendario)` | La cadena de partidas con holgura 0 sobre las fechas del plan (§6.4) |
+| `vista_gantt(programa, calendario, …)` | Filas, flechas y marcas de §8 como un diccionario que una pantalla dibuja |
+
+**Las reglas de carga son las de D-442 y D-443**: el desfase viene en horas y la jornada es de 8; el programa
+guarda el `oid`, nunca el número de fila; un bloque puede ser predecesora, también el que contiene a su
+sucesora, y se lee sin ella; la sucesora siempre es una partida. Se rechazan, sin detener la carga, y quedan
+en `Programa.rechazados` para que los vea el planeador:
+
+| Motivo | Cuándo |
+|---|---|
+| `autovinculo` | La partida cita su propia fila |
+| `cierra_un_ciclo` | El vínculo forma parte de un ciclo entre partidas, o a través de un bloque cuyo extremo espera a la sucesora. De cada ciclo se rechaza el que las fechas del propio plan ya contradicen, y si ninguno, el último escrito |
+| `sucesora_bloque` | La celda de vínculos está en una fila de bloque |
+| `formato` · `predecesora_desconocida` · `predecesora_sin_partidas` | El token no se lee, cita una fila que no existe o un concepto sin fechas, o un bloque sin partidas |
+
+**Un vínculo que las fechas contradicen sí se carga**: ese es el aviso de `ALERTA(tipo=vinculo_incumplido)`, no
+un error de carga. Con los siete programas reales, solo Zafiro rechaza algo: **seis de sus 124 vínculos** (118
+cargan). Son el autovínculo `EST-01151` y cinco ciclos: el de `BAP-01100` y `ICA-01030`, que se queda con el
+`SS` y suelta el `FS`, y cuatro de partidas hermanas dentro de un mismo grupo —las dos manos de pintura de
+`API-01010`, el muro sillar bajo `ECO-00046`, el firme de la cisterna—, donde cada una espera al resto del
+grupo, que incluye a la otra. Los otros nueve de los 15 incumplidos cargan y avisan. `ZAFIRO-15-INCUMPLIDOS.csv`
+dice qué pasa con cada uno (columna `al_cargar`).
+
+Al motor se le añadió el diagnóstico que esto pedía: cuando el cálculo no converge, `CicloError.vinculos` trae
+los vínculos que forman el ciclo que se alarga, rastreados desde quién empujó el arranque de cada partida.
+
+## 4.6 Cómo se prueba
+
+`cd backend && python3 -m unittest discover` corre 104 pruebas. Las del CPM están en
+`backend/core/tests/test_motor_cpm.py` y las del cargador y el Gantt en `test_programa.py`; siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
 a mano, y las de conformidad cargan `PROGRAMAS-PROTOTIPOS.csv` y los demás archivos de `programas/`
 y comprueban las cifras de §3, §6 y §7. Si un número de este archivo cambia, una prueba tiene que
@@ -338,7 +378,10 @@ cuelgan de la losa de azotea y no de las de entrepiso.
 
 Una ruta de relevos es la cadena de partidas con holgura 0 **sobre las fechas del plan**: cada una
 arranca el día hábil en que termina la anterior. No es lo que calcula el motor (§4.4), que mide la
-ruta crítica de la red, sino lo que lee el planeador en el programa hecho a mano. La de Zafiro, 28
+ruta crítica de la red, sino lo que lee el planeador en el programa hecho a mano. Ya no
+se lee a mano: `cadena_de_relevos` la calcula (la cadena más larga de vínculos con holgura 0 que termina en el
+cierre, contando como extremos del bloque a todas las partidas que empatan) y **reproduce fila por fila las
+cinco publicadas**; para Rubí da 28 pasos y para Jade 27, que D-425 solo daba por cumplidas como red mínima. La de Zafiro, 28
 pasos, cubre 138 de los 139 días hábiles (solo el lunes 6-oct no tiene paso) y es la que sostiene la
 red mínima; el único relevo con espera es obra gris → acabados, un día, que la red declara como `FS+1`
 para que diez días insertados antes lleguen completos al cierre. La validó el usuario (D-426).
@@ -490,29 +533,30 @@ o más de su gemela— y sus listas siguen siendo del planeador (`CONOCIMIENTO.m
 
 Zafiro es el original y no se toca (D-444): la lista pasa de «pendiente de aplicar» a **registro**. La
 lectura es la de D-443 (el bloque sin la sucesora): 10 `FS`, 2 `SS` y 3 `SF`; leyendo el bloque completo
-son 18 (D-442). La propuesta del sistema para cada uno no se aplica:
+son 18 (D-442). La propuesta del sistema para cada uno no se aplica; la última columna dice qué pasa con
+él al cargar el programa (§4.5):
 
-| Sucesora (fila) | Predecesora (fila) | Vínculo | Holgura | Propuesta del sistema (no se aplica, D-444) |
-|---|---|---|---:|---|
-| EST-03020 ZAPATA Z-1 DE 60X60X20 CM (407) | OBE-02020 JARDINERA PÓRFIDO EN LAJA (237) | SF | -6 | Anotar (SF, B-81) · Media |
-| IEC-01070 MURETE INSTALACIONES ACCESORIOS (247) | OBE-02030 ZOCLO DE PÓRFIDO LAJA 10-15 CM (240) | SF+2 | -5 | Anotar (SF, B-81) · Media |
-| IEC-01070 MURETE INSTALACIONES ACCESORIOS (247) | OBE-02020 JARDINERA PÓRFIDO EN LAJA (237) | SF | -6 | Anotar (SF, B-81) · Media |
-| ALB-01010 REPELLADO MURO 3.00 (147) | ALB-01012 REPELLADO MURO +3.00 (148) | FS-1 | -8 | Descartar · Media |
-| BAP-01100 CADENA CD-1 DE 15X20 (183) | ICA-01030 DURMIENTE 20X20 (185) | FS | -5 | Descartar · Alta |
-| EST-01151 FIRME DE CONCRETO 10 CM NIVELADO Y COMPACTADO (335) | EST-01151 FIRME DE CONCRETO 10 CM NIVELADO Y COMPACTADO (335) | FS | -1 | Descartar · Alta |
-| ACA-02041 JABONERA (198) | ACA-02070 ZOCLO BRUNEI BEIGE 60X60 (ÁREAS COMUNES) (196) | SS+1 | -16 | Invertir · Baja |
-| ACA-05010 CHAPEO DE PIEDRA (184) | ACA-20020 FINAS EN FACHADA +3.00 (182) | FS | -16 | Invertir · Baja |
-| ACA-30021 PINTURA PLAFOND 1ER MANO (375) | ACA-30012 PINTURA MURO INTERIOR 2DA MANO (373) | FS | -20 | Invertir · Baja |
-| OBE-02012 BOQUILLA EN PÓRFIDO (239) | OBE-02020 JARDINERA PÓRFIDO EN LAJA (237) | SS+2 | -6 | Invertir · Baja |
-| ACA-02510 PISO DOVER BERKSHIRE RED (ASADOR) (200) | ECO-00043 ESTRUCTURA / ACABADOS (334) | FS | -14 | Reasignar a hermanas · Media |
-| ACA-30011 PINTURA MURO INTERIOR 1ER MANO (372) | API-01010 PINTURA PB (370) | FS | -24 | Reasignar a hermanas · Media |
-| ACA-30020 LIJADO Y SELLADO DE PLAFOND (374) | API-01010 PINTURA PB (370) | FS | -24 | Reasignar a hermanas · Media |
-| BAP-01010 MURO SILLAR 20 CM (364) | ECO-00046 ESTRUCTURA BP (362) | FS | -4 | Reasignar a hermanas · Media |
-| OBE-01012 FIRME PARA CISTERNA (228) | OBE-01010 ENCOFRADO DE CISTERNA 3000 LTS (226) | FS | -7 | Reasignar a hermanas · Media |
+| Sucesora (fila) | Predecesora (fila) | Vínculo | Holgura | Propuesta del sistema (no se aplica, D-444) | Al cargar |
+|---|---|---|---:|---|---|
+| EST-03020 ZAPATA Z-1 DE 60X60X20 CM (407) | OBE-02020 JARDINERA PÓRFIDO EN LAJA (237) | SF | -6 | Anotar (SF, B-81) · Media | carga y avisa |
+| IEC-01070 MURETE INSTALACIONES ACCESORIOS (247) | OBE-02030 ZOCLO DE PÓRFIDO LAJA 10-15 CM (240) | SF+2 | -5 | Anotar (SF, B-81) · Media | carga y avisa |
+| IEC-01070 MURETE INSTALACIONES ACCESORIOS (247) | OBE-02020 JARDINERA PÓRFIDO EN LAJA (237) | SF | -6 | Anotar (SF, B-81) · Media | carga y avisa |
+| ALB-01010 REPELLADO MURO 3.00 (147) | ALB-01012 REPELLADO MURO +3.00 (148) | FS-1 | -8 | Descartar · Media | carga y avisa |
+| BAP-01100 CADENA CD-1 DE 15X20 (183) | ICA-01030 DURMIENTE 20X20 (185) | FS | -5 | Descartar · Alta | no carga: cierra un ciclo |
+| EST-01151 FIRME DE CONCRETO 10 CM NIVELADO Y COMPACTADO (335) | EST-01151 FIRME DE CONCRETO 10 CM NIVELADO Y COMPACTADO (335) | FS | -1 | Descartar · Alta | no carga: autovínculo |
+| ACA-02041 JABONERA (198) | ACA-02070 ZOCLO BRUNEI BEIGE 60X60 (ÁREAS COMUNES) (196) | SS+1 | -16 | Invertir · Baja | carga y avisa |
+| ACA-05010 CHAPEO DE PIEDRA (184) | ACA-20020 FINAS EN FACHADA +3.00 (182) | FS | -16 | Invertir · Baja | carga y avisa |
+| ACA-30021 PINTURA PLAFOND 1ER MANO (375) | ACA-30012 PINTURA MURO INTERIOR 2DA MANO (373) | FS | -20 | Invertir · Baja | carga y avisa |
+| OBE-02012 BOQUILLA EN PÓRFIDO (239) | OBE-02020 JARDINERA PÓRFIDO EN LAJA (237) | SS+2 | -6 | Invertir · Baja | carga y avisa |
+| ACA-02510 PISO DOVER BERKSHIRE RED (ASADOR) (200) | ECO-00043 ESTRUCTURA / ACABADOS (334) | FS | -14 | Reasignar a hermanas · Media | carga y avisa |
+| ACA-30011 PINTURA MURO INTERIOR 1ER MANO (372) | API-01010 PINTURA PB (370) | FS | -24 | Reasignar a hermanas · Media | no carga: cierra un ciclo |
+| ACA-30020 LIJADO Y SELLADO DE PLAFOND (374) | API-01010 PINTURA PB (370) | FS | -24 | Reasignar a hermanas · Media | no carga: cierra un ciclo |
+| BAP-01010 MURO SILLAR 20 CM (364) | ECO-00046 ESTRUCTURA BP (362) | FS | -4 | Reasignar a hermanas · Media | no carga: cierra un ciclo |
+| OBE-01012 FIRME PARA CISTERNA (228) | OBE-01010 ENCOFRADO DE CISTERNA 3000 LTS (226) | FS | -7 | Reasignar a hermanas · Media | no carga: cierra un ciclo |
 
 Siete de los 18 tienen como causa común que la predecesora es un bloque que contiene a su sucesora;
-con la lectura de D-443 esa forma no se rechaza. Hay además un autovínculo (`EST-01151`) y un ciclo
-(`ICA-01030` y `BAP-01100`) que el cargador descarta.
+con la lectura de D-443 esa forma no se rechaza. De los 15, **seis no se pueden cargar** (el autovínculo
+`EST-01151` y cinco ciclos) y nueve cargan y avisan con `vinculo_incumplido`.
 
 ## 7.4 Los ocho `SF`
 
@@ -550,22 +594,34 @@ Lo que arranca justo después de que termina esa ruta está en `SEGUNDA-RUTA-LO-
 
 # 8. El Gantt: reglas de visualización
 
-Lo único que falta del módulo es de pantalla, no de entidad. Lo que la imagen de Zafiro Plus con sus
-132 vínculos (D-432) ya fijó, como propuesta a confirmar:
+Lo único que falta del módulo es de pantalla, no de entidad. `vista_gantt` (§4.5) ya entrega los datos
+—filas, flechas y marcas— y una pantalla de trabajo de Zafiro Plus los dibuja. Las reglas siguen siendo
+propuesta a confirmar (B-95); parten de la imagen de D-432 y de lo que la pantalla obligó a precisar:
 
-- **Una fila por partida y por bloque**, los bloques como barras de resumen de las partidas que
-  contienen (479 filas visibles en Plus: 388 partidas y 90 resúmenes de bloque).
-- **Color por etapa** (7 colores categóricos); el **rojo está reservado** para la ruta crítica y para
-  ninguna otra cosa.
-- **Una flecha por vínculo**, desde la predecesora hasta la sucesora; cuando la predecesora es un
-  bloque, la flecha sale de la partida del bloque que de verdad fija la fecha (la que cierra la ventana)
-  y no del bloque.
-- **La ruta crítica se resalta siguiendo esa misma cadena**, partida a partida: es la razón de que Plus
-  muestre 31 pasos y no 5 (D-432, antes de que D-435 a D-437 la acortaran).
-- **Se marcan** los fines de semana, los feriados del calendario de la obra y la ventana de la planta
-  alta.
-- **El horizonte lo fija el programa más largo que se muestra** (D-449); la cuadrícula día por día es
-  una vista, no un dato (D-447).
+- **Una fila por partida y un resumen por cada bloque de Nivel 2 y 3**, con la barra de todo lo que
+  contiene. D-432 contó 389 filas de concepto y 90 resúmenes (479); la fila de cierre en blanco no tiene
+  barra, así que la vista trae 388 partidas y 90 resúmenes. Los frentes (Nivel 1) y el capítulo no llevan
+  resumen salvo que se pida (`niveles_resumen`).
+- **Color por frente**: los seis niveles constructivos (cimentación, planta baja, planta alta, azotea,
+  acabados, obras exteriores) con su color y los nueve frentes restantes, paquetes contratados terminados,
+  en gris. D-432 usó siete colores por etapa; las etapas son 49 en Plus y no se distinguen por color.
+- **El rojo es solo para una cadena a la vez.** Hay dos lecturas y la pantalla deja elegir: la **cadena de
+  relevos** del plan (13 pasos en Plus; la que lee el planeador y la que resaltó D-432) o la **ruta crítica
+  de la red** (28 partidas en Plus; la que calcula el motor). Son distintas porque la red tiene unos 130
+  vínculos sobre 388 partidas (§4.4).
+- **Una flecha por vínculo**, desde la predecesora hasta la sucesora, anclada donde el tipo lo pide
+  (`FS` del fin al inicio, `SS` de inicio a inicio, `FF` de fin a fin, `SF` del inicio al fin). Cuando la
+  predecesora es un bloque, sale de la partida del bloque que de verdad fija la fecha —la que cierra su
+  ventana en `FS` y `FF`, la que la abre en `SS` y `SF`, sin contar a la sucesora—; si empatan varias, de la
+  que está en la cadena roja, y si ninguna lo está, de la que arranca más tarde en el cierre o la primera
+  del libro en la apertura. Un vínculo incumplido se dibuja punteado.
+- **Se marcan** los fines de semana, los feriados del calendario de la obra y la ventana de la planta alta.
+- **El horizonte lo fija el programa más largo que se muestra** (D-449); la cuadrícula día por día es una
+  vista, no un dato (D-447).
+
+Tres preguntas para el usuario, sin las cuales B-95 no cierra: cuál de las dos cadenas va en rojo por
+defecto, si basta el resumen de Nivel 2 y 3 o también el de cada frente, y si las flechas se dibujan siempre
+o solo al pasar por una barra.
 
 ---
 
@@ -573,8 +629,8 @@ Lo único que falta del módulo es de pantalla, no de entidad. Lo que la imagen 
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| Visualización del Gantt | Las reglas de §8 son propuesta; falta que el usuario las confirme sobre una pantalla real |
-| Integración del motor con `ACTIVIDAD` y `PRECEDENCIA` | Es de la capa de aplicación (Django); el contrato de §4.1 es lo que se le entrega |
+| Visualización del Gantt (B-95) | Los datos y una pantalla de trabajo existen; faltan las tres preguntas de §8 |
+| Integración con `ACTIVIDAD` y `PRECEDENCIA` | El cargador y el motor entregan y reciben estructuras (§4.1, §4.5); guardarlas es de la capa de aplicación (Django) |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
 | Las listas del planeador | Los 12 supuestos de cada programa, los 15 de Zafiro, las 59 que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos por rol |
 | La segunda ruta de cuadrilla | Borrador; se captura a mano con `origen = recurso` (§7.5) |
@@ -598,3 +654,4 @@ Lo único que falta del módulo es de pantalla, no de entidad. Lo que la imagen 
 | Retraso y alertas | D-456 a D-459 |
 | Pendientes de B-86 | D-444, D-445, D-460 |
 | **El motor, los datos en el repositorio y esta consolidación** | **D-461** |
+| **El cargador, la cadena de relevos calculada y el Gantt como dato** | **D-462** |

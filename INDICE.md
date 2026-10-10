@@ -49,7 +49,7 @@ cerebro/
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
 ├── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
-└── backend/                   el código que el cerebro especifica: core/motor_calculo.py · core/motor_cpm.py (con sus pruebas)
+└── backend/                   el código que el cerebro especifica: core/motor_calculo.py · core/motor_cpm.py · core/programa.py (con sus pruebas)
 ```
 
 **Este archivo queda fuera de las cuatro.** Un órgano que se clasifica a sí mismo
@@ -240,10 +240,10 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 461 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 462 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
-| `PROGRAMA-CPM.md` | I | ✅ 76 pruebas · los siete programas reproducen las cifras publicadas |
+| `PROGRAMA-CPM.md` | I | ✅ 104 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |
