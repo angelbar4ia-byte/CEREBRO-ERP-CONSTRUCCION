@@ -1392,6 +1392,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `subfrente_detenido` | Un sub-frente (etapa) con avance mayor que 0 y menor que 100% lleva al menos `dias_sin_avance` sin una operación de avance —por defecto 21, en `ALERTA.parametro_usado`—. Es un aviso: el avance puede no haberse capturado | B-88 |
 | `ejecutado_sobre_ingenieria` | En una línea de destajo, el ejecutado valuado excede el costo de la ingeniería del lote — sin umbral, cualquier excedente | B-88 |
 | `subfrente_atrasado` | Un sub-frente (etapa) cuyo avance está por debajo del programa de la obra, en tres casos: su término planeado ya pasó y no llega a `porcentaje_terminado` (90% por defecto); debía haber arrancado y no arrancó; o va en curso `puntos_rezago` puntos o más por debajo de lo planeado (20 por defecto). Se ordena por valor rezagado, (planeado − ejecutado) × ingeniería | D-456 |
+| `obra_atrasada` | La obra va al menos un paso del calendario (`CALENDARIO_OBRA.paso_dias`, un día hábil) detrás de su programa, medido por tiempo ganado —hoy menos el último día en que el plan estaba en el avance ejecutado— y neto: lo adelantado compensa a lo atrasado. Sin umbral. `objeto_id` es la raíz de la obra y la `evidencia` trae los días, el retraso neto, lo atrasado y lo adelantado en $, y su desglose por frente, sub-frente, contratista y residente, que suma exacto | D-457 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -1745,6 +1746,8 @@ otro.
 `raiz_id` cuelga del árbol completo de una obra. `RESIDENTE_OBRA` apunta ahí,
 cerrando la asignación que C-3 (`PROPUESTA-CUATRO-MODULOS.md` §2) ya había
 anotado sin tabla.
+
+*D-457 (propuesta): `RESIDENTE_OBRA` gana `vigente_desde` y `vigente_hasta` (DATE; el segundo, nullable), igual que `ASIGNACION_CONTRATISTA` (§4a): sin ellos, auditar el retraso de la obra por residente le carga la historia al residente nuevo.*
 
 **`SUPERVISION` es una sola tabla para los dos niveles de la cascada**, no
 dos — Supervisor-sobre-Residente y Superintendente-sobre-Supervisor tienen
@@ -2429,6 +2432,14 @@ las de sus partidas, y se lee a cualquier fecha.
 operación, avance del frente siguiente, contratista en otras obras— y el residente las resuelve con una causa en
 `nota_resolucion` (terminado sin capturar · detenido de verdad · esperando un predecesor · contratista reasignado);
 sin campo nuevo.
+
+*D-457 corrige lo de arriba:* `porcentaje_terminado` y `puntos_rezago` no existen; el retraso real se avisa desde un
+día hábil (tiempo ganado) y es **una alerta por obra** (`obra_atrasada`, §5a): los sub-frentes de `subfrente_atrasado`
+pasan a ser su evidencia. Los parámetros quedan en `{"dias_sin_avance": 21}` y el 90% de `solicitar_cierre_frente`.
+**El retraso de la obra se audita por contratista y por residente** agrupando la misma evidencia: el retraso de una
+línea de destajo es (planeado de su etapa − ejecutado) × su costo, y la suma de las líneas es el retraso de la obra;
+cada línea cae con el contratista de `ASIGNACION_CONTRATISTA` vigente (o «sin contratista asignado») y cada obra con
+su `RESIDENTE_OBRA`. Es una lectura, no un campo, como la de `DESVIACION` por contratista (§5g).
 
 ### ⏸ Lo que esto sigue sin resolver
 

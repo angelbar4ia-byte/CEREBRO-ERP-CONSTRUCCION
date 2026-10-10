@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5903 | 20 |
+| §11 | Los flujos entre sistemas | 5959 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6241,6 +6241,62 @@ Libro: `ATRASO_Y_DETENIDOS_ALAMO18_D456.xlsx` (11 hojas: la respuesta, la cola d
 real por frente, el programa anclado, el diagnóstico de detenidos, la calibración, las pausas normales y por
 gremio, la sensibilidad del 90%, los parámetros y cómo se calcula). `MODELO.md` §5a y §5c,
 `PENDIENTES-MEJORAS.md` B-88 y B-92.
+
+*Corregido por D-457: no hay `puntos_rezago` ni `porcentaje_terminado`; el retraso real se avisa desde un día hábil y la alerta es una por obra.*
+
+### Si el retraso es real se avisa, el retraso es de la obra y se audita por contratista y por residente (D-457)
+
+Dato del usuario, respondiendo a la pregunta de D-456 (¿20 puntos de rezago?): **«si el retraso es real
+se avisa; el retraso es por obra, pero es auditable por contratista y por residente»**.
+
+**1. Sin umbral.** Se retiran `puntos_rezago` (20) y `porcentaje_terminado` (90) de D-456. El retraso se mide
+en días hábiles detrás del programa, por **tiempo ganado**: hoy menos el último día en que el plan estaba en el
+avance ejecutado. Es **real desde un paso del calendario** (`CALENDARIO_OBRA.paso_dias`, un día hábil, D-446): no
+hay otra perilla. Un sub-frente al 99.9% o más cuenta como terminado, que es la precisión de la medida y no una
+política. Quedan `dias_sin_avance` (21) y el 90% de `solicitar_cierre_frente` (D-261), que no son retraso.
+
+**2. El retraso es de la obra.** La alerta es **una por obra** (`obra_atrasada`, `objeto_id` = la raíz del
+presupuesto de la obra); los sub-frentes atrasados de D-456 son su evidencia, no alertas aparte. El retraso es
+neto —lo adelantado compensa a lo atrasado— y la evidencia trae las dos partes. `ALAMO 18` al 29-jul-2026:
+**13 días hábiles detrás**, 59.8% planeado contra 45.2% ejecutado, **$150,164** netos ($174,697 detrás del
+programa y $24,533 adelante, en Azotea y Planta alta). Si una obra va en tiempo pero un sub-frente atrasa
+compensado por otro adelantado, solo aparece en la evidencia y no dispara: es la consecuencia de que el retraso
+sea de la obra.
+
+**3. Auditable por contratista.** El valor se reparte **exacto**, línea de destajo por línea: retraso de la línea =
+(planeado de su etapa − ejecutado) × su costo, y la suma de las líneas es el retraso de la obra. Cada línea cae
+con el contratista de `ASIGNACION_CONTRATISTA` vigente (D-453); en los datos, que no la traen, se usó el que
+ejecutó la línea, si no el que más ejecutó su etapa, si no el que ejecutó el mismo gremio, si no «sin contratista
+asignado». Es una lectura que se agrupa y no un campo, como la de `DESVIACION` por contratista (§5g).
+
+| Contratista | Detrás | Adelante | Retraso neto | Parte |
+|---|---|---|---|---|
+| Luis Fernando Aguilera Mallagan | $148,227 | $24,437 | **$123,790** | 82% |
+| Rigoberto Orduña | $26,470 | $96 | **$26,374** | 18% |
+| Sin contratista asignado | — | — | $0 (71 líneas, $160,959 de ingeniería sin arrancar) | — |
+| **Obra** | $174,697 | $24,533 | **$150,164** | 100% |
+
+**4. Auditable en el tiempo.** Recalculado cada miércoles (el avance se registra por semana), el retraso de
+`ALAMO 18` aparece el 20-may (3 días) y llega a 13 el 22-jul. El de Rigoberto Orduña aparece pronto (unos $26,000
+desde el 20-may) y no se corrige: las instalaciones nunca alcanzan al programa. El de Luis Fernando Aguilera
+aparece el 10-jun y crece en julio con la obra negra de Planta baja ($137,923 el 22-jul). Auditar en el tiempo
+exige que la asignación guarde su vigencia: sin ella, una reasignación por abandono le cargaría su historia al
+contratista nuevo.
+
+**5. Por residente.** Se agrupa por la obra que tiene asignada (`RESIDENTE_OBRA`). Aquí el residente es el
+operador que más registra la obra (suposición, D-452): Isai Olvera Arteaga, con 4 obras de las que solo
+`ALAMO 18` tiene programa. **`RESIDENTE_OBRA` no tiene vigencia**: igual que la asignación del contratista,
+necesita `vigente_desde` y `vigente_hasta` para que un cambio de residente no le cargue la historia al nuevo
+(B-93, propuesta).
+
+**Qué no resuelve.** Auditar las 34 obras pide el programa de cada una, que sale de su prototipo corrido a su
+arranque; en el sistema el prototipo de cada obra se sabe por la clonación de su presupuesto, pero en estos
+datos solo se identificó el de `ALAMO 18`. Y la cifra en días crece cerca del final de un sub-frente chico
+(Cimentación: 62 días por el 8% de $87,518), así que las listas se ordenan por valor.
+
+Libro: `AUDITORIA_DEL_RETRASO_ALAMO18_D457.xlsx` (9 hojas: la respuesta, la obra y sus frentes, por contratista,
+contratista por sub-frente, por residente, la serie semanal, la cola de atención, las 280 líneas al corte y
+cómo se calcula). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-92 y B-93.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
