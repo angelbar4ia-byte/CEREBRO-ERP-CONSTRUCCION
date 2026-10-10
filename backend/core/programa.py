@@ -139,6 +139,7 @@ class Programa:
     ventanas: Dict[str, Ventana]  # el plan: inicio y término de cada partida
     bloques: Dict[str, List[str]]  # llave de bloque -> sus partidas, en orden del libro
     por_llave: Dict[str, Fila] = field(default_factory=dict)
+    origenes: Dict[Vinculo, str] = field(default_factory=dict)  # por qué existe cada vínculo: lo que se declaró
 
     def calcular(self, cal: Calendario, plazo_dias=None, inicio: Optional[date] = None) -> ResultadoCPM:
         """El CPM más temprano de la red cargada. `inicio` es el arranque de la obra, por defecto el
@@ -181,7 +182,8 @@ class Programa:
         return self.por_llave[llave].fila
 
 
-def cargar_programa(filas: Sequence[Fila], cal: Calendario) -> Programa:
+def _estructura(filas: Sequence[Fila]):
+    """Lo que dicen las filas por sí solas: sus índices, las ventanas del plan y las partidas de cada bloque."""
     por_fila: Dict[int, Fila] = {}
     for f in filas:
         if f.fila in por_fila:
@@ -190,9 +192,7 @@ def cargar_programa(filas: Sequence[Fila], cal: Calendario) -> Programa:
     por_llave = {f.llave: f for f in filas}
     if len(por_llave) != len(filas):
         raise ValueError("la llave (`oid`) se repite: no hay forma de seguir una fila cuando se inserta otra")
-
     ventanas = {f.llave: Ventana(f.inicio, f.termino) for f in filas if f.es_partida}
-
     # los bloques: cada fila que no es concepto con las partidas que cuelgan de ella
     bloques: Dict[str, List[str]] = {}
     for i, f in enumerate(filas):
@@ -205,6 +205,30 @@ def cargar_programa(filas: Sequence[Fila], cal: Calendario) -> Programa:
             if q.es_partida:
                 hijos.append(q.llave)
         bloques[f.llave] = hijos
+    return por_fila, por_llave, ventanas, bloques
+
+
+def armar_programa(
+    filas: Sequence[Fila],
+    vinculos: Sequence[Vinculo],
+    rechazados: Sequence[Rechazado],
+    cal: Calendario,
+    origenes: Optional[Mapping[Vinculo, str]] = None,
+) -> Programa:
+    """Un programa a partir de filas y de vínculos ya resueltos (por llave, no por número de fila): lo que
+    entrega un repositorio. Los vínculos se dan por buenos: la validación ocurrió al cargarlos."""
+    _, por_llave, ventanas, bloques = _estructura(filas)
+    usados = {v.predecesora for v in vinculos if v.predecesora in bloques}
+    actividades = [Actividad(f.llave, Fraction(cal.n(f.termino) + 1 - cal.n(f.inicio))) for f in filas if f.es_partida]
+    actividades += [Actividad(b, 0, tuple(h for h in bloques[b])) for b in bloques if b in usados]
+    return Programa(
+        list(filas), actividades, list(vinculos), list(rechazados), ventanas, bloques, por_llave,
+        {v: o for v, o in (origenes or {}).items() if v in set(vinculos)},
+    )
+
+
+def cargar_programa(filas: Sequence[Fila], cal: Calendario) -> Programa:
+    por_fila, por_llave, ventanas, bloques = _estructura(filas)
 
     # 1. leer y validar cada vínculo
     aceptados: List[Tuple[Vinculo, int, str]] = []  # (vínculo, fila sucesora, token)
@@ -237,12 +261,7 @@ def cargar_programa(filas: Sequence[Fila], cal: Calendario) -> Programa:
 
     # 2. los ciclos reales: solo entre partidas; un bloque nunca cierra un ciclo por sí mismo
     aceptados = _sin_ciclos(aceptados, ventanas, bloques, cal, por_llave, rechazados)
-
-    vinculos = [v for v, _, _ in aceptados]
-    usados = {v.predecesora for v in vinculos if v.predecesora in bloques}
-    actividades = [Actividad(f.llave, Fraction(cal.n(f.termino) + 1 - cal.n(f.inicio))) for f in filas if f.es_partida]
-    actividades += [Actividad(b, 0, tuple(h for h in bloques[b])) for b in bloques if b in usados]
-    return Programa(list(filas), actividades, vinculos, rechazados, ventanas, bloques, por_llave)
+    return armar_programa(filas, [v for v, _, _ in aceptados], rechazados, cal)
 
 
 def _holgura_en_el_plan(v: Vinculo, ventanas, bloques, cal) -> Optional[Fraction]:
@@ -413,12 +432,22 @@ class FijarInicio:
     fecha: date
 
 
+ORIGENES = ("tecnica", "recurso", "decision")  # `PRECEDENCIA.origen`: por qué existe ese orden
+ORIGEN_POR_OMISION = "decision"  # el de menor confianza: lo que alguien edita sin decir por qué se revisa primero
+CONFIANZA_DE = {"tecnica": "alta", "recurso": "media", "decision": "baja"}  # derivada del origen, no declarada
+
+
+def confianza_de(origen: Optional[str]) -> Optional[str]:
+    return CONFIANZA_DE.get(origen) if origen else None
+
+
 @dataclass(frozen=True)
 class AgregarVinculo:
     predecesora: str  # una partida o un bloque con partidas
     sucesora: str  # siempre una partida
     tipo: str = "FS"
     desfase: Fraction = Fraction(0)
+    origen: Optional[str] = None  # técnica · recurso · decisión; sin declarar, `decision`
 
 
 @dataclass(frozen=True)
@@ -435,6 +464,7 @@ class CambiarVinculo:
     tipo_actual: str
     tipo: str
     desfase: Fraction = Fraction(0)
+    origen: Optional[str] = None  # si no se declara, conserva el que tenía y, si no tenía, `decision`
 
 
 PERMISO_DE = {
@@ -446,6 +476,47 @@ PERMISO_DE = {
 }
 
 
+_TIPO_DE_EDICION = {
+    "cambiar_duracion": CambiarDuracion,
+    "fijar_inicio": FijarInicio,
+    "agregar_vinculo": AgregarVinculo,
+    "quitar_vinculo": QuitarVinculo,
+    "cambiar_vinculo": CambiarVinculo,
+}
+_NOMBRE_DE_EDICION = {c: n for n, c in _TIPO_DE_EDICION.items()}
+
+
+def edicion_a_dict(e: object) -> Dict[str, object]:
+    """La edición tal como se guarda: un diccionario de texto y números, sin objetos."""
+    nombre = _NOMBRE_DE_EDICION.get(type(e))
+    if nombre is None:
+        raise TypeError(f"edición desconocida: {e!r}")
+    d: Dict[str, object] = {"edicion": nombre}  # «tipo» ya es el del vínculo (FS, SS…)
+    for k, v in e.__dict__.items():
+        d[k] = v.isoformat() if isinstance(v, date) else (str(Fraction(v)) if k in ("dias", "desfase") else v)
+    return d
+
+
+def edicion_desde_dict(d: Mapping[str, object]) -> object:
+    clase = _TIPO_DE_EDICION.get(d.get("edicion"))  # type: ignore[arg-type]
+    if clase is None:
+        raise ValueError(f"edición desconocida: {d.get('edicion')!r}")
+    campos = {k: v for k, v in d.items() if k != "edicion"}
+    for k in ("dias", "desfase"):
+        if k in campos:
+            campos[k] = Fraction(campos[k])
+    if "fecha" in campos:
+        campos["fecha"] = date.fromisoformat(campos["fecha"])  # type: ignore[arg-type]
+    return clase(**campos)
+
+
+def origen_de_edicion(e: object) -> Optional[str]:
+    """El origen que declara la edición, si es de las que agregan o cambian un vínculo."""
+    if isinstance(e, (AgregarVinculo, CambiarVinculo)):
+        return e.origen or ORIGEN_POR_OMISION
+    return None
+
+
 @dataclass(frozen=True)
 class Movida:
     llave: str
@@ -453,10 +524,10 @@ class Movida:
     dias_fin: int
 
 
-@dataclass
-class Reprogramacion:
-    programa: Programa  # el programa con sus fechas nuevas: se puede calcular, dibujar y volver a editar
-    resultado: ResultadoCPM
+@dataclass(frozen=True)
+class Impacto:
+    """Lo que el planeador ve antes de decidir: qué se mueve, cuánto el cierre y si cambia la ruta."""
+
     movidas: List[Movida]
     fin_antes: date
     fin_despues: date
@@ -464,8 +535,69 @@ class Reprogramacion:
     ruta_antes: List[str]
     ruta_despues: List[str]
     ruta_cambia: bool  # D-100: la ruta se recalcula siempre, pero solo avisa si cambia de actividades
+
+    def resumen(self) -> Dict[str, object]:
+        """Lo que se guarda con una edición aplicada: lo que se le mostró a quien decidió."""
+        return {
+            "partidas_movidas": len(self.movidas),
+            "fin_antes": self.fin_antes.isoformat(),
+            "fin_despues": self.fin_despues.isoformat(),
+            "dias_de_cambio": self.dias_de_cambio,
+            "ruta_cambia": self.ruta_cambia,
+            "pasos_antes": len(self.ruta_antes),
+            "pasos_despues": len(self.ruta_despues),
+        }
+
+
+def comparar(antes: Programa, despues: Programa, cal: Calendario) -> Impacto:
+    """El impacto de pasar del programa `antes` al programa `despues`, sobre las mismas partidas."""
+    movidas = []
+    for k, w in antes.ventanas.items():
+        di, df = cal.n(despues.ventanas[k].inicio) - cal.n(w.inicio), cal.n(despues.ventanas[k].fin) - cal.n(w.fin)
+        if di or df:
+            movidas.append(Movida(k, di, df))
+    fin_antes = max(w.fin for w in antes.ventanas.values())
+    fin_despues = max(w.fin for w in despues.ventanas.values())
+    ra, rd = cadena_de_relevos(antes, cal), cadena_de_relevos(despues, cal)
+    return Impacto(movidas, fin_antes, fin_despues, cal.n(fin_despues) - cal.n(fin_antes), ra, rd, set(ra) != set(rd))
+
+
+@dataclass
+class Reprogramacion:
+    programa: Programa  # el programa con sus fechas nuevas: se puede calcular, dibujar y volver a editar
+    resultado: ResultadoCPM
+    impacto: Impacto  # contra el programa que se reprogramó
     rechazadas: List[Rechazado]  # ediciones que no se aplican, con su motivo
     incumplidos: List[Tuple[Vinculo, Fraction]]  # los que siguen sin cumplirse tras reprogramar
+
+    # el impacto, a la mano
+    @property
+    def movidas(self) -> List[Movida]:
+        return self.impacto.movidas
+
+    @property
+    def fin_antes(self) -> date:
+        return self.impacto.fin_antes
+
+    @property
+    def fin_despues(self) -> date:
+        return self.impacto.fin_despues
+
+    @property
+    def dias_de_cambio(self) -> int:
+        return self.impacto.dias_de_cambio
+
+    @property
+    def ruta_antes(self) -> List[str]:
+        return self.impacto.ruta_antes
+
+    @property
+    def ruta_despues(self) -> List[str]:
+        return self.impacto.ruta_despues
+
+    @property
+    def ruta_cambia(self) -> bool:
+        return self.impacto.ruta_cambia
 
 
 def reprogramar(
@@ -488,6 +620,7 @@ def reprogramar(
     duraciones = {k: Fraction(cal.n(w.fin) + 1 - cal.n(w.inicio)) for k, w in prog.ventanas.items()}
     anclas: Dict[str, date] = {k: w.inicio for k, w in prog.ventanas.items()} if modo == "empuje" else {}
     vivos: List[Tuple[Vinculo, int, str]] = [(v, 0, "") for v in prog.vinculos]
+    origenes: Dict[Vinculo, str] = dict(prog.origenes)
     rechazadas: List[Rechazado] = []
 
     def no(llave: str, motivo: str, token: str = "") -> None:
@@ -521,6 +654,8 @@ def reprogramar(
             motivo = valido(e.predecesora, e.sucesora)
             if motivo:
                 no(e.sucesora, motivo, token)
+            elif e.origen is not None and e.origen not in ORIGENES:
+                no(e.sucesora, "origen_invalido", token)
             elif e.predecesora == e.sucesora:
                 no(e.sucesora, "autovinculo", token)
             else:
@@ -531,17 +666,23 @@ def reprogramar(
                     no(e.sucesora, "cierra_un_ciclo", token)
                 else:
                     vivos.append((nuevo, 0, ""))
+                    origenes[nuevo] = e.origen or ORIGEN_POR_OMISION
         elif isinstance(e, QuitarVinculo):
             tipo = None if e.tipo is None else tipo_normal(e.tipo)
             quedan = [t for t in vivos if not (t[0].predecesora == e.predecesora and t[0].sucesora == e.sucesora and (tipo is None or t[0].tipo == tipo))]
             if len(quedan) == len(vivos):
                 no(e.sucesora, "vinculo_inexistente", f"{e.predecesora}{e.tipo or ''}")
+            for v, _, _ in vivos:
+                if all(v != q for q, _, _ in quedan):
+                    origenes.pop(v, None)
             vivos = quedan
         elif isinstance(e, CambiarVinculo):
             actual = tipo_normal(e.tipo_actual)
             idx = next((i for i, (v, _, _) in enumerate(vivos) if v.predecesora == e.predecesora and v.sucesora == e.sucesora and v.tipo == actual), None)
             if idx is None:
                 no(e.sucesora, "vinculo_inexistente", f"{e.predecesora}{e.tipo_actual}")
+            elif e.origen is not None and e.origen not in ORIGENES:
+                no(e.sucesora, "origen_invalido", f"{e.predecesora}{e.tipo}")
             else:
                 nuevo = Vinculo(e.predecesora, e.sucesora, e.tipo, e.desfase)
                 resto = vivos[:idx] + vivos[idx + 1 :]
@@ -550,6 +691,10 @@ def reprogramar(
                 elif _cierra_ciclo(resto + [(nuevo, 0, "")], prog, cal):
                     no(e.sucesora, "cierra_un_ciclo", f"{e.predecesora}{e.tipo}")
                 else:
+                    viejo = vivos[idx][0]
+                    origenes[nuevo] = e.origen or origenes.get(viejo) or ORIGEN_POR_OMISION
+                    if viejo != nuevo:
+                        origenes.pop(viejo, None)
                     vivos = resto[:idx] + [(nuevo, 0, "")] + resto[idx:]
         else:
             raise TypeError(f"edición desconocida: {e!r}")
@@ -561,27 +706,13 @@ def reprogramar(
     arranque = min(w.inicio for w in prog.ventanas.values())
     res = calcular_cpm(acts, vinculos, cal, arranque)
     nuevas = {k: Ventana(res[k].fecha_inicio, res[k].fecha_fin) for k in prog.ventanas}
-    nuevo_prog = replace(prog, actividades=acts, vinculos=vinculos, ventanas=nuevas)
+    nuevo_prog = replace(prog, actividades=acts, vinculos=vinculos, ventanas=nuevas,
+                         origenes={v: o for v, o in origenes.items() if v in set(vinculos)})
 
-    movidas = []
-    for k, w in prog.ventanas.items():
-        di, df = cal.n(nuevas[k].inicio) - cal.n(w.inicio), cal.n(nuevas[k].fin) - cal.n(w.fin)
-        if di or df:
-            movidas.append(Movida(k, di, df))
-    fin_antes = max(w.fin for w in prog.ventanas.values())
-    fin_despues = max(w.fin for w in nuevas.values())
-    antes = cadena_de_relevos(prog, cal)
-    despues = cadena_de_relevos(nuevo_prog, cal)
     return Reprogramacion(
         programa=nuevo_prog,
         resultado=res,
-        movidas=movidas,
-        fin_antes=fin_antes,
-        fin_despues=fin_despues,
-        dias_de_cambio=cal.n(fin_despues) - cal.n(fin_antes),
-        ruta_antes=antes,
-        ruta_despues=despues,
-        ruta_cambia=set(antes) != set(despues),
+        impacto=comparar(prog, nuevo_prog, cal),
         rechazadas=rechazadas,
         incumplidos=nuevo_prog.incumplidos(cal),
     )

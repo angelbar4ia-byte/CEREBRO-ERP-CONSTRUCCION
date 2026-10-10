@@ -1938,6 +1938,40 @@ las que sigan `heredada` dentro de él. Las que ya eran `propia` no se
 pisan: se avisan con `ALERTA` para que el planeador decida. Primer caso aplicado: la losa de 4.20 de Rubí,
 que el planeador sube de 7 a 9 días (`CONOCIMIENTO.md` §11.14).
 
+### La bitácora de ediciones del programa: lo que se guarda es lo que se editó, no las fechas (D-464)
+
+El programa vigente no se guarda: es el programa base más las ediciones aplicadas, repetidas por el motor
+(`reprogramar`, `PROGRAMA-CPM.md` §4.6). Lo único que se persiste de nuevo es la bitácora.
+
+```
+EDICION_PROGRAMA   — solo se agrega                                          propuesta, D-464
+  id
+  programa_id           hoy `programa`; cuelga de PRESUPUESTO cuando exista (B-03)
+  secuencia             1, 2, 3… dentro del programa
+  edicion               enum: cambiar_duracion · fijar_inicio · agregar_vinculo ·
+                         quitar_vinculo · cambiar_vinculo
+  datos                 JSONB — la edición tal como se pidió, citando la llave
+                         estable (`oid`) de la actividad y nunca su número de fila
+  origen                mismo enum que `PRECEDENCIA.origen` — solo en las dos que
+                         agregan o cambian un vínculo, y ahí obligatorio; sin
+                         declarar, `decision`
+  rol, usuario          quién la hizo y con qué permiso (§5b)
+  estado                enum: aplicada · revertida
+  impacto               JSONB — lo que el sistema mostró al decidir: partidas movidas,
+                         cierre antes y después, si cambia la ruta
+  creada_en, revertida_en, revertida_por
+```
+
+**Reglas.** (1) La bitácora no se borra ni se reescribe; lo único que cambia en una fila es pasar de `aplicada`
+a `revertida`. (2) Estructura —duración y vínculos— es de Control de obra y fechas, del Residente; ningún otro
+rol edita. (3) Una edición que no se puede aplicar no se guarda. (4) Se guarda con la versión del programa que
+vio quien decidió; si alguien editó entre medio, el conflicto se dice y no se pisa. (5) Deshacer repite la
+cuenta sin la edición y no se permite si otras posteriores dependen de ella. (6) **`PRECEDENCIA.origen` es
+nulo en lo importado** —el libro no dice por qué existe cada uno de sus 832 vínculos— **y obligatorio en lo
+que alguien edita**: el que no declara nada deja `decision`, la de menor confianza, que se revisa primero.
+Hasta que `NODO` y `PRESUPUESTO` tengan tabla, el programa se guarda como libro (`programa_fila`) y
+`programa_vinculo`, con la migración `database/migraciones/0001_programa.sql`.
+
 ### La herencia de una duración: referencia explícita, y el que edita pasa a ser la referencia de su alcance (D-441, cierra B-85)
 
 Dos campos en `ACTIVIDAD` (arriba), sin tabla nueva. **La referencia es una
@@ -3108,7 +3142,7 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
 | Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
-| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). *Resuelto en parte (D-461): el motor existe en `backend/core/motor_cpm.py`, probado contra los siete programas reales; la visualización del Gantt cierra en D-463 (`PROGRAMA-CPM.md` §8). D-462: el cargador con las reglas de D-442 y D-443 está en `backend/core/programa.py`; D-463: la reprogramación por empuje mínimo, también.* `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos; antes hay que decidir qué es un frente (D-448)*Resuelto (D-450): el frente es el nivel constructivo y se lee subiendo por el árbol desde la partida, así que `ACTIVIDAD` no necesita `frente_id`; el tope se compara por frente y oficio, por ventana de trabajo (D-449).* |
+| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). *Resuelto en parte (D-461): el motor existe en `backend/core/motor_cpm.py`, probado contra los siete programas reales; la visualización del Gantt cierra en D-463 (`PROGRAMA-CPM.md` §8). D-462: el cargador con las reglas de D-442 y D-443 está en `backend/core/programa.py`; D-463: la reprogramación por empuje mínimo, también; D-464: la bitácora de ediciones y su persistencia.* `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos; antes hay que decidir qué es un frente (D-448)*Resuelto (D-450): el frente es el nivel constructivo y se lee subiendo por el árbol desde la partida, así que `ACTIVIDAD` no necesita `frente_id`; el tope se compara por frente y oficio, por ventana de trabajo (D-449).* |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |
 

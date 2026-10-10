@@ -102,6 +102,24 @@ class Calendario:
         efectivos = sorted(d for d in self.no_habiles if d.weekday() in self.dias_laborables_semana)
         object.__setattr__(self, "_feriados", tuple(efectivos))
 
+    def a_dict(self) -> dict:
+        """Como se guarda: días de la semana, no hábiles y redondeo, sin objetos."""
+        return {
+            "dias_laborables_semana": sorted(self.dias_laborables_semana),
+            "no_habiles": sorted(d.isoformat() for d in self.no_habiles),
+            "paso_dias": None if self.paso_dias is None else str(self.paso_dias),
+            "sentido_redondeo": self.sentido_redondeo,
+        }
+
+    @classmethod
+    def desde_dict(cls, d: dict) -> "Calendario":
+        return cls(
+            dias_laborables_semana=frozenset(d["dias_laborables_semana"]),
+            no_habiles=frozenset(date.fromisoformat(x) for x in d["no_habiles"]),
+            paso_dias=None if d["paso_dias"] is None else Fraction(d["paso_dias"]),
+            sentido_redondeo=d["sentido_redondeo"],
+        )
+
     @property
     def habiles_por_semana(self) -> int:
         return len(self.dias_laborables_semana)

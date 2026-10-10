@@ -15,5 +15,7 @@ jobs:
           python-version: "3.12"
       - name: Comprobar coherencia
         run: python3 2-operacion/verificar-cerebro.py .
-      - name: Probar el motor contra los programas reales
+      - name: Instalar lo que las pruebas de persistencia necesitan
+        run: pip install pgserver "psycopg[binary]"
+      - name: Probar el motor y la persistencia contra los programas reales
         run: cd backend && python3 -m unittest discover

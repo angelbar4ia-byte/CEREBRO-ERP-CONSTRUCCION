@@ -49,7 +49,8 @@ cerebro/
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
 ├── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
-├── backend/                   el código que el cerebro especifica: core/motor_calculo.py · core/motor_cpm.py · core/programa.py (con sus pruebas)
+├── backend/                   el código que el cerebro especifica: core/ (motor_calculo · motor_cpm · programa · servicio_programa, con sus pruebas) · infra/ (adaptador de Postgres)
+├── database/migraciones/      el esquema, en SQL: 0001_programa.sql
 └── frontend/gantt/            la pantalla del Gantt: gantt.html · motor_gantt.js (reprograma en el navegador; una prueba lo contrasta con Python)
 ```
 
@@ -241,10 +242,10 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 463 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 464 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
-| `PROGRAMA-CPM.md` | I | ✅ 120 pruebas · los siete programas reproducen las cifras publicadas |
+| `PROGRAMA-CPM.md` | I | ✅ 168 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |

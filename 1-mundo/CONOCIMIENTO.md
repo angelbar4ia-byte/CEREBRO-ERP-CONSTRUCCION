@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 6186 | 20 |
+| §11 | Los flujos entre sistemas | 6203 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6524,6 +6524,23 @@ sin perder detalle» y «lo más autónomo posible pero editable». El detalle, 
   como diagnóstico.
 
 `PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-95.
+
+### Las ediciones del programa se guardan como bitácora y el vínculo editado lleva su origen (D-464)
+
+Dato del usuario: «vamos con lo que queda abierto». Lo que quedaba era guardar lo que el planeador edita y el
+origen del vínculo que D-463 dejó como propuesta. El detalle, el contrato y las pruebas están en
+`PROGRAMA-CPM.md` §4.7 y la entidad en `MODELO.md` §5c; lo que cambia lo dicho antes en este archivo:
+
+- **No se guardan fechas, se guarda lo que se editó.** El programa base no cambia y el vigente es la base más
+  las ediciones aplicadas: deshacer una es repetir la cuenta sin ella, y la historia de cómo se llegó a las
+  fechas de hoy no se pierde.
+- **Es la primera pieza de la persistencia que ESTADO daba por pendiente**, y está verificada contra un
+  Postgres de verdad (16, embebido) con el mismo contrato que el adaptador en memoria. La bitácora no se borra
+  ni se reescribe; sin autor o sin origen en un vínculo editado, la edición no entra.
+- **El origen de lo importado queda vacío.** El libro no dice por qué existe cada uno de sus 832 vínculos y no
+  se inventa; solo lo que alguien edita lleva origen, y sin declarar es `decision`.
+
+`PROGRAMA-CPM.md`, `MODELO.md` §5c.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

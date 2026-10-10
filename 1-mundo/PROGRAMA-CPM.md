@@ -6,14 +6,14 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 120 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 168 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
 > vivían (`MODELO.md` §5c, `CONOCIMIENTO.md` §11.14); aquí vive lo que **solo existía en libros de
 > Excel y en el código**: los siete programas completos, la red con sus identificadores, las
 > listas del planeador, el motor que calcula fechas y ruta crítica, el cargador que lee un programa,
-> la reprogramación y la pantalla del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
+> la reprogramación, su persistencia y la pantalla del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
 > `1-mundo/programas/` son la fuente, y `cd backend && python3 -m unittest discover` la prueba.
 
 ---
@@ -36,6 +36,7 @@ verificado: 120 pruebas · los siete programas reales (832 vínculos) reproducen
 | **El motor y su contrato** | **§4 y `backend/core/motor_cpm.py`** |
 | **El cargador del programa, la cadena de relevos y el Gantt como dato** | **§4.5 y `backend/core/programa.py`** |
 | **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
+| **Guardar lo que se edita** | **§4.7, `backend/core/servicio_programa.py` y `database/migraciones/`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
 ---
@@ -273,11 +274,56 @@ Zafiro Plus —duraciones, arranques en sábado, vínculos agregados, quitados y
 rechazadas, el modo temprano— y exige el mismo cierre, los mismos días, las mismas partidas movidas, la
 misma ruta y los mismos rechazos.
 
-## 4.7 Cómo se prueba
+## 4.7 Guardar lo que se edita: `servicio_programa.py`, `memoria_programa.py` y `infra/postgres_programa.py`
 
-`cd backend && python3 -m unittest discover` corre 120 pruebas. Las del CPM están en
+Lo que se guarda es **la bitácora de ediciones**, no las fechas. El programa base —las filas y los vínculos
+con que se importó— no cambia, y el programa vigente es `reprogramar(base, ediciones aplicadas)`. Así nada
+puede quedar a medias, deshacer una edición es repetir la cuenta sin ella y cualquiera puede reconstruir cómo
+se llegó a las fechas de hoy. Es la misma arquitectura del motor de cálculo (D-182): el dominio define un
+puerto, `RepositorioPrograma`, y hay dos adaptadores, uno en memoria para las pruebas y otro para Postgres, que
+cumplen el mismo contrato.
+
+| Pieza | Qué hace |
+|---|---|
+| `ServicioPrograma.abrir(programa)` | La base más lo aplicado: el programa que se ve, con su versión |
+| `proponer(programa, edición, rol)` | Qué pasaría: el impacto contra el programa vigente. No guarda nada |
+| `aplicar(programa, edición, rol, usuario)` | Propone y, si se puede, guarda la edición con lo que el sistema mostró. Una que no se puede aplicar vuelve con su motivo y sin guardarse |
+| `deshacer(programa, edición, rol, usuario)` | La marca revertida y repite la cuenta sin ella; si otras ediciones dependen de ella, dice cuáles y no toca nada (`NoSePuedeDeshacer`) |
+| `PermisoDenegado` · `Conflicto` | El rol no puede esa edición; o alguien editó entre que se calculó el impacto y se quiso guardar |
+
+**Los permisos son los de `MODELO.md` §5b**: la estructura (duración y vínculos) es de `control_de_obra` y las
+fechas, de `residente`; ningún otro rol edita, y deshacer pide el permiso de la edición que se deshace.
+
+**El candado es una versión.** Cada edición o reversión sube `programa.version`; quien guarda dice qué versión
+vio y, si ya es otra, `Conflicto`, sin pisar. La versión se lee antes que las ediciones: si algo cambia entre
+las dos lecturas, el candado salta en vez de dejar pasar un impacto viejo.
+
+**Cada edición guarda** quién la hizo y con qué rol, la edición tal como se pidió (citando el `oid`, nunca el
+número de fila), lo que el sistema mostró al decidir —partidas movidas, cierre antes y después, si cambia la
+ruta— y, si agrega o cambia un vínculo, su **`origen`** (`tecnica`, `recurso` o `decision`; la confianza se
+deriva de él). Sin declarar, el vínculo nace con `decision`, el de menor confianza, que es el que se revisa
+primero. Los vínculos importados vienen sin origen declarado y se quedan así: no se inventa lo que el libro no
+dice. *(Propuesta sin confirmar, de D-463; D-464 la implementa.)*
+
+**En Postgres** (`database/migraciones/0001_programa.sql`): `programa`, `programa_fila`, `programa_vinculo` y
+`edicion_programa`. La bitácora ni se borra ni se reescribe —un disparador deja pasar solo el cambio de
+`aplicada` a `revertida`, y ni borrar el programa que la contiene—; un vínculo editado no puede quedar sin
+origen, una edición no puede quedar sin autor, y un vínculo no puede citar una fila que no existe. Los
+vínculos que el cargador rechazó se guardan con su motivo, y los tipos usan los nombres del modelo
+(`fin_inicio`, `inicio_inicio`, `fin_fin`, `inicio_fin`).
+
+**Lo que todavía no es ese esquema.** Este corte no cuelga de `NODO`, `PRESUPUESTO` ni `CALENDARIO_OBRA`, que
+aún no tienen tabla (B-03): el calendario va como JSON dentro de `programa` y las filas guardan el árbol del
+libro. Cuando esas tablas existan, `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` sin tocar la bitácora, que
+cita `oid`. Tampoco hay API: la superficie pública es FastAPI (D-54) y se escribe sobre este servicio.
+
+## 4.8 Cómo se prueba
+
+`cd backend && python3 -m unittest discover` corre 168 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
-la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); siguen el principio del repositorio —datos reales del
+la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la persistencia se prueba
+con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
+verdad** (`pgserver`, embebido, que el CI instala), más lo que solo Postgres garantiza; siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
 a mano, y las de conformidad cargan `PROGRAMAS-PROTOTIPOS.csv` y los demás archivos de `programas/`
 y comprueban las cifras de §3, §6 y §7. Si un número de este archivo cambia, una prueba tiene que
@@ -684,8 +730,9 @@ ediciones reales las hace Control de obra y el Residente sobre la base de datos,
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| Guardar lo que se edita | La pantalla es una simulación; guardar las ediciones en `ACTIVIDAD` y `PRECEDENCIA` es de la capa de aplicación (Django), con el mismo `reprogramar` |
-| `origen` del vínculo que se edita | Propuesta sin confirmar: lo que declare quien edita y, si no, `decision` (§8) |
+| La API y la pantalla conectadas a lo guardado | La persistencia existe (§4.7); falta la superficie FastAPI (D-54) y que la pantalla deje de simular y llame a `proponer` y `aplicar` |
+| Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
+| `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`), sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
 | Las listas del planeador | Los 12 supuestos de cada programa, los 15 de Zafiro, las 59 que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos por rol |
 | La segunda ruta de cuadrilla | Borrador; se captura a mano con `origen = recurso` (§7.5) |
@@ -711,3 +758,4 @@ ediciones reales las hace Control de obra y el Residente sobre la base de datos,
 | **El motor, los datos en el repositorio y esta consolidación** | **D-461** |
 | **El cargador, la cadena de relevos calculada y el Gantt como dato** | **D-462** |
 | **Reprogramar por empuje mínimo, el árbol plegable y la edición en pantalla (B-95 cierra)** | **D-463** |
+| **Guardar las ediciones: puerto, servicio, Postgres y origen del vínculo** | **D-464** |
