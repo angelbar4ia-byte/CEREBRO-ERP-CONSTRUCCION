@@ -47,7 +47,7 @@ Y el estado del Pull Request — hay uno abierto:
 Si sigue abierto, el trabajo de esta rama todavía no se mergeó a `main`. Seguí
 trabajando sobre la misma rama salvo que el usuario diga lo contrario.
 
-> *D-468 (2026-10-10): **ya no hay ningún PR abierto.** El #1 se cerró y el #2 se mergeó a `main` hasta D-384. Los 73 commits que siguen —de D-385 a D-467: el CPM, el programa, la API y las pantallas, 58 archivos— viven solo en esta rama. Pedir el PR es del usuario. El CI de GitHub corre las 251 pruebas completas, sin saltarse ninguna, y está en verde en cada uno de esos commits.*
+> *D-468 (2026-10-10): **ya no hay ningún PR abierto.** El #1 se cerró y el #2 se mergeó a `main` hasta D-384. Los 73 commits que siguen —de D-385 a D-467: el CPM, el programa, la API y las pantallas, 58 archivos— viven solo en esta rama. Pedir el PR es del usuario. El CI de GitHub corre las 251 pruebas completas, sin saltarse ninguna, y está en verde en cada uno de esos commits. **Ese mismo día el usuario lo pidió y se abrió el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** con los 74 commits, de D-385 a D-468; mientras esté abierto, el trabajo sigue en esta rama.*
 
 **Después, leer en este orden — el cerebro está en carpetas por capa**
 (`1-mundo`, `2-operacion`, `3-historia`, `4-direccion`; ver `INDICE.md`):
@@ -145,7 +145,7 @@ Rehecha con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, con los dos fr
 
 | # | Qué | Quién lo mueve | Por qué va en este lugar |
 |---|---|---|---|
-| 1 | **Un PR con lo que `main` no tiene**: 73 commits, de D-385 a D-467 | El usuario, pidiéndolo | Casilla «ahora»: nada del CPM, el programa ni la API está en `main`, y cuesta un clic |
+| 1 | **Revisar y mergear el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** —los 74 commits de D-385 a D-468, abierto el 2026-10-10— | El usuario | Casilla «ahora»: nada del CPM, el programa ni la API está en `main`, y cuesta un clic |
 | 2 | **Dónde están los catálogos crudos de OPUS** —materiales, trabajos, mano de obra, conceptos, familias, contratistas, unidades— | El usuario | Es lo que más desbloquea. Sin ellos esperan P-09, P-11 (ejecutarlo sobre las 79 claves reales), P-14 (los cuatro catálogos de salida), P-32, M-14, los cuatro niveles de ALAMO 18 y la persistencia de `catalogo`, `apu` y `presupuesto` (B-03 a B-07), que por el principio de datos reales no se prueba con fixtures inventadas |
 | 3 | **B-96 · Autenticación** | El usuario | Freno 1: la decisión es suya. Freno 2: cada pantalla y operación nueva se apoya en las cabeceras provisionales; la recomendación está en B-96 |
 | 4 | **P16 en Zafiro Plus**: llevar el plazo a 32 semanas o relajar el vínculo | El planeador, por obra | Decisión de obra, no de sistema |
