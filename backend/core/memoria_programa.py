@@ -7,11 +7,19 @@ from __future__ import annotations
 
 from dataclasses import replace
 from datetime import datetime, timezone
-from typing import Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from .motor_cpm import Calendario
 from .programa import Programa, edicion_a_dict, edicion_desde_dict
-from .servicio_programa import Conflicto, EdicionGuardada, ProgramaGuardado, ProgramaNoExiste, ResumenPrograma
+from .servicio_programa import (
+    Conflicto,
+    EdicionGuardada,
+    Heredada,
+    ProgramaGuardado,
+    ProgramaNoExiste,
+    ResumenPrograma,
+    YaReemplazado,
+)
 
 
 class MemoriaPrograma:
@@ -25,6 +33,10 @@ class MemoriaPrograma:
 
     def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario, *,
                           usuario: Optional[str] = None, rol: Optional[str] = None) -> int:
+        return self._crear(nombre, programa, calendario, usuario, rol)
+
+    def _crear(self, nombre: str, programa: Programa, calendario: Calendario, usuario: Optional[str], rol: Optional[str],
+               version_de: Optional[int] = None, traspaso: Optional[Mapping[str, Any]] = None) -> int:
         self._sig_programa += 1
         self._llegada[self._sig_programa] = (datetime.now(timezone.utc), usuario, rol)
         self._programas[self._sig_programa] = ProgramaGuardado(
@@ -34,10 +46,29 @@ class MemoriaPrograma:
             vinculos=[(v, programa.origenes.get(v)) for v in programa.vinculos],
             rechazados=list(programa.rechazados),
             calendario=calendario,
+            version_de=version_de,
+            traspaso=None if traspaso is None else dict(traspaso),
         )
         self._ediciones[self._sig_programa] = []
         self._versiones[self._sig_programa] = 0
         return self._sig_programa
+
+    def importar_version(self, anterior_id: int, nombre: str, programa: Programa, calendario: Calendario, *, usuario: str, rol: str,
+                         heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int) -> int:
+        self.leer_programa(anterior_id)
+        self._candado(anterior_id, esperaba)
+        sucesor = next((p.id for p in self._programas.values() if p.version_de == anterior_id), None)
+        if sucesor is not None:
+            raise YaReemplazado(f"el programa {anterior_id} ya tiene una versión más nueva, la {sucesor}", sucesor)
+        pid = self._crear(nombre, programa, calendario, usuario, rol, version_de=anterior_id, traspaso=traspaso)
+        for h in heredadas:
+            self._sig_edicion += 1
+            self._ediciones[pid].append(EdicionGuardada(
+                id=self._sig_edicion, secuencia=len(self._ediciones[pid]) + 1, edicion=edicion_desde_dict(edicion_a_dict(h.edicion)),
+                rol=h.rol, usuario=h.usuario, estado="aplicada", impacto=dict(h.impacto), creada_en=h.creada_en, heredada_de=h.heredada_de,
+            ))
+        self._versiones[pid] = len(heredadas)
+        return pid
 
     def listar_programas(self) -> List[ResumenPrograma]:
         out = []
@@ -47,7 +78,7 @@ class MemoriaPrograma:
                 id=pid, nombre=g.nombre, version=self._versiones[pid], partidas=sum(f.es_partida for f in g.filas),
                 vinculos=len(g.vinculos), rechazados=len(g.rechazados),
                 ediciones=sum(e.estado == "aplicada" for e in self._ediciones[pid]),
-                creado_en=creado, importado_por=quien, importado_con_rol=rol,
+                creado_en=creado, importado_por=quien, importado_con_rol=rol, version_de=g.version_de,
             ))
         return out
 

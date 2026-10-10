@@ -18,10 +18,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Mapping, Optional, Protocol, Sequence, Tuple
+from dataclasses import replace
+from typing import Any, Dict, List, Mapping, Optional, Protocol, Sequence, Tuple
 
 from .motor_cpm import Calendario, Vinculo
 from .programa import (
+    CambiarDuracion,
+    FijarInicio,
     Fila,
     Impacto,
     PERMISO_DE,
@@ -30,6 +33,7 @@ from .programa import (
     Reprogramacion,
     armar_programa,
     comparar,
+    describir_edicion,
     reprogramar,
 )
 
@@ -66,6 +70,14 @@ class ProgramaNoExiste(KeyError):
     pass
 
 
+class YaReemplazado(Exception):
+    """Ese programa ya tiene una versión más nueva: la nueva se sube sobre ella, para que la cadena sea una sola."""
+
+    def __init__(self, mensaje: str, por: int) -> None:
+        super().__init__(mensaje)
+        self.por = por
+
+
 # --------------------------------------------------------------------------- lo que el puerto guarda y entrega
 
 
@@ -78,6 +90,8 @@ class ProgramaGuardado:
     rechazados: List[Rechazado]
     calendario: Calendario
     version: int = 0  # sube con cada edición o reversión: es lo que `esperaba` compara
+    version_de: Optional[int] = None  # el programa del que esta es la versión nueva
+    traspaso: Optional[Dict[str, Any]] = None  # qué pasó con sus ediciones al subirla: lo que pasó y lo que no, y por qué
 
 
 @dataclass(frozen=True)
@@ -92,6 +106,34 @@ class EdicionGuardada:
     creada_en: datetime
     revertida_por: Optional[str] = None
     revertida_en: Optional[datetime] = None
+    heredada_de: Optional[int] = None  # la edición de la versión anterior de la que esta es el traspaso
+
+
+@dataclass(frozen=True)
+class Heredada:
+    """Una edición de la versión anterior que pasa a la nueva: conserva quién la hizo, con qué rol y cuándo se decidió;
+    lo único que se vuelve a calcular es el impacto, que ahora es contra el programa nuevo."""
+
+    edicion: object
+    rol: str
+    usuario: str
+    creada_en: datetime
+    impacto: Mapping[str, object]
+    heredada_de: int
+
+
+@dataclass(frozen=True)
+class NoPaso:
+    anterior: EdicionGuardada  # la edición, tal como quedó en la versión anterior
+    motivo: str
+    texto: str  # «EST-02010 dura 12 d»
+
+
+@dataclass
+class VersionNueva:
+    id: int
+    pasaron: List[EdicionGuardada]  # ya en la versión nueva, en el mismo orden
+    no_pasaron: List[NoPaso]
 
 
 @dataclass(frozen=True)
@@ -108,6 +150,8 @@ class ResumenPrograma:
     creado_en: datetime
     importado_por: Optional[str] = None  # quién lo subió; nulo si se cargó sin decirlo (las pruebas, `servir`)
     importado_con_rol: Optional[str] = None
+    version_de: Optional[int] = None  # si es la versión nueva de otro programa, cuál
+    reemplazado_por: Optional[int] = None  # si ya tiene versión nueva, cuál (lo pone `ServicioPrograma.listar`)
 
 
 class RepositorioPrograma(Protocol):
@@ -117,6 +161,14 @@ class RepositorioPrograma(Protocol):
 
     def listar_programas(self) -> List[ResumenPrograma]:
         """Todos, del más viejo al más nuevo."""
+
+    def importar_version(
+        self, anterior_id: int, nombre: str, programa: Programa, calendario: Calendario, *, usuario: str, rol: str,
+        heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int,
+    ) -> int:
+        """Guarda el programa nuevo junto con las ediciones que pasan, todo o nada, y lo deja como la versión nueva de
+        `anterior_id`. `esperaba` es la versión del anterior que vio quien sube: si ya es otra, `Conflicto`; si el
+        anterior ya tiene versión nueva, `YaReemplazado`. La versión del programa nuevo queda en lo que heredó."""
 
     def leer_programa(self, programa_id: int) -> ProgramaGuardado: ...
 
@@ -189,7 +241,12 @@ class ServicioPrograma:
         self.repo = repositorio
 
     def listar(self) -> List[ResumenPrograma]:
-        return self.repo.listar_programas()
+        todos = self.repo.listar_programas()
+        sucesor = {r.version_de: r.id for r in todos if r.version_de is not None}
+        return [replace(r, reemplazado_por=sucesor.get(r.id)) for r in todos]
+
+    def reemplazo_de(self, programa_id: int) -> Optional[int]:
+        return next((r.reemplazado_por for r in self.listar() if r.id == programa_id), None)
 
     def verificar_importar(self, rol: str) -> None:
         """Quien no puede importar lo sabe antes de subir el archivo, no después de leerlo."""
@@ -203,6 +260,74 @@ class ServicioPrograma:
         if not nombre.strip():
             raise ValueError("todo programa lleva nombre")
         return self.repo.importar_programa(nombre.strip(), programa, calendario, usuario=usuario, rol=rol)
+
+    def subir_version(
+        self, programa_id: int, nombre: str, programa: Programa, calendario: Calendario, rol: str, usuario: str,
+        esperaba: Optional[int] = None,
+    ) -> VersionNueva:
+        """Sube `programa` como la versión nueva de `programa_id`. Las ediciones que ya estaban aplicadas pasan a la
+        nueva **si siguen teniendo sentido**, con su autor, su rol y su fecha; las que no, se dicen con su motivo
+        y no se guardan. El que sube no necesita el permiso de lo que se hereda: se decidió con el de quien lo hizo.
+
+        Dos razones para que una edición no pase: el motor la rechaza sobre la base nueva (la partida ya no está, el
+        vínculo ya existe o ya no existe, cerraría un ciclo), o **la versión nueva ya cambió esa partida** —su
+        duración o su arranque—: ahí gana el archivo nuevo, porque el planeador decidió algo y una edición vieja no se
+        lo desdice en silencio. El sistema propone y el humano decide."""
+        self.verificar_importar(rol)
+        if not usuario:
+            raise ValueError("todo programa dice quién lo subió")
+        if not nombre.strip():
+            raise ValueError("todo programa lleva nombre")
+        v = self.abrir(programa_id)
+        if esperaba is not None and esperaba != v.version:
+            raise Conflicto(f"el programa ya va en la versión {v.version}, no en la {esperaba}")
+        sucesor = self.reemplazo_de(programa_id)
+        if sucesor is not None:
+            raise YaReemplazado(f"el programa {programa_id} ya tiene una versión más nueva, la {sucesor}", sucesor)
+
+        anterior_cal = v.guardado.calendario
+
+        def cambio_la_nueva(e: object) -> bool:
+            llave = getattr(e, "llave", None)
+            if llave is None or llave not in v.base.ventanas or llave not in programa.ventanas:
+                return False  # lo que no está en alguna de las dos lo dice el motor
+            vieja, nueva = v.base.ventanas[llave], programa.ventanas[llave]
+            if isinstance(e, CambiarDuracion):
+                return anterior_cal.n(vieja.fin) - anterior_cal.n(vieja.inicio) != calendario.n(nueva.fin) - calendario.n(nueva.inicio)
+            return isinstance(e, FijarInicio) and vieja.inicio != nueva.inicio
+
+        aceptadas: List[object] = []
+        heredadas: List[Heredada] = []
+        no_pasaron: List[NoPaso] = []
+        antes = reprogramar(programa, calendario, []).programa
+        for g in v.aplicadas:
+            e = g.edicion
+            motivo = "la_version_nueva_ya_la_cambio" if cambio_la_nueva(e) else None
+            if motivo is None:
+                prueba = reprogramar(programa, calendario, aceptadas + [e])
+                if prueba.rechazadas:
+                    motivo = prueba.rechazadas[0].motivo
+            if motivo is not None:
+                no_pasaron.append(NoPaso(g, motivo, describir_edicion(e, v.base.por_llave)))
+                continue
+            aceptadas.append(e)
+            despues = prueba.programa
+            heredadas.append(Heredada(e, g.rol, g.usuario, g.creada_en, comparar(antes, despues, calendario).resumen(), g.id))
+            antes = despues
+        traspaso = {
+            "de": programa_id,
+            "de_nombre": v.guardado.nombre,
+            "pasaron": len(heredadas),
+            "no_pasaron": [
+                {"secuencia": n.anterior.secuencia, "texto": n.texto, "usuario": n.anterior.usuario, "rol": n.anterior.rol, "motivo": n.motivo}
+                for n in no_pasaron
+            ],
+        }
+        nuevo_id = self.repo.importar_version(
+            programa_id, nombre.strip(), programa, calendario, usuario=usuario, rol=rol, heredadas=heredadas, traspaso=traspaso,
+            esperaba=v.version,
+        )
+        return VersionNueva(nuevo_id, [e for e in self.repo.ediciones(nuevo_id)], no_pasaron)
 
     def abrir(self, programa_id: int) -> Vigente:
         """El programa tal como está hoy: la base más lo aplicado."""

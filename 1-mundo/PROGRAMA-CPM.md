@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 221 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 251 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -37,7 +37,7 @@ verificado: 221 pruebas · los siete programas reales (832 vínculos) reproducen
 | **El cargador del programa, la cadena de relevos y el Gantt como dato** | **§4.5 y `backend/core/programa.py`** |
 | **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
 | **Guardar lo que se edita** | **§4.7, `backend/core/servicio_programa.py` y `database/migraciones/`** |
-| **La API, subir un programa y su cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
+| **La API, subir un programa, su versión nueva y el cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
 ---
@@ -320,13 +320,14 @@ cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca.
 
 ## 4.8 La API y su cliente: `backend/api/` y `frontend/gantt/cliente_programa.js`
 
-FastAPI es la única superficie pública (D-54). Estas nueve operaciones, escritas sobre `ServicioPrograma` y nada más,
+FastAPI es la única superficie pública (D-54). Estas diez operaciones, escritas sobre `ServicioPrograma` y nada más,
 son las que las pantallas necesitan:
 
 | Operación | Método y ruta | Qué hace | Falla con |
 |---|---|---|---|
 | `listar_programas` | `GET /programas` | Los programas del más viejo al más nuevo: partidas, vínculos cargados, vínculos que no se cargaron, ediciones aplicadas, versión y quién lo subió | — |
 | `importar_programa` | `POST /programas` (201) | Sube un programa (ver abajo) | 401, 403, 422 `importacion_invalida` |
+| `subir_version` | `POST /programas/{id}/versiones` (201) | Sube la versión nueva de un programa (ver abajo) | 401, 403, 404, 409 `conflicto` o `reemplazado`, 422 `importacion_invalida` |
 | `ver_programa` | `GET /programas/{id}` | La base dibujable (`vista_gantt` con lo necesario para reprogramar en pantalla), el calendario, la versión y toda la bitácora | 404 |
 | `ver_bitacora` | `GET /programas/{id}/ediciones` | Todo lo editado, también lo revertido, en orden | 404 |
 | `proponer_edicion` | `POST /programas/{id}/propuestas` | Qué pasaría: el impacto contra lo vigente, o por qué no se puede aplicar. No guarda | 401, 403, 404, 422 |
@@ -352,6 +353,26 @@ son las que las pantallas necesitan:
   vínculos las fechas escritas no cumplen, que sí se cargan: son un aviso, no un error (D-443). El sistema no
   corrige ninguno; el planeador decide. Con el Zafiro real son 315 partidas, 118 vínculos, 6 sin cargar y 9 que las
   fechas no cumplen.
+
+**La versión nueva de un programa.** El planeador revisa su programa y lo vuelve a subir; hacerlo como programa nuevo
+perdería lo que ya se decidió. `subir_version` recibe el mismo cuerpo que subir —`nombre` y `no_habiles` son
+opcionales y, sin ellos, hereda los del anterior— más `esperaba`, la versión del anterior que vio quien sube. Lo que pasa:
+
+- **Es otro programa que dice de cuál viene.** El base de cada uno no cambia nunca (§4.7): el anterior se queda como
+  estaba, con su bitácora, y la cadena es una sola —sobre un programa que ya tiene versión nueva, 409 `reemplazado` con
+  el número de la última, para que la nueva se suba sobre ella—. Subirla pide `editar_estructura_programa`, como subir.
+- **Las ediciones aplicadas pasan** (las revertidas no), en el mismo orden, **con su autor, su rol y la fecha en que se
+  decidieron**, cada una con la edición de la versión anterior de la que viene. Se vuelve a calcular su impacto,
+  ahora contra el programa nuevo. Quien sube no necesita el permiso de lo heredado: se decidió con el de quien lo hizo.
+- **No pasa** una edición si el motor la rechaza sobre la base nueva —`actividad_desconocida`, `repetido`,
+  `vinculo_inexistente`, `cierra_un_ciclo`…— o si **el archivo nuevo ya cambió esa partida** (`la_version_nueva_ya_la_cambio`:
+  su duración, para una edición de duración, o su arranque, para una de arranque). Ahí gana el archivo: el planeador
+  decidió algo en la revisión y una edición vieja no se lo desdice en silencio. Lo que no pasa se dice con su texto,
+  quién lo había hecho y el motivo; el sistema no lo fuerza, y sigue en la bitácora de la versión anterior.
+- **El traspaso queda guardado en el programa** —de cuál viene, cuántas pasaron y cuáles no— y las pantallas lo
+  muestran (§8).
+- **Todo o nada.** El programa nuevo y sus ediciones se guardan en una sola transacción, con el anterior bloqueado: si
+  alguien lo editó mientras decidías, 409 `conflicto` y no se sube nada. La unicidad de la cadena la garantiza la base.
 
 **El texto de quien sube es de otro.** El nombre del programa, las claves y las descripciones los escribe quien subió
 el archivo y los ven todos: nunca se toman por HTML. El título se escapa en el servidor, los datos viajan como JSON
@@ -385,7 +406,7 @@ vacía, importa los que se pidan con `--programa`—. Escucha solo en `127.0.0.1
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 221 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 251 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
 la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
@@ -812,8 +833,13 @@ del archivo si trae varios y días no hábiles—. Al subir, el reporte de la ca
 vínculos que no entraron y por qué, y un enlace al Gantt. Quien sube dice su rol y su nombre en los mismos
 controles que el Gantt.
 
-**Lo que las pantallas todavía no hacen:** autenticar a nadie (B-96) y subir *otra versión* de un programa que ya
-está —hoy es un programa más—.
+**La versión nueva (D-467).** En la lista, cada programa que no tiene versión nueva ofrece «subir versión nueva» (o se
+elige en el formulario), y los reemplazados dicen por cuál. El reporte suma lo que pasó: cuántas ediciones pasaron, y
+una tabla de las que no, con su texto, quién las hizo y el motivo en palabras. El Gantt de la versión nueva dice
+arriba de cuál viene y qué pasó con sus ediciones —con las que no pasaron a un clic—; el del programa viejo avisa que
+hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versión anterior.
+
+**Lo que las pantallas todavía no hacen:** autenticar a nadie (B-96).
 
 ---
 
@@ -822,7 +848,8 @@ está —hoy es un programa más—.
 | Qué | Por qué sigue abierto |
 |---|---|
 | Autenticación de la API | Hoy quien llama dice su rol y su nombre en dos cabeceras, y eso no se despliega (§4.8). Falta decidir cómo se identifica cada quien; de dónde sale su rol ya está decidido (`ROL_FUNCION`, `MODELO.md` §5b) y el código todavía lo tiene como constante. Recomendación y lo que arrastra, en B-96 |
-| Subir otra versión de un programa que ya está | Hoy es un programa más y sus ediciones no pasan al nuevo. Como la bitácora cita el `oid`, podrían repetirse sobre la versión nueva si el libro conserva sus `oid`; cómo se hace y qué pasa con las que ya no aplican, sin decidir |
+| El programa anterior sigue editable | Aunque tenga versión nueva solo se avisa; editarlo no pasa a la nueva. Cerrarlo a ediciones queda sin decidir |
+| Una versión nueva con otros `oid` | Si el libro se rehizo y las partidas trajeron otro `oid`, ninguna edición pasa: todas dicen «esa partida ya no está». Casarlas por clave o por número de fila queda sin decidir |
 | Los datos del programa dentro de la página del Gantt | Con autenticación (B-96) la página no puede llevar los datos del programa dentro: tendrá que pedirlos a la API, como ya hace la lista |
 | Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
@@ -854,3 +881,4 @@ está —hoy es un programa más—.
 | **Guardar las ediciones: puerto, servicio, Postgres y origen del vínculo** | **D-464** |
 | **La API del programa, el cliente generado y la pantalla contra lo guardado** | **D-465** |
 | **Los programas se listan y se suben por la API, y el texto de quien sube no se toma por HTML** | **D-466** |
+| **La versión nueva de un programa: lo decidido pasa, y lo que no, se dice** | **D-467** |

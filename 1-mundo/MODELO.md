@@ -1960,6 +1960,8 @@ EDICION_PROGRAMA   — solo se agrega                                          p
   impacto               JSONB — lo que el sistema mostró al decidir: partidas movidas,
                          cierre antes y después, si cambia la ruta
   creada_en, revertida_en, revertida_por
+  heredada_de           FK EDICION_PROGRAMA, nullable — si pasó de la versión anterior
+                         de un programa, la edición de la que viene               propuesta, D-467
 ```
 
 **Reglas.** (1) La bitácora no se borra ni se reescribe; lo único que cambia en una fila es pasar de `aplicada`
@@ -1976,6 +1978,8 @@ Hasta que `NODO` y `PRESUPUESTO` tengan tabla, el programa se guarda como libro 
 pantalla y, si ya es otra, responde conflicto—.*
 
 *D-466: el programa dice quién lo subió (`programa.importado_por` e `importado_con_rol`, nulos si se cargó del repositorio), y subirlo pide `editar_estructura_programa`.*
+
+*D-467: la versión nueva de un programa es otro programa (`programa.version_de`, único: la cadena es una sola) con su `traspaso` —cuántas ediciones pasaron y cuáles no, con su motivo—. Las ediciones aplicadas pasan con su autor, su rol y su fecha, cada una con `heredada_de`; pasar no pide el permiso de nuevo, se decidió con el de quien la hizo.*
 
 ### La herencia de una duración: referencia explícita, y el que edita pasa a ser la referencia de su alcance (D-441, cierra B-85)
 

@@ -9,8 +9,12 @@ Chromium (en el CI de GitHub se instalan).
 """
 import unittest
 
-from api.tests.ayudas import NO_HABILES, csv_de
+from api.tests.ayudas import NO_HABILES, csv_de, mueve_fila
 from api.tests.servidor import ServidorDePrueba
+from dataclasses import replace
+
+from core.programa import CambiarDuracion, FijarInicio, cargar_programa
+from core.servicio_programa import ServicioPrograma
 from core.tests.contrato_programa import CAL, programa
 
 try:
@@ -239,6 +243,96 @@ class PruebasPantalla(unittest.TestCase):
         pg.fill("#q-usuario", "")
         pg.click("#f-subir")
         self.assertIn("tu nombre", pg.inner_text("#aviso"))
+
+    # ------------------------------------------------------------------ la versión nueva de un programa
+    def test_subir_la_version_nueva_desde_la_lista_y_ver_lo_que_paso(self):
+        from datetime import date
+        from fractions import Fraction
+
+        sv = ServicioPrograma(self.servidor.repo)
+        sv.aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), "control_de_obra", "luis")
+        sv.aplicar(self.pid, FijarInicio(self.f[1087], date(2025, 10, 30)), "residente", "ana")
+        pg = self.inicio(usuario="marta")
+        pg.locator(f'button[data-version="{self.pid}"]').click()
+        self.assertEqual(pg.input_value("#f-nombre"), "Zafiro Plus")  # propone el mismo nombre
+        pg.fill("#f-nombre", "Zafiro Plus v2")
+        pg.set_input_files("#f-archivo", files=[{"name": "v2.csv", "mimeType": "text/csv", "buffer": csv_de("Zafiro Plus", cambia=mueve_fila(1087, 2)).encode()}])
+        pg.fill("#f-prototipo", "")
+        pg.click("#f-subir")
+        pg.wait_for_selector("#reporte:not([hidden])")
+        texto = pg.inner_text("#reporte")
+        self.assertIn("como versión nueva de «Zafiro Plus»", texto)
+        self.assertIn("1 edición pasó a la versión nueva", texto)  # la de luis, que el archivo nuevo no tocó
+        self.assertIn("1 no pasó", texto)  # la de ana
+        self.assertEqual(pg.locator("#reporte tbody tr").count(), 1)  # la de ana: la versión nueva ya movió esa partida
+        self.assertIn("El archivo nuevo ya cambió esa partida", pg.inner_text("#reporte tbody"))
+        self.assertIn("ana (Residente)", pg.inner_text("#reporte tbody"))
+        antes = pg.locator("#lista tbody tr", has_text="Zafiro Plus").filter(has=pg.locator(f'a[href="/programas/{self.pid}/gantt"]'))
+        self.assertIn("reemplazado por", antes.inner_text())
+        self.assertEqual(antes.locator("button[data-version]").count(), 0)  # sobre la última, no sobre esta
+        pg.click("#reporte a")
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        self.assertTrue(pg.locator("#version-aviso").is_visible())
+        self.assertIn("Versión nueva de «Zafiro Plus»", pg.inner_text("#version-aviso"))
+        pg.click("#version-aviso summary")
+        no_paso = pg.inner_text("#version-aviso li")
+        self.assertIn("no arranca antes del 2025-10-30", no_paso)
+        self.assertIn("ana (Residente)", no_paso)
+        pg.click("#bitacora summary")
+        self.assertIn("1 aplicada", pg.inner_text("#bitacora summary"))
+        fila = pg.inner_text("#bitacora li")
+        self.assertIn("luis (Control de obra)", fila)  # conserva quién la decidió
+        self.assertIn("pasó de la versión anterior", fila)
+        pg.goto(f"{self.servidor.url}/programas/{self.pid}/gantt")  # y el viejo avisa que ya hay uno nuevo
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        self.assertIn("versión más nueva", pg.inner_text("#version-aviso"))
+        pg.click("#version-aviso a")
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        self.assertIn("Gantt Zafiro Plus v2", pg.inner_text("h1"))
+
+    def test_si_alguien_edito_la_pantalla_de_la_lista_lo_dice_y_se_actualiza(self):
+        from fractions import Fraction
+
+        pg = self.inicio(usuario="marta")
+        ServicioPrograma(self.servidor.repo).aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), "control_de_obra", "luis")  # después de abrir la lista
+        pg.locator(f'button[data-version="{self.pid}"]').click()
+        pg.fill("#f-nombre", "v2")
+        pg.set_input_files("#f-archivo", files=[{"name": "v2.csv", "mimeType": "text/csv", "buffer": csv_de("Zafiro Plus").encode()}])
+        pg.click("#f-subir")
+        pg.wait_for_function("document.querySelector('#aviso') && !document.querySelector('#aviso').hidden")
+        self.assertIn("Alguien editó", pg.inner_text("#aviso"))
+        self.assertEqual(pg.locator("#reporte:not([hidden])").count(), 0)
+        pg.click("#f-subir")  # ya con la lista al día
+        pg.wait_for_selector("#reporte:not([hidden])")
+        self.assertIn("1", pg.inner_text("#reporte .cifras"))
+
+    def test_el_texto_ajeno_del_traspaso_se_ve_como_texto(self):
+        from datetime import date
+
+        avisos = []
+        pg = self.inicio(usuario="marta")
+        pg.on("dialog", lambda d: (avisos.append(d.message), d.dismiss()))
+        # quien decidió se llama como un HTML, y la clave de la partida también
+        filas = [replace(f, clave="<b id=intruso2>EST") if f.fila == 1087 else f for f in self.plus.filas]
+        sv = ServicioPrograma(self.servidor.repo)
+        malo = sv.importar("Con clave rara", cargar_programa(filas, CAL), CAL, "control_de_obra", "luis")
+        sv.aplicar(malo, FijarInicio(self.f[1087], date(2025, 10, 30)), "residente", "<img src=x onerror=alert(3)>")
+        pg.reload()
+        pg.wait_for_selector("#lista table")
+        pg.locator(f'button[data-version="{malo}"]').click()
+        pg.fill("#f-nombre", "v2 rara")
+        pg.set_input_files("#f-archivo", files=[{"name": "v2.csv", "mimeType": "text/csv", "buffer": csv_de("Zafiro Plus", cambia=mueve_fila(1087, 2)).encode()}])
+        pg.click("#f-subir")
+        pg.wait_for_selector("#reporte:not([hidden])")
+        self.assertIn("<b id=intruso2>EST", pg.inner_text("#reporte tbody"))
+        self.assertIn("<img src=x onerror=alert(3)>", pg.inner_text("#reporte tbody"))
+        pg.click("#reporte a")
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        pg.click("#version-aviso summary")
+        self.assertIn("<b id=intruso2>EST", pg.inner_text("#version-aviso li"))
+        self.assertEqual(pg.locator("img, #intruso2").count(), 0)
+        pg.wait_for_timeout(300)
+        self.assertEqual(avisos, [])
 
     # ------------------------------------------------------------------ el texto de otros no es HTML
     def test_lo_que_trae_el_programa_se_ve_como_texto_y_no_se_ejecuta(self):

@@ -97,6 +97,8 @@
     <p class="nota" id="nota-pagina">El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Es una simulación en pantalla: nada se guarda. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.</p>
   </header>
 
+  <div class="aviso" id="version-aviso" hidden></div>
+
   <div class="tarjetas" aria-live="polite">
     <div class="tarjeta" id="t-cierre"></div>
     <div class="tarjeta" id="t-movidas"></div>
@@ -169,6 +171,14 @@ const MOTIVOS = {
   autovinculo: "Una partida no puede esperarse a sí misma.", sucesora_no_es_partida: "El vínculo siempre llega a una partida, no a un bloque.",
   predecesora_sin_partidas: "Ese bloque no tiene partidas.", duracion_invalida: "La duración debe ser mayor que cero.",
   vinculo_inexistente: "Ese vínculo ya no existe.", actividad_desconocida: "No encuentro esa actividad."
+};
+// por qué una edición de la versión anterior no pasó a esta
+const NO_PASO = {
+  la_version_nueva_ya_la_cambio: "El archivo nuevo ya cambió esa partida: ganó el archivo.", actividad_desconocida: "Esa partida ya no está en el programa.",
+  repetido: "Ese vínculo ya estaba en el archivo nuevo.", vinculo_inexistente: "Ese vínculo ya no existía en el archivo nuevo.",
+  cierra_un_ciclo: "Con el archivo nuevo cerraría un ciclo.", autovinculo: "Una partida no puede esperarse a sí misma.",
+  sucesora_no_es_partida: "Lo que espera ya no es una partida.", predecesora_sin_partidas: "El bloque que citaba ya no tiene partidas.",
+  duracion_invalida: "La duración no es válida."
 };
 const $ = id => document.getElementById(id);
 const fecha = s => new Date(s + "T00:00:00");
@@ -350,7 +360,7 @@ function bitacora() {
     const puede = ROL_DE[e.t] === ident.rol;
     return `<li class="${ok ? "" : "revertida"}"><span class="sec">#${g.secuencia}</span><span class="que">${textoEdicion(e, false)}${origen}</span>` +
       `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede ? "disabled" : ""} title="${puede ? "Deshacer esta edición" : "Se deshace como " + ROLES[ROL_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
-      `<span class="quien-cuando">${esc(g.usuario)} (${esc(ROLES[g.rol] || g.rol)}) · ${esc(fmtHora(g.creada_en))}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
+      `<span class="quien-cuando">${esc(g.usuario)} (${esc(ROLES[g.rol] || g.rol)}) · ${esc(fmtHora(g.creada_en))}${g.heredada_de ? " · pasó de la versión anterior" : ""}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
   };
   b.innerHTML = `<summary>Lo guardado · ${saved.length} aplicada(s)${guardadas.length > saved.length ? `, ${guardadas.length - saved.length} revertida(s)` : ""} · versión ${version}</summary>` +
     (guardadas.length ? `<ol>${guardadas.slice().reverse().map(fila).join("")}</ol>` : `<p class="nota" style="margin:8px 0 4px">Todavía no se ha guardado ninguna edición.</p>`);
@@ -551,7 +561,20 @@ $("marco").addEventListener("mousemove", e => {
   else tip.hidden = true;
 });
 $("marco").addEventListener("mouseleave", () => tip.hidden = true);
+function avisoDeVersion() { // de dónde viene este programa y a dónde fue: lo dice quien lo subió, no se deduce
+  const partes = [];
+  if (API.reemplazado_por) partes.push(`<p style="margin:0">Hay una <b>versión más nueva</b> de este programa. <a href="/programas/${esc(API.reemplazado_por)}/gantt">Abrirla</a></p>`);
+  const t = API.traspaso;
+  if (API.version_de && t) {
+    const no = t.no_pasaron || [];
+    partes.push(`<p style="margin:0">Versión nueva de «${esc(t.de_nombre)}» (<a href="/programas/${esc(API.version_de)}/gantt">verla</a>): <b>${esc(t.pasaron)}</b> ${t.pasaron === 1 ? "edición pasó" : "ediciones pasaron"}${no.length ? ` y <b>${no.length}</b> no` : ""}.</p>` +
+      (no.length ? `<details><summary>Las que no pasaron</summary><ul style="margin:6px 0 0;padding-left:18px">` +
+        no.map(n => `<li>#${esc(n.secuencia)} ${esc(n.texto)} — ${esc(n.usuario)} (${esc(ROLES[n.rol] || n.rol)}): ${esc(NO_PASO[n.motivo] || n.motivo)}</li>`).join("") + `</ul></details>` : ""));
+  }
+  const caja = $("version-aviso"); caja.hidden = !partes.length; caja.innerHTML = partes.join("");
+}
 if (API) {
+  avisoDeVersion();
   $("atras").hidden = false;
   $("nota-pagina").innerHTML = 'El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Lo que decides queda <b>por guardar</b> hasta que lo guardes; entonces entra a la bitácora con tu nombre, tu rol y el impacto que viste, y se puede deshacer. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.';
 }

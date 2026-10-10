@@ -39,6 +39,7 @@ from core.servicio_programa import (
     ResumenPrograma,
     ServicioPrograma,
     Vigente,
+    YaReemplazado,
 )
 
 
@@ -73,6 +74,8 @@ class ResumenSalida(BaseModel):
     creado_en: datetime
     importado_por: Optional[str] = Field(None, description="Quién lo subió; nulo si se cargó sin decirlo")
     importado_con_rol: Optional[str] = None
+    version_de: Optional[int] = Field(None, description="Si es la versión nueva de otro programa, cuál")
+    reemplazado_por: Optional[int] = Field(None, description="Si ya tiene una versión nueva, cuál")
 
 
 class ImportacionEntrada(BaseModel):
@@ -80,6 +83,22 @@ class ImportacionEntrada(BaseModel):
     csv: str = Field(description="El programa en el formato de `1-mundo/programas/PROGRAMAS-PROTOTIPOS.csv` (`PROGRAMA-CPM.md` §2)")
     prototipo: Optional[str] = Field(None, description="Cuál programa del archivo, si trae varios (columna `prototipo`)")
     no_habiles: List[date] = Field(default_factory=list, description="Los días entre semana en que la obra no trabaja: 25-dic, 1-ene… Sin ellos, todos los días de semana cuentan")
+
+
+class VersionEntrada(BaseModel):
+    nombre: Optional[str] = Field(None, max_length=120, description="Cómo se llama la versión nueva; sin decirlo, como la anterior")
+    csv: str = Field(description="El programa revisado, en el mismo formato que al subirlo")
+    prototipo: Optional[str] = Field(None, description="Cuál programa del archivo, si trae varios")
+    no_habiles: Optional[List[date]] = Field(None, description="Sin decirlos, los de la versión anterior")
+    esperaba: Optional[int] = Field(None, description="La versión del programa anterior que vio quien sube: si ya es otra, 409")
+
+
+class EdicionQueNoPaso(BaseModel):
+    secuencia: int = Field(description="El número que tenía en la bitácora de la versión anterior")
+    texto: str
+    usuario: str
+    rol: str
+    motivo: str = Field(description="la_version_nueva_ya_la_cambio, o lo que el motor rechazó: actividad_desconocida, repetido, vinculo_inexistente, cierra_un_ciclo…")
 
 
 class RechazoDeCarga(BaseModel):
@@ -94,6 +113,11 @@ class ImportacionSalida(BaseModel):
     resumen: ResumenSalida
     rechazados: List[RechazoDeCarga] = Field(description="Los vínculos que no se cargaron, para que los vea el planeador")
     incumplidos: int = Field(description="Vínculos cargados que las fechas escritas del propio programa no cumplen: no son error, son aviso")
+
+
+class VersionSalida(ImportacionSalida):
+    pasaron: int = Field(description="Cuántas ediciones de la versión anterior pasaron a la nueva, con su autor y su fecha")
+    no_pasaron: List[EdicionQueNoPaso] = Field(description="Las que no, cada una con su motivo: se decide a mano")
 
 
 class RechazoSalida(BaseModel):
@@ -129,6 +153,7 @@ class EdicionSalida(BaseModel):
     creada_en: datetime
     revertida_por: Optional[str] = None
     revertida_en: Optional[datetime] = None
+    heredada_de: Optional[int] = Field(None, description="Si pasó de la versión anterior, la edición de la que viene")
 
 
 class PropuestaSalida(BaseModel):
@@ -146,6 +171,9 @@ class ProgramaSalida(BaseModel):
     nombre: str
     version: int
     calendario: Dict[str, Any]
+    version_de: Optional[int] = None
+    reemplazado_por: Optional[int] = None
+    traspaso: Optional[Dict[str, Any]] = Field(None, description="Si es una versión nueva: de cuál y qué pasó con sus ediciones")
     vista: Dict[str, Any] = Field(description="El programa base dibujable, con lo necesario para reprogramar en pantalla")
     guardadas: List[EdicionSalida] = Field(description="Toda la bitácora, también lo revertido, en orden")
 
@@ -164,6 +192,7 @@ def _edicion_salida(e: EdicionGuardada) -> EdicionSalida:
     return EdicionSalida(
         id=e.id, secuencia=e.secuencia, edicion=edicion_a_dict(e.edicion), rol=e.rol, usuario=e.usuario, estado=e.estado,
         impacto=dict(e.impacto), creada_en=e.creada_en, revertida_por=e.revertida_por, revertida_en=e.revertida_en,
+        heredada_de=e.heredada_de,
     )
 
 
@@ -213,6 +242,18 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
         base = v.base
         return vista_gantt(base, v.guardado.calendario, resultado=base.calcular(v.guardado.calendario), para_editar=True)
 
+    def reporte_de_carga(pid: int, programa, cal: Calendario) -> Dict[str, Any]:
+        (resumen,) = [r for r in servicio.listar() if r.id == pid]
+        return dict(
+            resumen=_resumen_salida(resumen),
+            rechazados=[
+                RechazoDeCarga(fila=r.fila, clave=programa.por_llave[r.sucesora].clave, descripcion=programa.por_llave[r.sucesora].descripcion,
+                               token=r.token, motivo=r.motivo)
+                for r in programa.rechazados
+            ],
+            incumplidos=len(programa.incumplidos(cal)),
+        )
+
     @app.get("/programas", response_model=List[ResumenSalida], operation_id="listar_programas", summary="Los programas que hay, del más viejo al más nuevo")
     def listar_programas() -> List[ResumenSalida]:
         return [_resumen_salida(r) for r in servicio.listar()]
@@ -233,15 +274,34 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
             pid = servicio.importar(entrada.nombre, programa, cal, quien.rol, quien.usuario)
         except ValueError as e:  # el nombre en blanco o quien sube sin nombre
             raise _error(422, "importacion_invalida", str(e)) from None
-        (resumen,) = [r for r in servicio.listar() if r.id == pid]
-        return ImportacionSalida(
-            resumen=_resumen_salida(resumen),
-            rechazados=[
-                RechazoDeCarga(fila=r.fila, clave=programa.por_llave[r.sucesora].clave, descripcion=programa.por_llave[r.sucesora].descripcion,
-                               token=r.token, motivo=r.motivo)
-                for r in programa.rechazados
-            ],
-            incumplidos=len(programa.incumplidos(cal)),
+        return ImportacionSalida(**reporte_de_carga(pid, programa, cal))
+
+    @app.post("/programas/{programa_id}/versiones", response_model=VersionSalida, status_code=201, operation_id="subir_version",
+              summary="Subir la versión nueva de un programa: las ediciones que siguen teniendo sentido pasan a ella")
+    def subir_version(programa_id: int, entrada: VersionEntrada, quien: Identidad = Depends(identidad)) -> VersionSalida:
+        try:
+            servicio.verificar_importar(quien.rol)
+        except PermisoDenegado as e:
+            raise _error(403, "permiso_denegado", str(e)) from None
+        anterior = guardado(programa_id)
+        cal = Calendario(no_habiles=frozenset(entrada.no_habiles)) if entrada.no_habiles is not None else anterior.guardado.calendario
+        try:
+            programa = cargar_programa(filas_desde_texto(entrada.csv, entrada.prototipo), cal)
+        except (ImportacionInvalida, ValueError) as e:
+            raise _error(422, "importacion_invalida", str(e)) from None
+        try:
+            v = servicio.subir_version(programa_id, entrada.nombre or anterior.guardado.nombre, programa, cal, quien.rol, quien.usuario, entrada.esperaba)
+        except YaReemplazado as e:
+            raise _error(409, "reemplazado", f"Ese programa ya tiene una versión más nueva, la {e.por}: la nueva se sube sobre ella.", reemplazado_por=e.por) from None
+        except Conflicto as e:
+            raise _error(409, "conflicto", f"Alguien editó el programa mientras decidías. Vuelve a verlo. ({e})") from None
+        except ValueError as e:
+            raise _error(422, "importacion_invalida", str(e)) from None
+        return VersionSalida(
+            **reporte_de_carga(v.id, programa, cal),
+            pasaron=len(v.pasaron),
+            no_pasaron=[EdicionQueNoPaso(secuencia=n.anterior.secuencia, texto=n.texto, usuario=n.anterior.usuario, rol=n.anterior.rol, motivo=n.motivo)
+                        for n in v.no_pasaron],
         )
 
     @app.get("/programas/{programa_id}", response_model=ProgramaSalida, operation_id="ver_programa", summary="El programa base y su bitácora")
@@ -249,6 +309,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
         v = guardado(programa_id)
         return ProgramaSalida(
             id=programa_id, nombre=v.guardado.nombre, version=v.version, calendario=v.guardado.calendario.a_dict(), vista=vista_de(v),
+            version_de=v.guardado.version_de, reemplazado_por=servicio.reemplazo_de(programa_id), traspaso=v.guardado.traspaso,
             guardadas=[_edicion_salida(e) for e in servicio.repo.ediciones(programa_id)],
         )
 
@@ -307,7 +368,8 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
         guardadas = [_edicion_salida(e).model_dump(mode="json") for e in servicio.repo.ediciones(programa_id)]
         return HTMLResponse(pagina_gantt(
             v.base, v.guardado.calendario, f"Gantt {v.guardado.nombre}",
-            api={"programa": programa_id, "version": v.version, "guardadas": guardadas},
+            api={"programa": programa_id, "version": v.version, "guardadas": guardadas, "version_de": v.guardado.version_de,
+                 "reemplazado_por": servicio.reemplazo_de(programa_id), "traspaso": v.guardado.traspaso},
         ))
 
     return app

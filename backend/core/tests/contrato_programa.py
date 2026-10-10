@@ -28,6 +28,7 @@ from core.servicio_programa import (
     PermisoDenegado,
     ProgramaNoExiste,
     ServicioPrograma,
+    YaReemplazado,
 )
 
 RAIZ = Path(__file__).resolve().parents[3]
@@ -127,6 +128,127 @@ class ContratoPrograma:
         self.assertEqual(self.sv.abrir(pid).programa.ventanas, self.plus.ventanas)
         self.assertTrue(self.sv.aplicar(pid, self.p16(), CO, "luis").aplicable)
         self.assertEqual(self.sv.abrir(self.pid).version, 0)  # editar uno no toca al otro
+
+    # ------------------------------------------------------------------ la versión nueva de un programa
+    def _archivo_nuevo(self, cambia=None, sin=()):
+        """El programa de Zafiro Plus como lo volvería a subir el planeador, con lo que `cambia` le hace a unas filas."""
+        filas = [f for f in self.plus.filas if f.fila not in sin]
+        for fila, cambio in (cambia or {}).items():
+            filas = [cambio(f) if f.fila == fila else f for f in filas]
+        return cargar_programa(filas, CAL)
+
+    @staticmethod
+    def _mueve(dias):
+        """Corre una partida `dias` días hábiles, sin cambiar lo que dura."""
+        return lambda f: replace(f, inicio=CAL.fecha(CAL.n(f.inicio) + dias), termino=CAL.fecha(CAL.n(f.termino) + dias))
+
+    @staticmethod
+    def _alarga(dias):
+        return lambda f: replace(f, termino=CAL.fecha(CAL.n(f.termino) + dias))
+
+    def _con_historia(self):
+        """Tres decisiones sobre Zafiro Plus, de dos personas: la duración de una losa, P16 y el arranque de otra partida."""
+        self.sv.aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), CO, "luis")
+        self.sv.aplicar(self.pid, self.p16(), CO, "luis")
+        self.sv.aplicar(self.pid, FijarInicio(self.f[1087], date(2025, 10, 30)), RES, "ana")
+
+    def test_la_version_nueva_hereda_lo_que_sigue_teniendo_sentido(self):
+        self._con_historia()
+        nuevo = self._archivo_nuevo()  # el planeador no tocó nada de esas tres partidas
+        r = self.sv.subir_version(self.pid, "Zafiro Plus v2", nuevo, CAL, CO, "marta")
+        self.assertEqual([n for n in r.no_pasaron], [])
+        antes = self.repo.ediciones(self.pid)
+        despues = self.repo.ediciones(r.id)
+        self.assertEqual([(e.secuencia, e.usuario, e.rol, e.estado) for e in despues], [(1, "luis", CO, "aplicada"), (2, "luis", CO, "aplicada"), (3, "ana", RES, "aplicada")])
+        self.assertEqual([e.edicion for e in despues], [e.edicion for e in antes])  # las mismas decisiones, citando el mismo `oid`
+        self.assertEqual([e.heredada_de for e in despues], [e.id for e in antes])
+        self.assertEqual([e.creada_en for e in despues], [e.creada_en for e in antes])  # se decidieron cuando se decidieron
+        self.assertEqual(self.sv.abrir(r.id).programa.ventanas, reprogramar(nuevo, CAL, [e.edicion for e in antes]).programa.ventanas)
+        self.assertEqual(self.repo.leer_programa(r.id).version, 3)  # la versión del nuevo va en lo que heredó
+        self.assertEqual(self.repo.leer_programa(self.pid).version, 3)  # y el anterior ni se enteró
+        self.assertEqual(len([e for e in self.repo.ediciones(self.pid) if e.heredada_de is not None]), 0)
+
+    def test_el_impacto_de_lo_heredado_es_contra_el_programa_nuevo(self):
+        self._con_historia()
+        nuevo = self._archivo_nuevo()
+        r = self.sv.subir_version(self.pid, "v2", nuevo, CAL, CO, "marta")
+        ultimo = self.repo.ediciones(r.id)[-1]
+        self.assertEqual(ultimo.impacto["fin_despues"], self.sv.abrir(r.id).reprogramacion.fin_despues.isoformat())
+        self.assertEqual(self.repo.ediciones(r.id)[1].impacto["dias_de_cambio"], 10)  # P16, otra vez: +10 días hábiles sobre el programa nuevo
+
+    def test_lo_que_la_version_nueva_ya_cambio_gana_el_archivo_y_se_avisa(self):
+        self._con_historia()
+        # el planeador alargó la losa (982) y corrió la partida 1087: sus dos ediciones viejas ya no se le ponen encima
+        nuevo = self._archivo_nuevo({982: self._alarga(3), 1087: self._mueve(2)})
+        r = self.sv.subir_version(self.pid, "v2", nuevo, CAL, CO, "marta")
+        self.assertEqual([(n.anterior.secuencia, n.motivo) for n in r.no_pasaron],
+                         [(1, "la_version_nueva_ya_la_cambio"), (3, "la_version_nueva_ya_la_cambio")])
+        self.assertEqual([n.texto for n in r.no_pasaron][0], f"{self.plus.por_llave[self.f[982]].clave} dura 12 d")
+        self.assertEqual([e.edicion for e in self.repo.ediciones(r.id)], [self.p16()])  # solo P16 pasó
+        self.assertEqual(self.sv.abrir(r.id).programa.ventanas, reprogramar(nuevo, CAL, [self.p16()]).programa.ventanas)
+
+    def test_lo_que_el_motor_rechaza_sobre_la_base_nueva_se_dice_con_su_motivo(self):
+        self._con_historia()
+        sin_losa = self._archivo_nuevo(sin={982})  # la partida desapareció del programa
+        r = self.sv.subir_version(self.pid, "sin la losa", sin_losa, CAL, CO, "marta")
+        self.assertEqual([(n.anterior.secuencia, n.motivo) for n in r.no_pasaron], [(1, "actividad_desconocida")])
+        ya = self._archivo_nuevo({1102: lambda f: replace(f, vinculos=f.vinculos + ", 978FS+8")})  # el planeador ya escribió P16
+        r2 = self.sv.subir_version(r.id, "con P16 escrita", ya, CAL, CO, "marta")
+        self.assertEqual([(n.anterior.secuencia, n.motivo) for n in r2.no_pasaron], [(1, "repetido")])
+
+    def test_el_traspaso_queda_guardado_con_lo_que_no_paso(self):
+        self._con_historia()
+        r = self.sv.subir_version(self.pid, "v2", self._archivo_nuevo({1087: self._mueve(2)}), CAL, CO, "marta")
+        g = self.repo.leer_programa(r.id)
+        self.assertEqual((g.version_de, g.traspaso["de"], g.traspaso["de_nombre"], g.traspaso["pasaron"]), (self.pid, self.pid, "Zafiro Plus", 2))
+        (no,) = g.traspaso["no_pasaron"]
+        self.assertEqual((no["secuencia"], no["usuario"], no["rol"], no["motivo"]), (3, "ana", RES, "la_version_nueva_ya_la_cambio"))
+        self.assertIn("no arranca antes del 2025-10-30", no["texto"])
+        self.assertEqual((self.repo.leer_programa(self.pid).version_de, self.repo.leer_programa(self.pid).traspaso), (None, None))
+        a, b = self.sv.listar()
+        self.assertEqual((a.reemplazado_por, a.version_de, b.version_de, b.reemplazado_por), (r.id, None, self.pid, None))
+        self.assertEqual((b.importado_por, b.importado_con_rol, b.ediciones), ("marta", CO, 2))
+
+    def test_lo_revertido_no_pasa(self):
+        e = self.sv.aplicar(self.pid, self.p16(), CO, "luis").guardada
+        self.sv.deshacer(self.pid, e.id, CO, "luis")
+        r = self.sv.subir_version(self.pid, "v2", self._archivo_nuevo(), CAL, CO, "marta")
+        self.assertEqual((self.repo.ediciones(r.id), r.no_pasaron, self.repo.leer_programa(r.id).version), ([], [], 0))
+
+    def test_la_version_nueva_se_sigue_editando_y_la_cadena_es_una_sola(self):
+        self._con_historia()
+        r = self.sv.subir_version(self.pid, "v2", self._archivo_nuevo(), CAL, CO, "marta")
+        p = self.sv.aplicar(r.id, CambiarDuracion(self.f[1102], Fraction(3)), CO, "marta")
+        self.assertEqual((p.guardada.secuencia, p.esperaba), (4, 3))
+        with self.assertRaises(YaReemplazado) as cm:  # sobre el viejo no: ya tiene versión nueva
+            self.sv.subir_version(self.pid, "otra v2", self._archivo_nuevo(), CAL, CO, "marta")
+        self.assertEqual(cm.exception.por, r.id)
+        r3 = self.sv.subir_version(r.id, "v3", self._archivo_nuevo(), CAL, CO, "marta")  # sobre la última sí
+        self.assertEqual(len(self.repo.ediciones(r3.id)), 4)
+        self.assertEqual([x.reemplazado_por for x in self.sv.listar()], [r.id, r3.id, None])
+        self.assertEqual(len(self.sv.listar()), 3)
+
+    def test_una_version_nueva_que_se_pide_con_una_pantalla_vieja_no_se_sube(self):
+        self.sv.aplicar(self.pid, self.p16(), CO, "luis")
+        visto = self.sv.abrir(self.pid).version
+        self.sv.aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), CO, "luis")  # otro editó entre medio
+        with self.assertRaises(Conflicto):
+            self.sv.subir_version(self.pid, "v2", self._archivo_nuevo(), CAL, CO, "marta", esperaba=visto)
+        self.assertEqual(len(self.sv.listar()), 1)  # y no quedó nada a medias
+        r = self.sv.subir_version(self.pid, "v2", self._archivo_nuevo(), CAL, CO, "marta", esperaba=visto + 1)
+        self.assertEqual(len(self.repo.ediciones(r.id)), 2)
+
+    def test_subir_una_version_pide_el_permiso_quien_y_nombre_y_el_programa_existe(self):
+        nuevo = self._archivo_nuevo()
+        with self.assertRaises(PermisoDenegado):
+            self.sv.subir_version(self.pid, "v2", nuevo, CAL, RES, "ana")  # aunque lo heredado incluya fechas de Residente
+        with self.assertRaises(ValueError):
+            self.sv.subir_version(self.pid, "v2", nuevo, CAL, CO, "")
+        with self.assertRaises(ValueError):
+            self.sv.subir_version(self.pid, "  ", nuevo, CAL, CO, "marta")
+        with self.assertRaises(ProgramaNoExiste):
+            self.sv.subir_version(987654, "v2", nuevo, CAL, CO, "marta")
+        self.assertEqual(len(self.sv.listar()), 1)
 
     # ------------------------------------------------------------------ proponer y aplicar
     def test_proponer_no_guarda_nada(self):

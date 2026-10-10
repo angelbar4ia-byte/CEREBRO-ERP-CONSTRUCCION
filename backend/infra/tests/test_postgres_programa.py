@@ -50,7 +50,7 @@ class PruebasPostgres(ContratoPrograma, unittest.TestCase):
 
     # ------------------------------------------------------------------ lo que solo Postgres garantiza
     def test_la_migracion_corre_una_vez(self):
-        self.assertEqual(self.nuevas, ["0001_programa.sql", "0002_programa_importado_por.sql"])
+        self.assertEqual(self.nuevas, ["0001_programa.sql", "0002_programa_importado_por.sql", "0003_version_nueva_del_programa.sql"])
         self.assertEqual(aplicar_migraciones(self.conn), [])
 
     def test_los_tipos_de_vinculo_se_guardan_con_los_nombres_del_modelo(self):
@@ -114,6 +114,38 @@ class PruebasPostgres(ContratoPrograma, unittest.TestCase):
             self.assertEqual(len(self.repo.ediciones(self.pid)), 1)
         finally:
             otra.close()
+
+    def test_la_cadena_de_versiones_es_una_sola_tambien_en_la_base(self):
+        insertar = ("INSERT INTO programa (nombre, calendario, version_de, traspaso) VALUES ('v', '{}'::jsonb, %s, %s)")
+        self.conn.execute(insertar, (self.pid, Jsonb({})))
+        with self.assertRaises(psycopg.errors.UniqueViolation):  # un programa no tiene dos versiones nuevas directas
+            self.conn.execute(insertar, (self.pid, Jsonb({})))
+        with self.assertRaises(psycopg.errors.CheckViolation):  # una versión nueva siempre dice qué pasó con las ediciones
+            self.conn.execute("INSERT INTO programa (nombre, calendario, version_de) VALUES ('v', '{}'::jsonb, %s)", (self.pid,))
+
+    def test_una_version_nueva_que_falla_a_medias_no_deja_nada(self):
+        from datetime import datetime, timezone
+
+        from core.servicio_programa import Heredada
+
+        self.sv.aplicar(self.pid, self.p16(), CO, "luis")
+        buena = Heredada(self.p16("decision"), CO, "luis", datetime.now(timezone.utc), {}, self.repo.ediciones(self.pid)[0].id)
+        mala = Heredada(self.p16("decision"), CO, "", datetime.now(timezone.utc), {}, buena.heredada_de)  # sin autor: la base la rechaza
+        with self.assertRaises(psycopg.errors.CheckViolation):
+            self.repo.importar_version(self.pid, "v2", self.plus, CAL, usuario="marta", rol=CO, heredadas=[buena, mala], traspaso={"de": self.pid}, esperaba=1)
+        self.assertEqual([r.id for r in self.repo.listar_programas()], [self.pid])  # ni el programa ni la edición buena quedaron
+        self.assertEqual(self.conn.execute("SELECT count(*) FROM edicion_programa WHERE heredada_de IS NOT NULL").fetchone()[0], 0)
+
+    def test_de_donde_viene_una_edicion_heredada_no_se_reescribe(self):
+        self.sv.aplicar(self.pid, self.p16(), CO, "luis")
+        r = self.sv.subir_version(self.pid, "v2", self.plus, CAL, CO, "marta")
+        (heredada,) = self.repo.ediciones(r.id)
+        self.assertIsNotNone(heredada.heredada_de)
+        with self.assertRaises(psycopg.Error):  # revertirla sí, pero no de paso cambiar de dónde venía
+            self.conn.execute("UPDATE edicion_programa SET estado = 'revertida', revertida_en = now(), revertida_por = 'x', heredada_de = NULL WHERE id = %s", (heredada.id,))
+        self.sv.deshacer(r.id, heredada.id, CO, "marta")  # lo que sí se puede
+        self.assertEqual(self.repo.ediciones(r.id)[0].estado, "revertida")
+        self.assertEqual(self.repo.ediciones(r.id)[0].heredada_de, heredada.heredada_de)
 
     def test_los_dias_que_no_caben_exactos_no_se_guardan(self):
         from infra.postgres_programa import _a_numeric

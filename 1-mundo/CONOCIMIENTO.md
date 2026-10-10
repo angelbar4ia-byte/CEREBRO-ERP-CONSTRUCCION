@@ -6573,6 +6573,20 @@ dicho antes en este archivo:
 
 `PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
 
+### La versión nueva de un programa: lo decidido pasa, y lo que no, se dice (D-467)
+
+Dato del usuario: «vamos con el que sigue abierto». El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo
+dicho antes en este archivo:
+
+- **Revisar un programa no borra lo ya decidido.** La versión nueva es otro programa; las ediciones aplicadas pasan a
+  ella con su autor, su rol y su fecha, siempre que sigan teniendo sentido.
+- **Si el archivo nuevo ya cambió una partida, gana el archivo.** La duración o el arranque que el planeador puso en
+  la revisión no se pisan con una edición vieja; se avisa y él decide.
+- **Nada pasa a medias.** El programa nuevo y sus ediciones se guardan juntos o no se guarda nada, y la cadena de
+  versiones es una sola.
+
+`PROGRAMA-CPM.md`.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

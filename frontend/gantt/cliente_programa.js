@@ -82,6 +82,19 @@ const OPERACIONES = {
     ],
     "cuerpo": true
   },
+  "subir_version": {
+    "metodo": "POST",
+    "ruta": "/programas/{programa_id}/versiones",
+    "ruta_params": [
+      "programa_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true
+  },
   "ver_bitacora": {
     "metodo": "GET",
     "ruta": "/programas/{programa_id}/ediciones",
@@ -153,6 +166,8 @@ const ClientePrograma = (() => {
   cliente.pantalla_programas = args => llamar("pantalla_programas", args || {});
   /** POST /programas/{programa_id}/propuestas — Qué pasaría si se aplicara esta edición: no guarda nada */
   cliente.proponer_edicion = args => llamar("proponer_edicion", args || {});
+  /** POST /programas/{programa_id}/versiones — Subir la versión nueva de un programa: las ediciones que siguen teniendo sentido pasan a ella */
+  cliente.subir_version = args => llamar("subir_version", args || {});
   /** GET /programas/{programa_id}/ediciones — Todo lo que se ha editado, también lo revertido */
   cliente.ver_bitacora = args => llamar("ver_bitacora", args || {});
   /** GET /programas/{programa_id} — El programa base y su bitácora */

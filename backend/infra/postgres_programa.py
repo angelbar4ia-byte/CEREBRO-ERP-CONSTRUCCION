@@ -12,7 +12,7 @@ from datetime import datetime
 from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
-from typing import List, Mapping, Optional
+from typing import Any, List, Mapping, Optional, Sequence
 
 import psycopg
 from psycopg.types.json import Jsonb
@@ -26,7 +26,15 @@ from core.programa import (
     edicion_desde_dict,
     origen_de_edicion,
 )
-from core.servicio_programa import Conflicto, EdicionGuardada, ProgramaGuardado, ProgramaNoExiste, ResumenPrograma
+from core.servicio_programa import (
+    Conflicto,
+    EdicionGuardada,
+    Heredada,
+    ProgramaGuardado,
+    ProgramaNoExiste,
+    ResumenPrograma,
+    YaReemplazado,
+)
 
 MIGRACIONES = Path(__file__).resolve().parents[2] / "database" / "migraciones"
 ENUM_A_TIPO = dict(ALIAS_TIPO)  # fin_inicio → FS, y así
@@ -71,31 +79,54 @@ class PostgresPrograma:
     def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario, *,
                           usuario: Optional[str] = None, rol: Optional[str] = None) -> int:
         with self.conn.transaction():
-            pid = self.conn.execute(
-                "INSERT INTO programa (nombre, calendario, importado_por, importado_con_rol) VALUES (%s, %s, %s, %s) RETURNING id",
-                (nombre, Jsonb(calendario.a_dict()), usuario, rol),
-            ).fetchone()[0]
-            with self.conn.cursor() as cur:
-                cur.executemany(
-                    "INSERT INTO programa_fila (programa_id, oid, orden, fila, nivel, tipo, clave, descripcion, inicio, termino, dias, frente, etapa)"
-                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    [
-                        (pid, f.llave, i, f.fila, f.nivel, f.tipo, f.clave, f.descripcion, f.inicio, f.termino, _a_numeric(f.dias), f.frente, f.etapa)
-                        for i, f in enumerate(programa.filas)
-                    ],
+            return self._insertar(nombre, programa, calendario, usuario, rol)
+
+    def importar_version(self, anterior_id: int, nombre: str, programa: Programa, calendario: Calendario, *, usuario: str, rol: str,
+                         heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int) -> int:
+        with self.conn.transaction():
+            self._bloquear(anterior_id, esperaba)  # el anterior, con su fila bloqueada: nadie edita mientras se hereda
+            sucesor = self.conn.execute("SELECT id FROM programa WHERE version_de = %s", (anterior_id,)).fetchone()
+            if sucesor is not None:
+                raise YaReemplazado(f"el programa {anterior_id} ya tiene una versión más nueva, la {sucesor[0]}", sucesor[0])
+            pid = self._insertar(nombre, programa, calendario, usuario, rol, anterior_id, traspaso, len(heredadas))
+            for i, h in enumerate(heredadas, start=1):
+                datos = edicion_a_dict(h.edicion)
+                tipo = datos.pop("edicion")
+                self.conn.execute(
+                    "INSERT INTO edicion_programa (programa_id, secuencia, edicion, datos, origen, rol, usuario, impacto, creada_en, heredada_de)"
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (pid, i, tipo, Jsonb(datos), origen_de_edicion(h.edicion), h.rol, h.usuario, Jsonb(dict(h.impacto)), h.creada_en, h.heredada_de),
                 )
-                cur.executemany(
-                    "INSERT INTO programa_vinculo (programa_id, predecesora_oid, sucesora_oid, tipo_vinculo, traslape_espera, origen)"
-                    " VALUES (%s, %s, %s, %s, %s, %s)",
-                    [
-                        (pid, v.predecesora, v.sucesora, TIPO_A_ENUM[v.tipo], _a_numeric(v.desfase), programa.origenes.get(v))
-                        for v in programa.vinculos
-                    ],
-                )
-                cur.executemany(
-                    "INSERT INTO programa_vinculo (programa_id, sucesora_oid, estado, motivo, texto_fuente) VALUES (%s, %s, 'rechazado', %s, %s)",
-                    [(pid, r.sucesora, r.motivo, r.token) for r in programa.rechazados],
-                )
+        return pid
+
+    def _insertar(self, nombre: str, programa: Programa, calendario: Calendario, usuario: Optional[str], rol: Optional[str],
+                  version_de: Optional[int] = None, traspaso: Optional[Mapping[str, Any]] = None, version: int = 0) -> int:
+        pid = self.conn.execute(
+            "INSERT INTO programa (nombre, calendario, importado_por, importado_con_rol, version_de, traspaso, version)"
+            " VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id",
+            (nombre, Jsonb(calendario.a_dict()), usuario, rol, version_de, None if traspaso is None else Jsonb(dict(traspaso)), version),
+        ).fetchone()[0]
+        with self.conn.cursor() as cur:
+            cur.executemany(
+                "INSERT INTO programa_fila (programa_id, oid, orden, fila, nivel, tipo, clave, descripcion, inicio, termino, dias, frente, etapa)"
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                [
+                    (pid, f.llave, i, f.fila, f.nivel, f.tipo, f.clave, f.descripcion, f.inicio, f.termino, _a_numeric(f.dias), f.frente, f.etapa)
+                    for i, f in enumerate(programa.filas)
+                ],
+            )
+            cur.executemany(
+                "INSERT INTO programa_vinculo (programa_id, predecesora_oid, sucesora_oid, tipo_vinculo, traslape_espera, origen)"
+                " VALUES (%s, %s, %s, %s, %s, %s)",
+                [
+                    (pid, v.predecesora, v.sucesora, TIPO_A_ENUM[v.tipo], _a_numeric(v.desfase), programa.origenes.get(v))
+                    for v in programa.vinculos
+                ],
+            )
+            cur.executemany(
+                "INSERT INTO programa_vinculo (programa_id, sucesora_oid, estado, motivo, texto_fuente) VALUES (%s, %s, 'rechazado', %s, %s)",
+                [(pid, r.sucesora, r.motivo, r.token) for r in programa.rechazados],
+            )
         return pid
 
     # ------------------------------------------------------------------ listar
@@ -103,7 +134,7 @@ class PostgresPrograma:
         with self.conn.transaction():
             filas = self.conn.execute(
                 """
-                SELECT p.id, p.nombre, p.version, p.creado_en, p.importado_por, p.importado_con_rol,
+                SELECT p.id, p.nombre, p.version, p.creado_en, p.importado_por, p.importado_con_rol, p.version_de,
                        (SELECT count(*) FROM programa_fila f WHERE f.programa_id = p.id
                          AND f.tipo = 'Concepto' AND f.inicio IS NOT NULL AND f.dias > 0),
                        (SELECT count(*) FROM programa_vinculo v WHERE v.programa_id = p.id AND v.estado = 'vigente'),
@@ -113,17 +144,18 @@ class PostgresPrograma:
                 """).fetchall()
         return [
             ResumenPrograma(id=r[0], nombre=r[1], version=r[2], creado_en=r[3], importado_por=r[4], importado_con_rol=r[5],
-                            partidas=r[6], vinculos=r[7], rechazados=r[8], ediciones=r[9])
+                            version_de=r[6], partidas=r[7], vinculos=r[8], rechazados=r[9], ediciones=r[10])
             for r in filas
         ]
 
     # ------------------------------------------------------------------ leer
     def leer_programa(self, programa_id: int) -> ProgramaGuardado:
         with self.conn.transaction():
-            fila = self.conn.execute("SELECT nombre, calendario, version FROM programa WHERE id = %s", (programa_id,)).fetchone()
+            fila = self.conn.execute(
+                "SELECT nombre, calendario, version, version_de, traspaso FROM programa WHERE id = %s", (programa_id,)).fetchone()
             if fila is None:
                 raise ProgramaNoExiste(programa_id)
-            nombre, cal, version = fila
+            nombre, cal, version, version_de, traspaso = fila
             filas = [
                 Fila(llave=r[0], fila=r[1], nivel=r[2], tipo=r[3], clave=r[4], descripcion=r[5], inicio=r[6], termino=r[7],
                      dias=_a_fraction(r[8]), frente=r[9], etapa=r[10])
@@ -144,18 +176,18 @@ class PostgresPrograma:
                     "SELECT sucesora_oid, texto_fuente, motivo FROM programa_vinculo"
                     " WHERE programa_id = %s AND estado = 'rechazado' ORDER BY id", (programa_id,))
             ]
-        return ProgramaGuardado(programa_id, nombre, filas, vinculos, rechazados, Calendario.desde_dict(cal), version)
+        return ProgramaGuardado(programa_id, nombre, filas, vinculos, rechazados, Calendario.desde_dict(cal), version, version_de, traspaso)
 
     def ediciones(self, programa_id: int) -> List[EdicionGuardada]:
         with self.conn.transaction():
             if self.conn.execute("SELECT 1 FROM programa WHERE id = %s", (programa_id,)).fetchone() is None:
                 raise ProgramaNoExiste(programa_id)
             filas = self.conn.execute(
-                "SELECT id, secuencia, edicion, datos, rol, usuario, estado, impacto, creada_en, revertida_por, revertida_en"
+                "SELECT id, secuencia, edicion, datos, rol, usuario, estado, impacto, creada_en, revertida_por, revertida_en, heredada_de"
                 " FROM edicion_programa WHERE programa_id = %s ORDER BY secuencia", (programa_id,)).fetchall()
         return [
             EdicionGuardada(id=r[0], secuencia=r[1], edicion=edicion_desde_dict({"edicion": r[2], **r[3]}), rol=r[4], usuario=r[5],
-                            estado=r[6], impacto=r[7], creada_en=r[8], revertida_por=r[9], revertida_en=r[10])
+                            estado=r[6], impacto=r[7], creada_en=r[8], revertida_por=r[9], revertida_en=r[10], heredada_de=r[11])
             for r in filas
         ]
 

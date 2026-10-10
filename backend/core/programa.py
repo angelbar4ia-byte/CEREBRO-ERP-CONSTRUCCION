@@ -590,6 +590,27 @@ def edicion_desde_dict(d: Mapping[str, object]) -> object:
     return clase(**campos)
 
 
+def _numero(x: Fraction) -> str:
+    return str(int(x)) if x.denominator == 1 else f"{float(x):g}"
+
+
+def describir_edicion(e: object, por_llave: Mapping[str, Fila]) -> str:
+    """La edición en una línea, con las claves de las partidas y no sus `oid`: «EST-02010 dura 12 d»."""
+    c = lambda k: por_llave[k].clave if k in por_llave else k  # noqa: E731 — una llave que ya no está se cita tal cual
+    lag = lambda d: ("+" if d > 0 else "") + _numero(d) if d else ""  # noqa: E731
+    if isinstance(e, CambiarDuracion):
+        return f"{c(e.llave)} dura {_numero(e.dias)} d"
+    if isinstance(e, FijarInicio):
+        return f"{c(e.llave)} no arranca antes del {e.fecha.isoformat()}"
+    if isinstance(e, AgregarVinculo):
+        return f"{c(e.predecesora)} → {c(e.sucesora)} {e.tipo}{lag(e.desfase)}"
+    if isinstance(e, QuitarVinculo):
+        return f"quitar {c(e.predecesora)} → {c(e.sucesora)}"
+    if isinstance(e, CambiarVinculo):
+        return f"{c(e.predecesora)} → {c(e.sucesora)}: {e.tipo_actual} pasa a {e.tipo}{lag(e.desfase)}"
+    raise TypeError(f"edición desconocida: {e!r}")
+
+
 def origen_de_edicion(e: object) -> Optional[str]:
     """El origen que declara la edición, si es de las que agregan o cambian un vínculo."""
     if isinstance(e, (AgregarVinculo, CambiarVinculo)):

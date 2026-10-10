@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from api.app import crear_app
 from core.memoria_programa import MemoriaPrograma
 from core.servicio_programa import ServicioPrograma
-from api.tests.ayudas import NO_HABILES, csv_de
+from api.tests.ayudas import NO_HABILES, csv_de, mueve_fila
 from core.tests.contrato_programa import CAL, programa
 
 CO = {"X-Rol": "control_de_obra", "X-Usuario": "luis"}
@@ -103,6 +103,65 @@ class PruebasApi(unittest.TestCase):
                        {"nombre": "x", "csv": csv_de("Zafiro Plus"), "no_habiles": ["25/12/2025"]}):
             self.assertEqual(self.c.post("/programas", json=cuerpo, headers=CO).status_code, 422, cuerpo["nombre"])
         self.assertEqual(len(self.c.get("/programas").json()), 1)
+
+    # ------------------------------------------------------------------ la versión nueva de un programa
+    def _historia(self):
+        for cuerpo, h in ((self.p16, CO), ({"edicion": {"edicion": "cambiar_duracion", "llave": self.f[982], "dias": "12"}}, CO),
+                          ({"edicion": {"edicion": "fijar_inicio", "llave": self.f[1087], "fecha": "2025-10-30"}}, RES)):
+            self.assertEqual(self.c.post(f"/programas/{self.pid}/ediciones", json=cuerpo, headers=h).status_code, 201)
+
+    def test_la_version_nueva_dice_lo_que_paso_con_cada_edicion(self):
+        self._historia()
+        r = self.c.post(f"/programas/{self.pid}/versiones", json={"nombre": "Zafiro Plus v2", "csv": csv_de("Zafiro Plus", cambia=mueve_fila(1087, 2))}, headers=CO)
+        self.assertEqual(r.status_code, 201, r.text)
+        j = r.json()
+        self.assertEqual((j["pasaron"], [(n["secuencia"], n["motivo"], n["usuario"], n["rol"]) for n in j["no_pasaron"]]),
+                         (2, [(3, "la_version_nueva_ya_la_cambio", "ana", "residente")]))
+        self.assertIn("no arranca antes del 2025-10-30", j["no_pasaron"][0]["texto"])
+        s = j["resumen"]
+        self.assertEqual((s["nombre"], s["version_de"], s["ediciones"], s["version"], s["importado_por"]), ("Zafiro Plus v2", self.pid, 2, 2, "luis"))
+        nuevo = self.c.get(f"/programas/{s['id']}").json()
+        self.assertEqual((nuevo["version_de"], nuevo["traspaso"]["de"], nuevo["traspaso"]["pasaron"], len(nuevo["traspaso"]["no_pasaron"])), (self.pid, self.pid, 2, 1))
+        self.assertEqual([(e["usuario"], e["rol"], e["estado"]) for e in nuevo["guardadas"]], [("luis", "control_de_obra", "aplicada")] * 2)
+        viejo = self.c.get(f"/programas/{self.pid}").json()
+        self.assertEqual((viejo["reemplazado_por"], viejo["version"], len(viejo["guardadas"])), (s["id"], 3, 3))
+        self.assertEqual([x["reemplazado_por"] for x in self.c.get("/programas").json()], [s["id"], None])
+
+    def test_la_version_nueva_hereda_el_nombre_y_el_calendario_si_no_se_dicen(self):
+        r = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()
+        self.assertEqual(r["resumen"]["nombre"], "Zafiro Plus")
+        self.assertEqual(self.c.get(f"/programas/{r['resumen']['id']}").json()["calendario"]["no_habiles"], ["2025-12-25", "2026-01-01"])
+        otra = self.c.post(f"/programas/{r['resumen']['id']}/versiones", json={"csv": csv_de("Zafiro Plus"), "no_habiles": ["2025-12-25"]}, headers=CO).json()
+        self.assertEqual(self.c.get(f"/programas/{otra['resumen']['id']}").json()["calendario"]["no_habiles"], ["2025-12-25"])
+
+    def test_una_version_nueva_solo_se_sube_sobre_la_ultima(self):
+        primera = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()["resumen"]["id"]
+        r = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO)
+        self.assertEqual((r.status_code, r.json()["detail"]["codigo"], r.json()["detail"]["reemplazado_por"]), (409, "reemplazado", primera))
+        self.assertEqual(len(self.c.get("/programas").json()), 2)
+
+    def test_una_pantalla_vieja_no_sube_la_version_nueva(self):
+        visto = self.c.get(f"/programas/{self.pid}").json()["version"]
+        self.c.post(f"/programas/{self.pid}/ediciones", json=self.p16, headers=CO)
+        r = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus"), "esperaba": visto}, headers=CO)
+        self.assertEqual((r.status_code, r.json()["detail"]["codigo"]), (409, "conflicto"))
+        self.assertEqual(len(self.c.get("/programas").json()), 1)
+
+    def test_la_version_nueva_pide_permiso_antes_de_leer_y_dice_cuando_el_archivo_no_sirve(self):
+        basura = {"csv": "esto no es un programa"}
+        self.assertEqual(self.c.post(f"/programas/{self.pid}/versiones", json=basura).status_code, 401)
+        self.assertEqual(self.c.post(f"/programas/{self.pid}/versiones", json=basura, headers=RES).json()["detail"]["codigo"], "permiso_denegado")
+        r = self.c.post(f"/programas/{self.pid}/versiones", json=basura, headers=CO)
+        self.assertEqual((r.status_code, r.json()["detail"]["codigo"]), (422, "importacion_invalida"))
+        self.assertEqual(self.c.post("/programas/9999/versiones", json=basura, headers=CO).status_code, 404)
+        self.assertEqual(len(self.c.get("/programas").json()), 1)
+
+    def test_la_pantalla_sabe_de_donde_viene_y_a_donde_fue(self):
+        nuevo = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()["resumen"]["id"]
+        self.assertIn('"reemplazado_por":%d' % nuevo, self.c.get(f"/programas/{self.pid}/gantt").text)
+        html = self.c.get(f"/programas/{nuevo}/gantt").text
+        self.assertIn('"version_de":%d' % self.pid, html)
+        self.assertIn('"traspaso":{"de":%d' % self.pid, html)
 
     def test_el_texto_de_quien_sube_no_se_toma_por_html(self):
         malo = lambda r: r.update(descripcion="</script><img src=x onerror=alert(1)>") if r["fila"] == "6" else None
@@ -244,7 +303,7 @@ class PruebasApi(unittest.TestCase):
     # ------------------------------------------------------------------ el spec
     def test_el_spec_nombra_las_operaciones_en_espanol(self):
         ops = {op["operationId"] for ruta in self.c.get("/openapi.json").json()["paths"].values() for op in ruta.values()}
-        self.assertEqual(ops, {"listar_programas", "importar_programa", "pantalla_programas", "ver_programa", "ver_bitacora",
+        self.assertEqual(ops, {"listar_programas", "importar_programa", "subir_version", "pantalla_programas", "ver_programa", "ver_bitacora",
                                "proponer_edicion", "aplicar_edicion", "deshacer_edicion", "pantalla_gantt"})
 
 
