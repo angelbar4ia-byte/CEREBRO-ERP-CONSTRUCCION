@@ -1,14 +1,19 @@
 """
-La pantalla del Gantt como una sola página — `frontend/gantt/` y `1-mundo/PROGRAMA-CPM.md` §8.
+Las pantallas del programa como páginas sueltas — `frontend/gantt/` y `1-mundo/PROGRAMA-CPM.md` §4.8 y §8.
 
-Junta cuatro cosas: la plantilla de la pantalla (`gantt.html`), el motor que reprograma en el navegador
-(`motor_gantt.js`, que una prueba contrasta con `reprogramar`), el cliente de la API (`cliente_programa.js`,
-generado del spec, D-55) y los datos de un programa (`vista_gantt(..., para_editar=True)`). El resultado es un
-HTML que se abre solo, sin servidor; con `api` habla con él para guardar lo que se edita.
+Cada pantalla es un solo HTML que se abre solo: la plantilla, los colores compartidos (`tokens.css`), el cliente de la
+API (`cliente_programa.js`, generado del spec, D-55) y, en el Gantt, el motor que reprograma en el navegador
+(`motor_gantt.js`, que una prueba contrasta con `reprogramar`) y los datos de un programa
+(`vista_gantt(..., para_editar=True)`). Con `api` el Gantt habla con el servidor para guardar lo que se edita.
+
+Lo que viene de quien subió el programa —su nombre, las descripciones, las claves— es texto de otro: el título se
+escapa aquí y los datos viajan como JSON sin un solo `<`; la plantilla escapa todo lo que dibuja.
 """
 from __future__ import annotations
 
+import html
 import json
+import re
 from datetime import date
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -17,6 +22,19 @@ from .motor_cpm import Calendario
 from .programa import Programa, vista_gantt
 
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "gantt"
+
+
+def _leer(nombre: str) -> str:
+    return (FRONTEND / nombre).read_text(encoding="utf-8")
+
+
+def _armar(plantilla: str, valores: Dict[str, str]) -> str:
+    """Pone cada marca en su lugar de una sola pasada: lo que se inserta no se vuelve a leer, así que un título que
+    se parezca a una marca no sustituye nada."""
+    faltan = [m for m in valores if m not in plantilla]
+    if faltan:
+        raise ValueError(f"la plantilla ya no tiene {', '.join(faltan)}")
+    return re.sub("|".join(re.escape(m) for m in valores), lambda m: valores[m.group(0)], plantilla)
 
 
 def pagina_gantt(
@@ -35,12 +53,23 @@ def pagina_gantt(
     vista = vista_gantt(prog, cal, ventana=ventana, resultado=prog.calcular(cal), para_editar=True)
     if api is not None:
         vista["api"] = api
-    datos = json.dumps(vista, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    html = (FRONTEND / "gantt.html").read_text(encoding="utf-8")
-    motor = (FRONTEND / "motor_gantt.js").read_text(encoding="utf-8")
-    cliente = (FRONTEND / "cliente_programa.js").read_text(encoding="utf-8")
-    for marca in ("/*__MOTOR__*/", "/*__CLIENTE__*/", "__DATOS__", "__TITULO__"):
-        if marca not in html:
-            raise ValueError(f"la plantilla ya no tiene {marca}")
-    # el título va primero y los datos al final: nada de lo que traen puede parecerse a una marca
-    return html.replace("__TITULO__", titulo).replace("/*__MOTOR__*/", motor).replace("/*__CLIENTE__*/", cliente).replace("__DATOS__", datos)
+    # un `<` solo puede estar dentro de un texto del JSON: escapado, ningún dato puede cerrar el script
+    datos = json.dumps(vista, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+    return _armar(
+        _leer("gantt.html"),
+        {
+            "__TITULO__": html.escape(titulo),
+            "/*__TOKENS__*/": _leer("tokens.css"),
+            "/*__MOTOR__*/": _leer("motor_gantt.js"),
+            "/*__CLIENTE__*/": _leer("cliente_programa.js"),
+            "__DATOS__": datos,
+        },
+    )
+
+
+def pagina_programas() -> str:
+    """La lista de programas y subir uno. No lleva datos: los pide a la API."""
+    return _armar(
+        _leer("programas.html"),
+        {"/*__TOKENS__*/": _leer("tokens.css"), "/*__CLIENTE__*/": _leer("cliente_programa.js")},
+    )

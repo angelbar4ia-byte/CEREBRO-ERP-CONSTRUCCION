@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from api.app import crear_app
 from core.memoria_programa import MemoriaPrograma
 from core.servicio_programa import ServicioPrograma
+from api.tests.ayudas import NO_HABILES, csv_de
 from core.tests.contrato_programa import CAL, programa
 
 CO = {"X-Rol": "control_de_obra", "X-Usuario": "luis"}
@@ -26,6 +27,107 @@ class PruebasApi(unittest.TestCase):
         self.c = TestClient(crear_app(ServicioPrograma(self.repo)))
         self.f = {x.fila: x.llave for x in self.plus.filas}
         self.p16 = {"edicion": {"edicion": "agregar_vinculo", "predecesora": self.f[978], "sucesora": self.f[1102], "tipo": "FS", "desfase": "1"}}
+
+    # ------------------------------------------------------------------ la lista y subir un programa
+    def test_la_lista_trae_lo_que_hay(self):
+        r = self.c.get("/programas")
+        self.assertEqual(r.status_code, 200)
+        (p,) = r.json()
+        self.assertEqual((p["id"], p["nombre"], p["version"], p["ediciones"], p["importado_por"]), (self.pid, "Zafiro Plus", 0, 0, None))
+        self.assertEqual((p["partidas"], p["vinculos"], p["rechazados"]), (len(self.plus.ventanas), len(self.plus.vinculos), len(self.plus.rechazados)))
+
+    def test_subir_un_programa_real_dice_que_se_cargo_y_que_no(self):
+        zafiro = programa("Zafiro")
+        r = self.c.post("/programas", json={"nombre": " Zafiro subido ", "csv": csv_de("Zafiro"), "no_habiles": NO_HABILES}, headers=CO)
+        self.assertEqual(r.status_code, 201, r.text)
+        j = r.json()
+        s = j["resumen"]
+        self.assertEqual((s["nombre"], s["partidas"], s["vinculos"], s["rechazados"]), ("Zafiro subido", len(zafiro.ventanas), 118, 6))
+        self.assertEqual((s["importado_por"], s["importado_con_rol"], s["version"], s["ediciones"]), ("luis", "control_de_obra", 0, 0))
+        # los seis que el cargador de D-442 rechaza, cada uno con su motivo y la partida que lo traía
+        self.assertEqual(sorted((x["fila"], x["token"], x["motivo"]) for x in j["rechazados"]), sorted((x.fila, x.token, x.motivo) for x in zafiro.rechazados))
+        self.assertTrue(all(x["clave"] and x["descripcion"] for x in j["rechazados"]))
+        self.assertEqual(j["incumplidos"], len(zafiro.incumplidos(CAL)))
+        self.assertEqual([p["nombre"] for p in self.c.get("/programas").json()], ["Zafiro Plus", "Zafiro subido"])
+        self.assertEqual(self.c.get(f"/programas/{s['id']}").json()["calendario"]["no_habiles"], NO_HABILES)
+
+    def test_un_programa_subido_se_abre_y_se_edita_igual(self):
+        pid = self.c.post("/programas", json={"nombre": "Plus 2", "csv": csv_de("Zafiro Plus"), "no_habiles": NO_HABILES}, headers=CO).json()["resumen"]["id"]
+        self.assertEqual(self.c.get(f"/programas/{pid}/gantt").status_code, 200)
+        r = self.c.post(f"/programas/{pid}/ediciones", json=self.p16, headers=CO)
+        self.assertEqual((r.status_code, r.json()["impacto"]["dias_de_cambio"]), (201, 10))  # el mismo P16 que sobre el original
+        self.assertEqual(self.c.get(f"/programas/{self.pid}").json()["version"], 0)  # y el original ni se enteró
+
+    def test_el_archivo_de_los_siete_pide_decir_cual(self):
+        todo = csv_de()
+        r = self.c.post("/programas", json={"nombre": "x", "csv": todo}, headers=CO)
+        self.assertEqual((r.status_code, r.json()["detail"]["codigo"]), (422, "importacion_invalida"))
+        self.assertIn("varios programas", r.json()["detail"]["mensaje"])
+        ok = self.c.post("/programas", json={"nombre": "Rubí", "csv": todo, "prototipo": "Rubí", "no_habiles": NO_HABILES}, headers=CO)
+        self.assertEqual((ok.status_code, ok.json()["resumen"]["partidas"]), (201, len(programa("Rubí").ventanas)))
+        mal = self.c.post("/programas", json={"nombre": "x", "csv": todo, "prototipo": "Ónix"}, headers=CO)
+        self.assertEqual(mal.status_code, 422)
+        self.assertIn("Ónix", mal.json()["detail"]["mensaje"])
+
+    def test_el_csv_de_excel_en_espanol_tambien_entra(self):
+        r = self.c.post("/programas", json={"nombre": "x", "csv": csv_de("Zafiro Plus", delimitador=";", bom=True), "no_habiles": NO_HABILES}, headers=CO)
+        self.assertEqual((r.status_code, r.json()["resumen"]["partidas"]), (201, len(self.plus.ventanas)))
+
+    def test_sin_permiso_se_sabe_antes_de_leer_el_archivo(self):
+        basura = {"nombre": "x", "csv": "esto no es un programa"}
+        self.assertEqual(self.c.post("/programas", json=basura).status_code, 401)
+        r = self.c.post("/programas", json=basura, headers=RES)
+        self.assertEqual((r.status_code, r.json()["detail"]["codigo"]), (403, "permiso_denegado"))  # y no el 422 del archivo
+        self.assertEqual(len(self.c.get("/programas").json()), 1)
+
+    def test_lo_que_no_es_un_programa_se_dice_con_la_linea_y_no_se_guarda_nada(self):
+        casos = {
+            "faltan columnas": ("oid,fila\n1,1\n", "faltan columnas"),
+            "fecha ilegible": (csv_de("Zafiro", cambia=lambda r: r.update(inicio="9 de junio") if r["fila"] == "6" else None), "línea 6"),
+            "oid repetido": (csv_de("Zafiro", cambia=lambda r: r.update(oid="5570560") if r["fila"] == "7" else None), "ya está en la línea"),
+            "fila repetida": (csv_de("Zafiro", cambia=lambda r: r.update(fila="6") if r["fila"] == "7" else None), "la fila 6 ya está"),
+            "tipo desconocido": (csv_de("Zafiro", cambia=lambda r: r.update(tipo="Partida") if r["fila"] == "6" else None), "uno de:"),
+            "termina antes de empezar": (csv_de("Zafiro", cambia=lambda r: r.update(termino="2025-01-01") if r["fila"] == "6" else None), "anterior a"),
+            "sin partidas": (csv_de("Zafiro", cambia=lambda r: r.update(dias_laborables="0")), "ninguna partida"),
+            "vacío": ("", "está vacío"),
+            "solo el encabezado": (csv_de("Zafiro").split("\n", 1)[0] + "\n", "ninguna fila"),
+        }
+        for nombre, (texto, esperado) in casos.items():
+            r = self.c.post("/programas", json={"nombre": "x", "csv": texto, "no_habiles": NO_HABILES}, headers=CO)
+            self.assertEqual((r.status_code, r.json()["detail"]["codigo"]), (422, "importacion_invalida"), nombre)
+            self.assertIn(esperado, r.json()["detail"]["mensaje"], nombre)
+        self.assertEqual(len(self.c.get("/programas").json()), 1)
+
+    def test_el_nombre_en_blanco_y_los_dias_mal_escritos_son_422(self):
+        for cuerpo in ({"nombre": "", "csv": csv_de("Zafiro Plus")}, {"nombre": "   ", "csv": csv_de("Zafiro Plus")},
+                       {"nombre": "x", "csv": csv_de("Zafiro Plus"), "no_habiles": ["25/12/2025"]}):
+            self.assertEqual(self.c.post("/programas", json=cuerpo, headers=CO).status_code, 422, cuerpo["nombre"])
+        self.assertEqual(len(self.c.get("/programas").json()), 1)
+
+    def test_el_texto_de_quien_sube_no_se_toma_por_html(self):
+        malo = lambda r: r.update(descripcion="</script><img src=x onerror=alert(1)>") if r["fila"] == "6" else None
+        propio = "<script>alert(1)</script>"
+        pid = self.c.post("/programas", json={"nombre": propio, "csv": csv_de("Zafiro", cambia=malo), "no_habiles": NO_HABILES}, headers=CO).json()["resumen"]["id"]
+        html = self.c.get(f"/programas/{pid}/gantt").text
+        normal = self.c.get(f"/programas/{self.pid}/gantt").text
+        self.assertIn("<title>Gantt &lt;script&gt;alert(1)&lt;/script&gt;</title>", html)
+        self.assertNotIn(propio, html)
+        self.assertNotIn("</script><img", html)
+        self.assertEqual(html.count("</script>"), normal.count("</script>"))  # ningún dato cerró un script de la página
+        self.assertIn("\\u003c/script>\\u003cimg", html)  # viaja como dato, escapado
+
+    def test_un_titulo_que_parece_marca_no_cambia_la_plantilla(self):
+        pid = self.c.post("/programas", json={"nombre": "__DATOS__ /*__MOTOR__*/", "csv": csv_de("Zafiro Plus"), "no_habiles": NO_HABILES}, headers=CO).json()["resumen"]["id"]
+        html = self.c.get(f"/programas/{pid}/gantt").text
+        self.assertIn("<title>Gantt __DATOS__ /*__MOTOR__*/</title>", html)
+        self.assertEqual(html.count("const Motor = "), 1)
+
+    def test_la_pantalla_de_los_programas_no_lleva_datos(self):
+        r = self.c.get("/")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("<title>Programas</title>", r.text)
+        self.assertIn("const ClientePrograma", r.text)
+        self.assertNotIn("Zafiro Plus", r.text)  # la lista se pide a la API
 
     # ------------------------------------------------------------------ ver
     def test_ver_el_programa(self):
@@ -142,7 +244,8 @@ class PruebasApi(unittest.TestCase):
     # ------------------------------------------------------------------ el spec
     def test_el_spec_nombra_las_operaciones_en_espanol(self):
         ops = {op["operationId"] for ruta in self.c.get("/openapi.json").json()["paths"].values() for op in ruta.values()}
-        self.assertEqual(ops, {"ver_programa", "ver_bitacora", "proponer_edicion", "aplicar_edicion", "deshacer_edicion", "pantalla_gantt"})
+        self.assertEqual(ops, {"listar_programas", "importar_programa", "pantalla_programas", "ver_programa", "ver_bitacora",
+                               "proponer_edicion", "aplicar_edicion", "deshacer_edicion", "pantalla_gantt"})
 
 
 if __name__ == "__main__":

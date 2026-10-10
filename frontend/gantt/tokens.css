@@ -1,0 +1,29 @@
+  /* Pantalla de trabajo: el Gantt como plano de obra sobre papel tenue; el rojo es solo de la cadena.
+     Tokens: papel, tinta, retícula, ventana, rojo de obra, aviso, acento y seis hues de nivel + gris de paquetes. */
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --fg: #1d2326; --muted: #5d676c; --line: #d9d8d0; --grid: #ebeae4;
+    --fin-semana: #ecebe5; --ventana: rgba(46, 117, 166, .13); --acento: #2e75a6; --acento-fondo: #e6eff6;
+    --critica: #c4271b; --aviso: #b26a00; --flecha: #8a949a; --resumen: #2b3438; --sel: #fff6d6;
+    --f1: #8a6a3d; --f2: #3b7a8c; --f3: #6b5ea8; --f4: #3f8a5c; --f5: #b5588a; --f6: #a8883a; --fx: #9aa3a8;
+    --sombra: 0 1px 2px rgba(20, 28, 32, .12), 0 6px 18px rgba(20, 28, 32, .12);
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171a; --panel: #1a2125; --fg: #e6e8e4; --muted: #99a4a9; --line: #2f393e; --grid: #222b2f;
+      --fin-semana: #1e272b; --ventana: rgba(88, 160, 210, .18); --acento: #58a0d2; --acento-fondo: #1c2a33;
+      --critica: #ff6a5b; --aviso: #e0a23a; --flecha: #7d8a91; --resumen: #cfd6d3; --sel: #3a3416;
+      --f1: #c79b5c; --f2: #62b0c4; --f3: #9d90de; --f4: #62b883; --f5: #dc7fb2; --f6: #d2b25f; --fx: #6c777d;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 6px 18px rgba(0, 0, 0, .5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171a; --panel: #1a2125; --fg: #e6e8e4; --muted: #99a4a9; --line: #2f393e; --grid: #222b2f;
+    --fin-semana: #1e272b; --ventana: rgba(88, 160, 210, .18); --acento: #58a0d2; --acento-fondo: #1c2a33;
+    --critica: #ff6a5b; --aviso: #e0a23a; --flecha: #7d8a91; --resumen: #cfd6d3; --sel: #3a3416;
+    --f1: #c79b5c; --f2: #62b0c4; --f3: #9d90de; --f4: #62b883; --f5: #dc7fb2; --f6: #d2b25f; --fx: #6c777d;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 6px 18px rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }

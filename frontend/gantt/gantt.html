@@ -3,40 +3,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-  /* Pantalla de trabajo: el Gantt como plano de obra sobre papel tenue; el rojo es solo de la cadena.
-     Tokens: papel, tinta, retícula, ventana, rojo de obra, aviso, acento y seis hues de nivel + gris de paquetes. */
-  :root {
-    --bg: #f6f5f1; --panel: #ffffff; --fg: #1d2326; --muted: #5d676c; --line: #d9d8d0; --grid: #ebeae4;
-    --fin-semana: #ecebe5; --ventana: rgba(46, 117, 166, .13); --acento: #2e75a6; --acento-fondo: #e6eff6;
-    --critica: #c4271b; --aviso: #b26a00; --flecha: #8a949a; --resumen: #2b3438; --sel: #fff6d6;
-    --f1: #8a6a3d; --f2: #3b7a8c; --f3: #6b5ea8; --f4: #3f8a5c; --f5: #b5588a; --f6: #a8883a; --fx: #9aa3a8;
-    --sombra: 0 1px 2px rgba(20, 28, 32, .12), 0 6px 18px rgba(20, 28, 32, .12);
-    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #12171a; --panel: #1a2125; --fg: #e6e8e4; --muted: #99a4a9; --line: #2f393e; --grid: #222b2f;
-      --fin-semana: #1e272b; --ventana: rgba(88, 160, 210, .18); --acento: #58a0d2; --acento-fondo: #1c2a33;
-      --critica: #ff6a5b; --aviso: #e0a23a; --flecha: #7d8a91; --resumen: #cfd6d3; --sel: #3a3416;
-      --f1: #c79b5c; --f2: #62b0c4; --f3: #9d90de; --f4: #62b883; --f5: #dc7fb2; --f6: #d2b25f; --fx: #6c777d;
-      --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 6px 18px rgba(0, 0, 0, .5);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #12171a; --panel: #1a2125; --fg: #e6e8e4; --muted: #99a4a9; --line: #2f393e; --grid: #222b2f;
-    --fin-semana: #1e272b; --ventana: rgba(88, 160, 210, .18); --acento: #58a0d2; --acento-fondo: #1c2a33;
-    --critica: #ff6a5b; --aviso: #e0a23a; --flecha: #7d8a91; --resumen: #cfd6d3; --sel: #3a3416;
-    --f1: #c79b5c; --f2: #62b0c4; --f3: #9d90de; --f4: #62b883; --f5: #dc7fb2; --f6: #d2b25f; --fx: #6c777d;
-    --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 6px 18px rgba(0, 0, 0, .5);
-    color-scheme: dark;
-  }
+  /*__TOKENS__*/
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.45;
          padding-inline: 16px; padding-block: 20px 28px; }
   .pagina { max-width: 1480px; margin-inline: auto; display: grid; gap: 14px; }
+  .atras { font-size: .84rem; color: var(--acento); text-decoration: none; }
+  .atras:hover { text-decoration: underline; }
   header h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -.01em; margin: 0 0 4px; text-wrap: balance; }
   header .nota { margin: 0; color: var(--muted); max-width: 78ch; }
   code { font-family: var(--mono); font-size: .88em; }
@@ -118,6 +92,7 @@
 
 <div class="pagina">
   <header>
+    <a class="atras" id="atras" href="/" hidden>← Programas</a>
     <h1>__TITULO__</h1>
     <p class="nota" id="nota-pagina">El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Es una simulación en pantalla: nada se guarda. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.</p>
   </header>
@@ -181,6 +156,11 @@
 </script>
 <script>
 const G = __DATOS__;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+// El programa lo sube quien tiene permiso y lo ven todos: lo que se muestra de él nunca se toma por HTML. Las claves y
+// las descripciones se escapan una vez aquí; las llaves —que también son claves de búsqueda— al ponerlas en un atributo.
+G.filas.forEach(f => { f.clave = esc(f.clave); f.descripcion = esc(f.descripcion); });
+Object.keys(G.frentes).forEach(k => { G.frentes[k] = esc(G.frentes[k]); });
 const R = G.red, dias = R.dias;
 const FILA = 15, MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 const COLORES = ["var(--f1)","var(--f2)","var(--f3)","var(--f4)","var(--f5)","var(--f6)"];
@@ -267,7 +247,7 @@ const esVisible = () => { // las filas que se ven según lo que está plegado y 
 const rojoSet = () => rojo === "relevos" ? new Set(cur.rutaDespues) : (todas().length ? new Set() : new Set(G.ruta_critica_red));
 
 function textoEdicion(e, conOrigen = true) {
-  const c = k => porLlave[k] ? porLlave[k].clave : k;
+  const c = k => porLlave[k] ? porLlave[k].clave : esc(k);
   const lag = d => d ? (d > 0 ? "+" : "") + d : "";
   if (e.t === "dur") return `${c(e.k)} dura ${e.dias} d`;
   if (e.t === "ini") return `${c(e.k)} no arranca antes del ${fmt(e.fecha)}`;
@@ -366,11 +346,11 @@ function bitacora() {
   const fila = g => {
     const e = deServidor(g.edicion), i = g.impacto || {}, ok = g.estado === "aplicada";
     const imp = i.fin_despues ? `cierre ${i.dias_de_cambio > 0 ? "+" : ""}${i.dias_de_cambio} d, ${i.partidas_movidas} partida(s) movida(s)${i.ruta_cambia ? ", cambió la cadena" : ""}` : "";
-    const origen = g.edicion.origen ? ` · ${ORIGENES[g.edicion.origen] || g.edicion.origen} (confianza ${CONFIANZA[g.edicion.origen] || "?"})` : "";
+    const origen = g.edicion.origen ? ` · ${esc(ORIGENES[g.edicion.origen] || g.edicion.origen)} (confianza ${esc(CONFIANZA[g.edicion.origen] || "?")})` : "";
     const puede = ROL_DE[e.t] === ident.rol;
     return `<li class="${ok ? "" : "revertida"}"><span class="sec">#${g.secuencia}</span><span class="que">${textoEdicion(e, false)}${origen}</span>` +
       `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede ? "disabled" : ""} title="${puede ? "Deshacer esta edición" : "Se deshace como " + ROLES[ROL_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
-      `<span class="quien-cuando">${g.usuario} (${ROLES[g.rol] || g.rol}) · ${fmtHora(g.creada_en)}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${g.revertida_por}`}</span></li>`;
+      `<span class="quien-cuando">${esc(g.usuario)} (${esc(ROLES[g.rol] || g.rol)}) · ${esc(fmtHora(g.creada_en))}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
   };
   b.innerHTML = `<summary>Lo guardado · ${saved.length} aplicada(s)${guardadas.length > saved.length ? `, ${guardadas.length - saved.length} revertida(s)` : ""} · versión ${version}</summary>` +
     (guardadas.length ? `<ol>${guardadas.slice().reverse().map(fila).join("")}</ol>` : `<p class="nota" style="margin:8px 0 4px">Todavía no se ha guardado ninguna edición.</p>`);
@@ -379,7 +359,7 @@ function bitacora() {
 
 function leyenda() {
   $("leyenda").innerHTML = frentes.map(f =>
-    `<button data-f="${f}" aria-pressed="${soloFrente === null || soloFrente === f}"><i style="background:${colorDe(f)}"></i>${G.frentes[f].toLowerCase()}</button>`).join("") +
+    `<button data-f="${esc(f)}" aria-pressed="${soloFrente === null || soloFrente === f}"><i style="background:${colorDe(f)}"></i>${G.frentes[f].toLowerCase()}</button>`).join("") +
     `<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:8px;border-radius:2px;display:inline-block;background:var(--critica)"></i>cadena en rojo</span>`;
 }
 
@@ -400,8 +380,8 @@ function dibujar() {
     const tiene = f.resumen && hijosDe(f.llave).length;
     const abierto = expandidos.has(f.llave);
     const movida = f.resumen ? hijosDe(f.llave).some(h => CMP.movidas[h]) : !!CMP.movidas[f.llave];
-    return `<div class="fila-eti ${f.resumen ? "resumen" : ""} ${roja.has(f.llave) ? "critica" : ""} ${sel === f.llave ? "sel" : ""} ${movida ? "movida" : ""}" style="padding-left:${4 + f.nivel * 9}px" data-l="${f.llave}">` +
-      `<span class="caret" ${tiene ? `data-c="${f.llave}"` : ""}>${tiene ? (abierto ? "▼" : "▶") : ""}</span><span class="clave">${f.clave}</span><span class="desc">${f.descripcion.toLowerCase()}</span></div>`;
+    return `<div class="fila-eti ${f.resumen ? "resumen" : ""} ${roja.has(f.llave) ? "critica" : ""} ${sel === f.llave ? "sel" : ""} ${movida ? "movida" : ""}" style="padding-left:${4 + f.nivel * 9}px" data-l="${esc(f.llave)}">` +
+      `<span class="caret" ${tiene ? `data-c="${esc(f.llave)}"` : ""}>${tiene ? (abierto ? "▼" : "▶") : ""}</span><span class="clave">${f.clave}</span><span class="desc">${f.descripcion.toLowerCase()}</span></div>`;
   }).join("");
 
   let cab = `<svg width="${W}" height="46" role="img" aria-label="Escala de tiempo">`;
@@ -432,9 +412,9 @@ function dibujar() {
     if (b0 && (b0[0] !== w[0] || b0[1] !== w[1])) s += `<rect x="${x0(b0[0])}" y="${yy + 4}" width="${Math.max(x1(b0[1]) - x0(b0[0]), 2)}" height="7" rx="2" fill="none" stroke="var(--muted)" stroke-dasharray="2 2" opacity=".8"/>`;
     if (f.resumen) {
       const plegada = !expandidos.has(f.llave) && hijosDe(f.llave).length;
-      if (plegada) s += `<rect data-l="${f.llave}" x="${a}" y="${yy + 3}" width="${Math.max(b - a, 2)}" height="9" rx="2" fill="${colorDe(f.frente)}" opacity=".55"/>`;
-      s += `<g data-l="${f.llave}"><rect x="${a}" y="${yy + 5}" width="${b - a}" height="3.5" fill="var(--resumen)" opacity=".75"/><path d="M${a},${yy + 4} v7 l3,-3 z M${b},${yy + 4} v7 l-3,-3 z" fill="var(--resumen)" opacity=".75"/></g>`;
-    } else s += `<rect data-l="${f.llave}" x="${a}" y="${yy + 3}" width="${Math.max(b - a, 2)}" height="9" rx="2" fill="${roja.has(f.llave) ? "var(--critica)" : colorDe(f.frente)}"/>`;
+      if (plegada) s += `<rect data-l="${esc(f.llave)}" x="${a}" y="${yy + 3}" width="${Math.max(b - a, 2)}" height="9" rx="2" fill="${colorDe(f.frente)}" opacity=".55"/>`;
+      s += `<g data-l="${esc(f.llave)}"><rect x="${a}" y="${yy + 5}" width="${b - a}" height="3.5" fill="var(--resumen)" opacity=".75"/><path d="M${a},${yy + 4} v7 l3,-3 z M${b},${yy + 4} v7 l-3,-3 z" fill="var(--resumen)" opacity=".75"/></g>`;
+    } else s += `<rect data-l="${esc(f.llave)}" x="${a}" y="${yy + 3}" width="${Math.max(b - a, 2)}" height="9" rx="2" fill="${roja.has(f.llave) ? "var(--critica)" : colorDe(f.frente)}"/>`;
   });
 
   if (flechas !== "ninguna") {
@@ -483,7 +463,7 @@ function panel() {
     const otro = entrantes ? v.de : v.a, o = porLlave[otro];
     const wp = R.bloques[v.de] ? Motor.ventanaDeBloque(R, cur.win, v.de, v.a) : cur.win[v.de];
     const hol = wp ? Motor.holgura(v.tipo, v.desfase, wp[0], wp[1] + 1, cur.win[v.a][0], cur.win[v.a][1] + 1) : null;
-    return `<div class="vinculo ${hol !== null && hol < 0 ? "roto" : ""}"><div class="quien" title="${o ? o.descripcion : ""}"><span class="mono">${o ? o.clave : otro}</span> ${o ? o.descripcion.toLowerCase() : ""}</div>
+    return `<div class="vinculo ${hol !== null && hol < 0 ? "roto" : ""}"><div class="quien" title="${o ? o.descripcion : ""}"><span class="mono">${o ? o.clave : esc(otro)}</span> ${o ? o.descripcion.toLowerCase() : ""}</div>
       <div class="campo"><select data-vt="${i}" aria-label="Tipo">${Motor.TIPOS.map(t => `<option ${t === v.tipo ? "selected" : ""}>${t}</option>`).join("")}</select>
       <input type="number" step="1" value="${v.desfase}" data-vl="${i}" aria-label="Espera (+) o traslape (−), en días"> <span class="mono">d</span>
       <button class="b" data-vq="${i}">Quitar</button><span class="mono">${hol === null ? "" : "holgura " + hol}</span></div></div>`;
@@ -565,13 +545,14 @@ function mostrar(html, e) { tip.innerHTML = html; tip.hidden = false; const r = 
 $("marco").addEventListener("mousemove", e => {
   const l = filaDe(e), v = e.target.closest("[data-v]");
   if (v) { const x = cur.vinculos[+v.dataset.v];
-    mostrar(`<b>${x.tipo}${x.desfase ? (x.desfase > 0 ? "+" : "") + x.desfase : ""}</b><div class="mono">${porLlave[x.de] ? porLlave[x.de].clave : x.de} → ${porLlave[x.a].clave}</div><div>${porLlave[x.de] ? porLlave[x.de].descripcion.toLowerCase() : ""}<br>→ ${porLlave[x.a].descripcion.toLowerCase()}</div>`, e); }
+    mostrar(`<b>${x.tipo}${x.desfase ? (x.desfase > 0 ? "+" : "") + x.desfase : ""}</b><div class="mono">${porLlave[x.de] ? porLlave[x.de].clave : esc(x.de)} → ${porLlave[x.a].clave}</div><div>${porLlave[x.de] ? porLlave[x.de].descripcion.toLowerCase() : ""}<br>→ ${porLlave[x.a].descripcion.toLowerCase()}</div>`, e); }
   else if (l) { const f = porLlave[l.dataset.l], w = ventanaFila(f, cur.win);
     mostrar(`<b>${f.descripcion.toLowerCase()}</b><div class="mono">${f.clave} · fila ${f.fila}</div><div>${fmt(dias[w[0]])} → ${fmt(dias[w[1]])}</div>`, e); }
   else tip.hidden = true;
 });
 $("marco").addEventListener("mouseleave", () => tip.hidden = true);
 if (API) {
+  $("atras").hidden = false;
   $("nota-pagina").innerHTML = 'El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Lo que decides queda <b>por guardar</b> hasta que lo guardes; entonces entra a la bitácora con tu nombre, tu rol y el impacto que viste, y se puede deshacer. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.';
 }
 recalcular(); todo();

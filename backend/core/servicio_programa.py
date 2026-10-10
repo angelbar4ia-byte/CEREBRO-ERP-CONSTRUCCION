@@ -94,8 +94,29 @@ class EdicionGuardada:
     revertida_en: Optional[datetime] = None
 
 
+@dataclass(frozen=True)
+class ResumenPrograma:
+    """Lo que se ve de un programa en la lista, sin abrirlo."""
+
+    id: int
+    nombre: str
+    version: int
+    partidas: int  # los conceptos con fechas y días: lo que el CPM programa
+    vinculos: int  # los que se cargaron
+    rechazados: int  # los que el cargador no aceptó, con su motivo
+    ediciones: int  # las aplicadas, sin contar las revertidas
+    creado_en: datetime
+    importado_por: Optional[str] = None  # quién lo subió; nulo si se cargó sin decirlo (las pruebas, `servir`)
+    importado_con_rol: Optional[str] = None
+
+
 class RepositorioPrograma(Protocol):
-    def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario) -> int: ...
+    def importar_programa(
+        self, nombre: str, programa: Programa, calendario: Calendario, *, usuario: Optional[str] = None, rol: Optional[str] = None
+    ) -> int: ...
+
+    def listar_programas(self) -> List[ResumenPrograma]:
+        """Todos, del más viejo al más nuevo."""
 
     def leer_programa(self, programa_id: int) -> ProgramaGuardado: ...
 
@@ -148,16 +169,40 @@ def permiso_de(edicion: object) -> str:
         raise TypeError(f"edición desconocida: {edicion!r}") from None
 
 
+def verificar_funcion(funcion: str, rol: str) -> str:
+    if rol not in ROLES_CON_PERMISO[funcion]:
+        raise PermisoDenegado(f"el rol «{rol}» no puede {ETIQUETA_DE_PERMISO[funcion]}")
+    return funcion
+
+
 def verificar_permiso(edicion: object, rol: str) -> str:
-    permiso = permiso_de(edicion)
-    if rol not in ROLES_CON_PERMISO[permiso]:
-        raise PermisoDenegado(f"el rol «{rol}» no puede {ETIQUETA_DE_PERMISO[permiso]}")
-    return permiso
+    return verificar_funcion(permiso_de(edicion), rol)
+
+
+# Subir un programa es lo más estructural que hay —las partidas, sus duraciones y todos sus vínculos—: pide la misma
+# función que editar la estructura. No se inventa una función nueva sin un caso que la pida (`MODELO.md` §5b).
+FUNCION_DE_IMPORTAR = "editar_estructura_programa"
 
 
 class ServicioPrograma:
     def __init__(self, repositorio: RepositorioPrograma) -> None:
         self.repo = repositorio
+
+    def listar(self) -> List[ResumenPrograma]:
+        return self.repo.listar_programas()
+
+    def verificar_importar(self, rol: str) -> None:
+        """Quien no puede importar lo sabe antes de subir el archivo, no después de leerlo."""
+        verificar_funcion(FUNCION_DE_IMPORTAR, rol)
+
+    def importar(self, nombre: str, programa: Programa, calendario: Calendario, rol: str, usuario: str) -> int:
+        """Guarda un programa ya cargado, diciendo quién lo subió. Devuelve su id."""
+        self.verificar_importar(rol)
+        if not usuario:
+            raise ValueError("todo programa dice quién lo subió")
+        if not nombre.strip():
+            raise ValueError("todo programa lleva nombre")
+        return self.repo.importar_programa(nombre.strip(), programa, calendario, usuario=usuario, rol=rol)
 
     def abrir(self, programa_id: int) -> Vigente:
         """El programa tal como está hoy: la base más lo aplicado."""

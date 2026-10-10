@@ -89,6 +89,45 @@ class ContratoPrograma:
         self.assertEqual(v.programa.ventanas, self.plus.ventanas)
         self.assertEqual((v.aplicadas, v.version), ([], 0))
 
+    # ------------------------------------------------------------------ la lista y subir un programa
+    def test_la_lista_cuenta_lo_que_se_cargo(self):
+        zafiro = programa("Zafiro")
+        otro = self.sv.importar("  Zafiro de prueba ", zafiro, CAL, CO, "luis")
+        a, b = self.sv.listar()  # del más viejo al más nuevo
+        self.assertEqual((a.id, a.nombre, a.version, a.ediciones), (self.pid, "Zafiro Plus", 0, 0))
+        self.assertEqual((a.partidas, a.vinculos, a.rechazados), (len(self.plus.ventanas), len(self.plus.vinculos), len(self.plus.rechazados)))
+        self.assertEqual((a.importado_por, a.importado_con_rol), (None, None))  # cargado sin decir quién: no se inventa
+        self.assertEqual((b.id, b.nombre, b.importado_por, b.importado_con_rol), (otro, "Zafiro de prueba", "luis", CO))
+        self.assertEqual((b.partidas, b.vinculos, b.rechazados), (len(zafiro.ventanas), 118, 6))
+        self.assertIsNotNone(b.creado_en)
+        self.assertLessEqual(a.creado_en, b.creado_en)
+
+    def test_la_lista_sigue_las_ediciones_y_las_reversiones(self):
+        e = self.sv.aplicar(self.pid, self.p16(), CO, "luis").guardada
+        (r,) = self.sv.listar()
+        self.assertEqual((r.version, r.ediciones), (1, 1))
+        self.sv.deshacer(self.pid, e.id, CO, "luis")
+        (r,) = self.sv.listar()
+        self.assertEqual((r.version, r.ediciones), (2, 0))  # la versión sube; lo revertido ya no cuenta como aplicado
+
+    def test_subir_un_programa_pide_el_permiso_y_quien(self):
+        for rol in (RES, "supervisor"):
+            with self.assertRaises(PermisoDenegado):
+                self.sv.importar("x", self.plus, CAL, rol, "ana")
+            with self.assertRaises(PermisoDenegado):
+                self.sv.verificar_importar(rol)
+        with self.assertRaises(ValueError):
+            self.sv.importar("x", self.plus, CAL, CO, "")
+        with self.assertRaises(ValueError):
+            self.sv.importar("   ", self.plus, CAL, CO, "luis")
+        self.assertEqual(len(self.sv.listar()), 1)  # nada de eso dejó un programa a medias
+
+    def test_un_programa_subido_se_abre_igual_que_el_original(self):
+        pid = self.sv.importar("Plus subido", self.plus, CAL, CO, "luis")
+        self.assertEqual(self.sv.abrir(pid).programa.ventanas, self.plus.ventanas)
+        self.assertTrue(self.sv.aplicar(pid, self.p16(), CO, "luis").aplicable)
+        self.assertEqual(self.sv.abrir(self.pid).version, 0)  # editar uno no toca al otro
+
     # ------------------------------------------------------------------ proponer y aplicar
     def test_proponer_no_guarda_nada(self):
         p = self.sv.proponer(self.pid, self.p16(), CO)

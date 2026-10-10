@@ -50,7 +50,7 @@ class PruebasPostgres(ContratoPrograma, unittest.TestCase):
 
     # ------------------------------------------------------------------ lo que solo Postgres garantiza
     def test_la_migracion_corre_una_vez(self):
-        self.assertEqual(self.nuevas, ["0001_programa.sql"])
+        self.assertEqual(self.nuevas, ["0001_programa.sql", "0002_programa_importado_por.sql"])
         self.assertEqual(aplicar_migraciones(self.conn), [])
 
     def test_los_tipos_de_vinculo_se_guardan_con_los_nombres_del_modelo(self):

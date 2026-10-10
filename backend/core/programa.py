@@ -23,6 +23,7 @@ No depende de Django: recibe filas y devuelve estructuras.
 from __future__ import annotations
 
 import csv
+import io
 import re
 from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
@@ -75,32 +76,109 @@ class Fila:
         return self.tipo == "Concepto" and self.inicio is not None and self.dias > 0
 
 
+TIPOS_DE_FILA = ("Capítulo", "Subcapítulo", "Nivel 2", "Nivel 3", "Concepto")
+COLUMNAS_DE_FILA = ("oid", "fila", "nivel", "tipo", "clave", "descripcion", "inicio", "termino", "dias_laborables", "vinculos", "etapa", "frente")
+MAX_FILAS = 20000  # un programa real tiene unos cientos; más que esto es un archivo equivocado
+
+
+class ImportacionInvalida(ValueError):
+    """El archivo no es un programa que se pueda cargar. El mensaje dice qué y dónde, para quien lo subió."""
+
+
+def filas_desde_texto(texto: str, prototipo: Optional[str] = None) -> List[Fila]:
+    """Las filas de un programa en el formato de `PROGRAMAS-PROTOTIPOS.csv`, en el orden del archivo.
+
+    Si el archivo trae varios programas (columna `prototipo`) hay que decir cuál; si trae uno solo, sobra decirlo.
+    Lo que no se puede cargar —columnas que faltan, una fecha ilegible, una fila repetida— se dice con el número de
+    línea y no se carga nada: una base no se llena a medias. Acepta coma o punto y coma (el CSV de Excel en español)."""
+    texto = texto.lstrip("\ufeff")
+    if not texto.strip():
+        raise ImportacionInvalida("el archivo está vacío")
+    primera = texto.split("\n", 1)[0]
+    lector = csv.DictReader(io.StringIO(texto, newline=""), delimiter=";" if primera.count(";") > primera.count(",") else ",")
+    columnas = [c.strip() for c in (lector.fieldnames or [])]
+    lector.fieldnames = columnas
+    faltan = [c for c in COLUMNAS_DE_FILA if c not in columnas]
+    if faltan:
+        raise ImportacionInvalida(f"al archivo le faltan columnas: {', '.join(faltan)}")
+    out: List[Fila] = []
+    vistos_oid: Dict[str, int] = {}
+    vistos_fila: Dict[int, int] = {}
+    programas = set()
+    for r in lector:
+        n = lector.line_num
+        if None in r:
+            raise ImportacionInvalida(f"línea {n}: trae más celdas que columnas")
+        if "prototipo" in r:
+            programas.add(r["prototipo"])
+            if prototipo is not None and r["prototipo"] != prototipo:
+                continue
+        if len(out) >= MAX_FILAS:
+            raise ImportacionInvalida(f"el archivo pasa de {MAX_FILAS} filas: no es un programa de una obra")
+
+        def campo(nombre: str) -> str:
+            v = r[nombre]
+            if v is None:
+                raise ImportacionInvalida(f"línea {n}: faltan celdas")
+            return v.strip()
+
+        def entero(nombre: str) -> int:
+            try:
+                return int(campo(nombre))
+            except ValueError:
+                raise ImportacionInvalida(f"línea {n}: «{nombre}» debe ser un número entero, no «{r[nombre]}»") from None
+
+        def fecha(nombre: str) -> Optional[date]:
+            v = campo(nombre)
+            if not v:
+                return None
+            try:
+                return date.fromisoformat(v)
+            except ValueError:
+                raise ImportacionInvalida(f"línea {n}: «{nombre}» debe ser una fecha como 2025-06-09, no «{v}»") from None
+
+        llave, tipo = campo("oid"), campo("tipo")
+        fila_n, nivel = entero("fila"), entero("nivel")
+        if not llave:
+            raise ImportacionInvalida(f"línea {n}: la fila no trae «oid», la llave que la distingue")
+        if llave in vistos_oid:
+            raise ImportacionInvalida(f"línea {n}: el «oid» {llave} ya está en la línea {vistos_oid[llave]}")
+        if fila_n in vistos_fila:
+            raise ImportacionInvalida(f"línea {n}: la fila {fila_n} ya está en la línea {vistos_fila[fila_n]}")
+        if tipo not in TIPOS_DE_FILA:
+            raise ImportacionInvalida(f"línea {n}: «tipo» es «{tipo}» y debe ser uno de: {', '.join(TIPOS_DE_FILA)}")
+        if nivel < 0:
+            raise ImportacionInvalida(f"línea {n}: «nivel» no puede ser negativo")
+        ini, ter = fecha("inicio"), fecha("termino")
+        if (ini is None) != (ter is None):
+            raise ImportacionInvalida(f"línea {n}: trae solo una de «inicio» y «termino»")
+        if ini is not None and ter < ini:
+            raise ImportacionInvalida(f"línea {n}: «termino» ({ter}) es anterior a «inicio» ({ini})")
+        try:
+            dias = Fraction(campo("dias_laborables")) if campo("dias_laborables") else Fraction(0)
+        except (ValueError, ZeroDivisionError):
+            raise ImportacionInvalida(f"línea {n}: «dias_laborables» debe ser un número, no «{r['dias_laborables']}»") from None
+        if dias < 0:
+            raise ImportacionInvalida(f"línea {n}: «dias_laborables» no puede ser negativo")
+        vistos_oid[llave], vistos_fila[fila_n] = n, n
+        out.append(
+            Fila(
+                llave=llave, fila=fila_n, nivel=nivel, tipo=tipo, clave=campo("clave"), descripcion=campo("descripcion"),
+                inicio=ini, termino=ter, dias=dias, vinculos=campo("vinculos"), etapa=campo("etapa"), frente=campo("frente"),
+            )
+        )
+    if not out:
+        if prototipo is not None and programas:
+            raise ImportacionInvalida(f"el archivo no trae el programa «{prototipo}»; trae: {', '.join(sorted(programas))}")
+        raise ImportacionInvalida("el archivo no trae ninguna fila")
+    if prototipo is None and len(programas) > 1:
+        raise ImportacionInvalida(f"el archivo trae varios programas ({', '.join(sorted(programas))}): di cuál cargar")
+    return out
+
+
 def filas_desde_csv(ruta: Path, prototipo: str) -> List[Fila]:
     """Las filas de un prototipo de `PROGRAMAS-PROTOTIPOS.csv`, en el orden del libro."""
-    out: List[Fila] = []
-    with open(ruta, encoding="utf-8", newline="") as fh:
-        for r in csv.DictReader(fh):
-            if r["prototipo"] != prototipo:
-                continue
-            out.append(
-                Fila(
-                    llave=r["oid"],
-                    fila=int(r["fila"]),
-                    nivel=int(r["nivel"]),
-                    tipo=r["tipo"],
-                    clave=r["clave"],
-                    descripcion=r["descripcion"],
-                    inicio=date.fromisoformat(r["inicio"]) if r["inicio"] else None,
-                    termino=date.fromisoformat(r["termino"]) if r["termino"] else None,
-                    dias=Fraction(r["dias_laborables"]) if r["dias_laborables"] else Fraction(0),
-                    vinculos=r["vinculos"],
-                    etapa=r["etapa"],
-                    frente=r["frente"],
-                )
-            )
-    if not out:
-        raise ValueError(f"el prototipo {prototipo!r} no está en {ruta}")
-    return out
+    return filas_desde_texto(Path(ruta).read_text(encoding="utf-8"), prototipo)
 
 
 def leer_vinculos(texto: str) -> List[Tuple[Optional[int], str, str, Optional[Fraction]]]:
@@ -229,6 +307,8 @@ def armar_programa(
 
 def cargar_programa(filas: Sequence[Fila], cal: Calendario) -> Programa:
     por_fila, por_llave, ventanas, bloques = _estructura(filas)
+    if not ventanas:
+        raise ImportacionInvalida("el archivo no trae ninguna partida: un concepto con fechas de inicio y término y con días")
 
     # 1. leer y validar cada vínculo
     aceptados: List[Tuple[Vinculo, int, str]] = []  # (vínculo, fila sucesora, token)

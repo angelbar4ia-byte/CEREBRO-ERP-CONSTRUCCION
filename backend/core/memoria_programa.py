@@ -7,11 +7,11 @@ from __future__ import annotations
 
 from dataclasses import replace
 from datetime import datetime, timezone
-from typing import Dict, List, Mapping
+from typing import Dict, List, Mapping, Optional
 
 from .motor_cpm import Calendario
 from .programa import Programa, edicion_a_dict, edicion_desde_dict
-from .servicio_programa import Conflicto, EdicionGuardada, ProgramaGuardado, ProgramaNoExiste
+from .servicio_programa import Conflicto, EdicionGuardada, ProgramaGuardado, ProgramaNoExiste, ResumenPrograma
 
 
 class MemoriaPrograma:
@@ -19,11 +19,14 @@ class MemoriaPrograma:
         self._programas: Dict[int, ProgramaGuardado] = {}
         self._versiones: Dict[int, int] = {}
         self._ediciones: Dict[int, List[EdicionGuardada]] = {}
+        self._llegada: Dict[int, tuple] = {}  # id → (cuándo, quién, con qué rol)
         self._sig_programa = 0
         self._sig_edicion = 0
 
-    def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario) -> int:
+    def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario, *,
+                          usuario: Optional[str] = None, rol: Optional[str] = None) -> int:
         self._sig_programa += 1
+        self._llegada[self._sig_programa] = (datetime.now(timezone.utc), usuario, rol)
         self._programas[self._sig_programa] = ProgramaGuardado(
             id=self._sig_programa,
             nombre=nombre,
@@ -35,6 +38,18 @@ class MemoriaPrograma:
         self._ediciones[self._sig_programa] = []
         self._versiones[self._sig_programa] = 0
         return self._sig_programa
+
+    def listar_programas(self) -> List[ResumenPrograma]:
+        out = []
+        for pid, g in sorted(self._programas.items()):
+            creado, quien, rol = self._llegada[pid]
+            out.append(ResumenPrograma(
+                id=pid, nombre=g.nombre, version=self._versiones[pid], partidas=sum(f.es_partida for f in g.filas),
+                vinculos=len(g.vinculos), rechazados=len(g.rechazados),
+                ediciones=sum(e.estado == "aplicada" for e in self._ediciones[pid]),
+                creado_en=creado, importado_por=quien, importado_con_rol=rol,
+            ))
+        return out
 
     def leer_programa(self, programa_id: int) -> ProgramaGuardado:
         try:

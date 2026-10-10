@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 198 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 221 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -37,7 +37,7 @@ verificado: 198 pruebas · los siete programas reales (832 vínculos) reproducen
 | **El cargador del programa, la cadena de relevos y el Gantt como dato** | **§4.5 y `backend/core/programa.py`** |
 | **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
 | **Guardar lo que se edita** | **§4.7, `backend/core/servicio_programa.py` y `database/migraciones/`** |
-| **La API y su cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
+| **La API, subir un programa y su cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
 ---
@@ -320,17 +320,44 @@ cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca.
 
 ## 4.8 La API y su cliente: `backend/api/` y `frontend/gantt/cliente_programa.js`
 
-FastAPI es la única superficie pública (D-54). Estas seis operaciones, escritas sobre `ServicioPrograma` y nada más,
-son las que la pantalla necesita:
+FastAPI es la única superficie pública (D-54). Estas nueve operaciones, escritas sobre `ServicioPrograma` y nada más,
+son las que las pantallas necesitan:
 
 | Operación | Método y ruta | Qué hace | Falla con |
 |---|---|---|---|
+| `listar_programas` | `GET /programas` | Los programas del más viejo al más nuevo: partidas, vínculos cargados, vínculos que no se cargaron, ediciones aplicadas, versión y quién lo subió | — |
+| `importar_programa` | `POST /programas` (201) | Sube un programa (ver abajo) | 401, 403, 422 `importacion_invalida` |
 | `ver_programa` | `GET /programas/{id}` | La base dibujable (`vista_gantt` con lo necesario para reprogramar en pantalla), el calendario, la versión y toda la bitácora | 404 |
 | `ver_bitacora` | `GET /programas/{id}/ediciones` | Todo lo editado, también lo revertido, en orden | 404 |
 | `proponer_edicion` | `POST /programas/{id}/propuestas` | Qué pasaría: el impacto contra lo vigente, o por qué no se puede aplicar. No guarda | 401, 403, 404, 422 |
 | `aplicar_edicion` | `POST /programas/{id}/ediciones` (201) | Propone y guarda. Cuerpo: `edicion` y, si la pantalla lo manda, `esperaba` | 401, 403, 404, 409 `conflicto`, 422 `edicion_invalida` o `no_aplicable` con sus motivos |
 | `deshacer_edicion` | `DELETE /programas/{id}/ediciones/{edicion}` | Revierte una edición con el permiso que la hizo y devuelve la bitácora y la versión | 401, 403, 404, 409 `dependen` (con cuáles) o `conflicto` |
 | `pantalla_gantt` | `GET /programas/{id}/gantt` | El HTML de la pantalla de ese programa, con el cliente, el motor y lo guardado | 404 |
+| `pantalla_programas` | `GET /` | El HTML de la lista de programas y de subir uno. No lleva datos: los pide a la API | — |
+
+**Subir un programa.** El cuerpo trae el `nombre`, el `csv` —el programa en el formato de
+`PROGRAMAS-PROTOTIPOS.csv` (§2)—, el `prototipo` si el archivo trae varios (columna `prototipo`) y los `no_habiles`
+(los días entre semana en que la obra no trabaja; los sábados y domingos ya no cuentan). Lo que pasa:
+
+- **Quién puede se sabe antes de leer el archivo.** Subir un programa es lo más estructural que hay y pide
+  `editar_estructura_programa` (Control de obra), sin función nueva (`MODELO.md` §5b); el 403 llega antes que
+  cualquier 422, y el programa queda diciendo quién lo subió y con qué rol.
+- **Se carga entero o no se carga.** El archivo se valida completo —las doce columnas, que las fechas sean fechas,
+  que el `oid` y la fila no se repitan, que el tipo sea uno de los cinco, que el término no sea anterior al inicio,
+  que haya al menos una partida— y cada falla dice la línea. Acepta coma o punto y coma y el encabezado con BOM, que
+  es lo que guarda el CSV de Excel en español. Pasa de 20,000 filas: no es un programa de una obra.
+- **El reporte** dice las partidas y los vínculos que entraron, **los que no** —con su fila, la clave y la
+  descripción de la partida que lo traía, el texto tal como venía y el motivo (`formato`, `autovinculo`,
+  `predecesora_desconocida`, `predecesora_sin_partidas`, `sucesora_bloque`, `cierra_un_ciclo`, §4.5)— y cuántos
+  vínculos las fechas escritas no cumplen, que sí se cargan: son un aviso, no un error (D-443). El sistema no
+  corrige ninguno; el planeador decide. Con el Zafiro real son 315 partidas, 118 vínculos, 6 sin cargar y 9 que las
+  fechas no cumplen.
+
+**El texto de quien sube es de otro.** El nombre del programa, las claves y las descripciones los escribe quien subió
+el archivo y los ven todos: nunca se toman por HTML. El título se escapa en el servidor, los datos viajan como JSON
+con cada `<` escrito `\u003c`, las marcas de la plantilla se sustituyen de una sola pasada —un título que se parezca a
+una marca no cambia nada— y las pantallas escapan todo lo que dibujan. Una prueba en navegador con una descripción,
+un nombre de programa y un nombre de usuario hechos para ejecutar código falla si se quita el escape.
 
 **Cómo viaja una edición.** Como la guarda la bitácora (`edicion_a_dict`): un diccionario con el tipo en
 `edicion`, las llaves estables (`oid`) y los días y las esperas **como texto** —«12», «1/2»—, porque un número
@@ -353,14 +380,14 @@ un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`. Una prueba falla si
 el que daría el spec de hoy, y el CI lo comprueba.
 
 **Cómo se levanta para trabajar.** `cd backend && python3 -m api.servir` carga los programas del CSV en memoria
-(lo que se guarda se pierde al apagar); con `--postgres` guarda en una base —aplica las migraciones y, si está
+(lo que se guarda se pierde al apagar; `--vacio` arranca sin ninguno, para subirlos desde `/`); con `--postgres` guarda en una base —aplica las migraciones y, si está
 vacía, importa los que se pidan con `--programa`—. Escucha solo en `127.0.0.1`: por la identidad de arriba.
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 198 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 221 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
-la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **la pantalla en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y el programa real de Zafiro Plus; la persistencia se prueba
+la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
 verdad** (`pgserver`, embebido, que el CI instala), más lo que solo Postgres garantiza; siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
@@ -779,8 +806,14 @@ punteado cuando una edición mueve una partida, y el horizonte del programa más
 - **El origen del vínculo.** Al agregar una predecesora la pantalla pregunta por qué (técnico, recurso o decisión, con
   su confianza); sin contestar queda «por decisión».
 
-**Lo que la pantalla todavía no hace:** elegir entre programas (se abre por su id), importar uno por la API y
-autenticar a nadie (B-96).
+**La lista de programas (D-466).** `GET /` es la entrada: la tabla de los programas con sus cifras, cada uno con un
+enlace a su Gantt (y el Gantt, uno de vuelta), y debajo el formulario para subir uno —nombre, archivo, programa
+del archivo si trae varios y días no hábiles—. Al subir, el reporte de la carga (§4.8) queda a la vista con los
+vínculos que no entraron y por qué, y un enlace al Gantt. Quien sube dice su rol y su nombre en los mismos
+controles que el Gantt.
+
+**Lo que las pantallas todavía no hacen:** autenticar a nadie (B-96) y subir *otra versión* de un programa que ya
+está —hoy es un programa más—.
 
 ---
 
@@ -788,8 +821,9 @@ autenticar a nadie (B-96).
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| Autenticación de la API | Hoy quien llama dice su rol y su nombre en dos cabeceras, y eso no se despliega (§4.8). Falta decidir cómo se identifica cada quien y de dónde sale su rol (B-96) |
-| Listar e importar programas por la API | Hoy se cargan del CSV con `python3 -m api.servir` y la pantalla abre un programa por su id |
+| Autenticación de la API | Hoy quien llama dice su rol y su nombre en dos cabeceras, y eso no se despliega (§4.8). Falta decidir cómo se identifica cada quien; de dónde sale su rol ya está decidido (`ROL_FUNCION`, `MODELO.md` §5b) y el código todavía lo tiene como constante. Recomendación y lo que arrastra, en B-96 |
+| Subir otra versión de un programa que ya está | Hoy es un programa más y sus ediciones no pasan al nuevo. Como la bitácora cita el `oid`, podrían repetirse sobre la versión nueva si el libro conserva sus `oid`; cómo se hace y qué pasa con las que ya no aplican, sin decidir |
+| Los datos del programa dentro de la página del Gantt | Con autenticación (B-96) la página no puede llevar los datos del programa dentro: tendrá que pedirlos a la API, como ya hace la lista |
 | Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
@@ -819,3 +853,4 @@ autenticar a nadie (B-96).
 | **Reprogramar por empuje mínimo, el árbol plegable y la edición en pantalla (B-95 cierra)** | **D-463** |
 | **Guardar las ediciones: puerto, servicio, Postgres y origen del vínculo** | **D-464** |
 | **La API del programa, el cliente generado y la pantalla contra lo guardado** | **D-465** |
+| **Los programas se listan y se suben por la API, y el texto de quien sube no se toma por HTML** | **D-466** |

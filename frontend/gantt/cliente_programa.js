@@ -32,12 +32,39 @@ const OPERACIONES = {
     ],
     "cuerpo": false
   },
+  "importar_programa": {
+    "metodo": "POST",
+    "ruta": "/programas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true
+  },
+  "listar_programas": {
+    "metodo": "GET",
+    "ruta": "/programas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false
+  },
   "pantalla_gantt": {
     "metodo": "GET",
     "ruta": "/programas/{programa_id}/gantt",
     "ruta_params": [
       "programa_id"
     ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false
+  },
+  "pantalla_programas": {
+    "metodo": "GET",
+    "ruta": "/",
+    "ruta_params": [],
     "consulta": [],
     "cabeceras": [],
     "cuerpo": false
@@ -116,8 +143,14 @@ const ClientePrograma = (() => {
   cliente.aplicar_edicion = args => llamar("aplicar_edicion", args || {});
   /** DELETE /programas/{programa_id}/ediciones/{edicion_id} — Deshacer una edición aplicada */
   cliente.deshacer_edicion = args => llamar("deshacer_edicion", args || {});
+  /** POST /programas — Subir un programa: se carga, se guardan sus vínculos y se dice cuáles no entraron */
+  cliente.importar_programa = args => llamar("importar_programa", args || {});
+  /** GET /programas — Los programas que hay, del más viejo al más nuevo */
+  cliente.listar_programas = args => llamar("listar_programas", args || {});
   /** GET /programas/{programa_id}/gantt — La pantalla del Gantt de este programa */
   cliente.pantalla_gantt = args => llamar("pantalla_gantt", args || {});
+  /** GET / — La pantalla de los programas: la lista y subir uno */
+  cliente.pantalla_programas = args => llamar("pantalla_programas", args || {});
   /** POST /programas/{programa_id}/propuestas — Qué pasaría si se aplicara esta edición: no guarda nada */
   cliente.proponer_edicion = args => llamar("proponer_edicion", args || {});
   /** GET /programas/{programa_id}/ediciones — Todo lo que se ha editado, también lo revertido */

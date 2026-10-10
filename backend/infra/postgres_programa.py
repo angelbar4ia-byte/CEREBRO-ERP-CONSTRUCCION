@@ -26,7 +26,7 @@ from core.programa import (
     edicion_desde_dict,
     origen_de_edicion,
 )
-from core.servicio_programa import Conflicto, EdicionGuardada, ProgramaGuardado, ProgramaNoExiste
+from core.servicio_programa import Conflicto, EdicionGuardada, ProgramaGuardado, ProgramaNoExiste, ResumenPrograma
 
 MIGRACIONES = Path(__file__).resolve().parents[2] / "database" / "migraciones"
 ENUM_A_TIPO = dict(ALIAS_TIPO)  # fin_inicio → FS, y así
@@ -68,11 +68,12 @@ class PostgresPrograma:
         self.conn = conexion
 
     # ------------------------------------------------------------------ importar
-    def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario) -> int:
+    def importar_programa(self, nombre: str, programa: Programa, calendario: Calendario, *,
+                          usuario: Optional[str] = None, rol: Optional[str] = None) -> int:
         with self.conn.transaction():
             pid = self.conn.execute(
-                "INSERT INTO programa (nombre, calendario) VALUES (%s, %s) RETURNING id",
-                (nombre, Jsonb(calendario.a_dict())),
+                "INSERT INTO programa (nombre, calendario, importado_por, importado_con_rol) VALUES (%s, %s, %s, %s) RETURNING id",
+                (nombre, Jsonb(calendario.a_dict()), usuario, rol),
             ).fetchone()[0]
             with self.conn.cursor() as cur:
                 cur.executemany(
@@ -96,6 +97,25 @@ class PostgresPrograma:
                     [(pid, r.sucesora, r.motivo, r.token) for r in programa.rechazados],
                 )
         return pid
+
+    # ------------------------------------------------------------------ listar
+    def listar_programas(self) -> List[ResumenPrograma]:
+        with self.conn.transaction():
+            filas = self.conn.execute(
+                """
+                SELECT p.id, p.nombre, p.version, p.creado_en, p.importado_por, p.importado_con_rol,
+                       (SELECT count(*) FROM programa_fila f WHERE f.programa_id = p.id
+                         AND f.tipo = 'Concepto' AND f.inicio IS NOT NULL AND f.dias > 0),
+                       (SELECT count(*) FROM programa_vinculo v WHERE v.programa_id = p.id AND v.estado = 'vigente'),
+                       (SELECT count(*) FROM programa_vinculo v WHERE v.programa_id = p.id AND v.estado = 'rechazado'),
+                       (SELECT count(*) FROM edicion_programa e WHERE e.programa_id = p.id AND e.estado = 'aplicada')
+                  FROM programa p ORDER BY p.id
+                """).fetchall()
+        return [
+            ResumenPrograma(id=r[0], nombre=r[1], version=r[2], creado_en=r[3], importado_por=r[4], importado_con_rol=r[5],
+                            partidas=r[6], vinculos=r[7], rechazados=r[8], ediciones=r[9])
+            for r in filas
+        ]
 
     # ------------------------------------------------------------------ leer
     def leer_programa(self, programa_id: int) -> ProgramaGuardado:

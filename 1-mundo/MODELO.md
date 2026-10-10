@@ -1656,7 +1656,7 @@ fecha, en un solo lugar.
 | `solicitar_cierre_frente` | Residente | §5c, D-329 |
 | `aprobar_cierre_frente` | Supervisor | §5c, D-329 |
 | `validar_cierre_frente` | Control de obra | §5c, D-329 |
-| `editar_estructura_programa` | Control de obra | §5c, D-329 |
+| `editar_estructura_programa` | Control de obra | §5c, D-329; D-466: también subir un programa |
 | `editar_fechas_programa` | Residente | §5c, D-329 |
 | `proponer_precio_nuevo` | Costos | D-329 |
 | `aprobar_precio_nuevo` | Control de obra **y** Superintendente (los dos) | D-329 |
@@ -1974,6 +1974,8 @@ Hasta que `NODO` y `PRESUPUESTO` tengan tabla, el programa se guarda como libro 
 
 *D-465: la regla (4) la cumple quien llama, no solo el servicio —la API recibe en `esperaba` la versión que vio la
 pantalla y, si ya es otra, responde conflicto—.*
+
+*D-466: el programa dice quién lo subió (`programa.importado_por` e `importado_con_rol`, nulos si se cargó del repositorio), y subirlo pide `editar_estructura_programa`.*
 
 ### La herencia de una duración: referencia explícita, y el que edita pasa a ser la referencia de su alcance (D-441, cierra B-85)
 

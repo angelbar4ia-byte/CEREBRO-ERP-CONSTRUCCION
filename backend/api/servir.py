@@ -5,6 +5,7 @@ Levanta la API del programa con los programas reales — para trabajar con la pa
     python3 -m api.servir --postgres postgresql://…    guarda en Postgres (aplica las migraciones y, si no hay
                                                        programas, importa los que pida --programa)
     python3 -m api.servir --programa "Zafiro Plus" --programa Rubí
+    python3 -m api.servir --vacio                      sin programas: se suben desde la pantalla de inicio
 
 La identidad por cabeceras de `app.py` **no se despliega**: esto es para trabajar en una máquina propia, por eso
 escucha solo en 127.0.0.1 si no se le dice otra cosa.
@@ -63,10 +64,12 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--postgres", help="cadena de conexión; sin ella, en memoria")
     ap.add_argument("--programa", action="append", help="programa del CSV que se importa (varios permitidos)")
+    ap.add_argument("--vacio", action="store_true", help="no importar ningún programa al arrancar")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--puerto", type=int, default=8000)
     a = ap.parse_args()
-    app, programas = armar(a.postgres, a.programa or POR_OMISION)
+    app, programas = armar(a.postgres, [] if a.vacio else (a.programa or POR_OMISION))
+    print(f"Los programas: http://{a.host}:{a.puerto}/")
     for pid, nombre in programas:
         print(f"{nombre}: http://{a.host}:{a.puerto}/programas/{pid}/gantt")
     uvicorn.run(app, host=a.host, port=a.puerto, log_level="warning")

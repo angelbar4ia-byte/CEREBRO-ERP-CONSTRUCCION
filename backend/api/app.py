@@ -1,8 +1,8 @@
 """
 La API del programa — la única superficie pública (D-54), escrita sobre `ServicioPrograma`.
 
-Cuatro cosas se pueden hacer, y las cuatro pasan por el servicio: ver el programa con lo que ya se aplicó,
-preguntar qué pasaría con una edición (`propuestas`, no guarda nada), aplicarla (`ediciones`) o deshacerla.
+Todo pasa por el servicio: listar los programas y subir uno, ver un programa con lo que ya se aplicó, preguntar
+qué pasaría con una edición (`propuestas`, no guarda nada), aplicarla (`ediciones`) o deshacerla.
 El cliente de la pantalla se genera de este mismo spec y no se edita a mano (`generar_cliente.py`, D-55).
 
 **Quién llama.** El cerebro todavía no decide cómo se autentica nadie. Mientras tanto, quien llama dice quién es
@@ -19,8 +19,16 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
-from core.gantt_pagina import pagina_gantt
-from core.programa import edicion_a_dict, edicion_desde_dict, vista_gantt
+from core.gantt_pagina import pagina_gantt, pagina_programas
+from core.motor_cpm import Calendario
+from core.programa import (
+    ImportacionInvalida,
+    cargar_programa,
+    edicion_a_dict,
+    edicion_desde_dict,
+    filas_desde_texto,
+    vista_gantt,
+)
 from core.servicio_programa import (
     Conflicto,
     EdicionGuardada,
@@ -28,6 +36,7 @@ from core.servicio_programa import (
     PermisoDenegado,
     ProgramaNoExiste,
     Propuesta,
+    ResumenPrograma,
     ServicioPrograma,
     Vigente,
 )
@@ -51,6 +60,40 @@ class EdicionEntrada(BaseModel):
         description="La versión del programa que vio quien decide. Si el programa ya va en otra, no se guarda y se responde 409: "
         "el impacto que vio ya no es el de hoy. Sin ella se aplica sobre lo que haya.",
     )
+
+
+class ResumenSalida(BaseModel):
+    id: int
+    nombre: str
+    version: int
+    partidas: int = Field(description="Los conceptos con fechas y días: lo que el CPM programa")
+    vinculos: int = Field(description="Los vínculos que se cargaron")
+    rechazados: int = Field(description="Los que el cargador no aceptó, cada uno con su motivo")
+    ediciones: int = Field(description="Las aplicadas, sin contar las revertidas")
+    creado_en: datetime
+    importado_por: Optional[str] = Field(None, description="Quién lo subió; nulo si se cargó sin decirlo")
+    importado_con_rol: Optional[str] = None
+
+
+class ImportacionEntrada(BaseModel):
+    nombre: str = Field(min_length=1, max_length=120, description="Cómo se llama el programa en la lista")
+    csv: str = Field(description="El programa en el formato de `1-mundo/programas/PROGRAMAS-PROTOTIPOS.csv` (`PROGRAMA-CPM.md` §2)")
+    prototipo: Optional[str] = Field(None, description="Cuál programa del archivo, si trae varios (columna `prototipo`)")
+    no_habiles: List[date] = Field(default_factory=list, description="Los días entre semana en que la obra no trabaja: 25-dic, 1-ene… Sin ellos, todos los días de semana cuentan")
+
+
+class RechazoDeCarga(BaseModel):
+    fila: int
+    clave: str
+    descripcion: str
+    token: str = Field(description="El vínculo tal como venía escrito")
+    motivo: str = Field(description="formato · autovinculo · predecesora_desconocida · predecesora_sin_partidas · sucesora_bloque · cierra_un_ciclo")
+
+
+class ImportacionSalida(BaseModel):
+    resumen: ResumenSalida
+    rechazados: List[RechazoDeCarga] = Field(description="Los vínculos que no se cargaron, para que los vea el planeador")
+    incumplidos: int = Field(description="Vínculos cargados que las fechas escritas del propio programa no cumplen: no son error, son aviso")
 
 
 class RechazoSalida(BaseModel):
@@ -113,6 +156,10 @@ class VigenteSalida(BaseModel):
     fin: date
 
 
+def _resumen_salida(r: ResumenPrograma) -> ResumenSalida:
+    return ResumenSalida(**r.__dict__)
+
+
 def _edicion_salida(e: EdicionGuardada) -> EdicionSalida:
     return EdicionSalida(
         id=e.id, secuencia=e.secuencia, edicion=edicion_a_dict(e.edicion), rol=e.rol, usuario=e.usuario, estado=e.estado,
@@ -166,6 +213,37 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
         base = v.base
         return vista_gantt(base, v.guardado.calendario, resultado=base.calcular(v.guardado.calendario), para_editar=True)
 
+    @app.get("/programas", response_model=List[ResumenSalida], operation_id="listar_programas", summary="Los programas que hay, del más viejo al más nuevo")
+    def listar_programas() -> List[ResumenSalida]:
+        return [_resumen_salida(r) for r in servicio.listar()]
+
+    @app.post("/programas", response_model=ImportacionSalida, status_code=201, operation_id="importar_programa",
+              summary="Subir un programa: se carga, se guardan sus vínculos y se dice cuáles no entraron")
+    def importar_programa(entrada: ImportacionEntrada, quien: Identidad = Depends(identidad)) -> ImportacionSalida:
+        try:
+            servicio.verificar_importar(quien.rol)  # antes de leer el archivo: quien no puede, no espera
+        except PermisoDenegado as e:
+            raise _error(403, "permiso_denegado", str(e)) from None
+        cal = Calendario(no_habiles=frozenset(entrada.no_habiles))
+        try:
+            programa = cargar_programa(filas_desde_texto(entrada.csv, entrada.prototipo), cal)
+        except (ImportacionInvalida, ValueError) as e:
+            raise _error(422, "importacion_invalida", str(e)) from None
+        try:
+            pid = servicio.importar(entrada.nombre, programa, cal, quien.rol, quien.usuario)
+        except ValueError as e:  # el nombre en blanco o quien sube sin nombre
+            raise _error(422, "importacion_invalida", str(e)) from None
+        (resumen,) = [r for r in servicio.listar() if r.id == pid]
+        return ImportacionSalida(
+            resumen=_resumen_salida(resumen),
+            rechazados=[
+                RechazoDeCarga(fila=r.fila, clave=programa.por_llave[r.sucesora].clave, descripcion=programa.por_llave[r.sucesora].descripcion,
+                               token=r.token, motivo=r.motivo)
+                for r in programa.rechazados
+            ],
+            incumplidos=len(programa.incumplidos(cal)),
+        )
+
     @app.get("/programas/{programa_id}", response_model=ProgramaSalida, operation_id="ver_programa", summary="El programa base y su bitácora")
     def ver_programa(programa_id: int) -> ProgramaSalida:
         v = guardado(programa_id)
@@ -218,6 +296,10 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
             raise _error(404, "edicion_inexistente", f"Esa edición no está aplicada: {e}") from None
         return VigenteSalida(version=v.version, guardadas=[_edicion_salida(e) for e in servicio.repo.ediciones(programa_id)],
                              fin=v.reprogramacion.fin_despues)
+
+    @app.get("/", response_class=HTMLResponse, operation_id="pantalla_programas", summary="La pantalla de los programas: la lista y subir uno")
+    def pantalla_programas() -> HTMLResponse:
+        return HTMLResponse(pagina_programas())
 
     @app.get("/programas/{programa_id}/gantt", response_class=HTMLResponse, operation_id="pantalla_gantt", summary="La pantalla del Gantt de este programa")
     def pantalla_gantt(programa_id: int) -> HTMLResponse:

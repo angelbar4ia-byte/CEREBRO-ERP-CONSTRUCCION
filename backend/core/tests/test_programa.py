@@ -440,11 +440,13 @@ class PruebasPagina(unittest.TestCase):
     def test_la_pagina_junta_plantilla_motor_y_datos(self):
         html = pagina_gantt(programa("Zafiro Plus"), CAL, "Gantt Zafiro Plus", ventana=(date(2025, 8, 18), date(2025, 8, 29)))
         self.assertIn("<title>Gantt Zafiro Plus</title>", html)
-        for marca in ("/*__MOTOR__*/", "__DATOS__", "__TITULO__"):
+        for marca in ("/*__MOTOR__*/", "/*__CLIENTE__*/", "/*__TOKENS__*/", "__DATOS__", "__TITULO__"):
             self.assertNotIn(marca, html)
         self.assertIn("const Motor", html)
-        datos = html.split("const G = ", 1)[1].split(";\nconst R", 1)[0]
-        v = json.loads(datos.replace("<\\/", "</"))
+        self.assertIn("const ClientePrograma", html)
+        self.assertIn("--bg:", html)  # los colores compartidos
+        datos = html.split("const G = ", 1)[1].split(";\nconst esc", 1)[0]
+        v = json.loads(datos)
         self.assertEqual(len(v["red"]["partidas"]), 388)
         self.assertEqual(len(v["relevos"]), 13)
         self.assertEqual(len(v["ruta_critica_red"]), 28)

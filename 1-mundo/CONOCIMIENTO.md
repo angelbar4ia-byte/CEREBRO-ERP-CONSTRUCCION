@@ -6559,6 +6559,20 @@ antes en este archivo:
 
 `PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
 
+### Los programas se listan y se suben por la API (D-466)
+
+Dato del usuario: «vamos con el que sigue abierto». El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo
+dicho antes en este archivo:
+
+- **Subir un programa ya no es cosa del repositorio.** Un archivo en el formato de los siete prototipos se carga entero
+  o no se carga, y el reporte dice qué vínculos no entraron y por qué, sin corregirlos: los decide el planeador.
+- **Pide la misma función que editar la estructura** (Control de obra), porque subir un programa es lo más estructural
+  que hay; y el programa dice quién lo subió.
+- **El texto del programa es de otro.** Desde que cualquiera con permiso puede subir uno, lo que trae —su nombre, sus
+  claves, sus descripciones— se muestra siempre como texto y nunca como HTML.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las
