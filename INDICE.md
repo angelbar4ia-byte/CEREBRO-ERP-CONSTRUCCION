@@ -20,7 +20,7 @@ nombrarlo.
 
 | Capa | Tiempo | Qué contiene | Archivos |
 |---|---|---|---|
-| **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
+| **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `PROGRAMA-CPM` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
 | **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `skills/` · `agentes/` |
 | **III · Historia** | *Fue así* | Lo consolidado y lo que enseñó | `MEMORIA` · `CASO-TRABAJADO` · `APRENDIZAJE` |
 | **IV · Dirección** | *Vamos aquí* | Dónde estoy, qué falta, qué merece el enfoque | `ESTADO` · `PENDIENTES` · `PRIORIDADES` · `IDEAS` · `PROPUESTA-…` |
@@ -40,14 +40,16 @@ va sin archivo: `§3.2` dentro de su propio archivo es legible y no se rompe.
 cerebro/
 ├── README.md                  ← puerta de entrada del repositorio
 ├── INDICE.md                  ← fuera de las capas: las conecta
-├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
+├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
+│   └── programas/             los siete programas y sus listas, en CSV (13 archivos)
 ├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
 │   ├── skills/                erp-construccion + importacion · rediseno · parametrico
 │   └── agentes/               gravity (orquesta) · arquitecto · constructor · migrador · auditor
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
-└── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
+├── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
+└── backend/                   el código que el cerebro especifica: core/motor_calculo.py · core/motor_cpm.py (con sus pruebas)
 ```
 
 **Este archivo queda fuera de las cuatro.** Un órgano que se clasifica a sí mismo
@@ -95,6 +97,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | **CONOCIMIENTO** | I | ¿Cómo funciona el sistema? | Corteza asociativa |
 | **CATALOGOS** | I | ¿Qué trae cada catálogo de origen? | Memoria perceptiva |
 | **MODELO** | I | ¿Qué forma tienen los datos? | Esquema corporal |
+| **PROGRAMA-CPM** | I | ¿Cómo se calcula el programa y qué cifras lo prueban? | Cerebelo |
 | **LENGUAJE** | I | ¿Cómo se nombra en cada sistema? | Área de Wernicke |
 | **GLOSARIO** | I | ¿Cómo lo dicen las personas? | Léxico social |
 | **DICCIONARIO-DATOS** | I | Los renglones concretos a corregir | — |
@@ -133,6 +136,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | Una regla para quien programa | SKILL | *«`Decimal`, nunca `float`»* |
 | Cómo se averigua algo | MÉTODO | *«Hay que calcular con el catálogo, no leerlo»* |
 | Una entidad del esquema | MODELO | *«`reporta_a` vive en la línea, no en el insumo»* |
+| Los datos de un programa, su red, su ruta o el motor que los calcula | PROGRAMA-CPM | *«La ruta de relevos de Zafiro son 28 pasos»* |
 | Un módulo propuesto y sin aprobar | PROPUESTA | *«El factorizador primero»* |
 | **Cómo encaja un módulo que no existe** | **ESCALABILIDAD** | *«¿Qué dimensión agrega y de qué nodos cuelga?»* |
 
@@ -236,9 +240,10 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 460 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 461 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
+| `PROGRAMA-CPM.md` | I | ✅ 76 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |

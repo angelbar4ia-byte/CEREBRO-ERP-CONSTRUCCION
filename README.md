@@ -5,7 +5,7 @@ Gobernanza del ERP: qué es verdad, cómo se piensa, qué se decidió y qué fal
 
 ```
 INDICE.md          ← empezar aquí. Dice dónde va cada cosa
-├── 1-mundo/       Es así        CONOCIMIENTO · CATALOGOS · MODELO · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
+├── 1-mundo/       Es así        CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
 ├── 2-operacion/   Se hace así   METODO · INVARIANTES · ESCALABILIDAD · skills/ · agentes/
 ├── 3-historia/    Fue así       MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-*
 └── 4-direccion/   Vamos aquí    ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-*

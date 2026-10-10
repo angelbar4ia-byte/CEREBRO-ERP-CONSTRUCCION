@@ -41,7 +41,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 6 | Reversión por destajo | ⚠️ **Pasa al 84% — falta qué hacer con el 16%** |
 | 7 | Comparación contra prototipo | ✅ Pasa, y encuentra un hecho real |
 | 8 | Factorizador | ⚠️ **No resuelve el problema que parecía suyo — la política de consolidar ya cerró (P-36, 26/09), la comparación no se ha vuelto a correr con ella** |
-| 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse, y esta obra no tiene actividades cargadas para correrlo |
+| 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse *(D-461: ya existe, `backend/core/motor_cpm.py`)*, y esta obra no tiene actividades cargadas para correrlo |
 | 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
 | 11 | Contratación y congelamiento | ⛔ Sin probar |
 | 12 | Salidas y desviación | ✅ **Pasa — cinco meses de almacén y cuatro de avance, el triángulo material-avance cuadra en acumulado al 99.8%** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g). El 27/09 pasó de uno a cinco meses de almacén; el 28/09 cerró el avance —y con él, un falso positivo propio: el 68.5% sin respaldo que parecía un hallazgo real era la ventana de datos incompleta (D-375) |
@@ -300,7 +300,7 @@ ejercitado todavía:
 - **Programa** (`MODELO.md` §5c, D-327): `ACTIVIDAD` completa, `PRECEDENCIA`,
   `CALENDARIO_OBRA`/`CALENDARIO_EXCEPCION`, `TRAMO` — el motor de cálculo del
   CPM (fechas tempranas/tardías, ruta crítica) sigue siendo código, no
-  schema, y esta obra no tiene ni una `ACTIVIDAD` cargada para correrlo.
+  schema *(D-461: ya está escrito)*, y esta obra no tiene ni una `ACTIVIDAD` cargada para correrlo.
 - **Recursos por fecha** (`MODELO.md` §5f, D-336): la misma explosión leída
   por fecha, con `CONSTANTE_FISICA(categoria=tiempo_entrega)` para separar
   pedido de consumo — depende por completo de que 9 tenga datos que leer.

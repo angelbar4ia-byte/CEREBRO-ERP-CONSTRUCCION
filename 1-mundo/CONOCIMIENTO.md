@@ -26,11 +26,11 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 6123 | 20 |
+| §11 | Los flujos entre sistemas | 6148 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
-| §15 | La ruta crítica ya está en el modelo | 80 | 0 |
+| §15 | La ruta crítica ya está en el modelo | 81 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
 | §17 | Cuantificación gráfica — de inventario a regla verificada | 72 | 4 |
 
@@ -6457,10 +6457,35 @@ operaciones y la etapa se identificó en el 69% de las operaciones: se recalibra
   y Oro): queda como **incumplido conocido** de los cuatro prototipos de dos plantas, con `vinculo_incumplido`
   activa. Es lo que dejó la decisión de D-437 de cerrar en 30 semanas. Cerrarlo pide mover el plazo diez días
   hábiles (30 a 32 semanas) o relajar el vínculo; cualquiera de las dos lo decide el planeador por obra.
+  *(D-461 corrige: `P16` es solo de Plus y está sin escribir; en Diamante sin chimenea, Diamante con chimenea y Oro está escrito y se cumple.)*
 - **Sin cambio:** la segunda ruta de cuadrilla sigue en borrador (D-444), y las listas del planeador (17 ventanas, 53
   líneas sin rendimiento, emparejamientos por rol, 15 incumplidos de Zafiro) siguen siendo suyas.
 
 `MODELO.md` §5a y §5c, `CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-86, B-91 y B-92.
+
+### El motor del CPM existe, y el programa ya no depende de ningún libro de Excel (D-461)
+
+Dato del usuario: «vamos con el que sigue y contempla que todo lo anterior de programa CPM sí esté anotado en el cerebro».
+El motor que D-409 y §15 daban por pendiente está escrito (`backend/core/motor_cpm.py`) y lo que vivía solo en los
+libros de Excel de los siete prototipos pasó a `1-mundo/programas/`. El contrato, la red con sus identificadores,
+las listas del planeador y las cifras de referencia están en `PROGRAMA-CPM.md`; aquí queda lo que cambia lo dicho
+antes en este archivo:
+
+- **Se prueba con datos reales.** Los siete programas, pasados a CSV, reproducen cada cifra publicada de esta
+  sección: 832 vínculos (680 `FS`, 91 `SS`, 53 `FF`, 8 `SF`), los 15 de Zafiro (18 con el bloque completo), los 39
+  cuyo bloque contiene a su sucesora (35 cumplidos), el cierre en 139 y 149 días hábiles y la herencia de
+  duraciones 1,520 / 132 / 478.
+- **Un bloque como predecesora se calcula por punto fijo, no por orden topológico.** Con aristas desde todos sus
+  descendientes, la gualdra y la losa de su propio grupo parecen un ciclo en los seis programas limpios; no lo son.
+- **Zafiro: 124 vínculos y 75 no se contradicen.** Son dos libros: el original (75, D-424) y el de los siete, al que
+  D-426 le sumó la red mínima y le quitó los 5 que esa red reemplaza (75 − 5 + 54).
+- **Con la red que hay, el CPM puro no reproduce el cierre de los de dos plantas.** Rubí y Jade calculan 139 días
+  hábiles, igual que su plan; Diamante sin chimenea, Diamante con chimenea y Oro, 139 contra 149 (la ventana de la
+  planta alta no está en ningún vínculo); Plus, 81, porque le falta `P16`. Con `P16` escrito calcularía 135.
+- **`P16` es solo de Plus.** D-460 lo dio como incumplido de los cuatro de dos plantas; en los otros tres está
+  escrito y se cumple.
+
+`PROGRAMA-CPM.md`, `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-13 y B-95.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
@@ -8619,6 +8644,7 @@ qué— ya cerró con P-20:
 > El motor que calcula fechas tempranas/tardías y ruta crítica sigue sin
 > escribirse — es código sobre este schema, no schema en sí, mismo
 > criterio que excluye el resto de `MODELO.md` §6.
+> *(D-461: ya está escrito, `backend/core/motor_cpm.py`; ver `PROGRAMA-CPM.md`.)*
 
 Queda la conexión que seguía a medias: **el tiempo de entrega del material**
 da la fecha de pedido a partir del inicio de la actividad — ahora que el

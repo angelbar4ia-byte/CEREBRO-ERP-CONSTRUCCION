@@ -1,0 +1,87 @@
+id,grupo,sucesora,predecesora,tipo_y_desfase_dias_habiles,origen,por_que
+V01,heredado de Zafiro (D-425),80 CAR-01011 GUALDRA 6X12X8,78 EST-00010 LOSA ZAFIRO 3.00 (Nivel 3),SF,,
+V02,heredado de Zafiro (D-425),81 EST-10013 K1 - 1.00 ACERO,78 EST-00010 LOSA ZAFIRO 3.00 (Nivel 3),FF-9,,
+V03,heredado de Zafiro (D-425),84 EST-10072 K7 - 2.00 ACERO,82 EST-00020 LOSA ZAFIRO 4.20 (Nivel 3),SS+2,,
+V04,heredado de Zafiro (D-425),85 EST-10013 K1 - 1.00 ACERO,82 EST-00020 LOSA ZAFIRO 4.20 (Nivel 3),SS+3,,
+V05,heredado de Zafiro (D-425),137 IGAS-03010 TANQUE ESTACIONARIO LOSA GAS / 8M,78 EST-00010 LOSA ZAFIRO 3.00 (Nivel 3),SS+5,,
+V06,heredado de Zafiro (D-425),148 ALB-01012 REPELLADO MURO +3.00,149 ALB-01110 REPELLADO PLAFOND 3.00 (Concepto),FS,,
+V07,heredado de Zafiro (D-425),149 ALB-01110 REPELLADO PLAFOND 3.00,78 EST-00010 LOSA ZAFIRO 3.00 (Nivel 3),FS,,
+V08,heredado de Zafiro (D-425),150 ALB-01112 REPELLADO PLAFOND +3.00,82 EST-00020 LOSA ZAFIRO 4.20 (Nivel 3),FS,,
+V09,heredado de Zafiro (D-425),159 ACA-01030 FINAS PLAFOND 3.00,402 ECO-00050 IMPERMEABILIZACIÓN (Nivel 2),FS,,
+V10,heredado de Zafiro (D-425),160 ACA-01040 FINAS PLAFOND 4.20,402 ECO-00050 IMPERMEABILIZACIÓN (Nivel 2),FS,,
+V11,heredado de Zafiro (D-425),161 ACA-01060 BOQUILLA FINA INTERIOR,156 ACA-07050 OJO DE BUEY (Concepto),FS,,
+V12,heredado de Zafiro (D-425),162 ACA-07012 MARCOS DE CANTERA INTERIOR,150 ALB-01112 REPELLADO PLAFOND +3.00 (Concepto),FS,,
+V13,heredado de Zafiro (D-425),170 ALB-03014 RELLENO EN AZOTEA ANTIHUMEDAD,173 ALB-01212 REPELLADO MUROS FACHADA +3.00 (Concepto),FS,,
+V14,heredado de Zafiro (D-425),174 ACA-01051 BOQUILLA EXTERIOR,172 ALB-01010 REPELLADO MURO 3.00 (Concepto),FS,,
+V15,heredado de Zafiro (D-425),177 ACA-20012 FINAS EXTERIORES 3.00,181 ACA-20011 FINAS EN FACHADA 3.00 (Concepto),FS,,
+V16,heredado de Zafiro (D-425),181 ACA-20011 FINAS EN FACHADA 3.00,183 BAP-01100 CADENA CD-1 DE 15X20 (Concepto),FS,,
+V17,heredado de Zafiro (D-425),182 ACA-20020 FINAS EN FACHADA +3.00,180 ECO-00060 OBRA GRIS FACHADA (Nivel 2),SS+1,,
+V18,heredado de Zafiro (D-425),185 ICA-01030 DURMIENTE 20X20,183 BAP-01100 CADENA CD-1 DE 15X20 (Concepto),SS+3,,
+V19,heredado de Zafiro (D-425),186 ACA-07011 MARCOS DE CANTERA,173 ALB-01212 REPELLADO MUROS FACHADA +3.00 (Concepto),FS,,
+V20,heredado de Zafiro (D-425),193 ACA-02010 PISO LUGANO NATURALE 15X50 (RECÁMARAS),198 ACA-02041 JABONERA (Concepto),FS,,
+V21,heredado de Zafiro (D-425),194 ACA-02060 ZOCLO LUGANO NATURALE 15X50 (RECÁMARAS),192 ACA-01110 VERTEDERO SARDINEL 10X10 (Concepto),FS,,
+V22,heredado de Zafiro (D-425),195 ACA-02020 PISO BRUNEI BEIGE 60X60 (ÁREAS COMUNES),192 ACA-01110 VERTEDERO SARDINEL 10X10 (Concepto),FS,,
+V23,heredado de Zafiro (D-425),196 ACA-02070 ZOCLO BRUNEI BEIGE 60X60 (ÁREAS COMUNES),194 ACA-02060 ZOCLO LUGANO NATURALE 15X50 (RECÁMARAS) (Concepto),FS,,
+V24,heredado de Zafiro (D-425),197 ACA-02040 MÁRMOL TOMBOLEADO 10X10 CM,190 ACA-01090 RENIVELACIÓN CHAROLAS DE REGADERA (Concepto),FS,,
+V25,heredado de Zafiro (D-425),201 ACA-10020 PIEDRA LAJA EN MURO,198 ACA-02041 JABONERA (Concepto),FS,,
+V26,heredado de Zafiro (D-425),204 ACA-01052 BOQUILLA EN FACHADA,195 ACA-02020 PISO BRUNEI BEIGE 60X60 (ÁREAS COMUNES) (Concepto),FS,,
+V27,heredado de Zafiro (D-425),206 ACA-07020 RODAPIÉ 60 CM,181 ACA-20011 FINAS EN FACHADA 3.00 (Concepto),FS,,
+V28,heredado de Zafiro (D-425),207 ACA-07021 RODAPIÉ 20 CM,238 OBE-02011 PÓRFIDO EN LAJA 80-20 VERDE-ROJO (Concepto),FS,,
+V29,heredado de Zafiro (D-425),229 EST-02010 MURO PARA CISTERNA,227 OBE-01011 AFINE DE CISTERNA (Concepto),FS,,
+V30,heredado de Zafiro (D-425),230 ALB-01010 REPELLO PARA CISTERNA,228 OBE-01012 FIRME PARA CISTERNA (Concepto),FS,,
+V31,heredado de Zafiro (D-425),231 ACA-20010 FINA PARA CISTERNA,229 EST-02010 MURO PARA CISTERNA (Concepto),FS,,
+V32,heredado de Zafiro (D-425),232 OBE-01013 LOSA PARA CISTERNA,244 INS-00210 CISTERNA PREFABRICADA 3000 (Nivel 3),FS,,
+V33,heredado de Zafiro (D-425),236 OBE-01021 TAPA DE REGISTRO SANITARIO,238 OBE-02011 PÓRFIDO EN LAJA 80-20 VERDE-ROJO (Concepto),FS,,
+V34,heredado de Zafiro (D-425),237 OBE-02020 JARDINERA PÓRFIDO EN LAJA,238 OBE-02011 PÓRFIDO EN LAJA 80-20 VERDE-ROJO (Concepto),FS,,
+V35,heredado de Zafiro (D-425),238 OBE-02011 PÓRFIDO EN LAJA 80-20 VERDE-ROJO,198 ACA-02041 JABONERA (Concepto),FS,,
+V36,heredado de Zafiro (D-425),"245 EQU-01011 CISTERNA PREFABRICADA 3,000 LTS",230 ALB-01010 REPELLO PARA CISTERNA (Concepto),FS,,
+V37,heredado de Zafiro (D-425),313 MSA-01171 COLADERA JARDÍN,235 OBE-01020 REGISTRO SANITARIO 60X40X1000 (Concepto),SS,,
+V38,heredado de Zafiro (D-425),336 EST-03020 ZAPATA Z-1 60X60X20 CM,198 ACA-02041 JABONERA (Concepto),FS,,
+V39,heredado de Zafiro (D-425),337 ACA-09020 COLUMNA FORRADA 25X25 CM DE  3.00 M ARMADA,199 ACA-02050 MÁRMOL TRAVERTINO LARGOS LIBRES 30.05 CM (Concepto),FS,,
+V40,heredado de Zafiro (D-425),338 ACA-07060 FORJADO DE ASADOR 3.00 M,336 EST-03020 ZAPATA Z-1 60X60X20 CM (Concepto),FS,,
+V41,heredado de Zafiro (D-425),339 ACA-07061 FORRADO DE CANTERA ASADOR 3.00 M,337 ACA-09020 COLUMNA FORRADA 25X25 CM DE  3.00 M ARMADA (Concepto),FS,,
+V42,heredado de Zafiro (D-425),340 ALB-03021 CHAFLÁN 10 CM ANTIHUMEDAD + RESINA + FIBRA + IMPER,359 ECO-00045 PÉRGOLA ASADOR (Nivel 2),FS,,
+V43,heredado de Zafiro (D-425),360 CAR-10011 PÉRGOLA ASADOR ZAFIRO (14.80 m2),338 ACA-07060 FORJADO DE ASADOR 3.00 M (Concepto),FS,,
+V44,heredado de Zafiro (D-425),365 BAP-03020 CASTILLO K-1 APARENTE 25X20 CM,363 BAP-03010 CADENA CD-1 APARENTE 20X25 CM (Concepto),FS,,
+V45,heredado de Zafiro (D-425),366 BAP-03030 CADENA DE CERRAMIENTO CE-1 APARENTE 20X25 CM,364 BAP-01010 MURO SILLAR 20 CM (Concepto),FS,,
+V46,heredado de Zafiro (D-425),371 ACA-30010 LIJADO Y SELLADO DE MURO INTERIOR,195 ACA-02020 PISO BRUNEI BEIGE 60X60 (ÁREAS COMUNES) (Concepto),FS,,
+V47,heredado de Zafiro (D-425),376 ACA-30022 PINTURA PLAFOND 2DA MANO,372 ACA-30011 PINTURA MURO INTERIOR 1ER MANO (Concepto),FS,,
+V48,heredado de Zafiro (D-425),403 ACA-04010 IMPERMEABILIZACIÓN SUBCONTRATO,170 ALB-03014 RELLENO EN AZOTEA ANTIHUMEDAD (Concepto),FS,,
+V49,heredado de Zafiro (D-425),408 ACA-07040 COLUMNA DE CANTERA 3.00 CASTILLO AHOGADO,238 OBE-02011 PÓRFIDO EN LAJA 80-20 VERDE-ROJO (Concepto),FS,,
+V50,heredado de Zafiro (D-425),409 ACA-09020 COLUMNA FORRADA 25X25 CM DE  3.00M ARMADA,407 EST-03020 ZAPATA Z-1 DE 60X60X20 CM (Concepto),FS,,
+V51,heredado de Zafiro (D-425),410 ALB-03021 CHAFLÁN 10 CM ANTIHUMEDAD + RESINA + FIBRA + IMPER,412 ECO-00054 PÉRGOLA COCHERA (Nivel 2),FS,,
+V52,heredado de Zafiro (D-425),413 CAR-10012 PÉRGOLA COCHERA ZAFIRO (29.92 m2),408 ACA-07040 COLUMNA DE CANTERA 3.00 CASTILLO AHOGADO (Concepto),FS,,
+P01,red mínima (D-426),68 EST-02010 MURO TABIQUE DE 14 CM,4 ECO-00001 FS-1,,técnica,el muro tabique de planta baja arranca el último día de la losa de cimentación (traslape de 1 día)
+P02,red mínima (D-426),80 CAR-01011 GUALDRA 6X12X8,68 EST-02010 SS+15,,técnica,la gualdra se coloca 15 días hábiles después de que arranca el muro (levantados los muros de 3.00)
+P03,red mínima (D-426),79 EST-21011 LOSA MACIZA ZAFIRO 3.00 (125 M2),80 CAR-01011 FS,,técnica,la losa maciza de 3.00 arranca al día siguiente de la gualdra
+P04,red mínima (D-426),83 EST-21031 LOSA NERVADA ZAFIRO 4.20 (40 M2),79 EST-21011 SS+9,,técnica,la losa de 4.20 arranca 9 días hábiles después que la de 3.00: entre una y otra va el muro que enrasa
+P05,red mínima (D-426),166 EST-02010 MURO TABIQUE DE 14 CM,79 EST-21011 SS+7; 83 EST-21031 FF,,técnica,el muro de pretiles arranca 7 días hábiles tras la losa de 3.00 y termina con la losa de 4.20
+P06,red mínima (D-426),167 EST-02110 CASTILLO K-1 15X15,79 EST-21011 SS+9; 83 EST-21031 FF+3,,técnica,los castillos de azotea arrancan tras la losa de 3.00 y terminan 3 días hábiles después de la de 4.20
+P07,red mínima (D-426),172 ALB-01010 REPELLADO MURO 3.00,167 EST-02110 FS,,técnica,repellado de muro de azotea el día siguiente de terminar castillos y pretiles
+P08,red mínima (D-426),173 ALB-01212 REPELLADO MUROS FACHADA +3.00,167 EST-02110 FF+7,,técnica,el repellado de muros +3.00 termina 7 días hábiles después de los castillos de azotea
+P09,red mínima (D-426),174 ACA-01051 BOQUILLA EXTERIOR,173 ALB-01212 FS,,técnica,boquilla exterior tras el repellado de muros +3.00
+P10,red mínima (D-426),170 ALB-03014 RELLENO EN AZOTEA ANTIHUMEDAD,174 ACA-01051 FS,,técnica,relleno de azotea tras la boquilla exterior
+P11,red mínima (D-426),171 ALB-03020 CHAFLÁN 10 CM ANCHO ANTIHUMEDAD + RESINA + FIBRA,170 ALB-03014 FS,,técnica,chaflán tras el relleno
+P12,red mínima (D-426),403 ACA-04010 IMPERMEABILIZACIÓN SUBCONTRATO,171 ALB-03020 FS,,técnica,la membrana va sobre el chaflán terminado
+P13,red mínima (D-426),158 ACA-01020 FINAS INTERIORES +3.00,160 ACA-01040 FS,,técnica,finas interiores +3.00 tras las finas de plafond de 4.20
+P14,red mínima (D-426),157 ACA-01010 FINAS INTERIORES 3.00,158 ACA-01020 SS+1,,técnica,finas interiores de 3.00 arrancan un día después que las de +3.00
+P15,red mínima (D-426),161 ACA-01060 BOQUILLA FINA INTERIOR,157 ACA-01010 FS,,técnica,boquilla fina interior tras las finas interiores
+P16,red mínima (D-426),192 ACA-01110 VERTEDERO SARDINEL 10X10,161 ACA-01060 FS+1,,técnica,"los acabados arrancan tras la boquilla fina, con un día de espera (lunes 6-oct)"
+P17,red mínima (D-426),190 ACA-01090 RENIVELACIÓN CHAROLAS DE REGADERA,192 ACA-01110 FS,,recurso,renivelación de charolas tras el vertedero (misma cuadrilla de baños)
+P18,red mínima (D-426),191 ACA-01100 SARDINEL 10X10 REGADERAS,190 ACA-01090 FS,,técnica,el sardinel de regaderas va sobre la charola renivelada
+P19,red mínima (D-426),197 ACA-02040 MÁRMOL TOMBOLEADO 10X10 CM,191 ACA-01100 FS,,recurso,mármol tomboleado tras el sardinel (orden de la cuadrilla de pisos)
+P20,red mínima (D-426),199 ACA-02050 MÁRMOL TRAVERTINO LARGOS LIBRES 30.05 CM,197 ACA-02040 FS,,recurso,mármol travertino tras el tomboleado
+P21,red mínima (D-426),193 ACA-02010 PISO LUGANO NATURALE 15X50 (RECÁMARAS),199 ACA-02050 FS,,recurso,piso Lugano de recámaras tras el mármol
+P22,red mínima (D-426),195 ACA-02020 PISO BRUNEI BEIGE 60X60 (ÁREAS COMUNES),193 ACA-02010 FS,,recurso,piso Brunei de áreas comunes tras el piso de recámaras
+P23,red mínima (D-426),todas las partidas de ECO-00033 CANCELERÍA PB; todas las partidas de ECO-00035 CANCELERÍA AZ,195 ACA-02020 FS,,decisión,la cancelería arranca al terminar el piso de áreas comunes (31-oct)
+P24,red mínima (D-426),todas las partidas de ECO-00036 CARPINTERÍA PB,257 ECO-00033 FS; 259 ECO-00035 FS,,decisión,la carpintería entra cuando terminan las dos cancelerías (contrato terminado)
+P25,red mínima (D-426),373 ACA-30012 PINTURA MURO INTERIOR 2DA MANO,262 ECO-00036 FF+3,,técnica,la segunda mano de pintura de muros termina 3 días hábiles después de la carpintería
+P26,red mínima (D-426),376 ACA-30022 PINTURA PLAFOND 2DA MANO,373 ACA-30012 FF+2,,técnica,la segunda mano de plafond termina 2 días hábiles después que la de muros
+P27,red mínima (D-426),379 ACA-08030 SELLADO CON SILICÓN MARCO DE CANTERA,376 ACA-30022 FS,,técnica,sellado y limpieza final tras la segunda mano de plafond
+P28,red mínima (D-426),383 ACA-10030 LIMPIEZA Y SELLADO PIEDRA LAJA; 384 ACA-10040 LIMPIEZA DE MÁRMOL,379 ACA-08030 SS+2,,recurso,"limpieza de piedra y de mármol, los dos últimos días"
+P29,red mínima (D-426),327 ACA-02034 CUBIERTA DE COCINA,262 ECO-00036 FS,,técnica,la cubierta de cocina va sobre los muebles de cocina
+P30,red mínima (D-426),316 EQU-02010 ESTUFA ESTANDAR; 317 EQU-02020 CAMPANA ESTANDAR,327 ACA-02034 FF,,técnica,"estufa y campana terminan con la cubierta de cocina, el último día"
+PX01,propio de dos plantas (D-427),"estructura de la planta alta: muro tabique, castillos K-1, K-2, K-7 (y K-3, K-6 en Oro)","la última losa de la planta baja: la nervada de 4.20 en Plus y en Oro, el grupo de las losas en los dos Diamante",FS,técnica,"la planta alta arranca el día hábil siguiente a que termina la última losa de la planta baja, que le sirve de piso"
+PX02,propio de dos plantas (D-427),cadenas CE-1 (y CE-2 en Diamante y Oro) de la planta alta,muro tabique de la planta alta,FF,técnica,las cadenas de cierre terminan el mismo día que el muro sobre el que se cuelan
+PX03,propio de dos plantas (D-427),"losa(s) de azotea, el acero K1 1.50 y el escalón forjado de la planta alta",cadena CE-1 de la planta alta,FS,técnica,la losa de azotea se cuela al día hábil siguiente de la cadena que la corona
+PX04,"propio de dos plantas (D-427, D-434)",pretiles de la azotea: muro tabique 3er nivel y castillo K-1,losa de azotea (la primera que cuela),SS+3,técnica,el muro de pretiles arranca 3 días hábiles después de que arranca la losa de azotea; D-434 los lleva a después de la losa completa

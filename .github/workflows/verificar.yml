@@ -15,3 +15,5 @@ jobs:
           python-version: "3.12"
       - name: Comprobar coherencia
         run: python3 2-operacion/verificar-cerebro.py .
+      - name: Probar el motor contra los programas reales
+        run: cd backend && python3 -m unittest discover
