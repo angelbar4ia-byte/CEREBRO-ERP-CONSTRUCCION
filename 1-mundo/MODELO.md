@@ -2470,6 +2470,8 @@ CORTE_RETRASO   (inmutable; nace al cambiar de residente, y de contratista si se
 
 *D-459: los campos de `CORTE_RETRASO` quedan firmes y el motivo `cambio_contratista` vale desde ya: la misma regla se aplica a la reasignación de un contratista, que enlaza el corte en `ASIGNACION_CONTRATISTA.corte_inicio_id`. Entre dos cortes, el cambio del retraso de un sub-frente es de quien estaba al frente de la obra y del sub-frente en ese periodo; la suma de los periodos, por residente o por contratista, es el retraso de hoy. Si el residente y el contratista cambian el mismo día comparten el corte.*
 
+*D-460:* en una etapa de instalaciones, `subfrente_detenido` lleva una lectura propia porque las instalaciones no reanudan después de 21 días (26 pausas, máximo 14): **probable terminado sin capturar** si el nivel siguiente va al `siguiente_frente_pct` (50) o más y la etapa lleva `captura_tipica_pct` (50) o más; **pendiente real** si el nivel siguiente no llega; **atípico, se pregunta** si el nivel siguiente avanzó pero la etapa lleva menos. Parámetros en `ALERTA.parametro_usado`: `{"dias_sin_avance": 21, "siguiente_frente_pct": 50, "captura_tipica_pct": 50}`.
+
 ### ⏸ Lo que esto sigue sin resolver
 
 - **Reglas de visualización declaradas como regla de negocio** (rótulo de

@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 6054 | 20 |
+| §11 | Los flujos entre sistemas | 6123 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -5503,7 +5503,7 @@ aviso):
   los dos. **Faltan dos vínculos:** `498SF` en la gualdra de Rubí (`CAR-01012`) y
   `1401SF` en la de Jade (`CAR-01014`), junto al `SS` +15 que ya tienen; no pasan
   5 en Rubí y 9 en Jade, no 6 y 10. No se escriben mientras el usuario no lo
-  diga: los libros de Rubí y Jade están validados y un `SF` no mueve ninguna
+  diga *(lo dijo en D-460: se heredan)*: los libros de Rubí y Jade están validados y un `SF` no mueve ninguna
   fecha (el motor asigna por gemelo de `Clave`, no por CPM, D-427). Rubí pasaría
   de 102 a 103 vínculos y Jade de 85 a 86, en las mismas celdas.
 - **D-424:** «4 `SF`, de los que solo 1 se cumple» sigue siendo cierto en Zafiro.
@@ -6351,6 +6351,8 @@ cifras de la obra por contratista). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-M
 
 *Confirmado por D-459: los campos del corte quedan firmes y la regla aplica igual al contratista.*
 
+*D-460 diseña la fusión de Hidrosanitarias (B-91), resuelve el «detenido» de instalaciones (B-92) y suelta los `SF` de gualdra de Rubí y Jade.*
+
 ### Los campos del corte quedan firmes, y la regla del relevo aplica igual al contratista (D-459)
 
 Dato del usuario, respondiendo a D-458: **«sí, confirmo los campos, y aplica igual a contratista»**.
@@ -6392,6 +6394,73 @@ en la fecha del cambio se reparte en proporción a la cantidad pendiente que pas
 
 Libro: `PERIODOS_RESIDENTE_Y_CONTRATISTA_ALAMO18_D459.xlsx` (5 hojas: la respuesta, la regla, el cuadro de periodos,
 el cambio de contratista y las cuentas). `MODELO.md` §4a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-94.
+
+### Los tres abiertos quedan anotados: Hidrosanitarias como fusión, el «detenido» de instalaciones y los pendientes de B-86 (D-460)
+
+Dato del usuario: **«vamos con esos tres abiertos; ya no necesitamos tablas de Excel, necesitamos que esté anotado
+en el cerebro»**. Los tres son B-91, B-92 y los pendientes anteriores (los `SF` de la gualdra de Rubí y Jade, y
+`P16`). Desde aquí el trabajo se registra en el cerebro y no en libros.
+
+**1. Hidráulicas + Sanitarias = Hidrosanitarias (B-91, diseñado).** Es una fusión, y su regla ya existe (§7,
+«Reglas de la fusión»); se aplica tal cual:
+
+- **Nombre y claves.** «INSTALACIONES HIDROSANITARIAS» más el nivel (CIM, PB, PA), con claves ECO nuevas: el mismo
+  patrón de las demás etapas de instalaciones, y no choca con `ECO-00039` «HIDRO-SANITARIOS» (muebles de baño, en
+  Muebles / Iluminación). Las claves actuales no se reescriben.
+- **Convive con las originales.** Sanitarias e Hidráulicas siguen existiendo: las obras y programas que las tienen no
+  cambian. La fusionada se usa en las versiones nuevas de la plantilla, y **solo en presupuestos en diseño**; en lo
+  contratado va por control de cambio. El nodo nace con `procedencia=fusion` y la `PROPUESTA(tipo=fusion)`
+  aprobada que lo crea es su vínculo con las originales; para comparar una obra con la etapa fusionada contra una con
+  las separadas se suman las dos originales.
+- **Efecto en los siete programas: ninguna partida cambia de fecha.** La ventana del bloque es la unión de las dos:
+  Cimentación pasa a 16 a 18-jun (3 días hábiles) en seis de los siete y a 11 a 17-jun en Plus; la de Planta alta es
+  la de Sanitarias en todos y la de Planta baja es la mayor de las dos. El pico de etapas activas no cambia (14 a 17) y
+  Cimentación pasa de 5 a 4 sub-frentes.
+- **Contratista.** En las 17 combinaciones obra × nivel del dato donde hay las dos etapas, las ejecuta el mismo
+  contratista; si fueran dos, el sub-frente se divide por contratista (D-453).
+- **Cuándo.** Cuando el usuario cree la versión nueva de la plantilla. No se ha tocado ningún programa ni presupuesto.
+
+**2. El «detenido» en instalaciones (B-92, resuelto).** D-456 dejó sin pista a las instalaciones, porque reciben
+todo el material al abrir la orden de la etapa. Con las 34 obras (73 sub-frentes de instalaciones de Cimentación,
+Planta baja y Planta alta, 32 de ellos parciales):
+
+| Dato | Resultado |
+|---|---|
+| Pausas de instalaciones | 26; la más larga, 14 días; **ninguna pasa de 21 días** |
+| Parciales y quietos 21 días o más | 19, en 11 obras (15 de Cimentación y 4 de Planta baja) |
+| Nivel siguiente de esos 19 | Siempre avanzado: 61% como mínimo, mediana 86% |
+| Dónde se quedaron | Entre 36% y 99%; mediana 84%; percentil 10 en 50% |
+
+Una instalación que lleva 21 días quieta no vuelve a avanzar: el edificio sigue y ella queda donde estaba. La
+lectura propia de `subfrente_detenido` en una etapa de instalaciones:
+
+1. **Probable terminado sin capturar:** el nivel siguiente va al 50% o más y la etapa lleva 50% o más. Se propone
+   cerrarla en su avance capturado o completarla; lo decide el residente (nota de resolución, D-456).
+2. **Pendiente real:** el nivel siguiente no llega al 50%. Es un prerrequisito sin hacer.
+3. **Atípico, se pregunta:** el nivel siguiente va al 50% o más pero la etapa lleva menos de 50%; en los datos
+   ocurre en 2 de 19 casos.
+
+Parámetros en `ALERTA.parametro_usado`: `siguiente_frente_pct` 50 y `captura_tipica_pct` 50. En `ALAMO 18`:
+Cimentación sanitarias (92%) e hidráulicas (80%) y Planta baja sanitarias (87%) e hidráulicas (52%) son probables
+terminados sin capturar; Cimentación eléctricas (28%), Planta baja eléctricas (48%) y gas (19%) son atípicas, las
+tres por debajo de lo más bajo que se haya visto (36%). La lectura es más firme en Cimentación (15 de los 19) que
+en Planta baja (4), donde las instalaciones de muros pueden esperar al repello. El avance se midió por las líneas con
+operaciones y la etapa se identificó en el 69% de las operaciones: se recalibra con más obras.
+
+**3. Los pendientes de B-86.**
+
+- **`SF` de la gualdra de Rubí y Jade.** El usuario suelta la espera de D-445: Rubí hereda `498SF`
+  (`CAR-01012`) y Jade `1401SF` (`CAR-01014`), junto al `SS` +15 que ya tienen. Se cumplen con holgura 0 y no mueven
+  ninguna fecha: Rubí pasa de 102 a 103 vínculos y Jade de 85 a 86. El libro de programas no se regenera; lo que manda
+  es lo anotado aquí.
+- **`P16`** (vertedero tras la boquilla fina interior, déficit de 10 días hábiles en Plus, Diamante sin, Diamante con
+  y Oro): queda como **incumplido conocido** de los cuatro prototipos de dos plantas, con `vinculo_incumplido`
+  activa. Es lo que dejó la decisión de D-437 de cerrar en 30 semanas. Cerrarlo pide mover el plazo diez días
+  hábiles (30 a 32 semanas) o relajar el vínculo; cualquiera de las dos lo decide el planeador por obra.
+- **Sin cambio:** la segunda ruta de cuadrilla sigue en borrador (D-444), y las listas del planeador (17 ventanas, 53
+  líneas sin rendimiento, emparejamientos por rol, 15 incumplidos de Zafiro) siguen siendo suyas.
+
+`MODELO.md` §5a y §5c, `CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-86, B-91 y B-92.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

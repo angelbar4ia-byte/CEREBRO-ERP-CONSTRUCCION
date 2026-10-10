@@ -44,6 +44,8 @@ siguen siendo referenciados**:
 
 *D-453: las etapas de instalaciones se quedan separadas; solo Hidráulicas y Sanitarias se fusionarán después en Hidrosanitarias, con claves nuevas y sin reescribir las actuales (B-91). `ECO-00039` «HIDRO-SANITARIOS» ya existe, en Muebles / Iluminación.*
 
+*D-460 diseña la fusión: «INSTALACIONES HIDROSANITARIAS» más CIM, PB o PA, con claves ECO nuevas (no choca con `ECO-00039`); convive con las dos originales, se usa en versiones nuevas de la plantilla y solo en presupuestos en diseño; ninguna partida cambia de fecha. Detalle en `CONOCIMIENTO.md` §11.14.*
+
 ### Lo que OPUS tiene y aún no está en este proyecto
 
 Se pueden agregar más adelante. **No hacen falta por ahora:**

@@ -852,6 +852,8 @@ Varios destajos se vuelven uno. El precio se propone ponderado por cantidad.
 - **Ejemplo:** Salida hidráulica + sanitaria = hidro-sanitaria
 - **Hoy vive en:** `— pendiente`
 
+*D-460: también se fusionan etapas —Hidráulicas y Sanitarias en «Instalaciones hidrosanitarias» por nivel—, con la misma regla: convive con las originales (`CATALOGOS.md`).*
+
 ### División
 
 Un concepto con varios destajos se vuelve varios conceptos.
