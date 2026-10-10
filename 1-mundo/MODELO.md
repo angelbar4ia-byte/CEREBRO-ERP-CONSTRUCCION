@@ -1391,7 +1391,7 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `frente_listo_para_cierre` | El avance del frente (ejecutado ÷ ingeniería, ponderado por costo) llega al porcentaje de `solicitar_cierre_frente` —90%, D-261— y no se ha solicitado el cierre; la evidencia lista los sub-frentes que siguen pendientes. Avisa, no cierra: `CIERRE_FRENTE` pregunta, no impide | B-88 |
 | `subfrente_detenido` | Un sub-frente (etapa) con avance mayor que 0 y menor que 100% lleva al menos `dias_sin_avance` sin una operación de avance —por defecto 21, en `ALERTA.parametro_usado`—. Es un aviso: el avance puede no haberse capturado | B-88 |
 | `ejecutado_sobre_ingenieria` | En una línea de destajo, el ejecutado valuado excede el costo de la ingeniería del lote — sin umbral, cualquier excedente | B-88 |
-| `subfrente_atrasado` | Un sub-frente (etapa) cuyo avance está por debajo del programa de la obra, en tres casos: su término planeado ya pasó y no llega a `porcentaje_terminado` (90% por defecto); debía haber arrancado y no arrancó; o va en curso `puntos_rezago` puntos o más por debajo de lo planeado (20 por defecto). Se ordena por valor rezagado, (planeado − ejecutado) × ingeniería | D-456 |
+| `subfrente_atrasado` | Un sub-frente (etapa) cuyo avance está por debajo del programa de la obra, en tres casos: su término planeado ya pasó y no llega a `porcentaje_terminado` (90% por defecto); debía haber arrancado y no arrancó; o va en curso `puntos_rezago` puntos o más por debajo de lo planeado (20 por defecto). Se ordena por valor rezagado, (planeado − ejecutado) × ingeniería *(D-457: sin `puntos_rezago` ni `porcentaje_terminado`; real desde un día hábil. D-458: sigue avisando por sí solo, además de `obra_atrasada`)* | D-456 |
 | `obra_atrasada` | La obra va al menos un paso del calendario (`CALENDARIO_OBRA.paso_dias`, un día hábil) detrás de su programa, medido por tiempo ganado —hoy menos el último día en que el plan estaba en el avance ejecutado— y neto: lo adelantado compensa a lo atrasado. Sin umbral. `objeto_id` es la raíz de la obra y la `evidencia` trae los días, el retraso neto, lo atrasado y lo adelantado en $, y su desglose por frente, sub-frente, contratista y residente, que suma exacto | D-457 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
@@ -1748,6 +1748,8 @@ cerrando la asignación que C-3 (`PROPUESTA-CUATRO-MODULOS.md` §2) ya había
 anotado sin tabla.
 
 *D-457 (propuesta): `RESIDENTE_OBRA` gana `vigente_desde` y `vigente_hasta` (DATE; el segundo, nullable), igual que `ASIGNACION_CONTRATISTA` (§4a): sin ellos, auditar el retraso de la obra por residente le carga la historia al residente nuevo.*
+
+*D-458: `vigente_desde` y `vigente_hasta` quedan firmes (cierra B-93). Se agrega, como propuesta, `corte_inicio_id` (FK `CORTE_RETRASO`, nullable): el corte con que empezó el residente; el del anterior al salir es ese mismo (§5c).*
 
 **`SUPERVISION` es una sola tabla para los dos niveles de la cascada**, no
 dos — Supervisor-sobre-Residente y Superintendente-sobre-Supervisor tienen
@@ -2440,6 +2442,27 @@ pasan a ser su evidencia. Los parámetros quedan en `{"dias_sin_avance": 21}` y 
 línea de destajo es (planeado de su etapa − ejecutado) × su costo, y la suma de las líneas es el retraso de la obra;
 cada línea cae con el contratista de `ASIGNACION_CONTRATISTA` vigente (o «sin contratista asignado») y cada obra con
 su `RESIDENTE_OBRA`. Es una lectura, no un campo, como la de `DESVIACION` por contratista (§5g).
+
+*D-458 corrige y completa lo de arriba:* `subfrente_atrasado` sigue avisando por sí solo, además de `obra_atrasada`.
+La unidad de la auditoría es el **sub-frente por contratista**, y al cambiar de residente el retraso anterior se
+congela y la mejora es del nuevo:
+
+```
+CORTE_RETRASO   (inmutable; nace al cambiar de residente, y de contratista si se confirma)
+  id
+  presupuesto_id   FK PRESUPUESTO — la obra                                          propuesta — D-458
+  fecha            DATE — el corte                                                    propuesta
+  motivo           enum: cambio_residente · cambio_contratista · otro                 propuesta
+  dias_obra        INTEGER — días hábiles detrás de la obra (tiempo ganado)           propuesta
+  detalle          JSON — por sub-frente y contratista: planeado, ejecutado,
+                    retraso y adelanto en $, días                                     propuesta
+```
+
+- **Retraso propio del residente** = retraso(hoy) − retraso(corte de inicio), por sub-frente por contratista; positivo
+  empeora, negativo mejora y se le acredita, sin pasar de lo heredado. El anterior conserva el congelado. Se cuenta el
+  retraso y no el adelanto, que el plan va alcanzando.
+- En $ se suma entre sub-frentes; los días se restan dentro de cada nivel y no se suman entre niveles.
+- `obra_atrasada` y `subfrente_atrasado` llevan en su `evidencia` lo heredado y lo propio.
 
 ### ⏸ Lo que esto sigue sin resolver
 

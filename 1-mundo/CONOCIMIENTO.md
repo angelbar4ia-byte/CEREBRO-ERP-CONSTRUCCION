@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 5959 | 20 |
+| §11 | Los flujos entre sistemas | 6010 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6297,6 +6297,57 @@ datos solo se identificó el de `ALAMO 18`. Y la cifra en días crece cerca del 
 Libro: `AUDITORIA_DEL_RETRASO_ALAMO18_D457.xlsx` (9 hojas: la respuesta, la obra y sus frentes, por contratista,
 contratista por sub-frente, por residente, la serie semanal, la cola de atención, las 280 líneas al corte y
 cómo se calcula). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-92 y B-93.
+
+*Corregido por D-458: los sub-frentes atrasados también avisan por sí solos; el retraso bruto y el adelanto se cuentan por sub-frente por contratista ($165,426 y $15,262).*
+
+### El retraso también avisa por sub-frente, y al cambiar de residente el retraso anterior se congela y la mejora es del nuevo (D-458)
+
+Dato del usuario, respondiendo a las dos preguntas de D-457: **«también sub-frente»**, y **«si cambia de residente
+debe notar su propio retraso: el atraso anterior se congela y, si hay mejora, se atribuye al nuevo residente»**.
+
+**1. Por obra y también por sub-frente.** `obra_atrasada` (neto, una por obra) y `subfrente_atrasado` (un
+sub-frente al menos un día hábil detrás de su programa y sin terminar) disparan los dos. D-457 había dicho que los
+sub-frentes eran solo evidencia: se corrige. En `ALAMO 18` son la obra (13 días, $150,164) y 13 sub-frentes.
+
+**2. Relevo de residente.** La unidad de cuenta es el **sub-frente por contratista** (la división de D-453; con un
+solo contratista es el sub-frente). Al cambiar de residente en la fecha T:
+
+| Pieza | Regla |
+|---|---|
+| Residente anterior | Conserva, **congelado**, el retraso que había en T |
+| Residente nuevo | Ve **su propio retraso** aparte de lo heredado: retraso(hoy) − retraso(T), por sub-frente por contratista |
+| Mejora | Si un sub-frente heredado se recupera, la mejora se acredita al nuevo, sin pasar de lo que heredó |
+| Un sub-frente que no estaba atrasado y se atrasa | Es propio del nuevo |
+| Cuentas | Anterior + propio del nuevo = retraso de hoy, en cada sub-frente, frente y obra; con relevos sucesivos sigue cuadrando |
+
+Se cuenta el **retraso** (lo que va detrás) y no el adelanto. Si el adelanto contara, el nuevo residente pagaría la
+erosión del adelanto del anterior: en un relevo el 1-jul, Estructura de Planta alta pasaría de $47,803 adelantada a
+$11 atrasada sin que nadie hubiera hecho nada mal, porque el plan la alcanzó. En $ se suma entre sub-frentes; en días
+(tiempo ganado) se resta dentro de cada nivel y acompaña, sin sumarse entre niveles: cerca del final de un
+sub-frente chico los días suben sin que el valor cambie (Cimentación, +20 días con $0).
+
+**3. Lo que se guarda.** El congelado no se recalcula: con un programa editado después, otro cálculo daría otra
+cifra. Se guarda un corte inmutable por relevo (`CORTE_RETRASO`, `MODELO.md` §5c), que es el cierre del anterior y la
+herencia del nuevo. `RESIDENTE_OBRA` gana `vigente_desde` y `vigente_hasta`, que quedan firmes (cierra B-93); el
+corte y su enlace son propuesta.
+
+**4. Ejemplos con `ALAMO 18`** (no hubo relevo; son hipotéticos para ver la regla con datos reales):
+
+| Relevo | Anterior (congelado) | Nuevo, propio | Lo que explica |
+|---|---|---|---|
+| 1-jul-2026 | $82,981 (6 días) | **+$82,445** (+7 días): empeora $86,195, mejora $3,750 | Albañilerías de Planta baja +$42,561 y Obra gris +$39,955 (debía arrancar el 15-jul); Albañilerías de Planta alta −$2,330 |
+| 22-jul-2026 | $167,741 (13 días) | **−$2,315** (0 días): mejora $3,430, empeora $1,115 | Albañilerías de Planta baja −$3,254; Losas de Planta alta +$1,115 |
+
+**5. Cifras de D-457 que se afinan.** Contando por sub-frente por contratista el retraso es **$165,426 detrás y
+$15,262 adelante** (D-457 daba $174,697 y $24,533 contando por línea de destajo). El neto, $150,164, y el reparto
+neto por contratista (Luis Fernando Aguilera $123,790 y Rigoberto Orduña $26,374) no cambian.
+
+**Extensión propuesta, sin confirmar.** La misma regla para un cambio de contratista por abandono o logística
+(D-453): congelar el retraso del anterior y acreditarle la mejora al nuevo. Sin ella, el contratista que releva
+cargaría con el retraso de quien se fue.
+
+Libro: `RELEVO_DE_RESIDENTE_ALAMO18_D458.xlsx` (7 hojas: la respuesta, la regla, los dos ejemplos con sus días y las
+cifras de la obra por contratista). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-93 y B-94.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
