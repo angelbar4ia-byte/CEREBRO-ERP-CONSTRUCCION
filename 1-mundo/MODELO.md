@@ -1075,6 +1075,8 @@ El frente y el sub-frente no se guardan: son el nodo de Nivel 1 y el de Nivel 2 
 
 *D-454: el usuario confirmó los campos de arriba; pasan de propuesta a firmes.*
 
+*D-459: `ASIGNACION_CONTRATISTA` gana `corte_inicio_id` (FK `CORTE_RETRASO`, nullable), firme: el corte con que empezó el contratista. Al reasignar, el retraso del anterior se congela y el nuevo ve el propio, igual que con el residente (§5c).*
+
 ### Lo que ya quedaba resuelto por otro lado
 
 «Prototipo» es una convención de nombre, no un campo (P-40) — resuelto:
@@ -1750,6 +1752,8 @@ anotado sin tabla.
 *D-457 (propuesta): `RESIDENTE_OBRA` gana `vigente_desde` y `vigente_hasta` (DATE; el segundo, nullable), igual que `ASIGNACION_CONTRATISTA` (§4a): sin ellos, auditar el retraso de la obra por residente le carga la historia al residente nuevo.*
 
 *D-458: `vigente_desde` y `vigente_hasta` quedan firmes (cierra B-93). Se agrega, como propuesta, `corte_inicio_id` (FK `CORTE_RETRASO`, nullable): el corte con que empezó el residente; el del anterior al salir es ese mismo (§5c).*
+
+*D-459: `corte_inicio_id` queda firme.*
 
 **`SUPERVISION` es una sola tabla para los dos niveles de la cascada**, no
 dos — Supervisor-sobre-Residente y Superintendente-sobre-Supervisor tienen
@@ -2463,6 +2467,8 @@ CORTE_RETRASO   (inmutable; nace al cambiar de residente, y de contratista si se
   retraso y no el adelanto, que el plan va alcanzando.
 - En $ se suma entre sub-frentes; los días se restan dentro de cada nivel y no se suman entre niveles.
 - `obra_atrasada` y `subfrente_atrasado` llevan en su `evidencia` lo heredado y lo propio.
+
+*D-459: los campos de `CORTE_RETRASO` quedan firmes y el motivo `cambio_contratista` vale desde ya: la misma regla se aplica a la reasignación de un contratista, que enlaza el corte en `ASIGNACION_CONTRATISTA.corte_inicio_id`. Entre dos cortes, el cambio del retraso de un sub-frente es de quien estaba al frente de la obra y del sub-frente en ese periodo; la suma de los periodos, por residente o por contratista, es el retraso de hoy. Si el residente y el contratista cambian el mismo día comparten el corte.*
 
 ### ⏸ Lo que esto sigue sin resolver
 

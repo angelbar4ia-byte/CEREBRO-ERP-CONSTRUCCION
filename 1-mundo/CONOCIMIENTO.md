@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 6010 | 20 |
+| §11 | Los flujos entre sistemas | 6054 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6348,6 +6348,50 @@ cargaría con el retraso de quien se fue.
 
 Libro: `RELEVO_DE_RESIDENTE_ALAMO18_D458.xlsx` (7 hojas: la respuesta, la regla, los dos ejemplos con sus días y las
 cifras de la obra por contratista). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-93 y B-94.
+
+*Confirmado por D-459: los campos del corte quedan firmes y la regla aplica igual al contratista.*
+
+### Los campos del corte quedan firmes, y la regla del relevo aplica igual al contratista (D-459)
+
+Dato del usuario, respondiendo a D-458: **«sí, confirmo los campos, y aplica igual a contratista»**.
+
+**1. Campos firmes.** `CORTE_RETRASO` (obra, fecha, motivo, días y detalle por sub-frente y contratista) y
+`RESIDENTE_OBRA.corte_inicio_id` pasan de propuesta a firmes (`MODELO.md` §5c, §5b). Cierra B-94.
+
+**2. Igual al contratista.** Al reasignar un contratista por abandono o logística (D-453):
+
+- Se guarda un corte (`CORTE_RETRASO`, motivo `cambio_contratista`) y la nueva `ASIGNACION_CONTRATISTA` lo enlaza
+  en `corte_inicio_id` (campo nuevo, firme por consecuencia de lo que el usuario pidió).
+- El **contratista nuevo recibe el alcance** de la asignación que sustituye (obra y tipo de trabajo, etapa,
+  concepto o parte de la cantidad). Hereda el retraso de ese alcance en la fecha del cambio, que no es suyo.
+- El anterior conserva el retraso **congelado**. El nuevo ve su retraso **propio** = retraso(hoy) − retraso(corte), y
+  toda mejora se le acredita a él. Se cuenta el retraso y no el adelanto (D-458).
+- Lo ya ejecutado se queda con quien lo hizo (D-453).
+
+**3. Un periodo, un residente y un contratista.** Entre dos cortes, lo que cambia el retraso de un sub-frente es de
+quien estaba al frente de la obra y de ese sub-frente en ese periodo. La suma de los periodos es el retraso de hoy,
+sumada por residente o por contratista, y las dos sumas coinciden. Si el residente y el contratista cambian el mismo
+día, comparten un solo corte: el segundo evento apunta al que ya existe.
+
+**4. Ejemplo hipotético con `ALAMO 18`:** relevo de residente el 1-jul y cambio del contratista de instalaciones el
+22-jul.
+
+| Periodo | Residente | Luis Fernando Aguilera | Rigoberto Orduña | Contratista nuevo | Total |
+|---|---|---|---|---|---|
+| 22-abr a 1-jul | A | $57,478 | $25,503 | — | $82,981 |
+| 1-jul a 22-jul | B | $83,889 | $871 | — | $84,760 |
+| 22-jul a 29-jul | B | −$2,315 | congelado | $0 | −$2,315 |
+| **Total** | | **$139,052** | **$26,374** | **$0** | **$165,426** |
+
+Por residente: A deja $82,981 y B suma $82,445. Por contratista: Rigoberto Orduña se va con $26,374 congelados y el
+nuevo empieza en $0 propio, porque en la primera semana las instalaciones no se mueven. Las dos sumas dan $165,426, el
+retraso de hoy.
+
+**Caso borde, propuesta.** Si la reasignación es de una parte de la cantidad de un concepto, el retraso de la línea
+en la fecha del cambio se reparte en proporción a la cantidad pendiente que pasa. No está confirmado.
+
+Libro: `PERIODOS_RESIDENTE_Y_CONTRATISTA_ALAMO18_D459.xlsx` (5 hojas: la respuesta, la regla, el cuadro de periodos,
+el cambio de contratista y las cuentas). `MODELO.md` §4a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-94.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
