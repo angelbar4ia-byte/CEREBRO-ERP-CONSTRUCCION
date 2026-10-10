@@ -8,6 +8,7 @@ D-443 con filas armadas a mano, donde la regla se ve completa.
 Correr con: cd backend && python3 -m unittest discover
 """
 import csv
+import json
 import re
 import unittest
 from collections import Counter
@@ -15,13 +16,22 @@ from datetime import date
 from fractions import Fraction
 from pathlib import Path
 
+from core.gantt_pagina import pagina_gantt
 from core.motor_cpm import Calendario, CicloError, calcular_cpm
+from core.motor_cpm import Vinculo
 from core.programa import (
+    AgregarVinculo,
+    CambiarDuracion,
+    CambiarVinculo,
+    FijarInicio,
     Fila,
+    PERMISO_DE,
+    QuitarVinculo,
     cadena_de_relevos,
     cargar_programa,
     filas_desde_csv,
     leer_vinculos,
+    reprogramar,
     vista_gantt,
 )
 
@@ -239,12 +249,38 @@ class PruebasGantt(unittest.TestCase):
         cls.prog = programa("Zafiro Plus")
         cls.v = vista_gantt(cls.prog, CAL, ventana=(date(2025, 8, 18), date(2025, 8, 29)))
 
-    def test_una_fila_por_partida_y_una_por_resumen_de_nivel_2_y_3(self):
-        # D-432: 389 filas de concepto y 90 resúmenes = 479; la fila de cierre en blanco no tiene barra
+    def test_el_arbol_completo_por_defecto_y_los_resumenes_de_d432_si_se_piden(self):
+        # el árbol: 388 partidas y 105 resúmenes (capítulo, 14 frentes, 49 etapas y 41 de Nivel 3)
         filas = self.v["filas"]
         self.assertEqual(sum(1 for f in filas if not f["resumen"]), 388)
-        self.assertEqual(sum(1 for f in filas if f["resumen"]), 90)
-        self.assertEqual({f["nivel"] for f in filas if f["resumen"]}, {2, 3})
+        self.assertEqual(Counter(f["nivel"] for f in filas if f["resumen"]), Counter({0: 1, 1: 14, 2: 49, 3: 41}))
+        # D-432: 389 filas de concepto y 90 resúmenes de Nivel 2 y 3 = 479; la fila de cierre en blanco no tiene barra
+        solo = vista_gantt(self.prog, CAL, niveles_resumen=(2, 3))["filas"]
+        self.assertEqual(sum(1 for f in solo if f["resumen"]), 90)
+        self.assertEqual({f["nivel"] for f in solo if f["resumen"]}, {2, 3})
+
+    def test_cada_fila_cuelga_de_su_padre_y_se_puede_plegar(self):
+        por = {f["llave"]: f for f in self.v["filas"]}
+        raices = [f for f in self.v["filas"] if f["padre"] is None]
+        self.assertEqual([f["nivel"] for f in raices], [0])
+        for f in self.v["filas"]:
+            if f["padre"] is None:
+                continue
+            padre = por[f["padre"]]
+            self.assertLess(padre["nivel"], f["nivel"])
+            self.assertTrue(padre["resumen"])
+            self.assertLessEqual(padre["inicio"], f["inicio"])
+            self.assertGreaterEqual(padre["fin"], f["fin"])
+        # subiendo desde cualquier partida se llega a su frente y al capítulo
+        frente = {k: f for k, f in por.items() if f["nivel"] == 1}
+        for f in self.v["filas"]:
+            if f["resumen"]:
+                continue
+            x = f
+            while x["nivel"] != 1:
+                x = por[x["padre"]]
+            self.assertEqual(x["clave"], f["frente"])
+            self.assertIn(x["llave"], frente)
 
     def test_el_resumen_abarca_a_sus_partidas(self):
         por = {f["llave"]: f for f in self.v["filas"]}
@@ -287,6 +323,132 @@ class PruebasGantt(unittest.TestCase):
     def test_zafiro_muestra_sus_flechas_rotas(self):
         v = vista_gantt(programa("Zafiro"), CAL)
         self.assertEqual(sum(1 for f in v["flechas"] if f["incumplido"]), 9)
+
+
+def _por_fila(prog):
+    return {f.fila: f for f in prog.filas}
+
+
+class PruebasReprogramar(unittest.TestCase):
+    """Editar es proponer: se reprograma por empuje mínimo y se devuelve el impacto (§8 de PROGRAMA-CPM.md)."""
+
+    def test_sin_ediciones_un_plan_que_cumple_sus_vinculos_queda_identico(self):
+        for p in LOS_SIETE[1:]:
+            prog = programa(p)
+            r = reprogramar(prog, CAL)
+            self.assertEqual(r.movidas, [], p)
+            self.assertEqual(r.programa.ventanas, prog.ventanas, p)
+            self.assertEqual((r.fin_antes, r.fin_despues, r.dias_de_cambio, r.ruta_cambia), (r.fin_antes, r.fin_antes, 0, False), p)
+
+    def test_si_zafiro_obedeciera_los_118_vinculos_que_cargan_cerraria_12_dias_habiles_despues(self):
+        # D-444: Zafiro queda de origen. Esto solo mide qué costaría que la red mandara sobre el plan manual
+        prog = programa("Zafiro")
+        r = reprogramar(prog, CAL)
+        self.assertEqual(len(r.movidas), 47)
+        self.assertEqual((r.fin_antes, r.fin_despues, r.dias_de_cambio), (date(2025, 12, 18), date(2026, 1, 7), 12))
+        self.assertEqual(r.incumplidos, [])
+        self.assertTrue(all(m.dias_inicio >= 0 and m.dias_fin >= 0 for m in r.movidas))  # el empuje nunca adelanta
+
+    def test_p16_en_plus_corre_el_cierre_diez_dias_habiles(self):
+        # D-437 y D-460: «cerrarlo pide mover el plazo diez días hábiles (30 a 32 semanas)»
+        prog = programa("Zafiro Plus")
+        f = _por_fila(prog)
+        r = reprogramar(prog, CAL, [AgregarVinculo(f[978].llave, f[1102].llave, "FS", Fraction(1))])
+        self.assertEqual((r.fin_antes, r.fin_despues, r.dias_de_cambio), (date(2026, 1, 5), date(2026, 1, 19), 10))
+        self.assertEqual(r.rechazadas, [])
+        self.assertTrue(r.ruta_cambia)
+
+    def test_alargar_una_partida_con_holgura_no_mueve_el_cierre_ni_avisa_de_ruta(self):
+        prog = programa("Zafiro Plus")
+        f = _por_fila(prog)
+        r = reprogramar(prog, CAL, [CambiarDuracion(f[982].llave, Fraction(12))])  # el muro de la planta alta, 7 días hoy
+        self.assertEqual(r.dias_de_cambio, 0)
+        self.assertFalse(r.ruta_cambia)  # D-100: correr fechas no es noticia
+        self.assertTrue(r.movidas)
+        self.assertGreater(CAL.n(r.programa.ventanas[f[982].llave].fin), CAL.n(prog.ventanas[f[982].llave].fin))
+
+    def test_la_fecha_que_fija_el_residente_corre_lo_que_cuelga_y_nada_mas(self):
+        prog = programa("Zafiro Plus")
+        f = _por_fila(prog)
+        r = reprogramar(prog, CAL, [FijarInicio(f[1102].llave, date(2025, 10, 28))])  # el vertedero abre la cadena de relevos
+        self.assertEqual(r.dias_de_cambio, 5)
+        self.assertEqual(len(r.movidas), 31)
+        self.assertFalse(r.ruta_cambia)
+
+    def test_quitar_un_vinculo_nunca_adelanta_el_plan(self):
+        prog = programa("Zafiro Plus")
+        v = prog.vinculos[0]
+        r = reprogramar(prog, CAL, [QuitarVinculo(v.predecesora, v.sucesora)])
+        self.assertEqual(r.movidas, [])
+        self.assertEqual(len(r.programa.vinculos), len(prog.vinculos) - 1)
+
+    def test_el_modo_temprano_suelta_el_plan_y_calcula_la_red(self):
+        prog = programa("Zafiro Plus")
+        r = reprogramar(prog, CAL, modo="temprano")
+        self.assertEqual(CAL.n(r.fin_despues) - CAL.n(ORIGEN) + 1, 81)  # los 81 días de §4.4
+        self.assertLess(r.fin_despues, r.fin_antes)
+
+    def test_lo_que_no_se_puede_aplicar_queda_dicho_y_no_frena_a_lo_demas(self):
+        prog = programa("Zafiro Plus")
+        f = _por_fila(prog)
+        v = next(x for x in prog.vinculos if x.predecesora in prog.ventanas)
+        nivel2 = next(x for x in prog.filas if x.tipo == "Nivel 2")
+        r = reprogramar(prog, CAL, [
+            CambiarDuracion("no existe", 3),
+            CambiarDuracion(f[1102].llave, 0),
+            AgregarVinculo(f[1102].llave, f[1102].llave),
+            AgregarVinculo(f[1102].llave, nivel2.llave),
+            AgregarVinculo(v.predecesora, v.sucesora, v.tipo, v.desfase),
+            AgregarVinculo(v.sucesora, v.predecesora, "FS"),
+            QuitarVinculo(v.predecesora, "no existe"),
+            CambiarDuracion(f[982].llave, Fraction(8)),  # esta sí se aplica
+        ])
+        self.assertEqual(
+            [x.motivo for x in r.rechazadas],
+            ["actividad_desconocida", "duracion_invalida", "autovinculo", "sucesora_no_es_partida", "repetido", "cierra_un_ciclo", "vinculo_inexistente"],
+        )
+        self.assertTrue(r.movidas)  # la duración del muro sí se aplicó
+
+    def test_cambiar_el_tipo_de_un_vinculo(self):
+        prog = programa("Zafiro Plus")
+        v = next(x for x in prog.vinculos if x.tipo == "FS" and x.predecesora in prog.ventanas)
+        r = reprogramar(prog, CAL, [CambiarVinculo(v.predecesora, v.sucesora, "FS", "SS", Fraction(0))])
+        self.assertEqual(r.rechazadas, [])
+        self.assertIn(Vinculo(v.predecesora, v.sucesora, "SS", Fraction(0)), r.programa.vinculos)
+        self.assertNotIn(v, r.programa.vinculos)
+
+    def test_cada_edicion_dice_con_que_permiso_se_hace(self):
+        # `MODELO.md` §5b: la estructura es de Control de obra y las fechas, del Residente
+        self.assertEqual(PERMISO_DE[CambiarDuracion], "editar_estructura_programa")
+        self.assertEqual(PERMISO_DE[AgregarVinculo], "editar_estructura_programa")
+        self.assertEqual(PERMISO_DE[FijarInicio], "editar_fechas_programa")
+
+    def test_el_programa_reprogramado_se_dibuja_con_su_base(self):
+        prog = programa("Zafiro Plus")
+        f = _por_fila(prog)
+        r = reprogramar(prog, CAL, [AgregarVinculo(f[978].llave, f[1102].llave, "FS", Fraction(1))])
+        v = vista_gantt(r.programa, CAL, base=prog)
+        movidas = [x for x in v["filas"] if x.get("dias_movida")]
+        self.assertTrue(movidas)
+        cierre = next(x for x in v["filas"] if x["nivel"] == 0)  # el capítulo: cierra con el programa
+        self.assertEqual(cierre["dias_movida"], 10)
+        self.assertEqual(cierre["base_fin"], "2026-01-05")
+        self.assertEqual(cierre["fin"], "2026-01-19")
+
+
+class PruebasPagina(unittest.TestCase):
+    def test_la_pagina_junta_plantilla_motor_y_datos(self):
+        html = pagina_gantt(programa("Zafiro Plus"), CAL, "Gantt Zafiro Plus", ventana=(date(2025, 8, 18), date(2025, 8, 29)))
+        self.assertIn("<title>Gantt Zafiro Plus</title>", html)
+        for marca in ("/*__MOTOR__*/", "__DATOS__", "__TITULO__"):
+            self.assertNotIn(marca, html)
+        self.assertIn("const Motor", html)
+        datos = html.split("const G = ", 1)[1].split(";\nconst R", 1)[0]
+        v = json.loads(datos.replace("<\\/", "</"))
+        self.assertEqual(len(v["red"]["partidas"]), 388)
+        self.assertEqual(len(v["relevos"]), 13)
+        self.assertEqual(len(v["ruta_critica_red"]), 28)
+        self.assertEqual(v["marcas"]["ventana"]["inicio"], "2025-08-18")
 
 
 class PruebasMotorDiagnostico(unittest.TestCase):

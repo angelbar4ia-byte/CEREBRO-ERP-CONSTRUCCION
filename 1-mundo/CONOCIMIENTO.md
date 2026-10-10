@@ -26,7 +26,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 6167 | 20 |
+| §11 | Los flujos entre sistemas | 6186 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
 | §14 | La propuesta | 66 | 5 |
@@ -6505,6 +6505,25 @@ cambia lo dicho antes en este archivo:
   B-95.
 
 `PROGRAMA-CPM.md`, `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-95.
+
+### El programa se reprograma por empuje mínimo y el Gantt se edita (D-463)
+
+Dato del usuario sobre las tres preguntas de B-95: «tú decide lo mejor», «lo que sea mejor, simple de operar pero
+sin perder detalle» y «lo más autónomo posible pero editable». El detalle, las reglas y las pruebas están en
+`PROGRAMA-CPM.md` §4.6, §8; lo que cambia lo dicho antes en este archivo:
+
+- **Editar no es recalcular el programa entero.** Con la red mínima, el CPM más temprano colapsa (Plus, 81 días
+  hábiles contra 149) y no sirve como modo de trabajo; el planeador edita sobre el plan que tiene y el sistema
+  corre solo lo que la edición obliga. Sin ediciones, los seis programas limpios quedan idénticos.
+- **`P16` cuesta lo que D-437 midió.** Agregarlo a Plus corre el cierre del 5 al 19-ene-2026, 10 días hábiles:
+  el déficit de D-437 y los «30 a 32 semanas» que D-460 decía que costaría cerrarlo, ahora calculados por el
+  motor y no leídos a mano.
+- **Zafiro, si la red mandara:** con sus 118 vínculos cargados se moverían 47 partidas y cerraría el 7-ene-2026.
+  Solo informa; Zafiro sigue de origen (D-444).
+- **El rojo del Gantt es la cadena de relevos** que el usuario validó en D-426, y la ruta crítica de la red queda
+  como diagnóstico.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-95.
 
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 

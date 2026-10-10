@@ -6,14 +6,14 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 104 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 120 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
 > vivían (`MODELO.md` §5c, `CONOCIMIENTO.md` §11.14); aquí vive lo que **solo existía en libros de
 > Excel y en el código**: los siete programas completos, la red con sus identificadores, las
-> listas del planeador, el motor que calcula fechas y ruta crítica, el cargador que lee un programa
-> y la vista del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
+> listas del planeador, el motor que calcula fechas y ruta crítica, el cargador que lee un programa,
+> la reprogramación y la pantalla del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
 > `1-mundo/programas/` son la fuente, y `cd backend && python3 -m unittest discover` la prueba.
 
 ---
@@ -35,7 +35,8 @@ verificado: 104 pruebas · los siete programas reales (832 vínculos) reproducen
 | **Los datos de los siete programas, el catálogo de la red, las rutas, las listas del planeador** | **§2 a §7 de este archivo y `1-mundo/programas/`** |
 | **El motor y su contrato** | **§4 y `backend/core/motor_cpm.py`** |
 | **El cargador del programa, la cadena de relevos y el Gantt como dato** | **§4.5 y `backend/core/programa.py`** |
-| **Las reglas de visualización del Gantt** | **§8** |
+| **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
+| **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
 ---
 
@@ -204,7 +205,7 @@ vínculos y entrega actividades al CPM; no dibuja y no toca la base de datos.
 | `Programa.calcular()` · `.incumplidos()` | El CPM de la red cargada y los vínculos que las fechas del plan contradicen |
 | `Programa.referencias(v)` | La partida que fija el extremo de la predecesora de un vínculo; si es un bloque, todas las que empatan |
 | `cadena_de_relevos(programa, calendario)` | La cadena de partidas con holgura 0 sobre las fechas del plan (§6.4) |
-| `vista_gantt(programa, calendario, …)` | Filas, flechas y marcas de §8 como un diccionario que una pantalla dibuja |
+| `vista_gantt(programa, calendario, …)` | El árbol completo (capítulo, frentes, etapas, Nivel 3, partidas) con su `padre`, las flechas, las marcas de §8 y, si se pide, la base de una reprogramación y todo lo necesario para editar en pantalla |
 
 **Las reglas de carga son las de D-442 y D-443**: el desfase viene en horas y la jornada es de 8; el programa
 guarda el `oid`, nunca el número de fila; un bloque puede ser predecesora, también el que contiene a su
@@ -229,10 +230,54 @@ dice qué pasa con cada uno (columna `al_cargar`).
 Al motor se le añadió el diagnóstico que esto pedía: cuando el cálculo no converge, `CicloError.vinculos` trae
 los vínculos que forman el ciclo que se alarga, rastreados desde quién empujó el arranque de cada partida.
 
-## 4.6 Cómo se prueba
+## 4.6 Editar y reprogramar: `reprogramar` en `backend/core/programa.py`
 
-`cd backend && python3 -m unittest discover` corre 104 pruebas. Las del CPM están en
-`backend/core/tests/test_motor_cpm.py` y las del cargador y el Gantt en `test_programa.py`; siguen el principio del repositorio —datos reales del
+El planeador edita y el sistema reprograma, por lo mínimo, y dice qué cuesta antes de que se decida
+(§8). Cinco ediciones, repartidas en los dos permisos que ya existen (`MODELO.md` §5b):
+
+| Edición | Qué cambia | Permiso |
+|---|---|---|
+| `CambiarDuracion(llave, días)` | La partida dura esos días hábiles, contando sus paros | `editar_estructura_programa` (Control de obra) |
+| `AgregarVinculo` · `QuitarVinculo` · `CambiarVinculo` | Un vínculo de la red: tipo, espera o traslape, o que deje de existir | `editar_estructura_programa` |
+| `FijarInicio(llave, fecha)` | La partida no arranca antes de esa fecha | `editar_fechas_programa` (Residente) |
+
+**El empuje mínimo.** Cada partida conserva su arranque del plan y solo se corre lo que una edición obliga, y
+solo hacia adelante. Es el CPM con el arranque del plan como disparador de cada partida. Tiene tres
+consecuencias que son la regla, no un detalle:
+
+- Sin ediciones, un plan que cumple todos sus vínculos queda **idéntico**. Pasa en los seis programas limpios
+  (0 partidas movidas) y es la prueba de que el empuje no inventa nada.
+- **Quitar un vínculo o acortar una duración nunca adelanta nada**: adelantar es una decisión y se toma
+  fijando un arranque. Con `modo="temprano"` se suelta el plan y se calcula el CPM más temprano de la red,
+  que con la red mínima de hoy colapsa (§4.4); es un diagnóstico, no un modo de trabajo.
+- Un plan que no cumple sus vínculos se corre hasta cumplirlos. Si Zafiro obedeciera los 118 vínculos que
+  cargan (§4.5) se moverían 47 partidas y cerraría el 7-ene-2026, 12 días hábiles después. Zafiro sigue de
+  origen (D-444): es lo que costaría que la red mandara sobre el plan manual.
+
+**El impacto**, que se devuelve con el programa nuevo, es lo que el planeador ve antes de decidir: las
+partidas movidas (cuántos días hábiles se corre el arranque y el término de cada una), el cierre antes y
+después, la ruta antes y después y si cambia —`ruta_cambia` sigue D-100: la ruta se recalcula siempre y
+solo avisa si cambia de actividades; correr fechas no es noticia—, los vínculos que siguen sin cumplirse y
+las ediciones que no se pudieron aplicar con su motivo (`actividad_desconocida`, `duracion_invalida`,
+`autovinculo`, `sucesora_no_es_partida`, `repetido`, `cierra_un_ciclo`, `vinculo_inexistente`), que no frenan a
+las demás.
+
+**Lo que mide con datos reales.** Agregar `P16` a Plus (vertedero tras la boquilla fina interior, `FS+1`) corre el
+cierre del 5 al 19-ene-2026: **10 días hábiles**, exactamente el «déficit 10» de D-437 y lo que D-460 decía
+que costaría cerrarlo (30 a 32 semanas). Alargar el muro de la planta alta de 7 a 12 días mueve 5 partidas y
+no mueve el cierre. Fijar el arranque del vertedero cinco días después mueve 31 y corre el cierre cinco.
+
+**El mismo motor, en el navegador.** La pantalla reprograma sin ir al servidor y por eso trae su propia
+implementación (`frontend/gantt/motor_gantt.js`). Una prueba corre las dos con las mismas ediciones sobre
+Zafiro Plus —duraciones, arranques en sábado, vínculos agregados, quitados y cambiados, ediciones
+rechazadas, el modo temprano— y exige el mismo cierre, los mismos días, las mismas partidas movidas, la
+misma ruta y los mismos rechazos.
+
+## 4.7 Cómo se prueba
+
+`cd backend && python3 -m unittest discover` corre 120 pruebas. Las del CPM están en
+`backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
+la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
 a mano, y las de conformidad cargan `PROGRAMAS-PROTOTIPOS.csv` y los demás archivos de `programas/`
 y comprueban las cifras de §3, §6 y §7. Si un número de este archivo cambia, una prueba tiene que
@@ -592,36 +637,46 @@ Lo que arranca justo después de que termina esa ruta está en `SEGUNDA-RUTA-LO-
 
 ---
 
-# 8. El Gantt: reglas de visualización
+# 8. El Gantt: pantalla y reglas (B-95 cierra)
 
-Lo único que falta del módulo es de pantalla, no de entidad. `vista_gantt` (§4.5) ya entrega los datos
-—filas, flechas y marcas— y una pantalla de trabajo de Zafiro Plus los dibuja. Las reglas siguen siendo
-propuesta a confirmar (B-95); parten de la imagen de D-432 y de lo que la pantalla obligó a precisar:
+`vista_gantt` entrega los datos y `frontend/gantt/` los dibuja y los edita: una página sola, sin servidor, que
+`pagina_gantt` arma con los datos de un programa. Las tres preguntas que dejaba B-95 las contestó el usuario
+(D-463), y esto es lo que quedó:
 
-- **Una fila por partida y un resumen por cada bloque de Nivel 2 y 3**, con la barra de todo lo que
-  contiene. D-432 contó 389 filas de concepto y 90 resúmenes (479); la fila de cierre en blanco no tiene
-  barra, así que la vista trae 388 partidas y 90 resúmenes. Los frentes (Nivel 1) y el capítulo no llevan
-  resumen salvo que se pida (`niveles_resumen`).
-- **Color por frente**: los seis niveles constructivos (cimentación, planta baja, planta alta, azotea,
-  acabados, obras exteriores) con su color y los nueve frentes restantes, paquetes contratados terminados,
-  en gris. D-432 usó siete colores por etapa; las etapas son 49 en Plus y no se distinguen por color.
-- **El rojo es solo para una cadena a la vez.** Hay dos lecturas y la pantalla deja elegir: la **cadena de
-  relevos** del plan (13 pasos en Plus; la que lee el planeador y la que resaltó D-432) o la **ruta crítica
-  de la red** (28 partidas en Plus; la que calcula el motor). Son distintas porque la red tiene unos 130
-  vínculos sobre 388 partidas (§4.4).
-- **Una flecha por vínculo**, desde la predecesora hasta la sucesora, anclada donde el tipo lo pide
-  (`FS` del fin al inicio, `SS` de inicio a inicio, `FF` de fin a fin, `SF` del inicio al fin). Cuando la
-  predecesora es un bloque, sale de la partida del bloque que de verdad fija la fecha —la que cierra su
-  ventana en `FS` y `FF`, la que la abre en `SS` y `SF`, sin contar a la sucesora—; si empatan varias, de la
-  que está en la cadena roja, y si ninguna lo está, de la que arranca más tarde en el cierre o la primera
-  del libro en la apertura. Un vínculo incumplido se dibuja punteado.
-- **Se marcan** los fines de semana, los feriados del calendario de la obra y la ventana de la planta alta.
-- **El horizonte lo fija el programa más largo que se muestra** (D-449); la cuadrícula día por día es una
-  vista, no un dato (D-447).
+**1. El rojo es la cadena de relevos** de las fechas vigentes, la que el usuario validó en D-426 y la que lee
+el planeador. Se recalcula sola con cada edición, y cuando el programa se reprograma es la ruta crítica de lo
+reprogramado. La ruta crítica de la red queda como lectura de diagnóstico: la pantalla la ofrece mientras no
+hay ediciones y no la recalcula, porque con la red mínima apunta a cadenas que el plan no sigue (§4.4).
 
-Tres preguntas para el usuario, sin las cuales B-95 no cierra: cuál de las dos cadenas va en rojo por
-defecto, si basta el resumen de Nivel 2 y 3 o también el de cada frente, y si las flechas se dibujan siempre
-o solo al pasar por una barra.
+**2. Un árbol que se pliega, sin perder detalle.** Capítulo, frente, etapa, Nivel 3 y partida, con las barras de
+resumen que abarcan lo que contienen. Se abre con los frentes y las etapas a la vista (64 filas en Plus) y el
+detalle a un clic, o con «Todo el detalle» (493). Las flechas de lo plegado se suman al bloque que se ve, sin
+perder ninguna, y una partida movida se marca aunque su bloque esté plegado. Un frente se puede aislar desde la
+leyenda.
+
+**3. Autónomo, pero editable.** El sistema dibuja y propone; el planeador decide:
+- Los vínculos se dibujan solos, pero no todos a la vez: por defecto se ven **los que importan** —los de la
+  cadena en rojo, los de la partida o el bloque que se toca y los incumplidos, punteados—, y todos están a un
+  clic. Nadie configura nada para que la pantalla se lea.
+- Todo lo que se ve se edita: la duración, el arranque y cada vínculo de una partida (tipo, espera, quitarlo), y
+  se agrega una predecesora eligiéndola en el propio Gantt, que si es un bloque sale de la partida que fija la
+  fecha. Estructura es de Control de obra y fechas, del Residente (§4.6).
+- **Nada se aplica a ciegas**: cada edición reprograma por empuje mínimo y la pantalla muestra, en tres tarjetas,
+  el cierre (antes y después), cuántas partidas se mueven y si la cadena cambia. Una edición que no se puede
+  aplicar se dice con su motivo y no se aplica. Las ediciones se ven como fichas que se quitan una por una.
+- **Propuesta sin confirmar:** el vínculo que alguien agrega o cambia lleva el `origen` que declare
+  (`PRECEDENCIA.origen`: técnica, recurso o decisión) y, si no declara, `decision`, que es la de menor
+  confianza y la que se revisa primero.
+
+El resto de las reglas viene de la imagen de D-432: color por frente (los seis niveles constructivos con su
+color y los nueve paquetes contratados terminados en gris; las etapas, 49 en Plus, no se distinguen por color),
+anclaje de la flecha según el tipo (`FS` del fin al inicio, `SS` de inicio a inicio, `FF` de fin a fin, `SF` del
+inicio al fin), fines de semana, feriados y ventana de la planta alta marcados, la barra de antes en trazo
+punteado cuando una edición mueve una partida, y el horizonte del programa más largo (D-449).
+
+**Lo que la pantalla todavía no hace**, y es de la capa de aplicación: guardar. Es una simulación; las
+ediciones reales las hace Control de obra y el Residente sobre la base de datos, con la misma
+`reprogramar`.
 
 ---
 
@@ -629,8 +684,8 @@ o solo al pasar por una barra.
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| Visualización del Gantt (B-95) | Los datos y una pantalla de trabajo existen; faltan las tres preguntas de §8 |
-| Integración con `ACTIVIDAD` y `PRECEDENCIA` | El cargador y el motor entregan y reciben estructuras (§4.1, §4.5); guardarlas es de la capa de aplicación (Django) |
+| Guardar lo que se edita | La pantalla es una simulación; guardar las ediciones en `ACTIVIDAD` y `PRECEDENCIA` es de la capa de aplicación (Django), con el mismo `reprogramar` |
+| `origen` del vínculo que se edita | Propuesta sin confirmar: lo que declare quien edita y, si no, `decision` (§8) |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
 | Las listas del planeador | Los 12 supuestos de cada programa, los 15 de Zafiro, las 59 que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos por rol |
 | La segunda ruta de cuadrilla | Borrador; se captura a mano con `origen = recurso` (§7.5) |
@@ -655,3 +710,4 @@ o solo al pasar por una barra.
 | Pendientes de B-86 | D-444, D-445, D-460 |
 | **El motor, los datos en el repositorio y esta consolidación** | **D-461** |
 | **El cargador, la cadena de relevos calculada y el Gantt como dato** | **D-462** |
+| **Reprogramar por empuje mínimo, el árbol plegable y la edición en pantalla (B-95 cierra)** | **D-463** |

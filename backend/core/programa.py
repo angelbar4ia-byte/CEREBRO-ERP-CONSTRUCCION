@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import csv
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
 from fractions import Fraction
 from pathlib import Path
@@ -41,6 +41,7 @@ from .motor_cpm import (
     calcular_cpm,
     desfase_en_dias,
     holgura_vinculo,
+    tipo_normal,
     vinculos_incumplidos,
     ventana_de_bloque,
 )
@@ -388,6 +389,216 @@ def cadena_de_relevos(prog: Programa, cal: Calendario) -> List[str]:
     return max((mejor(n) for n in finales), key=lambda c: (len(c), -cal.n(prog.ventanas[c[0]].inicio)))
 
 
+# --------------------------------------------------------------------------- editar y reprogramar
+#
+# El sistema propone, el planeador decide (`PROGRAMA-CPM.md` §8). Una edición no se aplica a ciegas: se
+# reprograma y se devuelve el impacto —qué partidas se mueven, cuánto el cierre, si la ruta cambia—, y
+# recién entonces el planeador la acepta. Dos permisos distintos (`MODELO.md` §5b): la estructura (duración
+# y vínculos, `editar_estructura_programa`) y las fechas (`editar_fechas_programa`).
+
+
+@dataclass(frozen=True)
+class CambiarDuracion:
+    """Estructura: la partida dura `dias` días hábiles (envolvente: incluye sus paros)."""
+
+    llave: str
+    dias: Fraction
+
+
+@dataclass(frozen=True)
+class FijarInicio:
+    """Fechas: la partida no arranca antes de `fecha` (un disparador, como el ancla contractual)."""
+
+    llave: str
+    fecha: date
+
+
+@dataclass(frozen=True)
+class AgregarVinculo:
+    predecesora: str  # una partida o un bloque con partidas
+    sucesora: str  # siempre una partida
+    tipo: str = "FS"
+    desfase: Fraction = Fraction(0)
+
+
+@dataclass(frozen=True)
+class QuitarVinculo:
+    predecesora: str
+    sucesora: str
+    tipo: Optional[str] = None  # None: todos los de ese par
+
+
+@dataclass(frozen=True)
+class CambiarVinculo:
+    predecesora: str
+    sucesora: str
+    tipo_actual: str
+    tipo: str
+    desfase: Fraction = Fraction(0)
+
+
+PERMISO_DE = {
+    CambiarDuracion: "editar_estructura_programa",
+    AgregarVinculo: "editar_estructura_programa",
+    QuitarVinculo: "editar_estructura_programa",
+    CambiarVinculo: "editar_estructura_programa",
+    FijarInicio: "editar_fechas_programa",
+}
+
+
+@dataclass(frozen=True)
+class Movida:
+    llave: str
+    dias_inicio: int  # días hábiles que se corre el arranque
+    dias_fin: int
+
+
+@dataclass
+class Reprogramacion:
+    programa: Programa  # el programa con sus fechas nuevas: se puede calcular, dibujar y volver a editar
+    resultado: ResultadoCPM
+    movidas: List[Movida]
+    fin_antes: date
+    fin_despues: date
+    dias_de_cambio: int  # días hábiles que se mueve el cierre
+    ruta_antes: List[str]
+    ruta_despues: List[str]
+    ruta_cambia: bool  # D-100: la ruta se recalcula siempre, pero solo avisa si cambia de actividades
+    rechazadas: List[Rechazado]  # ediciones que no se aplican, con su motivo
+    incumplidos: List[Tuple[Vinculo, Fraction]]  # los que siguen sin cumplirse tras reprogramar
+
+
+def reprogramar(
+    prog: Programa,
+    cal: Calendario,
+    ediciones: Iterable[object] = (),
+    modo: str = "empuje",
+) -> Reprogramacion:
+    """Aplica las ediciones y reprograma.
+
+    `empuje` (por defecto) respeta el plan: cada partida conserva su arranque y solo se corre lo que un
+    vínculo, una duración o una fecha editada obliga, por lo mínimo. Sin ediciones, un plan que cumple
+    todos sus vínculos queda idéntico. `temprano` suelta el plan y calcula el CPM más temprano de la red
+    (con la red mínima de hoy colapsa: ver `PROGRAMA-CPM.md` §4.4).
+
+    Una edición que no se puede aplicar —actividad desconocida, duración inválida, un vínculo repetido o que
+    cierra un ciclo— no detiene a las demás: queda en `rechazadas` con su motivo."""
+    if modo not in ("empuje", "temprano"):
+        raise ValueError("modo: empuje o temprano")
+    duraciones = {k: Fraction(cal.n(w.fin) + 1 - cal.n(w.inicio)) for k, w in prog.ventanas.items()}
+    anclas: Dict[str, date] = {k: w.inicio for k, w in prog.ventanas.items()} if modo == "empuje" else {}
+    vivos: List[Tuple[Vinculo, int, str]] = [(v, 0, "") for v in prog.vinculos]
+    rechazadas: List[Rechazado] = []
+
+    def no(llave: str, motivo: str, token: str = "") -> None:
+        fila = prog.por_llave[llave].fila if llave in prog.por_llave else 0
+        rechazadas.append(Rechazado(llave, fila, token, motivo))
+
+    def valido(pred: str, suc: str):
+        if suc not in prog.ventanas:
+            return "sucesora_no_es_partida" if suc in prog.por_llave else "actividad_desconocida"
+        if pred in prog.ventanas:
+            return None
+        if pred in prog.bloques and prog.bloques[pred]:
+            return None
+        return "actividad_desconocida" if pred not in prog.por_llave else "predecesora_sin_partidas"
+
+    for e in ediciones:
+        if isinstance(e, CambiarDuracion):
+            if e.llave not in prog.ventanas:
+                no(e.llave, "actividad_desconocida", "duracion")
+            elif Fraction(e.dias) <= 0:
+                no(e.llave, "duracion_invalida", str(e.dias))
+            else:
+                duraciones[e.llave] = Fraction(e.dias)
+        elif isinstance(e, FijarInicio):
+            if e.llave not in prog.ventanas:
+                no(e.llave, "actividad_desconocida", "inicio")
+            else:
+                anclas[e.llave] = cal.siguiente_habil(e.fecha)
+        elif isinstance(e, AgregarVinculo):
+            token = f"{e.predecesora}{e.tipo}"
+            motivo = valido(e.predecesora, e.sucesora)
+            if motivo:
+                no(e.sucesora, motivo, token)
+            elif e.predecesora == e.sucesora:
+                no(e.sucesora, "autovinculo", token)
+            else:
+                nuevo = Vinculo(e.predecesora, e.sucesora, e.tipo, e.desfase)
+                if any(v == nuevo for v, _, _ in vivos):
+                    no(e.sucesora, "repetido", token)
+                elif _cierra_ciclo(vivos + [(nuevo, 0, "")], prog, cal):
+                    no(e.sucesora, "cierra_un_ciclo", token)
+                else:
+                    vivos.append((nuevo, 0, ""))
+        elif isinstance(e, QuitarVinculo):
+            tipo = None if e.tipo is None else tipo_normal(e.tipo)
+            quedan = [t for t in vivos if not (t[0].predecesora == e.predecesora and t[0].sucesora == e.sucesora and (tipo is None or t[0].tipo == tipo))]
+            if len(quedan) == len(vivos):
+                no(e.sucesora, "vinculo_inexistente", f"{e.predecesora}{e.tipo or ''}")
+            vivos = quedan
+        elif isinstance(e, CambiarVinculo):
+            actual = tipo_normal(e.tipo_actual)
+            idx = next((i for i, (v, _, _) in enumerate(vivos) if v.predecesora == e.predecesora and v.sucesora == e.sucesora and v.tipo == actual), None)
+            if idx is None:
+                no(e.sucesora, "vinculo_inexistente", f"{e.predecesora}{e.tipo_actual}")
+            else:
+                nuevo = Vinculo(e.predecesora, e.sucesora, e.tipo, e.desfase)
+                resto = vivos[:idx] + vivos[idx + 1 :]
+                if any(v == nuevo for v, _, _ in resto):
+                    no(e.sucesora, "repetido", f"{e.predecesora}{e.tipo}")
+                elif _cierra_ciclo(resto + [(nuevo, 0, "")], prog, cal):
+                    no(e.sucesora, "cierra_un_ciclo", f"{e.predecesora}{e.tipo}")
+                else:
+                    vivos = resto[:idx] + [(nuevo, 0, "")] + resto[idx:]
+        else:
+            raise TypeError(f"edición desconocida: {e!r}")
+
+    vinculos = [v for v, _, _ in vivos]
+    usados = {v.predecesora for v in vinculos if v.predecesora in prog.bloques}
+    acts = [Actividad(k, duraciones[k], ancla=anclas.get(k)) for k in prog.ventanas]
+    acts += [Actividad(b, 0, tuple(prog.bloques[b])) for b in prog.bloques if b in usados]
+    arranque = min(w.inicio for w in prog.ventanas.values())
+    res = calcular_cpm(acts, vinculos, cal, arranque)
+    nuevas = {k: Ventana(res[k].fecha_inicio, res[k].fecha_fin) for k in prog.ventanas}
+    nuevo_prog = replace(prog, actividades=acts, vinculos=vinculos, ventanas=nuevas)
+
+    movidas = []
+    for k, w in prog.ventanas.items():
+        di, df = cal.n(nuevas[k].inicio) - cal.n(w.inicio), cal.n(nuevas[k].fin) - cal.n(w.fin)
+        if di or df:
+            movidas.append(Movida(k, di, df))
+    fin_antes = max(w.fin for w in prog.ventanas.values())
+    fin_despues = max(w.fin for w in nuevas.values())
+    antes = cadena_de_relevos(prog, cal)
+    despues = cadena_de_relevos(nuevo_prog, cal)
+    return Reprogramacion(
+        programa=nuevo_prog,
+        resultado=res,
+        movidas=movidas,
+        fin_antes=fin_antes,
+        fin_despues=fin_despues,
+        dias_de_cambio=cal.n(fin_despues) - cal.n(fin_antes),
+        ruta_antes=antes,
+        ruta_despues=despues,
+        ruta_cambia=set(antes) != set(despues),
+        rechazadas=rechazadas,
+        incumplidos=nuevo_prog.incumplidos(cal),
+    )
+
+
+def _cierra_ciclo(vivos, prog: Programa, cal: Calendario) -> bool:
+    """¿Esta red tiene un ciclo? Entre partidas, o a través de un bloque (el motor no converge)."""
+    directos = [(v.predecesora, v.sucesora) for v, _, _ in vivos if v.predecesora in prog.ventanas]
+    if _componente_con_ciclo(directos):
+        return True
+    try:
+        _probar(vivos, prog.ventanas, prog.bloques, cal)
+    except CicloError:
+        return True
+    return False
+
+
 # --------------------------------------------------------------------------- el Gantt como dato
 
 
@@ -396,48 +607,75 @@ def vista_gantt(
     cal: Calendario,
     ventana: Optional[Tuple[date, date]] = None,
     relevos: Optional[Sequence[str]] = None,
-    niveles_resumen: Sequence[int] = (2, 3),
+    niveles_resumen: Sequence[int] = (0, 1, 2, 3),
     resultado: Optional[ResultadoCPM] = None,
+    base: Optional[Programa] = None,
+    para_editar: bool = False,
 ) -> Dict[str, object]:
     """Lo que una pantalla necesita para dibujar el Gantt de `PROGRAMA-CPM.md` §8, sin dibujar nada:
 
-    - `filas`: una por partida y una por bloque de los `niveles_resumen` (por defecto el 2 y el 3, como
-      la imagen de D-432: 388 partidas y 90 resúmenes en Zafiro Plus), en el orden del libro, con su
-      etapa para el color y `critica` si está en la cadena de relevos;
+    - `filas`: una por partida y una por bloque de los `niveles_resumen`, en el orden del libro. Por
+      defecto todos los niveles (capítulo, frente, etapa, nivel 3): el árbol completo, que la pantalla
+      pliega y despliega con `padre`. Cada fila lleva su frente y etapa para el color y `critica` si
+      está en la cadena de relevos. Zafiro Plus: 388 partidas y 105 resúmenes (90 de Nivel 2 y 3, como
+      la imagen de D-432, más los 14 frentes y el capítulo);
     - `flechas`: una por vínculo, desde la partida que fija la fecha de la predecesora (no desde el
       bloque), con su holgura y `incumplido` si las fechas lo contradicen;
     - `marcas`: los fines de semana y feriados que caen dentro del programa y la ventana, si la hay;
     - `ruta_critica_red`: si se pasa el `resultado` del CPM, las partidas de la ruta crítica de la red,
-      para que la pantalla pueda marcar una u otra (la cadena de relevos lee el plan; esta lee la red).
+      para que la pantalla pueda marcar una u otra (la cadena de relevos lee el plan; esta lee la red);
+    - `base`: si se pasa el programa de antes de una reprogramación, cada fila trae `base_inicio` y
+      `base_fin` (la barra fantasma) y `dias_movida`;
+    - `red`: si `para_editar`, lo que una pantalla necesita para reprogramar sin el servidor —días hábiles
+      numerados, partidas en orden del libro, bloques y vínculos—, con el mismo contrato que
+      `reprogramar` (`frontend/gantt/motor_gantt.js` lo implementa y una prueba lo contrasta).
     """
     if relevos is None:
         relevos = cadena_de_relevos(prog, cal)
     critica = set(relevos)
-    filas = []
-    for f in prog.filas:
+
+    def ventana_de(p: Programa, f: Fila) -> Optional[Tuple[date, date]]:
         if f.es_partida:
-            w = prog.ventanas[f.llave]
-            ini, fin = w.inicio, w.fin
-        elif f.nivel in niveles_resumen and f.llave in prog.bloques and prog.bloques[f.llave]:
-            ws = [prog.ventanas[h] for h in prog.bloques[f.llave]]
-            ini, fin = min(w.inicio for w in ws), max(w.fin for w in ws)
-        else:
+            w = p.ventanas[f.llave]
+            return w.inicio, w.fin
+        hijos = p.bloques.get(f.llave)
+        if not hijos:
+            return None
+        ws = [p.ventanas[h] for h in hijos]
+        return min(w.inicio for w in ws), max(w.fin for w in ws)
+
+    filas = []
+    pila: List[Tuple[int, str]] = []  # (nivel, llave) de los resúmenes que ya entraron: el padre es el tope
+    for f in prog.filas:
+        if not f.es_partida and f.nivel not in niveles_resumen:
             continue
-        filas.append(
-            {
-                "llave": f.llave,
-                "fila": f.fila,
-                "nivel": f.nivel,
-                "clave": f.clave,
-                "descripcion": f.descripcion,
-                "resumen": not f.es_partida,
-                "inicio": ini.isoformat(),
-                "fin": fin.isoformat(),
-                "frente": f.frente,
-                "etapa": f.etapa,
-                "critica": f.llave in critica,
-            }
-        )
+        v = ventana_de(prog, f)
+        if v is None:
+            continue
+        while pila and pila[-1][0] >= f.nivel:
+            pila.pop()
+        fila = {
+            "llave": f.llave,
+            "fila": f.fila,
+            "nivel": f.nivel,
+            "padre": pila[-1][1] if pila else None,
+            "clave": f.clave,
+            "descripcion": f.descripcion,
+            "resumen": not f.es_partida,
+            "inicio": v[0].isoformat(),
+            "fin": v[1].isoformat(),
+            "frente": f.frente,
+            "etapa": f.etapa,
+            "critica": f.llave in critica,
+        }
+        if base is not None:
+            b = ventana_de(base, f)
+            if b is not None:
+                fila["base_inicio"], fila["base_fin"] = b[0].isoformat(), b[1].isoformat()
+                fila["dias_movida"] = cal.n(v[1]) - cal.n(b[1])
+        filas.append(fila)
+        if not f.es_partida:
+            pila.append((f.nivel, f.llave))
     flechas = []
     for v in prog.vinculos:
         suc = prog.ventanas.get(v.sucesora)
@@ -452,6 +690,7 @@ def vista_gantt(
             {
                 "de": ref,
                 "a": v.sucesora,
+                "de_vinculo": v.predecesora,
                 "tipo": v.tipo,
                 "desfase": float(v.desfase),
                 "holgura": None if h is None else float(h),
@@ -472,8 +711,22 @@ def vista_gantt(
         d += timedelta(days=1)
     frentes = {f.clave: f.descripcion for f in prog.filas if f.tipo == "Subcapítulo"}
     etapas = {f.clave: f.descripcion for f in prog.filas if f.tipo == "Nivel 2"}
-    return {
+    vista: Dict[str, object] = {
         "filas": filas, "flechas": flechas, "marcas": marcas, "relevos": list(relevos),
         "frentes": frentes, "etapas": etapas, "desde": desde.isoformat(), "hasta": hasta.isoformat(),
         "ruta_critica_red": list(resultado.ruta_critica) if resultado is not None else [],
     }
+    if para_editar:
+        n0 = cal.n(desde)
+        horizonte = cal.n(hasta) - n0 + 260
+        vista["red"] = {
+            "n0": n0,
+            "dias": [cal.fecha(n0 + i).isoformat() for i in range(horizonte)],
+            "partidas": [{"k": k, "ini": cal.n(w.inicio) - n0, "fin": cal.n(w.fin) - n0} for k, w in prog.ventanas.items()],
+            "conocidas": list(prog.por_llave),
+            "bloques": {b: list(h) for b, h in prog.bloques.items() if h},
+            "vinculos": [
+                {"de": v.predecesora, "a": v.sucesora, "tipo": v.tipo, "desfase": float(v.desfase)} for v in prog.vinculos
+            ],
+        }
+    return vista
