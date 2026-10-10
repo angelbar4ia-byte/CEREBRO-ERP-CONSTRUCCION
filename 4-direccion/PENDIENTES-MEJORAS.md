@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué falta?
 tiempo:     vamos aquí
-corte:      2026-09-26
+corte:      2026-10-10
 verificado: 38 de decisión · 14 de datos · 25 módulos
 ```
 
@@ -219,7 +219,7 @@ puede escribir de lo que primero hay que definir.
 | B-10 | **`diccionario`** | Términos, equivalencias, homologación. **Vive dentro del ERP** | ✅ Definidas · datos en `DICCIONARIO-DATOS.md` | B-03 |
 | B-11 | **`rediseno`** | Fusión, división, extracción, composición, clonación + las tres capas | ✅ Definidas | B-04 |
 | B-12 | **`parametrico`** | Ensambles: plantilla e instancia, divisor, cohorte | ✅ Definidas, **y ahora con tabla** — `NODO`(rol=ensamble)+`COMPOSICION` reusadas, `ENSAMBLE_PARAMETRO` nuevo (`MODELO.md` §1c, D-325) | B-02, B-04 |
-| B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | ✅ **P-20 resuelto** — modelo de datos completo (`MODELO.md` §5c, D-327). Falta el motor de cálculo del CPM (código, no schema) *(D-461: el motor ya existe, `backend/core/motor_cpm.py`, probado contra los siete programas; la visualización del Gantt cierra con B-95, D-463; D-462 agrega el cargador del programa y D-463 la reprogramación y la pantalla editable)* | B-05, B-07 |
+| B-13 | **`programa`** | Actividades, asignaciones, avance, Gantt calculado **y ruta crítica** | ✅ **P-20 resuelto** — modelo de datos completo (`MODELO.md` §5c, D-327). Falta el motor de cálculo del CPM (código, no schema) *(D-461: el motor ya existe, `backend/core/motor_cpm.py`, probado contra los siete programas; la visualización del Gantt cierra con B-95, D-463; D-462 agrega el cargador del programa y D-463 la reprogramación y la pantalla editable; D-464 a D-467 guardan las ediciones, ponen la API y la lista de programas, y llevan lo decidido a la versión nueva de un programa. Lo que sigue abierto del módulo está en `PROGRAMA-CPM.md` §9)* | B-05, B-07 |
 | B-14 | **`contratos`** | Cadena de precios, precio por contratista, control de cambio | ✅ Definidas | B-05 |
 | B-15 | **Estimaciones** | Cómo se emiten, qué congelan, deducciones, retenciones | ✅ **P-18 resuelto** — `CONOCIMIENTO.md` §13.8 | B-14 |
 | B-16 | **Almacén** | Surtido contra consumido, corte matricial contra explosión | ✅ **P-19 resuelto** — `MOVIMIENTO_ALMACEN` nueva; el archivo real ya separaba surtido/consumido sin campo extra, corte matricial es vista, no tabla. Devoluciones sin espécimen real todavía, queda abierto — 🆕 apareció `devolucion_cliente` en los cinco meses (D-358), pero es candidato débil: sin `Lote`, con texto de ajuste de inventario, no de devolución real. `MODELO.md` §5e, D-333 | B-06 |

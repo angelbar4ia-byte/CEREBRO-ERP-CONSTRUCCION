@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿dónde vamos y cómo retomar?
 tiempo:     vamos aquí
-corte:      2026-09-26
+corte:      2026-10-10
 verificado: Punto de corte · sin bloqueos
 ```
 
@@ -46,6 +46,8 @@ Y el estado del Pull Request — hay uno abierto:
 **https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1**
 Si sigue abierto, el trabajo de esta rama todavía no se mergeó a `main`. Seguí
 trabajando sobre la misma rama salvo que el usuario diga lo contrario.
+
+> *D-468 (2026-10-10): **ya no hay ningún PR abierto.** El #1 se cerró y el #2 se mergeó a `main` hasta D-384. Los 73 commits que siguen —de D-385 a D-467: el CPM, el programa, la API y las pantallas, 58 archivos— viven solo en esta rama. Pedir el PR es del usuario. El CI de GitHub corre las 251 pruebas completas, sin saltarse ninguna, y está en verde en cada uno de esos commits.*
 
 **Después, leer en este orden — el cerebro está en carpetas por capa**
 (`1-mundo`, `2-operacion`, `3-historia`, `4-direccion`; ver `INDICE.md`):
@@ -106,7 +108,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326. 🆕 **P-22 se parte en dos rutas** — por analogía cierra (`PROPUESTA(tipo=matriz_generada)`, copia y escala, nunca genera; corpus es `PROPUESTA` misma, `MODELO.md` §5, D-352); por fórmula sigue siendo B-18, bloqueado en constantes físicas |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada · 🆕 Avanza P-14/B-09 — Cabeceras/Materiales/Operaciones confirmados contra el propio dialecto OPUS y el join entre ellos validado sin huérfanos; `Flete`, archivo-vs-API y los 4 catálogos de salida siguen abiertos (`CONOCIMIENTO.md` §4.3, D-331/D-332) |
-| **Memoria** | 467 decisiones · 12 descartes · 30 correcciones · 13 hallazgos de construcción · 🆕 recuento completo desde D-01, el número venía sobrestimado (D-338) |
+| **Memoria** | 468 decisiones · 12 descartes · 30 correcciones · 13 hallazgos de construcción · 🆕 recuento completo desde D-01, el número venía sobrestimado (D-338) |
 | **Desviación, Consulta y renovación de invariantes** | 🆕 `DESVIACION` cierra tercera aparición del mismo hueco — patrones son `GROUP BY`, no tabla (`MODELO.md` §5g, D-343). `CONSULTA_LOG` le da bandeja propia a Consulta, persistente sin retención (§5h, D-344, B-33). Renovación semestral de invariantes es una `ALERTA` más, lee el `corte:` que ya existe, sin campo nuevo — Control de obra la resuelve (§5a, D-345, B-54). 🆕 **Corrección (D-347): `causa` tenía el vocabulario equivocado** — las nueve causas de §13.6 deciden si la fila es `DESVIACION` siquiera, no la describen; el vocabulario real es «causas por categoría», del mismo §13.6 |
 | **Cuatro decisiones de política del usuario** | 🆕 P-34 (`NODO.marca_revisado`, checklist no validación) · P-35 (sustitución = `PROPUESTA(tipo=version)` + `GRUPO_FUNCIONAL`, ya lo tenía el caso mortero/cemento) · P-36 (consolidar solo al leer, no al cargar — depende de compras/obra vs. costos/control) · P-27 (`PROPUESTA(tipo=patron_carga)`, confirma la forma una vez, no por archivo) — D-339 a D-342. 🆕 **Cierra P-26**: las cinco estructuras de ingeniería (`CONOCIMIENTO.md` §11.8) ya caían bajo `patron_carga` — la firma solo necesitaba el patrón de llenado de la columna de agrupador, no solo conteo de columnas (D-351) |
 | **Skill** | Base + 4 satélites compilados: importación, rediseño, paramétrico, 🆕 cuantificador |
@@ -136,6 +138,25 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 ---
 
 ## Lo que sigue, en orden
+
+### La cola vigente — 2026-10-10 (D-468)
+
+Rehecha con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, con los dos frenos: ¿está decidido? y ¿qué cuesta deshacerlo?). La columna «quién» es la que importa: separa lo que se puede hacer hoy de lo que espera una decisión o un dato que no está en este repo.
+
+| # | Qué | Quién lo mueve | Por qué va en este lugar |
+|---|---|---|---|
+| 1 | **Un PR con lo que `main` no tiene**: 73 commits, de D-385 a D-467 | El usuario, pidiéndolo | Casilla «ahora»: nada del CPM, el programa ni la API está en `main`, y cuesta un clic |
+| 2 | **Dónde están los catálogos crudos de OPUS** —materiales, trabajos, mano de obra, conceptos, familias, contratistas, unidades— | El usuario | Es lo que más desbloquea. Sin ellos esperan P-09, P-11 (ejecutarlo sobre las 79 claves reales), P-14 (los cuatro catálogos de salida), P-32, M-14, los cuatro niveles de ALAMO 18 y la persistencia de `catalogo`, `apu` y `presupuesto` (B-03 a B-07), que por el principio de datos reales no se prueba con fixtures inventadas |
+| 3 | **B-96 · Autenticación** | El usuario | Freno 1: la decisión es suya. Freno 2: cada pantalla y operación nueva se apoya en las cabeceras provisionales; la recomendación está en B-96 |
+| 4 | **P16 en Zafiro Plus**: llevar el plazo a 32 semanas o relajar el vínculo | El planeador, por obra | Decisión de obra, no de sistema |
+| 5 | **Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA`** (B-03) | Quien lo construya, cuando exista el 2 | Casilla «planear»: partirlo en trozos con invariante propia |
+| 6 | **Las listas del planeador**: los 12 supuestos de cada programa, los 15 vínculos de Zafiro, las 59 partidas que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos de Rubí y Jade; y la segunda ruta de cuadrilla | El planeador | `PROGRAMA-CPM.md` §7 y §9 |
+| 7 | **Dos decisiones menores del programa**: si el programa que ya tiene versión nueva se cierra a ediciones, y si se casan las partidas por clave o por fila cuando una versión nueva trae otros `oid` | El usuario | Casilla «se hace al pasar» (D-467) |
+| 8 | **Lo que no se hace todavía**: las ideas sin diseñar (`IDEAS.md` §1 y §3 a §8), B-18, B-20, B-31 y B-34 | — | Casilla «caro y no desbloquea nada»: sin datos ni persistencia no hay con qué probarlas. B-31 está accionable en el papel, pero solo lee un modelo que aún no está en base |
+
+### La cola del 2026-09-15 (histórica)
+
+> *D-468: esta tabla quedó vieja y se conserva como historia. Su fila 1 ya no aplica (el PR #1 está cerrado), la 2 tampoco (estimaciones y almacén se cerraron con P-18 y P-19), la 3 sigue siendo una idea sin revisar y la numeración repite el 8. La vigente es la de arriba.*
 
 **Veintiún pendientes se cerraron el 2026-09-15** (P-02, P-03, P-04, P-05, P-06,
 P-11, P-12, P-13, P-19→B-19, P-23, P-25, P-29, P-30, M-13, M-15, M-16, B-01, B-02,
