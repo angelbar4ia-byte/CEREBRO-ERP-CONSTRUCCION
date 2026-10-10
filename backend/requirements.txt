@@ -1,0 +1,9 @@
+# Lo que el backend necesita para correr sus pruebas (y, salvo pgserver y playwright, para servirse).
+# pgserver: un Postgres embebido para probar el adaptador contra una base de verdad.
+# playwright: el navegador de las pruebas de la pantalla (después: playwright install chromium).
+fastapi
+uvicorn
+httpx
+psycopg[binary]
+pgserver
+playwright

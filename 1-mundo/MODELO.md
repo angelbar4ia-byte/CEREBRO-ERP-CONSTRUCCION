@@ -1972,6 +1972,9 @@ que alguien edita**: el que no declara nada deja `decision`, la de menor confian
 Hasta que `NODO` y `PRESUPUESTO` tengan tabla, el programa se guarda como libro (`programa_fila`) y
 `programa_vinculo`, con la migración `database/migraciones/0001_programa.sql`.
 
+*D-465: la regla (4) la cumple quien llama, no solo el servicio —la API recibe en `esperaba` la versión que vio la
+pantalla y, si ya es otra, responde conflicto—.*
+
 ### La herencia de una duración: referencia explícita, y el que edita pasa a ser la referencia de su alcance (D-441, cierra B-85)
 
 Dos campos en `ACTIVIDAD` (arriba), sin tabla nueva. **La referencia es una

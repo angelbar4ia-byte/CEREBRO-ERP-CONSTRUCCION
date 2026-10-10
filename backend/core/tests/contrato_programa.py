@@ -169,6 +169,17 @@ class ContratoPrograma:
             self.repo.guardar_edicion(self.pid, e, rol=CO, usuario="ana", impacto=mia.impacto.resumen(), esperaba=mia.esperaba)
         self.assertEqual(len(self.repo.ediciones(self.pid)), 1)
 
+    def test_una_pantalla_vieja_no_aplica_sobre_lo_que_no_vio(self):
+        e = CambiarDuracion(self.f[982], Fraction(9))
+        visto = self.sv.proponer(self.pid, e, CO).esperaba  # la pantalla vio la versión 0
+        self.sv.aplicar(self.pid, self.p16(), CO, "luis")  # otro edita: ya va en la 1
+        with self.assertRaises(Conflicto):
+            self.sv.aplicar(self.pid, e, CO, "ana", esperaba=visto)
+        self.assertEqual(len(self.repo.ediciones(self.pid)), 1)
+        # con la versión de hoy sí se aplica, y sin decir cuál vio se aplica sobre lo que haya
+        self.assertEqual(self.sv.aplicar(self.pid, e, CO, "ana", esperaba=1).guardada.secuencia, 2)
+        self.assertEqual(self.sv.aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(8)), CO, "ana").guardada.secuencia, 3)
+
     # ------------------------------------------------------------------ deshacer
     def test_deshacer_repite_la_cuenta_sin_la_edicion_y_la_bitacora_se_queda(self):
         a = self.sv.aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), CO, "luis").guardada

@@ -193,12 +193,16 @@ class ServicioPrograma:
             esperaba=v.version,
         )
 
-    def aplicar(self, programa_id: int, edicion: object, rol: str, usuario: str) -> Propuesta:
+    def aplicar(self, programa_id: int, edicion: object, rol: str, usuario: str, esperaba: Optional[int] = None) -> Propuesta:
         """Propone y, si se puede, guarda con lo que el sistema mostró. Una edición que no se puede aplicar
-        se devuelve sin guardar y con su motivo."""
+        se devuelve sin guardar y con su motivo. `esperaba` es la versión que vio quien decidió —una pantalla
+        abierta desde hace rato—: si el programa ya va en otra, `Conflicto`, porque el impacto que vio ya no
+        es el de hoy. Sin `esperaba` se aplica sobre lo que haya al momento de proponer."""
         if not usuario:
             raise ValueError("toda edición dice quién la hizo")
         p = self.proponer(programa_id, edicion, rol)
+        if esperaba is not None and esperaba != p.esperaba:
+            raise Conflicto(f"el programa ya va en la versión {p.esperaba}, no en la {esperaba}")
         if not p.aplicable:
             return p
         p.guardada = self.repo.guardar_edicion(

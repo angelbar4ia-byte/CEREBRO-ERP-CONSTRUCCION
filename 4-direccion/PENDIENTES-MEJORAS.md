@@ -306,6 +306,7 @@ puede escribir de lo que primero hay que definir.
 |---|---|---|
 | B-21 | `backend/` en Render · `database/` en Supabase | Definido en `CONOCIMIENTO.md` §3.3 |
 | B-22 | `frontend/` web en Vercel · móvil en Google Studio | El móvil consume la API, **nunca la base directo** |
+| B-96 | **Autenticación: cómo se identifica quien llama a la API y de dónde sale su rol** | ⏸️ Sin decidir. La API del programa (D-465) toma el rol y el nombre de dos cabeceras, `X-Rol` y `X-Usuario`, que sirven para trabajar y probar y **no se despliegan así**. Lo único que cambia cuando se decida es la dependencia `identidad` de `crear_app`; el servicio ya recibe rol y usuario como datos. Cruza con `MODELO.md` §5b (los permisos) |
 | B-23 | Los agentes de desarrollo en `.claude/agents/` | ✅ Cuatro escritos: arquitecto, constructor, migrador, **auditor** |
 | B-26 | **Contrato de módulo** — seis preguntas que todo módulo contesta antes de construirse | ✅ Escrito en `ESCALABILIDAD.md` |
 | B-27 | **Partir el skill por módulo**, compilado desde el conocimiento | ⏸️ No antes de que los módulos existan |

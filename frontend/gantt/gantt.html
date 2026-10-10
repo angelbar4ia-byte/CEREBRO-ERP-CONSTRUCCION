@@ -33,6 +33,7 @@
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.45;
          padding-inline: 16px; padding-block: 20px 28px; }
   .pagina { max-width: 1480px; margin-inline: auto; display: grid; gap: 14px; }
@@ -56,12 +57,22 @@
   .controles label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
   .controles .grupo { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .controles .titulo { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-  button.b, select, input[type=number], input[type=date] { font: inherit; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; }
+  button.b, select, input[type=number], input[type=date], input[type=text] { font: inherit; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; }
   button.b { cursor: pointer; }
   button.b:hover:not(:disabled) { border-color: var(--acento); }
   button.b:disabled { opacity: .45; cursor: default; }
   button.b.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
   :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  .ediciones .titulo-lista { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .ediciones .chip.nuevo { background: color-mix(in srgb, var(--aviso) 12%, var(--panel)); border-color: var(--aviso); }
+  .bitacora { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; }
+  .bitacora summary { cursor: pointer; font-weight: 500; }
+  .bitacora ol { list-style: none; margin: 8px 0 4px; padding: 0; display: grid; gap: 6px; max-height: 260px; overflow: auto; }
+  .bitacora li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; padding: 4px 0; border-top: 1px solid var(--grid); font-size: .86rem; }
+  .bitacora li .sec { font-family: var(--mono); color: var(--muted); }
+  .bitacora li .quien-cuando { grid-column: 2; font-size: .78rem; color: var(--muted); }
+  .bitacora li.revertida .que { text-decoration: line-through; color: var(--muted); }
+  .bitacora li .acciones { grid-row: 1 / span 2; grid-column: 3; align-self: center; }
   .leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .82rem; }
   .leyenda button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 4px; }
   .leyenda button[aria-pressed="false"] { opacity: .35; }
@@ -108,7 +119,7 @@
 <div class="pagina">
   <header>
     <h1>__TITULO__</h1>
-    <p class="nota">El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Es una simulación en pantalla: nada se guarda. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.</p>
+    <p class="nota" id="nota-pagina">El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Es una simulación en pantalla: nada se guarda. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.</p>
   </header>
 
   <div class="tarjetas" aria-live="polite">
@@ -117,9 +128,14 @@
     <div class="tarjeta" id="t-ruta"></div>
   </div>
   <div class="ediciones" id="ediciones"></div>
-  <div class="aviso" id="aviso" hidden></div>
+  <div class="aviso" id="aviso" role="status" hidden></div>
 
   <div class="controles" role="group" aria-label="Controles del Gantt">
+    <span class="grupo" id="g-quien" hidden><span class="titulo">Quién edita</span>
+      <select id="q-rol" aria-label="Rol"><option value="control_de_obra">Control de obra</option><option value="residente">Residente</option></select>
+      <input type="text" id="q-usuario" placeholder="tu nombre" aria-label="Tu nombre" maxlength="60" autocomplete="off">
+      <span class="mono" id="q-version"></span>
+    </span>
     <span class="grupo"><span class="titulo">Ver</span>
       <button class="b" id="b-frentes">Frentes</button>
       <button class="b" id="b-etapas">Etapas</button>
@@ -140,6 +156,8 @@
     </span>
   </div>
 
+  <details class="bitacora" id="bitacora" hidden></details>
+
   <div class="leyenda" id="leyenda" aria-label="Frentes"></div>
 
   <div class="zona">
@@ -157,6 +175,9 @@
 
 <script>
 /*__MOTOR__*/
+</script>
+<script>
+/*__CLIENTE__*/
 </script>
 <script>
 const G = __DATOS__;
@@ -184,7 +205,49 @@ const baseWin = {}; R.partidas.forEach(p => baseWin[p.k] = [p.ini, p.fin]);
 const baseCierre = Math.max(...R.partidas.map(p => p.fin));
 const hijosDe = k => R.bloques[k] || [];
 
-let edits = [], cur = Motor.reprogramar(R, edits), sel = null, pick = null;
+// Con `G.api` la pantalla trabaja contra el servidor: `saved` es lo ya guardado (la bitácora aplicada), `edits` lo que
+// está por guardar. Sin `G.api` es la simulación de siempre y `saved` queda vacío.
+const API = G.api || null;
+const ROLES = { control_de_obra: "Control de obra", residente: "Residente" };
+const ROL_DE = { dur: "control_de_obra", add: "control_de_obra", del: "control_de_obra", chg: "control_de_obra", ini: "residente" }; // el servidor decide; esto solo avisa antes
+const QUE_PUEDE = { control_de_obra: "editar la estructura (duración y vínculos)", residente: "editar las fechas" };
+const ORIGENES = { decision: "por decisión", recurso: "por recurso", tecnica: "técnico" };
+const CONFIANZA = { tecnica: "alta", recurso: "media", decision: "baja" };
+let guardadas = API ? API.guardadas : [], version = API ? API.version : 0, ocupado = false;
+let ident = { rol: "control_de_obra", usuario: "" };
+try { Object.assign(ident, JSON.parse(localStorage.getItem("gantt.quien") || "{}")); } catch (_) { /* sin almacenamiento: se escribe cada vez */ }
+if (!ROLES[ident.rol]) ident.rol = "control_de_obra";
+
+const frac = x => { const m = String(x).split("/"); return m.length === 2 ? +m[0] / +m[1] : +x; };
+function deServidor(d) { // la edición como la guarda la bitácora → la de este motor
+  if (d.edicion === "cambiar_duracion") return { t: "dur", k: d.llave, dias: frac(d.dias) };
+  if (d.edicion === "fijar_inicio") return { t: "ini", k: d.llave, fecha: d.fecha };
+  const v = { de: d.predecesora, a: d.sucesora, tipo: d.tipo };
+  if (d.edicion === "agregar_vinculo") return Object.assign({ t: "add", desfase: frac(d.desfase) }, v, d.origen ? { origen: d.origen } : {});
+  if (d.edicion === "quitar_vinculo") return Object.assign({ t: "del" }, v);
+  return Object.assign({ t: "chg", tipoActual: d.tipo_actual, desfase: frac(d.desfase) }, v, d.origen ? { origen: d.origen } : {});
+}
+function aServidor(e) { // y de vuelta; los días y las esperas cruzan como texto
+  if (e.t === "dur") return { edicion: "cambiar_duracion", llave: e.k, dias: String(e.dias) };
+  if (e.t === "ini") return { edicion: "fijar_inicio", llave: e.k, fecha: e.fecha };
+  const v = { predecesora: e.de, sucesora: e.a, tipo: e.tipo };
+  if (e.t === "add") return Object.assign({ edicion: "agregar_vinculo", desfase: String(e.desfase || 0) }, v, e.origen ? { origen: e.origen } : {});
+  if (e.t === "del") return Object.assign({ edicion: "quitar_vinculo" }, v);
+  return Object.assign({ edicion: "cambiar_vinculo", tipo_actual: e.tipoActual, desfase: String(e.desfase || 0) }, v);
+}
+let saved = [];
+const rehacerGuardadas = () => { saved = guardadas.filter(g => g.estado === "aplicada").map(g => deServidor(g.edicion)); };
+rehacerGuardadas();
+let edits = [], vig, cur, CMP, sel = null, pick = null;
+const todas = () => saved.concat(edits);
+function recalcular() { // lo guardado y, encima, lo que está por guardar
+  vig = Motor.reprogramar(R, saved); cur = Motor.reprogramar(R, todas());
+  if (API && edits.length) { // contra qué se compara: contra lo guardado si hay algo por decidir, y si no, contra el plan
+    const movidas = {}; let n = 0;
+    for (const p of R.partidas) { const a = cur.win[p.k], b = vig.win[p.k], di = a[0] - b[0], df = a[1] - b[1]; if (di || df) { movidas[p.k] = [di, df]; n++; } }
+    CMP = { win: vig.win, fin: vig.finDespues, movidas, nMovidas: n, rutaAntes: vig.rutaDespues, rutaCambia: cur.rutaDespues.length !== vig.rutaDespues.length || cur.rutaDespues.some(x => !vig.rutaDespues.includes(x)), contraGuardado: true };
+  } else CMP = { win: baseWin, fin: baseCierre, movidas: cur.movidas, nMovidas: cur.nMovidas, rutaAntes: cur.rutaAntes, rutaCambia: cur.rutaCambia, contraGuardado: false };
+}
 let px = 6, soloFrente = null, rojo = "relevos", flechas = "auto", aviso = null;
 let expandidos = new Set(G.filas.filter(f => f.resumen && f.nivel <= 1).map(f => f.llave));
 
@@ -201,46 +264,117 @@ const esVisible = () => { // las filas que se ven según lo que está plegado y 
   }
   return vis;
 };
-const rojoSet = () => rojo === "relevos" ? new Set(cur.rutaDespues) : (edits.length ? new Set() : new Set(G.ruta_critica_red));
+const rojoSet = () => rojo === "relevos" ? new Set(cur.rutaDespues) : (todas().length ? new Set() : new Set(G.ruta_critica_red));
 
-function textoEdicion(e) {
+function textoEdicion(e, conOrigen = true) {
   const c = k => porLlave[k] ? porLlave[k].clave : k;
   const lag = d => d ? (d > 0 ? "+" : "") + d : "";
   if (e.t === "dur") return `${c(e.k)} dura ${e.dias} d`;
   if (e.t === "ini") return `${c(e.k)} no arranca antes del ${fmt(e.fecha)}`;
-  if (e.t === "add") return `${c(e.de)} → ${c(e.a)} ${e.tipo}${lag(e.desfase)}`;
+  if (e.t === "add") return `${c(e.de)} → ${c(e.a)} ${e.tipo}${lag(e.desfase)}${conOrigen && e.origen ? " · " + ORIGENES[e.origen] : ""}`;
   if (e.t === "del") return `quitar ${c(e.de)} → ${c(e.a)}`;
   return `${c(e.de)} → ${c(e.a)}: ${e.tipoActual} pasa a ${e.tipo}${lag(e.desfase)}`;
 }
 
-function reconstruir(lista) { // vuelve a validar una a una: lo que ya no aplica se descarta
+function reconstruir(lista) { // vuelve a validar una a una, sobre lo guardado: lo que ya no aplica se descarta
   const ok = [];
-  for (const e of lista) { const p = Motor.reprogramar(R, ok.concat([e])); if (p.rechazadas.length === 0) ok.push(e); }
+  for (const e of lista) { const p = Motor.reprogramar(R, saved.concat(ok, [e])); if (p.rechazadas.length === 0) ok.push(e); }
   return ok;
 }
 function aplicar(e) {
+  if (API && ident.rol !== ROL_DE[e.t]) { aviso = `Esto es ${QUE_PUEDE[ROL_DE[e.t]]}: entra como ${ROLES[ROL_DE[e.t]]}.`; todo(); return; }
   const ant = e.t === "dur" || e.t === "ini" ? edits.filter(x => !(x.t === e.t && x.k === e.k)) : edits;
-  const prueba = Motor.reprogramar(R, ant.concat([e]));
+  const prueba = Motor.reprogramar(R, saved.concat(ant, [e]));
   if (prueba.rechazadas.length) { aviso = MOTIVOS[prueba.rechazadas[prueba.rechazadas.length - 1]] || "No se puede aplicar."; }
-  else { aviso = null; edits = ant.concat([e]); cur = prueba; }
-  todo();
+  else { aviso = null; edits = ant.concat([e]); }
+  recalcular(); todo();
 }
-function quitarEdicion(i) { edits = reconstruir(edits.filter((_, j) => j !== i)); cur = Motor.reprogramar(R, edits); aviso = null; todo(); }
+function quitarEdicion(i) { edits = reconstruir(edits.filter((_, j) => j !== i)); aviso = null; recalcular(); todo(); }
+
+// ------------------------------------------------------------------ hablar con el servidor
+const llamar = (op, args) => ClientePrograma[op](Object.assign({ programa_id: API.programa, "x-rol": ident.rol, "x-usuario": ident.usuario.trim() }, args));
+const textoError = err => {
+  if (!(err instanceof ClientePrograma.ErrorApi)) return "Algo falló: " + err;
+  const d = err.detalle || {};
+  if (err.codigo === "no_aplicable") return "El servidor no pudo aplicarla: " + (d.rechazadas || []).map(m => MOTIVOS[m] || m).join(" ");
+  if (err.codigo === "dependen") return `No se puede deshacer: las ediciones ${(d.dependientes || []).join(", ")} dependen de ella. Deshaz primero esas.`;
+  return err.mensaje;
+};
+async function recargar() { // trae lo que hay hoy; lo por guardar se vuelve a validar encima
+  const p = await ClientePrograma.ver_programa({ programa_id: API.programa });
+  guardadas = p.guardadas; version = p.version; rehacerGuardadas();
+  const antes = edits.length; edits = reconstruir(edits);
+  return antes - edits.length;
+}
+async function guardar() {
+  if (!API || !edits.length || ocupado) return;
+  if (!ident.usuario.trim()) { aviso = "Escribe tu nombre arriba: toda edición dice quién la hizo."; todo(); return; }
+  ocupado = true; aviso = null; todo();
+  try {
+    while (edits.length) {
+      const r = await llamar("aplicar_edicion", { cuerpo: { edicion: aServidor(edits[0]), esperaba: version } }); // la versión que vio quien decide
+      guardadas = guardadas.concat([r.guardada]); version = r.version; edits = edits.slice(1); rehacerGuardadas();
+    }
+  } catch (err) {
+    aviso = textoError(err);
+    if (err.codigo === "conflicto") {
+      try { const quitadas = await recargar(); aviso += " Ya traje lo de hoy" + (quitadas ? ` y quité ${quitadas} edición(es) que ya no aplicaban` : "") + "; revisa el impacto y guarda de nuevo."; } catch (e2) { aviso += " " + textoError(e2); }
+    }
+  }
+  ocupado = false; recalcular(); todo();
+}
+async function deshacer(id) {
+  if (!API || ocupado) return;
+  if (!ident.usuario.trim()) { aviso = "Escribe tu nombre arriba: todo deshacer dice quién lo hizo."; todo(); return; }
+  ocupado = true; aviso = null; todo();
+  try {
+    const r = await llamar("deshacer_edicion", { edicion_id: id });
+    guardadas = r.guardadas; version = r.version; rehacerGuardadas();
+    const antes = edits.length; edits = reconstruir(edits);
+    if (edits.length < antes) aviso = `Quité ${antes - edits.length} edición(es) por guardar que dependían de lo que deshiciste.`;
+  } catch (err) {
+    aviso = textoError(err);
+    if (err.codigo === "conflicto") { try { await recargar(); aviso += " Ya traje lo de hoy."; } catch (e2) { aviso += " " + textoError(e2); } }
+  }
+  ocupado = false; recalcular(); todo();
+}
 
 function tarjetas() {
-  const d = cur.diasDeCambio, hay = edits.length > 0;
+  const d = CMP.contraGuardado ? cur.finDespues - CMP.fin : cur.diasDeCambio, hay = todas().length > 0;
+  const cual = CMP.contraGuardado ? "lo guardado" : "el plan";
   $("t-cierre").className = "tarjeta" + (d ? " cambia" : "");
-  $("t-cierre").innerHTML = `<div class="k">Cierre</div><div class="v">${fmtL(dias[cur.finDespues])}${d ? `<span class="pastilla mas">${d > 0 ? "+" : ""}${d} d hábiles</span>` : ""}</div><div class="d">${d ? `antes ${fmtL(dias[baseCierre])}` : "el plan, sin cambios"}</div>`;
-  $("t-movidas").className = "tarjeta" + (cur.nMovidas ? " cambia" : "");
-  $("t-movidas").innerHTML = `<div class="k">Partidas que se mueven</div><div class="v">${cur.nMovidas}<span class="pastilla">de ${R.partidas.length}</span></div><div class="d">${cur.nMovidas ? "marcadas con ↦ en el árbol" : "ninguna"}</div>`;
-  $("t-ruta").className = "tarjeta" + (cur.rutaCambia ? " cambia" : "");
-  $("t-ruta").innerHTML = `<div class="k">Cadena de relevos</div><div class="v">${cur.rutaDespues.length} pasos${cur.rutaCambia ? `<span class="pastilla mas">cambia</span>` : ""}</div><div class="d">${cur.rutaCambia ? `eran ${cur.rutaAntes.length}; cambian de partidas` : (hay ? "la misma ruta: correr fechas no es noticia" : "la que lee el planeador")}</div>`;
-  $("ediciones").innerHTML = edits.length
-    ? edits.map((e, i) => `<span class="chip">${textoEdicion(e)}<button data-q="${i}" aria-label="Quitar esta edición">×</button></span>`).join("") + `<button class="b" id="b-reset">Deshacer todo</button>`
-    : `<span style="color:var(--muted)">Sin ediciones: es el programa tal como está.</span>`;
+  $("t-cierre").innerHTML = `<div class="k">Cierre</div><div class="v">${fmtL(dias[cur.finDespues])}${d ? `<span class="pastilla mas">${d > 0 ? "+" : ""}${d} d hábiles</span>` : ""}</div><div class="d">${d ? `antes ${fmtL(dias[CMP.fin])}` + (CMP.contraGuardado ? " (lo guardado)" : "") : `${cual}, sin cambios`}${CMP.contraGuardado && baseCierre !== vig.finDespues ? ` · plan ${fmtL(dias[baseCierre])}` : ""}</div>`;
+  $("t-movidas").className = "tarjeta" + (CMP.nMovidas ? " cambia" : "");
+  $("t-movidas").innerHTML = `<div class="k">Partidas que se mueven</div><div class="v">${CMP.nMovidas}<span class="pastilla">de ${R.partidas.length}</span></div><div class="d">${CMP.nMovidas ? `marcadas con ↦ en el árbol${CMP.contraGuardado ? "; contra lo guardado" : ""}` : "ninguna"}</div>`;
+  $("t-ruta").className = "tarjeta" + (CMP.rutaCambia ? " cambia" : "");
+  $("t-ruta").innerHTML = `<div class="k">Cadena de relevos</div><div class="v">${cur.rutaDespues.length} pasos${CMP.rutaCambia ? `<span class="pastilla mas">cambia</span>` : ""}</div><div class="d">${CMP.rutaCambia ? `eran ${CMP.rutaAntes.length}; cambian de partidas` : (hay ? "la misma ruta: correr fechas no es noticia" : "la que lee el planeador")}</div>`;
+  const chips = edits.map((e, i) => `<span class="chip ${API ? "nuevo" : ""}">${textoEdicion(e)}<button data-q="${i}" aria-label="Quitar esta edición" ${ocupado ? "disabled" : ""}>×</button></span>`).join("");
+  if (!API) $("ediciones").innerHTML = edits.length ? chips + `<button class="b" id="b-reset">Deshacer todo</button>` : `<span style="color:var(--muted)">Sin ediciones: es el programa tal como está.</span>`;
+  else $("ediciones").innerHTML = edits.length
+    ? `<span class="titulo-lista">Por guardar</span>${chips}<button class="b primario" id="b-guardar" ${ocupado ? "disabled" : ""}>${ocupado ? "Guardando…" : `Guardar ${edits.length === 1 ? "la edición" : edits.length + " ediciones"}`}</button><button class="b" id="b-reset" ${ocupado ? "disabled" : ""}>Descartar</button>`
+    : `<span style="color:var(--muted)">${saved.length ? `${saved.length} edición(es) guardada(s); nada por guardar.` : "Sin ediciones: es el programa tal como se importó."}</span>`;
   const av = $("aviso"); av.hidden = !aviso; av.textContent = aviso || "";
-  $("r-red").disabled = edits.length > 0;
-  if (edits.length && rojo === "red") { rojo = "relevos"; document.querySelector('input[name="rojo"][value="relevos"]').checked = true; }
+  $("r-red").disabled = hay;
+  if (hay && rojo === "red") { rojo = "relevos"; document.querySelector('input[name="rojo"][value="relevos"]').checked = true; }
+}
+
+function bitacora() {
+  const b = $("bitacora"); if (!API) { b.hidden = true; return; }
+  b.hidden = false;
+  const abierta = b.open; // al redibujar, no se cierra sola
+  const fmtHora = s => { try { return new Date(s).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" }); } catch (_) { return s; } };
+  const fila = g => {
+    const e = deServidor(g.edicion), i = g.impacto || {}, ok = g.estado === "aplicada";
+    const imp = i.fin_despues ? `cierre ${i.dias_de_cambio > 0 ? "+" : ""}${i.dias_de_cambio} d, ${i.partidas_movidas} partida(s) movida(s)${i.ruta_cambia ? ", cambió la cadena" : ""}` : "";
+    const origen = g.edicion.origen ? ` · ${ORIGENES[g.edicion.origen] || g.edicion.origen} (confianza ${CONFIANZA[g.edicion.origen] || "?"})` : "";
+    const puede = ROL_DE[e.t] === ident.rol;
+    return `<li class="${ok ? "" : "revertida"}"><span class="sec">#${g.secuencia}</span><span class="que">${textoEdicion(e, false)}${origen}</span>` +
+      `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede ? "disabled" : ""} title="${puede ? "Deshacer esta edición" : "Se deshace como " + ROLES[ROL_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
+      `<span class="quien-cuando">${g.usuario} (${ROLES[g.rol] || g.rol}) · ${fmtHora(g.creada_en)}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${g.revertida_por}`}</span></li>`;
+  };
+  b.innerHTML = `<summary>Lo guardado · ${saved.length} aplicada(s)${guardadas.length > saved.length ? `, ${guardadas.length - saved.length} revertida(s)` : ""} · versión ${version}</summary>` +
+    (guardadas.length ? `<ol>${guardadas.slice().reverse().map(fila).join("")}</ol>` : `<p class="nota" style="margin:8px 0 4px">Todavía no se ha guardado ninguna edición.</p>`);
+  b.open = abierta;
 }
 
 function leyenda() {
@@ -254,7 +388,7 @@ function dibujar() {
   const filas = G.filas.filter(f => vis.has(f.llave));
   const y = {}; filas.forEach((f, i) => y[f.llave] = i * FILA);
   const visDe = k => { let x = k; while (x && !vis.has(x)) x = porLlave[x] ? porLlave[x].padre : null; return x; };
-  const maxIdx = Math.max(baseCierre, cur.finDespues);
+  const maxIdx = Math.max(baseCierre, cur.finDespues, vig.finDespues);
   const total = OFF[maxIdx] + 6;
   const W = total * px, H = filas.length * FILA;
   const x0 = i => OFF[i] * px, x1 = i => (OFF[i] + 1) * px;
@@ -265,7 +399,7 @@ function dibujar() {
   $("etiquetas").innerHTML = filas.map(f => {
     const tiene = f.resumen && hijosDe(f.llave).length;
     const abierto = expandidos.has(f.llave);
-    const movida = f.resumen ? hijosDe(f.llave).some(h => cur.movidas[h]) : !!cur.movidas[f.llave];
+    const movida = f.resumen ? hijosDe(f.llave).some(h => CMP.movidas[h]) : !!CMP.movidas[f.llave];
     return `<div class="fila-eti ${f.resumen ? "resumen" : ""} ${roja.has(f.llave) ? "critica" : ""} ${sel === f.llave ? "sel" : ""} ${movida ? "movida" : ""}" style="padding-left:${4 + f.nivel * 9}px" data-l="${f.llave}">` +
       `<span class="caret" ${tiene ? `data-c="${f.llave}"` : ""}>${tiene ? (abierto ? "▼" : "▶") : ""}</span><span class="clave">${f.clave}</span><span class="desc">${f.descripcion.toLowerCase()}</span></div>`;
   }).join("");
@@ -292,7 +426,7 @@ function dibujar() {
   if (sel !== null && y[sel] !== undefined) s += `<rect x="0" y="${y[sel]}" width="${W}" height="${FILA}" fill="var(--sel)" opacity=".7"/>`;
 
   filas.forEach(f => {
-    const yy = y[f.llave], w = ventanaFila(f, win), b0 = ventanaFila(f, baseWin);
+    const yy = y[f.llave], w = ventanaFila(f, win), b0 = ventanaFila(f, CMP.win);
     if (!w) return;
     const a = x0(w[0]), b = x1(w[1]);
     if (b0 && (b0[0] !== w[0] || b0[1] !== w[1])) s += `<rect x="${x0(b0[0])}" y="${yy + 4}" width="${Math.max(x1(b0[1]) - x0(b0[0]), 2)}" height="7" rx="2" fill="none" stroke="var(--muted)" stroke-dasharray="2 2" opacity=".8"/>`;
@@ -336,11 +470,11 @@ function dibujar() {
 
 function panel() {
   const p = $("panel");
-  if (sel === null) { p.innerHTML = `<h2>Edición</h2><p class="nota">Toca una barra o una fila para ver sus vínculos y cambiarla. Con el triángulo pliegas o despliegas un bloque; sus flechas se suman al bloque plegado, sin perder ninguna.</p><p class="nota">Estructura (duración y vínculos) es de Control de obra; las fechas son del Residente. Aquí se simula y no se guarda.</p>`; return; }
-  const f = porLlave[sel], w = ventanaFila(f, cur.win), b0 = ventanaFila(f, baseWin);
+  if (sel === null) { p.innerHTML = `<h2>Edición</h2><p class="nota">Toca una barra o una fila para ver sus vínculos y cambiarla. Con el triángulo pliegas o despliegas un bloque; sus flechas se suman al bloque plegado, sin perder ninguna.</p><p class="nota">Estructura (duración y vínculos) es de Control de obra; las fechas son del Residente. ${API ? "Lo que apliques queda por guardar hasta que presiones Guardar." : "Aquí se simula y no se guarda."}</p>`; return; }
+  const f = porLlave[sel], w = ventanaFila(f, cur.win), b0 = ventanaFila(f, CMP.win);
   const info = `<h2>${f.descripcion.toLowerCase()}</h2><div class="mono">${f.clave} · fila ${f.fila}${G.frentes[f.frente] ? " · " + G.frentes[f.frente].toLowerCase() : ""}</div><div>${fmt(dias[w[0]])} → ${fmt(dias[w[1]])}${b0 && (b0[0] !== w[0] || b0[1] !== w[1]) ? ` <span class="pastilla mas">antes ${fmt(dias[b0[0]])} → ${fmt(dias[b0[1]])}</span>` : ""}</div>`;
   if (f.resumen) {
-    const n = hijosDe(f.llave).length, mov = hijosDe(f.llave).filter(h => cur.movidas[h]).length;
+    const n = hijosDe(f.llave).length, mov = hijosDe(f.llave).filter(h => CMP.movidas[h]).length;
     p.innerHTML = info + `<p class="nota">Resumen de ${n} partidas${mov ? `, ${mov} se mueven` : ""}. Despliégalo para editar una de ellas, o únelo como predecesora de una partida: sale de la que fija la fecha.</p>` + (pick ? `<button class="b primario" id="p-pick">Es la predecesora de ${porLlave[pick.a].clave}</button><button class="b" id="p-nopick">Cancelar</button>` : "");
     return;
   }
@@ -362,10 +496,17 @@ function panel() {
      <h3>Espera a</h3>${vinc(entran, true)}
      <h3>Le siguen</h3>${vinc(salen, false)}
      <h3>Agregar una predecesora</h3><div class="campo"><select id="a-tipo" aria-label="Tipo">${Motor.TIPOS.map(t => `<option>${t}</option>`).join("")}</select><input type="number" id="a-lag" step="1" value="0" aria-label="Espera en días"> <span class="mono">d</span>
-     <button class="b ${pick ? "primario" : ""}" id="a-pick">${pick ? "Toca la predecesora…" : "Elegir en el Gantt"}</button></div>`;
+     <button class="b ${pick ? "primario" : ""}" id="a-pick">${pick ? "Toca la predecesora…" : "Elegir en el Gantt"}</button></div>
+     ${API ? `<div class="campo"><label for="a-origen" class="mono">¿Por qué este orden?</label><select id="a-origen" aria-label="Por qué existe este orden">${Object.entries(ORIGENES).map(([k, t]) => `<option value="${k}" ${k === "decision" ? "selected" : ""}>${t} · confianza ${CONFIANZA[k]}</option>`).join("")}</select></div><p class="nota">Si no lo dices, queda «por decisión»: lo menos firme, lo primero que se revisa.</p>` : ""}`;
 }
 
-function todo() { tarjetas(); leyenda(); dibujar(); panel(); }
+function identidad() { // el rol y el nombre de quien edita: solo con servidor
+  $("g-quien").hidden = !API; if (!API) return;
+  if ($("q-rol").value !== ident.rol) $("q-rol").value = ident.rol;
+  if ($("q-usuario").value !== ident.usuario) $("q-usuario").value = ident.usuario;
+  $("q-version").textContent = "versión " + version;
+}
+function todo() { identidad(); tarjetas(); bitacora(); leyenda(); dibujar(); panel(); }
 
 // ------------------------------------------------------------------ eventos
 const filaDe = e => e.target.closest("[data-l]");
@@ -376,6 +517,7 @@ $("marco").addEventListener("click", e => {
   const k = l.dataset.l;
   if (pick && k !== pick.a) {
     const e1 = { t: "add", de: k, a: pick.a, tipo: pick.tipo, desfase: pick.desfase };
+    if (pick.origen) e1.origen = pick.origen;
     pick = null; aplicar(e1); return;
   }
   sel = k; tarjetas(); dibujar(); panel();
@@ -384,7 +526,7 @@ $("panel").addEventListener("click", e => {
   const id = e.target.id, d = e.target.dataset;
   if (id === "e-dur-ok") aplicar({ t: "dur", k: sel, dias: +$("e-dur").value });
   else if (id === "e-ini-ok") aplicar({ t: "ini", k: sel, fecha: $("e-ini").value });
-  else if (id === "a-pick") { pick = pick ? null : { a: sel, tipo: $("a-tipo").value, desfase: +$("a-lag").value || 0 }; panel(); }
+  else if (id === "a-pick") { pick = pick ? null : { a: sel, tipo: $("a-tipo").value, desfase: +$("a-lag").value || 0, origen: API ? $("a-origen").value : undefined }; panel(); }
   else if (id === "p-nopick") { pick = null; panel(); }
   else if (d.vq !== undefined) { const v = cur.vinculos[+d.vq]; aplicar({ t: "del", de: v.de, a: v.a, tipo: v.tipo }); }
 });
@@ -398,8 +540,17 @@ $("panel").addEventListener("change", e => {
 });
 $("ediciones").addEventListener("click", e => {
   if (e.target.dataset.q !== undefined) quitarEdicion(+e.target.dataset.q);
-  else if (e.target.id === "b-reset") { edits = []; cur = Motor.reprogramar(R, edits); aviso = null; todo(); }
+  else if (e.target.id === "b-reset") { edits = []; aviso = null; recalcular(); todo(); }
+  else if (e.target.id === "b-guardar") guardar();
 });
+$("bitacora").addEventListener("click", e => { const b = e.target.closest("button[data-d]"); if (b) { e.preventDefault(); deshacer(+b.dataset.d); } });
+function cambioDeQuien() {
+  ident.rol = $("q-rol").value; ident.usuario = $("q-usuario").value;
+  try { localStorage.setItem("gantt.quien", JSON.stringify(ident)); } catch (_) { /* no pasa nada: se vuelve a escribir */ }
+  aviso = null; tarjetas(); bitacora(); panel();
+}
+$("q-rol").onchange = cambioDeQuien;
+$("q-usuario").oninput = cambioDeQuien;
 $("leyenda").addEventListener("click", e => { const b = e.target.closest("button[data-f]"); if (b) { soloFrente = soloFrente === b.dataset.f ? null : b.dataset.f; leyenda(); dibujar(); } });
 $("b-frentes").onclick = () => { expandidos = new Set(G.filas.filter(f => f.nivel === 0).map(f => f.llave)); dibujar(); };
 $("b-etapas").onclick = () => { expandidos = new Set(G.filas.filter(f => f.resumen && f.nivel <= 1).map(f => f.llave)); dibujar(); };
@@ -420,5 +571,8 @@ $("marco").addEventListener("mousemove", e => {
   else tip.hidden = true;
 });
 $("marco").addEventListener("mouseleave", () => tip.hidden = true);
-todo();
+if (API) {
+  $("nota-pagina").innerHTML = 'El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Lo que decides queda <b>por guardar</b> hasta que lo guardes; entonces entra a la bitácora con tu nombre, tu rol y el impacto que viste, y se puede deshacer. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.';
+}
+recalcular(); todo();
 </script>

@@ -6,14 +6,14 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 168 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 198 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
 > vivían (`MODELO.md` §5c, `CONOCIMIENTO.md` §11.14); aquí vive lo que **solo existía en libros de
 > Excel y en el código**: los siete programas completos, la red con sus identificadores, las
 > listas del planeador, el motor que calcula fechas y ruta crítica, el cargador que lee un programa,
-> la reprogramación, su persistencia y la pantalla del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
+> la reprogramación, su persistencia, la API y la pantalla del Gantt, y las cifras con que se comprueba. Desde D-461 nada de eso depende de un libro: `backend/core/motor_cpm.py` y
 > `1-mundo/programas/` son la fuente, y `cd backend && python3 -m unittest discover` la prueba.
 
 ---
@@ -37,6 +37,7 @@ verificado: 168 pruebas · los siete programas reales (832 vínculos) reproducen
 | **El cargador del programa, la cadena de relevos y el Gantt como dato** | **§4.5 y `backend/core/programa.py`** |
 | **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
 | **Guardar lo que se edita** | **§4.7, `backend/core/servicio_programa.py` y `database/migraciones/`** |
+| **La API y su cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
 ---
@@ -287,7 +288,7 @@ cumplen el mismo contrato.
 |---|---|
 | `ServicioPrograma.abrir(programa)` | La base más lo aplicado: el programa que se ve, con su versión |
 | `proponer(programa, edición, rol)` | Qué pasaría: el impacto contra el programa vigente. No guarda nada |
-| `aplicar(programa, edición, rol, usuario)` | Propone y, si se puede, guarda la edición con lo que el sistema mostró. Una que no se puede aplicar vuelve con su motivo y sin guardarse |
+| `aplicar(programa, edición, rol, usuario, esperaba)` | Propone y, si se puede, guarda la edición con lo que el sistema mostró. Una que no se puede aplicar vuelve con su motivo y sin guardarse. `esperaba` es la versión que vio quien decide (D-465): si el programa ya va en otra, `Conflicto` |
 | `deshacer(programa, edición, rol, usuario)` | La marca revertida y repite la cuenta sin ella; si otras ediciones dependen de ella, dice cuáles y no toca nada (`NoSePuedeDeshacer`) |
 | `PermisoDenegado` · `Conflicto` | El rol no puede esa edición; o alguien editó entre que se calculó el impacto y se quiso guardar |
 
@@ -315,13 +316,51 @@ vínculos que el cargador rechazó se guardan con su motivo, y los tipos usan lo
 **Lo que todavía no es ese esquema.** Este corte no cuelga de `NODO`, `PRESUPUESTO` ni `CALENDARIO_OBRA`, que
 aún no tienen tabla (B-03): el calendario va como JSON dentro de `programa` y las filas guardan el árbol del
 libro. Cuando esas tablas existan, `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` sin tocar la bitácora, que
-cita `oid`. Tampoco hay API: la superficie pública es FastAPI (D-54) y se escribe sobre este servicio.
+cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca.
 
-## 4.8 Cómo se prueba
+## 4.8 La API y su cliente: `backend/api/` y `frontend/gantt/cliente_programa.js`
 
-`cd backend && python3 -m unittest discover` corre 168 pruebas. Las del CPM están en
+FastAPI es la única superficie pública (D-54). Estas seis operaciones, escritas sobre `ServicioPrograma` y nada más,
+son las que la pantalla necesita:
+
+| Operación | Método y ruta | Qué hace | Falla con |
+|---|---|---|---|
+| `ver_programa` | `GET /programas/{id}` | La base dibujable (`vista_gantt` con lo necesario para reprogramar en pantalla), el calendario, la versión y toda la bitácora | 404 |
+| `ver_bitacora` | `GET /programas/{id}/ediciones` | Todo lo editado, también lo revertido, en orden | 404 |
+| `proponer_edicion` | `POST /programas/{id}/propuestas` | Qué pasaría: el impacto contra lo vigente, o por qué no se puede aplicar. No guarda | 401, 403, 404, 422 |
+| `aplicar_edicion` | `POST /programas/{id}/ediciones` (201) | Propone y guarda. Cuerpo: `edicion` y, si la pantalla lo manda, `esperaba` | 401, 403, 404, 409 `conflicto`, 422 `edicion_invalida` o `no_aplicable` con sus motivos |
+| `deshacer_edicion` | `DELETE /programas/{id}/ediciones/{edicion}` | Revierte una edición con el permiso que la hizo y devuelve la bitácora y la versión | 401, 403, 404, 409 `dependen` (con cuáles) o `conflicto` |
+| `pantalla_gantt` | `GET /programas/{id}/gantt` | El HTML de la pantalla de ese programa, con el cliente, el motor y lo guardado | 404 |
+
+**Cómo viaja una edición.** Como la guarda la bitácora (`edicion_a_dict`): un diccionario con el tipo en
+`edicion`, las llaves estables (`oid`) y los días y las esperas **como texto** —«12», «1/2»—, porque un número
+decimal no cruza sin perder exactitud.
+
+**La versión.** `proponer_edicion` y `aplicar_edicion` responden con la versión que el programa tenía y con la que
+quedó. Quien guarda manda en `esperaba` la que vio: una pantalla abierta desde hace rato no aplica sobre lo que no
+vio —el impacto que le mostró ya no es el de hoy—, recibe 409 y la pantalla trae lo de hoy. Sin `esperaba` se aplica
+sobre lo que haya al momento de proponer.
+
+**Quién llama: sin decidir.** El cerebro todavía no decide cómo se autentica nadie (B-96). Mientras tanto quien
+llama dice su rol y su nombre en dos cabeceras, `X-Rol` y `X-Usuario`. Sirve para trabajar y para probar y **no se
+despliega así**: cualquiera podría decir que es Control de obra. `crear_app(identidad=…)` recibe otra dependencia
+de FastAPI y es el único lugar que cambia cuando haya autenticación; el servicio ya recibe el rol y el usuario
+como datos.
+
+**El cliente no se escribe a mano (D-55).** `python3 -m api.generar_cliente` lo genera del spec OpenAPI de la
+propia API: una función por `operationId`, que arma la ruta, las cabeceras y el cuerpo, y que ante un error lanza
+un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`. Una prueba falla si `cliente_programa.js` deja de ser
+el que daría el spec de hoy, y el CI lo comprueba.
+
+**Cómo se levanta para trabajar.** `cd backend && python3 -m api.servir` carga los programas del CSV en memoria
+(lo que se guarda se pierde al apagar); con `--postgres` guarda en una base —aplica las migraciones y, si está
+vacía, importa los que se pidan con `--programa`—. Escucha solo en `127.0.0.1`: por la identidad de arriba.
+
+## 4.9 Cómo se prueba
+
+`cd backend && python3 -m unittest discover` corre 198 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
-la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la persistencia se prueba
+la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **la pantalla en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y el programa real de Zafiro Plus; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
 verdad** (`pgserver`, embebido, que el CI instala), más lo que solo Postgres garantiza; siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
@@ -685,8 +724,9 @@ Lo que arranca justo después de que termina esa ruta está en `SEGUNDA-RUTA-LO-
 
 # 8. El Gantt: pantalla y reglas (B-95 cierra)
 
-`vista_gantt` entrega los datos y `frontend/gantt/` los dibuja y los edita: una página sola, sin servidor, que
-`pagina_gantt` arma con los datos de un programa. Las tres preguntas que dejaba B-95 las contestó el usuario
+`vista_gantt` entrega los datos y `frontend/gantt/` los dibuja y los edita: una página sola que `pagina_gantt` arma
+con los datos de un programa. Sin servidor es una simulación y nada se guarda; servida por la API (§4.8) trabaja contra
+lo guardado. Las tres preguntas que dejaba B-95 las contestó el usuario
 (D-463), y esto es lo que quedó:
 
 **1. El rojo es la cadena de relevos** de las fechas vigentes, la que el usuario validó en D-426 y la que lee
@@ -720,9 +760,27 @@ anclaje de la flecha según el tipo (`FS` del fin al inicio, `SS` de inicio a in
 inicio al fin), fines de semana, feriados y ventana de la planta alta marcados, la barra de antes en trazo
 punteado cuando una edición mueve una partida, y el horizonte del programa más largo (D-449).
 
-**Lo que la pantalla todavía no hace**, y es de la capa de aplicación: guardar. Es una simulación; las
-ediciones reales las hace Control de obra y el Residente sobre la base de datos, con la misma
-`reprogramar`.
+**Contra lo guardado (D-465).** Servida por `GET /programas/{id}/gantt`, la pantalla deja de simular:
+- **Lo guardado y, encima, lo por guardar.** Se abre con la bitácora aplicada ya repetida sobre la base. Lo que el
+  planeador decide —en fichas ámbar— queda **por guardar**; no se manda nada hasta que presiona «Guardar», y
+  «Descartar» lo deja como estaba.
+- **Quién edita.** Un selector de rol (Control de obra o Residente) y el nombre de quien edita, que la pantalla
+  recuerda en el navegador; guardar o deshacer sin nombre se avisa. Si el rol no puede esa edición, la pantalla lo
+  dice al decidir; la tabla de permisos la repite solo para avisar a tiempo y el servidor decide siempre.
+- **Guardar** manda las ediciones por guardar una por una con la versión que se vio. Si alguien editó entre medio
+  (409), la pantalla trae lo de hoy, revalida lo que seguía por guardar —quita lo que ya no aplica y lo dice— y pide
+  revisar el impacto antes de volver a guardar. Una falla del servidor (permiso, edición no aplicable) se dice con su
+  motivo y deja lo pendiente donde estaba.
+- **Qué compara el impacto.** Con algo por guardar, **contra lo guardado**: lo que esta decisión mueve, con la barra de
+  antes en trazo punteado y el ↦ de lo que se corre. Sin nada por guardar, contra el plan, como en la simulación.
+- **La bitácora a la vista:** cada edición con quién, con qué rol, cuándo, qué dijo el sistema que pasaría y, si es
+  un vínculo, por qué existe ese orden y con qué confianza. Se deshace desde ahí, con el permiso de la edición, y si
+  otras dependen de ella se dice cuáles y no se toca nada. Lo revertido se queda, tachado.
+- **El origen del vínculo.** Al agregar una predecesora la pantalla pregunta por qué (técnico, recurso o decisión, con
+  su confianza); sin contestar queda «por decisión».
+
+**Lo que la pantalla todavía no hace:** elegir entre programas (se abre por su id), importar uno por la API y
+autenticar a nadie (B-96).
 
 ---
 
@@ -730,9 +788,10 @@ ediciones reales las hace Control de obra y el Residente sobre la base de datos,
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| La API y la pantalla conectadas a lo guardado | La persistencia existe (§4.7); falta la superficie FastAPI (D-54) y que la pantalla deje de simular y llame a `proponer` y `aplicar` |
+| Autenticación de la API | Hoy quien llama dice su rol y su nombre en dos cabeceras, y eso no se despliega (§4.8). Falta decidir cómo se identifica cada quien y de dónde sale su rol (B-96) |
+| Listar e importar programas por la API | Hoy se cargan del CSV con `python3 -m api.servir` y la pantalla abre un programa por su id |
 | Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
-| `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`), sin confirmar |
+| `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
 | Las listas del planeador | Los 12 supuestos de cada programa, los 15 de Zafiro, las 59 que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos por rol |
 | La segunda ruta de cuadrilla | Borrador; se captura a mano con `origen = recurso` (§7.5) |
@@ -759,3 +818,4 @@ ediciones reales las hace Control de obra y el Residente sobre la base de datos,
 | **El cargador, la cadena de relevos calculada y el Gantt como dato** | **D-462** |
 | **Reprogramar por empuje mínimo, el árbol plegable y la edición en pantalla (B-95 cierra)** | **D-463** |
 | **Guardar las ediciones: puerto, servicio, Postgres y origen del vínculo** | **D-464** |
+| **La API del programa, el cliente generado y la pantalla contra lo guardado** | **D-465** |

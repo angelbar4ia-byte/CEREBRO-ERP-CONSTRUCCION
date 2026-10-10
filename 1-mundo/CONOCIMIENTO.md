@@ -6542,6 +6542,23 @@ origen del vínculo que D-463 dejó como propuesta. El detalle, el contrato y la
 
 `PROGRAMA-CPM.md`, `MODELO.md` §5c.
 
+### El programa tiene API y la pantalla trabaja contra lo guardado (D-465)
+
+Dato del usuario: «ok, lo que sigue». Lo que D-464 dejó abierto era la superficie FastAPI (D-54) y que la
+pantalla del Gantt dejara de simular. El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo dicho
+antes en este archivo:
+
+- **La pantalla ya no solo simula.** Servida por la API muestra lo guardado y, encima, lo que se decide, que queda
+  por guardar hasta que se guarda; cada edición entra a la bitácora con quién la hizo, con qué rol, cuándo y el
+  impacto que se vio, y se puede deshacer. Sin servidor sigue siendo la simulación de D-463.
+- **Quien guarda dice la versión que vio.** Una pantalla vieja no aplica sobre lo que no vio: recibe un conflicto,
+  trae lo de hoy y revalida lo que tenía pendiente.
+- **Sin decidir quién es quien llama.** Hasta que haya autenticación (B-96), el rol y el nombre viajan en dos
+  cabeceras que sirven para trabajar y probar y no se despliegan.
+- **El cliente de la pantalla se genera del spec** (D-55) y una prueba avisa si queda viejo.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

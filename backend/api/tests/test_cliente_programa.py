@@ -1,0 +1,94 @@
+"""
+El cliente generado (`frontend/gantt/cliente_programa.js`) contra la API de verdad.
+
+Dos cosas: que el archivo es el que da el spec de hoy (D-55: el cliente no se edita a mano) y que, ejecutado en
+node contra un servidor que atiende de verdad, ve, propone, aplica y deshace con los programas reales, y que los
+errores llegan con su código. Se salta si no hay `node` (el CI de GitHub lo trae).
+"""
+import json
+import shutil
+import subprocess
+import unittest
+
+from api.generar_cliente import DESTINO, generar, spec_de_la_api
+from api.tests.servidor import ServidorDePrueba
+from core.tests.contrato_programa import CAL, programa
+
+SCRIPT = r"""
+const C = require(process.argv[1]);
+C.base = process.argv[2];
+const pid = +process.argv[3];
+const CO = { "x-rol": "control_de_obra", "x-usuario": "luis" };
+const f = JSON.parse(process.argv[4]);
+(async () => {
+  const sal = {};
+  const v = await C.ver_programa({ programa_id: pid });
+  sal.version0 = v.version; sal.partidas = v.vista.red.partidas.length;
+  const ed = { edicion: "agregar_vinculo", predecesora: f.a, sucesora: f.b, tipo: "FS", desfase: "1" };
+  const p = await C.proponer_edicion({ programa_id: pid, cuerpo: { edicion: ed }, ...CO });
+  sal.propuesta = [p.aplicable, p.impacto.dias_de_cambio, p.version];
+  sal.bitacoraTrasProponer = (await C.ver_bitacora({ programa_id: pid })).length;
+  const a = await C.aplicar_edicion({ programa_id: pid, cuerpo: { edicion: ed, esperaba: 0 }, ...CO });
+  sal.aplicada = [a.guardada.secuencia, a.guardada.usuario, a.version];
+  try { await C.aplicar_edicion({ programa_id: pid, cuerpo: { edicion: { edicion: "fijar_inicio", llave: f.b, fecha: "2025-10-28" }, esperaba: 0 }, "x-rol": "residente", "x-usuario": "ana" }); }
+  catch (e) { sal.viejo = [e instanceof C.ErrorApi, e.status, e.codigo]; }
+  try { await C.aplicar_edicion({ programa_id: pid, cuerpo: { edicion: { edicion: "fijar_inicio", llave: f.b, fecha: "2025-10-28" } }, "x-rol": "control_de_obra", "x-usuario": "luis" }); }
+  catch (e) { sal.permiso = [e.status, e.codigo]; }
+  try { await C.ver_programa({ programa_id: 9999 }); } catch (e) { sal.noExiste = [e.status, e.codigo]; }
+  try { await C.proponer_edicion({ programa_id: pid, cuerpo: { edicion: ed } }); } catch (e) { sal.sinIdentidad = [e.status, e.codigo]; }
+  try { await C.proponer_edicion({ programa_id: pid, cuerpo: { edicion: { edicion: "no existe" } }, ...CO }); } catch (e) { sal.invalida = [e.status, e.codigo]; }
+  const d = await C.deshacer_edicion({ programa_id: pid, edicion_id: a.guardada.id, ...CO });
+  sal.deshecha = [d.guardadas.map(g => g.estado), d.version];
+  sal.html = (await C.pantalla_gantt({ programa_id: pid })).includes("ClientePrograma");
+  process.stdout.write(JSON.stringify(sal));
+})().catch(e => { process.stderr.write(String(e && e.stack || e)); process.exit(1); });
+"""
+
+
+class PruebasClienteGenerado(unittest.TestCase):
+    def test_el_cliente_publicado_es_el_que_da_el_spec_de_hoy(self):
+        self.assertEqual(DESTINO.read_text(encoding="utf-8"), generar(spec_de_la_api()), "corre: cd backend && python3 -m api.generar_cliente")
+
+    def test_hay_una_funcion_por_operacion(self):
+        spec = spec_de_la_api()
+        ids = {op["operationId"] for metodos in spec["paths"].values() for op in metodos.values()}
+        texto = DESTINO.read_text(encoding="utf-8")
+        for i in ids:
+            self.assertIn(f"cliente.{i} = ", texto)
+
+
+@unittest.skipUnless(shutil.which("node"), "no hay node")
+class PruebasClienteContraLaApi(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.servidor = ServidorDePrueba().arrancar()
+        cls.plus = programa("Zafiro Plus")
+        cls.pid = cls.servidor.repo.importar_programa("Zafiro Plus", cls.plus, CAL)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.apagar()
+
+    def test_ve_propone_aplica_y_deshace_y_los_errores_llegan_con_su_codigo(self):
+        f = {x.fila: x.llave for x in self.plus.filas}
+        r = subprocess.run(
+            ["node", "-e", SCRIPT, str(DESTINO), self.servidor.url, str(self.pid), json.dumps({"a": f[978], "b": f[1102]})],
+            capture_output=True, text=True, timeout=120,
+        )
+        self.assertEqual(r.returncode, 0, r.stderr)
+        s = json.loads(r.stdout)
+        self.assertEqual((s["version0"], s["partidas"]), (0, 388))
+        self.assertEqual(s["propuesta"], [True, 10, 0])  # proponer no sube la versión
+        self.assertEqual(s["bitacoraTrasProponer"], 0)
+        self.assertEqual(s["aplicada"], [1, "luis", 1])
+        self.assertEqual(s["viejo"], [True, 409, "conflicto"])  # esperaba la versión 0 y ya va en la 1
+        self.assertEqual(s["permiso"], [403, "permiso_denegado"])
+        self.assertEqual(s["noExiste"], [404, "programa_inexistente"])
+        self.assertEqual(s["sinIdentidad"], [401, "sin_identidad"])
+        self.assertEqual(s["invalida"], [422, "edicion_invalida"])
+        self.assertEqual(s["deshecha"], [["revertida"], 2])
+        self.assertTrue(s["html"])
+
+
+if __name__ == "__main__":
+    unittest.main()
