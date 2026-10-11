@@ -43,6 +43,8 @@ PERMISOS_POR_OMISION: Dict[str, FrozenSet[str]] = {
     "editar_fechas_programa": frozenset({"residente"}),
     # D-473, propuesta: cargar el catálogo y los presupuestos de OPUS lo hacen quien cuantifica y crea precios y quien gobierna entre obras
     "cargar_catalogo_opus": frozenset({"control_de_obra", "costos"}),
+    # D-475, propuesta: contratar un subárbol del presupuesto (fija sus PU y lo congela) es gobierno cruzado entre obras, como las demás
+    "contratar_subarbol": frozenset({"control_de_obra"}),
 }
 
 

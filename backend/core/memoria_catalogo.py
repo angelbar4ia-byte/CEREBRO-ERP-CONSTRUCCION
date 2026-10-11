@@ -13,10 +13,11 @@ import copy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from .catalogo import (
     CatalogoCambio,
+    Congelamiento,
     DatosDePresupuesto,
     EstadoVigente,
     InsumoGuardado,
@@ -24,11 +25,14 @@ from .catalogo import (
     LineaGuardada,
     NodoDePresupuesto,
     PlanDeCarga,
+    PlanDeContratacion,
     PrecioGuardado,
     ResumenCarga,
     ResumenPresupuesto,
     ResultadoCarga,
+    ResultadoContratacion,
     VersionGuardada,
+    YaContratado,
 )
 from .dominio import BasePorcentaje, Categoria, Composicion, ModoPrecio, Nodo, Rol, TipoCantidad
 from .motor_calculo import ArbolEnMemoria
@@ -98,6 +102,18 @@ class _Presupuesto:
 
 
 @dataclass
+class _Congelamiento:
+    id: int
+    nodo_id: int
+    estado: str
+    fecha: datetime
+    usuario: str
+    rol: str
+    carga_id: int
+    resumen: Dict
+
+
+@dataclass
 class _Datos:
     unidades: Dict[str, Tuple[int, str]] = field(default_factory=dict)  # clave en minúsculas → (id, clave tal como vino)
     cargas: List[ResumenCarga] = field(default_factory=list)
@@ -107,6 +123,8 @@ class _Datos:
     renglones: Dict[int, List[_LineaDePresupuesto]] = field(default_factory=dict)  # padre estructural → sus líneas
     precios: Dict[int, List[_Precio]] = field(default_factory=dict)
     presupuestos: Dict[int, _Presupuesto] = field(default_factory=dict)
+    congelamientos: List[_Congelamiento] = field(default_factory=list)
+    sig_congelamiento: int = 0
     sig_nodo: int = 0
     sig_version: int = 0
     sig_unidad: int = 0
@@ -123,6 +141,26 @@ class _Datos:
         v = self.versiones.get(nodo_id)
         return v[-1] if v else None
 
+    def contratados(self) -> Set[int]:
+        """Los bloques contratados y todos los que cuelgan de ellos."""
+        out: Set[int] = set()
+        pila = [c.nodo_id for c in self.congelamientos if c.estado == "contratado"]
+        while pila:
+            n = pila.pop()
+            if n in out:
+                continue
+            out.add(n)
+            pila += [l.hijo_id for l in self.renglones.get(n, ()) if self.nodos[l.hijo_id].rol == "estructural"]
+        return out
+
+    def arriba_de(self, nodo_id: int) -> List[int]:
+        """El nodo y los bloques de arriba, hasta la raíz de su presupuesto."""
+        padre_de = {l.hijo_id: padre for padre, ls in self.renglones.items() for l in ls if self.nodos[l.hijo_id].rol == "estructural"}
+        out = [nodo_id]
+        while out[-1] in padre_de:
+            out.append(padre_de[out[-1]])
+        return out
+
 
 class MemoriaCatalogo:
     def __init__(self) -> None:
@@ -138,13 +176,15 @@ class MemoriaCatalogo:
             if v is not None or n.rol in ("concepto", "ensamble"):
                 e.unidad[clave] = d.unidad_de(n)
                 if v is not None:
-                    e.huella[clave], e.pu[clave] = v.huella, v.pu
+                    e.huella[clave], e.pu[clave], e.version[clave] = v.huella, v.pu, v.version
                 else:
                     e.sin_matriz.add(clave)
             else:
                 e.insumos[clave] = InsumoGuardado(clave, d.unidad_de(n), n.categoria, n.precio_declarado)
         for p in d.presupuestos.values():
             e.presupuestos[p.clave] = self._resumen(p)
+        for bloque in d.contratados():
+            e.en_contratado |= {d.nodos[l.hijo_id].clave for l in d.renglones.get(bloque, ()) if d.nodos[l.hijo_id].rol != "estructural"}
         return e
 
     def _resumen(self, p: _Presupuesto) -> ResumenPresupuesto:
@@ -201,6 +241,22 @@ class MemoriaCatalogo:
                     lineas.append(LineaDePresupuesto(padre, l.hijo_id, l.orden, l.cantidad, v.version if v else None, v.pu if v else None, l.id))
         return DatosDePresupuesto(self._resumen(p), p.raiz_id, nodos, tuple(lineas))
 
+    def congelamientos(self, presupuesto_id: int) -> List[Congelamiento]:
+        d = self._d
+        return [
+            Congelamiento(c.id, c.nodo_id, d.nodos[c.nodo_id].ruta_natural or "", c.estado, c.fecha, c.usuario, c.rol, c.carga_id, dict(c.resumen))
+            for c in d.congelamientos if d.nodos[c.nodo_id].presupuesto_id == presupuesto_id
+        ]
+
+    def contratar(self, plan: PlanDeContratacion) -> ResultadoContratacion:
+        d0 = self._d
+        if plan.base != d0.sig_carga:
+            raise CatalogoCambio(f"la última carga es la {d0.sig_carga} y esta se revisó sobre la {plan.base}")
+        trabajo = copy.deepcopy(d0)
+        r = _contratar(trabajo, plan)
+        self._d = trabajo
+        return r
+
     def arbol(self) -> ArbolEnMemoria:
         d = self._d
         nodos = {
@@ -237,7 +293,7 @@ def _aplicar(d: _Datos, plan: PlanDeCarga) -> ResultadoCarga:
     ahora = datetime.now(timezone.utc)
     d.sig_carga += 1
     carga_id = d.sig_carga
-    d.cargas.append(ResumenCarga(carga_id, ahora, plan.usuario, plan.rol, dict(plan.archivos), dict(plan.resumen)))
+    d.cargas.append(ResumenCarga(carga_id, ahora, plan.usuario, plan.rol, dict(plan.archivos), dict(plan.resumen), "archivos"))
 
     def unidad(texto: str) -> Optional[int]:
         t = texto.strip()
@@ -313,3 +369,32 @@ def _aplicar(d: _Datos, plan: PlanDeCarga) -> ResultadoCarga:
             d.renglones.setdefault(padre, []).append(_LineaDePresupuesto(d.sig_linea, hijo, v.id if v else None, r.cantidad, orden[padre]))
         d.presupuestos[d.sig_presupuesto] = _Presupuesto(d.sig_presupuesto, p.clave, p.nombre, p.tipo, raiz_id, p.huella, carga_id)
     return ResultadoCarga(carga_id, dict(plan.resumen))
+
+
+def _contratar(d: _Datos, plan: PlanDeContratacion) -> ResultadoContratacion:
+    nodo = d.nodos.get(plan.nodo_id)
+    if nodo is None or nodo.rol != "estructural" or nodo.presupuesto_id != plan.presupuesto_id:
+        raise ValueError(f"el nodo {plan.nodo_id} no es un bloque del presupuesto {plan.presupuesto_id}")
+    contratados = {c.nodo_id for c in d.congelamientos if c.estado == "contratado"}
+    for arriba in d.arriba_de(plan.nodo_id):
+        if arriba in contratados:
+            raise YaContratado(f"el bloque {d.nodos[arriba].ruta_natural} ya está contratado", arriba)
+    ahora = datetime.now(timezone.utc)
+    d.sig_carga += 1
+    carga_id = d.sig_carga
+    d.cargas.append(ResumenCarga(carga_id, ahora, plan.usuario, plan.rol, {}, dict(plan.resumen), "contratacion"))
+    for v in plan.versiones_nuevas:
+        previas = d.versiones[d.por_clave[v.clave]]
+        ultima = previas[-1]
+        d.sig_version += 1
+        previas.append(_Version(d.sig_version, ultima.version + 1, ultima.huella, v.pu, ahora, carga_id, copy.deepcopy(ultima.lineas)))
+    fijados = 0
+    for renglon_id, clave in plan.renglones:
+        linea = next((l for ls in d.renglones.values() for l in ls if l.id == renglon_id), None)
+        if linea is None or d.nodos[linea.hijo_id].clave != clave:
+            raise ValueError(f"el renglón {renglon_id} no es de {clave}")
+        linea.hijo_version_id = d.vigente(linea.hijo_id).id
+        fijados += 1
+    d.sig_congelamiento += 1
+    d.congelamientos.append(_Congelamiento(d.sig_congelamiento, plan.nodo_id, "contratado", ahora, plan.usuario, plan.rol, carga_id, dict(plan.resumen)))
+    return ResultadoContratacion(carga_id, d.sig_congelamiento, len(plan.versiones_nuevas), fijados)

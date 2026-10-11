@@ -1018,6 +1018,28 @@ programa. La identidad de una fila dentro del programa sigue siendo su `oid`, as
 un atributo de la fila y **un enlace puesto no se mueve** (lo garantiza un disparador): se agrega uno nuevo, no se cambia el viejo.
 Se casan por ruta natural —no por posición— y lo que no casa se queda sin enlace y se dice, de los dos lados (`MEMORIA.md` D-474).
 
+### El estado de congelamiento: contratar un bloque fija sus PU y lo congela (D-475)
+
+*Cómo quedó en la base (`database/migraciones/0007_estado_de_congelamiento.sql`), con los siete presupuestos de OPUS:*
+
+```
+ESTADO_CONGELAMIENTO   (por nodo estructural, no por presupuesto — hallazgo 6)
+  nodo_id        FK Nodo — el bloque que se contrata; su subárbol se contrata completo y lo hereda hacia abajo
+  estado         diseño · contratado    todo bloque sin fila está en diseño; «descontratar» no está definido (sería un control de cambio)
+  fecha, usuario, rol                   quién contrató y con qué rol
+  carga_id       FK CARGA               la contratación que lo fijó: de ahí salen las versiones nuevas
+  resumen        jsonb                  qué se fijó: los totales de antes y de después y los PU que se movieron
+CARGA            gana   tipo            archivos · contratacion — una contratación también deja su carga, sin archivos
+```
+
+Un bloque se contrata una vez (índice único). **Contratar tiene dos efectos** (§4a, «dos disparadores de versión»): cada concepto del
+subárbol queda con su PU fijado a ese momento —si el que da el motor hoy no es el de la versión vigente, nace una versión nueva con **la misma
+receta** y el PU de hoy— y cada renglón fija la versión vigente; y el subárbol queda **congelado**: ni su cantidad, ni la versión que fija, ni
+su lugar se editan o se borran —lo garantiza un disparador— aunque se intente con SQL. Agregar sí se puede (§1.4: «solo admite adiciones al
+final»). Si el PU de un concepto se mueve más de 5 %, o no tiene matriz y valdría cero, **pide confirmación** y el bloque no se contrata a
+medias. La función es `contratar_subarbol` (§5b, propuesta): Control de obra. Y la carga ya no le cambia la receta a un concepto que fija un
+renglón contratado: esa versión se detiene y va a control de cambio (`MEMORIA.md` D-475).
+
 ### El tabulador por contratista no toca el PU
 
 ```
@@ -1706,6 +1728,7 @@ fecha, en un solo lugar.
 | `resolver_revisar_parametro` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
 | `renovar_invariante_valor` | Control de obra | dato del usuario, D-345 |
 | `cargar_catalogo_opus` | Control de obra y Costos — propuesto | D-473: la carga del catálogo y los presupuestos de OPUS |
+| `contratar_subarbol` | Control de obra — propuesto | D-475: contratar un bloque del presupuesto fija sus PU y lo congela |
 | `registrar_avance` | **Sin asignar** | P-21 |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
@@ -1719,7 +1742,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`: treinta y cinco funciones, veintitrés asignadas.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus` y D-475 agrega `contratar_subarbol`: treinta y seis funciones, veinticuatro asignadas.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin

@@ -217,7 +217,7 @@ class PruebasApiConToken(unittest.TestCase):
     def test_quien_soy_dice_roles_y_lo_que_puede_hacer(self):
         j = self.c.get("/yo", headers=self.de("Luis@Obra.MX")).json()
         self.assertEqual((j["nombre"], j["correo"], j["usuario"], j["roles"], j["modo"]), ("Luis Pérez", "luis@obra.mx", "luis@obra.mx", ["control_de_obra"], "token"))
-        self.assertEqual(j["funciones"], ["cargar_catalogo_opus", "editar_estructura_programa"])
+        self.assertEqual(j["funciones"], ["cargar_catalogo_opus", "contratar_subarbol", "editar_estructura_programa"])
         j = self.c.get("/yo", headers=self.de("doble@obra.mx")).json()
         self.assertEqual((j["roles"], j["funciones"]), (["residente", "supervisor"], ["editar_fechas_programa"]))
         self.assertEqual(self.c.get("/yo", headers=self.de("sinrol@obra.mx")).json()["funciones"], [])

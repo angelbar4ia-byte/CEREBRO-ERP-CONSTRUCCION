@@ -28,7 +28,7 @@ class PruebasServir(unittest.TestCase):
         c = TestClient(app)
         h = {"X-Rol": "control_de_obra", "X-Usuario": "luis"}
         self.assertEqual(c.get("/programas").status_code, 200)  # en modo cabeceras ver no pide identidad
-        self.assertEqual(c.get("/yo", headers=h).json()["funciones"], ["cargar_catalogo_opus", "editar_estructura_programa"])
+        self.assertEqual(c.get("/yo", headers=h).json()["funciones"], ["cargar_catalogo_opus", "contratar_subarbol", "editar_estructura_programa"])
 
     def test_dar_de_alta_no_pisa_a_los_que_ya_estan_y_pide_el_formato(self):
         a = MemoriaAccesos()

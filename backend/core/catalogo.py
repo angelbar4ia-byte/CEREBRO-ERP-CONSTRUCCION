@@ -19,6 +19,8 @@ Reglas que aquí se hacen concretas:
 - **El renglón de un presupuesto fija la versión del concepto** que tenía al cargarse.
 - **Un presupuesto que ya existe no se toca.** Si lo que llega es lo mismo, se dice; si es distinto, se dice que cambió y que no
   se aplicó —cómo se reconcilian las cantidades de un presupuesto vivo no está diseñado—. Se reconoce por la clave de su capítulo.
+- **Lo que algo contratado usa no cambia de receta por la carga** (D-475, §2.2: «algo contratado: no entra en vigor, va a control de
+  cambio»): la versión nueva de un concepto que fija un renglón de un subárbol contratado se detiene con su motivo.
 - **El estado del catálogo no cambia entre que se revisa y se aplica**: cada plan trae la última carga que vio, y si ya hay otra,
   `CatalogoCambio` y no se escribe nada (el mismo candado que `programa.version`).
 
@@ -62,6 +64,7 @@ UNIDAD_CAMBIO = "unidad_cambio"
 PRECIO_DE_TRABAJO = "precio_de_trabajo"
 PU_MOVIO = "pu_movio_mas_de_5"
 DEPENDE_DE = "depende_de"
+EN_CONTRATADO = "en_contratado"
 CONCEPTO_PENDIENTE = "concepto_pendiente"
 CONCEPTO_CON_PRECIO_Y_SIN_MATRIZ = "concepto_con_precio_y_sin_matriz"
 
@@ -103,6 +106,8 @@ class EstadoVigente:
     insumos: Dict[str, InsumoGuardado] = field(default_factory=dict)
     presupuestos: Dict[str, ResumenPresupuesto] = field(default_factory=dict)  # por la clave de su capítulo
     ultima_carga: int = 0
+    version: Dict[str, int] = field(default_factory=dict)  # padres con matriz → el número de su versión vigente
+    en_contratado: Set[str] = field(default_factory=set)  # conceptos que fija algún renglón de un subárbol contratado (D-475)
 
     def como_catalogo(self) -> CatalogoLeido:
         return CatalogoLeido(dict(self.unidad), dict(self.huella), tuple(sorted(self.sin_matriz)))
@@ -275,6 +280,7 @@ class ResumenCarga:
     rol: str
     archivos: Mapping[str, str]
     resumen: Mapping[str, Any]
+    tipo: str = "archivos"  # archivos · contratacion (D-475: contratar un subárbol también deja su carga)
 
 
 @dataclass(frozen=True)
@@ -335,6 +341,57 @@ class PresupuestoGuardado:
         return self.renglones[0].total
 
 
+@dataclass(frozen=True)
+class Congelamiento:
+    """Un subárbol que se contrató: el nodo, su ruta natural, quién, con qué rol, cuándo y qué se fijó."""
+
+    id: int
+    nodo_id: int
+    ruta: str
+    estado: str  # contratado (diseño es lo que tiene todo nodo sin fila)
+    fecha: datetime
+    usuario: str
+    rol: str
+    carga_id: int
+    resumen: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class VersionPorFijar:
+    """Una versión nueva de un concepto que nace al contratar: la misma receta que la vigente, con el PU de hoy."""
+
+    clave: str
+    pu: Decimal
+
+
+@dataclass(frozen=True)
+class PlanDeContratacion:
+    base: int  # la última carga que vio quien revisó: si hay otra, no se aplica
+    presupuesto_id: int
+    nodo_id: int
+    usuario: str
+    rol: str
+    resumen: Mapping[str, Any]
+    versiones_nuevas: Tuple[VersionPorFijar, ...] = ()
+    renglones: Tuple[Tuple[int, str], ...] = ()  # (renglón, clave de su concepto): pasan a fijar la versión vigente de ese concepto
+
+
+@dataclass(frozen=True)
+class ResultadoContratacion:
+    carga_id: int
+    congelamiento_id: int
+    versiones_nuevas: int
+    renglones_fijados: int
+
+
+class YaContratado(Exception):
+    """El nodo, o un bloque de arriba, ya está contratado: lo contratado no se vuelve a contratar."""
+
+    def __init__(self, mensaje: str, nodo_id: Optional[int] = None) -> None:
+        super().__init__(mensaje)
+        self.nodo_id = nodo_id
+
+
 class RepositorioCatalogo(Protocol):
     def estado_vigente(self) -> EstadoVigente: ...
 
@@ -358,6 +415,14 @@ class RepositorioCatalogo(Protocol):
 
     def id_de(self, clave: str) -> int:
         """El nodo del catálogo con esa clave."""
+
+    def congelamientos(self, presupuesto_id: int) -> List["Congelamiento"]:
+        """Los nodos de ese presupuesto que se contrataron, del más viejo al más nuevo (D-475). Un nodo sin fila está en diseño."""
+
+    def contratar(self, plan: "PlanDeContratacion") -> "ResultadoContratacion":
+        """Escribe la contratación completa o nada: una carga de tipo `contratacion`, las versiones nuevas (la misma receta que la
+        vigente, con el PU del plan), los renglones fijados a la versión vigente y el estado del nodo. Si la última carga ya no es
+        `plan.base`, `CatalogoCambio`; si el nodo o uno de arriba ya está contratado, `YaContratado`."""
 
 
 # --------------------------------------------------------------------------- el presupuesto guardado, armado
@@ -531,6 +596,10 @@ def planificar(
             if c not in retenido and not estado.unidad.get(c) and nuevo.unidad.get(c):
                 unidades_que_se_saben.append((c, nuevo.unidad[c]))
             continue
+        if c in versionan and c in estado.en_contratado:
+            retenido[c] = EN_CONTRATADO
+            pendientes.append(Pendiente(c, EN_CONTRATADO, "lo fija un renglón contratado: el cambio de su matriz va a control de cambio"))
+            continue
         causa = next((d for d in sorted(debajo[c]) if d in retenido), None)
         if causa is not None:
             retenido[c] = DEPENDE_DE
@@ -645,6 +714,7 @@ MOTIVOS = {
     PRECIO_DE_TRABAJO: "el precio de un trabajo se valida",
     PU_MOVIO: "el PU se movió más de 5 %: pide confirmación",
     DEPENDE_DE: "depende de algo que quedó pendiente",
+    EN_CONTRATADO: "lo usa algo contratado: va a control de cambio",
     CONCEPTO_PENDIENTE: "tiene un concepto pendiente",
     CONCEPTO_CON_PRECIO_Y_SIN_MATRIZ: "trae precio y ninguna matriz",
 }

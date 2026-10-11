@@ -6696,6 +6696,23 @@ en `MEMORIA.md` D-474, `MODELO.md` §4 (la subsección de D-474) y `PROGRAMA-CPM
 
 `PENDIENTES-MEJORAS.md` B-03 y B-05.
 
+### Contratar un subárbol fija sus PU y lo congela (D-475)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-475 y `MODELO.md` §4 (la subsección de D-475). Lo que cambia lo dicho antes
+en este archivo:
+
+- **El estado de §1.4 ya tiene dónde vivir:** es del bloque, su subárbol se contrata completo y los de abajo lo heredan. Lo contratado
+  está congelado en la base; «solo admite adiciones al final» se cumple porque agregar es lo único que la base deja.
+- **Contratar es el segundo disparador de versión de §2.2** (el primero es que cambie la receta): fija el PU de cada concepto a ese
+  momento, con una versión nueva de la misma receta si los precios se movieron. Con el acero un 2 % más caro, contratar la cimentación
+  de Zafiro cuesta $40.97 más y no mueve ni un centavo a los otros seis presupuestos.
+- **«Algo contratado: no entra en vigor, va a control de cambio» (§2.2) ya se cumple en la carga:** la versión nueva de un concepto
+  que fija un renglón contratado se detiene y ninguna confirmación la deja pasar.
+- **Sigue sin definirse** cómo se deshace una contratación (sería un control de cambio, §13.4) y no existe todavía la orden de cambio
+  que agrega sobre lo contratado.
+
+`PENDIENTES-MEJORAS.md` B-05.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

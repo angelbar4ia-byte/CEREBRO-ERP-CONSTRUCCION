@@ -16,6 +16,7 @@ from psycopg.types.json import Jsonb
 
 from core.catalogo import (
     CatalogoCambio,
+    Congelamiento,
     DatosDePresupuesto,
     EstadoVigente,
     InsumoGuardado,
@@ -23,11 +24,14 @@ from core.catalogo import (
     LineaGuardada,
     NodoDePresupuesto,
     PlanDeCarga,
+    PlanDeContratacion,
     PrecioGuardado,
     ResumenCarga,
     ResumenPresupuesto,
     ResultadoCarga,
+    ResultadoContratacion,
     VersionGuardada,
+    YaContratado,
 )
 from core.dominio import BasePorcentaje, Categoria, Composicion, ModoPrecio, Nodo, Rol, TipoCantidad
 from core.motor_calculo import ArbolEnMemoria
@@ -61,21 +65,29 @@ class PostgresCatalogo:
             self.conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")  # una sola foto, aunque alguien cargue mientras tanto
             e = EstadoVigente(ultima_carga=self._ultima_carga())
             filas = self.conn.execute(
-                "SELECT n.clave, n.rol, n.categoria, n.precio_declarado, coalesce(u.clave, ''), v.huella, v.pu"
+                "SELECT n.clave, n.rol, n.categoria, n.precio_declarado, coalesce(u.clave, ''), v.huella, v.pu, v.version"
                 " FROM nodo n LEFT JOIN unidad u ON u.id = n.unidad_id"
-                " LEFT JOIN LATERAL (SELECT huella, pu FROM version_concepto WHERE nodo_id = n.id ORDER BY version DESC LIMIT 1) v ON true"
+                " LEFT JOIN LATERAL (SELECT huella, pu, version FROM version_concepto WHERE nodo_id = n.id ORDER BY version DESC LIMIT 1) v ON true"
                 " WHERE n.rol <> 'estructural'").fetchall()
-            for clave, rol, categoria, precio, unidad, huella, pu in filas:
+            for clave, rol, categoria, precio, unidad, huella, pu, version in filas:
                 if huella is not None or rol in ("concepto", "ensamble"):
                     e.unidad[clave] = unidad
                     if huella is not None:
-                        e.huella[clave], e.pu[clave] = huella, pu
+                        e.huella[clave], e.pu[clave], e.version[clave] = huella, pu, version
                     else:
                         e.sin_matriz.add(clave)
                 else:
                     e.insumos[clave] = InsumoGuardado(clave, unidad, categoria, precio)
             for p in self._presupuestos():
                 e.presupuestos[p.clave] = p
+            e.en_contratado = {r[0] for r in self.conn.execute(
+                "WITH RECURSIVE bajo (id) AS ("
+                "  SELECT nodo_id FROM estado_congelamiento WHERE estado = 'contratado'"
+                "  UNION"
+                "  SELECT c.hijo_id FROM composicion c JOIN bajo b ON c.padre_id = b.id JOIN nodo h ON h.id = c.hijo_id"
+                "   WHERE c.version_id IS NULL AND h.rol = 'estructural')"
+                " SELECT DISTINCT h.clave FROM composicion c JOIN bajo b ON c.padre_id = b.id JOIN nodo h ON h.id = c.hijo_id"
+                "  WHERE c.version_id IS NULL AND h.rol <> 'estructural'")}
         return e
 
     def _presupuestos(self) -> List[ResumenPresupuesto]:
@@ -119,7 +131,7 @@ class PostgresCatalogo:
         return [PrecioGuardado(clave, *f) for f in filas]
 
     def cargas(self) -> List[ResumenCarga]:
-        filas = self.conn.execute("SELECT id, creada_en, usuario, rol, archivos, resumen FROM carga ORDER BY id").fetchall()
+        filas = self.conn.execute("SELECT id, creada_en, usuario, rol, archivos, resumen, tipo FROM carga ORDER BY id").fetchall()
         return [ResumenCarga(*f) for f in filas]
 
     def datos_de_presupuesto(self, presupuesto_id: int) -> DatosDePresupuesto:
@@ -144,6 +156,12 @@ class PostgresCatalogo:
                     nodos[hijo] = NodoDePresupuesto(hijo, clave, desc, unidad, False, "Concepto")
                 lineas.append(LineaDePresupuesto(padre, hijo, orden, cantidad, version, pu, linea_id))
         return DatosDePresupuesto(resumen, raiz_id, nodos, tuple(lineas))
+
+    def congelamientos(self, presupuesto_id: int) -> List[Congelamiento]:
+        filas = self.conn.execute(
+            "SELECT e.id, e.nodo_id, n.ruta_natural, e.estado, e.fecha, e.usuario, e.rol, e.carga_id, e.resumen"
+            " FROM estado_congelamiento e JOIN nodo n ON n.id = e.nodo_id WHERE n.presupuesto_id = %s ORDER BY e.id", (presupuesto_id,)).fetchall()
+        return [Congelamiento(*f) for f in filas]
 
     def arbol(self) -> ArbolEnMemoria:
         with self.conn.transaction():
@@ -260,3 +278,49 @@ class PostgresCatalogo:
                 cur.executemany(
                     "INSERT INTO composicion (padre_id, hijo_id, hijo_version_id, cantidad, orden, reporta_a)"
                     " VALUES (%s, %s, %s, %s, %s, 'concepto')", renglones)
+
+    def contratar(self, plan: PlanDeContratacion) -> ResultadoContratacion:
+        with self.conn.transaction():
+            self.conn.execute("SELECT pg_advisory_xact_lock(%s)", (CANDADO_DEL_CATALOGO,))
+            ultima = self._ultima_carga()
+            if ultima != plan.base:
+                raise CatalogoCambio(f"la última carga es la {ultima} y esta se revisó sobre la {plan.base}")
+            nodo = self.conn.execute("SELECT presupuesto_id, ruta_natural FROM nodo WHERE id = %s AND rol = 'estructural'", (plan.nodo_id,)).fetchone()
+            if nodo is None or nodo[0] != plan.presupuesto_id:
+                raise ValueError(f"el nodo {plan.nodo_id} no es un bloque del presupuesto {plan.presupuesto_id}")
+            ya = self.conn.execute(
+                "WITH RECURSIVE arriba (id) AS (SELECT %s::bigint UNION SELECT c.padre_id FROM composicion c JOIN arriba a ON c.hijo_id = a.id"
+                " WHERE c.version_id IS NULL) SELECT n.ruta_natural, e.nodo_id FROM estado_congelamiento e JOIN arriba a ON a.id = e.nodo_id"
+                " JOIN nodo n ON n.id = e.nodo_id WHERE e.estado = 'contratado' LIMIT 1", (plan.nodo_id,)).fetchone()
+            if ya is not None:
+                raise YaContratado(f"el bloque {ya[0]} ya está contratado", ya[1])
+            carga_id = self.conn.execute(
+                "INSERT INTO carga (usuario, rol, archivos, resumen, tipo) VALUES (%s, %s, '{}'::jsonb, %s, 'contratacion') RETURNING id",
+                (plan.usuario, plan.rol, Jsonb(dict(plan.resumen)))).fetchone()[0]
+            with self.conn.cursor() as cur:
+                for v in plan.versiones_nuevas:
+                    anterior = cur.execute(
+                        "SELECT v.id, v.nodo_id, v.version, v.huella FROM version_concepto v JOIN nodo n ON n.id = v.nodo_id"
+                        " WHERE n.clave = %s AND n.rol <> 'estructural' ORDER BY v.version DESC LIMIT 1", (v.clave,)).fetchone()
+                    if anterior is None:
+                        raise ValueError(f"{v.clave} no tiene matriz: no hay versión de la que sacar la nueva")
+                    nueva = cur.execute(
+                        "INSERT INTO version_concepto (nodo_id, version, huella, pu, carga_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+                        (anterior[1], anterior[2] + 1, anterior[3], v.pu, carga_id)).fetchone()[0]
+                    cur.execute(
+                        "INSERT INTO composicion (padre_id, version_id, hijo_id, cantidad, orden, reporta_a, tipo_cantidad, base_porcentaje)"
+                        " SELECT padre_id, %s, hijo_id, cantidad, orden, reporta_a, tipo_cantidad, base_porcentaje FROM composicion"
+                        " WHERE version_id = %s", (nueva, anterior[0]))
+                for renglon_id, clave in plan.renglones:
+                    n = cur.execute(
+                        "UPDATE composicion c SET hijo_version_id ="
+                        " (SELECT v.id FROM version_concepto v WHERE v.nodo_id = c.hijo_id ORDER BY v.version DESC LIMIT 1)"
+                        " FROM nodo h WHERE c.id = %s AND c.version_id IS NULL AND h.id = c.hijo_id AND h.clave = %s AND h.rol <> 'estructural'",
+                        (renglon_id, clave)).rowcount
+                    if n != 1:
+                        raise ValueError(f"el renglón {renglon_id} no es de {clave}")
+                congelamiento_id = cur.execute(
+                    "INSERT INTO estado_congelamiento (nodo_id, estado, usuario, rol, carga_id, resumen)"
+                    " VALUES (%s, 'contratado', %s, %s, %s, %s) RETURNING id",
+                    (plan.nodo_id, plan.usuario, plan.rol, carga_id, Jsonb(dict(plan.resumen)))).fetchone()[0]
+        return ResultadoContratacion(carga_id, congelamiento_id, len(plan.versiones_nuevas), len(plan.renglones))
