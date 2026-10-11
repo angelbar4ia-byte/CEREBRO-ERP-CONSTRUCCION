@@ -6644,6 +6644,24 @@ dependían de ningún dato nuevo; el detalle y las pruebas están en `PROGRAMA-C
 
 `PROGRAMA-CPM.md`.
 
+### Los archivos de OPUS que sí había, leídos con el cargador y contrastados con el motor (D-472)
+
+Dato del usuario: «Catálogos crudos de opus ya los tienes los convertiste a csv». Había tres CSV y las once ingenierías de
+ALAMO 18 en la carpeta de archivos subidos de la sesión; pasan a `1-mundo/opus/`. Los demás catálogos no están en ninguna
+parte de la máquina (`CATALOGOS.md`, «Qué archivos de OPUS están en el repo»). El detalle y las pruebas, en `MEMORIA.md` D-472:
+
+- **El cargador de §2.4 y §2.5 existe** (`backend/core/importacion_opus.py`): mapeo por alias con informe, árbol por posición,
+  placeholders descartados solo si se verifica, números estrictos, matrices, huella y diagnóstico de §2.9. No escribe nada.
+- **Los archivos reproducen lo que el cerebro decía de ellos:** las 3,231 filas, los 121 placeholders, la tabla de tipos de
+  §2.4, y `Indice` como lugar entre hermanos.
+- **El motor de cálculo da el precio de OPUS al centavo** en los 467 conceptos con matriz, los 89 compuestos y las 39
+  cuadrillas. Es la primera vez que B-02 se prueba con algo más que un caso trabajado.
+- **`ANALISIS_DE_BASICOS_COMPUESTOS` no aporta nada que `_CONCEPTOS` no traiga**, y `Origen` ahí es la clase del padre.
+- **P-09 sigue sin resolverse y P-11 ya se puede ejecutar:** los cuatro conceptos sin matriz no están en ningún archivo que
+  haya; las 79 claves `AUX-` son las reales y están completas.
+
+`CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-02, B-06, P-09 y P-11.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

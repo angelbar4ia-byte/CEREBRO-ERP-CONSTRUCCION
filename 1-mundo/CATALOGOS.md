@@ -46,6 +46,22 @@ siguen siendo referenciados**:
 
 *D-460 diseña la fusión: «INSTALACIONES HIDROSANITARIAS» más CIM, PB o PA, con claves ECO nuevas (no choca con `ECO-00039`); convive con las dos originales, se usa en versiones nuevas de la plantilla y solo en presupuestos en diseño; ninguna partida cambia de fecha. Detalle en `CONOCIMIENTO.md` §11.14.*
 
+### Qué archivos de OPUS están en el repo, y cuáles no (D-472)
+
+Los archivos que se suben a una sesión viven en una carpeta temporal de la máquina y se pierden con ella. Lo que sirve de
+dato para probar se guarda en el repo, tal cual.
+
+| Archivo | Filas | Dónde está |
+|---|---|---|
+| `CATALOGO_DE_PRESUPUESTO` | 3,231 | `1-mundo/opus/CATALOGO_DE_PRESUPUESTO.csv` |
+| `ANALISIS_DE_BASICOS_CONCEPTOS` | 2,568 | `1-mundo/opus/ANALISIS_DE_BASICOS_CONCEPTOS.csv` — trae también los compuestos y las 39 cuadrillas |
+| `ANALISIS_DE_BASICOS_COMPUESTOS` | 267 | `1-mundo/opus/ANALISIS_DE_BASICOS_COMPUESTOS.csv` — son las líneas de `Origen = Material` del anterior, idénticas |
+| `INGENIERIA - ALAMO 18 - …` | 11 archivos | `1-mundo/opus/ingenieria-alamo-18/` |
+| `CATALOGO_DE_MATERIALES` (387), `_TRABAJOS`, `_MANO_DE_OBRA`, `_FLETES`, `_CONCEPTOS` | — | **No están.** Se describen arriba porque se leyeron en sesiones anteriores; el archivo no está ni en el repo ni en la máquina |
+| Los de la generación anterior: unidades (16), niveles (15), etapas (50), familias (35), contratistas (29), cuadrillas, auxiliares, materiales (325), subcontratos | — | **No están**, por lo mismo |
+
+*Lo que falta bloquea P-09, P-32, M-14, B-07 y el cierre de P-14. Quien los tenga puede subirlos tal cual (`.xlsx` o `.csv`).*
+
 ### Lo que OPUS tiene y aún no está en este proyecto
 
 Se pueden agregar más adelante. **No hacen falta por ahora:**

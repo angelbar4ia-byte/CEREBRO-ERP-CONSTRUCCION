@@ -41,7 +41,8 @@ cerebro/
 ├── README.md                  ← puerta de entrada del repositorio
 ├── INDICE.md                  ← fuera de las capas: las conecta
 ├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
-│   └── programas/             los siete programas y sus listas, en CSV (13 archivos)
+│   ├── programas/             los siete programas y sus listas, en CSV (13 archivos)
+│   └── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices e ingenierías de ALAMO 18 (14 archivos)
 ├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
 │   ├── skills/                erp-construccion + importacion · rediseno · parametrico
@@ -49,7 +50,7 @@ cerebro/
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
 ├── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
-├── backend/                   el código que el cerebro especifica: core/ (motor_calculo · motor_cpm · programa · servicio_programa · accesos, con sus pruebas) · infra/ (adaptadores de Postgres) · api/ (FastAPI, autenticación por token, el cliente generado, servir y la terminal de usuarios) · requirements.txt
+├── backend/                   el código que el cerebro especifica: core/ (motor_calculo · motor_cpm · programa · servicio_programa · accesos · importacion_opus, con sus pruebas) · infra/ (adaptadores de Postgres) · api/ (FastAPI, autenticación por token, el cliente generado, servir y la terminal de usuarios) · requirements.txt
 ├── database/migraciones/      el esquema, en SQL: 0001_programa.sql · 0002_programa_importado_por.sql · 0003_version_nueva_del_programa.sql · 0004_usuarios_y_permisos.sql
 └── frontend/gantt/            las pantallas del programa: gantt.html · programas.html (la lista y subir uno) · tokens.css (los colores) · motor_gantt.js (reprograma en el navegador; una prueba lo contrasta con Python) · cliente_programa.js (generado del spec de la API) · sesion.js (quién eres, compartida por las pantallas)
 ```
@@ -242,10 +243,10 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 471 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 472 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
-| `PROGRAMA-CPM.md` | I | ✅ 328 pruebas · los siete programas reproducen las cifras publicadas |
+| `PROGRAMA-CPM.md` | I | ✅ 365 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |
