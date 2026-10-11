@@ -5,8 +5,8 @@
 capa:       IV — Dirección
 pregunta:   ¿qué se pensó y aún no se diseña?
 tiempo:     vamos aquí
-corte:      2026-09-21
-verificado: 8 ideas · una con tabla propia (§2), ninguna de las demás diseñada
+corte:      2026-10-11
+verificado: 8 ideas · una ejecutada (§6, D-478) · una con tabla propia (§2) · las demás sin diseñar
 ```
 
 > **Sólo las ideas del modelo que aún no se diseñan.** Todo pendiente de datos, de
@@ -24,7 +24,7 @@ verificado: 8 ideas · una con tabla propia (§2), ninguna de las demás diseña
 | Clasificar los materiales: dos ejes | §3 |
 | Constructor de matrices | §4 |
 | Cambiar la unidad de un insumo | §5 |
-| Corregir el prefijo `AUX-` | §6 |
+| Corregir el prefijo `AUX-` — ✅ **ejecutada** (D-478); queda el exportador de la clave vieja (B-08) | §6 |
 | Sustitución de insumo dentro de una matriz | §7 |
 | El agente interno sugiere tramos, aprendiendo de la salida de almacén | §8 |
 
