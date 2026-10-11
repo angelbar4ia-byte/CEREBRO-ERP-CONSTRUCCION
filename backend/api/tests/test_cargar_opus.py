@@ -9,7 +9,12 @@ from decimal import Decimal
 from api.cargar_opus import cargar
 from core.accesos import MemoriaAccesos
 from core.memoria_catalogo import MemoriaCatalogo
-from core.tests.datos_opus import CONCEPTOS, OPUS, PRESUPUESTO, reescalar_linea, texto
+from core.contratacion import ServicioContratacion
+from core.colgado import ServicioColgado
+from core.memoria_programa import MemoriaPrograma
+from core.servicio_programa import ServicioPrograma
+from core.tests.contrato_programa import CAL, programa
+from core.tests.datos_opus import CONCEPTOS, OPUS, PRESUPUESTO, con_cantidad, reescalar_linea, sin_renglon, texto
 
 
 class PruebasCargarOpus(unittest.TestCase):
@@ -59,13 +64,13 @@ class PruebasCargarOpus(unittest.TestCase):
         self.assertEqual(self.correr(conceptos=ruta, aplicar=True, confirmados=["ACA-01010"]), 0)
         self.assertEqual(len(self.cat.versiones("ACA-01010")), 2)
 
-    def escribir(self, contenido):
+    def escribir(self, contenido, nombre="conceptos.csv"):
         import tempfile
         from pathlib import Path
 
         d = Path(tempfile.mkdtemp(prefix="cargar_opus_"))
         self.addCleanup(lambda: __import__("shutil").rmtree(d, ignore_errors=True))
-        ruta = d / "conceptos.csv"
+        ruta = d / nombre
         ruta.write_text(contenido, encoding="utf-8")
         return ruta
 
@@ -81,6 +86,53 @@ class PruebasCargarOpus(unittest.TestCase):
         self.assertEqual(self.correr(conceptos=ruta, presupuesto=None, aplicar=True), 1)
         self.assertIn("faltan columnas obligatorias", self.errores.getvalue())
         self.assertEqual(self.cat.cargas(), [])
+
+    # ------------------------------------------------------------------ un presupuesto que ya existe (D-476)
+    K1 = "CAS-00004#1/NIV-00001#1/ECO-00001#1/EST-01040#1::EST-10010#1"
+
+    def test_un_presupuesto_que_llega_distinto_se_reconcilia_y_lo_dice(self):
+        self.correr(aplicar=True)
+        nuevo = self.escribir(con_cantidad(texto(PRESUPUESTO), "CAS-00004", "EST-10010", "40"), "presupuesto.csv")
+        self.assertEqual(self.correr(presupuesto=nuevo), 0)
+        t = self.salida.getvalue()
+        self.assertIn("CAS-00004  ZAFIRO 1.0 (172 M2) — ya está y llega distinto: se reconcilia (1 cantidades · 0 altas · 0 bajas)", t)
+        self.assertIn(f"cantidad EST-10010   37 → 40  ({self.K1})", t)
+        self.assertEqual(len(self.cat.cargas()), 1)  # revisar no escribe
+        self.assertEqual(self.correr(presupuesto=nuevo, aplicar=True), 0)
+        self.assertIn("Carga 2 aplicada.", self.salida.getvalue())
+        self.assertEqual(self.correr(presupuesto=nuevo, aplicar=True), 0)
+        self.assertIn("No había nada que aplicar.", self.salida.getvalue())
+
+    def test_una_baja_se_confirma_con_su_id_o_con_todas(self):
+        self.correr(aplicar=True)
+        sin = self.escribir(sin_renglon(texto(PRESUPUESTO), "CAS-00004", "EST-10010"), "presupuesto.csv")
+        self.assertEqual(self.correr(presupuesto=sin, aplicar=True), 0)
+        t = self.salida.getvalue()
+        self.assertIn(f"baja     EST-10010   × 37  ({self.K1})  [DETENIDO: una baja pide confirmación]", t)
+        self.assertIn("baja_sin_confirmar", str(self.cat.cargas()[-1].resumen))
+        self.assertEqual(self.correr(presupuesto=sin, aplicar=True, bajas=[self.K1]), 0)
+        self.assertEqual(self.correr(presupuesto=sin), 0)
+        self.assertIn("ya está, igual", self.salida.getvalue())
+        otro = self.escribir(sin_renglon(texto(PRESUPUESTO), "CAS-00004", "EST-10011"), "presupuesto2.csv")
+        self.assertEqual(self.correr(presupuesto=otro, aplicar=True, todas_las_bajas=True), 0)
+
+    def test_lo_contratado_se_dice_detenido(self):
+        self.correr(aplicar=True)
+        ServicioContratacion(self.cat).contratar("CAS-00004", "control_de_obra", "luis@obra.mx", "CAS-00004#1/NIV-00001#1")
+        nuevo = self.escribir(con_cantidad(texto(PRESUPUESTO), "CAS-00004", "EST-10010", "40"), "presupuesto.csv")
+        self.assertEqual(self.correr(presupuesto=nuevo, aplicar=True), 0)
+        self.assertIn("[DETENIDO: lo usa algo contratado: va a control de cambio]", self.salida.getvalue())
+
+    def test_la_terminal_dice_que_programas_citan_lo_que_se_da_de_baja(self):
+        self.correr(aplicar=True)
+        pro = MemoriaPrograma()
+        pid = ServicioPrograma(pro).importar("Zafiro de obra", programa("Zafiro"), CAL, "control_de_obra", "luis@obra.mx")
+        ServicioColgado(ServicioPrograma(pro), self.cat).colgar(pid, "control_de_obra", "luis@obra.mx")
+        sin = self.escribir(sin_renglon(texto(PRESUPUESTO), "CAS-00004", "EST-10010"), "presupuesto.csv")
+        self.assertEqual(self.correr(presupuesto=sin, programas=pro), 0)
+        self.assertIn(f"{self.K1}: lo cita el programa {pid} «Zafiro de obra» en 1 fila(s)", self.salida.getvalue())
+        self.assertEqual(self.correr(presupuesto=self.escribir(con_cantidad(texto(PRESUPUESTO), "CAS-00004", "EST-10010", "40"), "p2.csv"), programas=pro), 0)
+        self.assertNotIn("Programas que citan", self.salida.getvalue())  # una cantidad no quita el piso a nadie
 
 
 if __name__ == "__main__":

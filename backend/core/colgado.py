@@ -99,6 +99,7 @@ class Alineacion:
     vacias: int = 0  # los marcadores vacíos de OPUS que el programa trae: no cuentan ni como casados ni como faltantes
     ya_estaban: int = 0  # de `enlaces`, los que ya estaban puestos tal cual
     se_moverian: Tuple[str, ...] = ()  # los `oid` cuyo enlace puesto es otro: no se mueven, se dice y no se cuelga
+    huerfanos: Tuple[str, ...] = ()  # los `oid` enlazados a algo que el presupuesto dio de baja (D-476): el enlace no se toca, se dice
     nuevos: int = 0  # lo que `colgar` puso
 
     @property
@@ -117,6 +118,7 @@ class Alineacion:
             "partidas": self.partidas,
             "conceptos_del_programa": self.conceptos_del_programa,
             "marcadores_vacios": self.vacias,
+            "huerfanos": list(self.huerfanos),
             "ya_estaban": self.ya_estaban,
             "forzado": forzado,
             "programa_sin_par_total": len(self.sin_par),
@@ -217,6 +219,11 @@ def alinear(
 
     ya = [e for e in enlaces if puestos.get(e.oid) == e]
     mueven = tuple(e.oid for e in enlaces if e.oid in puestos and puestos[e.oid] != e)
+    vivos_nodos = {n.id for n in datos.nodos.values() if n.estructural}
+    vivos_renglones = {l.id for l in datos.lineas}
+    huerfanos = tuple(sorted(
+        oid for oid, e in puestos.items()
+        if (e.nodo_id is not None and e.nodo_id not in vivos_nodos) or (e.renglon_id is not None and e.renglon_id not in vivos_renglones)))
     return Alineacion(
         programa_id=programa_id,
         presupuesto_id=datos.resumen.id,
@@ -231,6 +238,7 @@ def alinear(
         vacias=vacias,
         ya_estaban=len(ya),
         se_moverian=mueven,
+        huerfanos=huerfanos,
     )
 
 
@@ -305,6 +313,9 @@ def informe_de_colgado(a: Alineacion, *, tope: int = 20) -> str:
         L.append(f"  {a.vacias} marcador(es) vacío(s) de OPUS (sin clave ni descripción) que no se enlazan.")
     if a.ya_estaban:
         L.append(f"  {a.ya_estaban} enlace(s) ya estaban puestos.")
+    if a.huerfanos:
+        L.append(f"\n{len(a.huerfanos)} fila(s) del programa siguen enlazadas a algo que el presupuesto dio de baja (el enlace no se toca): "
+                 + ", ".join(a.huerfanos[:10]) + ("…" if len(a.huerfanos) > 10 else ""))
     if a.sin_par:
         L.append(f"\nEl programa tiene {len(a.sin_par)} fila(s) que el presupuesto no tiene (quedan sin enlace):")
         for s in a.sin_par[:tope]:

@@ -9,6 +9,11 @@ Cargar los archivos de OPUS a la base, desde la terminal — D-473.
     python3 -m api.cargar_opus … --aplicar
     python3 -m api.cargar_opus … --aplicar --confirmar ACA-01010    (el PU de ese concepto se movió más de 5 % y alguien lo confirmó)
 
+    # un presupuesto que ya existe y llega distinto se reconcilia (D-476): las cantidades y los renglones nuevos entran; una baja pide
+    # confirmación con el id que el informe le da, y lo contratado no se toca
+    python3 -m api.cargar_opus … --aplicar --confirmar-baja "CAS-00004#1/NIV-00001#1::EST-10010#1"
+    python3 -m api.cargar_opus … --aplicar --todas-las-bajas
+
 Quien carga es un usuario dado de alta (`api.usuarios`) y de uno de los roles que tienen `cargar_catalogo_opus` en `ROL_FUNCION`
 —Control de obra y Costos por omisión—: queda en la carga con su correo y el rol con que la hizo. Sin `--aplicar` no se escribe nada.
 El archivo de compuestos es opcional: sus 267 líneas ya vienen dentro del de conceptos.
@@ -21,8 +26,26 @@ from pathlib import Path
 from typing import Callable, Optional, Sequence, TextIO
 
 from core.accesos import PermisoDenegado, RepositorioAccesos, normalizar_correo
-from core.catalogo import RepositorioCatalogo, ServicioCarga, informe_de_carga
+from core.catalogo import CambioDePresupuesto, RepositorioCatalogo, ServicioCarga, informe_de_carga
 from core.importacion_opus import CargaNoProcede
+from core.servicio_programa import RepositorioPrograma
+
+
+def citas_del_programa(programas: RepositorioPrograma, cambios: Sequence[CambioDePresupuesto]) -> str:
+    """Qué programas citan lo que se va (D-476): el catálogo y el programa son dos puertos que no se conocen, así que esto lo junta la
+    terminal, que tiene los dos. Dice quién cita cada baja para que quien la confirma sepa a qué fila del programa le quita el piso."""
+    bajas = [c for c in cambios if c.tipo == "baja" and (c.renglones or c.bloques)]
+    if not bajas:
+        return ""
+    lineas = []
+    resumenes = [r for r in programas.listar_programas() if r.reemplazado_por is None and r.enlazadas]
+    for r in resumenes:
+        g = programas.leer_programa(r.id)
+        for c in bajas:
+            n = sum(1 for e in g.enlaces if (e.renglon_id in c.renglones) or (e.nodo_id in c.bloques))
+            if n:
+                lineas.append(f"  {c.id}: lo cita el programa {r.id} «{r.nombre}» en {n} fila(s); seguirían enlazadas a algo dado de baja")
+    return "\n".join(["", "Programas que citan lo que se da de baja"] + lineas) if lineas else ""
 
 
 def cargar(
@@ -35,6 +58,9 @@ def cargar(
     compuestos: Optional[Path] = None,
     tipo: str = "plantilla",
     confirmados: Sequence[str] = (),
+    bajas: Sequence[str] = (),
+    todas_las_bajas: bool = False,
+    programas: Optional[RepositorioPrograma] = None,
     aplicar: bool = False,
     salida: TextIO = sys.stdout,
     errores: TextIO = sys.stderr,
@@ -48,7 +74,7 @@ def cargar(
     leer = lambda ruta: None if ruta is None else Path(ruta).read_text(encoding="utf-8")
     try:
         r = servicio.revisar(leer(conceptos), leer(presupuesto), leer(compuestos), rol=list(u.roles), usuario=u.correo, tipo=tipo,
-                             confirmados=confirmados)
+                             confirmados=confirmados, bajas_confirmadas=bajas, todas_las_bajas=todas_las_bajas)
     except PermisoDenegado as e:
         print(f"No se pudo: {e}", file=errores)
         return 2
@@ -56,6 +82,10 @@ def cargar(
         print(f"No se pudo leer: {e}", file=errores)
         return 1
     print(informe_de_carga(r.diagnostico), file=salida)
+    if programas is not None:
+        citas = citas_del_programa(programas, r.diagnostico.cambios)
+        if citas:
+            print(citas, file=salida)
     if not r.diagnostico.aplicable:
         return 1
     if not aplicar:
@@ -63,7 +93,7 @@ def cargar(
         return 0
     try:
         res = servicio.aplicar(leer(conceptos), leer(presupuesto), leer(compuestos), rol=list(u.roles), usuario=u.correo, tipo=tipo,
-                               confirmados=confirmados)
+                               confirmados=confirmados, bajas_confirmadas=bajas, todas_las_bajas=todas_las_bajas)
     except CargaNoProcede as e:
         print(f"No se pudo: {e}", file=errores)
         return 1
@@ -80,18 +110,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--compuestos", type=Path, help="ANALISIS_DE_BASICOS_COMPUESTOS.csv (ya viene dentro del de conceptos)")
     ap.add_argument("--tipo", default="plantilla", choices=["plantilla", "obra", "escenario"], help="qué son los presupuestos que se crean")
     ap.add_argument("--confirmar", action="append", default=[], metavar="CLAVE", help="confirma el cambio de más de 5 %% en el PU de ese concepto")
+    ap.add_argument("--confirmar-baja", action="append", default=[], metavar="ID", dest="bajas",
+                    help="confirma la baja de un renglón o bloque de un presupuesto que ya existe (el informe da el id)")
+    ap.add_argument("--todas-las-bajas", action="store_true", help="confirma todas las bajas de esta carga")
     ap.add_argument("--aplicar", action="store_true", help="aplica lo que entra; sin esto, solo se revisa")
     a = ap.parse_args(argv)
     import psycopg
 
     from infra.postgres_accesos import PostgresAccesos
     from infra.postgres_catalogo import PostgresCatalogo
-    from infra.postgres_programa import aplicar_migraciones
+    from infra.postgres_programa import PostgresPrograma, aplicar_migraciones
 
     conn = psycopg.connect(a.postgres, autocommit=True)
     aplicar_migraciones(conn)
     return cargar(PostgresCatalogo(conn), PostgresAccesos(conn), correo=a.usuario, conceptos=a.conceptos, presupuesto=a.presupuesto,
-                  compuestos=a.compuestos, tipo=a.tipo, confirmados=a.confirmar, aplicar=a.aplicar)
+                  compuestos=a.compuestos, tipo=a.tipo, confirmados=a.confirmar, bajas=a.bajas, todas_las_bajas=a.todas_las_bajas,
+                  programas=PostgresPrograma(conn), aplicar=a.aplicar)
 
 
 if __name__ == "__main__":

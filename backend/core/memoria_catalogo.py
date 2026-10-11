@@ -24,8 +24,10 @@ from .catalogo import (
     LineaDePresupuesto,
     LineaGuardada,
     NodoDePresupuesto,
+    CambioDeRenglon,
     PlanDeCarga,
     PlanDeContratacion,
+    ReconciliacionPlan,
     PrecioGuardado,
     ResumenCarga,
     ResumenPresupuesto,
@@ -51,6 +53,7 @@ class _Nodo:
     presupuesto_id: Optional[int] = None
     tipo_opus: Optional[str] = None
     ruta_natural: Optional[str] = None
+    baja_carga_id: Optional[int] = None  # el bloque se dio de baja en esa carga (D-476)
 
 
 @dataclass
@@ -80,6 +83,7 @@ class _LineaDePresupuesto:
     hijo_version_id: Optional[int]
     cantidad: Decimal
     orden: int
+    baja_carga_id: Optional[int] = None  # el renglón se dio de baja en esa carga (D-476): no cuenta, pero no se borra
 
 
 @dataclass
@@ -124,6 +128,7 @@ class _Datos:
     precios: Dict[int, List[_Precio]] = field(default_factory=dict)
     presupuestos: Dict[int, _Presupuesto] = field(default_factory=dict)
     congelamientos: List[_Congelamiento] = field(default_factory=list)
+    historia: List[Tuple[int, CambioDeRenglon]] = field(default_factory=list)  # (renglón, el cambio): solo se agrega
     sig_congelamiento: int = 0
     sig_nodo: int = 0
     sig_version: int = 0
@@ -141,6 +146,10 @@ class _Datos:
         v = self.versiones.get(nodo_id)
         return v[-1] if v else None
 
+    def vivos(self, padre: int) -> List[_LineaDePresupuesto]:
+        """Los renglones de un bloque que no están dados de baja, en su orden."""
+        return sorted((l for l in self.renglones.get(padre, ()) if l.baja_carga_id is None), key=lambda l: l.orden)
+
     def contratados(self) -> Set[int]:
         """Los bloques contratados y todos los que cuelgan de ellos."""
         out: Set[int] = set()
@@ -150,12 +159,12 @@ class _Datos:
             if n in out:
                 continue
             out.add(n)
-            pila += [l.hijo_id for l in self.renglones.get(n, ()) if self.nodos[l.hijo_id].rol == "estructural"]
+            pila += [l.hijo_id for l in self.vivos(n) if self.nodos[l.hijo_id].rol == "estructural"]
         return out
 
     def arriba_de(self, nodo_id: int) -> List[int]:
         """El nodo y los bloques de arriba, hasta la raíz de su presupuesto."""
-        padre_de = {l.hijo_id: padre for padre, ls in self.renglones.items() for l in ls if self.nodos[l.hijo_id].rol == "estructural"}
+        padre_de = {l.hijo_id: padre for padre, ls in self.renglones.items() for l in ls if l.baja_carga_id is None and self.nodos[l.hijo_id].rol == "estructural"}
         out = [nodo_id]
         while out[-1] in padre_de:
             out.append(padre_de[out[-1]])
@@ -184,7 +193,7 @@ class MemoriaCatalogo:
         for p in d.presupuestos.values():
             e.presupuestos[p.clave] = self._resumen(p)
         for bloque in d.contratados():
-            e.en_contratado |= {d.nodos[l.hijo_id].clave for l in d.renglones.get(bloque, ()) if d.nodos[l.hijo_id].rol != "estructural"}
+            e.en_contratado |= {d.nodos[l.hijo_id].clave for l in d.vivos(bloque) if d.nodos[l.hijo_id].rol != "estructural"}
         return e
 
     def _resumen(self, p: _Presupuesto) -> ResumenPresupuesto:
@@ -192,7 +201,7 @@ class MemoriaCatalogo:
         pendientes = [p.raiz_id]
         while pendientes:
             padre = pendientes.pop()
-            for l in self._d.renglones.get(padre, ()):
+            for l in self._d.vivos(padre):
                 renglones += 1
                 if self._d.nodos[l.hijo_id].rol == "estructural":
                     pendientes.append(l.hijo_id)
@@ -230,7 +239,7 @@ class MemoriaCatalogo:
             padre = pila.pop()
             n = d.nodos[padre]
             nodos[padre] = NodoDePresupuesto(n.id, n.clave, n.descripcion, d.unidad_de(n), True, n.tipo_opus or "", n.ruta_natural or "")
-            for l in d.renglones.get(padre, ()):
+            for l in d.vivos(padre):
                 h = d.nodos[l.hijo_id]
                 if h.rol == "estructural":
                     pila.append(l.hijo_id)
@@ -240,6 +249,10 @@ class MemoriaCatalogo:
                     v = next((v for v in d.versiones.get(l.hijo_id, ()) if v.id == l.hijo_version_id), None)
                     lineas.append(LineaDePresupuesto(padre, l.hijo_id, l.orden, l.cantidad, v.version if v else None, v.pu if v else None, l.id))
         return DatosDePresupuesto(self._resumen(p), p.raiz_id, nodos, tuple(lineas))
+
+    def historia(self, renglon_id: int) -> List[CambioDeRenglon]:
+        """Todo lo que le pasó a un renglón del presupuesto, del primero al último: alta, cantidad, lugar y baja."""
+        return [c for r, c in self._d.historia if r == renglon_id]
 
     def congelamientos(self, presupuesto_id: int) -> List[Congelamiento]:
         d = self._d
@@ -276,7 +289,8 @@ class MemoriaCatalogo:
                 agrega(nodo_id, l.hijo_id, l.cantidad, l.orden, l.reporta_a, l.porcentaje)
         for padre, lineas in d.renglones.items():
             for l in lineas:
-                agrega(padre, l.hijo_id, l.cantidad, l.orden, "concepto", False)
+                if l.baja_carga_id is None:
+                    agrega(padre, l.hijo_id, l.cantidad, l.orden, "concepto", False)
         return ArbolEnMemoria(nodos, composicion)
 
     # ------------------------------------------------------------------ escribir
@@ -368,7 +382,45 @@ def _aplicar(d: _Datos, plan: PlanDeCarga) -> ResultadoCarga:
             d.sig_linea += 1
             d.renglones.setdefault(padre, []).append(_LineaDePresupuesto(d.sig_linea, hijo, v.id if v else None, r.cantidad, orden[padre]))
         d.presupuestos[d.sig_presupuesto] = _Presupuesto(d.sig_presupuesto, p.clave, p.nombre, p.tipo, raiz_id, p.huella, carga_id)
+    for r in plan.reconciliaciones:
+        _reconciliar(d, r, carga_id, ahora, unidad, nuevo_nodo)
     return ResultadoCarga(carga_id, dict(plan.resumen))
+
+
+def _reconciliar(d: _Datos, r: ReconciliacionPlan, carga_id: int, ahora: datetime, unidad, nuevo_nodo) -> None:
+    """Lo que `core/reconciliacion.py` decidió, aplicado: las cantidades, las bajas, el lugar y las altas, cada cosa con su historia."""
+    lineas = {l.id: l for ls in d.renglones.values() for l in ls}
+
+    def anota(renglon: int, campo: str, antes: Optional[str], despues: Optional[str]) -> None:
+        d.historia.append((renglon, CambioDeRenglon(carga_id, campo, antes, despues, ahora)))
+
+    for lid, antes, ahora_ in r.cantidades:
+        lineas[lid].cantidad = ahora_
+        anota(lid, "cantidad", str(antes), str(ahora_))
+    for lid in r.bajas:
+        lineas[lid].baja_carga_id = carga_id
+        anota(lid, "baja", str(lineas[lid].cantidad), None)
+    for nid in r.bajas_de_bloque:
+        d.nodos[nid].baja_carga_id = carga_id
+        d.nodos[nid].ruta_natural = f"{d.nodos[nid].ruta_natural}~baja{carga_id}"  # su ruta queda libre para un bloque nuevo que se llame igual
+    for lid, antes, ahora_ in r.ordenes:
+        lineas[lid].orden = ahora_
+        anota(lid, "orden", str(antes), str(ahora_))
+    nodo_de_alta: Dict[int, int] = {}
+    for a in sorted(r.altas, key=lambda a: a.indice):
+        padre = a.padre_id if a.padre_id is not None else nodo_de_alta[a.padre_alta]
+        if a.tipo == "Concepto":
+            hijo = d.por_clave[a.clave]
+            v = d.vigente(hijo)
+        else:
+            n = nuevo_nodo(clave=a.clave, descripcion=a.descripcion, unidad_id=unidad(a.unidad), rol="estructural", categoria="concepto",
+                           presupuesto_id=r.presupuesto_id, tipo_opus=a.tipo, ruta_natural=a.ruta_natural)
+            hijo, v = n.id, None
+            nodo_de_alta[a.indice] = hijo
+        d.sig_linea += 1
+        d.renglones.setdefault(padre, []).append(_LineaDePresupuesto(d.sig_linea, hijo, v.id if v else None, a.cantidad, a.orden))
+        anota(d.sig_linea, "alta", None, str(a.cantidad))
+    d.presupuestos[r.presupuesto_id].huella = r.huella or f"parcial:{carga_id}"
 
 
 def _contratar(d: _Datos, plan: PlanDeContratacion) -> ResultadoContratacion:

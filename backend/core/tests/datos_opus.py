@@ -8,7 +8,7 @@ import csv
 import io
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 OPUS = Path(__file__).resolve().parents[3] / "1-mundo" / "opus"
 PRESUPUESTO = "CATALOGO_DE_PRESUPUESTO"
@@ -104,5 +104,93 @@ def sin_capitulo(presupuesto: str, clave_del_capitulo: str) -> str:
             if not dentro:
                 fuera.append(f)
         filas[:] = [filas[0]] + fuera
+
+    return editar(presupuesto, cambia)
+
+
+# ---------------------------------------------------------------------------- editar el presupuesto: lo que cambia entre dos cargas
+
+
+def _capitulo(filas: List[List[str]], capitulo: str):
+    """(columnas, desde, hasta) de las filas de un capítulo: desde el que lleva su clave en el nivel 0 hasta el siguiente nivel 0."""
+    n, k = columna(filas, "Nivel"), columna(filas, "Clave")
+    desde = next(i for i, f in enumerate(filas) if i and f[n].strip() == "0" and f[k] == capitulo)
+    hasta = next((i for i in range(desde + 1, len(filas)) if filas[i][n].strip() == "0"), len(filas))
+    return n, k, desde, hasta
+
+
+def _fila_de(filas: List[List[str]], capitulo: str, clave: str, n: int = 1) -> int:
+    """El índice de la `n`-ésima fila con esa clave dentro del capítulo."""
+    _, k, desde, hasta = _capitulo(filas, capitulo)
+    return [i for i in range(desde, hasta) if filas[i][k] == clave][n - 1]
+
+
+def _fin_del_subarbol(filas: List[List[str]], i: int, nivel: int) -> int:
+    nv = columna(filas, "Nivel")
+    j = i + 1
+    while j < len(filas) and int(filas[j][nv]) > int(filas[i][nivel]) and filas[j][nv].strip() != "0":
+        j += 1
+    return j
+
+
+def _renumerar(filas: List[List[str]]) -> None:
+    """El `Indice` es el lugar entre los hermanos (lo comprueba el lector): se vuelve a poner en las filas que no son raíz."""
+    nv, ind = columna(filas, "Nivel"), columna(filas, "Indice")
+    contador: List[int] = []
+    for f in filas[1:]:
+        nivel = int(f[nv])
+        del contador[nivel + 1:]
+        while len(contador) <= nivel:
+            contador.append(0)
+        contador[nivel] += 1
+        if nivel > 0:
+            f[ind] = str(contador[nivel])
+
+
+def con_cantidad(presupuesto: str, capitulo: str, clave: str, cantidad: str, n: int = 1) -> str:
+    """La `n`-ésima fila con esa clave del capítulo, con otra cantidad."""
+    def cambia(filas):
+        filas[_fila_de(filas, capitulo, clave, n)][columna(filas, "Cantidad")] = cantidad
+
+    return editar(presupuesto, cambia)
+
+
+def sin_renglon(presupuesto: str, capitulo: str, clave: str, n: int = 1) -> str:
+    """El capítulo sin la `n`-ésima fila con esa clave —y sin lo que cuelga de ella—, con el `Indice` de los hermanos al día."""
+    def cambia(filas):
+        i = _fila_de(filas, capitulo, clave, n)
+        del filas[i:_fin_del_subarbol(filas, i, columna(filas, "Nivel"))]
+        _renumerar(filas)
+
+    return editar(presupuesto, cambia)
+
+
+def con_copia(presupuesto: str, capitulo: str, origen: str, despues_de: str, *, cantidad: Optional[str] = None, n_origen: int = 1,
+              n_despues: int = 1, como_hijo_de_la_misma: bool = False) -> str:
+    """Una copia de la fila `origen` (y de lo que cuelga de ella) puesta justo después de `despues_de` y de lo que cuelga de ésta.
+    Si `despues_de` es hermana de `origen`, la copia queda en el mismo bloque; si no, en el bloque de `despues_de`."""
+    def cambia(filas):
+        o = _fila_de(filas, capitulo, origen, n_origen)
+        nivel_columna = columna(filas, "Nivel")
+        copia = [list(f) for f in filas[o:_fin_del_subarbol(filas, o, nivel_columna)]]
+        if cantidad is not None:
+            copia[0][columna(filas, "Cantidad")] = cantidad
+        d = _fila_de(filas, capitulo, despues_de, n_despues)
+        # la copia se ajusta al nivel de la fila después de la que va
+        ajuste = int(filas[d][nivel_columna]) - int(copia[0][nivel_columna])
+        for f in copia:
+            f[nivel_columna] = str(int(f[nivel_columna]) + ajuste)
+        filas[_fin_del_subarbol(filas, d, nivel_columna):_fin_del_subarbol(filas, d, nivel_columna)] = copia
+        _renumerar(filas)
+
+    return editar(presupuesto, cambia)
+
+
+def con_orden_cambiado(presupuesto: str, capitulo: str, primera: str, segunda: str, n_primera: int = 1, n_segunda: int = 1) -> str:
+    """Dos hermanos seguidos (sin nada que cuelgue de ellos) con su lugar cambiado."""
+    def cambia(filas):
+        a, b = _fila_de(filas, capitulo, primera, n_primera), _fila_de(filas, capitulo, segunda, n_segunda)
+        filas[a], filas[b] = filas[b], filas[a]
+        _renumerar(filas)
 
     return editar(presupuesto, cambia)

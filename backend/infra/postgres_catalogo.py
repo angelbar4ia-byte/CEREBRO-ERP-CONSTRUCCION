@@ -15,6 +15,7 @@ import psycopg
 from psycopg.types.json import Jsonb
 
 from core.catalogo import (
+    CambioDeRenglon,
     CatalogoCambio,
     Congelamiento,
     DatosDePresupuesto,
@@ -26,6 +27,7 @@ from core.catalogo import (
     PlanDeCarga,
     PlanDeContratacion,
     PrecioGuardado,
+    ReconciliacionPlan,
     ResumenCarga,
     ResumenPresupuesto,
     ResultadoCarga,
@@ -85,17 +87,17 @@ class PostgresCatalogo:
                 "  SELECT nodo_id FROM estado_congelamiento WHERE estado = 'contratado'"
                 "  UNION"
                 "  SELECT c.hijo_id FROM composicion c JOIN bajo b ON c.padre_id = b.id JOIN nodo h ON h.id = c.hijo_id"
-                "   WHERE c.version_id IS NULL AND h.rol = 'estructural')"
+                "   WHERE c.version_id IS NULL AND c.baja_carga_id IS NULL AND h.rol = 'estructural')"
                 " SELECT DISTINCT h.clave FROM composicion c JOIN bajo b ON c.padre_id = b.id JOIN nodo h ON h.id = c.hijo_id"
-                "  WHERE c.version_id IS NULL AND h.rol <> 'estructural'")}
+                "  WHERE c.version_id IS NULL AND c.baja_carga_id IS NULL AND h.rol <> 'estructural'")}
         return e
 
     def _presupuestos(self) -> List[ResumenPresupuesto]:
         filas = self.conn.execute(
             "SELECT p.id, p.clave, p.nombre, p.tipo, p.huella, p.carga_id,"
-            " (SELECT count(*) FROM nodo n WHERE n.presupuesto_id = p.id)"
+            " (SELECT count(*) FROM nodo n WHERE n.presupuesto_id = p.id AND n.baja_carga_id IS NULL)"
             " + (SELECT count(*) FROM composicion c JOIN nodo pa ON pa.id = c.padre_id JOIN nodo h ON h.id = c.hijo_id"
-            "     WHERE pa.presupuesto_id = p.id AND h.rol <> 'estructural')"
+            "     WHERE pa.presupuesto_id = p.id AND h.rol <> 'estructural' AND c.baja_carga_id IS NULL)"
             " FROM presupuesto p ORDER BY p.id").fetchall()
         return [ResumenPresupuesto(*r) for r in filas]
 
@@ -144,18 +146,23 @@ class PostgresCatalogo:
             nodos: Dict[int, NodoDePresupuesto] = {}
             for id_, clave, desc, unidad, tipo, ruta in self.conn.execute(
                     "SELECT n.id, n.clave, n.descripcion, coalesce(u.clave, ''), n.tipo_opus, n.ruta_natural FROM nodo n"
-                    " LEFT JOIN unidad u ON u.id = n.unidad_id WHERE n.presupuesto_id = %s", (presupuesto_id,)):
+                    " LEFT JOIN unidad u ON u.id = n.unidad_id WHERE n.presupuesto_id = %s AND n.baja_carga_id IS NULL", (presupuesto_id,)):
                 nodos[id_] = NodoDePresupuesto(id_, clave, desc, unidad, True, tipo, ruta)
             lineas: List[LineaDePresupuesto] = []
             for linea_id, padre, hijo, orden, cantidad, version, pu, estructural, clave, desc, unidad in self.conn.execute(
                     "SELECT c.id, c.padre_id, c.hijo_id, c.orden, c.cantidad, v.version, v.pu, h.rol = 'estructural', h.clave, h.descripcion,"
                     " coalesce(uh.clave, '') FROM composicion c JOIN nodo pa ON pa.id = c.padre_id JOIN nodo h ON h.id = c.hijo_id"
                     " LEFT JOIN unidad uh ON uh.id = h.unidad_id LEFT JOIN version_concepto v ON v.id = c.hijo_version_id"
-                    " WHERE pa.presupuesto_id = %s ORDER BY c.padre_id, c.orden", (presupuesto_id,)):
+                    " WHERE pa.presupuesto_id = %s AND c.baja_carga_id IS NULL ORDER BY c.padre_id, c.orden", (presupuesto_id,)):
                 if not estructural:
                     nodos[hijo] = NodoDePresupuesto(hijo, clave, desc, unidad, False, "Concepto")
                 lineas.append(LineaDePresupuesto(padre, hijo, orden, cantidad, version, pu, linea_id))
         return DatosDePresupuesto(resumen, raiz_id, nodos, tuple(lineas))
+
+    def historia(self, renglon_id: int) -> List[CambioDeRenglon]:
+        filas = self.conn.execute(
+            "SELECT carga_id, campo, antes, despues, creada_en FROM renglon_historia WHERE renglon_id = %s ORDER BY id", (renglon_id,)).fetchall()
+        return [CambioDeRenglon(*f) for f in filas]
 
     def congelamientos(self, presupuesto_id: int) -> List[Congelamiento]:
         filas = self.conn.execute(
@@ -176,7 +183,8 @@ class PostgresCatalogo:
             for id_, padre, hijo, cantidad, orden, reporta_a, porcentaje, base in self.conn.execute(
                     "SELECT c.id, c.padre_id, c.hijo_id, c.cantidad, c.orden, c.reporta_a, c.tipo_cantidad = 'porcentaje', c.base_porcentaje"
                     " FROM composicion c LEFT JOIN version_concepto v ON v.id = c.version_id"
-                    " WHERE c.version_id IS NULL OR v.version = (SELECT max(version) FROM version_concepto WHERE nodo_id = v.nodo_id)"):
+                    " WHERE (c.version_id IS NULL AND c.baja_carga_id IS NULL)"
+                    " OR (c.version_id IS NOT NULL AND v.version = (SELECT max(version) FROM version_concepto WHERE nodo_id = v.nodo_id))"):
                 composicion.append(Composicion(
                     id_, padre, hijo, cantidad, orden, Categoria(reporta_a),
                     TipoCantidad.PORCENTAJE if porcentaje else TipoCantidad.FIJA, BasePorcentaje(base) if base else None))
@@ -278,6 +286,53 @@ class PostgresCatalogo:
                 cur.executemany(
                     "INSERT INTO composicion (padre_id, hijo_id, hijo_version_id, cantidad, orden, reporta_a)"
                     " VALUES (%s, %s, %s, %s, %s, 'concepto')", renglones)
+
+        for r in plan.reconciliaciones:
+            self._reconciliar(cur, r, carga_id, nodo_id, u)
+
+    def _reconciliar(self, cur: "psycopg.Cursor", r: ReconciliacionPlan, carga_id: int, nodo_id: Dict[str, int], u) -> None:
+        """Lo que `core/reconciliacion.py` decidió, aplicado: las cantidades, las bajas, el lugar y las altas, cada cosa con su historia."""
+        def anota(renglon: int, campo: str, antes: Optional[str], despues: Optional[str]) -> None:
+            cur.execute("INSERT INTO renglon_historia (renglon_id, carga_id, campo, antes, despues) VALUES (%s, %s, %s, %s, %s)",
+                        (renglon, carga_id, campo, antes, despues))
+
+        for lid, antes, ahora in r.cantidades:
+            cur.execute("UPDATE composicion SET cantidad = %s WHERE id = %s AND version_id IS NULL", (ahora, lid))
+            anota(lid, "cantidad", str(antes), str(ahora))
+        if r.bajas:
+            for lid, cantidad in cur.execute("SELECT id, cantidad FROM composicion WHERE id = ANY(%s)", (list(r.bajas),)).fetchall():
+                anota(lid, "baja", str(cantidad), None)
+            cur.execute("UPDATE composicion SET baja_carga_id = %s WHERE id = ANY(%s) AND version_id IS NULL", (carga_id, list(r.bajas)))
+        if r.bajas_de_bloque:
+            # su ruta queda libre para un bloque nuevo que se llame igual
+            cur.execute("UPDATE nodo SET baja_carga_id = %s, ruta_natural = ruta_natural || '~baja' || %s WHERE id = ANY(%s)",
+                        (carga_id, str(carga_id), list(r.bajas_de_bloque)))
+        if r.ordenes:
+            cur.execute("UPDATE composicion SET orden = orden + 1000000 WHERE id = ANY(%s)", ([lid for lid, _, _ in r.ordenes],))  # el índice es único
+            for lid, antes, ahora in r.ordenes:
+                cur.execute("UPDATE composicion SET orden = %s WHERE id = %s", (ahora, lid))
+                anota(lid, "orden", str(antes), str(ahora))
+        if r.altas:
+            vigente: Dict[int, int] = {n: v for v, n in cur.execute(
+                "SELECT DISTINCT ON (nodo_id) id, nodo_id FROM version_concepto ORDER BY nodo_id, version DESC")}
+            nodo_de_alta: Dict[int, int] = {}
+            for a in sorted(r.altas, key=lambda a: a.indice):
+                padre = a.padre_id if a.padre_id is not None else nodo_de_alta[a.padre_alta]
+                if a.tipo == "Concepto":
+                    hijo = nodo_id[a.clave]
+                    version = vigente.get(hijo)
+                else:
+                    hijo = cur.execute(
+                        "INSERT INTO nodo (presupuesto_id, clave, descripcion, unidad_id, rol, categoria, tipo_opus, ruta_natural)"
+                        " VALUES (%s, %s, %s, %s, 'estructural', 'concepto', %s, %s) RETURNING id",
+                        (r.presupuesto_id, a.clave, a.descripcion, u(a.unidad), a.tipo, a.ruta_natural)).fetchone()[0]
+                    nodo_de_alta[a.indice] = hijo
+                    version = None
+                linea = cur.execute(
+                    "INSERT INTO composicion (padre_id, hijo_id, hijo_version_id, cantidad, orden, reporta_a)"
+                    " VALUES (%s, %s, %s, %s, %s, 'concepto') RETURNING id", (padre, hijo, version, a.cantidad, a.orden)).fetchone()[0]
+                anota(linea, "alta", None, str(a.cantidad))
+        cur.execute("UPDATE presupuesto SET huella = %s WHERE id = %s", (r.huella or f"parcial:{carga_id}", r.presupuesto_id))
 
     def contratar(self, plan: PlanDeContratacion) -> ResultadoContratacion:
         with self.conn.transaction():

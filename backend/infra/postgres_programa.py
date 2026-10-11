@@ -248,13 +248,13 @@ class PostgresPrograma:
         renglones = [e.renglon_id for e in enlaces if e.renglon_id is not None]
         if nodos:
             hallados = self.conn.execute(
-                "SELECT count(*) FROM nodo WHERE id = ANY(%s) AND presupuesto_id = %s", (nodos, presupuesto_id)).fetchone()[0]
+                "SELECT count(*) FROM nodo WHERE id = ANY(%s) AND presupuesto_id = %s AND baja_carga_id IS NULL", (nodos, presupuesto_id)).fetchone()[0]
             if hallados != len(set(nodos)):
                 raise ValueError(f"hay nodos enlazados que no son del presupuesto {presupuesto_id}")
         if renglones:
             hallados = self.conn.execute(
                 "SELECT count(*) FROM composicion c JOIN nodo p ON p.id = c.padre_id"
-                " WHERE c.id = ANY(%s) AND c.version_id IS NULL AND p.presupuesto_id = %s", (renglones, presupuesto_id)).fetchone()[0]
+                " WHERE c.id = ANY(%s) AND c.version_id IS NULL AND c.baja_carga_id IS NULL AND p.presupuesto_id = %s", (renglones, presupuesto_id)).fetchone()[0]
             if hallados != len(set(renglones)):
                 raise ValueError(f"hay renglones enlazados que no son del presupuesto {presupuesto_id}")
         self.conn.execute("UPDATE programa SET presupuesto_id = %s WHERE id = %s", (presupuesto_id, programa_id))

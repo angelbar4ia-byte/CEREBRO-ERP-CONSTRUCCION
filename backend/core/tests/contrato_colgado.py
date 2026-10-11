@@ -10,12 +10,12 @@ from decimal import Decimal
 from fractions import Fraction
 
 from core.catalogo import ServicioCarga
-from core.colgado import ColgadoNoCuadra, ServicioColgado, TOPE_DEL_RESUMEN, alinear
+from core.colgado import ColgadoNoCuadra, ServicioColgado, TOPE_DEL_RESUMEN, alinear, informe_de_colgado
 from core.programa import CambiarDuracion, cargar_programa
 from core.servicio_programa import Enlace, PermisoDenegado, ProgramaNoExiste, ServicioPrograma, YaColgado, YaReemplazado
 from core.tests.contrato_catalogo import USUARIO
 from core.tests.contrato_programa import CAL, CO, CSV, RES, programa
-from core.tests.datos_opus import CONCEPTOS, PRESUPUESTO, texto
+from core.tests.datos_opus import CONCEPTOS, PRESUPUESTO, con_cantidad, con_copia, sin_renglon, texto
 
 QUIEN = "luis@obra.mx"
 # programa → (clave de su presupuesto, bloques que casan, partidas que casan, marcadores vacíos de OPUS que trae)
@@ -324,6 +324,38 @@ class ContratoColgado:
         por_id = {r.id: r for r in self.sp.listar()}
         self.assertEqual((por_id[a].presupuesto_id, por_id[a].enlazadas), (None, 0))
         self.assertEqual((por_id[b].presupuesto_id, por_id[b].enlazadas), (self.presupuestos["CAS-00002"].id, 78 + 289))
+
+    # ------------------------------------------------------------------ el presupuesto cambia (D-476)
+    def reconciliar(self, presupuesto, **kw):
+        return ServicioCarga(self.catalogo).aplicar(texto(CONCEPTOS), presupuesto, None, rol="costos", usuario=USUARIO, **kw)
+
+    def test_reconciliar_el_presupuesto_no_mueve_los_enlaces_del_programa(self):
+        pid, _ = self.colgar("Zafiro")
+        antes = self.programas.leer_programa(pid).enlaces
+        nuevo = con_cantidad(texto(PRESUPUESTO), "CAS-00004", "EST-10010", "40")  # otra cantidad: el mismo renglón
+        nuevo = con_copia(nuevo, "CAS-00004", "EST-10011", "EST-10011", cantidad="5")  # y un renglón que el programa no tiene
+        self.reconciliar(nuevo)
+        a = self.sc.proponer(pid, CO)
+        self.assertEqual((self.programas.leer_programa(pid).enlaces, a.se_moverian, a.huerfanos, a.nuevos), (antes, (), (), 0))
+        self.assertEqual(a.ya_estaban, 398)  # todos los enlaces de antes siguen valiendo
+        self.assertEqual([(s.clave, s.cantidad, s.renglon) for s in a.sin_programar], [("EST-10011", "5", True)])  # dinero nuevo sin fecha
+        self.assertEqual(self.sc.colgar(pid, CO, QUIEN).nuevos, 0)  # el renglón nuevo no tiene fila a la que enlazar
+
+    def test_un_renglon_dado_de_baja_deja_su_enlace_huerfano_y_el_programa_lo_dice(self):
+        pid, _ = self.colgar("Zafiro")
+        g = self.programas.leer_programa(pid)
+        fila = next(f for f in g.filas if f.fila == 241)  # OBE-04010, la que dice 4 en el programa y 1 en el presupuesto
+        oid = fila.llave
+        sin = sin_renglon(texto(PRESUPUESTO), "CAS-00004", "OBE-04010")
+        self.reconciliar(sin, todas_las_bajas=True)
+        a = self.sc.proponer(pid, CO)
+        self.assertEqual(a.huerfanos, (oid,))
+        self.assertIn(("OBE-04010", "concepto_sin_par"), [(s.clave, s.motivo) for s in a.sin_par])
+        self.assertIn("dio de baja", informe_de_colgado(a))
+        self.assertEqual(self.sc.colgar(pid, CO, QUIEN).nuevos, 0)  # no se mueve ni se borra: el enlace es historia
+        self.assertEqual(self.programas.leer_programa(pid).enlaces, g.enlaces)
+        (c,) = self.programas.leer_programa(pid).colgaduras
+        self.assertEqual(c.nuevos, 398)
 
     # ------------------------------------------------------------------ alinear, puro
     def test_alinear_no_depende_del_orden_de_las_filas_del_presupuesto_sino_de_su_ruta(self):

@@ -17,8 +17,9 @@ Reglas que aquí se hacen concretas:
   precios no cuentan: un precio que se mueve es una fila de `PRECIO_HISTORICO`, no una versión de nada.
 - **El PU de una versión se congela** al crearse, calculado con el motor sobre el archivo que se carga. Nunca se recalcula.
 - **El renglón de un presupuesto fija la versión del concepto** que tenía al cargarse.
-- **Un presupuesto que ya existe no se toca.** Si lo que llega es lo mismo, se dice; si es distinto, se dice que cambió y que no
-  se aplicó —cómo se reconcilian las cantidades de un presupuesto vivo no está diseñado—. Se reconoce por la clave de su capítulo.
+- **Un presupuesto que ya existe se reconcilia, no se pisa** (D-476, `reconciliacion.py`): se reconoce por la clave de su capítulo; si
+  lo que llega es lo mismo, se dice; si no, las cantidades distintas y los renglones nuevos entran con su historia, una baja pide
+  confirmación y no borra, y lo contratado no se toca.
 - **Lo que algo contratado usa no cambia de receta por la carga** (D-475, §2.2: «algo contratado: no entra en vigor, va a control de
   cambio»): la versión nueva de un concepto que fija un renglón de un subárbol contratado se detiene con su motivo.
 - **El estado del catálogo no cambia entre que se revisa y se aplica**: cada plan trae la última carga que vio, y si ya hay otra,
@@ -58,6 +59,7 @@ FUNCION_DE_CARGAR = "cargar_catalogo_opus"
 UMBRAL_DE_CONFIRMACION = Decimal("0.05")  # §2.2: si el PU se movió más de 5 %, pide confirmación aunque sea en diseño
 TOLERANCIA_DE_PRECIO_OBSERVADO = Decimal("0.005")
 TIPOS_DE_PRESUPUESTO = ("plantilla", "obra", "escenario")
+TOPE_DE_CAMBIOS_EN_EL_RESUMEN = 500  # lo que se guarda en la carga de la lista de cambios; el total siempre se guarda
 
 # por qué algo quedó pendiente
 UNIDAD_CAMBIO = "unidad_cambio"
@@ -65,6 +67,7 @@ PRECIO_DE_TRABAJO = "precio_de_trabajo"
 PU_MOVIO = "pu_movio_mas_de_5"
 DEPENDE_DE = "depende_de"
 EN_CONTRATADO = "en_contratado"
+BAJA_SIN_CONFIRMAR = "baja_sin_confirmar"
 CONCEPTO_PENDIENTE = "concepto_pendiente"
 CONCEPTO_CON_PRECIO_Y_SIN_MATRIZ = "concepto_con_precio_y_sin_matriz"
 
@@ -93,6 +96,14 @@ class ResumenPresupuesto:
     huella: str
     carga_id: int
     renglones: int
+
+
+@dataclass(frozen=True)
+class PresupuestoExistente:
+    """Un presupuesto guardado que el archivo trae otra vez, para reconciliarlo: su contenido y qué bloques están contratados."""
+
+    datos: "DatosDePresupuesto"
+    contratados: FrozenSet[int]  # los bloques contratados y todos los que cuelgan de ellos
 
 
 @dataclass
@@ -178,6 +189,60 @@ class PresupuestoPlan:
 
 
 @dataclass(frozen=True)
+class AltaPlan:
+    """Un renglón o un bloque que el archivo trae y el presupuesto guardado no tiene (D-476)."""
+
+    indice: int  # su lugar en la tupla de altas: los bloques nuevos van antes que lo que cuelga de ellos
+    padre_id: Optional[int]  # el bloque que ya existe…
+    padre_alta: Optional[int]  # …o el índice de otra alta, si cuelga de un bloque nuevo
+    tipo: str  # Subcapítulo · Nivel 2 · Nivel 3 · Concepto
+    nivel: int
+    clave: str
+    descripcion: str
+    unidad: str
+    cantidad: Decimal
+    ruta_natural: str  # solo de los bloques
+    orden: int  # el lugar que ocupa entre los hermanos vivos
+
+
+@dataclass(frozen=True)
+class ReconciliacionPlan:
+    """Lo que se le hace a un presupuesto que ya existe cuando llega con otro contenido: solo lo que se puede aplicar."""
+
+    presupuesto_id: int
+    clave: str
+    huella: str  # la del archivo si se aplica todo; vacía si algo quedó detenido (el adaptador pone una marca con la carga)
+    cantidades: Tuple[Tuple[int, Decimal, Decimal], ...] = ()  # (renglón, antes, ahora)
+    altas: Tuple[AltaPlan, ...] = ()
+    bajas: Tuple[int, ...] = ()  # los renglones que se dan de baja, también los de abajo de un bloque que se va
+    bajas_de_bloque: Tuple[int, ...] = ()  # los bloques (nodos) que se dan de baja
+    ordenes: Tuple[Tuple[int, int, int], ...] = ()  # (renglón, antes, ahora): el lugar entre los hermanos
+
+    @property
+    def cambia_algo(self) -> bool:
+        return bool(self.cantidades or self.altas or self.bajas or self.bajas_de_bloque or self.ordenes)
+
+
+@dataclass(frozen=True)
+class CambioDePresupuesto:
+    """Una diferencia entre un presupuesto guardado y el que llega, y qué se hace con ella."""
+
+    presupuesto: str  # la clave de su capítulo
+    tipo: str  # cantidad · alta · baja
+    id: str  # con lo que se identifica: la ruta del bloque, o `ruta del bloque::CLAVE#n` en un renglón; es lo que se confirma en una baja
+    clave: str
+    descripcion: str
+    es_bloque: bool
+    antes: Optional[Decimal]
+    ahora: Optional[Decimal]
+    estado: str  # aplica · detenido
+    motivo: str = ""  # si está detenido
+    detalle: str = ""
+    renglones: Tuple[int, ...] = ()  # de una baja: los renglones que se van con ella…
+    bloques: Tuple[int, ...] = ()  # …y los bloques, para saber quién los cita (el programa, D-474)
+
+
+@dataclass(frozen=True)
 class PlanDeCarga:
     base: int  # la última carga que vio quien revisó: si hay otra, no se aplica
     usuario: str
@@ -192,11 +257,13 @@ class PlanDeCarga:
     versiones_nuevas: Tuple[NodoConMatriz, ...] = ()
     conceptos_sin_matriz: Tuple[ConceptoSinMatriz, ...] = ()
     presupuestos_nuevos: Tuple[PresupuestoPlan, ...] = ()
+    reconciliaciones: Tuple[ReconciliacionPlan, ...] = ()
 
     @property
     def cambia_algo(self) -> bool:
         return bool(self.insumos_nuevos or self.precios_nuevos or self.unidades_que_se_saben or self.nodos_nuevos
-                    or self.versiones_nuevas or self.conceptos_sin_matriz or self.presupuestos_nuevos)
+                    or self.versiones_nuevas or self.conceptos_sin_matriz or self.presupuestos_nuevos
+                    or any(r.cambia_algo or r.huella for r in self.reconciliaciones))
 
 
 @dataclass(frozen=True)
@@ -210,7 +277,7 @@ class Pendiente:
 class EstadoDePresupuesto:
     clave: str
     nombre: str
-    estado: str  # nuevo · sin_cambios · cambio_no_aplicado · pendiente
+    estado: str  # nuevo · sin_cambios · reconciliado · parcial · pendiente
     detalle: str = ""
 
 
@@ -228,6 +295,7 @@ class DiagnosticoDeCarga:
     precios_observados_distintos: Tuple[Tuple[str, Decimal, Decimal], ...]  # (clave, el del presupuesto, el calculado)
     avisos: Tuple[str, ...]
     problemas: Tuple[str, ...]  # lo que impide aplicar: el archivo trae algo que no cuadra
+    cambios: Tuple[CambioDePresupuesto, ...] = ()  # lo que cambia en los presupuestos que ya existían (D-476)
 
     @property
     def aplicable(self) -> bool:
@@ -342,6 +410,17 @@ class PresupuestoGuardado:
 
 
 @dataclass(frozen=True)
+class CambioDeRenglon:
+    """Algo que le pasó a un renglón del presupuesto al reconciliarlo (D-476): quedó en la carga que lo hizo."""
+
+    carga_id: int
+    campo: str  # alta · cantidad · orden · baja
+    antes: Optional[str]
+    despues: Optional[str]
+    creada_en: datetime
+
+
+@dataclass(frozen=True)
 class Congelamiento:
     """Un subárbol que se contrató: el nodo, su ruta natural, quién, con qué rol, cuándo y qué se fijó."""
 
@@ -415,6 +494,9 @@ class RepositorioCatalogo(Protocol):
 
     def id_de(self, clave: str) -> int:
         """El nodo del catálogo con esa clave."""
+
+    def historia(self, renglon_id: int) -> List["CambioDeRenglon"]:
+        """Todo lo que le pasó a un renglón del presupuesto, del primero al último: alta, cantidad, lugar y baja (D-476)."""
 
     def congelamientos(self, presupuesto_id: int) -> List["Congelamiento"]:
         """Los nodos de ese presupuesto que se contrataron, del más viejo al más nuevo (D-475). Un nodo sin fila está en diseño."""
@@ -507,9 +589,17 @@ def planificar(
     archivos: Mapping[str, str],
     tipo: str = "plantilla",
     confirmados: Iterable[str] = (),
+    existentes: Optional[Mapping[str, PresupuestoExistente]] = None,
+    bajas_confirmadas: Iterable[str] = (),
+    todas_las_bajas: bool = False,
 ) -> Tuple[DiagnosticoDeCarga, PlanDeCarga]:
-    """Puro: lo que haría cargar este archivo sobre lo vigente. No escribe ni lee nada más."""
+    """Puro: lo que haría cargar este archivo sobre lo vigente. No escribe ni lee nada más. `existentes` trae el contenido de los
+    presupuestos guardados que el archivo trae distintos, para reconciliarlos."""
+    from .reconciliacion import reconciliar
+
     confirmados = frozenset(confirmados)
+    bajas_confirmadas = frozenset(bajas_confirmadas)
+    existentes = existentes or {}
     unidades_de_concepto = {c: presupuesto.unidad_de(c) for c in presupuesto.conceptos} if presupuesto is not None else {}
     arbol = armar_arbol(matrices, unidades_de_concepto)
     problemas: List[str] = list(arbol.problemas) + (list(presupuesto.problemas) if presupuesto is not None else [])
@@ -631,9 +721,20 @@ def planificar(
     estados_p: List[EstadoDePresupuesto] = []
     presupuestos_nuevos: List[PresupuestoPlan] = []
     conceptos_sin_matriz: List[ConceptoSinMatriz] = []
+    reconciliaciones: List[ReconciliacionPlan] = []
+    cambios_de_presupuesto: List[CambioDePresupuesto] = []
     sin_matriz: List[str] = []
     observados: List[Tuple[str, Decimal, Decimal]] = []
     creados = {n.clave for n in nodos_nuevos}
+
+    def detenido_hoy(c: str) -> Optional[str]:
+        """Por qué un concepto no puede entrar hoy a un presupuesto, o nulo si puede."""
+        if c in retenido:
+            return f"{c} quedó pendiente ({retenido[c]})"
+        if c in sin_matriz and any((f.precio_observado or Decimal("0")) != 0 for f in presupuesto.conceptos.get(c, ())):
+            return f"{c} trae precio y ninguna matriz"
+        return None
+
     if presupuesto is not None and presupuesto.limpia:
         sin_matriz = sorted(c for c in presupuesto.conceptos if c not in matrices.por_padre and c not in estado.huella)
         for cap in presupuesto.capitulos():
@@ -643,10 +744,30 @@ def planificar(
             if guardado is not None:
                 if guardado.huella == huella_p:
                     estados_p.append(EstadoDePresupuesto(clave, nombre, "sin_cambios"))
-                else:
-                    estados_p.append(EstadoDePresupuesto(
-                        clave, nombre, "cambio_no_aplicado",
-                        "lo que llega no es lo que está guardado; reconciliar un presupuesto que ya existe no está diseñado"))
+                    continue
+                existente = existentes.get(clave)
+                if existente is None:
+                    raise ValueError(f"el presupuesto {clave} llega distinto y no se trajo su contenido para reconciliarlo")
+                plan_r, cambios_r = reconciliar(
+                    cap, existente.datos, existente.contratados, huella_del_archivo=huella_p, concepto_detenido=detenido_hoy,
+                    bajas_confirmadas=bajas_confirmadas, todas_las_bajas=todas_las_bajas)
+                cambios_de_presupuesto += cambios_r
+                detenidos = [c for c in cambios_r if c.estado == "detenido"]
+                aplican = [c for c in cambios_r if c.estado == "aplica"]
+                for c in detenidos:
+                    pendientes.append(Pendiente(c.id, c.motivo, f"{clave}: {c.tipo} de {c.clave}: {c.detalle}"))
+                cuenta = {k: sum(1 for c in aplican if c.tipo == k) for k in ("cantidad", "alta", "baja")}
+                detalle = f"{cuenta['cantidad']} cantidades · {cuenta['alta']} altas · {cuenta['baja']} bajas"
+                if detenidos:
+                    detalle += f" · {len(detenidos)} detenidos"
+                estados_p.append(EstadoDePresupuesto(clave, nombre, "parcial" if detenidos else "reconciliado", detalle if cambios_r else "ya estaba igual"))
+                if plan_r.cambia_algo or plan_r.huella:
+                    reconciliaciones.append(plan_r)
+                for al in plan_r.altas:
+                    if al.tipo == "Concepto" and al.clave in sin_matriz and al.clave not in estado.unidad \
+                            and al.clave not in {x.clave for x in conceptos_sin_matriz}:
+                        fila = presupuesto.conceptos[al.clave][0]
+                        conceptos_sin_matriz.append(ConceptoSinMatriz(al.clave, fila.descripcion, fila.unidad))
                 continue
             conceptos = sorted({f.clave for f in cap.filas if f.es_concepto})
             frena = [(c, retenido[c]) for c in conceptos if c in retenido]
@@ -685,7 +806,8 @@ def planificar(
     # ---- las unidades que hay que tener
     vistas: Dict[str, str] = {}
     for u in ([i.unidad for i in insumos_nuevos] + [n.unidad for n in nodos_nuevos + versiones_nuevas] + [c.unidad for c in conceptos_sin_matriz]
-              + [u for _, u in unidades_que_se_saben] + [r.unidad for p in presupuestos_nuevos for r in p.renglones]):
+              + [u for _, u in unidades_que_se_saben] + [r.unidad for p in presupuestos_nuevos for r in p.renglones]
+              + [a.unidad for r in reconciliaciones for a in r.altas]):
         if u.strip():
             vistas.setdefault(u.strip().casefold(), u.strip())
     sin_unidad = tuple(sorted([i.clave for i in insumos_nuevos if not i.unidad.strip()] + [n.clave for n in nodos_nuevos if not n.unidad.strip()]))
@@ -697,13 +819,20 @@ def planificar(
         "pendientes": [{"clave": p.clave, "motivo": p.motivo, "detalle": p.detalle} for p in pendientes],
         "presupuestos": [{"clave": e.clave, "estado": e.estado, "detalle": e.detalle} for e in estados_p],
         "confirmados": sorted(confirmados),
+        "bajas_confirmadas": sorted(bajas_confirmadas) + (["todas"] if todas_las_bajas else []),
+        "cambios_de_presupuesto": [
+            {"presupuesto": c.presupuesto, "tipo": c.tipo, "id": c.id, "clave": c.clave, "antes": None if c.antes is None else str(c.antes),
+             "ahora": None if c.ahora is None else str(c.ahora), "estado": c.estado, "motivo": c.motivo}
+            for c in cambios_de_presupuesto[:TOPE_DE_CAMBIOS_EN_EL_RESUMEN]],
+        "cambios_de_presupuesto_total": len(cambios_de_presupuesto),
     }
     diagnostico = DiagnosticoDeCarga(
         diag, len(insumos_nuevos), tuple(precios_que_cambian), tuple(pendientes), tuple(estados_p), tuple(sin_matriz), sin_unidad,
-        tuple(observados), tuple(avisos), tuple(problemas))
+        tuple(observados), tuple(avisos), tuple(problemas), tuple(cambios_de_presupuesto))
     plan = PlanDeCarga(
         estado.ultima_carga, usuario, rol, dict(archivos), resumen, tuple(vistas.values()), tuple(insumos_nuevos), tuple(precios_nuevos),
-        tuple(unidades_que_se_saben), tuple(nodos_nuevos), tuple(versiones_nuevas), tuple(conceptos_sin_matriz), tuple(presupuestos_nuevos))
+        tuple(unidades_que_se_saben), tuple(nodos_nuevos), tuple(versiones_nuevas), tuple(conceptos_sin_matriz), tuple(presupuestos_nuevos),
+        tuple(reconciliaciones))
     return diagnostico, plan
 
 
@@ -715,6 +844,7 @@ MOTIVOS = {
     PU_MOVIO: "el PU se movió más de 5 %: pide confirmación",
     DEPENDE_DE: "depende de algo que quedó pendiente",
     EN_CONTRATADO: "lo usa algo contratado: va a control de cambio",
+    BAJA_SIN_CONFIRMAR: "una baja pide confirmación",
     CONCEPTO_PENDIENTE: "tiene un concepto pendiente",
     CONCEPTO_CON_PRECIO_Y_SIN_MATRIZ: "trae precio y ninguna matriz",
 }
@@ -733,8 +863,18 @@ def informe_de_carga(d: DiagnosticoDeCarga) -> str:
         o.append(f"  {len(g.ausentes):>5} ya no vienen en el archivo (no se borran)")
     if d.presupuestos:
         o += ["", "Presupuestos"]
-        etiqueta = {"nuevo": "se cargará", "sin_cambios": "ya está, igual", "cambio_no_aplicado": "ya está y llega distinto: NO se aplica", "pendiente": "pendiente"}
+        etiqueta = {"nuevo": "se cargará", "sin_cambios": "ya está, igual", "reconciliado": "ya está y llega distinto: se reconcilia",
+                    "parcial": "ya está y llega distinto: se reconcilia, con cambios detenidos", "pendiente": "pendiente"}
         o += [f"  {e.clave:<10} {e.nombre} — {etiqueta.get(e.estado, e.estado)}" + (f" ({e.detalle})" if e.detalle else "") for e in d.presupuestos]
+    if d.cambios:
+        o += ["", "Cambios en presupuestos que ya existen"]
+        nombre_de_tipo = {"cantidad": "cantidad", "alta": "alta", "baja": "baja"}
+        for c in d.cambios[:40]:
+            valor = (f"{c.antes} → {c.ahora}" if c.tipo == "cantidad" else (f"× {c.ahora}" if c.tipo == "alta" else f"× {c.antes}"))
+            marca = "" if c.estado == "aplica" else f"  [DETENIDO: {MOTIVOS.get(c.motivo, c.motivo)}]"
+            o.append(f"  {c.presupuesto} · {nombre_de_tipo[c.tipo]:<8} {c.clave:<11} {valor}  ({c.id}){marca}")
+        if len(d.cambios) > 40:
+            o.append(f"  … y {len(d.cambios) - 40} más")
     if d.pendientes:
         o += ["", "Pendientes (no se aplican; quedan dichos en la carga)"]
         o += [f"  {p.clave:<12} {MOTIVOS.get(p.motivo, p.motivo)}: {p.detalle}" for p in d.pendientes]
@@ -785,8 +925,11 @@ class ServicioCarga:
         usuario: str,
         tipo: str = "plantilla",
         confirmados: Iterable[str] = (),
+        bajas_confirmadas: Iterable[str] = (),
+        todas_las_bajas: bool = False,
     ) -> Revision:
-        """Lee los archivos y dice qué haría cargarlos hoy. No escribe nada."""
+        """Lee los archivos y dice qué haría cargarlos hoy. No escribe nada. `bajas_confirmadas` son los `id` de las bajas de renglones o
+        bloques de presupuestos que ya existen que alguien confirmó (el informe los dice); `todas_las_bajas` las confirma todas."""
         rol_con_que = self.rol_para(rol)
         if not usuario:
             raise ValueError("toda carga dice quién la hizo")
@@ -799,8 +942,19 @@ class ServicioCarga:
             archivos["CATALOGO_DE_PRESUPUESTO"] = sha256_de(presupuesto)
         matrices = leer_matrices(conceptos, compuestos)
         lectura = leer_presupuesto(presupuesto) if presupuesto is not None else None
-        d, plan = planificar(self.repo.estado_vigente(), matrices, lectura, usuario=usuario, rol=rol_con_que, archivos=archivos,
-                             tipo=tipo, confirmados=confirmados)
+        estado = self.repo.estado_vigente()  # primero la última carga y después el contenido: si algo cambia en medio, el candado salta
+        existentes: Dict[str, PresupuestoExistente] = {}
+        if lectura is not None and lectura.limpia:
+            from .contratacion import nodos_contratados
+
+            for cap in lectura.capitulos():
+                guardado = estado.presupuestos.get(cap.raiz.clave)
+                if guardado is not None and guardado.huella != huella_presupuesto(cap.filas):
+                    datos = self.repo.datos_de_presupuesto(guardado.id)
+                    existentes[cap.raiz.clave] = PresupuestoExistente(
+                        datos, frozenset(nodos_contratados(datos, self.repo.congelamientos(guardado.id))))
+        d, plan = planificar(estado, matrices, lectura, usuario=usuario, rol=rol_con_que, archivos=archivos, tipo=tipo,
+                             confirmados=confirmados, existentes=existentes, bajas_confirmadas=bajas_confirmadas, todas_las_bajas=todas_las_bajas)
         return Revision(d, plan)
 
     def aplicar(
@@ -813,10 +967,13 @@ class ServicioCarga:
         usuario: str,
         tipo: str = "plantilla",
         confirmados: Iterable[str] = (),
+        bajas_confirmadas: Iterable[str] = (),
+        todas_las_bajas: bool = False,
     ) -> ResultadoCarga:
         """Revisa y aplica lo que entra. Lo detenido no se aplica y queda dicho en la carga. Si el archivo trae algo que no
         cuadra (`problemas`), no se escribe nada."""
-        r = self.revisar(conceptos, presupuesto, compuestos, rol=rol, usuario=usuario, tipo=tipo, confirmados=confirmados)
+        r = self.revisar(conceptos, presupuesto, compuestos, rol=rol, usuario=usuario, tipo=tipo, confirmados=confirmados,
+                         bajas_confirmadas=bajas_confirmadas, todas_las_bajas=todas_las_bajas)
         if not r.diagnostico.aplicable:
             raise CargaNoProcede("el archivo trae algo que no cuadra: " + "; ".join(r.diagnostico.problemas))
         if not r.plan.cambia_algo and not r.diagnostico.pendientes:

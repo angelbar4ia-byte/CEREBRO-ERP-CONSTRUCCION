@@ -290,7 +290,8 @@ class ContratoCatalogo:
         self.assertEqual(self.repo.estado_vigente().unidad["ZZZ-00001"], "")  # no cuelga de ningún presupuesto: no se sabe su unidad
 
     # ------------------------------------------------------------------ los presupuestos que ya existen y los que llegan
-    def test_un_presupuesto_que_ya_existe_no_se_toca_aunque_llegue_distinto(self):
+    def test_un_presupuesto_que_ya_existe_se_reconcilia_y_los_demas_siguen_igual(self):
+        """Lo que antes no se aplicaba (D-473) ahora se reconcilia (D-476); los casos están en `contrato_reconciliacion.py`."""
         self.base()
         total = self.presupuesto("CAS-00004").total
 
@@ -301,10 +302,12 @@ class ContratoCatalogo:
 
         r = self.revisar(presupuesto=editar(self.pres, mas_de_algo))
         estados = {e.clave: e.estado for e in r.diagnostico.presupuestos}
-        self.assertEqual(estados["CAS-00004"], "cambio_no_aplicado")
+        self.assertEqual(estados["CAS-00004"], "reconciliado")
         self.assertEqual({e for c, e in estados.items() if c != "CAS-00004"}, {"sin_cambios"})
-        self.assertIsNone(self.cargar(presupuesto=editar(self.pres, mas_de_algo)).carga_id)
-        self.assertEqual((self.presupuesto("CAS-00004").total, len(self.repo.cargas())), (total, 1))
+        self.assertEqual(self.presupuesto("CAS-00004").total, total)  # revisar no escribe
+        self.assertIsNotNone(self.cargar(presupuesto=editar(self.pres, mas_de_algo)).carga_id)
+        self.assertGreater(self.presupuesto("CAS-00004").total, total)
+        self.assertEqual(len(self.repo.cargas()), 2)
 
     def test_un_presupuesto_nuevo_cuelga_de_lo_que_ya_hay(self):
         self.cargar(presupuesto=sin_capitulo(self.pres, "CAS-00001"), compuestos=self.comp)

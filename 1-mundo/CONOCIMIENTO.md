@@ -6713,6 +6713,22 @@ en este archivo:
 
 `PENDIENTES-MEJORAS.md` B-05.
 
+### Un presupuesto que ya existe se reconcilia (D-476)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-476 y `MODELO.md` §4 (la subsección de D-476). Lo que cambia lo dicho antes en
+este archivo:
+
+- **«Un presupuesto que ya existe no se toca» (D-473) ya no es cierto:** llega otra vez y se reconcilia por la ruta natural de §2.3 —no por
+  posición—. En diseño «renumera libre» (§1.4): las cantidades distintas y los renglones nuevos entran, con su historia; lo contratado
+  «solo admite adiciones al final» y por control de cambio, así que la carga no le toca nada.
+- **Una baja es la decisión más cara y la que más se confirma:** el archivo que ya no trae un renglón no basta para quitarlo. Se dice, con
+  el id con que se confirma, y el renglón sigue hasta que alguien lo confirme; un bloque que se va se lleva lo que cuelga de él con una sola
+  confirmación. Y no se borra: queda dado de baja con su carga.
+- **El programa y el presupuesto cambian cada uno por su lado sin perderse:** reconciliar no mueve un enlace; si un renglón que el programa
+  cita se da de baja, el enlace queda donde estaba y el programa lo dice.
+
+`PENDIENTES-MEJORAS.md` B-05 y B-06.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

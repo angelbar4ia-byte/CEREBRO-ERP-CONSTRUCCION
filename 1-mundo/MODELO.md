@@ -1040,6 +1040,20 @@ final»). Si el PU de un concepto se mueve más de 5 %, o no tiene matriz y vald
 medias. La función es `contratar_subarbol` (§5b, propuesta): Control de obra. Y la carga ya no le cambia la receta a un concepto que fija un
 renglón contratado: esa versión se detiene y va a control de cambio (`MEMORIA.md` D-475).
 
+### Reconciliar un presupuesto que ya existe: la baja no borra y la historia solo se agrega (D-476)
+
+*Cómo quedó en la base (`database/migraciones/0008_reconciliar_un_presupuesto.sql`):*
+
+```
+COMPOSICION     gana   baja_carga_id    solo en un renglón de presupuesto: la carga que lo dio de baja; nulo si está vivo
+NODO            gana   baja_carga_id    ídem para un bloque; su ruta natural queda libre (se le agrega «~baja<carga>»)
+RENGLON_HISTORIA nueva renglon_id, carga_id, campo (alta · cantidad · orden · baja), antes, despues — solo se agrega
+```
+
+El lugar de un renglón (`orden`) es único entre los vivos de su bloque; el de uno dado de baja ya no cuenta. **Lo dado de baja no se
+borra** porque el programa lo puede citar (`programa_fila.renglon_id`, `nodo_id`, D-474) y porque la historia es de quien la lea
+después; pero no sale en el presupuesto, ni en el motor de cálculo, ni ocupa lugar. Reglas completas en `MEMORIA.md` D-476.
+
 ### El tabulador por contratista no toca el PU
 
 ```
