@@ -6729,6 +6729,21 @@ este archivo:
 
 `PENDIENTES-MEJORAS.md` B-05 y B-06.
 
+### La alerta por diferencia de texto, en la carga (D-477)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-477. Lo que cambia o se aprende:
+
+- **§2.7.1 ya no es solo una regla escrita:** al recargar, la descripción de cada nodo del catálogo se normaliza y se compara con la
+  guardada. Cosmético no alerta; un número o una palabra que cambian alertan como **alta**; el orden o un calificativo, como informativa.
+- **Cruzar texto y huella ya se cumple:** un texto que cambió de forma alta junto con la matriz es **otro concepto**: se detiene y se
+  propone la clave siguiente libre, y quien decide puede confirmar que es el mismo.
+- **En los datos que hay no hay una sola diferencia de texto** —cada clave trae una sola descripción en los dos archivos de OPUS—: la regla
+  se probó contra todas las descripciones reales y con filas reales editadas, no contra un caso que haya ocurrido.
+- **Falta el diccionario de sinónimos** que §2.7.1 menciona: no existe en el repositorio, y sin él fabricación y elaboración son palabras
+  distintas.
+
+`PENDIENTES-MEJORAS.md` B-06.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

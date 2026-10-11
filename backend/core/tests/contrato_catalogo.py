@@ -17,6 +17,7 @@ from core.catalogo import (
     PRECIO_DE_TRABAJO,
     PU_MOVIO,
     ServicioCarga,
+    TEXTO_Y_RECETA,
     UNIDAD_CAMBIO,
 )
 from core.importacion_opus import CargaNoProcede, armar_arbol, huella, leer_matrices, leer_presupuesto
@@ -29,6 +30,8 @@ from core.tests.datos_opus import (
     cambiar_unidad_del_concepto,
     cambiar_unidad_del_hijo,
     columna,
+    con_descripcion_del_concepto,
+    con_descripcion_del_hijo,
     editar,
     reescalar_costo,
     reescalar_linea,
@@ -216,7 +219,9 @@ class ContratoCatalogo:
             filas[mias[0]][d] += " (corregido)"
 
         r = self.revisar(editar(self.con, retocar))
-        self.assertEqual((r.diagnostico.diagnostico.versionan, r.plan.cambia_algo), ((), False))
+        self.assertEqual((r.diagnostico.diagnostico.versionan, r.plan.versiones_nuevas, r.plan.nodos_nuevos), ((), (), ()))
+        # el texto sí se dice, como informativo (§2.7.1: «corregido» es una anotación, no un cambio de qué se trata)
+        self.assertEqual([(a.nivel, a.estado) for a in r.diagnostico.alertas_de_texto], [("informativa", "carga")])
 
     def test_un_cambio_de_mas_de_5_por_ciento_pide_confirmacion_y_lo_demas_entra(self):
         self.base()
@@ -388,3 +393,93 @@ class ContratoCatalogo:
         self.assertEqual(res.carga_id, 2)
         self.assertEqual(self.repo.cargas()[-1].resumen["pendientes"][0]["motivo"], PU_MOVIO)
         self.assertEqual(len(self.repo.versiones("ACA-01010")), 1)
+
+    # ------------------------------------------------------------------ el texto que cambia (§2.7.1, D-477)
+    K1 = "EST-10010"
+
+    def alertas(self, r):
+        return {a.clave: a for a in r.diagnostico.alertas_de_texto}
+
+    def test_un_cambio_cosmetico_de_texto_ni_alerta_ni_escribe(self):
+        self.base()
+        r = self.revisar(presupuesto=con_descripcion_del_concepto(self.pres, self.K1, str.lower))
+        self.assertEqual((r.diagnostico.alertas_de_texto, r.plan.cambia_algo, r.plan.descripciones), ((), False, ()))
+        self.assertIsNone(self.cargar(presupuesto=con_descripcion_del_concepto(self.pres, self.K1, str.upper)).carga_id)
+
+    def test_el_orden_de_las_palabras_o_un_calificativo_solo_informa_y_el_texto_entra(self):
+        self.base()
+        antes = self.repo.estado_vigente().descripcion[self.K1]
+        nuevo = con_descripcion_del_concepto(self.pres, self.K1, lambda d: "Nuevo. " + d)
+        r = self.revisar(presupuesto=nuevo)
+        a = self.alertas(r)[self.K1]
+        self.assertEqual((a.nivel, a.motivo, a.estado), ("informativa", "calificativo", "carga"))
+        self.cargar(presupuesto=nuevo)
+        self.assertEqual(self.repo.estado_vigente().descripcion[self.K1], "Nuevo. " + antes)
+        self.assertEqual(len(self.repo.versiones(self.K1)), 1)  # el texto no versiona nada
+        self.assertEqual(self.repo.cargas()[-1].resumen["alertas_de_texto"][0]["antes"], antes)  # y el de antes queda en la carga
+
+    def test_un_numero_que_cambia_es_alta_y_carga_si_la_receta_es_la_misma(self):
+        self.base()
+        nuevo = con_descripcion_del_concepto(self.pres, self.K1, lambda d: d.replace("4.00", "5.00"))
+        r = self.revisar(presupuesto=nuevo)
+        a = self.alertas(r)[self.K1]
+        self.assertEqual((a.nivel, a.motivo, a.detalle, a.estado), ("alta", "numero", "4 → 5", "carga"))
+        self.assertEqual(r.diagnostico.pendientes, ())
+        self.cargar(presupuesto=nuevo)
+        self.assertIn("5.00", self.repo.estado_vigente().descripcion[self.K1])
+        self.assertEqual(self.estado_de_texto(self.revisar(presupuesto=nuevo)), ())  # y ya no vuelve a alertar
+
+    def estado_de_texto(self, r):
+        return r.diagnostico.alertas_de_texto
+
+    def test_el_texto_que_cambia_de_verdad_junto_con_la_receta_es_otro_concepto(self):
+        self.base()
+        antes = self.repo.estado_vigente().descripcion[self.K1]
+        pres = con_descripcion_del_concepto(self.pres, self.K1, lambda d: d.replace("4.00", "5.00"))
+        con = reescalar_linea(self.con, self.K1, 0, Decimal("1.01"))  # y la receta también: el PU se mueve poco
+        r = self.revisar(con, pres)
+        a = self.alertas(r)[self.K1]
+        self.assertEqual((a.estado, a.nivel), ("detenido", "alta"))
+        self.assertNotIn(a.clave_propuesta, self.repo.estado_vigente().unidad)  # la clave que se propone está libre
+        self.assertTrue(a.clave_propuesta.startswith("EST-"), a.clave_propuesta)
+        self.assertEqual([(p.clave, p.motivo) for p in r.diagnostico.pendientes], [(self.K1, TEXTO_Y_RECETA)])
+        self.assertEqual(r.diagnostico.diagnostico.versionan, (self.K1,))
+        self.cargar(con, pres)
+        self.assertEqual((len(self.repo.versiones(self.K1)), self.repo.estado_vigente().descripcion[self.K1]), (1, antes))  # nada entró
+        # quien decide dice que es el mismo concepto: entra como versión y el texto con ella
+        self.cargar(con, pres, confirmados=[self.K1])
+        self.assertEqual(len(self.repo.versiones(self.K1)), 2)
+        self.assertIn("5.00", self.repo.estado_vigente().descripcion[self.K1])
+
+    def test_lo_que_contiene_un_compuesto_detenido_por_texto_tambien_espera_si_cambia(self):
+        self.base()
+        aux, usa = "AUX-00001", "EST-21011"
+        nuevo_texto = con_descripcion_del_hijo(self.con, aux, lambda d: d.replace("15x25", "15x30"))
+        con = reescalar_linea(reescalar_linea(nuevo_texto, aux, 0, Decimal("1.01")), usa, 0, Decimal("1.01"))  # la trabe cambia, y el concepto que la lleva
+        r = self.revisar(con)
+        self.assertEqual(self.alertas(r)[aux].estado, "detenido")
+        self.assertEqual([(p.clave, p.motivo) for p in r.diagnostico.pendientes], [(aux, TEXTO_Y_RECETA), (usa, DEPENDE_DE)])
+        self.cargar(con)
+        self.assertEqual({len(self.repo.versiones(c)) for c in (aux, usa)}, {1})
+        # los que la llevan y no cambian de receta no esperan nada: su PU está congelado en su versión
+        solo_la_trabe = self.revisar(nuevo_texto)
+        self.assertEqual([p.motivo for p in solo_la_trabe.diagnostico.pendientes], [])
+
+    def test_el_texto_de_un_insumo_alerta_y_entra_porque_no_tiene_receta_que_cruzar(self):
+        self.base()
+        nuevo = con_descripcion_del_hijo(self.con, "ACE-00001", lambda d: d + " CAL. 16")
+        r = self.revisar(nuevo)
+        a = self.alertas(r)["ACE-00001"]
+        self.assertEqual((a.nivel, a.estado), ("alta", "carga"))
+        self.cargar(nuevo)
+        self.assertEqual(self.repo.estado_vigente().descripcion["ACE-00001"], "ALAMBRE RECOCIDO CAL. 16")
+
+    def test_lo_que_se_detiene_por_otra_razon_no_cambia_de_texto(self):
+        self.base()
+        grande = reescalar_linea(self.con, "ACA-01010", 1, Decimal("2"))  # el PU se mueve 70 %: pide confirmación
+        nuevo = con_descripcion_del_concepto(self.pres, "ACA-01010", lambda d: d.replace("3.00", "2.40"))
+        antes = self.repo.estado_vigente().descripcion["ACA-01010"]
+        r = self.revisar(grande, nuevo)
+        self.assertEqual(self.alertas(r)["ACA-01010"].estado, "detenido")
+        self.cargar(grande, nuevo)
+        self.assertEqual(self.repo.estado_vigente().descripcion["ACA-01010"], antes)

@@ -22,6 +22,9 @@ Reglas que aquí se hacen concretas:
   confirmación y no borra, y lo contratado no se toca.
 - **Lo que algo contratado usa no cambia de receta por la carga** (D-475, §2.2: «algo contratado: no entra en vigor, va a control de
   cambio»): la versión nueva de un concepto que fija un renglón de un subárbol contratado se detiene con su motivo.
+- **Un texto que cambia de verdad con la receta es otro concepto** (D-477, §2.7.1): si la descripción de un concepto cambió de forma
+  significativa —un número, el verbo o el elemento— **y** su matriz también, no se trata como una versión sino que se detiene y se
+  propone una clave nueva; quien decide puede confirmar que es el mismo. Un texto que cambia sin la receta carga y alerta.
 - **El estado del catálogo no cambia entre que se revisa y se aplica**: cada plan trae la última carga que vio, y si ya hay otra,
   `CatalogoCambio` y no se escribe nada (el mismo candado que `programa.version`).
 
@@ -54,6 +57,7 @@ from .importacion_opus import (
 )
 from .motor_calculo import CicloError, ArbolEnMemoria, precio_unitario
 from .servicio_programa import Roles, rol_efectivo
+from .texto import ALTA, DiferenciaDeTexto, clave_nueva, comparar
 
 FUNCION_DE_CARGAR = "cargar_catalogo_opus"
 UMBRAL_DE_CONFIRMACION = Decimal("0.05")  # §2.2: si el PU se movió más de 5 %, pide confirmación aunque sea en diseño
@@ -67,6 +71,7 @@ PRECIO_DE_TRABAJO = "precio_de_trabajo"
 PU_MOVIO = "pu_movio_mas_de_5"
 DEPENDE_DE = "depende_de"
 EN_CONTRATADO = "en_contratado"
+TEXTO_Y_RECETA = "texto_y_receta"
 BAJA_SIN_CONFIRMAR = "baja_sin_confirmar"
 CONCEPTO_PENDIENTE = "concepto_pendiente"
 CONCEPTO_CON_PRECIO_Y_SIN_MATRIZ = "concepto_con_precio_y_sin_matriz"
@@ -118,6 +123,7 @@ class EstadoVigente:
     presupuestos: Dict[str, ResumenPresupuesto] = field(default_factory=dict)  # por la clave de su capítulo
     ultima_carga: int = 0
     version: Dict[str, int] = field(default_factory=dict)  # padres con matriz → el número de su versión vigente
+    descripcion: Dict[str, str] = field(default_factory=dict)  # todo nodo del catálogo → su descripción guardada (D-477)
     en_contratado: Set[str] = field(default_factory=set)  # conceptos que fija algún renglón de un subárbol contratado (D-475)
 
     def como_catalogo(self) -> CatalogoLeido:
@@ -243,6 +249,20 @@ class CambioDePresupuesto:
 
 
 @dataclass(frozen=True)
+class AlertaDeTexto:
+    """Una descripción que llega distinta de la guardada, y qué se hace con ella (§2.7.1, D-477)."""
+
+    clave: str
+    antes: str
+    despues: str
+    nivel: str  # informativa · alta
+    motivo: str  # numero · palabra · orden · calificativo
+    detalle: str  # lo que cambió: «3 → 4.2», «tabique → block»
+    estado: str  # carga: la descripción nueva entra · detenido: con la receta, parece otro concepto
+    clave_propuesta: str = ""  # si está detenido: la clave nueva que el sistema propone
+
+
+@dataclass(frozen=True)
 class PlanDeCarga:
     base: int  # la última carga que vio quien revisó: si hay otra, no se aplica
     usuario: str
@@ -258,12 +278,13 @@ class PlanDeCarga:
     conceptos_sin_matriz: Tuple[ConceptoSinMatriz, ...] = ()
     presupuestos_nuevos: Tuple[PresupuestoPlan, ...] = ()
     reconciliaciones: Tuple[ReconciliacionPlan, ...] = ()
+    descripciones: Tuple[Tuple[str, str], ...] = ()  # (clave, descripción nueva): lo que cambió de texto y entra
 
     @property
     def cambia_algo(self) -> bool:
         return bool(self.insumos_nuevos or self.precios_nuevos or self.unidades_que_se_saben or self.nodos_nuevos
                     or self.versiones_nuevas or self.conceptos_sin_matriz or self.presupuestos_nuevos
-                    or any(r.cambia_algo or r.huella for r in self.reconciliaciones))
+                    or any(r.cambia_algo or r.huella for r in self.reconciliaciones) or self.descripciones)
 
 
 @dataclass(frozen=True)
@@ -296,6 +317,7 @@ class DiagnosticoDeCarga:
     avisos: Tuple[str, ...]
     problemas: Tuple[str, ...]  # lo que impide aplicar: el archivo trae algo que no cuadra
     cambios: Tuple[CambioDePresupuesto, ...] = ()  # lo que cambia en los presupuestos que ya existían (D-476)
+    alertas_de_texto: Tuple[AlertaDeTexto, ...] = ()  # las descripciones que llegan distintas (D-477)
 
     @property
     def aplicable(self) -> bool:
@@ -681,11 +703,42 @@ def planificar(
     versiones_nuevas: List[NodoConMatriz] = []
     pu_de: Dict[str, Decimal] = {}  # el PU con que queda cada matriz que se aplica
     descripcion_de = {l.hijo: l.descripcion for l in matrices.lineas}
+
+    # ---- los textos (§2.7.1, D-477): lo cosmético no alerta; lo informativo y lo alto se dicen; lo alto junto con la receta es otro concepto
+    entrante: Dict[str, str] = {}
+    for l in matrices.lineas:
+        entrante.setdefault(l.hijo, l.descripcion)
+    if presupuesto is not None:
+        for c_, filas_ in presupuesto.conceptos.items():
+            entrante[c_] = filas_[0].descripcion
+    claves_del_catalogo = frozenset(estado.descripcion) | frozenset(padres) | frozenset(hojas)
+    de_texto: List[Tuple[str, str, str, "DiferenciaDeTexto"]] = []  # (clave, antes, después, diferencia) de lo que llega distinto
+    llenar: List[Tuple[str, str]] = []  # lo que existía sin texto y ahora lo trae
+    for c, despues in sorted(entrante.items()):
+        antes = estado.descripcion.get(c)
+        if antes is None or not despues.strip():
+            continue  # un nodo nuevo no tiene con qué compararse
+        if not antes.strip():
+            llenar.append((c, despues))
+            continue
+        dif = comparar(antes, despues)
+        if not dif.alerta:
+            continue
+        de_texto.append((c, antes, despues, dif))
+        if dif.nivel == ALTA and c in versionan and c not in confirmados and c not in retenido:
+            propuesta = clave_nueva(c, claves_del_catalogo | frozenset(entrante))
+            retenido[c] = TEXTO_Y_RECETA
+            pendientes.append(Pendiente(
+                c, TEXTO_Y_RECETA,
+                f"el texto cambió ({dif.detalle}) y la matriz también: parece otro concepto; la clave nueva sería {propuesta}, o confírmalo si es el mismo"))
+
     for c in orden:
         if c not in nuevos and c not in versionan:
             if c not in retenido and not estado.unidad.get(c) and nuevo.unidad.get(c):
                 unidades_que_se_saben.append((c, nuevo.unidad[c]))
             continue
+        if retenido.get(c) == TEXTO_Y_RECETA:
+            continue  # ya quedó dicho arriba
         if c in versionan and c in estado.en_contratado:
             retenido[c] = EN_CONTRATADO
             pendientes.append(Pendiente(c, EN_CONTRATADO, "lo fija un renglón contratado: el cambio de su matriz va a control de cambio"))
@@ -803,6 +856,13 @@ def planificar(
     elif presupuesto is not None:
         estados_p.append(EstadoDePresupuesto("", "", "pendiente", "el archivo trae problemas: no se carga ningún presupuesto"))
 
+    # ---- lo que de los textos entra: nada de lo que quedó detenido por otra razón
+    alertas_de_texto = tuple(
+        AlertaDeTexto(c, antes, despues, dif.nivel, dif.motivo, dif.detalle, "detenido" if c in retenido else "carga",
+                      clave_nueva(c, claves_del_catalogo | frozenset(entrante)) if retenido.get(c) == TEXTO_Y_RECETA else "")
+        for c, antes, despues, dif in de_texto)
+    descripciones = tuple([(c, despues) for c, _, despues, _ in de_texto if c not in retenido] + [(c, d) for c, d in llenar if c not in retenido])
+
     # ---- las unidades que hay que tener
     vistas: Dict[str, str] = {}
     for u in ([i.unidad for i in insumos_nuevos] + [n.unidad for n in nodos_nuevos + versiones_nuevas] + [c.unidad for c in conceptos_sin_matriz]
@@ -825,14 +885,18 @@ def planificar(
              "ahora": None if c.ahora is None else str(c.ahora), "estado": c.estado, "motivo": c.motivo}
             for c in cambios_de_presupuesto[:TOPE_DE_CAMBIOS_EN_EL_RESUMEN]],
         "cambios_de_presupuesto_total": len(cambios_de_presupuesto),
+        "alertas_de_texto": [
+            {"clave": a.clave, "antes": a.antes, "despues": a.despues, "nivel": a.nivel, "motivo": a.motivo, "detalle": a.detalle, "estado": a.estado,
+             "clave_propuesta": a.clave_propuesta} for a in alertas_de_texto[:TOPE_DE_CAMBIOS_EN_EL_RESUMEN]],
+        "alertas_de_texto_total": len(alertas_de_texto),
     }
     diagnostico = DiagnosticoDeCarga(
         diag, len(insumos_nuevos), tuple(precios_que_cambian), tuple(pendientes), tuple(estados_p), tuple(sin_matriz), sin_unidad,
-        tuple(observados), tuple(avisos), tuple(problemas), tuple(cambios_de_presupuesto))
+        tuple(observados), tuple(avisos), tuple(problemas), tuple(cambios_de_presupuesto), alertas_de_texto)
     plan = PlanDeCarga(
         estado.ultima_carga, usuario, rol, dict(archivos), resumen, tuple(vistas.values()), tuple(insumos_nuevos), tuple(precios_nuevos),
         tuple(unidades_que_se_saben), tuple(nodos_nuevos), tuple(versiones_nuevas), tuple(conceptos_sin_matriz), tuple(presupuestos_nuevos),
-        tuple(reconciliaciones))
+        tuple(reconciliaciones), descripciones)
     return diagnostico, plan
 
 
@@ -845,6 +909,7 @@ MOTIVOS = {
     DEPENDE_DE: "depende de algo que quedó pendiente",
     EN_CONTRATADO: "lo usa algo contratado: va a control de cambio",
     BAJA_SIN_CONFIRMAR: "una baja pide confirmación",
+    TEXTO_Y_RECETA: "el texto y la matriz cambiaron: parece otro concepto",
     CONCEPTO_PENDIENTE: "tiene un concepto pendiente",
     CONCEPTO_CON_PRECIO_Y_SIN_MATRIZ: "trae precio y ninguna matriz",
 }
@@ -875,6 +940,14 @@ def informe_de_carga(d: DiagnosticoDeCarga) -> str:
             o.append(f"  {c.presupuesto} · {nombre_de_tipo[c.tipo]:<8} {c.clave:<11} {valor}  ({c.id}){marca}")
         if len(d.cambios) > 40:
             o.append(f"  … y {len(d.cambios) - 40} más")
+    if d.alertas_de_texto:
+        o += ["", "Descripciones que cambiaron (§2.7.1)"]
+        nivel = {"alta": "ALTA", "informativa": "informativa"}
+        for a in d.alertas_de_texto[:30]:
+            marca = "" if a.estado == "carga" else f"  [DETENIDO — clave nueva propuesta: {a.clave_propuesta}]" if a.clave_propuesta else "  [DETENIDO por otra razón]"
+            o.append(f"  {a.clave:<12} {nivel.get(a.nivel, a.nivel):<11} {a.detalle}{marca}")
+        if len(d.alertas_de_texto) > 30:
+            o.append(f"  … y {len(d.alertas_de_texto) - 30} más")
     if d.pendientes:
         o += ["", "Pendientes (no se aplican; quedan dichos en la carga)"]
         o += [f"  {p.clave:<12} {MOTIVOS.get(p.motivo, p.motivo)}: {p.detalle}" for p in d.pendientes]

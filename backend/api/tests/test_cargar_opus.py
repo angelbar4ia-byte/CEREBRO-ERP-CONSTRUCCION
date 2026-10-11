@@ -14,7 +14,7 @@ from core.colgado import ServicioColgado
 from core.memoria_programa import MemoriaPrograma
 from core.servicio_programa import ServicioPrograma
 from core.tests.contrato_programa import CAL, programa
-from core.tests.datos_opus import CONCEPTOS, OPUS, PRESUPUESTO, con_cantidad, reescalar_linea, sin_renglon, texto
+from core.tests.datos_opus import CONCEPTOS, OPUS, PRESUPUESTO, con_cantidad, con_descripcion_del_concepto, reescalar_linea, sin_renglon, texto
 
 
 class PruebasCargarOpus(unittest.TestCase):
@@ -133,6 +133,24 @@ class PruebasCargarOpus(unittest.TestCase):
         self.assertIn(f"{self.K1}: lo cita el programa {pid} «Zafiro de obra» en 1 fila(s)", self.salida.getvalue())
         self.assertEqual(self.correr(presupuesto=self.escribir(con_cantidad(texto(PRESUPUESTO), "CAS-00004", "EST-10010", "40"), "p2.csv"), programas=pro), 0)
         self.assertNotIn("Programas que citan", self.salida.getvalue())  # una cantidad no quita el piso a nadie
+
+    # ------------------------------------------------------------------ el texto que cambia (D-477)
+    def test_un_texto_que_cambia_se_dice_y_con_la_receta_se_detiene_y_propone_clave_nueva(self):
+        self.correr(aplicar=True)
+        presupuesto = self.escribir(con_descripcion_del_concepto(texto(PRESUPUESTO), "EST-10010", lambda d: d.replace("4.00", "5.00")), "presupuesto.csv")
+        self.assertEqual(self.correr(presupuesto=presupuesto), 0)
+        t = self.salida.getvalue()
+        self.assertIn("Descripciones que cambiaron (§2.7.1)", t)
+        self.assertIn("EST-10010    ALTA        4 → 5", t)
+        self.assertNotIn("DETENIDO", t)
+        conceptos = self.escribir(reescalar_linea(texto(CONCEPTOS), "EST-10010", 0, Decimal("1.01")))
+        self.assertEqual(self.correr(conceptos=conceptos, presupuesto=presupuesto, aplicar=True), 0)
+        t = self.salida.getvalue()
+        self.assertIn("[DETENIDO — clave nueva propuesta: EST-", t)
+        self.assertIn("parece otro concepto", t)
+        self.assertEqual(len(self.cat.versiones("EST-10010")), 1)
+        self.assertEqual(self.correr(conceptos=conceptos, presupuesto=presupuesto, aplicar=True, confirmados=["EST-10010"]), 0)
+        self.assertEqual(len(self.cat.versiones("EST-10010")), 2)
 
 
 if __name__ == "__main__":

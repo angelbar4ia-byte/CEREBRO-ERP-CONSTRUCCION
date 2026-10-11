@@ -67,11 +67,12 @@ class PostgresCatalogo:
             self.conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")  # una sola foto, aunque alguien cargue mientras tanto
             e = EstadoVigente(ultima_carga=self._ultima_carga())
             filas = self.conn.execute(
-                "SELECT n.clave, n.rol, n.categoria, n.precio_declarado, coalesce(u.clave, ''), v.huella, v.pu, v.version"
+                "SELECT n.clave, n.rol, n.categoria, n.precio_declarado, coalesce(u.clave, ''), v.huella, v.pu, v.version, n.descripcion"
                 " FROM nodo n LEFT JOIN unidad u ON u.id = n.unidad_id"
                 " LEFT JOIN LATERAL (SELECT huella, pu, version FROM version_concepto WHERE nodo_id = n.id ORDER BY version DESC LIMIT 1) v ON true"
                 " WHERE n.rol <> 'estructural'").fetchall()
-            for clave, rol, categoria, precio, unidad, huella, pu, version in filas:
+            for clave, rol, categoria, precio, unidad, huella, pu, version, descripcion in filas:
+                e.descripcion[clave] = descripcion
                 if huella is not None or rol in ("concepto", "ensamble"):
                     e.unidad[clave] = unidad
                     if huella is not None:
@@ -238,6 +239,8 @@ class PostgresCatalogo:
             cur.execute("UPDATE nodo SET precio_declarado = %s WHERE id = %s", (precio, nodo_id[clave]))
         for clave, unidad in plan.unidades_que_se_saben:
             cur.execute("UPDATE nodo SET unidad_id = %s WHERE id = %s", (u(unidad), nodo_id[clave]))
+        for clave, texto in plan.descripciones:
+            cur.execute("UPDATE nodo SET descripcion = %s WHERE id = %s", (texto, nodo_id[clave]))
 
         # las versiones y sus líneas
         ultima: Dict[int, int] = {n: v for n, v in cur.execute("SELECT nodo_id, max(version) FROM version_concepto GROUP BY nodo_id")}

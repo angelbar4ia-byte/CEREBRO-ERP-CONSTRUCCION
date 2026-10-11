@@ -181,6 +181,7 @@ class MemoriaCatalogo:
         e = EstadoVigente(ultima_carga=d.sig_carga)
         for clave, nodo_id in d.por_clave.items():
             n = d.nodos[nodo_id]
+            e.descripcion[clave] = n.descripcion
             v = d.vigente(nodo_id)
             if v is not None or n.rol in ("concepto", "ensamble"):
                 e.unidad[clave] = d.unidad_de(n)
@@ -344,6 +345,8 @@ def _aplicar(d: _Datos, plan: PlanDeCarga) -> ResultadoCarga:
         d.nodos[nodo_id].precio_declarado = precio
     for clave, u in plan.unidades_que_se_saben:
         d.nodos[d.por_clave[clave]].unidad_id = unidad(u)
+    for clave, texto in plan.descripciones:
+        d.nodos[d.por_clave[clave]].descripcion = texto
 
     for c in plan.conceptos_sin_matriz:
         nuevo_nodo(clave=c.clave, descripcion=c.descripcion, unidad_id=unidad(c.unidad), rol="concepto", categoria="concepto")

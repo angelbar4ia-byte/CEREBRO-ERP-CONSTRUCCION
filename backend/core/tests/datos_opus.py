@@ -194,3 +194,25 @@ def con_orden_cambiado(presupuesto: str, capitulo: str, primera: str, segunda: s
         _renumerar(filas)
 
     return editar(presupuesto, cambia)
+
+
+def con_descripcion_del_concepto(presupuesto: str, clave: str, cambia: Callable[[str], str]) -> str:
+    """La descripción de un concepto del presupuesto, en todas las filas que lo nombran, con lo que `cambia` le haga."""
+    def edita(filas):
+        k, t, d = columna(filas, "Clave"), columna(filas, "Tipo"), columna(filas, "Descripción")
+        for f in filas[1:]:
+            if f[k] == clave and f[t] == "Concepto":
+                f[d] = cambia(f[d])
+
+    return editar(presupuesto, edita)
+
+
+def con_descripcion_del_hijo(conceptos: str, hijo: str, cambia: Callable[[str], str]) -> str:
+    """La descripción de un insumo o un compuesto, en todas las líneas de matriz que lo citan."""
+    def edita(filas):
+        h, d = columna(filas, "Clave Hijo"), columna(filas, "Descripción")
+        for f in filas[1:]:
+            if f[h] == hijo:
+                f[d] = cambia(f[d])
+
+    return editar(conceptos, edita)
