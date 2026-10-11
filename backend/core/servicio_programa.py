@@ -46,6 +46,7 @@ ROLES_CON_PERMISO = PERMISOS_POR_OMISION
 ETIQUETA_DE_PERMISO = {
     "editar_estructura_programa": "editar la estructura del programa",
     "editar_fechas_programa": "editar las fechas del programa",
+    "cargar_catalogo_opus": "cargar el catálogo y los presupuestos de OPUS",
 }
 
 

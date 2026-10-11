@@ -7,11 +7,8 @@ archivos al escribir esto. Cuando una prueba necesita un archivo «cambiado», s
 
 Correr con: cd backend && python3 -m unittest discover
 """
-import csv
-import io
 import unittest
 from decimal import Decimal
-from pathlib import Path
 
 from core.importacion_opus import (
     CargaNoProcede,
@@ -24,32 +21,9 @@ from core.importacion_opus import (
 )
 from core.motor_calculo import precio_unitario, reporte_montos
 
-OPUS = Path(__file__).resolve().parents[3] / "1-mundo" / "opus"
-_textos = {}
+from core.tests.datos_opus import COMPUESTOS, CONCEPTOS, PRESUPUESTO, columna, editar, texto
 
 
-def texto(nombre):
-    if nombre not in _textos:
-        _textos[nombre] = (OPUS / f"{nombre}.csv").read_text(encoding="utf-8")
-    return _textos[nombre]
-
-
-def editar(contenido, cambia):
-    """Una copia del archivo con lo que `cambia(filas)` le haga a sus filas (la primera es el encabezado)."""
-    filas = list(csv.reader(io.StringIO(contenido.lstrip("﻿"), newline="")))
-    cambia(filas)
-    sal = io.StringIO()
-    csv.writer(sal, lineterminator="\n").writerows(filas)
-    return sal.getvalue()
-
-
-def columna(filas, nombre):
-    return [c.strip() for c in filas[0]].index(nombre)
-
-
-PRESUPUESTO = "CATALOGO_DE_PRESUPUESTO"
-CONCEPTOS = "ANALISIS_DE_BASICOS_CONCEPTOS"
-COMPUESTOS = "ANALISIS_DE_BASICOS_COMPUESTOS"
 CONCEPTO_CON_MATRIZ = "EST-01040"  # la losa de cimentación de Zafiro, la primera del presupuesto
 
 
@@ -338,14 +312,13 @@ class PruebasDeLaHuellaYElDiagnostico(unittest.TestCase):
 
     def test_la_huella_no_depende_del_orden_ni_de_los_ceros_ni_de_los_textos_ni_de_los_precios(self):
         lineas = [(l.hijo, l.cantidad) for l in self.m.por_padre[CONCEPTO_CON_MATRIZ]]
-        base = huella("m2", lineas)
-        self.assertEqual(huella("M2 ", list(reversed(lineas))), base)
-        self.assertEqual(huella("m2", [(h, Decimal(str(c)) * Decimal("1.000000")) for h, c in lineas]), base)
-        self.assertNotEqual(huella("m2", [(lineas[0][0], lineas[0][1] + 1)] + lineas[1:]), base)  # una cantidad sí
-        self.assertNotEqual(huella("pza", lineas), base)  # la unidad sí
-        self.assertNotEqual(huella("m2", lineas[1:]), base)  # un insumo menos sí
-        self.assertEqual(huella("m2", [("a", Decimal("1.050000"))]), huella("m2", [("a", Decimal("1.05"))]))
-        self.assertNotEqual(huella("m2", [("a", Decimal("1")), ("a", Decimal("1"))]), huella("m2", [("a", Decimal("1"))]))  # el alambre dos veces
+        base = huella(lineas)
+        self.assertEqual(huella(list(reversed(lineas))), base)
+        self.assertEqual(huella([(h, Decimal(str(c)) * Decimal("1.000000")) for h, c in lineas]), base)
+        self.assertNotEqual(huella([(lineas[0][0], lineas[0][1] + 1)] + lineas[1:]), base)  # una cantidad sí
+        self.assertNotEqual(huella(lineas[1:]), base)  # un insumo menos sí
+        self.assertEqual(huella([("a", Decimal("1.050000"))]), huella([("a", Decimal("1.05"))]))
+        self.assertNotEqual(huella([("a", Decimal("1")), ("a", Decimal("1"))]), huella([("a", Decimal("1"))]))  # el alambre dos veces
 
     def test_cambiar_el_texto_o_el_precio_de_una_linea_no_versiona_nada(self):
         def retocar(filas):

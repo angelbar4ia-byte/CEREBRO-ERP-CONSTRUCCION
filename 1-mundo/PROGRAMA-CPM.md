@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 365 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 429 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -467,7 +467,7 @@ un proveedor, `python3 -m api.emitir_token --secreto … --correo …` da un tok
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 365 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 429 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
 la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
@@ -923,7 +923,7 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | Dar de alta a las personas (pospuesto por el usuario, D-470) | Hoy lo hace quien administra la base (`python3 -m api.usuarios`); `MODELO.md` §5b no tiene una función para crear usuarios, y `gestionar_rol_funcion` todavía no tiene operación en la API |
 | El alcance de datos por obra (pospuesto por el usuario, D-470) | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
 | La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
-| Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
+| Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | `NODO` y `PRESUPUESTO` ya existen con los siete prototipos (D-473, migración `0005`); falta `CALENDARIO_OBRA`, y que `programa_fila` se vuelva `ACTIVIDAD` y `TRAMO` cuelgue del renglón del presupuesto en lugar de citar un `oid` |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
 | Las listas del planeador | Los 12 supuestos de cada programa, los 15 de Zafiro, las 59 que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos por rol |

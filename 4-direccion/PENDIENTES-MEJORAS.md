@@ -196,9 +196,9 @@ puede escribir de lo que primero hay que definir.
 |---|---|---|---|---|
 | B-01 | **Modelo de datos** | Entidades, relaciones, migraciones | ✅ Aprobado — `MODELO.md`, 13 hallazgos resueltos | — |
 | B-02 | **Motor de cálculo** | Suma de partes, recursivo sin límite de capas, `%MO`, las dos lecturas | ✅ **Escrito y probado** — `backend/core/`, 11 pruebas contra `CASO-TRABAJADO.md` (D-178 a D-182). *D-472: además da al centavo el precio de los 467 conceptos, 89 compuestos y 39 cuadrillas de los archivos reales de OPUS* | B-01 |
-| B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas | B-01 |
-| B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas | B-02, B-03 |
-| B-05 | **`presupuesto`** | Árbol, WBS, cantidades, estados | ✅ Definidas | B-02, B-04 |
+| B-03 | **`catalogo`** | Insumos, unidades, familias, claves, clonar y borrar | ✅ Definidas · 🔶 **insumos con su precio y su historia, unidades como vienen y claves, persistidos** (D-473). Faltan familias, el catálogo de unidades y los contratistas (sus archivos no están), clonar y borrar | B-01 |
+| B-04 | **`apu`** | Matrices, compuestos, versionado | ✅ Definidas · ✅ **matrices, compuestos y cuadrillas persistidos con su versionado** (D-473): una versión por receta distinta, el PU congelado, la anterior intacta, probado contra los 596 de verdad | B-02, B-03 |
+| B-05 | **`presupuesto`** | Árbol, WBS, cantidades, estados | ✅ Definidas · 🔶 **árbol, WBS por posición y cantidades persistidos**, un presupuesto por capítulo y cada renglón con la versión fijada (D-473): los siete se leen de vuelta como el archivo. Faltan los estados por subárbol (`ESTADO_CONGELAMIENTO`, `ESTADO_CARGA`) y reconciliar un presupuesto que ya existe | B-02, B-04 |
 
 > **B-02 es núcleo compartido**, no un módulo más: `presupuesto`, `apu` y
 > `parametrico` dependen del mismo motor. No se puede partir en servicios.
@@ -207,7 +207,7 @@ puede escribir de lo que primero hay que definir.
 
 | # | Módulo | Qué hace | Reglas | Depende de |
 |---|---|---|---|---|
-| B-06 | **`importacion`** | Carga desde OPUS: 4 columnas obligatorias, alias, placeholders, huella, versionado | ✅ Definidas · 🔶 **pasos 1 a 3 de §2.9 escritos y probados con los archivos reales** (`backend/core/importacion_opus.py`, D-472): mapeo por alias, árbol y WBS por posición, placeholders verificados, huella y diagnóstico entran / versionan / detenidos. Falta aplicar —persistir— y la alerta por diferencia de texto de §2.7.1 | B-03, B-05 |
+| B-06 | **`importacion`** | Carga desde OPUS: 4 columnas obligatorias, alias, placeholders, huella, versionado | ✅ Definidas · 🔶 **pasos 1 a 3 de §2.9 escritos y probados con los archivos reales** (`backend/core/importacion_opus.py`, D-472): mapeo por alias, árbol y WBS por posición, placeholders verificados, huella y diagnóstico entran / versionan / detenidos. **D-473 aplica y persiste** (`core/catalogo.py`, `python3 -m api.cargar_opus`): revisar no escribe; aplicar es todo o nada, con compuertas (unidad, 5 % de PU, dependencias, precio de un trabajo) y un candado contra cargas simultáneas. Falta la alerta por diferencia de texto de §2.7.1 y una API o pantalla | B-03, B-05 |
 | B-07 | **Semilla** | Cuadrilla y rendimiento teórico, una sola vez | ✅ El archivo ya existe | B-03 |
 | B-08 | **`exportacion`** | Cabeceras, Materiales, Operaciones + los 4 catálogos que se volvieron salida | 🔶 **P-14** — Cabeceras/Materiales/Operaciones resueltas contra especímenes reales (D-331); los 4 catálogos de salida siguen sin columna, falta el catálogo viejo | B-05 |
 | B-09 | **Traductor de dialectos** | Canon, mapeo por ficha, prueba de ida y vuelta | 🔶 Canon listo; el dialecto de OPUS avanza —dos campos de entrada, tres reportes de salida confirmados y el join entre ellos validado, `LENGUAJE.md`, D-331/D-332— pero no cierra: falta `Flete`, archivo-vs-API, los 4 catálogos de salida y una prueba de ida y vuelta propia de este lado. 🆕 **Segundo caso real, no hipotético (D-374, cierra P-15): «Mi ERP PYME» (almacén, corre sobre SAP Business One)** — `CONOCIMIENTO.md` §11.15 a §11.20 ya son la traducción informal; falta pasarla por el mismo canon formal que OPUS, columna por columna, con su propia prueba de ida y vuelta | B-06 |

@@ -131,7 +131,7 @@ class PruebasClienteConToken(unittest.TestCase):
         s = json.loads(r.stdout)
         self.assertEqual(s["sinToken"], [401, "sin_token", "https://proveedor.example/entrar"])
         self.assertEqual(s["malo"], [401, "token_invalido"])
-        self.assertEqual(s["yo"], ["luis@obra.mx", ["control_de_obra"], ["editar_estructura_programa"], "token"])
+        self.assertEqual(s["yo"], ["luis@obra.mx", ["control_de_obra"], ["cargar_catalogo_opus", "editar_estructura_programa"], "token"])
         self.assertEqual((s["lista"], s["sinTokenOtraVez"], s["pantalla"]), (1, 401, True))
 
 

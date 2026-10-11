@@ -6662,6 +6662,23 @@ parte de la máquina (`CATALOGOS.md`, «Qué archivos de OPUS están en el repo�
 
 `CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-02, B-06, P-09 y P-11.
 
+### El catálogo, las matrices y los presupuestos de OPUS, persistidos (D-473)
+
+Dato del usuario: «vamos con persistir presupuesto y APU». El detalle, las decisiones y las pruebas están en `MEMORIA.md` D-473 y
+`MODELO.md` §4 (la subsección de D-473). Lo que cambia lo dicho antes en este archivo:
+
+- **La secuencia de §2.9 está completa para lo que traen los tres archivos:** se lee, se compara, se muestra el diagnóstico, y se aplica
+  todo junto. Lo que se detiene (unidad distinta, PU movido más de 5 % sin confirmar, lo que depende de algo detenido, el precio de
+  un trabajo) queda dicho en la carga con su motivo; el resto entra.
+- **Versionar es de la receta y el precio es otra historia** (§2.2 y `MODELO.md` §4a): una cantidad cambiada es una versión nueva, sola;
+  un precio movido es una fila de historia que cierra la anterior y no versiona nada. El PU de una versión se congela.
+- **La huella de una matriz ya no lleva la unidad** *(corrige §2.7, que la definía como `f(unidad, insumos, cantidades)`)*: se compara
+  antes y aparte, y saber una unidad que no se sabía no cambia la receta.
+- **Un presupuesto que ya existe no se toca.** Reconciliar sus cantidades cuando llega distinto es lo siguiente que hay que diseñar.
+- **Cada capítulo del archivo es un presupuesto**, con su árbol desde 1.
+
+`PENDIENTES-MEJORAS.md` B-03 a B-06.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

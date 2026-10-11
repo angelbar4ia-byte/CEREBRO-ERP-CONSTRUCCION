@@ -17,8 +17,9 @@ Qué hace con lo que lee, y qué no:
   tienen descendientes con clave. Si alguno no pasa, se queda y se reporta: es un error, no una fila que se tira en silencio.
 - **Los números se leen estrictos.** `1,842,426.01` es mil ochocientos millones con centavos; `1,5` no es un número que este
   archivo traiga, y si llegara sería un error y no un quince.
-- **La huella de un concepto** es `f(unidad, insumos, cantidades)` y deja fuera la descripción y los precios: una corrección
-  de acento no versiona nada, y un precio movido no es un cambio de matriz.
+- **La huella de una matriz** es `f(insumos, cantidades)` y deja fuera la descripción, los precios **y la unidad**: una corrección
+  de acento no versiona nada, un precio movido no es un cambio de matriz, y la unidad se compara aparte (§2.7), antes que la receta —un
+  cambio de unidad detiene el concepto; que se llegue a saber una unidad que no se sabía no lo versiona (D-473, que corrige a D-472)—.
 
 Lo que arma para el motor de cálculo (`motor_calculo.py`) son nodos y líneas de `dominio.py`, con lo mínimo que hace falta para
 calcular un precio: lo demás de `NODO` y `COMPOSICION` (procedencia, familia, vigencia…) llega con la persistencia.
@@ -185,6 +186,12 @@ class FilaPresupuesto:
 
 
 @dataclass(frozen=True)
+class Capitulo:
+    raiz: FilaPresupuesto
+    filas: Tuple[FilaPresupuesto, ...]  # la raíz primero, y sus descendientes en el orden del archivo
+
+
+@dataclass(frozen=True)
 class LecturaPresupuesto:
     informe: InformeDeMapeo
     filas: Tuple[FilaPresupuesto, ...]  # las que se quedan, en el orden del archivo
@@ -196,6 +203,16 @@ class LecturaPresupuesto:
     @property
     def limpia(self) -> bool:
         return not self.problemas
+
+    def capitulos(self) -> Tuple["Capitulo", ...]:
+        """Un presupuesto por capítulo: el archivo trae los siete prototipos juntos, cada uno con su capítulo en el nivel 0."""
+        out: List[Tuple[FilaPresupuesto, List[FilaPresupuesto]]] = []
+        for f in self.filas:
+            if f.padre is None:
+                out.append((f, []))
+            if out:
+                out[-1][1].append(f)
+        return tuple(Capitulo(raiz, tuple(filas)) for raiz, filas in out)
 
     def unidad_de(self, clave: str) -> str:
         return next((f.unidad for f in self.conceptos.get(clave, ()) if f.unidad), "")
@@ -240,11 +257,12 @@ def leer_presupuesto(texto: str) -> LecturaPresupuesto:
                                       cantidad, precio, padre, ""))
         pila.append(pos)
 
-    # el `Indice` es el lugar entre los hermanos: si no coincide, se perdieron filas o se reordenaron
+    # el `Indice` es el lugar entre los hermanos: si no coincide, se perdieron filas o se reordenaron. Las raíces no cuentan: cada
+    # capítulo es un presupuesto distinto, y su lugar depende de qué otros vengan en el archivo (los siete juntos o uno solo)
     hermanos: Dict[Optional[int], int] = defaultdict(int)
     for f in crudas:
         hermanos[f.padre] += 1
-        if "indice" in col and indices[f.posicion] != hermanos[f.padre]:
+        if "indice" in col and f.padre is not None and indices[f.posicion] != hermanos[f.padre]:
             problemas.append(f"línea {f.linea}: «Indice» es {indices[f.posicion]} y por su lugar entre los hermanos debería ser {hermanos[f.padre]}")
 
     con_hijos = {f.padre for f in crudas if f.padre is not None}
@@ -264,6 +282,8 @@ def leer_presupuesto(texto: str) -> LecturaPresupuesto:
     descartadas, quedan = [], []
     for f in crudas:
         if f.clave or f.descripcion:
+            if not f.clave:
+                problemas.append(f"línea {f.linea}: trae descripción pero no clave, y sin clave no se reconoce al volver a cargar")
             quedan.append(f)
             continue
         total = totales[f.posicion]
@@ -440,12 +460,14 @@ def armar_arbol(matrices: Matrices, unidades: Optional[Mapping[str, str]] = None
 # --------------------------------------------------------------------------- la huella y el diagnóstico (§2.7 y §2.9)
 
 
-def huella(unidad: str, lineas: Iterable[Tuple[str, Decimal]]) -> str:
-    """`f(unidad, insumos, cantidades)`: sin la descripción, sin los precios y sin el orden de las líneas.
+def huella(lineas: Iterable[Tuple[str, Decimal]]) -> str:
+    """`f(insumos, cantidades)`: sin la descripción, sin los precios, sin la unidad y sin el orden de las líneas.
 
-    `1.050000` y `1.05` son la misma cantidad; una línea repetida (el alambre de `AUX-00001`) cuenta dos veces."""
+    `1.050000` y `1.05` son la misma cantidad; una línea repetida (el alambre de `AUX-00001`) cuenta dos veces. La unidad no entra
+    porque `diagnosticar` la compara antes y aparte: si cambió, el concepto se detiene sin mirar la receta; y si antes no se sabía, saber
+    cuál es no cambia la receta."""
     canon = "\n".join(sorted(f"{hijo}|{format(cantidad.normalize(), 'f')}" for hijo, cantidad in lineas))
-    return hashlib.sha256(f"{unidad.strip().casefold()}\n{canon}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(canon.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -464,7 +486,7 @@ def catalogo_leido(matrices: Matrices, presupuesto: Optional[LecturaPresupuesto]
     for padre, lineas in matrices.por_padre.items():
         u = (presupuesto.unidad_de(padre) if presupuesto is not None else "") or unidad_hijo.get(padre, "")
         unidad[padre] = u
-        hue[padre] = huella(u, ((l.hijo, l.cantidad) for l in lineas))
+        hue[padre] = huella((l.hijo, l.cantidad) for l in lineas)
     sin = tuple(c for c in (presupuesto.conceptos if presupuesto is not None else ()) if c not in matrices.por_padre)
     return CatalogoLeido(unidad, hue, sin)
 

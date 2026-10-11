@@ -977,6 +977,27 @@ por `PRECIO_HISTORICO` como un insumo más: dispara directo validar o
 descartar la versión, porque su precio nace de una negociación puntual, no
 de un mercado que fluctúa.
 
+### La matriz es de una versión, el renglón fija la versión y la unidad puede no saberse (D-473)
+
+*Cómo quedó en la base (`database/migraciones/0005_catalogo_apu_presupuesto.sql`), con los archivos de OPUS que hay:*
+
+```
+COMPOSICION   gana    version_id        la versión de la matriz a la que pertenece la línea; nulo en un presupuesto
+                       hijo_version_id   solo en un presupuesto: la versión del concepto que el renglón fijó al cargarse
+NODO          no usa   cantidad          la cantidad es de la línea (las 58 negativas son de matrices); no hay padre_id
+                                        materializado: todo el árbol son líneas de COMPOSICION, y el WBS se calcula por posición
+NODO          gana     presupuesto_id    solo los estructurales: son de un presupuesto, no del catálogo (ECO-00001 está en los siete)
+                       ruta_natural      clave#n/clave#n… dentro del presupuesto: la llave con que se reconocen al volver a cargar
+                       tipo_opus         Capítulo · Subcapítulo · Nivel 2 · Nivel 3
+              unidad_id  puede ser nulo  ni las cuadrillas ni un concepto fuera de todo presupuesto la traen, y no está el catálogo
+CARGA         nueva    quién, con qué rol, los archivos (huella sha256) y qué quedó pendiente con su motivo
+PRESUPUESTO   gana     clave, huella     la del capítulo; la huella es de estructura y cantidades, para saber si lo que llega es lo mismo
+VERSION_CONCEPTO       la huella ya no lleva la unidad: f(insumos, cantidades); la unidad se compara aparte y antes (§2.7)
+```
+
+La clave es única solo entre los nodos del catálogo. Cada capítulo del archivo es un `PRESUPUESTO`. Una versión, sus líneas, una carga y
+los precios cerrados no se reescriben ni se borran: lo garantizan disparadores. Un concepto sin matriz es un nodo sin versiones y vale cero.
+
 **Solo `ORDEN DE CAMBIO` mueve un PU ya contratado** — `CONOCIMIENTO.md` §13.4, ya firme — con causa, impacto en monto, quién autoriza.
 
 ### El tabulador por contratista no toca el PU
@@ -1666,6 +1687,7 @@ fecha, en un solo lugar.
 | `reclasificar_familia` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
 | `resolver_revisar_parametro` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
 | `renovar_invariante_valor` | Control de obra | dato del usuario, D-345 |
+| `cargar_catalogo_opus` | Control de obra y Costos — propuesto | D-473: la carga del catálogo y los presupuestos de OPUS |
 | `registrar_avance` | **Sin asignar** | P-21 |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
@@ -1679,7 +1701,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.**
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`: treinta y cinco funciones, veintitrés asignadas.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin

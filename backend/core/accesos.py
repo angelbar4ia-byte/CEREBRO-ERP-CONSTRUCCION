@@ -41,6 +41,8 @@ ROLES: Dict[str, str] = {
 PERMISOS_POR_OMISION: Dict[str, FrozenSet[str]] = {
     "editar_estructura_programa": frozenset({"control_de_obra"}),
     "editar_fechas_programa": frozenset({"residente"}),
+    # D-473, propuesta: cargar el catálogo y los presupuestos de OPUS lo hacen quien cuantifica y crea precios y quien gobierna entre obras
+    "cargar_catalogo_opus": frozenset({"control_de_obra", "costos"}),
 }
 
 
