@@ -1551,6 +1551,8 @@ El clon apunta a su origen, en el diccionario. Sin eso, un año después nadie s
 que `PRE-00120` y `AUX-00001` son la misma trabe: quedarían como dos insumos
 distintos con el mismo precio.
 
+*D-478: ya se ejecuta —`core/clonacion.py`, `python3 -m api.clonar`—; la equivalencia queda en `CLON` y la sustitución, en versiones nuevas que no mueven el PU.*
+
 ---
 
 ## 8.5 Borrar un insumo
@@ -6744,6 +6746,24 @@ El detalle, las reglas y las pruebas están en `MEMORIA.md` D-477. Lo que cambia
 
 `PENDIENTES-MEJORAS.md` B-06.
 
+### P-11 se ejecuta: las 79 claves `AUX-` pasan a `PRE-` por clonar y sustituir (D-478)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-478. Lo que cambia o se aprende:
+
+- **El diseño de §8.4 y §16.2 se cumplió tal como estaba escrito:** no se renombra, nace `PRE-00120` con la receta y el precio de `AUX-00001`;
+  lo que lo citaba pasa a citarlo con una versión nueva (el mismo PU, así que no se mueve un centavo) y la clave vieja **sigue entrando**: un
+  archivo de OPUS que la traiga se lee como el clon, y la carga lo avisa.
+- **Los compuestos de material son materiales, no auxiliares (§10.4):** D-472 los había guardado como `auxiliar`; se corrigió en la carga y en la base.
+- **Con los datos reales:** las 79 juntas son 177 versiones nuevas y 217 renglones fijados; los siete presupuestos suman lo mismo al centavo; recargar
+  los tres archivos de siempre no cambia nada. Hay diez pares donde un `AUX-` cita a otro (nervaduras de nervaduras): el orden no importa.
+- **Lo contratado se respeta como en la corrección de unidad (§2.8):** libre en diseño, se detiene donde hay contrato; el original no se toca y se dice
+  cuál lo frena.
+- **El viaje de vuelta es una bandera, no un exportador:** `exporta_clave_vieja` dice que la clave vieja sigue saliendo; todavía no hay quien exporte (B-08).
+- **El mismo mecanismo sirve para los demás prefijos** (el material hidráulico con prefijo sanitario de `IDEAS.md` §6; `HD-00411` y `MOS-2079` de P-33):
+  `python3 -m api.clonar --corregir-prefijo VIEJO --por NUEVO --desde N`. Qué claves son no está en ningún archivo que haya.
+
+`PENDIENTES-MEJORAS.md` P-11, `IDEAS.md` §6.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las
@@ -9001,6 +9021,8 @@ sale    hacia otro sistema              →  vuelve la clave vieja
 
 La clave vieja deja de salir **cuando el usuario lo autoriza** — individual o total,
 según haya actualizado o no cada sistema externo.
+
+*D-478: «entra» ya se cumple —la carga lee la clave vieja como el clon y lo avisa—; «sale» es solo la bandera `exporta_clave_vieja` hasta que haya exportador (B-08).*
 
 ## 16.3 La homologación es bidireccional; la normalización no
 

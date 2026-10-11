@@ -1054,6 +1054,25 @@ El lugar de un renglón (`orden`) es único entre los vivos de su bloque; el de 
 borra** porque el programa lo puede citar (`programa_fila.renglon_id`, `nodo_id`, D-474) y porque la historia es de quien la lea
 después; pero no sale en el presupuesto, ni en el motor de cálculo, ni ocupa lugar. Reglas completas en `MEMORIA.md` D-476.
 
+### Clonar un insumo: lo que guarda `CLON` y cómo se lee la clave vieja (D-478)
+
+*Cómo quedó en la base (`database/migraciones/0009_clonar_un_insumo.sql`):*
+
+```
+CLON    nueva   original_id, clon_id (único: un clon nace de un solo original), modo (mantener · sustituir),
+                reconoce_clave_vieja_al_importar (solo si es sustituir), exporta_clave_vieja (nace en verdadero),
+                usuario, rol, carga_id, resumen (qué se redirigió, concepto por concepto), creada_en
+CARGA   gana    tipo = clonacion
+NODO    ya traía procedencia = clonacion: la lleva el clon
+```
+
+Un clon **no se reescribe ni se borra** —lo garantiza un disparador—; lo único que cambia es `exporta_clave_vieja`, que pasa a falso **una vez**
+(alguien autoriza dejar de usar la clave vieja) y no se vuelve a abrir. El clon copia la receta, la huella y el PU del original; *sustituir* le
+agrega una **versión nueva** a cada concepto o compuesto que citaba al original (la misma receta con el clon, el mismo PU) y los renglones de presupuesto
+que fijaban esa versión pasan a fijar la nueva. Las versiones viejas, el original y todo lo contratado quedan como estaban. **La carga lee los archivos
+con las claves vigentes**: la vieja entra como el clon, y lo retirado no se cuenta como «ausente» (`MEMORIA.md` D-478). Y `armar_arbol` guarda un compuesto
+de material como **`material`**, no como `auxiliar` (`CONOCIMIENTO.md` §10.4): la migración corrige lo que ya estuviera guardado.
+
 ### El tabulador por contratista no toca el PU
 
 ```
@@ -1184,6 +1203,8 @@ CLON   (ya existía — gana dos campos, CONOCIMIENTO.md §16.2, CONOCIMIENTO.md
                                        usuario autorice — individual por
                                        sistema externo, o total             nuevo
 ```
+
+*D-478: `reconoce_clave_vieja_al_importar` se resuelve **al clon**, no «al original» como dice la línea de arriba —la clave vieja entra y se lee como la nueva—; así quedó en la base y en la carga (`MEMORIA.md` D-478).*
 
 **Solo homologación viaja de vuelta; normalización no** (`CONOCIMIENTO.md` §16.3):
 `pza` no sale como `pza`, sale `PZ` siempre — es forma, no identidad. La clave sí

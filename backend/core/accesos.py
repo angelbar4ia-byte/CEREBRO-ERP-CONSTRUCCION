@@ -45,6 +45,8 @@ PERMISOS_POR_OMISION: Dict[str, FrozenSet[str]] = {
     "cargar_catalogo_opus": frozenset({"control_de_obra", "costos"}),
     # D-475, propuesta: contratar un subárbol del presupuesto (fija sus PU y lo congela) es gobierno cruzado entre obras, como las demás
     "contratar_subarbol": frozenset({"control_de_obra"}),
+    # D-478, propuesta: clonar un insumo (y sustituir el original) cambia lo que citan los conceptos de todas las obras: gobierno cruzado
+    "clonar_insumo": frozenset({"control_de_obra"}),
 }
 
 

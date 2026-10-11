@@ -47,6 +47,7 @@ ETIQUETA_DE_PERMISO = {
     "editar_fechas_programa": "editar las fechas del programa",
     "cargar_catalogo_opus": "cargar el catálogo y los presupuestos de OPUS",
     "contratar_subarbol": "contratar un subárbol del presupuesto",
+    "clonar_insumo": "clonar un insumo y sustituir el original",
 }
 
 

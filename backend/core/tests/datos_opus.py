@@ -186,6 +186,17 @@ def con_copia(presupuesto: str, capitulo: str, origen: str, despues_de: str, *, 
     return editar(presupuesto, cambia)
 
 
+def con_otra_clave(presupuesto: str, capitulo: str, clave: str, nueva: str, n: int = 1, *, unidad: Optional[str] = None) -> str:
+    """La `n`-ésima fila con esa clave del capítulo, con otra clave (y otra unidad, si se dice; el texto se queda como estaba)."""
+    def cambia(filas):
+        i = _fila_de(filas, capitulo, clave, n)
+        filas[i][columna(filas, "Clave")] = nueva
+        if unidad is not None:
+            filas[i][columna(filas, "Unidad")] = unidad
+
+    return editar(presupuesto, cambia)
+
+
 def con_orden_cambiado(presupuesto: str, capitulo: str, primera: str, segunda: str, n_primera: int = 1, n_segunda: int = 1) -> str:
     """Dos hermanos seguidos (sin nada que cuelgue de ellos) con su lugar cambiado."""
     def cambia(filas):

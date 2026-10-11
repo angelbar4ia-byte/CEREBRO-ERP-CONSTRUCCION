@@ -504,6 +504,8 @@ o total.
 > **El caso no es sólo `AUX-`.** Un material hidráulico con prefijo sanitario tiene el
 > mismo problema, y ahí corregir sí importa: el prefijo engaña sobre la naturaleza.
 
+*D-478: ejecutado. Las 79 claves se corrigen con `python3 -m api.clonar --corregir-prefijo AUX --por PRE --desde 120` —clonar y sustituir, la clave vieja sigue entrando—; lo que queda es el exportador del viaje de vuelta (B-08). `MEMORIA.md` D-478.*
+
 ---
 
 ## 7 Sustitución de insumo dentro de una matriz

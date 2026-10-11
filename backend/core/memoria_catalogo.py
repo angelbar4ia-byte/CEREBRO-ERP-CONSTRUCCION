@@ -17,24 +17,33 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from .catalogo import (
     CatalogoCambio,
+    CitasDe,
+    ClonGuardado,
     Congelamiento,
     DatosDePresupuesto,
     EstadoVigente,
     InsumoGuardado,
     LineaDePresupuesto,
+    InsumoPlan,
     LineaGuardada,
+    NodoConMatriz,
+    NodoDelCatalogo,
     NodoDePresupuesto,
     CambioDeRenglon,
+    PadreCitante,
     PlanDeCarga,
+    PlanDeClonacion,
     PlanDeContratacion,
     ReconciliacionPlan,
     PrecioGuardado,
     ResumenCarga,
     ResumenPresupuesto,
     ResultadoCarga,
+    ResultadoClonacion,
     ResultadoContratacion,
     VersionGuardada,
     YaContratado,
+    cerrar_homologaciones,
 )
 from .dominio import BasePorcentaje, Categoria, Composicion, ModoPrecio, Nodo, Rol, TipoCantidad
 from .motor_calculo import ArbolEnMemoria
@@ -54,6 +63,7 @@ class _Nodo:
     tipo_opus: Optional[str] = None
     ruta_natural: Optional[str] = None
     baja_carga_id: Optional[int] = None  # el bloque se dio de baja en esa carga (D-476)
+    procedencia: str = "importado"  # clonacion: nació de clonar otro (D-478)
 
 
 @dataclass
@@ -118,6 +128,21 @@ class _Congelamiento:
 
 
 @dataclass
+class _Clon:
+    id: int
+    original_id: int
+    clon_id: int
+    modo: str
+    reconoce: bool
+    exporta: bool
+    usuario: str
+    rol: str
+    carga_id: int
+    resumen: Dict
+    creada_en: datetime
+
+
+@dataclass
 class _Datos:
     unidades: Dict[str, Tuple[int, str]] = field(default_factory=dict)  # clave en minúsculas → (id, clave tal como vino)
     cargas: List[ResumenCarga] = field(default_factory=list)
@@ -129,6 +154,7 @@ class _Datos:
     presupuestos: Dict[int, _Presupuesto] = field(default_factory=dict)
     congelamientos: List[_Congelamiento] = field(default_factory=list)
     historia: List[Tuple[int, CambioDeRenglon]] = field(default_factory=list)  # (renglón, el cambio): solo se agrega
+    clones: List[_Clon] = field(default_factory=list)
     sig_congelamiento: int = 0
     sig_nodo: int = 0
     sig_version: int = 0
@@ -195,6 +221,8 @@ class MemoriaCatalogo:
             e.presupuestos[p.clave] = self._resumen(p)
         for bloque in d.contratados():
             e.en_contratado |= {d.nodos[l.hijo_id].clave for l in d.vivos(bloque) if d.nodos[l.hijo_id].rol != "estructural"}
+        e.homologaciones = cerrar_homologaciones(
+            (d.nodos[c.original_id].clave, d.nodos[c.clon_id].clave) for c in d.clones if c.reconoce)
         return e
 
     def _resumen(self, p: _Presupuesto) -> ResumenPresupuesto:
@@ -268,6 +296,45 @@ class MemoriaCatalogo:
             raise CatalogoCambio(f"la última carga es la {d0.sig_carga} y esta se revisó sobre la {plan.base}")
         trabajo = copy.deepcopy(d0)
         r = _contratar(trabajo, plan)
+        self._d = trabajo
+        return r
+
+    def nodo(self, clave: str) -> NodoDelCatalogo:
+        d = self._d
+        n = d.nodos[d.por_clave[clave]]
+        v = d.vigente(n.id)
+        precio = n.precio_declarado if n.id in d.precios else None
+        return NodoDelCatalogo(clave, n.descripcion, d.unidad_de(n), n.rol, n.categoria, n.procedencia, precio, v is not None)
+
+    def citas_de(self, clave: str) -> CitasDe:
+        d = self._d
+        nodo_id = d.por_clave[clave]
+        padres: List[PadreCitante] = []
+        for padre_id, versiones in d.versiones.items():
+            v = versiones[-1]
+            if not any(l.hijo_id == nodo_id for l in v.lineas):
+                continue
+            renglones = tuple(sorted(
+                l.id for ls in d.renglones.values() for l in ls
+                if l.baja_carga_id is None and l.hijo_id == padre_id and l.hijo_version_id == v.id))
+            lineas = tuple(LineaGuardada(d.nodos[l.hijo_id].clave, l.cantidad, l.orden, l.reporta_a, l.porcentaje) for l in v.lineas)
+            padres.append(PadreCitante(d.nodos[padre_id].clave, v.version, v.huella, v.pu, lineas, renglones))
+        directos = sum(1 for ls in d.renglones.values() for l in ls if l.baja_carga_id is None and l.hijo_id == nodo_id)
+        return CitasDe(tuple(sorted(padres, key=lambda p: p.clave)), directos)
+
+    def clones(self) -> List[ClonGuardado]:
+        d = self._d
+        return [
+            ClonGuardado(c.id, d.nodos[c.original_id].clave, d.nodos[c.clon_id].clave, c.modo, c.reconoce, c.exporta, c.usuario, c.rol,
+                         c.carga_id, dict(c.resumen), c.creada_en)
+            for c in d.clones]
+
+    def clonar(self, plan: PlanDeClonacion) -> ResultadoClonacion:
+        d0 = self._d
+        if plan.base != d0.sig_carga:
+            raise CatalogoCambio(f"la última carga es la {d0.sig_carga} y esta se revisó sobre la {plan.base}")
+        trabajo = copy.deepcopy(d0)
+        r = _clonar(trabajo, plan)
         self._d = trabajo
         return r
 
@@ -453,3 +520,49 @@ def _contratar(d: _Datos, plan: PlanDeContratacion) -> ResultadoContratacion:
     d.sig_congelamiento += 1
     d.congelamientos.append(_Congelamiento(d.sig_congelamiento, plan.nodo_id, "contratado", ahora, plan.usuario, plan.rol, carga_id, dict(plan.resumen)))
     return ResultadoContratacion(carga_id, d.sig_congelamiento, len(plan.versiones_nuevas), fijados)
+
+
+def _clonar(d: _Datos, plan: PlanDeClonacion) -> ResultadoClonacion:
+    if plan.original not in d.por_clave:
+        raise ValueError(f"no hay un nodo del catálogo con la clave {plan.original}")
+    if plan.clave in d.por_clave:
+        raise ValueError(f"ya hay un nodo del catálogo con la clave {plan.clave}")
+    original = d.nodos[d.por_clave[plan.original]]
+    ahora = datetime.now(timezone.utc)
+    d.sig_carga += 1
+    carga_id = d.sig_carga
+    d.cargas.append(ResumenCarga(carga_id, ahora, plan.usuario, plan.rol, {}, dict(plan.resumen), "clonacion"))
+    nuevo = plan.nuevo
+    d.sig_nodo += 1
+    clon = _Nodo(id=d.sig_nodo, clave=plan.clave, descripcion=nuevo.descripcion, unidad_id=original.unidad_id, rol=original.rol,
+                 categoria=original.categoria, procedencia="clonacion")
+    if isinstance(nuevo, InsumoPlan):
+        clon.modo_precio, clon.precio_declarado = "declarado", nuevo.precio
+        if nuevo.con_historico:
+            d.precios[clon.id] = [_Precio(nuevo.precio, ahora, None, carga_id)]
+    d.por_clave[clon.clave] = clon.id
+    d.nodos[clon.id] = clon
+    def lineas_de(lineas) -> List[_Linea]:
+        for l in lineas:
+            if l.hijo not in d.por_clave:
+                raise ValueError(f"{l.hijo} no está en el catálogo")
+        return [_Linea(d.por_clave[l.hijo], l.cantidad, orden, l.reporta_a.value, l.porcentaje) for orden, l in enumerate(lineas, start=1)]
+
+    if isinstance(nuevo, NodoConMatriz):
+        d.sig_version += 1
+        d.versiones[clon.id] = [_Version(d.sig_version, 1, nuevo.huella, nuevo.pu, ahora, carga_id, lineas_de(nuevo.lineas))]
+    fijados = 0
+    for s in plan.sustituciones:
+        padre_id = d.por_clave[s.clave]
+        previas = d.versiones[padre_id]
+        d.sig_version += 1
+        previas.append(_Version(d.sig_version, previas[-1].version + 1, s.huella, s.pu, ahora, carga_id, lineas_de(s.lineas)))
+        for renglon_id in s.renglones:
+            linea = next((l for ls in d.renglones.values() for l in ls if l.id == renglon_id), None)
+            if linea is None or d.nodos[linea.hijo_id].clave != s.clave:
+                raise ValueError(f"el renglón {renglon_id} no es de {s.clave}")
+            linea.hijo_version_id = previas[-1].id
+            fijados += 1
+    d.clones.append(_Clon(len(d.clones) + 1, original.id, clon.id, plan.modo, plan.modo == "sustituir", True, plan.usuario, plan.rol,
+                          carga_id, dict(plan.resumen), ahora))
+    return ResultadoClonacion(carga_id, clon.id, len(plan.sustituciones), fijados)

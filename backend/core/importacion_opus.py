@@ -32,7 +32,7 @@ import io
 import re
 import unicodedata
 from collections import Counter, defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
@@ -392,6 +392,40 @@ def leer_matrices(conceptos: str, compuestos: Optional[str] = None) -> Matrices:
     return Matrices(informe, tuple(lineas), {k: tuple(v) for k, v in por_padre.items()}, mal, extra)
 
 
+# --------------------------------------------------------------------------- la clave vieja que se lee como su clon (§16.2)
+
+
+def canonizar_matrices(m: Matrices, mapa: Mapping[str, str]) -> Tuple[Matrices, Tuple[Tuple[str, str], ...]]:
+    """Lee el archivo con las claves vigentes: una clave que se sustituyó por un clon (`AUX-00001` → `PRE-00120`) sigue entrando,
+    y entra como el clon (homologación, `CONOCIMIENTO.md` §16.2). Devuelve las matrices así y qué claves viejas se leyeron como cuál.
+    Si el archivo trae las dos —la vieja y el clon—, manda la del clon: la de la clave vieja no se suma a la suya."""
+    if not mapa:
+        return m, ()
+    padres = set(m.por_padre)
+    leidas = sorted({(l.padre, mapa[l.padre]) for l in m.lineas if l.padre in mapa} | {(l.hijo, mapa[l.hijo]) for l in m.lineas if l.hijo in mapa})
+    # la vieja y el clon, los dos con matriz en el mismo archivo: se queda la del clon
+    sobran = {vieja for vieja, nueva in leidas if vieja in padres and nueva in padres}
+    lineas = tuple(
+        replace(l, padre=mapa.get(l.padre, l.padre), hijo=mapa.get(l.hijo, l.hijo)) for l in m.lineas if l.padre not in sobran)
+    por_padre: Dict[str, List[LineaDeMatriz]] = defaultdict(list)
+    for l in lineas:
+        por_padre[l.padre].append(l)
+    mal = tuple(replace(l, padre=mapa.get(l.padre, l.padre), hijo=mapa.get(l.hijo, l.hijo)) for l in m.importes_que_no_cuadran if l.padre not in sobran)
+    return replace(m, lineas=lineas, por_padre={k: tuple(v) for k, v in por_padre.items()}, importes_que_no_cuadran=mal), tuple(leidas)
+
+
+def canonizar_presupuesto(p: LecturaPresupuesto, mapa: Mapping[str, str]) -> LecturaPresupuesto:
+    """Lo mismo para los conceptos de un presupuesto: los bloques se reconocen por su ruta, no por esto."""
+    if not mapa or not any(f.es_concepto and f.clave in mapa for f in p.filas):
+        return p
+    filas = tuple(replace(f, clave=mapa[f.clave]) if f.es_concepto and f.clave in mapa else f for f in p.filas)
+    conceptos: Dict[str, List[FilaPresupuesto]] = defaultdict(list)
+    for f in filas:
+        if f.es_concepto and f.clave:
+            conceptos[f.clave].append(f)
+    return replace(p, filas=filas, conceptos={k: tuple(v) for k, v in conceptos.items()})
+
+
 # --------------------------------------------------------------------------- para el motor de cálculo
 
 
@@ -438,7 +472,7 @@ def armar_arbol(matrices: Matrices, unidades: Optional[Mapping[str, str]] = None
             origen = padres[clave]
             rol, categoria = {
                 "Concepto": (Rol.CONCEPTO, Categoria.CONCEPTO),
-                "Material": (Rol.INSUMO, Categoria.AUXILIAR),
+                "Material": (Rol.INSUMO, Categoria.MATERIAL),  # un compuesto de material es un material (§10.4); D-478 corrige a D-472
                 "ManoDeObra": (Rol.ENSAMBLE, Categoria.MANO_DE_OBRA),
             }.get(origen, (Rol.CONCEPTO, Categoria.CONCEPTO))
             nodos[i] = Nodo(i, clave, texto_hijo.get(clave, ""), unidad, rol, categoria)

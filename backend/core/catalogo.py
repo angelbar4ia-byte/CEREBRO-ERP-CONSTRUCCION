@@ -25,6 +25,8 @@ Reglas que aquí se hacen concretas:
 - **Un texto que cambia de verdad con la receta es otro concepto** (D-477, §2.7.1): si la descripción de un concepto cambió de forma
   significativa —un número, el verbo o el elemento— **y** su matriz también, no se trata como una versión sino que se detiene y se
   propone una clave nueva; quien decide puede confirmar que es el mismo. Un texto que cambia sin la receta carga y alerta.
+- **Una clave que se sustituyó por un clon sigue entrando** (D-478, §16.2): el archivo de OPUS que todavía trae `AUX-00001` se lee como
+  `PRE-00120`; el catálogo no vuelve a tener dos nodos de lo mismo ni avisa de «ausentes» por la clave retirada.
 - **El estado del catálogo no cambia entre que se revisa y se aplica**: cada plan trae la última carga que vio, y si ya hay otra,
   `CatalogoCambio` y no se escribe nada (el mismo candado que `programa.version`).
 
@@ -37,7 +39,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Mapping, Optional, Protocol, Sequence, Set, Tuple
+from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Mapping, Optional, Protocol, Sequence, Set, Tuple, Union
 
 from .accesos import PermisoDenegado  # noqa: F401  (se re-exporta: quien llama lo captura de aquí)
 from .dominio import Categoria, Rol
@@ -50,6 +52,8 @@ from .importacion_opus import (
     LecturaPresupuesto,
     Matrices,
     armar_arbol,
+    canonizar_matrices,
+    canonizar_presupuesto,
     catalogo_leido,
     diagnosticar,
     leer_matrices,
@@ -125,9 +129,27 @@ class EstadoVigente:
     version: Dict[str, int] = field(default_factory=dict)  # padres con matriz → el número de su versión vigente
     descripcion: Dict[str, str] = field(default_factory=dict)  # todo nodo del catálogo → su descripción guardada (D-477)
     en_contratado: Set[str] = field(default_factory=set)  # conceptos que fija algún renglón de un subárbol contratado (D-475)
+    homologaciones: Dict[str, str] = field(default_factory=dict)  # clave vieja → la vigente, de lo que se sustituyó por un clon (D-478)
 
     def como_catalogo(self) -> CatalogoLeido:
-        return CatalogoLeido(dict(self.unidad), dict(self.huella), tuple(sorted(self.sin_matriz)))
+        """Lo vigente para compararlo con un archivo: sin las claves retiradas, que el archivo ya llega leídas como su clon."""
+        retiradas = self.homologaciones
+        return CatalogoLeido(
+            {k: v for k, v in self.unidad.items() if k not in retiradas}, {k: v for k, v in self.huella.items() if k not in retiradas},
+            tuple(sorted(c for c in self.sin_matriz if c not in retiradas)))
+
+
+def cerrar_homologaciones(pares: Iterable[Tuple[str, str]]) -> Dict[str, str]:
+    """`vieja → vigente` de una cadena de sustituciones: si `A` se sustituyó por `B` y `B` por `C`, `A` entra como `C`."""
+    directo = dict(pares)
+    out: Dict[str, str] = {}
+    for vieja in directo:
+        actual, vistas = directo[vieja], {vieja}
+        while actual in directo and actual not in vistas:
+            vistas.add(actual)
+            actual = directo[actual]
+        out[vieja] = actual
+    return out
 
 
 # --------------------------------------------------------------------------- lo que se escribe
@@ -485,6 +507,87 @@ class ResultadoContratacion:
     renglones_fijados: int
 
 
+@dataclass(frozen=True)
+class NodoDelCatalogo:
+    """Un nodo del catálogo tal como está guardado: lo que hace falta saber para clonarlo."""
+
+    clave: str
+    descripcion: str
+    unidad: str
+    rol: str  # insumo · ensamble · concepto
+    categoria: str
+    procedencia: str
+    precio: Optional[Decimal]  # el vigente, de un insumo con historia de precio; nulo en el resto
+    con_matriz: bool  # tiene versión vigente
+
+
+@dataclass(frozen=True)
+class PadreCitante:
+    """Un concepto o compuesto cuya versión vigente cita a un nodo, y los renglones de presupuesto que fijan esa versión (D-478)."""
+
+    clave: str
+    version: int
+    huella: str
+    pu: Decimal
+    lineas: Tuple[LineaGuardada, ...]
+    renglones: Tuple[int, ...]  # las líneas de COMPOSICION de presupuesto (sin baja) que fijan esa versión
+
+
+@dataclass(frozen=True)
+class CitasDe:
+    """Quién usa un nodo: las matrices que lo citan en su versión vigente, y los renglones que lo ponen directo en un presupuesto."""
+
+    padres: Tuple[PadreCitante, ...]
+    renglones_directos: int = 0
+
+
+@dataclass(frozen=True)
+class ClonGuardado:
+    id: int
+    original: str
+    clon: str
+    modo: str  # mantener · sustituir
+    reconoce_clave_vieja_al_importar: bool
+    exporta_clave_vieja: bool  # sigue saliendo con la clave vieja hasta que alguien autorice lo contrario: es solo la bandera (B-08)
+    usuario: str
+    rol: str
+    carga_id: int
+    resumen: Mapping[str, Any]
+    creada_en: datetime
+
+
+@dataclass(frozen=True)
+class SustitucionDePadre:
+    """La versión nueva que nace en un concepto o compuesto cuando lo que citaba pasa a citar al clon: la misma receta, el mismo PU."""
+
+    clave: str
+    lineas: Tuple[LineaPlan, ...]
+    huella: str
+    pu: Decimal
+    renglones: Tuple[int, ...]  # pasan a fijar esa versión nueva
+
+
+@dataclass(frozen=True)
+class PlanDeClonacion:
+    base: int  # la última carga que vio quien revisó: si hay otra, no se aplica
+    original: str
+    clave: str  # la del clon
+    modo: str
+    usuario: str
+    rol: str
+    resumen: Mapping[str, Any]
+    nuevo: Union[InsumoPlan, NodoConMatriz, ConceptoSinMatriz]  # el clon, con lo que copia del original
+    sustituciones: Tuple[SustitucionDePadre, ...] = ()
+
+
+@dataclass(frozen=True)
+class ResultadoClonacion:
+    carga_id: int
+    clon_id: int
+    versiones_nuevas: int
+    renglones_fijados: int
+
+
 class YaContratado(Exception):
     """El nodo, o un bloque de arriba, ya está contratado: lo contratado no se vuelve a contratar."""
 
@@ -527,6 +630,20 @@ class RepositorioCatalogo(Protocol):
         """Escribe la contratación completa o nada: una carga de tipo `contratacion`, las versiones nuevas (la misma receta que la
         vigente, con el PU del plan), los renglones fijados a la versión vigente y el estado del nodo. Si la última carga ya no es
         `plan.base`, `CatalogoCambio`; si el nodo o uno de arriba ya está contratado, `YaContratado`."""
+
+    def nodo(self, clave: str) -> "NodoDelCatalogo":
+        """El nodo del catálogo con esa clave; `KeyError` si no existe (D-478)."""
+
+    def citas_de(self, clave: str) -> "CitasDe":
+        """Quién usa a ese nodo hoy: las matrices que lo citan en su versión vigente, con los renglones que fijan esa versión (D-478)."""
+
+    def clones(self) -> List["ClonGuardado"]:
+        """Todas las clonaciones, de la más vieja a la más nueva."""
+
+    def clonar(self, plan: "PlanDeClonacion") -> "ResultadoClonacion":
+        """Escribe la clonación completa o nada: una carga de tipo `clonacion`, el clon (con la receta y el precio del original), una versión
+        nueva de cada concepto que se redirige —la misma receta con el clon en lugar del original— con sus renglones fijados a ella, y la
+        fila de `CLON`. Si la última carga ya no es `plan.base`, `CatalogoCambio`; si la clave del clon existe, `ValueError`."""
 
 
 # --------------------------------------------------------------------------- el presupuesto guardado, armado
@@ -622,11 +739,17 @@ def planificar(
     confirmados = frozenset(confirmados)
     bajas_confirmadas = frozenset(bajas_confirmadas)
     existentes = existentes or {}
+    matrices, leidas = canonizar_matrices(matrices, estado.homologaciones)  # la clave vieja que se sustituyó entra como su clon (D-478)
+    if presupuesto is not None:
+        presupuesto = canonizar_presupuesto(presupuesto, estado.homologaciones)
     unidades_de_concepto = {c: presupuesto.unidad_de(c) for c in presupuesto.conceptos} if presupuesto is not None else {}
     arbol = armar_arbol(matrices, unidades_de_concepto)
     problemas: List[str] = list(arbol.problemas) + (list(presupuesto.problemas) if presupuesto is not None else [])
     avisos: List[str] = [
         f"línea {l.linea}: {l.padre} → {l.hijo}: cantidad × costo no da el importe ({l.importe})" for l in matrices.importes_que_no_cuadran]
+    if leidas:
+        ejemplo = ", ".join(f"{v} → {n}" for v, n in leidas[:3]) + (" …" if len(leidas) > 3 else "")
+        avisos.append(f"{len(leidas)} claves del archivo se sustituyeron por un clon y se leyeron como él ({ejemplo}); la clave vieja sigue entrando")
     nuevo = catalogo_leido(matrices, presupuesto)
     diag = diagnosticar(nuevo, estado.como_catalogo())
     padres = set(matrices.por_padre)
@@ -1020,7 +1143,7 @@ class ServicioCarga:
         if lectura is not None and lectura.limpia:
             from .contratacion import nodos_contratados
 
-            for cap in lectura.capitulos():
+            for cap in canonizar_presupuesto(lectura, estado.homologaciones).capitulos():  # igual que lo lee `planificar`
                 guardado = estado.presupuestos.get(cap.raiz.clave)
                 if guardado is not None and guardado.huella != huella_presupuesto(cap.filas):
                     datos = self.repo.datos_de_presupuesto(guardado.id)

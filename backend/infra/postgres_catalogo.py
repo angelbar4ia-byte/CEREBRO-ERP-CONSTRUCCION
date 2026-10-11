@@ -17,23 +17,32 @@ from psycopg.types.json import Jsonb
 from core.catalogo import (
     CambioDeRenglon,
     CatalogoCambio,
+    CitasDe,
+    ClonGuardado,
     Congelamiento,
     DatosDePresupuesto,
     EstadoVigente,
     InsumoGuardado,
+    InsumoPlan,
     LineaDePresupuesto,
     LineaGuardada,
+    NodoConMatriz,
+    NodoDelCatalogo,
     NodoDePresupuesto,
+    PadreCitante,
     PlanDeCarga,
+    PlanDeClonacion,
     PlanDeContratacion,
     PrecioGuardado,
     ReconciliacionPlan,
     ResumenCarga,
     ResumenPresupuesto,
     ResultadoCarga,
+    ResultadoClonacion,
     ResultadoContratacion,
     VersionGuardada,
     YaContratado,
+    cerrar_homologaciones,
 )
 from core.dominio import BasePorcentaje, Categoria, Composicion, ModoPrecio, Nodo, Rol, TipoCantidad
 from core.motor_calculo import ArbolEnMemoria
@@ -91,6 +100,9 @@ class PostgresCatalogo:
                 "   WHERE c.version_id IS NULL AND c.baja_carga_id IS NULL AND h.rol = 'estructural')"
                 " SELECT DISTINCT h.clave FROM composicion c JOIN bajo b ON c.padre_id = b.id JOIN nodo h ON h.id = c.hijo_id"
                 "  WHERE c.version_id IS NULL AND c.baja_carga_id IS NULL AND h.rol <> 'estructural'")}
+            e.homologaciones = cerrar_homologaciones(self.conn.execute(
+                "SELECT o.clave, n.clave FROM clon c JOIN nodo o ON o.id = c.original_id JOIN nodo n ON n.id = c.clon_id"
+                " WHERE c.reconoce_clave_vieja_al_importar ORDER BY c.id").fetchall())
         return e
 
     def _presupuestos(self) -> List[ResumenPresupuesto]:
@@ -120,11 +132,14 @@ class PostgresCatalogo:
                 (nodo_id,)).fetchall()
             out = []
             for vid, version, huella, pu, desde, carga_id in versiones:
-                lineas = self.conn.execute(
-                    "SELECT h.clave, c.cantidad, c.orden, c.reporta_a, c.tipo_cantidad = 'porcentaje'"
-                    " FROM composicion c JOIN nodo h ON h.id = c.hijo_id WHERE c.version_id = %s ORDER BY c.orden", (vid,)).fetchall()
-                out.append(VersionGuardada(clave, version, huella, pu, desde, carga_id, tuple(LineaGuardada(*l) for l in lineas)))
+                out.append(VersionGuardada(clave, version, huella, pu, desde, carga_id, self._lineas_de(vid)))
         return out
+
+    def _lineas_de(self, version_id: int) -> Tuple[LineaGuardada, ...]:
+        lineas = self.conn.execute(
+            "SELECT h.clave, c.cantidad, c.orden, c.reporta_a, c.tipo_cantidad = 'porcentaje'"
+            " FROM composicion c JOIN nodo h ON h.id = c.hijo_id WHERE c.version_id = %s ORDER BY c.orden", (version_id,)).fetchall()
+        return tuple(LineaGuardada(*l) for l in lineas)
 
     def precios(self, clave: str) -> List[PrecioGuardado]:
         nodo_id = self.id_de(clave)
@@ -170,6 +185,40 @@ class PostgresCatalogo:
             "SELECT e.id, e.nodo_id, n.ruta_natural, e.estado, e.fecha, e.usuario, e.rol, e.carga_id, e.resumen"
             " FROM estado_congelamiento e JOIN nodo n ON n.id = e.nodo_id WHERE n.presupuesto_id = %s ORDER BY e.id", (presupuesto_id,)).fetchall()
         return [Congelamiento(*f) for f in filas]
+
+    def nodo(self, clave: str) -> NodoDelCatalogo:
+        fila = self.conn.execute(
+            "SELECT n.id, n.descripcion, coalesce(u.clave, ''), n.rol, n.categoria, n.procedencia, n.precio_declarado,"
+            " EXISTS (SELECT 1 FROM precio_historico p WHERE p.nodo_id = n.id),"
+            " EXISTS (SELECT 1 FROM version_concepto v WHERE v.nodo_id = n.id)"
+            " FROM nodo n LEFT JOIN unidad u ON u.id = n.unidad_id WHERE n.clave = %s AND n.rol <> 'estructural'", (clave,)).fetchone()
+        if fila is None:
+            raise KeyError(clave)
+        _, descripcion, unidad, rol, categoria, procedencia, precio, con_historico, con_matriz = fila
+        return NodoDelCatalogo(clave, descripcion, unidad, rol, categoria, procedencia, precio if con_historico else None, con_matriz)
+
+    def citas_de(self, clave: str) -> CitasDe:
+        nodo_id = self.id_de(clave)
+        with self.conn.transaction():
+            self.conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+            versiones = self.conn.execute(
+                "SELECT DISTINCT p.clave, v.id, v.version, v.huella, v.pu FROM composicion c JOIN version_concepto v ON v.id = c.version_id"
+                " JOIN nodo p ON p.id = c.padre_id WHERE c.hijo_id = %s"
+                " AND v.version = (SELECT max(version) FROM version_concepto WHERE nodo_id = v.nodo_id) ORDER BY p.clave", (nodo_id,)).fetchall()
+            padres = []
+            for padre, vid, version, huella, pu in versiones:
+                renglones = tuple(r[0] for r in self.conn.execute(
+                    "SELECT id FROM composicion WHERE version_id IS NULL AND hijo_version_id = %s AND baja_carga_id IS NULL ORDER BY id", (vid,)))
+                padres.append(PadreCitante(padre, version, huella, pu, self._lineas_de(vid), renglones))
+            directos = self.conn.execute(
+                "SELECT count(*) FROM composicion WHERE hijo_id = %s AND version_id IS NULL AND baja_carga_id IS NULL", (nodo_id,)).fetchone()[0]
+        return CitasDe(tuple(padres), directos)
+
+    def clones(self) -> List[ClonGuardado]:
+        filas = self.conn.execute(
+            "SELECT c.id, o.clave, n.clave, c.modo, c.reconoce_clave_vieja_al_importar, c.exporta_clave_vieja, c.usuario, c.rol, c.carga_id,"
+            " c.resumen, c.creada_en FROM clon c JOIN nodo o ON o.id = c.original_id JOIN nodo n ON n.id = c.clon_id ORDER BY c.id").fetchall()
+        return [ClonGuardado(*f) for f in filas]
 
     def arbol(self) -> ArbolEnMemoria:
         with self.conn.transaction():
@@ -382,3 +431,70 @@ class PostgresCatalogo:
                     " VALUES (%s, 'contratado', %s, %s, %s, %s) RETURNING id",
                     (plan.nodo_id, plan.usuario, plan.rol, carga_id, Jsonb(dict(plan.resumen)))).fetchone()[0]
         return ResultadoContratacion(carga_id, congelamiento_id, len(plan.versiones_nuevas), len(plan.renglones))
+
+    def clonar(self, plan: PlanDeClonacion) -> ResultadoClonacion:
+        with self.conn.transaction():
+            self.conn.execute("SELECT pg_advisory_xact_lock(%s)", (CANDADO_DEL_CATALOGO,))
+            ultima = self._ultima_carga()
+            if ultima != plan.base:
+                raise CatalogoCambio(f"la última carga es la {ultima} y esta se revisó sobre la {plan.base}")
+            original = self.conn.execute(
+                "SELECT id, unidad_id, rol, categoria FROM nodo WHERE clave = %s AND rol <> 'estructural'", (plan.original,)).fetchone()
+            if original is None:
+                raise ValueError(f"no hay un nodo del catálogo con la clave {plan.original}")
+            if self.conn.execute("SELECT 1 FROM nodo WHERE clave = %s AND rol <> 'estructural'", (plan.clave,)).fetchone() is not None:
+                raise ValueError(f"ya hay un nodo del catálogo con la clave {plan.clave}")
+            original_id, unidad_id, rol, categoria = original
+            carga_id = self.conn.execute(
+                "INSERT INTO carga (usuario, rol, archivos, resumen, tipo) VALUES (%s, %s, '{}'::jsonb, %s, 'clonacion') RETURNING id",
+                (plan.usuario, plan.rol, Jsonb(dict(plan.resumen)))).fetchone()[0]
+            nuevo = plan.nuevo
+            precio = nuevo.precio if isinstance(nuevo, InsumoPlan) else None
+            with self.conn.cursor() as cur:
+                clon_id = cur.execute(
+                    "INSERT INTO nodo (clave, descripcion, unidad_id, rol, categoria, modo_precio, precio_declarado, procedencia)"
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, 'clonacion') RETURNING id",
+                    (plan.clave, nuevo.descripcion, unidad_id, rol, categoria, "declarado" if precio is not None else "calculado", precio)).fetchone()[0]
+                if isinstance(nuevo, InsumoPlan) and nuevo.con_historico:
+                    cur.execute("INSERT INTO precio_historico (nodo_id, precio, fuente, carga_id) VALUES (%s, %s, 'catalogo', %s)",
+                                (clon_id, nuevo.precio, carga_id))
+                if isinstance(nuevo, NodoConMatriz):
+                    self._escribir_version(cur, clon_id, 1, nuevo.huella, nuevo.pu, carga_id, nuevo.lineas)
+                fijados = 0
+                for s in plan.sustituciones:
+                    padre_id, ultima_version = cur.execute(
+                        "SELECT n.id, coalesce(max(v.version), 0) FROM nodo n LEFT JOIN version_concepto v ON v.nodo_id = n.id"
+                        " WHERE n.clave = %s AND n.rol <> 'estructural' GROUP BY n.id", (s.clave,)).fetchone()
+                    version_id = self._escribir_version(cur, padre_id, ultima_version + 1, s.huella, s.pu, carga_id, s.lineas)
+                    for renglon_id in s.renglones:
+                        n = cur.execute(
+                            "UPDATE composicion c SET hijo_version_id = %s FROM nodo h"
+                            " WHERE c.id = %s AND c.version_id IS NULL AND h.id = c.hijo_id AND h.clave = %s AND h.rol <> 'estructural'",
+                            (version_id, renglon_id, s.clave)).rowcount
+                        if n != 1:
+                            raise ValueError(f"el renglón {renglon_id} no es de {s.clave}")
+                        fijados += 1
+                cur.execute(
+                    "INSERT INTO clon (original_id, clon_id, modo, reconoce_clave_vieja_al_importar, usuario, rol, carga_id, resumen)"
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (original_id, clon_id, plan.modo, plan.modo == "sustituir", plan.usuario, plan.rol, carga_id, Jsonb(dict(plan.resumen))))
+        return ResultadoClonacion(carga_id, clon_id, len(plan.sustituciones), fijados)
+
+    @staticmethod
+    def _escribir_version(cur: "psycopg.Cursor", nodo_id: int, version: int, huella: str, pu: Decimal, carga_id: int, lineas) -> int:
+        """Una versión de matriz con sus líneas; las líneas se resuelven por clave."""
+        version_id = cur.execute(
+            "INSERT INTO version_concepto (nodo_id, version, huella, pu, carga_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+            (nodo_id, version, huella, pu, carga_id)).fetchone()[0]
+        ids = {clave: id_ for id_, clave in cur.execute(
+            "SELECT id, clave FROM nodo WHERE rol <> 'estructural' AND clave = ANY(%s)", ([l.hijo for l in lineas],))}
+        for l in lineas:
+            if l.hijo not in ids:
+                raise ValueError(f"{l.hijo} no está en el catálogo")
+        cur.executemany(
+            "INSERT INTO composicion (padre_id, version_id, hijo_id, cantidad, orden, reporta_a, tipo_cantidad, base_porcentaje)"
+            " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            [(nodo_id, version_id, ids[l.hijo], l.cantidad, orden, l.reporta_a.value,
+              "porcentaje" if l.porcentaje else "fija", "suma_jornales_hermanos" if l.porcentaje else None)
+             for orden, l in enumerate(lineas, start=1)])
+        return version_id
