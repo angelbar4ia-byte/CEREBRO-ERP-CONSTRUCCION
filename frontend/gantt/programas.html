@@ -56,8 +56,7 @@
 
   <div class="controles" role="group" aria-label="Quién sube">
     <span class="titulo">Quién sube</span>
-    <select id="q-rol" aria-label="Rol"><option value="control_de_obra">Control de obra</option><option value="residente">Residente</option></select>
-    <input type="text" id="q-usuario" placeholder="tu nombre" aria-label="Tu nombre" maxlength="60" autocomplete="off">
+    <span id="sesion"></span>
   </div>
 
   <div class="aviso" id="aviso" role="status" hidden></div>
@@ -96,9 +95,12 @@
 /*__CLIENTE__*/
 </script>
 <script>
+/*__SESION__*/
+</script>
+<script>
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const ROLES = { control_de_obra: "Control de obra", residente: "Residente" };
+const CFG = __CONFIG__;
 const MOTIVOS = {
   formato: "No entiendo cómo está escrito (debe ser como 80FS, 68SS+16.0).",
   autovinculo: "Una partida no puede esperarse a sí misma.",
@@ -120,18 +122,14 @@ const NO_PASO = {
   duracion_invalida: "La duración no es válida."
 };
 let programas = [];
-let ident = { rol: "control_de_obra", usuario: "" };
-try { Object.assign(ident, JSON.parse(localStorage.getItem("gantt.quien") || "{}")); } catch (_) { /* sin almacenamiento: se escribe cada vez */ }
-if (!ROLES[ident.rol]) ident.rol = "control_de_obra";
-$("q-rol").value = ident.rol; $("q-usuario").value = ident.usuario;
-const llamar = (op, args) => ClientePrograma[op](Object.assign({ "x-rol": ident.rol, "x-usuario": ident.usuario.trim() }, args));
+const llamar = (op, args) => Sesion.llamar(op, args);
 const aviso = t => { const a = $("aviso"); a.hidden = !t; a.textContent = t || ""; };
-const textoError = err => err instanceof ClientePrograma.ErrorApi ? err.mensaje : "Algo falló: " + err;
+const textoError = err => Sesion.esFaltaDeSesion(err) ? "Tu sesión no es válida: vuelve a entrar." : err instanceof ClientePrograma.ErrorApi ? err.mensaje : "Algo falló: " + err;
 const fmtFecha = s => { try { return new Date(s).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" }); } catch (_) { return s; } };
 
 async function lista() {
   try {
-    const ps = programas = await ClientePrograma.listar_programas();
+    const ps = programas = await llamar("listar_programas", {});
     const nombre = id => { const x = ps.find(p => p.id === id); return x ? x.nombre : "#" + id; };
     const elegida = $("f-version-de").value;
     $("f-version-de").innerHTML = `<option value="">No, es un programa nuevo</option>` +
@@ -143,16 +141,13 @@ async function lista() {
           (p.version_de !== null ? `<span class="nuevo">versión nueva de «${esc(nombre(p.version_de))}»</span>` : "") +
           (p.reemplazado_por !== null ? `<span class="nuevo">· reemplazado por <a href="/programas/${p.reemplazado_por}/gantt">«${esc(nombre(p.reemplazado_por))}»</a></span>`
             : ` <button class="b" type="button" data-version="${p.id}" style="font-size:.75rem;padding:1px 6px">subir versión nueva</button>`) + `</td><td class="num">${p.partidas}</td><td class="num">${p.vinculos}</td><td class="num">${p.rechazados}</td><td class="num">${p.ediciones}</td><td class="num">${p.version}</td>` +
-          `<td class="quien">${p.importado_por ? `${esc(p.importado_por)} (${esc(ROLES[p.importado_con_rol] || p.importado_con_rol)}) · ` : ""}${esc(fmtFecha(p.creado_en))}</td></tr>`).join("") + `</tbody></table></div>`
+          `<td class="quien">${p.importado_por ? `${esc(p.importado_por)} (${esc(Sesion.nombreDeRol(p.importado_con_rol))}) · ` : ""}${esc(fmtFecha(p.creado_en))}</td></tr>`).join("") + `</tbody></table></div>`
       : `<p class="vacio">Todavía no hay programas. Sube uno abajo.</p>`;
-  } catch (err) { $("lista").innerHTML = `<p class="vacio">No pude traer la lista: ${esc(textoError(err))}</p>`; }
+  } catch (err) {
+    if (Sesion.esFaltaDeSesion(err)) { Sesion.pantallaDeEntrada(document.querySelector(".pagina")); return; }
+    $("lista").innerHTML = `<p class="vacio">No pude traer la lista: ${esc(textoError(err))}</p>`;
+  }
 }
-
-function cambioDeQuien() {
-  ident.rol = $("q-rol").value; ident.usuario = $("q-usuario").value;
-  try { localStorage.setItem("gantt.quien", JSON.stringify(ident)); } catch (_) { /* no pasa nada */ }
-}
-$("q-rol").onchange = cambioDeQuien; $("q-usuario").oninput = cambioDeQuien;
 
 const fechas = texto => texto.split(/[\s,;]+/).filter(Boolean);
 
@@ -164,7 +159,7 @@ function reporte(r) {
     (version ? `<div class="cifras"><span><b>${r.pasaron}</b> ${r.pasaron === 1 ? "edición pasó" : "ediciones pasaron"} a la versión nueva</span><span><b>${r.no_pasaron.length}</b> ${r.no_pasaron.length === 1 ? "no pasó" : "no pasaron"}</span></div>` +
       (r.pasaron ? `<p class="nota">Las que pasaron conservan quién las decidió, con qué rol y cuándo; su impacto se calculó otra vez contra el programa nuevo.</p>` : "") +
       (r.no_pasaron.length ? `<p class="nota">Estas no pasaron, y siguen en la bitácora de la versión anterior. El sistema no las fuerza: tú decides si se editan de nuevo.</p><div class="scroll"><table class="tabla"><thead><tr><th class="num">#</th><th>Edición</th><th>La hizo</th><th>Por qué no pasó</th></tr></thead><tbody>` +
-        r.no_pasaron.map(x => `<tr><td class="num">${x.secuencia}</td><td>${esc(x.texto)}</td><td class="quien">${esc(x.usuario)} (${esc(ROLES[x.rol] || x.rol)})</td><td>${esc(NO_PASO[x.motivo] || x.motivo)}</td></tr>`).join("") + `</tbody></table></div>` : "") : "") +
+        r.no_pasaron.map(x => `<tr><td class="num">${x.secuencia}</td><td>${esc(x.texto)}</td><td class="quien">${esc(x.usuario)} (${esc(Sesion.nombreDeRol(x.rol))})</td><td>${esc(NO_PASO[x.motivo] || x.motivo)}</td></tr>`).join("") + `</tbody></table></div>` : "") : "") +
     `<div class="cifras"><span><b>${s.partidas}</b> partidas</span><span><b>${s.vinculos}</b> vínculos cargados</span><span><b>${r.rechazados.length}</b> sin cargar</span><span><b>${r.incumplidos}</b> que las fechas escritas no cumplen</span></div>` +
     (r.incumplidos ? `<p class="nota">Los que las fechas no cumplen sí se cargaron: son un aviso, no un error. En el Gantt se ven punteados.</p>` : "") +
     (r.rechazados.length
@@ -178,7 +173,7 @@ function reporte(r) {
 $("form").addEventListener("submit", async e => {
   e.preventDefault();
   aviso(null); $("reporte").hidden = true;
-  if (!ident.usuario.trim()) { aviso("Escribe tu nombre arriba: todo programa dice quién lo subió."); return; }
+  const falta = Sesion.falta(); if (falta) { aviso(falta); return; }
   const archivo = $("f-archivo").files[0];
   if (!archivo) { aviso("Elige el archivo del programa."); return; }
   $("f-subir").disabled = true; $("f-subir").textContent = "Subiendo…";
@@ -208,5 +203,7 @@ $("f-version-de").addEventListener("change", () => {
   const p = programas.find(x => x.id === +$("f-version-de").value);
   if (p && !$("f-nombre").value) $("f-nombre").value = p.nombre;
 });
+Sesion.iniciar(CFG);
+Sesion.montar($("sesion"));
 lista();
 </script>

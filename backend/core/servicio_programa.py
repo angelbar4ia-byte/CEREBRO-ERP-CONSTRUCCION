@@ -19,8 +19,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from dataclasses import replace
-from typing import Any, Dict, List, Mapping, Optional, Protocol, Sequence, Tuple
+from typing import Any, Callable, Dict, FrozenSet, List, Mapping, Optional, Protocol, Sequence, Tuple, Union
 
+from .accesos import PERMISOS_POR_OMISION, PermisoDenegado
 from .motor_cpm import Calendario, Vinculo
 from .programa import (
     CambiarDuracion,
@@ -37,21 +38,15 @@ from .programa import (
     reprogramar,
 )
 
-# `MODELO.md` §5b: la estructura es de Control de obra y las fechas, del Residente
-ROLES_CON_PERMISO = {
-    "editar_estructura_programa": frozenset({"control_de_obra"}),
-    "editar_fechas_programa": frozenset({"residente"}),
-}
+# `MODELO.md` §5b: la estructura es de Control de obra y las fechas, del Residente. Esta es la tabla por omisión (la que
+# siembra la migración 0004); el servicio lee la vigente de `ROL_FUNCION` cuando se la dan (`ServicioPrograma(permisos=)`)
+ROLES_CON_PERMISO = PERMISOS_POR_OMISION
 
 
 ETIQUETA_DE_PERMISO = {
     "editar_estructura_programa": "editar la estructura del programa",
     "editar_fechas_programa": "editar las fechas del programa",
 }
-
-
-class PermisoDenegado(Exception):
-    """El rol no puede hacer esa edición."""
 
 
 class Conflicto(Exception):
@@ -221,14 +216,33 @@ def permiso_de(edicion: object) -> str:
         raise TypeError(f"edición desconocida: {edicion!r}") from None
 
 
-def verificar_funcion(funcion: str, rol: str) -> str:
-    if rol not in ROLES_CON_PERMISO[funcion]:
-        raise PermisoDenegado(f"el rol «{rol}» no puede {ETIQUETA_DE_PERMISO[funcion]}")
+Roles = Union[str, Sequence[str]]  # el rol con que se pide, o todos los que tiene quien pide
+
+
+def rol_efectivo(funcion: str, roles: Roles, permisos: Optional[Mapping[str, FrozenSet[str]]] = None) -> str:
+    """El rol con que queda hecha la acción: el primero —en orden alfabético— de los que tiene quien la pide y que tienen la
+    función. Si ninguno la tiene, `PermisoDenegado`."""
+    tabla = ROLES_CON_PERMISO if permisos is None else permisos
+    mios = (roles,) if isinstance(roles, str) else tuple(roles)
+    tienen = tabla.get(funcion, frozenset())
+    for r in sorted(mios):
+        if r in tienen:
+            return r
+    quehacer = ETIQUETA_DE_PERMISO.get(funcion, funcion)
+    if not mios:
+        raise PermisoDenegado(f"no tienes ningún rol: no puedes {quehacer}")
+    if len(mios) == 1:
+        raise PermisoDenegado(f"el rol «{mios[0]}» no puede {quehacer}")
+    raise PermisoDenegado(f"ninguno de tus roles ({', '.join(sorted(mios))}) puede {quehacer}")
+
+
+def verificar_funcion(funcion: str, rol: Roles, permisos: Optional[Mapping[str, FrozenSet[str]]] = None) -> str:
+    rol_efectivo(funcion, rol, permisos)
     return funcion
 
 
-def verificar_permiso(edicion: object, rol: str) -> str:
-    return verificar_funcion(permiso_de(edicion), rol)
+def verificar_permiso(edicion: object, rol: Roles, permisos: Optional[Mapping[str, FrozenSet[str]]] = None) -> str:
+    return verificar_funcion(permiso_de(edicion), rol, permisos)
 
 
 # Subir un programa es lo más estructural que hay —las partidas, sus duraciones y todos sus vínculos—: pide la misma
@@ -237,8 +251,24 @@ FUNCION_DE_IMPORTAR = "editar_estructura_programa"
 
 
 class ServicioPrograma:
-    def __init__(self, repositorio: RepositorioPrograma) -> None:
+    def __init__(
+        self, repositorio: RepositorioPrograma, permisos: Optional[Callable[[], Mapping[str, FrozenSet[str]]]] = None
+    ) -> None:
+        """`permisos` entrega `ROL_FUNCION` tal como está hoy (`RepositorioAccesos.permisos`); sin ella, la tabla por omisión.
+        Se lee en cada acción: lo que `gestionar_rol_funcion` cambia vale desde la siguiente."""
         self.repo = repositorio
+        self._permisos = permisos
+
+    def tabla_de_permisos(self) -> Mapping[str, FrozenSet[str]]:
+        return ROLES_CON_PERMISO if self._permisos is None else self._permisos()
+
+    def rol_para(self, funcion: str, roles: Roles) -> str:
+        return rol_efectivo(funcion, roles, self.tabla_de_permisos())
+
+    def funciones_de(self, roles: Roles) -> List[str]:
+        """Lo que puede hacer quien tiene esos roles."""
+        mios = {roles} if isinstance(roles, str) else set(roles)
+        return sorted(f for f, rs in self.tabla_de_permisos().items() if rs & mios)
 
     def listar(self) -> List[ResumenPrograma]:
         todos = self.repo.listar_programas()
@@ -248,13 +278,13 @@ class ServicioPrograma:
     def reemplazo_de(self, programa_id: int) -> Optional[int]:
         return next((r.reemplazado_por for r in self.listar() if r.id == programa_id), None)
 
-    def verificar_importar(self, rol: str) -> None:
-        """Quien no puede importar lo sabe antes de subir el archivo, no después de leerlo."""
-        verificar_funcion(FUNCION_DE_IMPORTAR, rol)
+    def verificar_importar(self, rol: Roles) -> str:
+        """Quien no puede importar lo sabe antes de subir el archivo, no después de leerlo. Devuelve el rol con que lo haría."""
+        return self.rol_para(FUNCION_DE_IMPORTAR, rol)
 
-    def importar(self, nombre: str, programa: Programa, calendario: Calendario, rol: str, usuario: str) -> int:
+    def importar(self, nombre: str, programa: Programa, calendario: Calendario, rol: Roles, usuario: str) -> int:
         """Guarda un programa ya cargado, diciendo quién lo subió. Devuelve su id."""
-        self.verificar_importar(rol)
+        rol = self.verificar_importar(rol)
         if not usuario:
             raise ValueError("todo programa dice quién lo subió")
         if not nombre.strip():
@@ -262,7 +292,7 @@ class ServicioPrograma:
         return self.repo.importar_programa(nombre.strip(), programa, calendario, usuario=usuario, rol=rol)
 
     def subir_version(
-        self, programa_id: int, nombre: str, programa: Programa, calendario: Calendario, rol: str, usuario: str,
+        self, programa_id: int, nombre: str, programa: Programa, calendario: Calendario, rol: Roles, usuario: str,
         esperaba: Optional[int] = None,
     ) -> VersionNueva:
         """Sube `programa` como la versión nueva de `programa_id`. Las ediciones que ya estaban aplicadas pasan a la
@@ -273,7 +303,7 @@ class ServicioPrograma:
         vínculo ya existe o ya no existe, cerraría un ciclo), o **la versión nueva ya cambió esa partida** —su
         duración o su arranque—: ahí gana el archivo nuevo, porque el planeador decidió algo y una edición vieja no se
         lo desdice en silencio. El sistema propone y el humano decide."""
-        self.verificar_importar(rol)
+        rol = self.verificar_importar(rol)
         if not usuario:
             raise ValueError("todo programa dice quién lo subió")
         if not nombre.strip():
@@ -344,9 +374,10 @@ class ServicioPrograma:
         rep = reprogramar(base, g.calendario, [e.edicion for e in aplicadas])
         return Vigente(g, base, rep, aplicadas, g.version)
 
-    def proponer(self, programa_id: int, edicion: object, rol: str) -> Propuesta:
+    def proponer(self, programa_id: int, edicion: object, rol: Roles) -> Propuesta:
         """Qué pasaría si se aplicara. No guarda nada."""
-        permiso = verificar_permiso(edicion, rol)
+        permiso = permiso_de(edicion)
+        rol = self.rol_para(permiso, rol)
         v = self.abrir(programa_id)
         cal = v.guardado.calendario
         nuevo = reprogramar(v.base, cal, [e.edicion for e in v.aplicadas] + [edicion])
@@ -363,7 +394,7 @@ class ServicioPrograma:
             esperaba=v.version,
         )
 
-    def aplicar(self, programa_id: int, edicion: object, rol: str, usuario: str, esperaba: Optional[int] = None) -> Propuesta:
+    def aplicar(self, programa_id: int, edicion: object, rol: Roles, usuario: str, esperaba: Optional[int] = None) -> Propuesta:
         """Propone y, si se puede, guarda con lo que el sistema mostró. Una edición que no se puede aplicar
         se devuelve sin guardar y con su motivo. `esperaba` es la versión que vio quien decidió —una pantalla
         abierta desde hace rato—: si el programa ya va en otra, `Conflicto`, porque el impacto que vio ya no
@@ -376,11 +407,11 @@ class ServicioPrograma:
         if not p.aplicable:
             return p
         p.guardada = self.repo.guardar_edicion(
-            programa_id, edicion, rol=rol, usuario=usuario, impacto=p.impacto.resumen(), esperaba=p.esperaba
+            programa_id, edicion, rol=p.rol, usuario=usuario, impacto=p.impacto.resumen(), esperaba=p.esperaba
         )
         return p
 
-    def deshacer(self, programa_id: int, edicion_id: int, rol: str, usuario: str) -> Vigente:
+    def deshacer(self, programa_id: int, edicion_id: int, rol: Roles, usuario: str) -> Vigente:
         """Revierte una edición, con el permiso que la hizo, si las que vinieron después siguen teniendo
         sentido sin ella. Si no, dice cuáles dependen de ella y no toca nada."""
         if not usuario:
@@ -389,7 +420,7 @@ class ServicioPrograma:
         objetivo = next((e for e in v.aplicadas if e.id == edicion_id), None)
         if objetivo is None:
             raise KeyError(f"la edición {edicion_id} no está aplicada")
-        verificar_permiso(objetivo.edicion, rol)
+        self.rol_para(permiso_de(objetivo.edicion), rol)
         cal = v.guardado.calendario
         resto = [e for e in v.aplicadas if e.id != edicion_id]
         acumuladas: List[object] = []

@@ -6587,6 +6587,21 @@ dicho antes en este archivo:
 
 `PROGRAMA-CPM.md`.
 
+### La autenticación, los permisos desde su tabla y las pantallas sin datos (D-469)
+
+Dato del usuario: «vamos con el que sigue abierto». Es B-96, tomado con la recomendación que ya estaba escrita y como
+propuesta sin confirmar. El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo dicho antes en este archivo:
+
+- **Quién puede qué es, por fin, la tabla que `MODELO.md` §5b decía.** El código lo tenía como una constante; ahora el
+  servicio lee `ROL_FUNCION` en cada acción, y lo que corrija `gestionar_rol_funcion` vale en la siguiente.
+- **La API no tiene contraseñas.** Verifica los tokens que entrega un proveedor de identidad y se queda con el correo;
+  quién es y qué puede hacer se resuelve con las tablas de aquí. El proveedor dice quién es; no decide qué puede hacer.
+- **Un token se acepta solo con el algoritmo que el servidor configuró**, nunca con el que el token diga, y siempre
+  vence: así no pasan ni `none` ni el `HS256` firmado con una llave pública.
+- **Los datos no salen sin saber quién los pide.** Por eso las pantallas llegan vacías y los piden con el token.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

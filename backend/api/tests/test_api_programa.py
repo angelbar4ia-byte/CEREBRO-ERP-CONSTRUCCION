@@ -156,19 +156,22 @@ class PruebasApi(unittest.TestCase):
         self.assertEqual(self.c.post("/programas/9999/versiones", json=basura, headers=CO).status_code, 404)
         self.assertEqual(len(self.c.get("/programas").json()), 1)
 
-    def test_la_pantalla_sabe_de_donde_viene_y_a_donde_fue(self):
+    def test_de_donde_viene_y_a_donde_fue_un_programa_lo_dice_la_api_y_no_la_pagina(self):
         nuevo = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()["resumen"]["id"]
-        self.assertIn('"reemplazado_por":%d' % nuevo, self.c.get(f"/programas/{self.pid}/gantt").text)
-        html = self.c.get(f"/programas/{nuevo}/gantt").text
-        self.assertIn('"version_de":%d' % self.pid, html)
-        self.assertIn('"traspaso":{"de":%d' % self.pid, html)
+        self.assertEqual(self.c.get(f"/programas/{self.pid}").json()["reemplazado_por"], nuevo)
+        j = self.c.get(f"/programas/{nuevo}").json()
+        self.assertEqual((j["version_de"], j["traspaso"]["de"]), (self.pid, self.pid))
+        self.assertNotIn("traspaso\":{", self.c.get(f"/programas/{nuevo}/gantt").text)
 
-    def test_el_texto_de_quien_sube_no_se_toma_por_html(self):
+    def test_el_texto_de_quien_sube_no_se_toma_por_html_en_la_simulacion(self):
+        from core.gantt_pagina import pagina_gantt
+        from core.programa import cargar_programa, filas_desde_texto
+
         malo = lambda r: r.update(descripcion="</script><img src=x onerror=alert(1)>") if r["fila"] == "6" else None
         propio = "<script>alert(1)</script>"
-        pid = self.c.post("/programas", json={"nombre": propio, "csv": csv_de("Zafiro", cambia=malo), "no_habiles": NO_HABILES}, headers=CO).json()["resumen"]["id"]
-        html = self.c.get(f"/programas/{pid}/gantt").text
-        normal = self.c.get(f"/programas/{self.pid}/gantt").text
+        prog = cargar_programa(filas_desde_texto(csv_de("Zafiro", cambia=malo)), CAL)
+        html = pagina_gantt(prog, CAL, f"Gantt {propio}")
+        normal = pagina_gantt(self.plus, CAL, "Gantt Zafiro Plus")
         self.assertIn("<title>Gantt &lt;script&gt;alert(1)&lt;/script&gt;</title>", html)
         self.assertNotIn(propio, html)
         self.assertNotIn("</script><img", html)
@@ -176,8 +179,9 @@ class PruebasApi(unittest.TestCase):
         self.assertIn("\\u003c/script>\\u003cimg", html)  # viaja como dato, escapado
 
     def test_un_titulo_que_parece_marca_no_cambia_la_plantilla(self):
-        pid = self.c.post("/programas", json={"nombre": "__DATOS__ /*__MOTOR__*/", "csv": csv_de("Zafiro Plus"), "no_habiles": NO_HABILES}, headers=CO).json()["resumen"]["id"]
-        html = self.c.get(f"/programas/{pid}/gantt").text
+        from core.gantt_pagina import pagina_gantt
+
+        html = pagina_gantt(self.plus, CAL, "Gantt __DATOS__ /*__MOTOR__*/")
         self.assertIn("<title>Gantt __DATOS__ /*__MOTOR__*/</title>", html)
         self.assertEqual(html.count("const Motor = "), 1)
 
@@ -293,17 +297,20 @@ class PruebasApi(unittest.TestCase):
         self.assertEqual(self.c.delete(f"/programas/{self.pid}/ediciones/9999", headers=CO).status_code, 404)
 
     # ------------------------------------------------------------------ la pantalla
-    def test_la_pantalla_sale_de_la_api_y_trae_lo_guardado(self):
+    def test_la_pantalla_sale_de_la_api_y_no_lleva_ningun_dato_del_programa(self):
         self.c.post(f"/programas/{self.pid}/ediciones", json=self.p16, headers=CO)
-        r = self.c.get(f"/programas/{self.pid}/gantt")
+        r = self.c.get(f"/programas/{self.pid}/gantt")  # sin identidad: el navegador no puede mandarla al abrir la página
         self.assertEqual(r.status_code, 200)
-        self.assertIn("<title>Gantt Zafiro Plus</title>", r.text)
-        self.assertIn('"api":{"programa":%d,"version":1' % self.pid, r.text)
+        self.assertIn("<title>Gantt</title>", r.text)
+        self.assertIn('const CFG = {"modo":"cabeceras","login_url":null,"programa":%d};' % self.pid, r.text)
+        fila = self.plus.filas[5]
+        for dato in ("Zafiro Plus", fila.llave, fila.descripcion, "luis"):
+            self.assertNotIn(dato, r.text, dato)  # ni el nombre, ni una fila, ni quién editó: eso lo pide la página con el token
 
     # ------------------------------------------------------------------ el spec
     def test_el_spec_nombra_las_operaciones_en_espanol(self):
         ops = {op["operationId"] for ruta in self.c.get("/openapi.json").json()["paths"].values() for op in ruta.values()}
-        self.assertEqual(ops, {"listar_programas", "importar_programa", "subir_version", "pantalla_programas", "ver_programa", "ver_bitacora",
+        self.assertEqual(ops, {"quien_soy", "listar_programas", "importar_programa", "subir_version", "pantalla_programas", "ver_programa", "ver_bitacora",
                                "proponer_edicion", "aplicar_edicion", "deshacer_edicion", "pantalla_gantt"})
 
 

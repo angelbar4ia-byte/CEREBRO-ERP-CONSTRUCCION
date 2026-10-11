@@ -93,7 +93,7 @@
 <div class="pagina">
   <header>
     <a class="atras" id="atras" href="/" hidden>← Programas</a>
-    <h1>__TITULO__</h1>
+    <h1 id="titulo">__TITULO__</h1>
     <p class="nota" id="nota-pagina">El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Es una simulación en pantalla: nada se guarda. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.</p>
   </header>
 
@@ -109,8 +109,7 @@
 
   <div class="controles" role="group" aria-label="Controles del Gantt">
     <span class="grupo" id="g-quien" hidden><span class="titulo">Quién edita</span>
-      <select id="q-rol" aria-label="Rol"><option value="control_de_obra">Control de obra</option><option value="residente">Residente</option></select>
-      <input type="text" id="q-usuario" placeholder="tu nombre" aria-label="Tu nombre" maxlength="60" autocomplete="off">
+      <span id="sesion"></span>
       <span class="mono" id="q-version"></span>
     </span>
     <span class="grupo"><span class="titulo">Ver</span>
@@ -157,8 +156,33 @@
 /*__CLIENTE__*/
 </script>
 <script>
-const G = __DATOS__;
+/*__SESION__*/
+</script>
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+// Con configuración, la pantalla trabaja contra la API y pide el programa: la página no lleva ningún dato suyo, porque
+// el navegador no puede mandar un token al abrirla y los datos no pueden salir sin saber quién los pide (B-96).
+// Sin ella es la simulación de siempre, con el programa dentro de la página.
+const CFG = __CONFIG__;
+async function cargarVivo() {
+  const p = await Sesion.llamar("ver_programa", { programa_id: CFG.programa });
+  const g = p.vista;
+  g.nombre = p.nombre;
+  g.api = { programa: p.id, version: p.version, guardadas: p.guardadas, version_de: p.version_de, reemplazado_por: p.reemplazado_por, traspaso: p.traspaso };
+  return g;
+}
+let G;
+try {
+  if (CFG) { Sesion.iniciar(CFG); G = await cargarVivo(); } else G = __DATOS__;
+} catch (err) {
+  const caja = document.querySelector(".pagina");
+  if (Sesion.esFaltaDeSesion(err)) Sesion.pantallaDeEntrada(caja);
+  else caja.innerHTML = `<h1>No pude abrir el programa</h1><p class="nota">${esc(err && err.mensaje || err)}</p><p><a href="/">← Programas</a></p>`;
+  return;
+}
+if (CFG) { document.title = "Gantt " + G.nombre; $("titulo").textContent = "Gantt " + G.nombre; }
 // El programa lo sube quien tiene permiso y lo ven todos: lo que se muestra de él nunca se toma por HTML. Las claves y
 // las descripciones se escapan una vez aquí; las llaves —que también son claves de búsqueda— al ponerlas en un atributo.
 G.filas.forEach(f => { f.clave = esc(f.clave); f.descripcion = esc(f.descripcion); });
@@ -180,7 +204,6 @@ const NO_PASO = {
   sucesora_no_es_partida: "Lo que espera ya no es una partida.", predecesora_sin_partidas: "El bloque que citaba ya no tiene partidas.",
   duracion_invalida: "La duración no es válida."
 };
-const $ = id => document.getElementById(id);
 const fecha = s => new Date(s + "T00:00:00");
 const desde = fecha(G.desde);
 const dia = s => Math.round((fecha(s) - desde) / 864e5);
@@ -198,15 +221,12 @@ const hijosDe = k => R.bloques[k] || [];
 // Con `G.api` la pantalla trabaja contra el servidor: `saved` es lo ya guardado (la bitácora aplicada), `edits` lo que
 // está por guardar. Sin `G.api` es la simulación de siempre y `saved` queda vacío.
 const API = G.api || null;
-const ROLES = { control_de_obra: "Control de obra", residente: "Residente" };
-const ROL_DE = { dur: "control_de_obra", add: "control_de_obra", del: "control_de_obra", chg: "control_de_obra", ini: "residente" }; // el servidor decide; esto solo avisa antes
-const QUE_PUEDE = { control_de_obra: "editar la estructura (duración y vínculos)", residente: "editar las fechas" };
+// qué función de `ROL_FUNCION` pide cada edición (`PERMISO_DE` en programa.py); quién la tiene lo dice la API (`Sesion.puede`)
+const FUNCION_DE = { dur: "editar_estructura_programa", add: "editar_estructura_programa", del: "editar_estructura_programa", chg: "editar_estructura_programa", ini: "editar_fechas_programa" };
+const QUE_ES = { editar_estructura_programa: "editar la estructura (duración y vínculos)", editar_fechas_programa: "editar las fechas" };
 const ORIGENES = { decision: "por decisión", recurso: "por recurso", tecnica: "técnico" };
 const CONFIANZA = { tecnica: "alta", recurso: "media", decision: "baja" };
 let guardadas = API ? API.guardadas : [], version = API ? API.version : 0, ocupado = false;
-let ident = { rol: "control_de_obra", usuario: "" };
-try { Object.assign(ident, JSON.parse(localStorage.getItem("gantt.quien") || "{}")); } catch (_) { /* sin almacenamiento: se escribe cada vez */ }
-if (!ROLES[ident.rol]) ident.rol = "control_de_obra";
 
 const frac = x => { const m = String(x).split("/"); return m.length === 2 ? +m[0] / +m[1] : +x; };
 function deServidor(d) { // la edición como la guarda la bitácora → la de este motor
@@ -272,7 +292,7 @@ function reconstruir(lista) { // vuelve a validar una a una, sobre lo guardado: 
   return ok;
 }
 function aplicar(e) {
-  if (API && ident.rol !== ROL_DE[e.t]) { aviso = `Esto es ${QUE_PUEDE[ROL_DE[e.t]]}: entra como ${ROLES[ROL_DE[e.t]]}.`; todo(); return; }
+  if (API && !Sesion.puede(FUNCION_DE[e.t])) { aviso = `Con ${Sesion.describir()} no puedes ${QUE_ES[FUNCION_DE[e.t]]}.`; todo(); return; }
   const ant = e.t === "dur" || e.t === "ini" ? edits.filter(x => !(x.t === e.t && x.k === e.k)) : edits;
   const prueba = Motor.reprogramar(R, saved.concat(ant, [e]));
   if (prueba.rechazadas.length) { aviso = MOTIVOS[prueba.rechazadas[prueba.rechazadas.length - 1]] || "No se puede aplicar."; }
@@ -282,23 +302,24 @@ function aplicar(e) {
 function quitarEdicion(i) { edits = reconstruir(edits.filter((_, j) => j !== i)); aviso = null; recalcular(); todo(); }
 
 // ------------------------------------------------------------------ hablar con el servidor
-const llamar = (op, args) => ClientePrograma[op](Object.assign({ programa_id: API.programa, "x-rol": ident.rol, "x-usuario": ident.usuario.trim() }, args));
+const llamar = (op, args) => Sesion.llamar(op, Object.assign({ programa_id: API.programa }, args));
 const textoError = err => {
   if (!(err instanceof ClientePrograma.ErrorApi)) return "Algo falló: " + err;
+  if (Sesion.esFaltaDeSesion(err)) return "Tu sesión no es válida: vuelve a entrar.";
   const d = err.detalle || {};
   if (err.codigo === "no_aplicable") return "El servidor no pudo aplicarla: " + (d.rechazadas || []).map(m => MOTIVOS[m] || m).join(" ");
   if (err.codigo === "dependen") return `No se puede deshacer: las ediciones ${(d.dependientes || []).join(", ")} dependen de ella. Deshaz primero esas.`;
   return err.mensaje;
 };
 async function recargar() { // trae lo que hay hoy; lo por guardar se vuelve a validar encima
-  const p = await ClientePrograma.ver_programa({ programa_id: API.programa });
+  const p = await llamar("ver_programa", {});
   guardadas = p.guardadas; version = p.version; rehacerGuardadas();
   const antes = edits.length; edits = reconstruir(edits);
   return antes - edits.length;
 }
 async function guardar() {
   if (!API || !edits.length || ocupado) return;
-  if (!ident.usuario.trim()) { aviso = "Escribe tu nombre arriba: toda edición dice quién la hizo."; todo(); return; }
+  const falta = Sesion.falta(); if (falta) { aviso = falta; todo(); return; }
   ocupado = true; aviso = null; todo();
   try {
     while (edits.length) {
@@ -315,7 +336,7 @@ async function guardar() {
 }
 async function deshacer(id) {
   if (!API || ocupado) return;
-  if (!ident.usuario.trim()) { aviso = "Escribe tu nombre arriba: todo deshacer dice quién lo hizo."; todo(); return; }
+  const falta = Sesion.falta(); if (falta) { aviso = falta; todo(); return; }
   ocupado = true; aviso = null; todo();
   try {
     const r = await llamar("deshacer_edicion", { edicion_id: id });
@@ -357,10 +378,10 @@ function bitacora() {
     const e = deServidor(g.edicion), i = g.impacto || {}, ok = g.estado === "aplicada";
     const imp = i.fin_despues ? `cierre ${i.dias_de_cambio > 0 ? "+" : ""}${i.dias_de_cambio} d, ${i.partidas_movidas} partida(s) movida(s)${i.ruta_cambia ? ", cambió la cadena" : ""}` : "";
     const origen = g.edicion.origen ? ` · ${esc(ORIGENES[g.edicion.origen] || g.edicion.origen)} (confianza ${esc(CONFIANZA[g.edicion.origen] || "?")})` : "";
-    const puede = ROL_DE[e.t] === ident.rol;
+    const puede = Sesion.puede(FUNCION_DE[e.t]);
     return `<li class="${ok ? "" : "revertida"}"><span class="sec">#${g.secuencia}</span><span class="que">${textoEdicion(e, false)}${origen}</span>` +
-      `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede ? "disabled" : ""} title="${puede ? "Deshacer esta edición" : "Se deshace como " + ROLES[ROL_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
-      `<span class="quien-cuando">${esc(g.usuario)} (${esc(ROLES[g.rol] || g.rol)}) · ${esc(fmtHora(g.creada_en))}${g.heredada_de ? " · pasó de la versión anterior" : ""}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
+      `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede ? "disabled" : ""} title="${puede ? "Deshacer esta edición" : "Tus roles no pueden " + QUE_ES[FUNCION_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
+      `<span class="quien-cuando">${esc(g.usuario)} (${esc(Sesion.nombreDeRol(g.rol))}) · ${esc(fmtHora(g.creada_en))}${g.heredada_de ? " · pasó de la versión anterior" : ""}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
   };
   b.innerHTML = `<summary>Lo guardado · ${saved.length} aplicada(s)${guardadas.length > saved.length ? `, ${guardadas.length - saved.length} revertida(s)` : ""} · versión ${version}</summary>` +
     (guardadas.length ? `<ol>${guardadas.slice().reverse().map(fila).join("")}</ol>` : `<p class="nota" style="margin:8px 0 4px">Todavía no se ha guardado ninguna edición.</p>`);
@@ -490,10 +511,8 @@ function panel() {
      ${API ? `<div class="campo"><label for="a-origen" class="mono">¿Por qué este orden?</label><select id="a-origen" aria-label="Por qué existe este orden">${Object.entries(ORIGENES).map(([k, t]) => `<option value="${k}" ${k === "decision" ? "selected" : ""}>${t} · confianza ${CONFIANZA[k]}</option>`).join("")}</select></div><p class="nota">Si no lo dices, queda «por decisión»: lo menos firme, lo primero que se revisa.</p>` : ""}`;
 }
 
-function identidad() { // el rol y el nombre de quien edita: solo con servidor
+function identidad() { // la sesión de quien edita: solo con servidor
   $("g-quien").hidden = !API; if (!API) return;
-  if ($("q-rol").value !== ident.rol) $("q-rol").value = ident.rol;
-  if ($("q-usuario").value !== ident.usuario) $("q-usuario").value = ident.usuario;
   $("q-version").textContent = "versión " + version;
 }
 function todo() { identidad(); tarjetas(); bitacora(); leyenda(); dibujar(); panel(); }
@@ -534,13 +553,6 @@ $("ediciones").addEventListener("click", e => {
   else if (e.target.id === "b-guardar") guardar();
 });
 $("bitacora").addEventListener("click", e => { const b = e.target.closest("button[data-d]"); if (b) { e.preventDefault(); deshacer(+b.dataset.d); } });
-function cambioDeQuien() {
-  ident.rol = $("q-rol").value; ident.usuario = $("q-usuario").value;
-  try { localStorage.setItem("gantt.quien", JSON.stringify(ident)); } catch (_) { /* no pasa nada: se vuelve a escribir */ }
-  aviso = null; tarjetas(); bitacora(); panel();
-}
-$("q-rol").onchange = cambioDeQuien;
-$("q-usuario").oninput = cambioDeQuien;
 $("leyenda").addEventListener("click", e => { const b = e.target.closest("button[data-f]"); if (b) { soloFrente = soloFrente === b.dataset.f ? null : b.dataset.f; leyenda(); dibujar(); } });
 $("b-frentes").onclick = () => { expandidos = new Set(G.filas.filter(f => f.nivel === 0).map(f => f.llave)); dibujar(); };
 $("b-etapas").onclick = () => { expandidos = new Set(G.filas.filter(f => f.resumen && f.nivel <= 1).map(f => f.llave)); dibujar(); };
@@ -569,14 +581,17 @@ function avisoDeVersion() { // de dónde viene este programa y a dónde fue: lo 
     const no = t.no_pasaron || [];
     partes.push(`<p style="margin:0">Versión nueva de «${esc(t.de_nombre)}» (<a href="/programas/${esc(API.version_de)}/gantt">verla</a>): <b>${esc(t.pasaron)}</b> ${t.pasaron === 1 ? "edición pasó" : "ediciones pasaron"}${no.length ? ` y <b>${no.length}</b> no` : ""}.</p>` +
       (no.length ? `<details><summary>Las que no pasaron</summary><ul style="margin:6px 0 0;padding-left:18px">` +
-        no.map(n => `<li>#${esc(n.secuencia)} ${esc(n.texto)} — ${esc(n.usuario)} (${esc(ROLES[n.rol] || n.rol)}): ${esc(NO_PASO[n.motivo] || n.motivo)}</li>`).join("") + `</ul></details>` : ""));
+        no.map(n => `<li>#${esc(n.secuencia)} ${esc(n.texto)} — ${esc(n.usuario)} (${esc(Sesion.nombreDeRol(n.rol))}): ${esc(NO_PASO[n.motivo] || n.motivo)}</li>`).join("") + `</ul></details>` : ""));
   }
   const caja = $("version-aviso"); caja.hidden = !partes.length; caja.innerHTML = partes.join("");
 }
 if (API) {
+  Sesion.montar($("sesion"));
+  Sesion.alCambiar(() => { aviso = null; tarjetas(); bitacora(); panel(); }); // cuando se sabe qué puede hacer quien edita, se redibuja lo que depende de eso
   avisoDeVersion();
   $("atras").hidden = false;
   $("nota-pagina").innerHTML = 'El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Lo que decides queda <b>por guardar</b> hasta que lo guardes; entonces entra a la bitácora con tu nombre, tu rol y el impacto que viste, y se puede deshacer. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.';
 }
 recalcular(); todo();
+})();
 </script>

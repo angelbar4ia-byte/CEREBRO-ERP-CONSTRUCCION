@@ -3,7 +3,10 @@
 
    Cada operación recibe un objeto con los parámetros por su nombre en el spec (`programa_id`, `x-rol`…) y,
    si lleva cuerpo, el cuerpo en `cuerpo`. Devuelve lo que contesta la API ya leído (JSON, o texto si es HTML)
-   y, si contesta con error, lanza un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`. */
+   y, si contesta con error, lanza un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`.
+
+   Las operaciones que el spec declara protegidas mandan `Authorization: Bearer <token>` si `ClientePrograma.token` tiene uno
+   (B-96): el cliente no sabe de dónde sale, solo lo manda. */
 const OPERACIONES = {
   "aplicar_edicion": {
     "metodo": "POST",
@@ -16,7 +19,8 @@ const OPERACIONES = {
       "x-rol",
       "x-usuario"
     ],
-    "cuerpo": true
+    "cuerpo": true,
+    "seguridad": true
   },
   "deshacer_edicion": {
     "metodo": "DELETE",
@@ -30,7 +34,8 @@ const OPERACIONES = {
       "x-rol",
       "x-usuario"
     ],
-    "cuerpo": false
+    "cuerpo": false,
+    "seguridad": true
   },
   "importar_programa": {
     "metodo": "POST",
@@ -41,7 +46,8 @@ const OPERACIONES = {
       "x-rol",
       "x-usuario"
     ],
-    "cuerpo": true
+    "cuerpo": true,
+    "seguridad": true
   },
   "listar_programas": {
     "metodo": "GET",
@@ -49,7 +55,8 @@ const OPERACIONES = {
     "ruta_params": [],
     "consulta": [],
     "cabeceras": [],
-    "cuerpo": false
+    "cuerpo": false,
+    "seguridad": true
   },
   "pantalla_gantt": {
     "metodo": "GET",
@@ -59,7 +66,8 @@ const OPERACIONES = {
     ],
     "consulta": [],
     "cabeceras": [],
-    "cuerpo": false
+    "cuerpo": false,
+    "seguridad": false
   },
   "pantalla_programas": {
     "metodo": "GET",
@@ -67,7 +75,8 @@ const OPERACIONES = {
     "ruta_params": [],
     "consulta": [],
     "cabeceras": [],
-    "cuerpo": false
+    "cuerpo": false,
+    "seguridad": false
   },
   "proponer_edicion": {
     "metodo": "POST",
@@ -80,7 +89,20 @@ const OPERACIONES = {
       "x-rol",
       "x-usuario"
     ],
-    "cuerpo": true
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "quien_soy": {
+    "metodo": "GET",
+    "ruta": "/yo",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": false,
+    "seguridad": true
   },
   "subir_version": {
     "metodo": "POST",
@@ -93,7 +115,8 @@ const OPERACIONES = {
       "x-rol",
       "x-usuario"
     ],
-    "cuerpo": true
+    "cuerpo": true,
+    "seguridad": true
   },
   "ver_bitacora": {
     "metodo": "GET",
@@ -103,7 +126,8 @@ const OPERACIONES = {
     ],
     "consulta": [],
     "cabeceras": [],
-    "cuerpo": false
+    "cuerpo": false,
+    "seguridad": true
   },
   "ver_programa": {
     "metodo": "GET",
@@ -113,7 +137,8 @@ const OPERACIONES = {
     ],
     "consulta": [],
     "cabeceras": [],
-    "cuerpo": false
+    "cuerpo": false,
+    "seguridad": true
   }
 };
 
@@ -140,6 +165,7 @@ const ClientePrograma = (() => {
       .map(p => encodeURIComponent(p) + "=" + encodeURIComponent(args[p])).join("&");
     const cabeceras = {};
     for (const h of op.cabeceras) if (args[h] !== undefined && args[h] !== null) cabeceras[h] = String(args[h]);
+    if (op.seguridad && cliente.token) cabeceras["Authorization"] = "Bearer " + cliente.token;
     const init = { method: op.metodo, headers: cabeceras };
     if (op.cuerpo) { cabeceras["Content-Type"] = "application/json"; init.body = JSON.stringify(args.cuerpo); }
     let r;
@@ -151,7 +177,7 @@ const ClientePrograma = (() => {
     return dato;
   }
 
-  const cliente = { ErrorApi, base: "" };
+  const cliente = { ErrorApi, base: "", token: null };
   /** POST /programas/{programa_id}/ediciones — Aplicar una edición y guardarla en la bitácora */
   cliente.aplicar_edicion = args => llamar("aplicar_edicion", args || {});
   /** DELETE /programas/{programa_id}/ediciones/{edicion_id} — Deshacer una edición aplicada */
@@ -166,6 +192,8 @@ const ClientePrograma = (() => {
   cliente.pantalla_programas = args => llamar("pantalla_programas", args || {});
   /** POST /programas/{programa_id}/propuestas — Qué pasaría si se aplicara esta edición: no guarda nada */
   cliente.proponer_edicion = args => llamar("proponer_edicion", args || {});
+  /** GET /yo — Quién eres y qué puedes hacer */
+  cliente.quien_soy = args => llamar("quien_soy", args || {});
   /** POST /programas/{programa_id}/versiones — Subir la versión nueva de un programa: las ediciones que siguen teniendo sentido pasan a ella */
   cliente.subir_version = args => llamar("subir_version", args || {});
   /** GET /programas/{programa_id}/ediciones — Todo lo que se ha editado, también lo revertido */

@@ -90,5 +90,50 @@ class PruebasClienteContraLaApi(unittest.TestCase):
         self.assertTrue(s["html"])
 
 
+SCRIPT_TOKEN = r"""
+const C = require(process.argv[1]);
+C.base = process.argv[2];
+const token = process.argv[3];
+(async () => {
+  const sal = {};
+  try { await C.quien_soy({}); } catch (e) { sal.sinToken = [e.status, e.codigo, e.detalle.login_url]; }
+  C.token = "basura";
+  try { await C.listar_programas({}); } catch (e) { sal.malo = [e.status, e.codigo]; }
+  C.token = token;
+  const yo = await C.quien_soy({});
+  sal.yo = [yo.usuario, yo.roles, yo.funciones, yo.modo];
+  sal.lista = (await C.listar_programas({})).length;
+  C.token = null;  // las pantallas no mandan token: no hay a quien mandárselo
+  try { await C.listar_programas({}); } catch (e) { sal.sinTokenOtraVez = e.status; }
+  sal.pantalla = (await C.pantalla_programas({})).includes("const CFG");  // las pantallas se abren sin token
+  process.stdout.write(JSON.stringify(sal));
+})().catch(e => { process.stderr.write(String(e && e.stack || e)); process.exit(1); });
+"""
+
+
+@unittest.skipUnless(shutil.which("node"), "no hay node")
+class PruebasClienteConToken(unittest.TestCase):
+    """El cliente manda `Authorization: Bearer` en las operaciones que el spec declara protegidas, y solo si tiene un token."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.servidor = ServidorDePrueba("token").arrancar()
+        cls.servidor.repo.importar_programa("Zafiro Plus", programa("Zafiro Plus"), CAL)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.apagar()
+
+    def test_el_token_va_en_las_operaciones_protegidas(self):
+        r = subprocess.run(["node", "-e", SCRIPT_TOKEN, str(DESTINO), self.servidor.url, self.servidor.token("luis@obra.mx")],
+                           capture_output=True, text=True, timeout=120)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        s = json.loads(r.stdout)
+        self.assertEqual(s["sinToken"], [401, "sin_token", "https://proveedor.example/entrar"])
+        self.assertEqual(s["malo"], [401, "token_invalido"])
+        self.assertEqual(s["yo"], ["luis@obra.mx", ["control_de_obra"], ["editar_estructura_programa"], "token"])
+        self.assertEqual((s["lista"], s["sinTokenOtraVez"], s["pantalla"]), (1, 401, True))
+
+
 if __name__ == "__main__":
     unittest.main()

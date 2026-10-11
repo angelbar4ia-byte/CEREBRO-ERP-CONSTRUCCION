@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 251 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 317 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -38,6 +38,7 @@ verificado: 251 pruebas · los siete programas reales (832 vínculos) reproducen
 | **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
 | **Guardar lo que se edita** | **§4.7, `backend/core/servicio_programa.py` y `database/migraciones/`** |
 | **La API, subir un programa, su versión nueva y el cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
+| **Quién es cada quien: usuarios, roles, permisos y la autenticación por token** | **§4.8, `backend/core/accesos.py`, `backend/api/autenticacion.py` y `database/migraciones/0004_usuarios_y_permisos.sql`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
 ---
@@ -292,8 +293,11 @@ cumplen el mismo contrato.
 | `deshacer(programa, edición, rol, usuario)` | La marca revertida y repite la cuenta sin ella; si otras ediciones dependen de ella, dice cuáles y no toca nada (`NoSePuedeDeshacer`) |
 | `PermisoDenegado` · `Conflicto` | El rol no puede esa edición; o alguien editó entre que se calculó el impacto y se quiso guardar |
 
-**Los permisos son los de `MODELO.md` §5b**: la estructura (duración y vínculos) es de `control_de_obra` y las
-fechas, de `residente`; ningún otro rol edita, y deshacer pide el permiso de la edición que se deshace.
+**Los permisos son los de `MODELO.md` §5b y salen de su tabla** (`ROL_FUNCION`, D-469), no de una constante: la
+estructura (duración y vínculos) es de `control_de_obra` y las fechas, de `residente`; ningún otro rol edita, y
+deshacer pide el permiso de la edición que se deshace. El servicio lee la tabla en cada acción (`ServicioPrograma(permisos=)`),
+así que lo que corrige `gestionar_rol_funcion` vale en la siguiente. Quien tiene más de un rol puede lo que alguno de
+ellos pueda, y la acción queda registrada con el primero —en orden alfabético— que tiene la función.
 
 **El candado es una versión.** Cada edición o reversión sube `programa.version`; quien guarda dice qué versión
 vio y, si ya es otra, `Conflicto`, sin pisar. La versión se lee antes que las ediciones: si algo cambia entre
@@ -320,11 +324,12 @@ cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca.
 
 ## 4.8 La API y su cliente: `backend/api/` y `frontend/gantt/cliente_programa.js`
 
-FastAPI es la única superficie pública (D-54). Estas diez operaciones, escritas sobre `ServicioPrograma` y nada más,
+FastAPI es la única superficie pública (D-54). Estas once operaciones, escritas sobre `ServicioPrograma` y nada más,
 son las que las pantallas necesitan:
 
 | Operación | Método y ruta | Qué hace | Falla con |
 |---|---|---|---|
+| `quien_soy` | `GET /yo` | Quién eres, con qué roles y qué puedes hacer con ellos (las funciones de `ROL_FUNCION`, hoy) | 401, 403 |
 | `listar_programas` | `GET /programas` | Los programas del más viejo al más nuevo: partidas, vínculos cargados, vínculos que no se cargaron, ediciones aplicadas, versión y quién lo subió | — |
 | `importar_programa` | `POST /programas` (201) | Sube un programa (ver abajo) | 401, 403, 422 `importacion_invalida` |
 | `subir_version` | `POST /programas/{id}/versiones` (201) | Sube la versión nueva de un programa (ver abajo) | 401, 403, 404, 409 `conflicto` o `reemplazado`, 422 `importacion_invalida` |
@@ -333,8 +338,8 @@ son las que las pantallas necesitan:
 | `proponer_edicion` | `POST /programas/{id}/propuestas` | Qué pasaría: el impacto contra lo vigente, o por qué no se puede aplicar. No guarda | 401, 403, 404, 422 |
 | `aplicar_edicion` | `POST /programas/{id}/ediciones` (201) | Propone y guarda. Cuerpo: `edicion` y, si la pantalla lo manda, `esperaba` | 401, 403, 404, 409 `conflicto`, 422 `edicion_invalida` o `no_aplicable` con sus motivos |
 | `deshacer_edicion` | `DELETE /programas/{id}/ediciones/{edicion}` | Revierte una edición con el permiso que la hizo y devuelve la bitácora y la versión | 401, 403, 404, 409 `dependen` (con cuáles) o `conflicto` |
-| `pantalla_gantt` | `GET /programas/{id}/gantt` | El HTML de la pantalla de ese programa, con el cliente, el motor y lo guardado | 404 |
-| `pantalla_programas` | `GET /` | El HTML de la lista de programas y de subir uno. No lleva datos: los pide a la API | — |
+| `pantalla_gantt` | `GET /programas/{id}/gantt` | El HTML de la pantalla del Gantt. **No lleva ningún dato del programa, ni su nombre**: los pide a la API con el token de quien la abre | — |
+| `pantalla_programas` | `GET /` | El HTML de la lista de programas y de subir uno. Tampoco lleva datos | — |
 
 **Subir un programa.** El cuerpo trae el `nombre`, el `csv` —el programa en el formato de
 `PROGRAMAS-PROTOTIPOS.csv` (§2)—, el `prototipo` si el archivo trae varios (columna `prototipo`) y los `no_habiles`
@@ -389,20 +394,46 @@ quedó. Quien guarda manda en `esperaba` la que vio: una pantalla abierta desde 
 vio —el impacto que le mostró ya no es el de hoy—, recibe 409 y la pantalla trae lo de hoy. Sin `esperaba` se aplica
 sobre lo que haya al momento de proponer.
 
-**Quién llama: sin decidir.** El cerebro todavía no decide cómo se autentica nadie (B-96). Mientras tanto quien
-llama dice su rol y su nombre en dos cabeceras, `X-Rol` y `X-Usuario`. Sirve para trabajar y para probar y **no se
-despliega así**: cualquiera podría decir que es Control de obra. `crear_app(identidad=…)` recibe otra dependencia
-de FastAPI y es el único lugar que cambia cuando haya autenticación; el servicio ya recibe el rol y el usuario
-como datos.
+**Quién llama (B-96, D-469, propuesta sin confirmar).** La API **no emite tokens ni tiene contraseñas**: verifica los
+que entrega un proveedor de identidad (Supabase Auth, Auth0, Keycloak, el que se elija) y de ellos toma solo el
+correo que el proveedor ya comprobó. Con el correo busca al `USUARIO` (`core/accesos.py`), y de él salen sus roles y,
+de los roles, lo que puede hacer. Cambiar de proveedor es cambiar la llave y, a lo más, el nombre del reclamo del
+correo (`--jwt-reclamo-correo`).
+- **Qué token se acepta:** trae `exp` y no ha vencido (30 s de margen por relojes desfasados); está firmado con el
+  algoritmo de la llave que se configuró —`HS256` con el secreto compartido, o `RS256`/`ES256` con una llave del JWKS
+  del proveedor—, y **el algoritmo lo fija el servidor, no el token**: uno que diga `none`, o `HS256` firmado con la
+  llave pública del proveedor como si fuera secreto, o `ES256` con la llave RSA que nombró su `kid`, no pasa; si se
+  configuraron, coinciden audiencia y emisor; y trae un correo.
+- **Qué responde:** sin token, con uno que no sirve o vencido, **401** (`sin_token`, `token_invalido`, `token_vencido`,
+  `token_sin_correo`) con la `login_url` para que la pantalla mande a entrar. Con un token bueno de alguien que no está
+  dado de alta o que ya se retiró, **403** (`usuario_desconocido`, `usuario_inactivo`): el proveedor dice quién es,
+  pero no es el proveedor quien decide qué puede hacer aquí. Un usuario que se retira pierde el acceso en la siguiente
+  llamada, aunque su token siga vigente.
+- **En modo token toda ruta de datos pide el token**, también las que solo ven. Las dos pantallas se abren sin él
+  —el navegador no puede mandarlo al navegar— y por eso **no llevan ningún dato**.
+- **Lo que queda en la bitácora es el correo** del usuario, que es único; el nombre no lo es.
+- **Las cabeceras `X-Rol` y `X-Usuario`** (la identidad provisional de D-465) son el modo `cabeceras`: sirven para
+  trabajar y probar en una máquina propia y **no se despliegan** —cualquiera podría decir que es Control de obra—.
+  `servir.py` no las activa sin `--inseguro-cabeceras` y no arranca sin decirle una de las dos cosas.
+
+**Los usuarios y los permisos son tablas** (`database/migraciones/0004_usuarios_y_permisos.sql`, `MODELO.md` §5b):
+`rol`, `funcion_atomica`, `rol_funcion`, `usuario` y `usuario_rol`. Se siembran los seis roles y solo las dos funciones
+que hoy tienen código detrás, con quién las tiene; las demás de las treinta y cuatro se agregan cuando haya un módulo
+que las use. El correo va en minúsculas y no se repite, y un usuario se retira, no se borra. Hasta que se decida
+quién da de alta a las personas, lo hace quien administra la base: `python3 -m api.usuarios` (`agregar`, `retirar`,
+`listar`) o `--usuario correo|Nombre|rol,rol` al arrancar.
 
 **El cliente no se escribe a mano (D-55).** `python3 -m api.generar_cliente` lo genera del spec OpenAPI de la
 propia API: una función por `operationId`, que arma la ruta, las cabeceras y el cuerpo, y que ante un error lanza
 un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`. Una prueba falla si `cliente_programa.js` deja de ser
-el que daría el spec de hoy, y el CI lo comprueba.
+el que daría el spec de hoy, y el CI lo comprueba. Las operaciones que el spec declara protegidas mandan
+`Authorization: Bearer <token>` si `ClientePrograma.token` tiene uno; el cliente no sabe de dónde sale.
 
 **Cómo se levanta para trabajar.** `cd backend && python3 -m api.servir` carga los programas del CSV en memoria
 (lo que se guarda se pierde al apagar; `--vacio` arranca sin ninguno, para subirlos desde `/`); con `--postgres` guarda en una base —aplica las migraciones y, si está
-vacía, importa los que se pidan con `--programa`—. Escucha solo en `127.0.0.1`: por la identidad de arriba.
+vacía, importa los que se pidan con `--programa`—. Escucha solo en `127.0.0.1`. Para trabajar con identidad de verdad sin
+un proveedor, `python3 -m api.emitir_token --secreto … --correo …` da un token y la pantalla se abre con
+`http://127.0.0.1:8000/#access_token=…`; en producción los emite el proveedor.
 
 ## 4.9 Cómo se prueba
 
@@ -812,15 +843,20 @@ punteado cuando una edición mueve una partida, y el horizonte del programa más
 - **Lo guardado y, encima, lo por guardar.** Se abre con la bitácora aplicada ya repetida sobre la base. Lo que el
   planeador decide —en fichas ámbar— queda **por guardar**; no se manda nada hasta que presiona «Guardar», y
   «Descartar» lo deja como estaba.
-- **Quién edita.** Un selector de rol (Control de obra o Residente) y el nombre de quien edita, que la pantalla
-  recuerda en el navegador; guardar o deshacer sin nombre se avisa. Si el rol no puede esa edición, la pantalla lo
-  dice al decidir; la tabla de permisos la repite solo para avisar a tiempo y el servidor decide siempre.
+- **Quién edita (D-469).** En modo token nadie elige nada: la pantalla muestra quién eres y con qué roles, y un «Salir»;
+  el token llega en el fragmento de la dirección (`#access_token=…`, como lo devuelve el proveedor), se guarda solo para
+  esa pestaña y se quita de la dirección. En modo cabeceras hay un selector de rol y un nombre, que la pantalla recuerda.
+  En los dos, **lo que puede hacer cada quien lo dice la API** (`quien_soy`, de `ROL_FUNCION`), no una tabla escrita en la
+  pantalla: si el rol no puede esa edición, se avisa al decidir; mientras la respuesta no llega se deja intentar, y el
+  servidor decide siempre al guardar. Sin sesión, la pantalla dice «Falta iniciar sesión» con el enlace a entrar.
 - **Guardar** manda las ediciones por guardar una por una con la versión que se vio. Si alguien editó entre medio
   (409), la pantalla trae lo de hoy, revalida lo que seguía por guardar —quita lo que ya no aplica y lo dice— y pide
   revisar el impacto antes de volver a guardar. Una falla del servidor (permiso, edición no aplicable) se dice con su
   motivo y deja lo pendiente donde estaba.
 - **Qué compara el impacto.** Con algo por guardar, **contra lo guardado**: lo que esta decisión mueve, con la barra de
   antes en trazo punteado y el ↦ de lo que se corre. Sin nada por guardar, contra el plan, como en la simulación.
+- **Los datos se piden con el token** (D-469): la página del Gantt llega sin nada del programa y pide `ver_programa`; si el
+  token venció a media edición, se dice y lo por guardar no se pierde.
 - **La bitácora a la vista:** cada edición con quién, con qué rol, cuándo, qué dijo el sistema que pasaría y, si es
   un vínculo, por qué existe ese orden y con qué confianza. Se deshace desde ahí, con el permiso de la edición, y si
   otras dependen de ella se dice cuáles y no se toca nada. Lo revertido se queda, tachado.
@@ -847,10 +883,12 @@ hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versió
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| Autenticación de la API | Hoy quien llama dice su rol y su nombre en dos cabeceras, y eso no se despliega (§4.8). Falta decidir cómo se identifica cada quien; de dónde sale su rol ya está decidido (`ROL_FUNCION`, `MODELO.md` §5b) y el código todavía lo tiene como constante. Recomendación y lo que arrastra, en B-96 |
+| Elegir el proveedor de identidad y desplegar | La API ya verifica tokens de cualquiera que firme con `HS256`, `RS256` o `ES256` (§4.8), pero la autenticación está como propuesta sin confirmar (D-469) y no hay un proveedor elegido ni configurado; el hosting definido (B-21) hace de Supabase Auth el candidato |
+| Dar de alta a las personas | Hoy lo hace quien administra la base (`python3 -m api.usuarios`); `MODELO.md` §5b no tiene una función para crear usuarios, y `gestionar_rol_funcion` todavía no tiene operación en la API |
+| El alcance de datos por obra | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
+| La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
 | El programa anterior sigue editable | Aunque tenga versión nueva solo se avisa; editarlo no pasa a la nueva. Cerrarlo a ediciones queda sin decidir |
 | Una versión nueva con otros `oid` | Si el libro se rehizo y las partidas trajeron otro `oid`, ninguna edición pasa: todas dicen «esa partida ya no está». Casarlas por clave o por número de fila queda sin decidir |
-| Los datos del programa dentro de la página del Gantt | Con autenticación (B-96) la página no puede llevar los datos del programa dentro: tendrá que pedirlos a la API, como ya hace la lista |
 | Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
@@ -882,3 +920,4 @@ hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versió
 | **La API del programa, el cliente generado y la pantalla contra lo guardado** | **D-465** |
 | **Los programas se listan y se suben por la API, y el texto de quien sube no se toma por HTML** | **D-466** |
 | **La versión nueva de un programa: lo decidido pasa, y lo que no, se dice** | **D-467** |
+| **La autenticación por token, los permisos desde sus tablas y las pantallas sin datos (B-96)** | **D-469** |

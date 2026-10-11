@@ -5,5 +5,6 @@ fastapi
 uvicorn
 httpx
 psycopg[binary]
+pyjwt[crypto]
 pgserver
 playwright

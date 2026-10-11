@@ -27,7 +27,10 @@ ENCABEZADO = """\
 
    Cada operación recibe un objeto con los parámetros por su nombre en el spec (`programa_id`, `x-rol`…) y,
    si lleva cuerpo, el cuerpo en `cuerpo`. Devuelve lo que contesta la API ya leído (JSON, o texto si es HTML)
-   y, si contesta con error, lanza un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`. */
+   y, si contesta con error, lanza un `ErrorApi` con `status`, `codigo`, `mensaje` y `detalle`.
+
+   Las operaciones que el spec declara protegidas mandan `Authorization: Bearer <token>` si `ClientePrograma.token` tiene uno
+   (B-96): el cliente no sabe de dónde sale, solo lo manda. */
 """
 
 EJECUCION = """\
@@ -54,6 +57,7 @@ const ClientePrograma = (() => {
       .map(p => encodeURIComponent(p) + "=" + encodeURIComponent(args[p])).join("&");
     const cabeceras = {};
     for (const h of op.cabeceras) if (args[h] !== undefined && args[h] !== null) cabeceras[h] = String(args[h]);
+    if (op.seguridad && cliente.token) cabeceras["Authorization"] = "Bearer " + cliente.token;
     const init = { method: op.metodo, headers: cabeceras };
     if (op.cuerpo) { cabeceras["Content-Type"] = "application/json"; init.body = JSON.stringify(args.cuerpo); }
     let r;
@@ -65,7 +69,7 @@ const ClientePrograma = (() => {
     return dato;
   }
 
-  const cliente = { ErrorApi, base: "" };
+  const cliente = { ErrorApi, base: "", token: null };
 """
 
 
@@ -84,6 +88,7 @@ def _operaciones(spec: Dict[str, Any]) -> List[Dict[str, Any]]:
                     "consulta": [p["name"] for p in parametros if p["in"] == "query"],
                     "cabeceras": [p["name"] for p in parametros if p["in"] == "header"],
                     "cuerpo": "requestBody" in op,
+                    "seguridad": bool(op.get("security")),
                 }
             )
     return sorted(ops, key=lambda o: o["nombre"])
@@ -92,7 +97,7 @@ def _operaciones(spec: Dict[str, Any]) -> List[Dict[str, Any]]:
 def generar(spec: Dict[str, Any]) -> str:
     ops = _operaciones(spec)
     tabla = {
-        o["nombre"]: {k: o[k] for k in ("metodo", "ruta", "ruta_params", "consulta", "cabeceras", "cuerpo")} for o in ops
+        o["nombre"]: {k: o[k] for k in ("metodo", "ruta", "ruta_params", "consulta", "cabeceras", "cuerpo", "seguridad")} for o in ops
     }
     partes = [ENCABEZADO]
     partes.append("const OPERACIONES = " + json.dumps(tabla, ensure_ascii=False, indent=2) + ";\n\n")

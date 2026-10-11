@@ -5,21 +5,23 @@ Todo pasa por el servicio: listar los programas y subir uno, ver un programa con
 qué pasaría con una edición (`propuestas`, no guarda nada), aplicarla (`ediciones`) o deshacerla.
 El cliente de la pantalla se genera de este mismo spec y no se edita a mano (`generar_cliente.py`, D-55).
 
-**Quién llama.** El cerebro todavía no decide cómo se autentica nadie. Mientras tanto, quien llama dice quién es
-con dos cabeceras, `X-Rol` y `X-Usuario`: sirve para trabajar y probar y **no se despliega así** —cualquiera
-podría decir que es Control de obra—. `crear_app(identidad=...)` acepta otra dependencia de FastAPI, y es el
-único lugar que cambia cuando haya autenticación.
+**Quién llama** (B-96, D-469). En `modo="token"` —el que se despliega— toda ruta de datos pide el token que entregó el
+proveedor de identidad (`autenticacion.py`) y de él salen el usuario, sus roles y lo que puede hacer. En
+`modo="cabeceras"` quien llama dice su rol y su nombre en `X-Rol` y `X-Usuario`: sirve para trabajar y probar y **no se
+despliega así**. Las pantallas (`GET /` y `GET /programas/{id}/gantt`) no llevan ningún dato: el navegador no puede
+mandar un token al navegar, así que ellas lo piden a la API ya con él.
 """
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
-from core.gantt_pagina import pagina_gantt, pagina_programas
+from api.autenticacion import Autenticacion, Identidad, por_cabeceras
+from core.gantt_pagina import pagina_gantt_en_vivo, pagina_programas
 from core.motor_cpm import Calendario
 from core.programa import (
     ImportacionInvalida,
@@ -46,9 +48,13 @@ from core.servicio_programa import (
 # --------------------------------------------------------------------------- lo que entra y lo que sale
 
 
-class Identidad(BaseModel):
-    rol: str
-    usuario: str
+class YoSalida(BaseModel):
+    usuario: str = Field(description="Lo que queda en la bitácora: el correo en modo token, el nombre que se dijo en modo cabeceras")
+    nombre: Optional[str] = None
+    correo: Optional[str] = None
+    roles: List[str]
+    funciones: List[str] = Field(description="Lo que puede hacer con esos roles (`ROL_FUNCION`, hoy)")
+    modo: str = Field(description="token · cabeceras")
 
 
 class EdicionEntrada(BaseModel):
@@ -213,17 +219,13 @@ def _error(status: int, codigo: str, mensaje: str, **extra: Any) -> HTTPExceptio
     return HTTPException(status_code=status, detail={"codigo": codigo, "mensaje": mensaje, **extra})
 
 
-def identidad_por_cabeceras(x_rol: Optional[str] = Header(None), x_usuario: Optional[str] = Header(None)) -> Identidad:
-    """Quien llama dice quién es (ver el docstring del módulo: no se despliega así)."""
-    if not x_rol or not x_usuario:
-        raise _error(401, "sin_identidad", "Falta decir quién eres: las cabeceras X-Rol y X-Usuario.")
-    return Identidad(rol=x_rol, usuario=x_usuario)
-
-
 # --------------------------------------------------------------------------- la aplicación
 
 
-def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = identidad_por_cabeceras) -> FastAPI:
+def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion] = None) -> FastAPI:
+    """`autenticacion` decide cómo se sabe quién llama (`autenticacion.por_token` en producción); sin ella, las cabeceras."""
+    auth = autenticacion or por_cabeceras()
+    identidad, lectura = auth.identidad, auth.lectura
     app = FastAPI(title="Programa", version="1", description="El programa de obra: verlo, proponer una edición, aplicarla y deshacerla.")
 
     def edicion_de(entrada: EdicionEntrada):
@@ -254,7 +256,16 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
             incumplidos=len(programa.incumplidos(cal)),
         )
 
-    @app.get("/programas", response_model=List[ResumenSalida], operation_id="listar_programas", summary="Los programas que hay, del más viejo al más nuevo")
+    def config_de_pantalla(**extra: Any) -> Dict[str, Any]:
+        return {"modo": auth.modo, "login_url": auth.login_url, **extra}
+
+    @app.get("/yo", response_model=YoSalida, operation_id="quien_soy", summary="Quién eres y qué puedes hacer")
+    def quien_soy(quien: Identidad = Depends(identidad)) -> YoSalida:
+        return YoSalida(usuario=quien.usuario, nombre=quien.nombre, correo=quien.correo, roles=quien.roles,
+                        funciones=servicio.funciones_de(quien.roles), modo=auth.modo)
+
+    @app.get("/programas", response_model=List[ResumenSalida], operation_id="listar_programas", dependencies=[Depends(lectura)],
+             summary="Los programas que hay, del más viejo al más nuevo")
     def listar_programas() -> List[ResumenSalida]:
         return [_resumen_salida(r) for r in servicio.listar()]
 
@@ -262,7 +273,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
               summary="Subir un programa: se carga, se guardan sus vínculos y se dice cuáles no entraron")
     def importar_programa(entrada: ImportacionEntrada, quien: Identidad = Depends(identidad)) -> ImportacionSalida:
         try:
-            servicio.verificar_importar(quien.rol)  # antes de leer el archivo: quien no puede, no espera
+            servicio.verificar_importar(quien.roles)  # antes de leer el archivo: quien no puede, no espera
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
         cal = Calendario(no_habiles=frozenset(entrada.no_habiles))
@@ -271,7 +282,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
         except (ImportacionInvalida, ValueError) as e:
             raise _error(422, "importacion_invalida", str(e)) from None
         try:
-            pid = servicio.importar(entrada.nombre, programa, cal, quien.rol, quien.usuario)
+            pid = servicio.importar(entrada.nombre, programa, cal, quien.roles, quien.usuario)
         except ValueError as e:  # el nombre en blanco o quien sube sin nombre
             raise _error(422, "importacion_invalida", str(e)) from None
         return ImportacionSalida(**reporte_de_carga(pid, programa, cal))
@@ -280,7 +291,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
               summary="Subir la versión nueva de un programa: las ediciones que siguen teniendo sentido pasan a ella")
     def subir_version(programa_id: int, entrada: VersionEntrada, quien: Identidad = Depends(identidad)) -> VersionSalida:
         try:
-            servicio.verificar_importar(quien.rol)
+            servicio.verificar_importar(quien.roles)
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
         anterior = guardado(programa_id)
@@ -290,7 +301,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
         except (ImportacionInvalida, ValueError) as e:
             raise _error(422, "importacion_invalida", str(e)) from None
         try:
-            v = servicio.subir_version(programa_id, entrada.nombre or anterior.guardado.nombre, programa, cal, quien.rol, quien.usuario, entrada.esperaba)
+            v = servicio.subir_version(programa_id, entrada.nombre or anterior.guardado.nombre, programa, cal, quien.roles, quien.usuario, entrada.esperaba)
         except YaReemplazado as e:
             raise _error(409, "reemplazado", f"Ese programa ya tiene una versión más nueva, la {e.por}: la nueva se sube sobre ella.", reemplazado_por=e.por) from None
         except Conflicto as e:
@@ -304,7 +315,8 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
                         for n in v.no_pasaron],
         )
 
-    @app.get("/programas/{programa_id}", response_model=ProgramaSalida, operation_id="ver_programa", summary="El programa base y su bitácora")
+    @app.get("/programas/{programa_id}", response_model=ProgramaSalida, operation_id="ver_programa", dependencies=[Depends(lectura)],
+             summary="El programa base y su bitácora")
     def ver_programa(programa_id: int) -> ProgramaSalida:
         v = guardado(programa_id)
         return ProgramaSalida(
@@ -313,7 +325,8 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
             guardadas=[_edicion_salida(e) for e in servicio.repo.ediciones(programa_id)],
         )
 
-    @app.get("/programas/{programa_id}/ediciones", response_model=List[EdicionSalida], operation_id="ver_bitacora", summary="Todo lo que se ha editado, también lo revertido")
+    @app.get("/programas/{programa_id}/ediciones", response_model=List[EdicionSalida], operation_id="ver_bitacora", dependencies=[Depends(lectura)],
+             summary="Todo lo que se ha editado, también lo revertido")
     def ver_bitacora(programa_id: int) -> List[EdicionSalida]:
         guardado(programa_id)
         return [_edicion_salida(e) for e in servicio.repo.ediciones(programa_id)]
@@ -323,7 +336,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
     def proponer_edicion(programa_id: int, entrada: EdicionEntrada, quien: Identidad = Depends(identidad)) -> PropuestaSalida:
         guardado(programa_id)
         try:
-            return _propuesta_salida(servicio.proponer(programa_id, edicion_de(entrada), quien.rol))
+            return _propuesta_salida(servicio.proponer(programa_id, edicion_de(entrada), quien.roles))
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
 
@@ -332,7 +345,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
     def aplicar_edicion(programa_id: int, entrada: EdicionEntrada, quien: Identidad = Depends(identidad)) -> PropuestaSalida:
         guardado(programa_id)
         try:
-            p = servicio.aplicar(programa_id, edicion_de(entrada), quien.rol, quien.usuario, entrada.esperaba)
+            p = servicio.aplicar(programa_id, edicion_de(entrada), quien.roles, quien.usuario, entrada.esperaba)
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
         except Conflicto as e:
@@ -346,7 +359,7 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
     def deshacer_edicion(programa_id: int, edicion_id: int, quien: Identidad = Depends(identidad)) -> VigenteSalida:
         guardado(programa_id)
         try:
-            v = servicio.deshacer(programa_id, edicion_id, quien.rol, quien.usuario)
+            v = servicio.deshacer(programa_id, edicion_id, quien.roles, quien.usuario)
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
         except NoSePuedeDeshacer as e:
@@ -360,16 +373,11 @@ def crear_app(servicio: ServicioPrograma, identidad: Callable[..., Identidad] = 
 
     @app.get("/", response_class=HTMLResponse, operation_id="pantalla_programas", summary="La pantalla de los programas: la lista y subir uno")
     def pantalla_programas() -> HTMLResponse:
-        return HTMLResponse(pagina_programas())
+        return HTMLResponse(pagina_programas(config_de_pantalla()))
 
     @app.get("/programas/{programa_id}/gantt", response_class=HTMLResponse, operation_id="pantalla_gantt", summary="La pantalla del Gantt de este programa")
     def pantalla_gantt(programa_id: int) -> HTMLResponse:
-        v = guardado(programa_id)
-        guardadas = [_edicion_salida(e).model_dump(mode="json") for e in servicio.repo.ediciones(programa_id)]
-        return HTMLResponse(pagina_gantt(
-            v.base, v.guardado.calendario, f"Gantt {v.guardado.nombre}",
-            api={"programa": programa_id, "version": v.version, "guardadas": guardadas, "version_de": v.guardado.version_de,
-                 "reemplazado_por": servicio.reemplazo_de(programa_id), "traspaso": v.guardado.traspaso},
-        ))
+        # sin un dato del programa —ni su nombre—: la pantalla los pide a la API con el token de quien la abre
+        return HTMLResponse(pagina_gantt_en_vivo(config_de_pantalla(programa=programa_id)))
 
     return app

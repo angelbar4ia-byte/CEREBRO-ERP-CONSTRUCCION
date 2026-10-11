@@ -7,6 +7,7 @@ equivocado se avisa, y que una pantalla vieja no pisa lo que otro guardó; que l
 deja subir uno diciendo qué vínculos no entraron; y que el texto de quien sube un programa nunca se toma por HTML. Se salta si no hay `playwright` o un
 Chromium (en el CI de GitHub se instalan).
 """
+import time
 import unittest
 
 from api.tests.ayudas import NO_HABILES, csv_de, mueve_fila
@@ -35,7 +36,9 @@ def _lanzar(p):
 
 
 @unittest.skipIf(sync_playwright is None, "no hay playwright")
-class PruebasPantalla(unittest.TestCase):
+class _ConNavegador(unittest.TestCase):
+    MODO = "cabeceras"  # cómo sabe el servidor de prueba quién llama: «cabeceras» o «token»
+
     @classmethod
     def setUpClass(cls):
         cls.pw = sync_playwright().start()
@@ -43,7 +46,7 @@ class PruebasPantalla(unittest.TestCase):
         if cls.navegador is None:
             cls.pw.stop()
             raise unittest.SkipTest("no hay un Chromium para lanzar")
-        cls.servidor = ServidorDePrueba().arrancar()
+        cls.servidor = ServidorDePrueba(cls.MODO).arrancar()
         cls.plus = programa("Zafiro Plus")
         cls.f = {x.fila: x.llave for x in cls.plus.filas}
 
@@ -72,9 +75,15 @@ class PruebasPantalla(unittest.TestCase):
         self.paginas.append(pg)
         pg.goto(f"{self.servidor.url}/programas/{self.pid}/gantt")
         pg.wait_for_selector("#etiquetas .fila-eti")
+        self.quien(pg, usuario, rol)
+        return pg
+
+    @staticmethod
+    def quien(pg, usuario, rol):
+        """Dice quién edita y espera a que la pantalla sepa qué puede hacer (lo que contesta `/yo`)."""
         pg.select_option("#q-rol", rol)
         pg.fill("#q-usuario", usuario)
-        return pg
+        pg.wait_for_function("document.querySelector('#sesion').dataset.listo === '1'")
 
     def fila(self, pg, n):
         pg.click("#b-todo")
@@ -88,6 +97,8 @@ class PruebasPantalla(unittest.TestCase):
     def cierre(self, pg):  # la fecha y lo que se movió, sin la línea de «contra qué se compara»
         return pg.inner_text("#t-cierre .v").replace("\n", " ")
 
+
+class PruebasPantalla(_ConNavegador):
     # ------------------------------------------------------------------ las pruebas
     def test_abre_con_lo_guardado_y_nada_por_guardar(self):
         pg = self.abrir()
@@ -136,11 +147,11 @@ class PruebasPantalla(unittest.TestCase):
     def test_el_rol_equivocado_se_avisa_antes_de_guardar(self):
         pg = self.abrir(usuario="ana", rol="residente")
         self.duracion(pg, 982, 12)  # la duración es de Control de obra
-        self.assertIn("Control de obra", pg.inner_text("#aviso"))
+        self.assertIn("Con Residente no puedes editar la estructura", pg.inner_text("#aviso"))
         self.assertEqual(pg.locator("#ediciones .chip").count(), 0)
-        pg.select_option("#q-rol", "control_de_obra")
+        self.quien(pg, "ana", "control_de_obra")
         self.duracion(pg, 982, 12)
-        pg.select_option("#q-rol", "residente")  # cambia de rol con algo por guardar: el servidor lo dice
+        self.quien(pg, "ana", "residente")  # cambia de rol con algo por guardar: el servidor lo dice
         pg.click("#b-guardar")
         pg.wait_for_function("document.querySelector('#aviso') && !document.querySelector('#aviso').hidden")
         self.assertIn("residente", pg.inner_text("#aviso"))
@@ -195,8 +206,7 @@ class PruebasPantalla(unittest.TestCase):
         self.paginas.append(pg)
         pg.goto(f"{self.servidor.url}/")
         pg.wait_for_selector("#lista table, #lista .vacio:not(:has-text('Cargando'))")
-        pg.select_option("#q-rol", rol)
-        pg.fill("#q-usuario", usuario)
+        self.quien(pg, usuario, rol)
         return pg
 
     def subir(self, pg, csv, nombre="Zafiro subido", prototipo="", no_habiles="\n".join(NO_HABILES)):
@@ -376,6 +386,136 @@ class PruebasPantalla(unittest.TestCase):
         self.duracion(pg, 982, 12)
         self.assertEqual(pg.locator("#b-guardar").count(), 0)
         self.assertIn("Deshacer todo", pg.inner_text("#ediciones"))
+
+
+class PruebasPantallaConToken(_ConNavegador):
+    """El modo que se despliega: nadie dice quién es, lo dice el token que entregó el proveedor de identidad."""
+
+    MODO = "token"
+
+    def entrar(self, correo, ruta="/", **kw):
+        """Abre una pantalla como la abriría el proveedor al devolver al usuario: con el token en el fragmento."""
+        pg = self.navegador.new_page(viewport={"width": 1400, "height": 900})
+        pg.on("pageerror", lambda e: self.errores.append(f"error de la página: {e}"))
+        pg.route("https://proveedor.example/**", lambda r: r.fulfill(body="<title>el proveedor</title>", content_type="text/html"))
+        self.paginas.append(pg)
+        pg.goto(f"{self.servidor.url}{ruta}" + (f"#access_token={self.servidor.token(correo, **kw)}" if correo else ""))
+        return pg
+
+    def gantt(self, correo, **kw):
+        pg = self.entrar(correo, f"/programas/{self.pid}/gantt", **kw)
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        pg.wait_for_function("document.querySelector('#sesion').dataset.listo === '1'")
+        return pg
+
+    # ------------------------------------------------------------------ entrar
+    def test_sin_sesion_no_sale_ningun_dato_y_dice_como_entrar(self):
+        for ruta in ("/", f"/programas/{self.pid}/gantt"):
+            pg = self.entrar(None, ruta)
+            pg.wait_for_selector("text=Falta iniciar sesión")
+            self.assertEqual(pg.locator("a", has_text="Entrar").get_attribute("href"), "https://proveedor.example/entrar")
+            self.assertNotIn("Zafiro Plus", pg.content())  # ni el nombre del programa
+            self.assertEqual(pg.locator("#lista, #etiquetas").count(), 0)
+
+    def test_con_el_token_en_la_direccion_se_entra_y_la_direccion_se_limpia(self):
+        pg = self.entrar("luis@obra.mx")
+        pg.wait_for_selector("#lista table")
+        self.assertIn("Zafiro Plus", pg.inner_text("#lista"))
+        self.assertEqual(pg.evaluate("location.hash"), "")  # el token no se queda a la vista, ni en el historial
+        self.assertNotIn("access_token", pg.url)
+        pg.reload()  # y la sesión sigue en esta pestaña
+        pg.wait_for_selector("#lista table")
+        sesion = pg.inner_text("#sesion")
+        self.assertIn("Luis Pérez", sesion)
+        self.assertIn("Control de obra", sesion)
+        self.assertEqual(pg.locator("#q-rol, #q-usuario").count(), 0)  # nadie elige quién es
+
+    def test_un_token_vencido_o_de_quien_no_esta_dado_de_alta_se_dice(self):
+        pg = self.entrar("luis@obra.mx", f"/programas/{self.pid}/gantt", horas=0.1, ahora=time.time() - 7200)
+        pg.wait_for_selector("text=Falta iniciar sesión")
+        pg = self.entrar("nadie@obra.mx", f"/programas/{self.pid}/gantt")
+        pg.wait_for_selector("text=No pude abrir el programa")
+        self.assertIn("nadie@obra.mx no está dado de alta", pg.inner_text(".pagina"))
+
+    def test_salir_borra_la_sesion_y_manda_al_proveedor(self):
+        pg = self.entrar("luis@obra.mx")
+        pg.wait_for_selector("#lista table")
+        pg.click("#b-salir")
+        pg.wait_for_url("https://proveedor.example/**")
+        self.assertIsNone(pg.evaluate("sessionStorage.getItem('programa.token')"))
+
+    # ------------------------------------------------------------------ el Gantt
+    def test_el_gantt_pide_el_programa_y_edita_como_quien_inicio_sesion(self):
+        pg = self.gantt("luis@obra.mx")
+        self.assertEqual(pg.title(), "Gantt Zafiro Plus")  # el nombre llega con los datos, no en la página
+        self.assertIn("Gantt Zafiro Plus", pg.inner_text("h1"))
+        self.duracion(pg, 982, 12)
+        pg.click("#b-guardar")
+        pg.wait_for_selector("#b-guardar", state="detached")
+        (e,) = self.servidor.repo.ediciones(self.pid)
+        self.assertEqual((e.usuario, e.rol), ("luis@obra.mx", "control_de_obra"))  # quien dice el token, no quien escribió un nombre
+        pg.click("#bitacora summary")
+        self.assertIn("luis@obra.mx (Control de obra)", pg.inner_text("#bitacora li"))
+
+    def test_la_pantalla_sabe_lo_que_puede_cada_rol_por_lo_que_dice_la_api(self):
+        pg = self.gantt("ana@obra.mx")  # Residente: fechas sí, estructura no
+        self.duracion(pg, 982, 12)
+        self.assertIn("Con Residente no puedes editar la estructura", pg.inner_text("#aviso"))
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 0)
+        self.fila(pg, 1087)
+        pg.fill("#e-ini", "2025-10-30")
+        pg.click("#e-ini-ok")
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 1)
+        pg.click("#b-guardar")
+        pg.wait_for_selector("#b-guardar", state="detached")
+        (e,) = self.servidor.repo.ediciones(self.pid)
+        self.assertEqual((e.usuario, e.rol), ("ana@obra.mx", "residente"))
+
+    def test_si_corrigen_la_tabla_de_permisos_la_pantalla_lo_sabe_en_la_siguiente_carga(self):
+        pg = self.gantt("ana@obra.mx")
+        self.duracion(pg, 982, 12)
+        self.assertIn("no puedes editar la estructura", pg.inner_text("#aviso"))
+        self.servidor.accesos.dar_funcion("residente", "editar_estructura_programa")  # `gestionar_rol_funcion`
+        pg.reload()
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        pg.wait_for_function("document.querySelector('#sesion').dataset.listo === '1'")
+        self.duracion(pg, 982, 12)
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 1)
+        self.servidor.accesos.quitar_funcion("residente", "editar_estructura_programa")
+
+    def test_si_la_sesion_vence_a_media_edicion_se_dice_y_no_se_pierde_lo_decidido(self):
+        pg = self.gantt("luis@obra.mx")
+        self.duracion(pg, 982, 12)
+        pg.evaluate("ClientePrograma.token = 'basura'")  # el token deja de servir
+        pg.click("#b-guardar")
+        pg.wait_for_function("document.querySelector('#aviso') && !document.querySelector('#aviso').hidden")
+        self.assertIn("Tu sesión no es válida", pg.inner_text("#aviso"))
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 1)  # sigue por guardar
+        self.assertEqual(self.servidor.repo.ediciones(self.pid), [])
+
+    # ------------------------------------------------------------------ subir
+    def test_subir_un_programa_queda_a_nombre_de_quien_inicio_sesion(self):
+        pg = self.entrar("luis@obra.mx")
+        pg.wait_for_selector("#lista table")
+        pg.wait_for_function("document.querySelector('#sesion').dataset.listo === '1'")
+        pg.fill("#f-nombre", "Zafiro subido")
+        pg.set_input_files("#f-archivo", files=[{"name": "p.csv", "mimeType": "text/csv", "buffer": csv_de("Zafiro").encode()}])
+        pg.fill("#f-no-habiles", "\n".join(NO_HABILES))
+        pg.click("#f-subir")
+        pg.wait_for_selector("#reporte:not([hidden])")
+        fila = pg.locator("#lista tbody tr", has_text="Zafiro subido").first.inner_text()
+        self.assertIn("luis@obra.mx (Control de obra)", fila)
+
+    def test_quien_no_puede_subir_programas_lo_oye_del_servidor(self):
+        pg = self.entrar("ana@obra.mx")
+        pg.wait_for_selector("#lista table")
+        pg.wait_for_function("document.querySelector('#sesion').dataset.listo === '1'")
+        pg.fill("#f-nombre", "No debe entrar")
+        pg.set_input_files("#f-archivo", files=[{"name": "p.csv", "mimeType": "text/csv", "buffer": csv_de("Zafiro").encode()}])
+        pg.click("#f-subir")
+        pg.wait_for_function("document.querySelector('#aviso') && !document.querySelector('#aviso').hidden")
+        self.assertIn("residente", pg.inner_text("#aviso"))
+        self.assertEqual([r.nombre for r in self.servidor.repo.listar_programas() if r.nombre == "No debe entrar"], [])
 
 
 if __name__ == "__main__":
