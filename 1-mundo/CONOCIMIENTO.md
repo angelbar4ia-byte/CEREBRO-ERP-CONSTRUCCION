@@ -6602,6 +6602,31 @@ propuesta sin confirmar. El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo q
 
 `PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
 
+### Supabase Auth es el proveedor y el modelo de autenticación queda firme (D-470)
+
+Dato del usuario, respondiendo las dos preguntas con que quedó D-469: «1 supabase. 2 confirmar, para pendientes que
+arrastra. No es necesario en este momento, vamos con otros pendientes». **Cambia lo que la sección anterior (D-469) llama
+«propuesta sin confirmar»:** el modelo —token firmado que la API verifica, correo como llave de `USUARIO`, personas dadas
+de alta a propósito, permisos desde `ROL_FUNCION`— es el que el usuario quiere, y el proveedor es Supabase Auth (el
+hosting ya era Supabase: D-03, B-21).
+
+- **No cambia el código.** Supabase entra por la configuración que D-469 dejó abierta: su JWKS (o el secreto compartido,
+  si el proyecto no firma con llaves asimétricas), la audiencia, el emisor y la dirección de entrada. La receta está en
+  `PROGRAMA-CPM.md` §4.8.
+- **De Supabase solo se toma el `email`.** Su reclamo `role` vale `authenticated` para todos; los roles de este sistema
+  salen de `USUARIO_ROL` y nunca de lo que diga el proveedor.
+- **Un requisito que es del proyecto de Supabase:** la API se fía del correo que el token trae, así que el proyecto debe
+  exigir confirmar el correo (y, de preferencia, no dejar registrarse a cualquiera). Si no, quien se registre con el
+  correo de otro —uno que sí esté dado de alta— recibiría un token válido.
+- **Lo que no se pudo verificar:** no se abre el sitio de Supabase desde donde se trabaja y no hay un proyecto. Lo que
+  Supabase documenta (por búsqueda) es la dirección del JWKS y que solo trae llaves si el proyecto firma con las
+  asimétricas; `aud`, `iss`, `email` y la duración del acceso salen de fuentes de terceros y se confirman con el primer
+  token real, donde la API dice por qué rechaza uno.
+- **Lo pospuesto no se descarta:** alta de personas desde la API, alcance de datos por obra y clave foránea al usuario
+  son B-98; cómo inicia sesión la gente y la renovación del token son B-97.
+
+`PROGRAMA-CPM.md` §4.8, §9, `PENDIENTES-MEJORAS.md` B-96, B-97, B-98.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

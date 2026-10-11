@@ -394,7 +394,7 @@ quedó. Quien guarda manda en `esperaba` la que vio: una pantalla abierta desde 
 vio —el impacto que le mostró ya no es el de hoy—, recibe 409 y la pantalla trae lo de hoy. Sin `esperaba` se aplica
 sobre lo que haya al momento de proponer.
 
-**Quién llama (B-96, D-469, propuesta sin confirmar).** La API **no emite tokens ni tiene contraseñas**: verifica los
+**Quién llama (B-96, D-469; confirmado en D-470 con Supabase Auth como proveedor).** La API **no emite tokens ni tiene contraseñas**: verifica los
 que entrega un proveedor de identidad (Supabase Auth, Auth0, Keycloak, el que se elija) y de ellos toma solo el
 correo que el proveedor ya comprobó. Con el correo busca al `USUARIO` (`core/accesos.py`), y de él salen sus roles y,
 de los roles, lo que puede hacer. Cambiar de proveedor es cambiar la llave y, a lo más, el nombre del reclamo del
@@ -415,6 +415,25 @@ correo (`--jwt-reclamo-correo`).
 - **Las cabeceras `X-Rol` y `X-Usuario`** (la identidad provisional de D-465) son el modo `cabeceras`: sirven para
   trabajar y probar en una máquina propia y **no se despliegan** —cualquiera podría decir que es Control de obra—.
   `servir.py` no las activa sin `--inseguro-cabeceras` y no arranca sin decirle una de las dos cosas.
+
+**Con Supabase Auth (D-470).** El proveedor elegido es Supabase; la API no cambia, solo se configura. Con un proyecto
+que firma con llaves asimétricas (las que publica en `https://<proyecto>.supabase.co/auth/v1/.well-known/jwks.json`):
+
+    python3 -m api.servir --postgres … --jwks https://<proyecto>.supabase.co/auth/v1/.well-known/jwks.json \
+        --jwt-audiencia authenticated --jwt-emisor https://<proyecto>.supabase.co/auth/v1 --login-url https://…
+
+y con un proyecto que firma con el secreto compartido de siempre, `--jwt-secreto "$PROGRAMA_JWT_SECRETO"` en lugar de
+`--jwks` (ese JWKS no trae llaves si el proyecto no firma con las asimétricas). **De Supabase solo se lee el `email`**; su
+reclamo `role` vale `authenticated` para todos y no tiene nada que ver con los roles de aquí, que salen de `USUARIO_ROL`.
+Dos requisitos para desplegar, que son del proyecto de Supabase y no de este código: **la confirmación de correo
+activa** y, de preferencia, **el registro abierto cerrado** (las personas se invitan). La API se fía del correo que el
+token trae, así que un proyecto que deje registrarse con un correo ajeno sin confirmarlo le daría un token a quien no
+es; la tabla `usuario` ya frena a los correos que no estén dados de alta, pero no a quien se registre con uno que sí.
+**Sin verificar contra un proyecto real** (no se pudo abrir el sitio de Supabase desde donde se trabaja, y no hay proyecto):
+que el JWKS esté en esa dirección y solo traiga llaves con las asimétricas lo dice su documentación, leída por búsqueda;
+que `aud` sea `authenticated`, que `iss` sea la dirección de `/auth/v1`, que
+`email` venga en el token y que el acceso dure una hora salen de fuentes de terceros. Con el primer token real se
+confirma: si no pasa, la API dice por qué (`token_invalido`, `token_vencido`, `token_sin_correo`).
 
 **Los usuarios y los permisos son tablas** (`database/migraciones/0004_usuarios_y_permisos.sql`, `MODELO.md` §5b):
 `rol`, `funcion_atomica`, `rol_funcion`, `usuario` y `usuario_rol`. Se siembran los seis roles y solo las dos funciones
@@ -883,9 +902,10 @@ hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versió
 
 | Qué | Por qué sigue abierto |
 |---|---|
-| Elegir el proveedor de identidad y desplegar | La API ya verifica tokens de cualquiera que firme con `HS256`, `RS256` o `ES256` (§4.8), pero la autenticación está como propuesta sin confirmar (D-469) y no hay un proveedor elegido ni configurado; el hosting definido (B-21) hace de Supabase Auth el candidato |
-| Dar de alta a las personas | Hoy lo hace quien administra la base (`python3 -m api.usuarios`); `MODELO.md` §5b no tiene una función para crear usuarios, y `gestionar_rol_funcion` todavía no tiene operación en la API |
-| El alcance de datos por obra | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
+| Crear el proyecto de Supabase y entregarle su llave a la API | D-470 confirmó el modelo y eligió Supabase Auth como proveedor; lo que falta no es código sino configuración (§4.8): crear el proyecto, activar la confirmación de correo, darle a `servir` el JWKS o el secreto, y dar de alta a las primeras personas |
+| Cómo entra la gente y cuánto dura la sesión (B-97) | Supabase no trae una página de entrada para correo y contraseña; con Google basta una dirección (`--login-url`) y no hay que escribir nada, con correo hace falta un formulario. Y la pantalla no renueva el token: dura lo que dure el acceso (una hora, según fuentes de terceros) y luego manda a entrar otra vez |
+| Dar de alta a las personas (pospuesto por el usuario, D-470) | Hoy lo hace quien administra la base (`python3 -m api.usuarios`); `MODELO.md` §5b no tiene una función para crear usuarios, y `gestionar_rol_funcion` todavía no tiene operación en la API |
+| El alcance de datos por obra (pospuesto por el usuario, D-470) | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
 | La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
 | El programa anterior sigue editable | Aunque tenga versión nueva solo se avisa; editarlo no pasa a la nueva. Cerrarlo a ediciones queda sin decidir |
 | Una versión nueva con otros `oid` | Si el libro se rehizo y las partidas trajeron otro `oid`, ninguna edición pasa: todas dicen «esa partida ya no está». Casarlas por clave o por número de fila queda sin decidir |
@@ -921,3 +941,4 @@ hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versió
 | **Los programas se listan y se suben por la API, y el texto de quien sube no se toma por HTML** | **D-466** |
 | **La versión nueva de un programa: lo decidido pasa, y lo que no, se dice** | **D-467** |
 | **La autenticación por token, los permisos desde sus tablas y las pantallas sin datos (B-96)** | **D-469** |
+| **El proveedor de identidad es Supabase Auth y el modelo de autenticación queda confirmado** | **D-470** |
