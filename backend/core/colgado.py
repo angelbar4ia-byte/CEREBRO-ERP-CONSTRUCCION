@@ -28,9 +28,9 @@ from collections import defaultdict
 from dataclasses import dataclass, replace
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
-from .catalogo import DatosDePresupuesto, LineaDePresupuesto, RepositorioCatalogo
+from .catalogo import CambioDePresupuesto, DatosDePresupuesto, LineaDePresupuesto, RepositorioCatalogo
 from .programa import Fila
-from .servicio_programa import Enlace, Roles, ServicioPrograma, YaColgado
+from .servicio_programa import Enlace, RepositorioPrograma, Roles, ServicioPrograma, YaColgado
 
 # Subir un programa y colgarlo piden lo mismo: es estructura (`MODELO.md` §5b). No se inventa una función sin un caso que la pida.
 FUNCION_DE_COLGAR = "editar_estructura_programa"
@@ -300,6 +300,39 @@ class ServicioColgado:
         nuevos = self.programas.repo.colgar(
             programa_id, a.presupuesto_id, a.enlaces, usuario=usuario, rol=rol_con_que, resumen=a.resumen(forzado=forzar and not a.casa_bien))
         return replace(a, nuevos=nuevos)
+
+
+# --------------------------------------------------------------------------- quién cita lo que se va
+
+
+@dataclass(frozen=True)
+class CitaDeBaja:
+    """Una baja del presupuesto (D-476) que un programa vigente cita: cuántas de sus filas quedarían enlazadas a algo dado de baja."""
+
+    baja: str  # el `id` del cambio de presupuesto
+    programa_id: int
+    programa: str
+    filas: int
+
+
+def citas_de_bajas(programas: RepositorioPrograma, cambios: Sequence[CambioDePresupuesto]) -> List[CitaDeBaja]:
+    """Qué programas citan lo que se va (D-476). El catálogo y el programa son dos puertos que no se conocen: esto los junta, y lo usan la
+    terminal (`api.cargar_opus`) y la API. Dice quién cita cada baja para que quien la confirma sepa a qué fila del programa le quita el piso."""
+    bajas = [c for c in cambios if c.tipo == "baja" and (c.renglones or c.bloques)]
+    if not bajas:
+        return []
+    out: List[CitaDeBaja] = []
+    for r in programas.listar_programas():
+        if not r.enlazadas:
+            continue
+        g = programas.leer_programa(r.id)
+        if g.reemplazado_por is not None:  # uno con versión nueva está cerrado: no se edita y su enlace ya no le quita el piso a nadie
+            continue
+        for c in bajas:
+            n = sum(1 for e in g.enlaces if (e.renglon_id in c.renglones) or (e.nodo_id in c.bloques))
+            if n:
+                out.append(CitaDeBaja(c.id, r.id, r.nombre, n))
+    return out
 
 
 # --------------------------------------------------------------------------- el informe, para quien decide

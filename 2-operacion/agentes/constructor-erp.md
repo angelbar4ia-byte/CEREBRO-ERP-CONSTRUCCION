@@ -32,16 +32,17 @@ modelo de datos mientras escribís vistas es la forma más cara de equivocarse.
 backend/core/      el dominio y los servicios, sin saber de ninguna base: motor_calculo · importacion_opus · catalogo · reconciliacion ·
                    texto · colgado · contratacion · clonacion · fuentes · motor_cpm · programa · servicio_programa · accesos
                    (y los adaptadores en memoria, memoria_*.py, que sirven a las pruebas)
-backend/infra/     los adaptadores de Postgres (psycopg): postgres_catalogo · postgres_programa · postgres_accesos
-backend/api/       FastAPI, la autenticación, el cliente generado y las terminales: cargar_opus · colgar_programa · contratar · clonar ·
-                   guardar_subidas · usuarios · servir
+backend/infra/     los adaptadores de Postgres (psycopg): postgres_catalogo · postgres_programa · postgres_accesos · conexion (una conexión por hilo)
+backend/api/       FastAPI (el programa, y el catálogo con sus presupuestos en catalogo.py), la autenticación, el cliente generado y las terminales:
+                   cargar_opus · colgar_programa · contratar · clonar · guardar_subidas · usuarios · servir
 database/migraciones/   el esquema, en SQL, numerado: 0001 … 0009 (la que ya se aplicó no se edita; un cambio es una migración nueva)
 frontend/gantt/    las pantallas
 ```
 
 Cada puerto tiene un adaptador en memoria y otro de Postgres, **y los dos cumplen el mismo contrato**: un `contrato_*.py` se corre contra ambos
 (`D-182`). Lo que no se reescribe lo defiende la base con un disparador, no solo el código. Escribir es una transacción: todo o nada. Lo que se va a escribir
-se revisa antes, sin escribir nada, y el sistema propone.
+se revisa antes, sin escribir nada, y el sistema propone. En la API cada acción son dos rutas —`…/propuestas` no escribe, la otra aplica— y aplicar acepta
+`esperaba` (la `base` de la propuesta): si el catálogo cambió entre las dos, 409 y no se escribe (D-482).
 
 ## Cómo trabajás
 
@@ -72,6 +73,8 @@ se revisa antes, sin escribir nada, y el sistema propone.
   centavo (`CAPITULOS` en `contrato_catalogo.py`).
 - Cada adaptador pasa el mismo contrato; lo que solo la base garantiza (disparadores, restricciones) tiene su prueba contra Postgres.
 - Una versión, una línea de matriz o una historia ya guardadas **no se reescriben**: se agrega una nueva.
+- **Dos peticiones traslapadas no se mezclan:** cada hilo del servidor tiene su conexión de Postgres (`infra/conexion.py`); una conexión compartida deja escrito lo que
+  debía revertirse.
 
 ## Qué no hacés
 

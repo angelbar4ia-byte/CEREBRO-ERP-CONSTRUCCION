@@ -1165,11 +1165,15 @@ class ServicioCarga:
         confirmados: Iterable[str] = (),
         bajas_confirmadas: Iterable[str] = (),
         todas_las_bajas: bool = False,
+        esperaba: Optional[int] = None,
     ) -> ResultadoCarga:
         """Revisa y aplica lo que entra. Lo detenido no se aplica y queda dicho en la carga. Si el archivo trae algo que no
-        cuadra (`problemas`), no se escribe nada."""
+        cuadra (`problemas`), no se escribe nada. `esperaba` es la última carga que vio quien decide (`Revision.plan.base`): si el
+        catálogo ya va en otra, `CatalogoCambio` y no se escribe nada —lo que vio ya no es lo de hoy—."""
         r = self.revisar(conceptos, presupuesto, compuestos, rol=rol, usuario=usuario, tipo=tipo, confirmados=confirmados,
                          bajas_confirmadas=bajas_confirmadas, todas_las_bajas=todas_las_bajas)
+        if esperaba is not None and r.plan.base != esperaba:
+            raise CatalogoCambio(f"la última carga es la {r.plan.base} y esta se revisó sobre la {esperaba}")
         if not r.diagnostico.aplicable:
             raise CargaNoProcede("el archivo trae algo que no cuadra: " + "; ".join(r.diagnostico.problemas))
         if not r.plan.cambia_algo and not r.diagnostico.pendientes:

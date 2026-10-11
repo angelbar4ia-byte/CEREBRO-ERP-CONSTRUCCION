@@ -8,12 +8,76 @@
    Las operaciones que el spec declara protegidas mandan `Authorization: Bearer <token>` si `ClientePrograma.token` tiene uno
    (B-96): el cliente no sabe de dónde sale, solo lo manda. */
 const OPERACIONES = {
+  "aplicar_carga": {
+    "metodo": "POST",
+    "ruta": "/cargas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
   "aplicar_edicion": {
     "metodo": "POST",
     "ruta": "/programas/{programa_id}/ediciones",
     "ruta_params": [
       "programa_id"
     ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "clonar_insumo": {
+    "metodo": "POST",
+    "ruta": "/clonaciones",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "colgar_programa": {
+    "metodo": "POST",
+    "ruta": "/programas/{programa_id}/colgado",
+    "ruta_params": [
+      "programa_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "contratar_subarbol": {
+    "metodo": "POST",
+    "ruta": "/presupuestos/{presupuesto_id}/contrataciones",
+    "ruta_params": [
+      "presupuesto_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "corregir_prefijo": {
+    "metodo": "POST",
+    "ruta": "/correcciones-de-prefijo",
+    "ruta_params": [],
     "consulta": [],
     "cabeceras": [
       "x-rol",
@@ -49,6 +113,33 @@ const OPERACIONES = {
     "cuerpo": true,
     "seguridad": true
   },
+  "listar_cargas": {
+    "metodo": "GET",
+    "ruta": "/cargas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "listar_clones": {
+    "metodo": "GET",
+    "ruta": "/clones",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "listar_presupuestos": {
+    "metodo": "GET",
+    "ruta": "/presupuestos",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
   "listar_programas": {
     "metodo": "GET",
     "ruta": "/programas",
@@ -77,6 +168,70 @@ const OPERACIONES = {
     "cabeceras": [],
     "cuerpo": false,
     "seguridad": false
+  },
+  "proponer_carga": {
+    "metodo": "POST",
+    "ruta": "/cargas/propuestas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "proponer_clonacion": {
+    "metodo": "POST",
+    "ruta": "/clonaciones/propuestas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "proponer_colgado": {
+    "metodo": "POST",
+    "ruta": "/programas/{programa_id}/colgado/propuestas",
+    "ruta_params": [
+      "programa_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "proponer_contratacion": {
+    "metodo": "POST",
+    "ruta": "/presupuestos/{presupuesto_id}/contrataciones/propuestas",
+    "ruta_params": [
+      "presupuesto_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "proponer_correccion_de_prefijo": {
+    "metodo": "POST",
+    "ruta": "/correcciones-de-prefijo/propuestas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
   },
   "proponer_edicion": {
     "metodo": "POST",
@@ -129,11 +284,66 @@ const OPERACIONES = {
     "cuerpo": false,
     "seguridad": true
   },
+  "ver_contratados": {
+    "metodo": "GET",
+    "ruta": "/presupuestos/{presupuesto_id}/contratados",
+    "ruta_params": [
+      "presupuesto_id"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "ver_nodo": {
+    "metodo": "GET",
+    "ruta": "/catalogo/{clave}",
+    "ruta_params": [
+      "clave"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "ver_precios": {
+    "metodo": "GET",
+    "ruta": "/catalogo/{clave}/precios",
+    "ruta_params": [
+      "clave"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "ver_presupuesto": {
+    "metodo": "GET",
+    "ruta": "/presupuestos/{presupuesto_id}",
+    "ruta_params": [
+      "presupuesto_id"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
   "ver_programa": {
     "metodo": "GET",
     "ruta": "/programas/{programa_id}",
     "ruta_params": [
       "programa_id"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "ver_versiones_de_matriz": {
+    "metodo": "GET",
+    "ruta": "/catalogo/{clave}/versiones",
+    "ruta_params": [
+      "clave"
     ],
     "consulta": [],
     "cabeceras": [],
@@ -178,18 +388,44 @@ const ClientePrograma = (() => {
   }
 
   const cliente = { ErrorApi, base: "", token: null };
+  /** POST /cargas — Cargar los archivos de OPUS: entra lo que se propuso, lo detenido queda dicho en la carga */
+  cliente.aplicar_carga = args => llamar("aplicar_carga", args || {});
   /** POST /programas/{programa_id}/ediciones — Aplicar una edición y guardarla en la bitácora */
   cliente.aplicar_edicion = args => llamar("aplicar_edicion", args || {});
+  /** POST /clonaciones — Clonar un insumo (y, si se pide, sustituir el original): la clave vieja sigue entrando */
+  cliente.clonar_insumo = args => llamar("clonar_insumo", args || {});
+  /** POST /programas/{programa_id}/colgado — Colgar el programa del presupuesto: se ponen los enlaces que casan; uno puesto no se mueve */
+  cliente.colgar_programa = args => llamar("colgar_programa", args || {});
+  /** POST /presupuestos/{presupuesto_id}/contrataciones — Contratar un bloque del presupuesto: fija el PU de sus conceptos a hoy y lo congela */
+  cliente.contratar_subarbol = args => llamar("contratar_subarbol", args || {});
+  /** POST /correcciones-de-prefijo — Sustituir cada clave de un prefijo por su clon con el prefijo nuevo; lo que hoy no se puede se salta y se dice */
+  cliente.corregir_prefijo = args => llamar("corregir_prefijo", args || {});
   /** DELETE /programas/{programa_id}/ediciones/{edicion_id} — Deshacer una edición aplicada */
   cliente.deshacer_edicion = args => llamar("deshacer_edicion", args || {});
   /** POST /programas — Subir un programa: se carga, se guardan sus vínculos y se dice cuáles no entraron */
   cliente.importar_programa = args => llamar("importar_programa", args || {});
+  /** GET /cargas — Todo lo que se ha cargado, contratado o clonado, con quién y cuándo */
+  cliente.listar_cargas = args => llamar("listar_cargas", args || {});
+  /** GET /clones — Los insumos clonados y sustituidos, y quién lo decidió */
+  cliente.listar_clones = args => llamar("listar_clones", args || {});
+  /** GET /presupuestos — Los presupuestos cargados */
+  cliente.listar_presupuestos = args => llamar("listar_presupuestos", args || {});
   /** GET /programas — Los programas que hay, del más viejo al más nuevo */
   cliente.listar_programas = args => llamar("listar_programas", args || {});
   /** GET /programas/{programa_id}/gantt — La pantalla del Gantt de este programa */
   cliente.pantalla_gantt = args => llamar("pantalla_gantt", args || {});
   /** GET / — La pantalla de los programas: la lista y subir uno */
   cliente.pantalla_programas = args => llamar("pantalla_programas", args || {});
+  /** POST /cargas/propuestas — Qué pasaría si se cargaran estos archivos de OPUS: no escribe nada */
+  cliente.proponer_carga = args => llamar("proponer_carga", args || {});
+  /** POST /clonaciones/propuestas — Qué pasaría si se clonara un insumo: lo que lo cita y lo que impide hacerlo; no escribe nada */
+  cliente.proponer_clonacion = args => llamar("proponer_clonacion", args || {});
+  /** POST /programas/{programa_id}/colgado/propuestas — Cómo quedaría colgado el programa del presupuesto, de los dos lados: no escribe nada */
+  cliente.proponer_colgado = args => llamar("proponer_colgado", args || {});
+  /** POST /presupuestos/{presupuesto_id}/contrataciones/propuestas — Qué PU se fijarían al contratar un bloque y cuánto cambia el monto: no escribe nada */
+  cliente.proponer_contratacion = args => llamar("proponer_contratacion", args || {});
+  /** POST /correcciones-de-prefijo/propuestas — Qué claves de un prefijo pasarían a otro, cada una con lo que la cita hoy: no escribe nada */
+  cliente.proponer_correccion_de_prefijo = args => llamar("proponer_correccion_de_prefijo", args || {});
   /** POST /programas/{programa_id}/propuestas — Qué pasaría si se aplicara esta edición: no guarda nada */
   cliente.proponer_edicion = args => llamar("proponer_edicion", args || {});
   /** GET /yo — Quién eres y qué puedes hacer */
@@ -198,8 +434,18 @@ const ClientePrograma = (() => {
   cliente.subir_version = args => llamar("subir_version", args || {});
   /** GET /programas/{programa_id}/ediciones — Todo lo que se ha editado, también lo revertido */
   cliente.ver_bitacora = args => llamar("ver_bitacora", args || {});
+  /** GET /presupuestos/{presupuesto_id}/contratados — Los bloques del presupuesto que ya se contrataron */
+  cliente.ver_contratados = args => llamar("ver_contratados", args || {});
+  /** GET /catalogo/{clave} — Un insumo, compuesto o concepto del catálogo, con quién lo cita */
+  cliente.ver_nodo = args => llamar("ver_nodo", args || {});
+  /** GET /catalogo/{clave}/precios — La historia de precio de un insumo */
+  cliente.ver_precios = args => llamar("ver_precios", args || {});
+  /** GET /presupuestos/{presupuesto_id} — Un presupuesto: renglón por renglón, con su cantidad, su PU y su total */
+  cliente.ver_presupuesto = args => llamar("ver_presupuesto", args || {});
   /** GET /programas/{programa_id} — El programa base y su bitácora */
   cliente.ver_programa = args => llamar("ver_programa", args || {});
+  /** GET /catalogo/{clave}/versiones — Las versiones de la matriz (APU) de un concepto o compuesto, con sus líneas */
+  cliente.ver_versiones_de_matriz = args => llamar("ver_versiones_de_matriz", args || {});
   return cliente;
 })();
 if (typeof module !== "undefined" && module.exports) module.exports = ClientePrograma;

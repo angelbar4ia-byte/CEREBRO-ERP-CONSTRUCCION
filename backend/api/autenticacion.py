@@ -32,6 +32,7 @@ from fastapi import Depends, Header, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
+from api.errores import _error
 from core.accesos import RepositorioAccesos, normalizar_correo
 
 HS = ("HS256",)
@@ -51,10 +52,6 @@ class Identidad(BaseModel):
     roles: List[str]
     nombre: Optional[str] = None
     correo: Optional[str] = None
-
-
-def _error(status: int, codigo: str, mensaje: str, **extra: Any) -> HTTPException:
-    return HTTPException(status_code=status, detail={"codigo": codigo, "mensaje": mensaje, **extra})
 
 
 class VerificadorJWT:

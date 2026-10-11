@@ -34,6 +34,7 @@ from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
 from .catalogo import (
+    CatalogoCambio,
     ConceptoSinMatriz,
     InsumoPlan,
     LineaPlan,
@@ -192,12 +193,16 @@ class ServicioClonacion:
         plan = PlanDeClonacion(estado.ultima_carga, original, clave, modo, usuario, rol_con_que, resumen, nuevo, tuple(sustituciones))
         return PropuestaDeClonacion(original, clave, modo, nodo.descripcion, nodo.unidad, tipo, tuple(redirigidos), (), plan)
 
-    def clonar(self, original: str, clave: str, modo: str, rol: Roles, usuario: str) -> Tuple[PropuestaDeClonacion, ResultadoClonacion]:
-        """Propone y aplica. Si la propuesta tiene un impedimento, `ClonacionNoProcede` y no se escribe nada."""
+    def clonar(self, original: str, clave: str, modo: str, rol: Roles, usuario: str,
+               esperaba: Optional[int] = None) -> Tuple[PropuestaDeClonacion, ResultadoClonacion]:
+        """Propone y aplica. Si la propuesta tiene un impedimento, `ClonacionNoProcede` y no se escribe nada. `esperaba` es la última
+        carga que vio quien decide (`plan.base` de la propuesta): si el catálogo ya va en otra, `CatalogoCambio`."""
         p = self.proponer(original, clave, modo, rol, usuario)
         if not p.aplicable:
             raise ClonacionNoProcede("no se puede clonar: " + "; ".join(p.problemas), p.problemas)
         assert p.plan is not None
+        if esperaba is not None and p.plan.base != esperaba:
+            raise CatalogoCambio(f"la última carga es la {p.plan.base} y esta se revisó sobre la {esperaba}")
         return p, self.repo.clonar(p.plan)
 
     # ------------------------------------------------------------------ un prefijo entero

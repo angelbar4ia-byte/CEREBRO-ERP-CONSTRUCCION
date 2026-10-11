@@ -27,25 +27,18 @@ from typing import Callable, Optional, Sequence, TextIO
 
 from core.accesos import PermisoDenegado, RepositorioAccesos, normalizar_correo
 from core.catalogo import CambioDePresupuesto, RepositorioCatalogo, ServicioCarga, informe_de_carga
+from core.colgado import citas_de_bajas
 from core.importacion_opus import CargaNoProcede
 from core.servicio_programa import RepositorioPrograma
 
 
 def citas_del_programa(programas: RepositorioPrograma, cambios: Sequence[CambioDePresupuesto]) -> str:
-    """Qué programas citan lo que se va (D-476): el catálogo y el programa son dos puertos que no se conocen, así que esto lo junta la
-    terminal, que tiene los dos. Dice quién cita cada baja para que quien la confirma sepa a qué fila del programa le quita el piso."""
-    bajas = [c for c in cambios if c.tipo == "baja" and (c.renglones or c.bloques)]
-    if not bajas:
+    """Qué programas citan lo que se va (D-476), dicho para quien confirma una baja (`core.colgado.citas_de_bajas`)."""
+    citas = citas_de_bajas(programas, cambios)
+    if not citas:
         return ""
-    lineas = []
-    resumenes = [r for r in programas.listar_programas() if r.reemplazado_por is None and r.enlazadas]
-    for r in resumenes:
-        g = programas.leer_programa(r.id)
-        for c in bajas:
-            n = sum(1 for e in g.enlaces if (e.renglon_id in c.renglones) or (e.nodo_id in c.bloques))
-            if n:
-                lineas.append(f"  {c.id}: lo cita el programa {r.id} «{r.nombre}» en {n} fila(s); seguirían enlazadas a algo dado de baja")
-    return "\n".join(["", "Programas que citan lo que se da de baja"] + lineas) if lineas else ""
+    lineas = [f"  {c.baja}: lo cita el programa {c.programa_id} «{c.programa}» en {c.filas} fila(s); seguirían enlazadas a algo dado de baja" for c in citas]
+    return "\n".join(["", "Programas que citan lo que se da de baja"] + lineas)
 
 
 def cargar(

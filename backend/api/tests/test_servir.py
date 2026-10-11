@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from api.autenticacion import VerificadorJWT, emitir_token
 from api.servir import armar, dar_de_alta
 from core.accesos import MemoriaAccesos
+from core.tests.datos_opus import CONCEPTOS, PRESUPUESTO, texto
 
 SECRETO = "un-secreto-compartido-de-prueba-largo-de-32-bytes!"
 
@@ -29,6 +30,17 @@ class PruebasServir(unittest.TestCase):
         h = {"X-Rol": "control_de_obra", "X-Usuario": "luis"}
         self.assertEqual(c.get("/programas").status_code, 200)  # en modo cabeceras ver no pide identidad
         self.assertEqual(c.get("/yo", headers=h).json()["funciones"], ["cargar_catalogo_opus", "clonar_insumo", "contratar_subarbol", "editar_estructura_programa"])
+
+    def test_la_aplicacion_trae_las_rutas_del_catalogo_con_los_mismos_permisos(self):
+        app, _ = armar(None, [], usuarios=["ana@obra.mx|Ana Soto|costos", "rosa@obra.mx|Rosa Díaz|residente"], verificador=VerificadorJWT(secreto=SECRETO))
+        c = TestClient(app)
+        ana, rosa = ({"Authorization": "Bearer " + emitir_token(SECRETO, x)} for x in ("ana@obra.mx", "rosa@obra.mx"))
+        cuerpo = {"conceptos": texto(CONCEPTOS), "presupuesto": texto(PRESUPUESTO)}
+        self.assertEqual(c.get("/presupuestos").status_code, 401)
+        self.assertEqual(c.get("/presupuestos", headers=rosa).json(), [])
+        self.assertEqual(c.post("/cargas", json=cuerpo, headers=rosa).status_code, 403)
+        self.assertEqual(c.post("/cargas", json=cuerpo, headers=ana).status_code, 201)
+        self.assertEqual(len(c.get("/presupuestos", headers=rosa).json()), 7)
 
     def test_dar_de_alta_no_pisa_a_los_que_ya_estan_y_pide_el_formato(self):
         a = MemoriaAccesos()

@@ -29,7 +29,7 @@ prefijo no es llave), y `erp-importacion`.
 conceptos) se registran como no disponibles; no se piden.
 
 **Ya hay un lector:** `backend/core/importacion_opus.py` hace los pasos de lectura sin escribir nada (mapeo de columnas con informe, árbol, placeholders,
-matrices, huella, diagnóstico), y `python3 -m api.cargar_opus` revisa una carga contra lo vigente. Usalo para el inventario y el diagnóstico en vez
+matrices, huella, diagnóstico), y `python3 -m api.cargar_opus` (o `POST /cargas/propuestas`) revisa una carga contra lo vigente. Usalo para el inventario y el diagnóstico en vez
 de volver a escribir las cuentas; tu aporte es leer **lo que el lector no sabe que existe**.
 
 ## Cómo trabajás
@@ -77,7 +77,7 @@ alguien decida**. No las mezcles: la primera lista es accionable hoy.
 
 ## Qué no hacés
 
-- No cargás datos sin aprobación explícita (`api.cargar_opus` revisa por omisión; `--aplicar` escribe, y solo lo hace quien tiene la función).
+- No cargás datos sin aprobación explícita (`api.cargar_opus` revisa por omisión; `--aplicar` escribe, y solo lo hace quien tiene la función; por la API, `POST /cargas/propuestas` revisa y `POST /cargas` escribe).
 - No corregís valores por tu cuenta. Los proponés.
 - No descartás registros raros: los reportás.
 

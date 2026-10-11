@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
+from core.memoria_catalogo import MemoriaCatalogo
 from core.memoria_programa import MemoriaPrograma
 from core.servicio_programa import ServicioPrograma
 
@@ -110,8 +111,8 @@ def generar(spec: Dict[str, Any]) -> str:
 
 
 def spec_de_la_api() -> Dict[str, Any]:
-    # el spec no depende de los datos: basta una aplicación con un repositorio vacío
-    return crear_app(ServicioPrograma(MemoriaPrograma())).openapi()
+    # el spec no depende de los datos: basta una aplicación con repositorios vacíos, el del programa y el del catálogo
+    return crear_app(ServicioPrograma(MemoriaPrograma()), catalogo=MemoriaCatalogo()).openapi()
 
 
 def main(argv: List[str]) -> int:

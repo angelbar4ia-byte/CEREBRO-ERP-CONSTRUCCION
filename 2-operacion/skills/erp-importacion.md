@@ -383,7 +383,9 @@ entre una y otra se cargó otra cosa (cada plan trae la última carga que vio), 
 escribe: `CatalogoCambio`. Si el archivo trae algo que no cuadra, no se escribe nada.
 
 En la terminal: `python3 -m api.cargar_opus` revisa; con `--aplicar` escribe (solo un usuario con la
-función `cargar_catalogo_opus`).
+función `cargar_catalogo_opus`). Por la API (D-482): `POST /cargas/propuestas` revisa —trae el informe, lo
+detenido y la `base`, la última carga que vio quien revisó— y `POST /cargas` aplica; ahí se manda `esperaba`
+con esa `base`, y si otro cargó, contrató o clonó entre las dos, responde 409 `conflicto` y no escribe nada.
 
 ```
 412 conceptos entran sin cambios

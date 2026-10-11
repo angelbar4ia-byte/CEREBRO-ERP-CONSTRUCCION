@@ -57,6 +57,22 @@ def dar_de_alta(accesos: RepositorioAccesos, usuarios: List[str]) -> None:
             accesos.agregar_usuario(nombre, correo, [r for r in roles.split(",") if r])
 
 
+def adaptadores_postgres(cadena: str):
+    """Los tres adaptadores de Postgres, sobre una conexión por hilo (`infra/conexion.py`, D-482): el servidor atiende cada petición en un
+    hilo, y una sola conexión compartida mezcla las transacciones de dos peticiones que se traslapan. Aplica las migraciones al empezar."""
+    import psycopg
+
+    from infra.conexion import ConexionPorHilo
+    from infra.postgres_accesos import PostgresAccesos
+    from infra.postgres_catalogo import PostgresCatalogo
+    from infra.postgres_programa import PostgresPrograma, aplicar_migraciones
+
+    with psycopg.connect(cadena, autocommit=True) as conn:
+        aplicar_migraciones(conn)
+    conexion = ConexionPorHilo(cadena)
+    return PostgresPrograma(conexion), PostgresAccesos(conexion), PostgresCatalogo(conexion)
+
+
 def armar(
     postgres: Optional[str],
     nombres: List[str],
@@ -67,25 +83,19 @@ def armar(
     """La aplicación y la lista de (id, nombre) de los programas que atiende. Sin `verificador`, identidad por cabeceras
     (lo inseguro, que quien llama pidió a propósito)."""
     if postgres is None:
+        from core.memoria_catalogo import MemoriaCatalogo
         from core.memoria_programa import MemoriaPrograma
 
-        repo, accesos = MemoriaPrograma(), MemoriaAccesos()
+        repo, accesos, catalogo = MemoriaPrograma(), MemoriaAccesos(), MemoriaCatalogo()
         programas = importar(repo, nombres)
     else:
-        import psycopg
-
-        from infra.postgres_accesos import PostgresAccesos
-        from infra.postgres_programa import PostgresPrograma, aplicar_migraciones
-
-        conn = psycopg.connect(postgres, autocommit=True)
-        aplicar_migraciones(conn)
-        repo, accesos = PostgresPrograma(conn), PostgresAccesos(conn)
-        programas = [(r[0], r[1]) for r in conn.execute("SELECT id, nombre FROM programa ORDER BY id")]
+        repo, accesos, catalogo = adaptadores_postgres(postgres)
+        programas = [(r[0], r[1]) for r in repo.conn.execute("SELECT id, nombre FROM programa ORDER BY id")]
         if not programas:
             programas = importar(repo, nombres)
     dar_de_alta(accesos, usuarios or [])
     autenticar = por_token(verificador, accesos, login_url) if verificador is not None else por_cabeceras()
-    return crear_app(ServicioPrograma(repo, permisos=accesos.permisos), autenticar), programas
+    return crear_app(ServicioPrograma(repo, permisos=accesos.permisos), autenticar, catalogo), programas
 
 
 def main() -> None:

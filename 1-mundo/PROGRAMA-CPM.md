@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 705 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 787 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -329,7 +329,7 @@ muchos lugares y cada lugar tiene su cantidad y su sitio en el programa—. La i
 | `ServicioColgado.proponer(programa, rol, presupuesto)` | La alineación; no escribe nada. El presupuesto se encuentra por la clave del capítulo con que abre el programa, o se dice cuál |
 | `ServicioColgado.colgar(programa, rol, usuario, presupuesto, forzar)` | Escribe lo que `proponer` mostró. Pide `editar_estructura_programa`; no cuelga si casan menos de la mitad de los conceptos salvo `forzar`, ni si no casa ninguno |
 | `RepositorioPrograma.colgar(…)` | Pone `presupuesto_id` y los enlaces nuevos y deja una fila en `programa_colgadura`; repetirlo no escribe nada; un enlace puesto no se mueve (`YaColgado`); con versión nueva, `YaReemplazado` |
-| `python3 -m api.colgar_programa` | La terminal: revisa por omisión y cuelga con `--colgar` |
+| `python3 -m api.colgar_programa` · `proponer_colgado` y `colgar_programa` de la API (§4.8) | La terminal revisa por omisión y cuelga con `--colgar`; la API propone y cuelga |
 
 **Cómo se casan:** un bloque por su **ruta natural** `clave#n` (la que guardó la carga del presupuesto), y una partida por su bloque y su
 clave, la n-ésima vez que el programa la nombra contra la n-ésima línea del presupuesto con ese concepto. Nada se alinea por número de
@@ -341,12 +341,12 @@ cuadran de los dos lados y el de Zafiro tiene una partida que el presupuesto no 
 
 **Lo que todavía no es ese esquema.** Falta `CALENDARIO_OBRA` (el calendario va como JSON dentro de `programa`) y que `programa_fila` se
 vuelva `ACTIVIDAD` y `TRAMO`, que no necesita tocar la bitácora porque cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca;
-solo entrega de qué presupuesto cuelga el programa y cuántas de sus filas están enlazadas: colgar se hace desde la terminal.
+entrega de qué presupuesto cuelga el programa y cuántas de sus filas están enlazadas, y desde D-482 también se cuelga por ella (`proponer_colgado`, `colgar_programa`, §4.8), además de la terminal.
 
 ## 4.8 La API y su cliente: `backend/api/` y `frontend/gantt/cliente_programa.js`
 
 FastAPI es la única superficie pública (D-54). Estas once operaciones, escritas sobre `ServicioPrograma` y nada más,
-son las que las pantallas necesitan:
+son las que las pantallas del programa necesitan (las dieciocho del catálogo y los presupuestos, D-482, van más abajo):
 
 | Operación | Método y ruta | Qué hace | Falla con |
 |---|---|---|---|
@@ -426,6 +426,48 @@ quedó. Quien guarda manda en `esperaba` la que vio: una pantalla abierta desde 
 vio —el impacto que le mostró ya no es el de hoy—, recibe 409 y la pantalla trae lo de hoy. Sin `esperaba` se aplica
 sobre lo que haya al momento de proponer.
 
+**El catálogo y los presupuestos (D-482).** Lo que se construyó sobre el catálogo de OPUS —cargar los archivos, colgar el programa del presupuesto,
+contratar un subárbol, clonar un insumo— solo tenía terminal. `crear_app(servicio, autenticacion, catalogo)` agrega **dieciocho operaciones**
+(`backend/api/catalogo.py`; sin catálogo la API es la de arriba), escritas sobre `ServicioCarga`, `ServicioColgado`, `ServicioContratacion` y
+`ServicioClonacion` y nada más. Cada acción son **dos rutas gemelas**, como `propuestas` y `ediciones` en el programa: la propuesta dice qué pasaría, con
+las mismas cifras que el informe de la terminal (que también viaja, en `informe`), y no escribe; la otra hace lo propuesto. *El sistema propone y el
+humano decide.*
+
+| Operación | Método y ruta | Qué hace | Pide |
+|---|---|---|---|
+| `proponer_carga` | `POST /cargas/propuestas` | Qué entra, qué versiona, qué se detiene y por qué, qué cambia en los presupuestos que ya existen y qué programas citan lo que se da de baja. Cuerpo: `conceptos`, `presupuesto`, `compuestos` (el texto de los CSV de OPUS), `tipo`, `confirmados`, `bajas_confirmadas`, `todas_las_bajas` | `cargar_catalogo_opus` |
+| `aplicar_carga` | `POST /cargas` (201) | Aplica lo que entra; lo detenido queda dicho en la carga. Mismo cuerpo, más `esperaba`. `carga_id` nulo si no había nada que aplicar | `cargar_catalogo_opus` |
+| `proponer_colgado` · `colgar_programa` | `POST /programas/{id}/colgado/propuestas` · `POST /programas/{id}/colgado` (201) | La alineación de los dos lados · poner los enlaces que casan. Cuerpo: `presupuesto_id` y, al colgar, `forzar` | `editar_estructura_programa` |
+| `proponer_contratacion` · `contratar_subarbol` | `POST /presupuestos/{id}/contrataciones/propuestas` · `POST /presupuestos/{id}/contrataciones` (201) | Qué PU se fijan, cuánto cambia el monto y qué pide confirmación · contratar el bloque. Cuerpo: `bloque` (la ruta natural; sin ella, el presupuesto entero), `confirmados`, `esperaba` | `contratar_subarbol` |
+| `proponer_clonacion` · `clonar_insumo` | `POST /clonaciones/propuestas` · `POST /clonaciones` (201) | A quién cita el original y qué impide clonarlo · clonar. Cuerpo: `original`, `clave`, `modo` (`sustituir` o `mantener`), `esperaba` | `clonar_insumo` |
+| `proponer_correccion_de_prefijo` · `corregir_prefijo` | `POST /correcciones-de-prefijo/propuestas` · `POST /correcciones-de-prefijo` (201) | Las claves de un prefijo que pasarían a otro, cada una con lo que la cita hoy · hacerlas una por una; lo que hoy no se puede se salta y se dice. Cuerpo: `viejo`, `nuevo`, `desde` | `clonar_insumo` |
+| `listar_presupuestos` · `ver_presupuesto` · `ver_contratados` | `GET /presupuestos` · `GET /presupuestos/{id}` · `GET /presupuestos/{id}/contratados` | Los presupuestos; uno renglón por renglón, con su cantidad, su PU y su total; los bloques que ya se contrataron | — |
+| `listar_cargas` · `listar_clones` | `GET /cargas` · `GET /clones` | Todo lo que se cargó, contrató o clonó, con quién y cuándo · lo que se sustituyó y por quién | — |
+| `ver_nodo` · `ver_versiones_de_matriz` · `ver_precios` | `GET /catalogo/{clave}` · `GET /catalogo/{clave}/versiones` · `GET /catalogo/{clave}/precios` | Un insumo, compuesto o concepto con las matrices que lo citan · las versiones de su matriz, con sus líneas · su historia de precio | — |
+
+- **Quién llama** es lo de siempre: en modo token toda ruta pide el token, también las que solo ven; el usuario y el rol que quedan en la carga, la
+  colgadura, la contratación y la clonación son los del token, y la función se lee de `ROL_FUNCION` en cada acción (cambiarla vale desde la siguiente).
+- **Lo que se aplica es lo que se vio.** En la terminal revisar y aplicar iban en la misma corrida; en la API son dos llamadas con una persona en medio, y
+  aplicar vuelve a revisar con lo de hoy. Si alguien cargó, contrató o clonó entre las dos, quien decide aplicaría algo distinto de lo que vio. Cada
+  propuesta trae `base` (la última carga que vio) y cada aplicación acepta `esperaba` —lo mismo que `esperaba` en las ediciones del programa—: si el
+  catálogo ya va en otra, **409 `conflicto`** y no se escribe nada. Sin `esperaba` se aplica sobre lo que haya. `ServicioCarga.aplicar`,
+  `ServicioContratacion.contratar` y `ServicioClonacion.clonar` ganan ese parámetro opcional.
+- **Los códigos.** 403 `permiso_denegado`; 404 `presupuesto_inexistente`, `programa_inexistente` o `nodo_inexistente`; **409** cuando el estado cambió o ya está
+  hecho (`conflicto`, `ya_contratado`, `ya_colgado`, `reemplazado`); **422** cuando lo pedido no procede y quien decide puede corregirlo
+  (`carga_no_procede`; `colgado_no_cuadra`, con `forzable` si de todos modos se puede confirmar; `confirmacion_pendiente`, con los conceptos que piden
+  confirmación para reenviarlos en `confirmados`; `clonacion_no_procede`, con sus `problemas`; `contratacion_invalida`; `peticion_invalida`).
+- **Una propuesta que no se puede hacer no es un error:** responde 200 con `aplicable: false` y por qué (`problemas`, `pendientes`, `casa_bien`). El error es
+  pedir que se aplique.
+- **Lo que viaja.** Los CSV de OPUS van como texto en el cuerpo (el de presupuestos pesa 1.4 MB); el dinero y las cantidades, como texto; las listas que
+  pueden ser de miles —lo que no casa en un colgado— vienen con tope de 200 y su total entero.
+- **Dos cosas que salieron de escribirla.** (1) La advertencia «qué programas citan lo que se da de baja» (D-476) pretendía saltarse los programas ya
+  reemplazados, pero lo comprobaba en un campo que solo llena `ServicioPrograma.listar`; el puerto no lo llena, así que el filtro no hacía nada.
+  Ahora vive en `core/colgado.citas_de_bajas` —la terminal y la API la usan— y mira el programa guardado. (2) `api.servir` compartía **una sola conexión** de
+  Postgres entre los hilos que atienden las peticiones: dos peticiones traslapadas abrían su `transaction()` en la misma sesión y, al salir en otro
+  orden, psycopg lanza `OutOfOrderTransactionNesting` **y lo que la primera había escrito antes de fallar se queda escrito**. Existía desde que el
+  programa se guarda en Postgres; una carga de OPUS tarda segundos y lo vuelve probable. `infra/conexion.py` (`ConexionPorHilo`) da a cada hilo la
+  suya y `api.servir` la usa.
+
 **Quién llama (B-96, D-469; confirmado en D-470 con Supabase Auth como proveedor).** La API **no emite tokens ni tiene contraseñas**: verifica los
 que entrega un proveedor de identidad (Supabase Auth, Auth0, Keycloak, el que se elija) y de ellos toma solo el
 correo que el proveedor ya comprobó. Con el correo busca al `USUARIO` (`core/accesos.py`), y de él salen sus roles y,
@@ -488,9 +530,9 @@ un proveedor, `python3 -m api.emitir_token --secreto … --correo …` da un tok
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 705 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 787 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
-la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
+la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas —las del catálogo con un contrato propio (`contrato_api_catalogo.py`), que corre contra la memoria y contra Postgres de verdad—, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
 verdad** (`pgserver`, embebido, que el CI instala), más lo que solo Postgres garantiza; siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
@@ -945,7 +987,7 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | El alcance de datos por obra (pospuesto por el usuario, D-470) | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
 | La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
 | `CALENDARIO_OBRA`, y que `programa_fila` se vuelva `ACTIVIDAD` y `TRAMO` | El programa ya cuelga de `NODO` y `PRESUPUESTO` (D-474, migración `0006`: cada fila, de un bloque o de un renglón); falta la tabla del calendario y el paso a `ACTIVIDAD`, que no toca la bitácora |
-| Colgar desde la API o una pantalla | Hoy se cuelga desde la terminal (`python3 -m api.colgar_programa`); la API entrega `presupuesto_id` y `enlazadas` pero no tiene la operación |
+| Las pantallas de lo que la API del catálogo ya hace (B-99) | Cargar los archivos de OPUS y decidir lo detenido, ver un presupuesto, colgar un programa, contratar un bloque y clonar un insumo tienen su API y su cliente generado (D-482, §4.8); ninguna tiene todavía pantalla |
 | Dos diferencias que salieron de colgar a Zafiro | `ACA-02034` está en el programa y en ningún presupuesto, y `OBE-04010` dice 4 en el programa y 1 en el presupuesto: lo deciden el planeador y Costos |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
@@ -981,3 +1023,4 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | **El proveedor de identidad es Supabase Auth y el modelo de autenticación queda confirmado** | **D-470** |
 | **El programa con versión nueva se cierra a ediciones y las partidas se reconocen solo por `oid`** | **D-471** |
 | **El programa cuelga del presupuesto: cada fila, de un bloque o de un renglón** | **D-474** |
+| **La API del catálogo y los presupuestos: cargar, colgar, contratar y clonar con propuesta y aplicación, `esperaba` y una conexión por hilo** | **D-482** |

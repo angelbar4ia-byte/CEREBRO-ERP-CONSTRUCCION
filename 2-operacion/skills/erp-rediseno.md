@@ -146,7 +146,7 @@ repartos anteriores y **proponer** para casos similares, nunca aplicarlos solo.
 ## 5. Clonación
 
 Crear un insumo nuevo copiando el contenido de otro. **No edita: crea.** Es la única de las seis
-que ya está construida (`backend/core/clonacion.py`, `python3 -m api.clonar`, D-478).
+que ya está construida (`backend/core/clonacion.py`, `python3 -m api.clonar`, D-478; y por la API, `POST /clonaciones` y `POST /correcciones-de-prefijo`, cada una con su `…/propuestas` que no escribe, D-482).
 
 El uso principal son las **variantes**: partir de la trabe T-3 y crear la T-4
 cambiando la sección, sin capturar todo de nuevo. Arreglar un prefijo equivocado es

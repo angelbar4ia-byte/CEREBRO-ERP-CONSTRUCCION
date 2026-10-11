@@ -9,10 +9,13 @@ import json
 import shutil
 import subprocess
 import unittest
+from decimal import Decimal
 
 from api.generar_cliente import DESTINO, generar, spec_de_la_api
 from api.tests.servidor import ServidorDePrueba
+from core.catalogo import ServicioCarga
 from core.tests.contrato_programa import CAL, programa
+from core.tests.datos_opus import CONCEPTOS, PRESUPUESTO, reescalar_costo, texto
 
 SCRIPT = r"""
 const C = require(process.argv[1]);
@@ -88,6 +91,83 @@ class PruebasClienteContraLaApi(unittest.TestCase):
         self.assertEqual(s["invalida"], [422, "edicion_invalida"])
         self.assertEqual(s["deshecha"], [["revertida"], 2])
         self.assertTrue(s["html"])
+
+
+SCRIPT_CATALOGO = r"""
+const C = require(process.argv[1]);
+C.base = process.argv[2];
+const CO = { "x-rol": "control_de_obra", "x-usuario": "luis@obra.mx" };
+const RES = { "x-rol": "residente", "x-usuario": "ana@obra.mx" };
+const bloque = "CAS-00004#1/NIV-00001#1";
+(async () => {
+  const sal = {};
+  const lista = await C.listar_presupuestos({});
+  sal.lista = [lista.length, lista[0].clave];
+  const pid = lista[0].id;
+  const pr = await C.ver_presupuesto({ presupuesto_id: pid });
+  sal.total = [pr.renglones.length, pr.total];
+  const p = await C.proponer_contratacion({ presupuesto_id: pid, cuerpo: { bloque }, ...CO });
+  sal.propuesta = [p.aplicable, p.renglones, p.total_antes, p.total_despues, p.diferencia];
+  sal.contratadosAntes = (await C.ver_contratados({ presupuesto_id: pid })).length;
+  const c = await C.contratar_subarbol({ presupuesto_id: pid, cuerpo: { bloque }, ...CO });
+  sal.contratada = [c.versiones_nuevas, c.renglones_fijados];
+  try { await C.contratar_subarbol({ presupuesto_id: pid, cuerpo: { bloque }, ...CO }); } catch (e) { sal.repetida = [e instanceof C.ErrorApi, e.status, e.codigo]; }
+  try { await C.contratar_subarbol({ presupuesto_id: pid, cuerpo: { bloque }, ...RES }); } catch (e) { sal.permiso = [e.status, e.codigo]; }
+  try { await C.ver_presupuesto({ presupuesto_id: 9999 }); } catch (e) { sal.noExiste = [e.status, e.codigo]; }
+  try { await C.ver_nodo({ clave: "NOEXISTE" }); } catch (e) { sal.sinNodo = [e.status, e.codigo]; }
+  try { await C.proponer_carga({ cuerpo: { conceptos: "esto,no,es,un,archivo\n1,2,3,4,5\n" }, ...CO }); } catch (e) { sal.archivo = [e.status, e.codigo]; }
+  try { await C.proponer_carga({ cuerpo: { conceptos: "x" } }); } catch (e) { sal.sinIdentidad = [e.status, e.codigo]; }
+  const cl = await C.proponer_clonacion({ cuerpo: { original: "AUX-00001", clave: "PRE-00120" }, ...CO });
+  sal.clonacion = [cl.aplicable, cl.redirigidos.length, cl.renglones];
+  const hecha = await C.clonar_insumo({ cuerpo: { original: "AUX-00001", clave: "PRE-00120" }, ...CO });
+  sal.clonada = [hecha.versiones_nuevas, hecha.renglones_fijados];
+  const nodo = await C.ver_nodo({ clave: "AUX-00001" });
+  sal.nodo = [nodo.sustituido_por, nodo.citado_por.length];
+  sal.clones = (await C.listar_clones({})).map(x => [x.original, x.clon, x.usuario]);
+  sal.cargas = (await C.listar_cargas({})).map(x => x.tipo);
+  const prec = await C.ver_precios({ clave: "ACE-00001" });
+  sal.precio = prec[0].precio;
+  process.stdout.write(JSON.stringify(sal));
+})().catch(e => { process.stderr.write(String(e && e.stack || e)); process.exit(1); });
+"""
+
+
+@unittest.skipUnless(shutil.which("node"), "no hay node")
+class PruebasClienteDelCatalogo(unittest.TestCase):
+    """Las operaciones del catálogo (D-482) por el cliente generado, contra un servidor que atiende de verdad."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.servidor = ServidorDePrueba().arrancar()
+        carga = ServicioCarga(cls.servidor.catalogo)
+        carga.aplicar(texto(CONCEPTOS), texto(PRESUPUESTO), None, rol="costos", usuario="ana@obra.mx")
+        # y el acero sube 2 %: los renglones siguen con el PU de su versión; contratar los fija a hoy
+        carga.aplicar(reescalar_costo(texto(CONCEPTOS), "ACE-00001", Decimal("1.02")), texto(PRESUPUESTO), None, rol="costos", usuario="ana@obra.mx")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.apagar()
+
+    def test_ve_contrata_y_clona_y_los_errores_llegan_con_su_codigo(self):
+        r = subprocess.run(["node", "-e", SCRIPT_CATALOGO, str(DESTINO), self.servidor.url], capture_output=True, text=True, timeout=300)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        s = json.loads(r.stdout)
+        self.assertEqual(s["lista"], [7, "CAS-00004"])
+        self.assertEqual(s["total"], [398, "1842426.01"])
+        self.assertEqual(s["propuesta"], [True, 56, "178768.69", "178809.66", "40.97"])
+        self.assertEqual((s["contratadosAntes"], s["contratada"]), (0, [25, 25]))
+        self.assertEqual(s["repetida"], [True, 409, "ya_contratado"])
+        self.assertEqual(s["permiso"], [403, "permiso_denegado"])
+        self.assertEqual(s["noExiste"], [404, "presupuesto_inexistente"])
+        self.assertEqual(s["sinNodo"], [404, "nodo_inexistente"])
+        self.assertEqual(s["archivo"], [422, "carga_no_procede"])
+        self.assertEqual(s["sinIdentidad"], [401, "sin_identidad"])
+        self.assertEqual(s["clonacion"], [True, 9, 9])
+        self.assertEqual(s["clonada"], [9, 9])
+        self.assertEqual(s["nodo"], ["PRE-00120", 0])
+        self.assertEqual(s["clones"], [["AUX-00001", "PRE-00120", "luis@obra.mx"]])
+        self.assertEqual(s["cargas"], ["archivos", "archivos", "contratacion", "clonacion"])
+        self.assertEqual(s["precio"], "24.68")
 
 
 SCRIPT_TOKEN = r"""

@@ -27,6 +27,7 @@ from decimal import Decimal
 from typing import Dict, Iterable, List, Mapping, Optional, Set, Tuple, Union
 
 from .catalogo import (
+    CatalogoCambio,
     Congelamiento,
     DatosDePresupuesto,
     Pendiente,
@@ -278,9 +279,13 @@ class ServicioContratacion:
         usuario: str,
         donde: Optional[Union[int, str]] = None,
         confirmados: Iterable[str] = (),
+        esperaba: Optional[int] = None,
     ) -> Tuple[PropuestaDeContratacion, ResultadoContratacion]:
-        """Propone y, si nada pide confirmación, contrata lo que se propuso. Con algo sin confirmar, `ContratacionPendiente`."""
+        """Propone y, si nada pide confirmación, contrata lo que se propuso. Con algo sin confirmar, `ContratacionPendiente`.
+        `esperaba` es la última carga que vio quien decide (`plan.base` de la propuesta): si el catálogo ya va en otra, `CatalogoCambio`."""
         p = self.proponer(presupuesto, rol, usuario, donde, confirmados)
+        if esperaba is not None and p.plan.base != esperaba:
+            raise CatalogoCambio(f"la última carga es la {p.plan.base} y esta se revisó sobre la {esperaba}")
         if not p.aplicable:
             raise ContratacionPendiente(
                 f"{len(p.pendientes)} concepto(s) piden confirmación antes de contratar {p.ruta}: " + ", ".join(x.clave for x in p.pendientes[:10]), p)
