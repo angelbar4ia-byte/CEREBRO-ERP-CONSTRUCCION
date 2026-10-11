@@ -62,6 +62,22 @@ dato para probar se guarda en el repo, tal cual.
 
 *Lo que falta bloquea P-09, P-32, M-14, B-07 y el cierre de P-14. Quien los tenga puede subirlos tal cual (`.xlsx` o `.csv`).*
 
+*D-479: por indicación del usuario esto ya no es una petición —son temas menores y no se vuelve a preguntar por ellos—; se registran como no disponibles. Lo que el usuario sí compartió está completo en el repo, con la lista de abajo.*
+
+### Las demás tablas que el usuario compartió, a salvo (D-479)
+
+Además de los 14 CSV de OPUS (arriba), el usuario subió 14 libros de Excel que solo vivían en la carpeta temporal de la sesión. Cada uno está **tal cual** (la huella lo prueba) y cada hoja, también como CSV, en `1-mundo/fuentes/`; `1-mundo/fuentes/MANIFIESTO.csv` lista los 59 archivos con su huella sha256.
+
+| Tabla | Qué es | Dónde está |
+|---|---|---|
+| `03_MARZO` a `07_JULIO_MOVIMIENTOS_DE_ALMACEN` | El export de movimientos de almacén del ERP externo, un mes por archivo (hoja `Consulta`, 46 columnas; la de julio trae una 47ª) | `1-mundo/fuentes/almacen/` |
+| `grid_AvanceOPEventosOpr_MARZO`, `_28` (abril), `_MAYO`, `_JUNIO`, `_JULIO` | El avance de operación por evento, todas las obras (hoja `Consulta`, 25 columnas) | `1-mundo/fuentes/avance/` |
+| `PRECIO_REAL_ALAMO_18` (dos versiones) | Lo realmente pagado en ALAMO 18, nueve hojas. **La primera que se subió (27 KB) es la chica; `__2` (89 KB, cinco minutos después) es la completa** | `1-mundo/fuentes/precio-real/` |
+| `SEMILLA-cuadrilla-rendimiento` | La semilla de cuadrillas y rendimientos (hoja `Semilla`) | `1-mundo/fuentes/semilla/` |
+| `PROGRAMA_ZAFIRO` | El programa de Zafiro del que salen los siete (hojas `Hoja1`, 222 columnas, y `Hoja2`) | `1-mundo/fuentes/programa/` |
+
+Las notas de lectura que se escribieron al recibir almacén y precio real están en `1-mundo/fuentes/notas/`. **Una prueba del CI vigila todo esto**: falla si falta una tabla, si cambió o si llega una que el manifiesto no conoce. `METODO.md` §2.6 dice qué hacer cuando llega una nueva.
+
 ### Lo que OPUS tiene y aún no está en este proyecto
 
 Se pueden agregar más adelante. **No hacen falta por ahora:**

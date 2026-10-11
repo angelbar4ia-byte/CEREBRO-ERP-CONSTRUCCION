@@ -166,6 +166,18 @@ se acercó contra Zafiro Plus.
 > **El contenido es la evidencia; la descripción es una etiqueta.** Si alguien forma
 > el presupuesto leyendo la etiqueta, costea el prototipo equivocado.
 
+## 2.6 Una tabla que el usuario sube se guarda en el repo antes de leerla
+
+Lo que se sube a una sesión vive en una carpeta temporal de la máquina y **se pierde con ella**: el usuario no tiene por qué volver a subirlo ni
+volver a oír la pregunta. Al recibir una tabla —antes de analizarla—:
+
+1. `cd backend && python3 -m api.guardar_subidas` copia lo nuevo a `1-mundo/opus/` o `1-mundo/fuentes/` (el libro tal cual, cada hoja en CSV) y lo anota en
+   `1-mundo/fuentes/MANIFIESTO.csv`.
+2. Commit y push: lo guardado solo en la máquina tampoco sobrevive a ella.
+3. `python3 -m api.guardar_subidas --verificar` (y el CI, con una prueba) dice si algo falta, cambió o llegó sin registrarse.
+
+Los CSV recortados o consolidados que se generen para analizar son derivados: se regeneran del original y no se guardan en su lugar.
+
 ---
 
 # 3. Cómo decidir

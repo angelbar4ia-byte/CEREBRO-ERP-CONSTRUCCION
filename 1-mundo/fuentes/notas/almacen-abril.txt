@@ -1,0 +1,67 @@
+[Nota de lectura que se escribió al recibir estas tablas (sesión de 2026-09-18 a 2026-09-27); D-479 la conserva tal cual. Habla de las tablas de la carpeta hermana, no de los CSV recortados que mencionan: esos no se guardan, se regeneran del original.]
+
+# almacen-abril — de dónde sale y qué se recortó
+
+Fuente: `04_ABRIL_MOVIMIENTOS_DE_ALMACEN.xlsx`, hoja única `Consulta`.
+Export tipo SAP Business One (terminología: `# OV`=Orden de Venta,
+`# OT`=Orden de Transferencia, `# OP`=Orden de Producción, `# OM`=Orden de
+Movimiento, `# IR`=Recepción de Inventario, `# RMA`=Return Merchandise
+Authorization).
+
+4,445 filas · 46 columnas originales · 28 quedaron en `almacen-abril.csv`.
+
+## Columnas que existen en el ERP pero abril no las usó
+
+No se descartó el conocimiento de que existen — solo no van fila por fila
+en el CSV porque no traen dato:
+
+| Columna | Por qué se fue | Podría traer dato en otro mes si... |
+|---|---|---|
+| `BarCode` | 0/4,445 con dato | el material se identifica por código de barras |
+| `# OV` | 0/4,445 | hay una Orden de Venta detrás del movimiento |
+| `# OT` | 0/4,445 | hay una Orden de Transferencia entre almacenes |
+| `# Opr/Prod` | 0/4,445 | — |
+| `# OM` | 0/4,445 | hay una Orden de Movimiento manual |
+| `# Empaque OM` | 0/4,445 | ligado a `# OM` |
+| `# Operacion OM` | 0/4,445 | ligado a `# OM` |
+| `# Inv/Fisico` | 0/4,445 | hay un inventario físico corriendo ese mes |
+| `# Empaque OV` | 28/4,445, siempre 0.0 | — |
+| `# Rec OT` | 28/4,445, siempre 0.0 | — |
+| `# RMA` | 28/4,445, siempre 0.0 | hay una devolución de material |
+| `# Empaque OT` | 28/4,445, siempre 0.0 | — |
+| `Es Alergeno?` | 4,444/4,445, siempre 0.0 | viene de un template genérico de inventario, no aplica a construcción |
+| `# Lote` | 4,444/4,445, siempre `"S/L"` | el material se rastrea por lote de fabricación (distinto de `Lote` = número de casa, esa sí quedó) |
+| `Almacen` | 4,440/4,445 dicen `ALM-MAGNOLIA`, idéntico a `# Almacen` | se usa más de un almacén — `# Almacen` ya lo cubre |
+| `Ubicacion.1` | 4,440/4,445 dicen `GENERAL` | se usan ubicaciones internas del almacén distintas de la general |
+| `Usuario` | metadato de quién capturó, no del movimiento | — |
+| `Fecha Sys` | casi idéntica a `Fecha` | — |
+
+## Columnas que sí quedaron (28)
+
+`# Solicitud`, `Solicitante`, `Contratista`, `Nivel`, `Ubicacion`, `Lote`,
+`# Reg`, `Fecha`, `Tipo`, `Motivo`, `# Parte`, `Parte`, `Clase`, `Grupo`,
+`# Almacen`, `Cantidad`, `UDM`, `Efecto Qty`, `C/Promedio`, `C/Ultimo`,
+`Ptr Costo Estandar`, `Ptr Costo Mov`, `Efecto Costo`, `Referencia`, `# IR`,
+`Proveedor`, `# OP`, `# Empaque OP`.
+
+## Corrección aplicada: mojibake
+
+El texto libre (`Referencia`, `Parte`, nombres) venía con acentos rotos —
+`ColocaciÃ³n` en vez de `Colocación`— por una doble codificación UTF-8 leída
+como Latin-1. Se corrigió en todo el archivo antes de guardar el CSV.
+
+## Lo que ya se sabe de este archivo (ver conversación)
+
+- `Tipo` × `Motivo` son 4 movimientos reales, casi 1 a 1: `PUR-STK`/Recepción
+  (entrada), `STK-ASM`/Implosión (consumo con `# OP`, casi siempre trazable),
+  `STK-UNK` (bolsa de 6 motivos, incluye "Salida De Material Para
+  Producción" — 1,674 filas, **ninguna con `# OP`**).
+- `Cantidad` es la magnitud (puede venir negativa en una reversión);
+  `Efecto Qty` es el efecto con signo sobre el inventario.
+- `Referencia` es texto semi-estructurado: cuando trae `OP:nnnnn,
+  No.Parte:XXX-nnnnn, Parte-DESCRIPCIÓN - PROTOTIPO` es parseable; cuando no,
+  es libre y a veces cubre varias obras a la vez.
+- `ALAMO` + `Lote=18` = ALAMO 18. Su `Referencia` dice `ZAFIRO PLUS BASE`,
+  pero `PRUEBA-ALAMO-18.md` ya estableció que el prototipo real es
+  **Diamante con chimenea** — la etiqueta miente, igual que D-121 ya probó
+  a nivel de presupuesto.
