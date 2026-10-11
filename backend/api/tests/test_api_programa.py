@@ -127,6 +127,39 @@ class PruebasApi(unittest.TestCase):
         self.assertEqual((viejo["reemplazado_por"], viejo["version"], len(viejo["guardadas"])), (s["id"], 3, 3))
         self.assertEqual([x["reemplazado_por"] for x in self.c.get("/programas").json()], [s["id"], None])
 
+    def test_un_programa_con_version_nueva_se_ve_pero_quien_lo_edita_recibe_409(self):
+        self._historia()
+        nuevo = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()["resumen"]["id"]
+        mas = {"edicion": {"edicion": "cambiar_duracion", "llave": self.f[1102], "dias": "3"}}
+        visto = self.c.get(f"/programas/{self.pid}").json()
+        for r in (self.c.post(f"/programas/{self.pid}/propuestas", json=mas, headers=CO),
+                  self.c.post(f"/programas/{self.pid}/ediciones", json=mas, headers=CO),
+                  self.c.post(f"/programas/{self.pid}/ediciones", json={**mas, "esperaba": 0}, headers=CO),  # aunque traiga una versión vieja: está cerrado, no «cambió»
+                  self.c.delete(f"/programas/{self.pid}/ediciones/{visto['guardadas'][0]['id']}", headers=CO)):
+            d = r.json()["detail"]
+            self.assertEqual((r.status_code, d["codigo"], d["reemplazado_por"]), (409, "reemplazado", nuevo), r.text)
+        self.assertIn(f"la {nuevo}", d["mensaje"])
+        # el permiso se pide primero: quien no puede, no se entera de más
+        self.assertEqual(self.c.post(f"/programas/{self.pid}/ediciones", json=mas, headers=RES).json()["detail"]["codigo"], "permiso_denegado")
+        # se queda como estaba y se sigue viendo; la versión nueva sí se edita
+        igual = self.c.get(f"/programas/{self.pid}").json()
+        self.assertEqual((igual["version"], igual["guardadas"], igual["reemplazado_por"]), (visto["version"], visto["guardadas"], nuevo))
+        self.assertEqual(self.c.post(f"/programas/{nuevo}/ediciones", json=mas, headers=CO).status_code, 201)
+
+    def test_la_version_nueva_dice_cuantas_partidas_comparte_y_un_archivo_de_otro_programa_no_comparte_ninguna(self):
+        n = len(self.plus.ventanas)
+        ok = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()
+        self.assertEqual((ok["partidas_anterior"], ok["partidas_en_comun"]), (n, n))
+        nuevo = ok["resumen"]["id"]
+        self.assertEqual(self.c.get(f"/programas/{nuevo}").json()["traspaso"]["partidas_en_comun"], n)
+        self.c.post(f"/programas/{nuevo}/ediciones", json=self.p16, headers=CO)
+        # el archivo de Rubí subido por error como versión de Zafiro Plus: ninguna partida en común, ninguna edición pasa
+        r = self.c.post(f"/programas/{nuevo}/versiones", json={"nombre": "Rubí por error", "csv": csv_de("Rubí")}, headers=CO)
+        self.assertEqual(r.status_code, 201, r.text)
+        j = r.json()
+        self.assertEqual((j["partidas_en_comun"], j["partidas_anterior"], j["pasaron"], len(j["no_pasaron"])), (0, n, 0, 1))
+        self.assertEqual(j["no_pasaron"][0]["motivo"], "actividad_desconocida")
+
     def test_la_version_nueva_hereda_el_nombre_y_el_calendario_si_no_se_dicen(self):
         r = self.c.post(f"/programas/{self.pid}/versiones", json={"csv": csv_de("Zafiro Plus")}, headers=CO).json()
         self.assertEqual(r["resumen"]["nombre"], "Zafiro Plus")

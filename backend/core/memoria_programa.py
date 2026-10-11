@@ -57,9 +57,7 @@ class MemoriaPrograma:
                          heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int) -> int:
         self.leer_programa(anterior_id)
         self._candado(anterior_id, esperaba)
-        sucesor = next((p.id for p in self._programas.values() if p.version_de == anterior_id), None)
-        if sucesor is not None:
-            raise YaReemplazado(f"el programa {anterior_id} ya tiene una versión más nueva, la {sucesor}", sucesor)
+        self._cerrado(anterior_id)
         pid = self._crear(nombre, programa, calendario, usuario, rol, version_de=anterior_id, traspaso=traspaso)
         for h in heredadas:
             self._sig_edicion += 1
@@ -84,9 +82,17 @@ class MemoriaPrograma:
 
     def leer_programa(self, programa_id: int) -> ProgramaGuardado:
         try:
-            return replace(self._programas[programa_id], version=self._versiones[programa_id])
+            return replace(self._programas[programa_id], version=self._versiones[programa_id], reemplazado_por=self._sucesor(programa_id))
         except KeyError:
             raise ProgramaNoExiste(programa_id) from None
+
+    def _sucesor(self, programa_id: int) -> Optional[int]:
+        return next((p.id for p in self._programas.values() if p.version_de == programa_id), None)
+
+    def _cerrado(self, programa_id: int) -> None:
+        sucesor = self._sucesor(programa_id)
+        if sucesor is not None:
+            raise YaReemplazado(f"el programa {programa_id} ya tiene una versión más nueva, la {sucesor}", sucesor)
 
     def ediciones(self, programa_id: int) -> List[EdicionGuardada]:
         self.leer_programa(programa_id)
@@ -99,6 +105,7 @@ class MemoriaPrograma:
     def guardar_edicion(self, programa_id: int, edicion: object, *, rol: str, usuario: str,
                         impacto: Mapping[str, object], esperaba: int) -> EdicionGuardada:
         self.leer_programa(programa_id)
+        self._cerrado(programa_id)
         self._candado(programa_id, esperaba)
         self._sig_edicion += 1
         # se guarda como se guardaría en una base: pasa por su forma de texto y vuelve
@@ -118,6 +125,7 @@ class MemoriaPrograma:
 
     def revertir_edicion(self, programa_id: int, edicion_id: int, *, usuario: str, esperaba: int) -> None:
         self.leer_programa(programa_id)
+        self._cerrado(programa_id)
         self._candado(programa_id, esperaba)
         lista = self._ediciones[programa_id]
         for i, e in enumerate(lista):

@@ -6627,6 +6627,23 @@ hosting ya era Supabase: D-03, B-21).
 
 `PROGRAMA-CPM.md` §4.8, §9, `PENDIENTES-MEJORAS.md` B-96, B-97, B-98.
 
+### El programa con versión nueva se cierra a ediciones, y las partidas se reconocen solo por `oid` (D-471)
+
+Dato del usuario: «vamos con otros pendientes». Eran las dos decisiones menores que D-467 había dejado abiertas, y no
+dependían de ningún dato nuevo; el detalle y las pruebas están en `PROGRAMA-CPM.md` §4.8, §8 y §9.
+
+- **Un programa con versión nueva se ve pero no se edita.** Lo que se decidiera ahí no pasaría a la nueva y se
+  perdería en silencio. La API contesta 409 `reemplazado` con el número de la nueva, y el puerto lo comprueba con la
+  fila bloqueada, antes que la versión. No se pierde ninguna salida: si la versión nueva salió mala, se sube otra encima.
+- **Las partidas se reconocen por `oid` y no por clave ni por fila.** La clave se repite dentro de un mismo programa
+  (Zafiro: 317 conceptos, 297 claves distintas) y la fila se corre; casar por cualquiera de las dos sería adivinar, y un
+  acierto falso mueve en silencio otra partida que la decidida. Lo que no se encuentra se dice y se decide a mano.
+- **Lo que se agregó es el aviso del caso probable:** cuántas partidas comparte el archivo nuevo con el anterior. Los
+  siete programas reales no comparten ni un `oid` entre sí, así que un archivo de otro programa subido como versión da
+  cero y la pantalla pregunta si es el archivo correcto, sin impedirlo.
+
+`PROGRAMA-CPM.md`.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

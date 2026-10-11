@@ -227,6 +227,9 @@ const QUE_ES = { editar_estructura_programa: "editar la estructura (duración y 
 const ORIGENES = { decision: "por decisión", recurso: "por recurso", tecnica: "técnico" };
 const CONFIANZA = { tecnica: "alta", recurso: "media", decision: "baja" };
 let guardadas = API ? API.guardadas : [], version = API ? API.version : 0, ocupado = false;
+// un programa con versión nueva se ve y se consulta, pero no se edita (D-471): lo que se decidiera aquí no pasaría a la nueva
+const cerrado = () => !!(API && API.reemplazado_por);
+const AVISO_CERRADO = () => `Este programa ya tiene una versión más nueva (la ${API.reemplazado_por}): ahí se edita; éste queda como estaba.`;
 
 const frac = x => { const m = String(x).split("/"); return m.length === 2 ? +m[0] / +m[1] : +x; };
 function deServidor(d) { // la edición como la guarda la bitácora → la de este motor
@@ -292,6 +295,7 @@ function reconstruir(lista) { // vuelve a validar una a una, sobre lo guardado: 
   return ok;
 }
 function aplicar(e) {
+  if (cerrado()) { aviso = AVISO_CERRADO(); todo(); return; }
   if (API && !Sesion.puede(FUNCION_DE[e.t])) { aviso = `Con ${Sesion.describir()} no puedes ${QUE_ES[FUNCION_DE[e.t]]}.`; todo(); return; }
   const ant = e.t === "dur" || e.t === "ini" ? edits.filter(x => !(x.t === e.t && x.k === e.k)) : edits;
   const prueba = Motor.reprogramar(R, saved.concat(ant, [e]));
@@ -308,6 +312,7 @@ const textoError = err => {
   if (Sesion.esFaltaDeSesion(err)) return "Tu sesión no es válida: vuelve a entrar.";
   const d = err.detalle || {};
   if (err.codigo === "no_aplicable") return "El servidor no pudo aplicarla: " + (d.rechazadas || []).map(m => MOTIVOS[m] || m).join(" ");
+  if (err.codigo === "reemplazado") { API.reemplazado_por = d.reemplazado_por; avisoDeVersion(); return `Mientras mirabas se subió una versión más nueva (la ${d.reemplazado_por}): ahí se edita; éste queda como estaba.`; }
   if (err.codigo === "dependen") return `No se puede deshacer: las ediciones ${(d.dependientes || []).join(", ")} dependen de ella. Deshaz primero esas.`;
   return err.mensaje;
 };
@@ -336,6 +341,7 @@ async function guardar() {
 }
 async function deshacer(id) {
   if (!API || ocupado) return;
+  if (cerrado()) { aviso = AVISO_CERRADO(); todo(); return; }
   const falta = Sesion.falta(); if (falta) { aviso = falta; todo(); return; }
   ocupado = true; aviso = null; todo();
   try {
@@ -380,7 +386,7 @@ function bitacora() {
     const origen = g.edicion.origen ? ` · ${esc(ORIGENES[g.edicion.origen] || g.edicion.origen)} (confianza ${esc(CONFIANZA[g.edicion.origen] || "?")})` : "";
     const puede = Sesion.puede(FUNCION_DE[e.t]);
     return `<li class="${ok ? "" : "revertida"}"><span class="sec">#${g.secuencia}</span><span class="que">${textoEdicion(e, false)}${origen}</span>` +
-      `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede ? "disabled" : ""} title="${puede ? "Deshacer esta edición" : "Tus roles no pueden " + QUE_ES[FUNCION_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
+      `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede || cerrado() ? "disabled" : ""} title="${cerrado() ? "Este programa ya tiene una versión más nueva: ya no se edita" : puede ? "Deshacer esta edición" : "Tus roles no pueden " + QUE_ES[FUNCION_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
       `<span class="quien-cuando">${esc(g.usuario)} (${esc(Sesion.nombreDeRol(g.rol))}) · ${esc(fmtHora(g.creada_en))}${g.heredada_de ? " · pasó de la versión anterior" : ""}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
   };
   b.innerHTML = `<summary>Lo guardado · ${saved.length} aplicada(s)${guardadas.length > saved.length ? `, ${guardadas.length - saved.length} revertida(s)` : ""} · versión ${version}</summary>` +
@@ -479,7 +485,14 @@ function dibujar() {
   $("cuerpo").innerHTML = s + `</svg>`;
 }
 
-function panel() {
+function panel() { // el panel de siempre; si el programa ya tiene versión nueva, solo se mira
+  panelDeEdicion();
+  if (!cerrado()) return;
+  const p = $("panel");
+  p.querySelectorAll("input, select, button").forEach(x => x.disabled = true);
+  p.insertAdjacentHTML("beforeend", `<p class="nota" data-cerrado>${esc(AVISO_CERRADO())} <a href="/programas/${esc(API.reemplazado_por)}/gantt">Abrirla</a></p>`);
+}
+function panelDeEdicion() {
   const p = $("panel");
   if (sel === null) { p.innerHTML = `<h2>Edición</h2><p class="nota">Toca una barra o una fila para ver sus vínculos y cambiarla. Con el triángulo pliegas o despliegas un bloque; sus flechas se suman al bloque plegado, sin perder ninguna.</p><p class="nota">Estructura (duración y vínculos) es de Control de obra; las fechas son del Residente. ${API ? "Lo que apliques queda por guardar hasta que presiones Guardar." : "Aquí se simula y no se guarda."}</p>`; return; }
   const f = porLlave[sel], w = ventanaFila(f, cur.win), b0 = ventanaFila(f, CMP.win);
@@ -575,11 +588,13 @@ $("marco").addEventListener("mousemove", e => {
 $("marco").addEventListener("mouseleave", () => tip.hidden = true);
 function avisoDeVersion() { // de dónde viene este programa y a dónde fue: lo dice quien lo subió, no se deduce
   const partes = [];
-  if (API.reemplazado_por) partes.push(`<p style="margin:0">Hay una <b>versión más nueva</b> de este programa. <a href="/programas/${esc(API.reemplazado_por)}/gantt">Abrirla</a></p>`);
+  if (API.reemplazado_por) partes.push(`<p style="margin:0">Hay una <b>versión más nueva</b> de este programa, y éste ya no se edita: se ve como quedó. <a href="/programas/${esc(API.reemplazado_por)}/gantt">Abrirla</a></p>`);
   const t = API.traspaso;
   if (API.version_de && t) {
     const no = t.no_pasaron || [];
     partes.push(`<p style="margin:0">Versión nueva de «${esc(t.de_nombre)}» (<a href="/programas/${esc(API.version_de)}/gantt">verla</a>): <b>${esc(t.pasaron)}</b> ${t.pasaron === 1 ? "edición pasó" : "ediciones pasaron"}${no.length ? ` y <b>${no.length}</b> no` : ""}.</p>` +
+      (typeof t.partidas_en_comun === "number"
+        ? `<p style="margin:0">${t.partidas_en_comun === 0 ? `<b>No comparte ninguna de las ${esc(t.partidas_anterior)} partidas</b> de la versión anterior —cada partida se reconoce por su <span class="mono">oid</span>—: ¿es el archivo correcto?` : `Comparte ${esc(t.partidas_en_comun)} de las ${esc(t.partidas_anterior)} partidas de la versión anterior.`}</p>` : "") +
       (no.length ? `<details><summary>Las que no pasaron</summary><ul style="margin:6px 0 0;padding-left:18px">` +
         no.map(n => `<li>#${esc(n.secuencia)} ${esc(n.texto)} — ${esc(n.usuario)} (${esc(Sesion.nombreDeRol(n.rol))}): ${esc(NO_PASO[n.motivo] || n.motivo)}</li>`).join("") + `</ul></details>` : ""));
   }

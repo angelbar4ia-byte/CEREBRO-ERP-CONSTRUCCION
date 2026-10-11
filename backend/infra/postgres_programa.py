@@ -85,9 +85,7 @@ class PostgresPrograma:
                          heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int) -> int:
         with self.conn.transaction():
             self._bloquear(anterior_id, esperaba)  # el anterior, con su fila bloqueada: nadie edita mientras se hereda
-            sucesor = self.conn.execute("SELECT id FROM programa WHERE version_de = %s", (anterior_id,)).fetchone()
-            if sucesor is not None:
-                raise YaReemplazado(f"el programa {anterior_id} ya tiene una versión más nueva, la {sucesor[0]}", sucesor[0])
+            self._sin_sucesor(anterior_id)
             pid = self._insertar(nombre, programa, calendario, usuario, rol, anterior_id, traspaso, len(heredadas))
             for i, h in enumerate(heredadas, start=1):
                 datos = edicion_a_dict(h.edicion)
@@ -152,10 +150,11 @@ class PostgresPrograma:
     def leer_programa(self, programa_id: int) -> ProgramaGuardado:
         with self.conn.transaction():
             fila = self.conn.execute(
-                "SELECT nombre, calendario, version, version_de, traspaso FROM programa WHERE id = %s", (programa_id,)).fetchone()
+                "SELECT nombre, calendario, version, version_de, traspaso, (SELECT s.id FROM programa s WHERE s.version_de = p.id)"
+                " FROM programa p WHERE p.id = %s", (programa_id,)).fetchone()
             if fila is None:
                 raise ProgramaNoExiste(programa_id)
-            nombre, cal, version, version_de, traspaso = fila
+            nombre, cal, version, version_de, traspaso, reemplazado_por = fila
             filas = [
                 Fila(llave=r[0], fila=r[1], nivel=r[2], tipo=r[3], clave=r[4], descripcion=r[5], inicio=r[6], termino=r[7],
                      dias=_a_fraction(r[8]), frente=r[9], etapa=r[10])
@@ -176,7 +175,8 @@ class PostgresPrograma:
                     "SELECT sucesora_oid, texto_fuente, motivo FROM programa_vinculo"
                     " WHERE programa_id = %s AND estado = 'rechazado' ORDER BY id", (programa_id,))
             ]
-        return ProgramaGuardado(programa_id, nombre, filas, vinculos, rechazados, Calendario.desde_dict(cal), version, version_de, traspaso)
+        return ProgramaGuardado(programa_id, nombre, filas, vinculos, rechazados, Calendario.desde_dict(cal), version, version_de, traspaso,
+                                reemplazado_por)
 
     def ediciones(self, programa_id: int) -> List[EdicionGuardada]:
         with self.conn.transaction():
@@ -192,19 +192,28 @@ class PostgresPrograma:
         ]
 
     # ------------------------------------------------------------------ escribir
-    def _bloquear(self, programa_id: int, esperaba: int) -> None:
+    def _bloquear(self, programa_id: int, esperaba: int, cerrado_si_reemplazado: bool = False) -> None:
         fila = self.conn.execute("SELECT version FROM programa WHERE id = %s FOR UPDATE", (programa_id,)).fetchone()
         if fila is None:
             raise ProgramaNoExiste(programa_id)
+        if cerrado_si_reemplazado:
+            self._sin_sucesor(programa_id)  # antes que la versión: con la nueva ya subida, lo que pasa es que está cerrado, no que cambió
         if fila[0] != esperaba:
             raise Conflicto(f"el programa ya va en la versión {fila[0]}, no en la {esperaba}")
+
+    def _sin_sucesor(self, programa_id: int) -> None:
+        """Con la fila del programa ya bloqueada: quien sube una versión nueva la bloquea primero, así que o esta edición
+        entró antes (y la versión nueva la hereda) o ve la versión nueva ya guardada y no entra."""
+        sucesor = self.conn.execute("SELECT id FROM programa WHERE version_de = %s", (programa_id,)).fetchone()
+        if sucesor is not None:
+            raise YaReemplazado(f"el programa {programa_id} ya tiene una versión más nueva, la {sucesor[0]}", sucesor[0])
 
     def guardar_edicion(self, programa_id: int, edicion: object, *, rol: str, usuario: str,
                         impacto: Mapping[str, object], esperaba: int) -> EdicionGuardada:
         datos = edicion_a_dict(edicion)
         nombre = datos.pop("edicion")
         with self.conn.transaction():
-            self._bloquear(programa_id, esperaba)
+            self._bloquear(programa_id, esperaba, cerrado_si_reemplazado=True)
             secuencia = self.conn.execute(
                 "SELECT coalesce(max(secuencia), 0) + 1 FROM edicion_programa WHERE programa_id = %s", (programa_id,)).fetchone()[0]
             r = self.conn.execute(
@@ -218,7 +227,7 @@ class PostgresPrograma:
 
     def revertir_edicion(self, programa_id: int, edicion_id: int, *, usuario: str, esperaba: int) -> None:
         with self.conn.transaction():
-            self._bloquear(programa_id, esperaba)
+            self._bloquear(programa_id, esperaba, cerrado_si_reemplazado=True)
             n = self.conn.execute(
                 "UPDATE edicion_programa SET estado = 'revertida', revertida_en = now(), revertida_por = %s"
                 " WHERE id = %s AND programa_id = %s AND estado = 'aplicada'", (usuario, edicion_id, programa_id)).rowcount

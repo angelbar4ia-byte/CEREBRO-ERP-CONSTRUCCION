@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 317 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 328 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -335,9 +335,9 @@ son las que las pantallas necesitan:
 | `subir_version` | `POST /programas/{id}/versiones` (201) | Sube la versión nueva de un programa (ver abajo) | 401, 403, 404, 409 `conflicto` o `reemplazado`, 422 `importacion_invalida` |
 | `ver_programa` | `GET /programas/{id}` | La base dibujable (`vista_gantt` con lo necesario para reprogramar en pantalla), el calendario, la versión y toda la bitácora | 404 |
 | `ver_bitacora` | `GET /programas/{id}/ediciones` | Todo lo editado, también lo revertido, en orden | 404 |
-| `proponer_edicion` | `POST /programas/{id}/propuestas` | Qué pasaría: el impacto contra lo vigente, o por qué no se puede aplicar. No guarda | 401, 403, 404, 422 |
-| `aplicar_edicion` | `POST /programas/{id}/ediciones` (201) | Propone y guarda. Cuerpo: `edicion` y, si la pantalla lo manda, `esperaba` | 401, 403, 404, 409 `conflicto`, 422 `edicion_invalida` o `no_aplicable` con sus motivos |
-| `deshacer_edicion` | `DELETE /programas/{id}/ediciones/{edicion}` | Revierte una edición con el permiso que la hizo y devuelve la bitácora y la versión | 401, 403, 404, 409 `dependen` (con cuáles) o `conflicto` |
+| `proponer_edicion` | `POST /programas/{id}/propuestas` | Qué pasaría: el impacto contra lo vigente, o por qué no se puede aplicar. No guarda | 401, 403, 404, 409 `reemplazado`, 422 |
+| `aplicar_edicion` | `POST /programas/{id}/ediciones` (201) | Propone y guarda. Cuerpo: `edicion` y, si la pantalla lo manda, `esperaba` | 401, 403, 404, 409 `conflicto` o `reemplazado`, 422 `edicion_invalida` o `no_aplicable` con sus motivos |
+| `deshacer_edicion` | `DELETE /programas/{id}/ediciones/{edicion}` | Revierte una edición con el permiso que la hizo y devuelve la bitácora y la versión | 401, 403, 404, 409 `dependen` (con cuáles), `conflicto` o `reemplazado` |
 | `pantalla_gantt` | `GET /programas/{id}/gantt` | El HTML de la pantalla del Gantt. **No lleva ningún dato del programa, ni su nombre**: los pide a la API con el token de quien la abre | — |
 | `pantalla_programas` | `GET /` | El HTML de la lista de programas y de subir uno. Tampoco lleva datos | — |
 
@@ -374,8 +374,19 @@ opcionales y, sin ellos, hereda los del anterior— más `esperaba`, la versión
   su duración, para una edición de duración, o su arranque, para una de arranque). Ahí gana el archivo: el planeador
   decidió algo en la revisión y una edición vieja no se lo desdice en silencio. Lo que no pasa se dice con su texto,
   quién lo había hecho y el motivo; el sistema no lo fuerza, y sigue en la bitácora de la versión anterior.
-- **El traspaso queda guardado en el programa** —de cuál viene, cuántas pasaron y cuáles no— y las pantallas lo
-  muestran (§8).
+- **El programa anterior se cierra a ediciones (D-471).** Proponer, aplicar y deshacer sobre un programa que ya tiene
+  versión nueva responden 409 `reemplazado` con el número de la nueva, y el puerto lo comprueba con la fila bloqueada y
+  antes que la versión —así no se cuela una edición entre que se sube la nueva y quien edita se entera—. Se queda como
+  estaba, con su bitácora, y se sigue viendo y consultando. La razón: lo que se decidiera ahí no pasaría a la nueva y se
+  perdería en silencio; y no hace falta una vía de regreso, porque si la versión nueva salió mala se sube otra encima.
+- **Las partidas se reconocen por `oid` y por nada más (D-471).** Por clave sería adivinar: en los programas reales hay
+  claves que se repiten dentro de un mismo programa (18 en Zafiro, 9 en Rubí, también en Zafiro Plus), y por número de
+  fila, peor: se corre al insertar una. Una edición que cita una partida que el archivo nuevo no trae no pasa
+  (`actividad_desconocida`) y se dice. Para que no pase desapercibido, el traspaso cuenta **cuántas partidas comparte**
+  el archivo nuevo con el anterior (`partidas_en_comun` de `partidas_anterior`): si son cero —los siete programas reales
+  no comparten ni un `oid` entre sí—, casi seguro se subió el archivo de otro programa, y la lista y el Gantt lo dicen.
+- **El traspaso queda guardado en el programa** —de cuál viene, cuántas pasaron y cuáles no, y cuántas partidas
+  comparte— y las pantallas lo muestran (§8).
 - **Todo o nada.** El programa nuevo y sus ediciones se guardan en una sola transacción, con el anterior bloqueado: si
   alguien lo editó mientras decidías, 409 `conflicto` y no se sube nada. La unicidad de la cadena la garantiza la base.
 
@@ -456,7 +467,7 @@ un proveedor, `python3 -m api.emitir_token --secreto … --correo …` da un tok
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 251 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 328 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
 la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
@@ -891,10 +902,15 @@ controles que el Gantt.
 **La versión nueva (D-467).** En la lista, cada programa que no tiene versión nueva ofrece «subir versión nueva» (o se
 elige en el formulario), y los reemplazados dicen por cuál. El reporte suma lo que pasó: cuántas ediciones pasaron, y
 una tabla de las que no, con su texto, quién las hizo y el motivo en palabras. El Gantt de la versión nueva dice
-arriba de cuál viene y qué pasó con sus ediciones —con las que no pasaron a un clic—; el del programa viejo avisa que
-hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versión anterior.
+arriba de cuál viene y qué pasó con sus ediciones —con las que no pasaron a un clic— y cuántas partidas comparte con
+la anterior (si ninguna, pregunta si es el archivo correcto); y la bitácora marca las ediciones que pasaron de la versión
+anterior. **El del programa viejo se mira pero no se edita (D-471):** avisa que hay uno más nuevo y que éste ya no se
+edita, el panel de edición queda a la vista con todo deshabilitado y un enlace a la nueva, y «Deshacer» de la bitácora
+también. Si la versión nueva se sube mientras alguien tiene la pantalla abierta, al guardar la API contesta
+`reemplazado`, no se guarda nada, la pantalla lo dice y se pone en ese mismo estado sin recargar; lo que había por
+guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 
-**Lo que las pantallas todavía no hacen:** autenticar a nadie (B-96).
+**Lo que las pantallas todavía no hacen:** iniciar la sesión por sí mismas con correo y contraseña ni renovar el token (B-97).
 
 ---
 
@@ -903,12 +919,10 @@ hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versió
 | Qué | Por qué sigue abierto |
 |---|---|
 | Crear el proyecto de Supabase y entregarle su llave a la API | D-470 confirmó el modelo y eligió Supabase Auth como proveedor; lo que falta no es código sino configuración (§4.8): crear el proyecto, activar la confirmación de correo, darle a `servir` el JWKS o el secreto, y dar de alta a las primeras personas |
-| Cómo entra la gente y cuánto dura la sesión (B-97) | Supabase no trae una página de entrada para correo y contraseña; con Google basta una dirección (`--login-url`) y no hay que escribir nada, con correo hace falta un formulario. Y la pantalla no renueva el token: dura lo que dure el acceso (una hora, según fuentes de terceros) y luego manda a entrar otra vez |
+| Cómo entra la gente y cuánto dura la sesión (B-97) | Hasta donde se sabe, y sin probar con un proyecto: Supabase no entrega una página de entrada hecha para correo y contraseña; con Google basta una dirección (`--login-url`) y no hay que escribir nada, con correo hace falta un formulario. Y la pantalla no renueva el token: dura lo que dure el acceso (una hora, según fuentes de terceros) y luego manda a entrar otra vez |
 | Dar de alta a las personas (pospuesto por el usuario, D-470) | Hoy lo hace quien administra la base (`python3 -m api.usuarios`); `MODELO.md` §5b no tiene una función para crear usuarios, y `gestionar_rol_funcion` todavía no tiene operación en la API |
 | El alcance de datos por obra (pospuesto por el usuario, D-470) | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
 | La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
-| El programa anterior sigue editable | Aunque tenga versión nueva solo se avisa; editarlo no pasa a la nueva. Cerrarlo a ediciones queda sin decidir |
-| Una versión nueva con otros `oid` | Si el libro se rehizo y las partidas trajeron otro `oid`, ninguna edición pasa: todas dicen «esa partida ya no está». Casarlas por clave o por número de fila queda sin decidir |
 | Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | Esas tablas aún no existen (B-03); entonces `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
@@ -942,3 +956,4 @@ hay uno más nuevo; y la bitácora marca las ediciones que pasaron de la versió
 | **La versión nueva de un programa: lo decidido pasa, y lo que no, se dice** | **D-467** |
 | **La autenticación por token, los permisos desde sus tablas y las pantallas sin datos (B-96)** | **D-469** |
 | **El proveedor de identidad es Supabase Auth y el modelo de autenticación queda confirmado** | **D-470** |
+| **El programa con versión nueva se cierra a ediciones y las partidas se reconocen solo por `oid`** | **D-471** |

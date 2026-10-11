@@ -228,6 +228,56 @@ class ContratoPrograma:
         self.assertEqual([x.reemplazado_por for x in self.sv.listar()], [r.id, r3.id, None])
         self.assertEqual(len(self.sv.listar()), 3)
 
+    def test_un_programa_con_version_nueva_se_ve_pero_no_se_edita(self):
+        self._con_historia()
+        r = self.sv.subir_version(self.pid, "v2", self._archivo_nuevo(), CAL, CO, "marta")
+        antes = (self.repo.leer_programa(self.pid).version, self.repo.ediciones(self.pid))
+        mas = CambiarDuracion(self.f[1102], Fraction(3))
+        # ni por el servicio…
+        with self.assertRaises(YaReemplazado) as cm:
+            self.sv.proponer(self.pid, mas, CO)
+        self.assertEqual(cm.exception.por, r.id)
+        with self.assertRaises(YaReemplazado):
+            self.sv.aplicar(self.pid, mas, CO, "luis")
+        with self.assertRaises(YaReemplazado):
+            self.sv.deshacer(self.pid, antes[1][0].id, CO, "luis")
+        # …ni por el puerto, aunque quien edita traiga la versión al día: el cierre se mira con la fila bloqueada, y antes que la versión
+        with self.assertRaises(YaReemplazado):
+            self.repo.guardar_edicion(self.pid, mas, rol=CO, usuario="luis", impacto={}, esperaba=antes[0])
+        with self.assertRaises(YaReemplazado):
+            self.repo.guardar_edicion(self.pid, mas, rol=CO, usuario="luis", impacto={}, esperaba=antes[0] - 1)
+        with self.assertRaises(YaReemplazado):
+            self.repo.revertir_edicion(self.pid, antes[1][0].id, usuario="luis", esperaba=antes[0])
+        # se queda como estaba, con su bitácora, y se sigue viendo
+        self.assertEqual((self.repo.leer_programa(self.pid).version, self.repo.ediciones(self.pid)), antes)
+        self.assertEqual(self.repo.leer_programa(self.pid).reemplazado_por, r.id)
+        self.assertEqual(self.sv.abrir(self.pid).programa.ventanas, reprogramar(self.plus, CAL, [e.edicion for e in antes[1]]).programa.ventanas)
+        # y la nueva sí se edita, y deshace lo que heredó
+        self.assertIsNone(self.repo.leer_programa(r.id).reemplazado_por)
+        self.assertEqual(self.sv.aplicar(r.id, mas, CO, "marta").guardada.secuencia, 4)
+        self.sv.deshacer(r.id, self.repo.ediciones(r.id)[0].id, CO, "marta")
+
+    def test_el_traspaso_dice_cuantas_partidas_comparte_el_archivo_nuevo(self):
+        n = len(self.plus.ventanas)
+        r = self.sv.subir_version(self.pid, "v2", self._archivo_nuevo(), CAL, CO, "marta")
+        self.assertEqual((r.partidas_anterior, r.partidas_en_comun), (n, n))
+        g = self.repo.leer_programa(r.id)
+        self.assertEqual((g.traspaso["partidas_anterior"], g.traspaso["partidas_nueva"], g.traspaso["partidas_en_comun"]), (n, n, n))
+        r2 = self.sv.subir_version(r.id, "v3", self._archivo_nuevo(sin={982}), CAL, CO, "marta")  # una partida menos
+        self.assertEqual((r2.partidas_anterior, r2.partidas_en_comun), (n, n - 1))
+        self.assertEqual(self.repo.leer_programa(r2.id).traspaso["partidas_nueva"], n - 1)
+
+    def test_las_partidas_se_reconocen_por_oid_y_el_archivo_de_otro_programa_no_pasa_nada(self):
+        """Casar por clave sería adivinar: en el mismo Zafiro Plus hay claves que se repiten. Y casar por fila, peor: se corre."""
+        claves = [f.clave for f in self.plus.filas if f.llave in self.plus.ventanas]
+        self.assertGreater(len(claves), len(set(claves)))
+        self._con_historia()
+        rubi = programa("Rubí")  # otro programa real, que no comparte ni un `oid` con Zafiro Plus
+        r = self.sv.subir_version(self.pid, "Rubí por error", rubi, CAL, CO, "marta")
+        self.assertEqual((r.partidas_en_comun, r.partidas_anterior, len(r.pasaron)), (0, len(self.plus.ventanas), 0))
+        self.assertEqual([(n.anterior.secuencia, n.motivo) for n in r.no_pasaron], [(i, "actividad_desconocida") for i in (1, 2, 3)])
+        self.assertEqual(self.repo.ediciones(r.id), [])  # nada se forzó
+
     def test_una_version_nueva_que_se_pide_con_una_pantalla_vieja_no_se_sube(self):
         self.sv.aplicar(self.pid, self.p16(), CO, "luis")
         visto = self.sv.abrir(self.pid).version

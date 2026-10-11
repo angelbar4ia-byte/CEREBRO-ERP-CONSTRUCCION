@@ -124,6 +124,8 @@ class ImportacionSalida(BaseModel):
 class VersionSalida(ImportacionSalida):
     pasaron: int = Field(description="Cuántas ediciones de la versión anterior pasaron a la nueva, con su autor y su fecha")
     no_pasaron: List[EdicionQueNoPaso] = Field(description="Las que no, cada una con su motivo: se decide a mano")
+    partidas_anterior: int = Field(description="Las partidas que tenía la versión anterior")
+    partidas_en_comun: int = Field(description="De ésas, cuántas trae también el archivo nuevo, reconocidas por su `oid` y por nada más: si es cero, casi seguro no es una versión de ese programa")
 
 
 class RechazoSalida(BaseModel):
@@ -240,6 +242,9 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
         except ProgramaNoExiste:
             raise _error(404, "programa_inexistente", f"No hay un programa {programa_id}.") from None
 
+    def cerrado(e: YaReemplazado) -> HTTPException:
+        return _error(409, "reemplazado", f"Ese programa ya tiene una versión más nueva, la {e.por}: ahí se edita; éste queda como estaba.", reemplazado_por=e.por)
+
     def vista_de(v: Vigente) -> Dict[str, Any]:
         base = v.base
         return vista_gantt(base, v.guardado.calendario, resultado=base.calcular(v.guardado.calendario), para_editar=True)
@@ -310,7 +315,7 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
             raise _error(422, "importacion_invalida", str(e)) from None
         return VersionSalida(
             **reporte_de_carga(v.id, programa, cal),
-            pasaron=len(v.pasaron),
+            pasaron=len(v.pasaron), partidas_anterior=v.partidas_anterior, partidas_en_comun=v.partidas_en_comun,
             no_pasaron=[EdicionQueNoPaso(secuencia=n.anterior.secuencia, texto=n.texto, usuario=n.anterior.usuario, rol=n.anterior.rol, motivo=n.motivo)
                         for n in v.no_pasaron],
         )
@@ -321,7 +326,7 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
         v = guardado(programa_id)
         return ProgramaSalida(
             id=programa_id, nombre=v.guardado.nombre, version=v.version, calendario=v.guardado.calendario.a_dict(), vista=vista_de(v),
-            version_de=v.guardado.version_de, reemplazado_por=servicio.reemplazo_de(programa_id), traspaso=v.guardado.traspaso,
+            version_de=v.guardado.version_de, reemplazado_por=v.guardado.reemplazado_por, traspaso=v.guardado.traspaso,
             guardadas=[_edicion_salida(e) for e in servicio.repo.ediciones(programa_id)],
         )
 
@@ -339,6 +344,8 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
             return _propuesta_salida(servicio.proponer(programa_id, edicion_de(entrada), quien.roles))
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
+        except YaReemplazado as e:
+            raise cerrado(e) from None
 
     @app.post("/programas/{programa_id}/ediciones", response_model=PropuestaSalida, status_code=201, operation_id="aplicar_edicion",
               summary="Aplicar una edición y guardarla en la bitácora")
@@ -348,6 +355,8 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
             p = servicio.aplicar(programa_id, edicion_de(entrada), quien.roles, quien.usuario, entrada.esperaba)
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
+        except YaReemplazado as e:
+            raise cerrado(e) from None
         except Conflicto as e:
             raise _error(409, "conflicto", f"Alguien editó el programa mientras decidías. Vuelve a verlo. ({e})") from None
         if not p.aplicable:
@@ -362,6 +371,8 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
             v = servicio.deshacer(programa_id, edicion_id, quien.roles, quien.usuario)
         except PermisoDenegado as e:
             raise _error(403, "permiso_denegado", str(e)) from None
+        except YaReemplazado as e:
+            raise cerrado(e) from None
         except NoSePuedeDeshacer as e:
             raise _error(409, "dependen", str(e), dependientes=list(e.dependientes)) from None
         except Conflicto as e:

@@ -126,6 +126,47 @@ class PruebasPantalla(_ConNavegador):
         (e,) = self.servidor.repo.ediciones(self.pid)
         self.assertEqual((e.usuario, e.rol, e.estado), ("luis", "control_de_obra", "aplicada"))
 
+    def _version_nueva(self):
+        """Sube, por el servicio, la versión nueva de Zafiro Plus (con lo que ya se haya guardado) y devuelve su id."""
+        sv = ServicioPrograma(self.servidor.repo)
+        return sv.subir_version(self.pid, "Zafiro Plus v2", cargar_programa(list(self.plus.filas), CAL), CAL, "control_de_obra", "marta").id
+
+    def test_un_programa_con_version_nueva_se_mira_pero_no_se_edita(self):
+        from fractions import Fraction
+
+        ServicioPrograma(self.servidor.repo).aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), "control_de_obra", "luis")
+        nuevo = self._version_nueva()
+        pg = self.abrir()
+        self.assertIn("ya no se edita", pg.inner_text("#version-aviso"))
+        self.fila(pg, 982)
+        self.assertTrue(pg.is_disabled("#e-dur-ok"))  # el panel se ve, pero no se toca
+        self.assertTrue(pg.is_disabled("#e-ini-ok"))
+        self.assertTrue(pg.is_disabled("#a-pick"))
+        self.assertIn("ya tiene una versión más nueva", pg.inner_text("#panel"))
+        pg.click("#bitacora summary")
+        self.assertTrue(pg.is_disabled("#bitacora button[data-d]"))  # ni deshacer lo que ya estaba
+        self.assertIn("ya no se edita", pg.get_attribute("#bitacora button[data-d]", "title"))
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 0)
+        self.assertEqual(len(self.servidor.repo.ediciones(self.pid)), 1)
+        pg.click("#panel a")  # y de ahí se pasa a la nueva, donde sí
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        self.assertIn("Gantt Zafiro Plus v2", pg.inner_text("h1"))
+        self.duracion(pg, 1102, 3)
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 1)
+        self.assertFalse(pg.is_disabled("#e-dur-ok"))
+        self.assertEqual(len(self.servidor.repo.ediciones(nuevo)), 1)  # la que heredó, todavía sin la nueva
+
+    def test_si_se_sube_la_version_nueva_mientras_se_edita_el_guardado_lo_dice_y_no_guarda(self):
+        pg = self.abrir()
+        self.duracion(pg, 982, 12)
+        nuevo = self._version_nueva()  # alguien más sube la versión nueva mientras esta pantalla sigue abierta
+        pg.click("#b-guardar")
+        pg.wait_for_function("document.querySelector('#aviso') && document.querySelector('#aviso').textContent.includes('versión más nueva')")
+        self.assertIn(f"la {nuevo}", pg.inner_text("#aviso"))
+        self.assertEqual(self.servidor.repo.ediciones(self.pid), [])  # no se guardó nada en el cerrado
+        self.assertIn("ya no se edita", pg.inner_text("#version-aviso"))  # y la pantalla se enteró sin recargar
+        self.assertEqual(pg.locator("#ediciones .chip").count(), 1)  # lo que se había decidido sigue a la vista, para descartarlo o repetirlo allá
+
     def test_lo_guardado_se_ve_al_volver_a_abrir_y_se_deshace(self):
         pg = self.abrir()
         self.duracion(pg, 982, 12)
@@ -273,6 +314,8 @@ class PruebasPantalla(_ConNavegador):
         texto = pg.inner_text("#reporte")
         self.assertIn("como versión nueva de «Zafiro Plus»", texto)
         self.assertIn("1 edición pasó a la versión nueva", texto)  # la de luis, que el archivo nuevo no tocó
+        n = len(self.plus.ventanas)
+        self.assertIn(f"Comparte {n} de las {n} partidas", texto)
         self.assertIn("1 no pasó", texto)  # la de ana
         self.assertEqual(pg.locator("#reporte tbody tr").count(), 1)  # la de ana: la versión nueva ya movió esa partida
         self.assertIn("El archivo nuevo ya cambió esa partida", pg.inner_text("#reporte tbody"))
@@ -284,6 +327,7 @@ class PruebasPantalla(_ConNavegador):
         pg.wait_for_selector("#etiquetas .fila-eti")
         self.assertTrue(pg.locator("#version-aviso").is_visible())
         self.assertIn("Versión nueva de «Zafiro Plus»", pg.inner_text("#version-aviso"))
+        self.assertIn(f"Comparte {n} de las {n} partidas", pg.inner_text("#version-aviso"))
         pg.click("#version-aviso summary")
         no_paso = pg.inner_text("#version-aviso li")
         self.assertIn("no arranca antes del 2025-10-30", no_paso)
@@ -299,6 +343,26 @@ class PruebasPantalla(_ConNavegador):
         pg.click("#version-aviso a")
         pg.wait_for_selector("#etiquetas .fila-eti")
         self.assertIn("Gantt Zafiro Plus v2", pg.inner_text("h1"))
+
+    def test_un_archivo_de_otro_programa_subido_como_version_se_dice_en_la_lista_y_en_el_gantt(self):
+        from fractions import Fraction
+
+        ServicioPrograma(self.servidor.repo).aplicar(self.pid, CambiarDuracion(self.f[982], Fraction(12)), "control_de_obra", "luis")
+        pg = self.inicio(usuario="marta")
+        pg.locator(f'button[data-version="{self.pid}"]').click()
+        pg.fill("#f-nombre", "Rubí por error")
+        pg.set_input_files("#f-archivo", files=[{"name": "rubi.csv", "mimeType": "text/csv", "buffer": csv_de("Rubí").encode()}])
+        pg.fill("#f-prototipo", "")
+        pg.click("#f-subir")
+        pg.wait_for_selector("#reporte:not([hidden])")
+        texto = pg.inner_text("#reporte")
+        self.assertIn(f"No comparte ninguna de las {len(self.plus.ventanas)} partidas", texto)
+        self.assertIn("¿es el archivo correcto?", texto)
+        self.assertIn("0 ediciones pasaron", texto)
+        self.assertIn("1 no pasó", texto)  # la de luis: no la fuerza sobre otro programa
+        pg.click("#reporte a")
+        pg.wait_for_selector("#etiquetas .fila-eti")
+        self.assertIn("No comparte ninguna de las", pg.inner_text("#version-aviso"))
 
     def test_si_alguien_edito_la_pantalla_de_la_lista_lo_dice_y_se_actualiza(self):
         from fractions import Fraction

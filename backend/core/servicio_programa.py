@@ -66,7 +66,8 @@ class ProgramaNoExiste(KeyError):
 
 
 class YaReemplazado(Exception):
-    """Ese programa ya tiene una versión más nueva: la nueva se sube sobre ella, para que la cadena sea una sola."""
+    """Ese programa ya tiene una versión más nueva. No se le suben versiones —la nueva se sube sobre la última, para que la
+    cadena sea una sola— ni se le editan (D-471): lo que se decida ahí no pasaría a la nueva, y se perdería en silencio."""
 
     def __init__(self, mensaje: str, por: int) -> None:
         super().__init__(mensaje)
@@ -87,6 +88,7 @@ class ProgramaGuardado:
     version: int = 0  # sube con cada edición o reversión: es lo que `esperaba` compara
     version_de: Optional[int] = None  # el programa del que esta es la versión nueva
     traspaso: Optional[Dict[str, Any]] = None  # qué pasó con sus ediciones al subirla: lo que pasó y lo que no, y por qué
+    reemplazado_por: Optional[int] = None  # si ya tiene versión nueva, cuál: ese programa está cerrado a ediciones (D-471)
 
 
 @dataclass(frozen=True)
@@ -129,6 +131,8 @@ class VersionNueva:
     id: int
     pasaron: List[EdicionGuardada]  # ya en la versión nueva, en el mismo orden
     no_pasaron: List[NoPaso]
+    partidas_en_comun: int = 0  # las partidas (por `oid`) que el archivo nuevo comparte con la versión anterior…
+    partidas_anterior: int = 0  # …de las que ésta tenía: si no comparte ninguna, casi seguro es otro programa
 
 
 @dataclass(frozen=True)
@@ -174,7 +178,9 @@ class RepositorioPrograma(Protocol):
         self, programa_id: int, edicion: object, *, rol: str, usuario: str, impacto: Mapping[str, object], esperaba: int
     ) -> EdicionGuardada:
         """Agrega la edición con la secuencia siguiente y sube la versión. `esperaba` es la versión que vio
-        quien decidió; si el programa ya va en otra, `Conflicto` y no se guarda nada."""
+        quien decidió; si el programa ya va en otra, `Conflicto` y no se guarda nada. Si el programa ya tiene versión
+        nueva, `YaReemplazado` —se mira con la fila bloqueada, antes que la versión: así no se cuela una edición entre
+        que se sube la nueva y quien edita se entera—."""
 
     def revertir_edicion(self, programa_id: int, edicion_id: int, *, usuario: str, esperaba: int) -> None:
         """Marca la edición como revertida y sube la versión. Igual que `guardar_edicion`, con candado."""
@@ -275,8 +281,11 @@ class ServicioPrograma:
         sucesor = {r.version_de: r.id for r in todos if r.version_de is not None}
         return [replace(r, reemplazado_por=sucesor.get(r.id)) for r in todos]
 
-    def reemplazo_de(self, programa_id: int) -> Optional[int]:
-        return next((r.reemplazado_por for r in self.listar() if r.id == programa_id), None)
+    @staticmethod
+    def _abierto(g: ProgramaGuardado) -> None:
+        """Un programa con versión nueva ya no se edita: se ve, con su bitácora, y se sigue en la nueva."""
+        if g.reemplazado_por is not None:
+            raise YaReemplazado(f"el programa {g.id} ya tiene una versión más nueva, la {g.reemplazado_por}", g.reemplazado_por)
 
     def verificar_importar(self, rol: Roles) -> str:
         """Quien no puede importar lo sabe antes de subir el archivo, no después de leerlo. Devuelve el rol con que lo haría."""
@@ -311,9 +320,7 @@ class ServicioPrograma:
         v = self.abrir(programa_id)
         if esperaba is not None and esperaba != v.version:
             raise Conflicto(f"el programa ya va en la versión {v.version}, no en la {esperaba}")
-        sucesor = self.reemplazo_de(programa_id)
-        if sucesor is not None:
-            raise YaReemplazado(f"el programa {programa_id} ya tiene una versión más nueva, la {sucesor}", sucesor)
+        self._abierto(v.guardado)
 
         anterior_cal = v.guardado.calendario
 
@@ -344,9 +351,15 @@ class ServicioPrograma:
             despues = prueba.programa
             heredadas.append(Heredada(e, g.rol, g.usuario, g.creada_en, comparar(antes, despues, calendario).resumen(), g.id))
             antes = despues
+        # las partidas se reconocen por su `oid` y por nada más (D-471): una clave se repite dentro de un mismo programa y un
+        # número de fila se corre; lo que el archivo nuevo no comparta se dice, no se adivina
+        en_comun = len(set(v.base.ventanas) & set(programa.ventanas))
         traspaso = {
             "de": programa_id,
             "de_nombre": v.guardado.nombre,
+            "partidas_anterior": len(v.base.ventanas),
+            "partidas_nueva": len(programa.ventanas),
+            "partidas_en_comun": en_comun,
             "pasaron": len(heredadas),
             "no_pasaron": [
                 {"secuencia": n.anterior.secuencia, "texto": n.texto, "usuario": n.anterior.usuario, "rol": n.anterior.rol, "motivo": n.motivo}
@@ -357,7 +370,7 @@ class ServicioPrograma:
             programa_id, nombre.strip(), programa, calendario, usuario=usuario, rol=rol, heredadas=heredadas, traspaso=traspaso,
             esperaba=v.version,
         )
-        return VersionNueva(nuevo_id, [e for e in self.repo.ediciones(nuevo_id)], no_pasaron)
+        return VersionNueva(nuevo_id, [e for e in self.repo.ediciones(nuevo_id)], no_pasaron, en_comun, len(v.base.ventanas))
 
     def abrir(self, programa_id: int) -> Vigente:
         """El programa tal como está hoy: la base más lo aplicado."""
@@ -379,6 +392,7 @@ class ServicioPrograma:
         permiso = permiso_de(edicion)
         rol = self.rol_para(permiso, rol)
         v = self.abrir(programa_id)
+        self._abierto(v.guardado)
         cal = v.guardado.calendario
         nuevo = reprogramar(v.base, cal, [e.edicion for e in v.aplicadas] + [edicion])
         # lo que ya estaba rechazado al repetir la bitácora no cuenta: solo lo que trae esta edición
@@ -417,6 +431,7 @@ class ServicioPrograma:
         if not usuario:
             raise ValueError("todo deshacer dice quién lo hizo")
         v = self.abrir(programa_id)
+        self._abierto(v.guardado)
         objetivo = next((e for e in v.aplicadas if e.id == edicion_id), None)
         if objetivo is None:
             raise KeyError(f"la edición {edicion_id} no está aplicada")
