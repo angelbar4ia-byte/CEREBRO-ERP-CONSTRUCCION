@@ -8,8 +8,9 @@ description: Cargar presupuestos y catálogos desde OPUS, Neodata u otros sistem
 capa:       II — Operación
 pregunta:   ¿cómo entra un dato ajeno sin romper lo que ya existe?
 tiempo:     se hace así
-corte:      2026-09-12
-compilado:  `CONOCIMIENTO.md` §2 · `CATALOGOS.md` §11 · `CONOCIMIENTO.md` §4.2 — no se escribe a mano
+corte:      2026-10-11
+compilado:  `CONOCIMIENTO.md` §2 · `CATALOGOS.md` §11 · `CONOCIMIENTO.md` §4.2 · lo que D-472 a D-479 agregaron a `CONOCIMIENTO.md` (la carga persistida,
+            la reconciliación, la alerta de texto, la clonación) y `METODO.md` §2.6 — no se escribe a mano
 ```
 
 > **Satélite.** Carga el skill base `erp-construccion` primero: el árbol, el motor,
@@ -27,6 +28,21 @@ calcula aquí, por posición.
 
 Y no basta con no confiar: **la prueba de ida y vuelta demostró que esas columnas
 tampoco se pueden generar** — la regla no es deducible de los datos.
+
+---
+
+## 0b. Lo primero: guardar lo que se sube
+
+Lo que el usuario sube a una sesión vive en una carpeta temporal y **se pierde con la máquina**. Antes de leer una tabla —antes del informe de
+mapeo, antes de cualquier cuenta— se guarda en el repo:
+
+```
+cd backend && python3 -m api.guardar_subidas             guarda lo nuevo (por su huella); un libro de Excel queda tal cual y cada hoja, en CSV
+cd backend && python3 -m api.guardar_subidas --verificar comprueba que todo lo guardado sigue ahí, sin cambios
+```
+
+Los de OPUS van a `1-mundo/opus/`; el resto, a `1-mundo/fuentes/`, con su huella en `MANIFIESTO.csv`. Después, commit y push. Una prueba del CI falla si
+falta una tabla, si cambió o si llega una que el manifiesto no conoce (`METODO.md` §2.6, D-479). **No se vuelve a pedir lo que ya se subió.**
 
 ---
 
@@ -64,17 +80,28 @@ inventar números.
 ## 2. La huella
 
 ```
-huella = f(unidad, insumos, cantidades)
+huella = f(insumos, cantidades)
 ```
 
 Se calcula al cargar y se compara con la anterior. **Si cambió, cambió** — aunque el
-texto sea idéntico y aunque el PU dé la misma cifra por coincidencia.
+texto sea idéntico y aunque el PU dé la misma cifra por coincidencia. Una cantidad
+`1.050000` y una `1.05` son la misma; una línea repetida (el alambre de `AUX-00001`)
+cuenta dos veces; el orden de las líneas no cuenta.
 
 > **La descripción queda fuera de la huella a propósito.** Si entrara, cada
 > corrección de acento generaría versión y el versionado perdería sentido.
 
+> **La unidad también quedó fuera** *(D-473, corrige a `CONOCIMIENTO.md` §2.7, que la
+> definía con ella)*: se compara **aparte y antes**. Si cambió, el concepto se detiene sin
+> mirar la receta; y si antes no se sabía, saber cuál es no cambia la receta ni crea
+> versión.
+
 **Lo que más señal da:** texto significativamente distinto **y** huella distinta. Ya
-no es otra descripción — es otro concepto, y se propone clave nueva.
+no es otra descripción — es otro concepto: **se detiene** (motivo `texto_y_receta`) y
+el sistema **propone la clave nueva** —la siguiente libre del mismo prefijo, con el
+mismo ancho—. Quien decide puede confirmar que es el mismo, y confirmar una clave
+confirma a la vez la compuerta del 5 % (§3). Un texto que cambia **sin** la receta
+carga y alerta.
 
 ### Qué diferencia de texto dispara alerta
 
@@ -82,14 +109,20 @@ Un porcentaje de diferencia no sirve: engaña en los dos sentidos. *De 3.00 a 4.
 es cambio mínimo de texto y enorme de significado; reordenar una frase es lo
 contrario.
 
-Primero se normaliza —minúsculas, acentos, sinónimos del diccionario, quitar el
-«Incluye:»— y se compara el núcleo. Idéntico → cosmético, sin alerta. Si difiere:
+Primero se normaliza —minúsculas, acentos, plurales, conectores, quitar el «Incluye:»
+y los sinónimos que se den— y se compara el núcleo. Idéntico → cosmético, sin alerta.
+Si difiere:
 
 | Cambió | Nivel |
 |---|---|
-| Un número o dimensión | **Alta** |
+| Un número o dimensión (se comparan como números: *3.00* es *3*) | **Alta** |
 | El verbo o el elemento (*colocación* → *suministro*) | **Alta** |
-| Puntuación, orden, calificativos | Informativo |
+| El orden de las palabras, o un calificativo (*nuevo*, *similar*, *aproximado*, *corregido*…) | Informativo |
+
+Ante una palabra que no es calificativo se alerta: «alerta» por sí sola no detiene nada;
+lo que detiene es cruzar el texto con la huella. **El diccionario de sinónimos no
+existe todavía** (la comparación lo recibe como parámetro): sin él, *fabricación* y
+*elaboración* son palabras distintas.
 
 ---
 
@@ -116,10 +149,13 @@ sólo cuando hay algo en juego, medido por impacto:
 |---|---|
 | Sin presupuestos | Automático y silencioso |
 | Sólo en diseño | Automático, pero **avisa** a quienes usan esos presupuestos |
-| Algo contratado | **No entra en vigor.** Va a control de cambio |
+| Algo contratado | **No entra en vigor.** La versión se detiene (`en_contratado`), ninguna confirmación la deja pasar, y va a control de cambio |
 
 Más una compuerta por magnitud: **si el PU se movió más de 5%, pide confirmación**
 aunque sea en diseño.
+
+**El PU de una versión se congela al crearse**, calculado con el motor sobre el archivo que se carga, y no se recalcula nunca. **Un precio que se mueve no es una
+versión:** es una fila de `PRECIO_HISTORICO` (el precio de un *trabajo* es la excepción: se valida). El renglón del presupuesto fija la versión que tenía al cargarse.
 
 > **El silencio nunca aprueba.** Sin respuesta queda pendiente, no vigente por
 > vencimiento de plazo.
@@ -250,7 +286,8 @@ cuáles no se reconocieron, cuáles obligatorias faltan.
 ## 6. Reconciliación
 
 Las filas llegan sin `id`. La primera carga lo asigna y **guarda la llave natural** —
-clave, y ruta o prototipo para los nodos estructurales.
+clave, y para los nodos estructurales la **ruta natural** (`clave#n/clave#n…`, la
+*n*-ésima vez que esa clave aparece entre sus hermanos).
 
 > Sin eso, la segunda importación **duplica todo el árbol**.
 
@@ -278,6 +315,37 @@ la clave suelta.** Lo que faltaba era decir quién la fija y cuándo.
 Comparar contra el catálogo vigente produce diferencias que son de calendario, no de
 obra — fue exactamente lo que pasó con el cemento al 35% de `ALAMO 18`.
 
+## 6c. Un presupuesto que ya existe se reconcilia, no se pisa (D-476)
+
+Un capítulo se reconoce por su clave. Si llega **igual**, se dice («ya está, igual») y no se escribe nada. Si llega distinto, se casa **por ruta natural**: un renglón
+que sigue siendo el mismo conserva su identidad, y con ella los enlaces del programa.
+
+| Cambió | En diseño | En lo contratado |
+|---|---|---|
+| Una cantidad | Entra, con su historia | **No entra nada** |
+| Un renglón o un bloque nuevo | Entra, con la versión vigente y en su lugar | — |
+| El lugar entre hermanos | Entra, con su historia | — |
+| **Una baja** | **Pide confirmación** con un id que el informe da (`ruta::CLAVE#n`), o todas juntas; un bloque que se va se lleva lo que cuelga con una sola | — |
+
+**Una baja no borra:** el renglón deja de contar —en el presupuesto, en el motor, en el lugar que ocupaba— y se queda, porque el programa lo puede citar. La historia de un
+renglón (alta, cantidad, lugar, baja) **solo se agrega**. Si algo quedó detenido (una baja sin confirmar, un concepto pendiente), el presupuesto queda marcado `parcial` y se vuelve a ofrecer lo que falta. Antes
+de confirmar una baja se dice **qué programas la citan**.
+
+---
+
+## 6d. La clave vieja de un clon sigue entrando (D-478)
+
+Cuando una clave se corrige por clonar y sustituir (`erp-rediseno` §5), los archivos de OPUS siguen trayendo la clave vieja. La carga **los lee con las claves vigentes**:
+
+- la vieja se lee como el clon, de padre y de hijo, y los conceptos del presupuesto también; **lo dice** en un aviso, no lo hace en silencio;
+- si el archivo trae las dos —la vieja y el clon— con matriz, **manda la del clon**: no se suman;
+- lo retirado **no sale como «ausente»** ni como concepto nuevo;
+- un cambio de receta en el archivo versiona **al clon**, y un precio nuevo entra a **su** historia.
+
+El viaje de vuelta (la clave vieja sigue saliendo hacia otros sistemas hasta que alguien lo autorice) es hoy solo una bandera: no hay exportador.
+
+---
+
 ## 7. Placeholders
 
 OPUS genera renglones estructurales vacíos al explotar por agrupadores. **Son andamio
@@ -299,15 +367,23 @@ Cargar primero y corregir después no sirve: **ya se pisó el dato y se perdió 
 qué comparar.**
 
 ```
-1. Se lee el archivo              nada se escribe todavía
-2. Se compara contra lo vigente   huella por concepto
+1. Se lee el archivo              nada se escribe todavía            revisar
+2. Se compara contra lo vigente   huella por concepto                revisar
 3. Se muestra el diagnóstico      qué entra, qué versiona, qué se detiene
-4. Alguien resuelve               sólo lo detenido
-5. Se aplica                      todo junto
+4. Alguien resuelve               sólo lo detenido                   confirmar
+5. Se aplica                      todo junto, en una transacción     aplicar
 ```
 
 **Lo que se detiene no es la carga: son los conceptos en conflicto.** El resto entra
-normal.
+normal. Se detiene, con su motivo: la unidad que cambió, el PU que se movió más de 5 %
+sin confirmar, el texto que cambió junto con la receta, lo que depende de algo detenido,
+la versión de lo que fija un renglón contratado, el precio de un trabajo, y una baja sin
+confirmar. **`revisar` no escribe nada; `aplicar` escribe el plan completo o nada**, y si
+entre una y otra se cargó otra cosa (cada plan trae la última carga que vio), no se
+escribe: `CatalogoCambio`. Si el archivo trae algo que no cuadra, no se escribe nada.
+
+En la terminal: `python3 -m api.cargar_opus` revisa; con `--aplicar` escribe (solo un usuario con la
+función `cargar_catalogo_opus`).
 
 ```
 412 conceptos entran sin cambios
@@ -333,3 +409,9 @@ normal.
 8. Convertir cantidades solo porque cambió la unidad.
 9. Cargar y luego corregir: ya no hay contra qué comparar.
 10. Aplicar la carga a medias sin dejar registro de lo que faltó.
+11. Meter la unidad en la huella: versiona por una unidad que apenas se aprendió.
+12. Dejar entrar la versión nueva de un concepto que fija un renglón contratado.
+13. Reconciliar un presupuesto por número de fila en vez de por ruta natural: los enlaces del programa dejan de valer.
+14. Borrar una baja, o aplicarla sin confirmación: el programa puede citar lo que se va.
+15. Tratar la clave vieja de un clon como concepto nuevo o como «ausente».
+16. Leer una tabla que el usuario subió sin haberla guardado antes en el repo.

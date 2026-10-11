@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Bash
 capa:       II — Operación
 pregunta:   ¿qué hay realmente en los archivos?
 tiempo:     se hace así
-corte:      2026-09-10
+corte:      2026-10-11
 verificado: Reporta, no carga sin aprobación
 ```
 
@@ -21,7 +21,16 @@ cargue. Lo que parece obvio en un export casi nunca lo es.
 ## Antes de opinar
 
 Leé el skill `erp-construccion`, sobre todo `erp-construccion.md` §8 (importación y sus trampas) y `erp-construccion.md` §5 (el
-prefijo no es llave).
+prefijo no es llave), y `erp-importacion`.
+
+**Lo primero: guardá lo que el usuario subió.** Una tabla que se sube vive en una carpeta temporal y se pierde con la máquina:
+`cd backend && python3 -m api.guardar_subidas`, commit y push, **antes** de leerla (`METODO.md` §2.6). Lo ya guardado está en `1-mundo/opus/` y
+`1-mundo/fuentes/` y `MANIFIESTO.csv` lo lista: **no lo pidas de nuevo.** Los catálogos de OPUS que no están (materiales, trabajos, mano de obra, fletes,
+conceptos) se registran como no disponibles; no se piden.
+
+**Ya hay un lector:** `backend/core/importacion_opus.py` hace los pasos de lectura sin escribir nada (mapeo de columnas con informe, árbol, placeholders,
+matrices, huella, diagnóstico), y `python3 -m api.cargar_opus` revisa una carga contra lo vigente. Usalo para el inventario y el diagnóstico en vez
+de volver a escribir las cuentas; tu aporte es leer **lo que el lector no sabe que existe**.
 
 ## Cómo trabajás
 
@@ -68,7 +77,7 @@ alguien decida**. No las mezcles: la primera lista es accionable hoy.
 
 ## Qué no hacés
 
-- No cargás datos sin aprobación explícita.
+- No cargás datos sin aprobación explícita (`api.cargar_opus` revisa por omisión; `--aplicar` escribe, y solo lo hace quien tiene la función).
 - No corregís valores por tu cuenta. Los proponés.
 - No descartás registros raros: los reportás.
 

@@ -8,8 +8,8 @@ description: Presupuesto paramétrico por ensambles en el ERP de construcción �
 capa:       II — Operación
 pregunta:   ¿cómo se presupuesta sin tener el detalle todavía?
 tiempo:     se hace así
-corte:      2026-09-12
-compilado:  `CONOCIMIENTO.md` §5 — no se escribe a mano
+corte:      2026-10-11
+compilado:  `CONOCIMIENTO.md` §5 (con B-52 y B-49 cerrados) — no se escribe a mano
 ```
 
 > **Satélite.** Carga el skill base `erp-construccion` primero.
@@ -125,7 +125,7 @@ Por subcapítulo, algunos sí:
 | Cimentación | 931 | 23% |
 | Herrería | 116 | **38%** |
 
-Y la cimentación revela por qué falla:
+Y la cimentación revela por qué falla — y la primera explicación era incompleta:
 
 ```
 1 planta    Zafiro 1,039   Rubí 1,012   Jade 1,053          → CV  2%
@@ -133,19 +133,32 @@ Y la cimentación revela por qué falla:
                                                     juntos  → CV 23%
 ```
 
-En una planta la cimentación por m² es prácticamente idéntica. **Lo que la rompía era
-mezclar cohortes:** en dos plantas el m² construido ya no es proporcional a la
-superficie de desplante.
+Separar por número de plantas mejoró el número y parecía la explicación. **No lo es:** los dos
+Diamante tienen planta alta y su cimentación por m² se comporta como la de una planta; los que se salen son
+Zafiro Plus y Oro. **Lo que rompía el parámetro era el denominador.** La cimentación escala con el **área
+de desplante** (la losa que realmente se cuela), no con el m² total construido, que incluye
+planta alta que nunca toca el suelo *(B-52, D-312)*:
+
+| Se mide contra | CV de los siete |
+|---|---|
+| m² total | 21.5 % |
+| **Desplante** | **6.0 %** |
+
+Zafiro Plus y Oro dejan de ser «otra población»: su desplante es el 61 % y el 53 % de su m² total (en los otros cinco es el 90–100 %), así que dividir su
+cimentación entre el m² total los hacía ver artificialmente baratos. El residuo de 6 % (Diamante algo arriba) es variación normal: no hay señal de una tercera cohorte.
+
+> **Era una regla ya escrita sin comprobar** —«cimentación escala con desplante»— y ahora está comprobada. Y la lección es de método: **una partición que mejora el
+> número no queda probada por mejorarlo**; el residuo alto era la señal de que la explicación estaba incompleta, y se leyó como ruido.
 
 > **El paramétrico no falla por ser paramétrico. Falla por usar el parámetro
-> equivocado o la cohorte equivocada.**
+> equivocado.**
 
 ### Las tres reglas que salen de ahí
 
 - **Parámetro propio por ensamble.** Cimentación escala con desplante, instalaciones
   con salidas. No todo con el m² total.
 - **Cohorte explícita.** Cada ensamble declara a qué aplica. **Fuera de ella, no se
-  usa.**
+  usa.** *(La cohorte se declara por lo que de verdad separa a los prototipos; el número de plantas no es lo que separa a la cimentación.)*
 - **La dispersión se guarda junto al valor.** Acabados a $911 ±5% es utilizable;
   Herrería a $116 ±38% es una adivinanza.
 
@@ -206,8 +219,9 @@ PARAMÉTRICO      cantidad ÷ divisor → tasa     aprende de lo medido
 5. Guardar el renglón en vez del concepto, y dejar el ensamble colgando.
 6. Una sola explosión: la de costo no sirve para contratar.
 7. Un parámetro único para todo el presupuesto. El m² global varía 36%.
-8. Mezclar cohortes: una planta y dos plantas no son la misma población.
+8. Partir las cohortes por número de plantas: la cimentación escala con el desplante, y con ese denominador los siete caen en el mismo rango.
 9. Publicar una tasa sin su dispersión.
 10. Usar un ensamble fuera de su cohorte declarada.
 11. Al regenerar, arrasar los renglones editados a mano —o respetarlos en silencio—.
 12. Construir el corpus paramétrico sobre cantidades capturadas y llamarlo estadística.
+13. Dar por explicada una partición porque mejora el número, y leer como ruido el residuo que queda.

@@ -9,7 +9,7 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿quién interviene, en qué orden, y cuándo terminó?
 tiempo:     se hace así
-corte:      2026-09-12
+corte:      2026-10-11
 verificado: Enruta a los 4 agentes · no los lanza
 ```
 
@@ -36,6 +36,9 @@ Esto no es una limitación a rodear: es lo que mantiene a un humano en cada salt
    evaluaron y se rechazaron
 3. `2-operacion/INVARIANTES.md` — contra qué se comprueba y, sobre todo, **cuándo se
    para**
+4. `1-mundo/fuentes/MANIFIESTO.csv` (y `1-mundo/opus/`) — **qué tablas del usuario ya están en el
+   repo.** No planees pedir otra vez lo que ya se subió; si el plan necesita una tabla nueva, su
+   primer paso es guardarla (`METODO.md` §2.6)
 
 Sin la tercera no podés cerrar un plan: una tarea sin cifra de paro no está lista
 para trabajarse, **está lista para discutirse**, y eso también es una respuesta
@@ -55,7 +58,7 @@ válida tuya.
 **Las rutas que se repiten:**
 
 ```
-Datos nuevos        migrador → arquitecto → constructor → auditor
+Datos nuevos        (guardar la tabla en el repo) → migrador → arquitecto → constructor → auditor
 Cambio de esquema   arquitecto → constructor → auditor
 Módulo nuevo        arquitecto (incluye skills y agentes) → constructor → auditor
 Algo no cuadra      auditor → (según hallazgo) arquitecto o migrador

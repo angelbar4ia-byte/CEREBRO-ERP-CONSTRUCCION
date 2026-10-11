@@ -8,8 +8,8 @@ description: Operaciones de autoría sobre un presupuesto cargado — fusión, d
 capa:       II — Operación
 pregunta:   ¿cómo se transforma lo cargado sin perderlo?
 tiempo:     se hace así
-corte:      2026-09-12
-compilado:  `CONOCIMIENTO.md` §6.4 · `CONOCIMIENTO.md` §8 · `CONOCIMIENTO.md` §9 · `CONOCIMIENTO.md` §12 — no se escribe a mano
+corte:      2026-10-11
+compilado:  `CONOCIMIENTO.md` §6.4 · `CONOCIMIENTO.md` §8 · `CONOCIMIENTO.md` §9 · `CONOCIMIENTO.md` §12 · `CONOCIMIENTO.md` §16.2 y lo que D-478 agregó (la clonación construida) — no se escribe a mano
 ```
 
 > **Satélite.** Carga el skill base `erp-construccion` primero.
@@ -145,30 +145,56 @@ repartos anteriores y **proponer** para casos similares, nunca aplicarlos solo.
 
 ## 5. Clonación
 
-Crear un insumo nuevo copiando el contenido de otro. **No edita: crea.**
+Crear un insumo nuevo copiando el contenido de otro. **No edita: crea.** Es la única de las seis
+que ya está construida (`backend/core/clonacion.py`, `python3 -m api.clonar`, D-478).
 
 El uso principal son las **variantes**: partir de la trabe T-3 y crear la T-4
 cambiando la sección, sin capturar todo de nuevo. Arreglar un prefijo equivocado es
-apenas un caso particular.
+apenas un caso particular — y es el que se ejecutó: las 79 claves `AUX-` (trabes, mallas,
+nervaduras y losas nervadas, que son **materiales compuestos**, no auxiliares) pasaron a `PRE-`.
+
+El clon nace con la descripción, la unidad, la categoría, la receta, la huella y el PU del original
+(si es un insumo, con su precio), y con `procedencia = clonación`.
 
 | Modo | Qué pasa con el original | Cuándo |
 |---|---|---|
 | **Clonar y mantener** | Sigue vivo. **Los dos se usan** | Variante real: T-3 y T-4 conviven |
 | **Clonar y sustituir** | **Todo lo que apuntaba al original pasa al clon** | La misma cosa con otro nombre |
 
-### La sustitución sí toca lo existente
+### La sustitución sí toca lo existente — pero no reescribe nada
 
-Mueve referencias en presupuestos y matrices, así que tiene el mismo alcance que la
-corrección de unidad: **libre en diseño, se detiene donde hay contrato.**
+Mueve referencias en las matrices y en los presupuestos, así que tiene el mismo alcance que la
+corrección de unidad: **libre en diseño, se detiene donde hay contrato.** Si algún concepto que
+cita al original fija un renglón de un subárbol contratado, **el original no se toca** y se dice cuál
+lo frena (va a control de cambio). Tampoco se sustituye lo que un renglón de presupuesto pone
+**directo**: un concepto se sustituye renglón por renglón, no aquí. Clonar y mantener sí se puede
+en cualquiera de los dos casos.
 
-El aviso importa más que en el otro modo: **cuántas líneas se van a redirigir y en qué
-presupuestos**, antes de aceptar.
+**Cómo se redirige:** cada concepto o compuesto cuya versión *vigente* citaba al original recibe una
+**versión nueva** —la misma receta con el clon en lugar del original, **el mismo PU** (el clon vale lo que
+valía el original: no se mueve un centavo)— y los renglones que fijaban esa versión pasan a fijar la nueva. Las
+versiones viejas y el original quedan como estaban. Un compuesto que ya se sustituyó no se vuelve a tocar, así que el orden no importa.
+
+El aviso importa más que en el otro modo: **cuántas versiones nuevas y cuántos renglones, en qué
+presupuestos**, antes de aceptar. `proponer` lo dice y no escribe nada.
+
+### La clave vieja sigue entrando
+
+Después de sustituir, un archivo de OPUS que traiga la clave vieja se **lee como el clon** (`erp-importacion`
+6d, `CONOCIMIENTO.md` §16.2) y la carga lo avisa. El viaje de vuelta —la clave vieja sigue saliendo hacia otros sistemas
+hasta que alguien lo autorice— es solo la bandera `exporta_clave_vieja`: todavía no hay quien exporte.
 
 ### La equivalencia se registra
 
-El clon apunta a su origen, en el diccionario. Sin eso, un año después nadie sabrá que
-dos claves son la misma trabe: quedarían como dos insumos distintos con el mismo
-precio.
+El clon apunta a su origen en la tabla `CLON` (`MODELO.md` §4b): quién, con qué rol, qué se redirigió. Sin eso, un año después nadie
+sabrá que dos claves son la misma trabe. **Un clon no se reescribe ni se borra**; lo único que cambia es que alguien autorice dejar de exportar la
+clave vieja, y no se reabre.
+
+### Corregir un prefijo entero
+
+Son tantas clonaciones como claves, **cada una completa y con su carga**: se hacen en el orden del número, la numeración sigue donde iba
+(se saltan los números ocupados) y, si la tanda se interrumpe o algo contratado frena a algunas, **se reanuda sin repetir ni descuadrar**.
+`python3 -m api.clonar --corregir-prefijo AUX --por PRE --desde 120` (sin `--clonar` solo muestra).
 
 ---
 
@@ -206,8 +232,9 @@ definición**.
 
 ### Sustituir y borrar son dos actos
 
-Sustituir es lo que **deja borrable** al original: después, nadie le apunta. Pero
-borrar se decide aparte, después.
+Sustituir es lo que **deja sin uso** al original: después, nadie vigente le apunta. Pero
+borrar se decide aparte, después — y mientras las versiones viejas de lo que lo citaba lo nombren,
+sigue sin ser borrable (están en una capa de matriz). Sustituir no borra.
 
 ---
 
@@ -265,3 +292,7 @@ hijos son *por esa unidad*.
 12. Congelar las versiones de los hijos de un compuesto.
 13. Validar el ciclo sólo contra el padre directo, o al calcular en vez de al agregar.
 14. Rediseñar sobre un subárbol contratado.
+15. Sustituir reescribiendo las versiones viejas en vez de agregar una nueva a cada concepto que citaba al original.
+16. Mover dinero al sustituir: el clon tiene que valer lo que valía el original.
+17. Redirigir lo que fija un renglón contratado, o lo que un renglón pone directo.
+18. Clasificar como auxiliar un compuesto de material: es un material, aunque OPUS lo llame `AUX-`.

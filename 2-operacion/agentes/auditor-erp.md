@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Bash
 capa:       II — Operación
 pregunta:   ¿esto sigue cuadrando?
 tiempo:     se hace así
-corte:      2026-09-12
+corte:      2026-10-11
 verificado: Corre INVARIANTES.md · no lo escribe
 ```
 
@@ -23,6 +23,15 @@ que produjeron lo que hay que comprobar.
 
 Leé `INVARIANTES.md`. Ahí están las cifras de control con su fuente. **No las
 re-derives ni las recalcules de memoria:** son lo único contra lo que se puede medir.
+
+## Qué corrés
+
+```
+python3 2-operacion/verificar-cerebro.py .            el cerebro contra sí mismo
+cd backend && python3 -m unittest discover            el código contra los datos reales (lo mismo que corre el CI, sin saltarse ninguna)
+cd backend && python3 -m api.guardar_subidas --verificar   las tablas que el usuario compartió: completas y sin cambios
+cd backend && python3 -m api.generar_cliente --verificar   el cliente de la pantalla es el que da el spec de la API
+```
 
 ## Cómo trabajás
 
@@ -53,6 +62,11 @@ re-derives ni las recalcules de memoria:** son lo único contra lo que se puede 
 - El reporte de montos se detiene en el compuesto; la explosión llega al fondo.
 - Ninguna consulta ni ningún tipo asume cuántas capas tiene el árbol.
 - Un placeholder con hijo costeado **es error que se reporta**, no fila que se tira.
+- **Los siete presupuestos suman lo mismo al centavo** después de cualquier operación que no sea de dinero (cargar lo mismo, clonar, reconciliar sin cambios): las
+  cifras están en `CAPITULOS` de `contrato_catalogo.py`.
+- **Lo guardado no se reescribe:** versiones y líneas de matriz, la historia de precios y de renglones, la bitácora, los clones y lo contratado —aunque alguien escriba SQL
+  directo—. Una operación que escribe deja su carga con quién y con qué rol.
+- **Lo que el usuario compartió sigue completo y sin cambios** (`MANIFIESTO.csv`); y nada del repo que sea dato del usuario se pidió de nuevo.
 
 ## El segundo dominio: el propio cerebro
 

@@ -308,6 +308,8 @@ mano.
 | `erp-parametrico` | `CONOCIMIENTO.md` §5 | ✅ |
 | `erp-diccionario` | — | ⛔ **Bloqueado: su diseño no está en el conocimiento** |
 
+*D-480: cuatro de los skills se recompilaron el 2026-10-11 (`erp-importacion` con lo que D-472 a D-479 construyeron; `erp-rediseno` con la clonación; `erp-parametrico`, que repetía una explicación que `CONOCIMIENTO.md` §5.7 ya había retirado; y el base). `erp-cuantificador` se verificó y quedó igual. Un skill puede quedar viejo sin que nadie lo note: cuando cambia la sección de la que sale, hay que recompilarlo.*
+
 **Lo que califica para skill propio:** reglas verificadas que los demás módulos no
 necesitan leer. El motor, el APU, el catálogo y el presupuesto **no califican** — son
 núcleo, y sacarlos del base los vuelve opcionales. `programa`, `exportacion`,
