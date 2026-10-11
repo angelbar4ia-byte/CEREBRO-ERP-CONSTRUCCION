@@ -287,6 +287,7 @@ class NodoDePresupuesto:
     unidad: str
     estructural: bool
     tipo_opus: str  # Capítulo… para un estructural; «Concepto» para un concepto
+    ruta_natural: str = ""  # de un estructural: clave#n/clave#n…; vacía en un concepto
 
 
 @dataclass(frozen=True)
@@ -297,6 +298,7 @@ class LineaDePresupuesto:
     cantidad: Decimal
     version: Optional[int]  # la versión del concepto que el renglón fijó; nula en un estructural o en un concepto sin matriz
     pu: Optional[Decimal]  # el PU congelado de esa versión
+    id: int = 0  # el de la línea de COMPOSICION: es la identidad del renglón, a la que se cuelga una partida del programa
 
 
 @dataclass(frozen=True)

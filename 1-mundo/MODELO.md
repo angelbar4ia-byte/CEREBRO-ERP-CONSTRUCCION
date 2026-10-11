@@ -977,6 +977,8 @@ por `PRECIO_HISTORICO` como un insumo más: dispara directo validar o
 descartar la versión, porque su precio nace de una negociación puntual, no
 de un mercado que fluctúa.
 
+**Solo `ORDEN DE CAMBIO` mueve un PU ya contratado** — `CONOCIMIENTO.md` §13.4, ya firme — con causa, impacto en monto, quién autoriza.
+
 ### La matriz es de una versión, el renglón fija la versión y la unidad puede no saberse (D-473)
 
 *Cómo quedó en la base (`database/migraciones/0005_catalogo_apu_presupuesto.sql`), con los archivos de OPUS que hay:*
@@ -998,7 +1000,23 @@ VERSION_CONCEPTO       la huella ya no lleva la unidad: f(insumos, cantidades); 
 La clave es única solo entre los nodos del catálogo. Cada capítulo del archivo es un `PRESUPUESTO`. Una versión, sus líneas, una carga y
 los precios cerrados no se reescriben ni se borran: lo garantizan disparadores. Un concepto sin matriz es un nodo sin versiones y vale cero.
 
-**Solo `ORDEN DE CAMBIO` mueve un PU ya contratado** — `CONOCIMIENTO.md` §13.4, ya firme — con causa, impacto en monto, quién autoriza.
+### El programa cuelga del presupuesto: cada fila dice a qué se refiere (D-474)
+
+*Cómo quedó en la base (`database/migraciones/0006_programa_cuelga_del_presupuesto.sql`), con los siete programas contra los siete presupuestos:*
+
+```
+PROGRAMA            presupuesto_id   FK PRESUPUESTO — de qué presupuesto es; se pone al colgarlo y no se cambia
+PROGRAMA_FILA       nodo_id          un bloque (Capítulo, Subcapítulo, Nivel 2 o 3) → el NODO estructural del presupuesto
+                    renglon_id       una partida → la línea de COMPOSICION del bloque al concepto; el concepto es su hijo_id
+                                     (una fila tiene uno de los dos o ninguno; un nodo o un renglón lo ocupa a lo más una fila por programa)
+PROGRAMA_COLGADURA  nueva            quién, con qué rol, cuándo, cuántos enlaces puso y qué cuadró y qué no; solo se agrega
+```
+
+`ACTIVIDAD.concepto_id` (§5c) es el `hijo_id` del renglón y `ACTIVIDAD.presupuesto_id` es el del programa: la partida **no** apunta al
+concepto a secas, porque el mismo concepto está en muchos lugares de un presupuesto y cada lugar tiene su cantidad y su sitio en el
+programa. La identidad de una fila dentro del programa sigue siendo su `oid`, así que la bitácora de ediciones no se toca; el enlace es
+un atributo de la fila y **un enlace puesto no se mueve** (lo garantiza un disparador): se agrega uno nuevo, no se cambia el viejo.
+Se casan por ruta natural —no por posición— y lo que no casa se queda sin enlace y se dice, de los dos lados (`MEMORIA.md` D-474).
 
 ### El tabulador por contratista no toca el PU
 
@@ -1874,7 +1892,8 @@ cuantificadores que P-9 ya distinguía sin tabla donde vivir.
 ```
 ACTIVIDAD
   id
-  concepto_id           FK Nodo                                             firme
+  concepto_id           FK Nodo — en la base es `renglon_id`, la línea de
+                         COMPOSICION del bloque al concepto (D-474)          firme
   presupuesto_id        FK PRESUPUESTO                                      firme
   origen_captura        enum: manual_con_diseño · manual_sin_diseño ·
                          por_carga_estructura · por_carga_fechas — el mismo

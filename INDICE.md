@@ -50,8 +50,8 @@ cerebro/
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
 ├── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
-├── backend/                   el código que el cerebro especifica: core/ (motor_calculo · motor_cpm · programa · servicio_programa · accesos · importacion_opus · catalogo, con sus pruebas) · infra/ (adaptadores de Postgres) · api/ (FastAPI, autenticación por token, el cliente generado, servir y la terminal de usuarios) · requirements.txt
-├── database/migraciones/      el esquema, en SQL: 0001_programa.sql · 0002_programa_importado_por.sql · 0003_version_nueva_del_programa.sql · 0004_usuarios_y_permisos.sql · 0005_catalogo_apu_presupuesto.sql
+├── backend/                   el código que el cerebro especifica: core/ (motor_calculo · motor_cpm · programa · servicio_programa · accesos · importacion_opus · catalogo · colgado, con sus pruebas) · infra/ (adaptadores de Postgres) · api/ (FastAPI, autenticación por token, el cliente generado, servir y la terminal de usuarios) · requirements.txt
+├── database/migraciones/      el esquema, en SQL: 0001_programa.sql · 0002_programa_importado_por.sql · 0003_version_nueva_del_programa.sql · 0004_usuarios_y_permisos.sql · 0005_catalogo_apu_presupuesto.sql · 0006_programa_cuelga_del_presupuesto.sql
 └── frontend/gantt/            las pantallas del programa: gantt.html · programas.html (la lista y subir uno) · tokens.css (los colores) · motor_gantt.js (reprograma en el navegador; una prueba lo contrasta con Python) · cliente_programa.js (generado del spec de la API) · sesion.js (quién eres, compartida por las pantallas)
 ```
 
@@ -243,10 +243,10 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 473 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 474 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
-| `PROGRAMA-CPM.md` | I | ✅ 429 pruebas · los siete programas reproducen las cifras publicadas |
+| `PROGRAMA-CPM.md` | I | ✅ 489 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |

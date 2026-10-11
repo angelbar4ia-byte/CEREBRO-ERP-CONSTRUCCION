@@ -130,19 +130,19 @@ class PostgresCatalogo:
             raiz_id = fila[0]
             resumen = next(p for p in self._presupuestos() if p.id == presupuesto_id)
             nodos: Dict[int, NodoDePresupuesto] = {}
-            for id_, clave, desc, unidad, tipo in self.conn.execute(
-                    "SELECT n.id, n.clave, n.descripcion, coalesce(u.clave, ''), n.tipo_opus FROM nodo n LEFT JOIN unidad u ON u.id = n.unidad_id"
-                    " WHERE n.presupuesto_id = %s", (presupuesto_id,)):
-                nodos[id_] = NodoDePresupuesto(id_, clave, desc, unidad, True, tipo)
+            for id_, clave, desc, unidad, tipo, ruta in self.conn.execute(
+                    "SELECT n.id, n.clave, n.descripcion, coalesce(u.clave, ''), n.tipo_opus, n.ruta_natural FROM nodo n"
+                    " LEFT JOIN unidad u ON u.id = n.unidad_id WHERE n.presupuesto_id = %s", (presupuesto_id,)):
+                nodos[id_] = NodoDePresupuesto(id_, clave, desc, unidad, True, tipo, ruta)
             lineas: List[LineaDePresupuesto] = []
-            for padre, hijo, orden, cantidad, version, pu, estructural, clave, desc, unidad in self.conn.execute(
-                    "SELECT c.padre_id, c.hijo_id, c.orden, c.cantidad, v.version, v.pu, h.rol = 'estructural', h.clave, h.descripcion,"
+            for linea_id, padre, hijo, orden, cantidad, version, pu, estructural, clave, desc, unidad in self.conn.execute(
+                    "SELECT c.id, c.padre_id, c.hijo_id, c.orden, c.cantidad, v.version, v.pu, h.rol = 'estructural', h.clave, h.descripcion,"
                     " coalesce(uh.clave, '') FROM composicion c JOIN nodo pa ON pa.id = c.padre_id JOIN nodo h ON h.id = c.hijo_id"
                     " LEFT JOIN unidad uh ON uh.id = h.unidad_id LEFT JOIN version_concepto v ON v.id = c.hijo_version_id"
                     " WHERE pa.presupuesto_id = %s ORDER BY c.padre_id, c.orden", (presupuesto_id,)):
                 if not estructural:
                     nodos[hijo] = NodoDePresupuesto(hijo, clave, desc, unidad, False, "Concepto")
-                lineas.append(LineaDePresupuesto(padre, hijo, orden, cantidad, version, pu))
+                lineas.append(LineaDePresupuesto(padre, hijo, orden, cantidad, version, pu, linea_id))
         return DatosDePresupuesto(resumen, raiz_id, nodos, tuple(lineas))
 
     def arbol(self) -> ArbolEnMemoria:

@@ -71,6 +71,7 @@ class _Version:
 
 @dataclass
 class _LineaDePresupuesto:
+    id: int
     hijo_id: int
     hijo_version_id: Optional[int]
     cantidad: Decimal
@@ -111,6 +112,7 @@ class _Datos:
     sig_unidad: int = 0
     sig_carga: int = 0
     sig_presupuesto: int = 0
+    sig_linea: int = 0
 
     def unidad_de(self, nodo: _Nodo) -> str:
         if nodo.unidad_id is None:
@@ -187,16 +189,16 @@ class MemoriaCatalogo:
         while pila:
             padre = pila.pop()
             n = d.nodos[padre]
-            nodos[padre] = NodoDePresupuesto(n.id, n.clave, n.descripcion, d.unidad_de(n), True, n.tipo_opus or "")
+            nodos[padre] = NodoDePresupuesto(n.id, n.clave, n.descripcion, d.unidad_de(n), True, n.tipo_opus or "", n.ruta_natural or "")
             for l in d.renglones.get(padre, ()):
                 h = d.nodos[l.hijo_id]
                 if h.rol == "estructural":
                     pila.append(l.hijo_id)
-                    lineas.append(LineaDePresupuesto(padre, l.hijo_id, l.orden, l.cantidad, None, None))
+                    lineas.append(LineaDePresupuesto(padre, l.hijo_id, l.orden, l.cantidad, None, None, l.id))
                 else:
                     nodos[l.hijo_id] = NodoDePresupuesto(h.id, h.clave, h.descripcion, d.unidad_de(h), False, "Concepto")
                     v = next((v for v in d.versiones.get(l.hijo_id, ()) if v.id == l.hijo_version_id), None)
-                    lineas.append(LineaDePresupuesto(padre, l.hijo_id, l.orden, l.cantidad, v.version if v else None, v.pu if v else None))
+                    lineas.append(LineaDePresupuesto(padre, l.hijo_id, l.orden, l.cantidad, v.version if v else None, v.pu if v else None, l.id))
         return DatosDePresupuesto(self._resumen(p), p.raiz_id, nodos, tuple(lineas))
 
     def arbol(self) -> ArbolEnMemoria:
@@ -307,6 +309,7 @@ def _aplicar(d: _Datos, plan: PlanDeCarga) -> ResultadoCarga:
             orden[padre] = orden.get(padre, 0) + 1
             hijo = ids[r.posicion]
             v = d.vigente(hijo) if r.tipo == "Concepto" else None
-            d.renglones.setdefault(padre, []).append(_LineaDePresupuesto(hijo, v.id if v else None, r.cantidad, orden[padre]))
+            d.sig_linea += 1
+            d.renglones.setdefault(padre, []).append(_LineaDePresupuesto(d.sig_linea, hijo, v.id if v else None, r.cantidad, orden[padre]))
         d.presupuestos[d.sig_presupuesto] = _Presupuesto(d.sig_presupuesto, p.clave, p.nombre, p.tipo, raiz_id, p.huella, carga_id)
     return ResultadoCarga(carga_id, dict(plan.resumen))

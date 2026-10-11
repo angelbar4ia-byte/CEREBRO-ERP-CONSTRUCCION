@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 429 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 489 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -317,10 +317,31 @@ origen, una edición no puede quedar sin autor, y un vínculo no puede citar una
 vínculos que el cargador rechazó se guardan con su motivo, y los tipos usan los nombres del modelo
 (`fin_inicio`, `inicio_inicio`, `fin_fin`, `inicio_fin`).
 
-**Lo que todavía no es ese esquema.** Este corte no cuelga de `NODO`, `PRESUPUESTO` ni `CALENDARIO_OBRA`, que
-aún no tienen tabla (B-03): el calendario va como JSON dentro de `programa` y las filas guardan el árbol del
-libro. Cuando esas tablas existan, `programa_fila` se vuelve `ACTIVIDAD` y `TRAMO` sin tocar la bitácora, que
-cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca.
+**Colgar el programa del presupuesto (D-474).** Hasta D-473 el programa citaba sus filas por `oid` y el presupuesto vivía aparte;
+ahora cada fila dice **a qué se refiere en el presupuesto**: un bloque, a un nodo estructural (`nodo_id`); una partida, a un
+**renglón** (`renglon_id`), la línea de `COMPOSICION` del bloque al concepto —no al concepto a secas, porque el mismo concepto está en
+muchos lugares y cada lugar tiene su cantidad y su sitio en el programa—. La identidad de la fila en el programa sigue siendo su
+`oid`, así que la bitácora no se toca.
+
+| Pieza | Qué hace |
+|---|---|
+| `alinear(filas, presupuesto, puestos)` en `core/colgado.py` | Puro. Casa cada fila con su bloque o su renglón y dice lo que no casó, de los dos lados |
+| `ServicioColgado.proponer(programa, rol, presupuesto)` | La alineación; no escribe nada. El presupuesto se encuentra por la clave del capítulo con que abre el programa, o se dice cuál |
+| `ServicioColgado.colgar(programa, rol, usuario, presupuesto, forzar)` | Escribe lo que `proponer` mostró. Pide `editar_estructura_programa`; no cuelga si casan menos de la mitad de los conceptos salvo `forzar`, ni si no casa ninguno |
+| `RepositorioPrograma.colgar(…)` | Pone `presupuesto_id` y los enlaces nuevos y deja una fila en `programa_colgadura`; repetirlo no escribe nada; un enlace puesto no se mueve (`YaColgado`); con versión nueva, `YaReemplazado` |
+| `python3 -m api.colgar_programa` | La terminal: revisa por omisión y cuelga con `--colgar` |
+
+**Cómo se casan:** un bloque por su **ruta natural** `clave#n` (la que guardó la carga del presupuesto), y una partida por su bloque y su
+clave, la n-ésima vez que el programa la nombra contra la n-ésima línea del presupuesto con ese concepto. Nada se alinea por número de
+fila. Un renglón sin clave y sin descripción es un marcador vacío de OPUS y no cuenta como faltante. **La versión nueva de un programa
+hereda el presupuesto y los enlaces de las filas que comparte con la anterior** (por `oid`); lo que el archivo nuevo ya no trae queda
+sin enlace y el traspaso lo dice. **Con los siete programas de verdad:** 3,110 enlaces —las 3,110 filas de los siete presupuestos—; seis
+cuadran de los dos lados y el de Zafiro tiene una partida que el presupuesto no tiene (`ACA-02034`) y una cantidad distinta
+(`OBE-04010`, 4 contra 1) (`MEMORIA.md` D-474).
+
+**Lo que todavía no es ese esquema.** Falta `CALENDARIO_OBRA` (el calendario va como JSON dentro de `programa`) y que `programa_fila` se
+vuelva `ACTIVIDAD` y `TRAMO`, que no necesita tocar la bitácora porque cita `oid`. La API (§4.8) se escribe sobre este servicio y no lo toca;
+solo entrega de qué presupuesto cuelga el programa y cuántas de sus filas están enlazadas: colgar se hace desde la terminal.
 
 ## 4.8 La API y su cliente: `backend/api/` y `frontend/gantt/cliente_programa.js`
 
@@ -467,7 +488,7 @@ un proveedor, `python3 -m api.emitir_token --secreto … --correo …` da un tok
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 429 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 489 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
 la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
@@ -923,7 +944,9 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | Dar de alta a las personas (pospuesto por el usuario, D-470) | Hoy lo hace quien administra la base (`python3 -m api.usuarios`); `MODELO.md` §5b no tiene una función para crear usuarios, y `gestionar_rol_funcion` todavía no tiene operación en la API |
 | El alcance de datos por obra (pospuesto por el usuario, D-470) | `MODELO.md` §5b: el Residente ve sus obras y los demás roles heredan. Necesita ligar el programa a una obra (B-03); hoy cualquiera con sesión ve todos los programas |
 | La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
-| Colgar el programa de `NODO`, `PRESUPUESTO` y `CALENDARIO_OBRA` | `NODO` y `PRESUPUESTO` ya existen con los siete prototipos (D-473, migración `0005`); falta `CALENDARIO_OBRA`, y que `programa_fila` se vuelva `ACTIVIDAD` y `TRAMO` cuelgue del renglón del presupuesto en lugar de citar un `oid` |
+| `CALENDARIO_OBRA`, y que `programa_fila` se vuelva `ACTIVIDAD` y `TRAMO` | El programa ya cuelga de `NODO` y `PRESUPUESTO` (D-474, migración `0006`: cada fila, de un bloque o de un renglón); falta la tabla del calendario y el paso a `ACTIVIDAD`, que no toca la bitácora |
+| Colgar desde la API o una pantalla | Hoy se cuelga desde la terminal (`python3 -m api.colgar_programa`); la API entrega `presupuesto_id` y `enlazadas` pero no tiene la operación |
+| Dos diferencias que salieron de colgar a Zafiro | `ACA-02034` está en el programa y en ningún presupuesto, y `OBE-04010` dice 4 en el programa y 1 en el presupuesto: lo deciden el planeador y Costos |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
 | Las listas del planeador | Los 12 supuestos de cada programa, los 15 de Zafiro, las 59 que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos por rol |
@@ -957,3 +980,4 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | **La autenticación por token, los permisos desde sus tablas y las pantallas sin datos (B-96)** | **D-469** |
 | **El proveedor de identidad es Supabase Auth y el modelo de autenticación queda confirmado** | **D-470** |
 | **El programa con versión nueva se cierra a ediciones y las partidas se reconocen solo por `oid`** | **D-471** |
+| **El programa cuelga del presupuesto: cada fila, de un bloque o de un renglón** | **D-474** |

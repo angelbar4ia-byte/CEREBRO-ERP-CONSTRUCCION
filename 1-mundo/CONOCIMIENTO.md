@@ -6679,6 +6679,23 @@ Dato del usuario: «vamos con persistir presupuesto y APU». El detalle, las dec
 
 `PENDIENTES-MEJORAS.md` B-03 a B-06.
 
+### El programa cuelga del presupuesto (D-474)
+
+Dato del usuario: «vamos con colgar el programa del presupuesto y lo que no está también». El detalle, las reglas y las pruebas están
+en `MEMORIA.md` D-474, `MODELO.md` §4 (la subsección de D-474) y `PROGRAMA-CPM.md` §4.7. Lo que cambia o se aprende:
+
+- **Los siete programas cuelgan de sus siete presupuestos: 3,110 enlaces, exactamente las 3,110 filas que se quedaron al cargarlos.**
+  Seis cuadran de los dos lados sin excepción. Un bloque se casa por su ruta natural (`clave#n`), una partida por su bloque y su
+  clave, la n-ésima vez que se nombra; los programas traen 120 marcadores vacíos de OPUS (§2.5) que no se enlazan.
+- **El cruce encontró dos cosas que el planeador y Costos deciden:** el programa de Zafiro tiene `ACA-02034` «CUBIERTA DE COCINA» (8 días,
+  vinculada a la fila 262), que **no está en ningún archivo de OPUS que haya** —el plan manual le puso un total de $1—, y dice 4 en
+  `OBE-04010` donde el presupuesto dice 1 (el programa trae $34,863.48, cuatro veces el precio). El sistema no corrige ninguna de las
+  dos: las dice.
+- **Un programa no se cuelga de un presupuesto que no es el suyo:** la ruta lleva la clave del capítulo, así que Rubí contra Zafiro
+  casa cero filas; si casan menos de la mitad de los conceptos hace falta que alguien lo confirme.
+
+`PENDIENTES-MEJORAS.md` B-03 y B-05.
+
 ### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
 
 Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las

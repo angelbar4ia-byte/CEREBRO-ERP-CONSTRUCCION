@@ -16,9 +16,8 @@ mostró y nada más; si entre una cosa y otra alguien editó, el conflicto se di
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from datetime import datetime
-from dataclasses import replace
 from typing import Any, Callable, Dict, FrozenSet, List, Mapping, Optional, Protocol, Sequence, Tuple, Union
 
 from .accesos import PERMISOS_POR_OMISION, PermisoDenegado
@@ -75,7 +74,43 @@ class YaReemplazado(Exception):
         self.por = por
 
 
+class YaColgado(Exception):
+    """El programa ya cuelga de otro presupuesto, o una de sus filas ya está enlazada a otra cosa. Un enlace puesto no se mueve
+    (D-474): si el programa es de otro presupuesto, se sube como programa nuevo."""
+
+    def __init__(self, mensaje: str, presupuesto_id: Optional[int] = None) -> None:
+        super().__init__(mensaje)
+        self.presupuesto_id = presupuesto_id
+
+
 # --------------------------------------------------------------------------- lo que el puerto guarda y entrega
+
+
+@dataclass(frozen=True)
+class Enlace:
+    """A qué se refiere una fila del programa en el presupuesto (D-474): un bloque, a un **nodo estructural**; una partida, a un
+    **renglón** —la línea de `COMPOSICION` del bloque al concepto—, no al concepto a secas, porque el mismo concepto está en
+    muchos lugares y cada lugar tiene su cantidad y su sitio en el programa. `oid` es la fila del programa."""
+
+    oid: str
+    nodo_id: Optional[int] = None
+    renglon_id: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        if (self.nodo_id is None) == (self.renglon_id is None):
+            raise ValueError(f"el enlace de {self.oid} es a un nodo o a un renglón, a uno solo")
+
+
+@dataclass(frozen=True)
+class Colgadura:
+    """Una vez que se colgó el programa (o que una versión nueva heredó los enlaces): quién, con qué rol, cuándo y qué cuadró."""
+
+    usuario: str
+    rol: str
+    presupuesto_id: int
+    nuevos: int  # los enlaces que se pusieron esa vez
+    resumen: Mapping[str, Any]
+    creada_en: datetime
 
 
 @dataclass
@@ -90,6 +125,9 @@ class ProgramaGuardado:
     version_de: Optional[int] = None  # el programa del que esta es la versión nueva
     traspaso: Optional[Dict[str, Any]] = None  # qué pasó con sus ediciones al subirla: lo que pasó y lo que no, y por qué
     reemplazado_por: Optional[int] = None  # si ya tiene versión nueva, cuál: ese programa está cerrado a ediciones (D-471)
+    presupuesto_id: Optional[int] = None  # el presupuesto del que cuelga, si ya se colgó (D-474)
+    enlaces: List[Enlace] = field(default_factory=list)  # cada fila enlazada; las que no están, no tienen con qué casarse
+    colgaduras: List[Colgadura] = field(default_factory=list)  # cada vez que se colgó, de la primera a la última
 
 
 @dataclass(frozen=True)
@@ -134,6 +172,8 @@ class VersionNueva:
     no_pasaron: List[NoPaso]
     partidas_en_comun: int = 0  # las partidas (por `oid`) que el archivo nuevo comparte con la versión anterior…
     partidas_anterior: int = 0  # …de las que ésta tenía: si no comparte ninguna, casi seguro es otro programa
+    enlaces_pasaron: int = 0  # los enlaces al presupuesto que la nueva hereda (D-474)…
+    enlaces_anterior: int = 0  # …de los que la anterior tenía
 
 
 @dataclass(frozen=True)
@@ -152,6 +192,8 @@ class ResumenPrograma:
     importado_con_rol: Optional[str] = None
     version_de: Optional[int] = None  # si es la versión nueva de otro programa, cuál
     reemplazado_por: Optional[int] = None  # si ya tiene versión nueva, cuál (lo pone `ServicioPrograma.listar`)
+    presupuesto_id: Optional[int] = None  # el presupuesto del que cuelga (D-474)
+    enlazadas: int = 0  # cuántas de sus filas están enlazadas a algo del presupuesto
 
 
 class RepositorioPrograma(Protocol):
@@ -165,12 +207,24 @@ class RepositorioPrograma(Protocol):
     def importar_version(
         self, anterior_id: int, nombre: str, programa: Programa, calendario: Calendario, *, usuario: str, rol: str,
         heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int,
+        presupuesto_id: Optional[int] = None, enlaces: Sequence[Enlace] = (),
     ) -> int:
         """Guarda el programa nuevo junto con las ediciones que pasan, todo o nada, y lo deja como la versión nueva de
         `anterior_id`. `esperaba` es la versión del anterior que vio quien sube: si ya es otra, `Conflicto`; si el
-        anterior ya tiene versión nueva, `YaReemplazado`. La versión del programa nuevo queda en lo que heredó."""
+        anterior ya tiene versión nueva, `YaReemplazado`. La versión del programa nuevo queda en lo que heredó.
+        Si el anterior colgaba de un presupuesto, `presupuesto_id` y los `enlaces` que pasan (de las filas que el archivo nuevo
+        comparte) quedan puestos, con una `Colgadura` que dice que fueron heredados (D-474)."""
 
     def leer_programa(self, programa_id: int) -> ProgramaGuardado: ...
+
+    def colgar(
+        self, programa_id: int, presupuesto_id: int, enlaces: Sequence[Enlace], *, usuario: str, rol: str, resumen: Mapping[str, Any]
+    ) -> int:
+        """Cuelga el programa de un presupuesto y enlaza sus filas. Devuelve cuántos enlaces **nuevos** puso; si no puso ninguno,
+        no escribe nada. Un enlace puesto no se mueve: el programa ya colgado de otro presupuesto, o una fila ya enlazada a otra
+        cosa, es `YaColgado`; repetir lo mismo no cambia nada. Con versión nueva el programa está cerrado: `YaReemplazado`.
+        Colgar no es editar: no sube la versión del programa ni toca su bitácora. Cada `oid` ha de ser del programa; el puerto
+        no sabe qué ids tiene el presupuesto —quien llama los sacó de él—, aunque una base los verifica con sus llaves."""
 
     def ediciones(self, programa_id: int) -> List[EdicionGuardada]:
         """Todas, en orden de secuencia, también las revertidas: la bitácora no se borra."""
@@ -355,6 +409,10 @@ class ServicioPrograma:
         # las partidas se reconocen por su `oid` y por nada más (D-471): una clave se repite dentro de un mismo programa y un
         # número de fila se corre; lo que el archivo nuevo no comparta se dice, no se adivina
         en_comun = len(set(v.base.ventanas) & set(programa.ventanas))
+        # los enlaces al presupuesto (D-474) pasan por `oid`, como todo lo demás, y solo si la fila sigue siendo de la misma clase:
+        # un bloque sigue siendo bloque y una partida, partida; lo que el archivo nuevo no trae queda sin enlace y se dice
+        tipos = {f.llave: f.tipo for f in programa.filas}
+        enlaces = [e for e in v.guardado.enlaces if e.oid in tipos and (tipos[e.oid] == "Concepto") == (e.renglon_id is not None)]
         traspaso = {
             "de": programa_id,
             "de_nombre": v.guardado.nombre,
@@ -367,11 +425,15 @@ class ServicioPrograma:
                 for n in no_pasaron
             ],
         }
+        if v.guardado.presupuesto_id is not None:
+            traspaso.update({"presupuesto_id": v.guardado.presupuesto_id, "enlaces_anterior": len(v.guardado.enlaces),
+                             "enlaces_pasaron": len(enlaces)})
         nuevo_id = self.repo.importar_version(
             programa_id, nombre.strip(), programa, calendario, usuario=usuario, rol=rol, heredadas=heredadas, traspaso=traspaso,
-            esperaba=v.version,
+            esperaba=v.version, presupuesto_id=v.guardado.presupuesto_id, enlaces=enlaces,
         )
-        return VersionNueva(nuevo_id, [e for e in self.repo.ediciones(nuevo_id)], no_pasaron, en_comun, len(v.base.ventanas))
+        return VersionNueva(nuevo_id, [e for e in self.repo.ediciones(nuevo_id)], no_pasaron, en_comun, len(v.base.ventanas),
+                            len(enlaces), len(v.guardado.enlaces))
 
     def abrir(self, programa_id: int) -> Vigente:
         """El programa tal como está hoy: la base más lo aplicado."""

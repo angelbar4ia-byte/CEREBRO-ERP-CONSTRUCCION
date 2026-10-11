@@ -82,6 +82,8 @@ class ResumenSalida(BaseModel):
     importado_con_rol: Optional[str] = None
     version_de: Optional[int] = Field(None, description="Si es la versión nueva de otro programa, cuál")
     reemplazado_por: Optional[int] = Field(None, description="Si ya tiene una versión nueva, cuál")
+    presupuesto_id: Optional[int] = Field(None, description="El presupuesto del que cuelga, si ya se colgó (D-474; `python3 -m api.colgar_programa`)")
+    enlazadas: int = Field(0, description="Cuántas de sus filas están enlazadas a algo del presupuesto")
 
 
 class ImportacionEntrada(BaseModel):
@@ -181,6 +183,8 @@ class ProgramaSalida(BaseModel):
     calendario: Dict[str, Any]
     version_de: Optional[int] = None
     reemplazado_por: Optional[int] = None
+    presupuesto_id: Optional[int] = Field(None, description="El presupuesto del que cuelga, si ya se colgó")
+    enlazadas: int = Field(0, description="Cuántas de sus filas están enlazadas a algo del presupuesto")
     traspaso: Optional[Dict[str, Any]] = Field(None, description="Si es una versión nueva: de cuál y qué pasó con sus ediciones")
     vista: Dict[str, Any] = Field(description="El programa base dibujable, con lo necesario para reprogramar en pantalla")
     guardadas: List[EdicionSalida] = Field(description="Toda la bitácora, también lo revertido, en orden")
@@ -327,6 +331,7 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
         return ProgramaSalida(
             id=programa_id, nombre=v.guardado.nombre, version=v.version, calendario=v.guardado.calendario.a_dict(), vista=vista_de(v),
             version_de=v.guardado.version_de, reemplazado_por=v.guardado.reemplazado_por, traspaso=v.guardado.traspaso,
+            presupuesto_id=v.guardado.presupuesto_id, enlazadas=len(v.guardado.enlaces),
             guardadas=[_edicion_salida(e) for e in servicio.repo.ediciones(programa_id)],
         )
 

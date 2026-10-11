@@ -27,12 +27,15 @@ from core.programa import (
     origen_de_edicion,
 )
 from core.servicio_programa import (
+    Colgadura,
     Conflicto,
     EdicionGuardada,
+    Enlace,
     Heredada,
     ProgramaGuardado,
     ProgramaNoExiste,
     ResumenPrograma,
+    YaColgado,
     YaReemplazado,
 )
 
@@ -82,11 +85,17 @@ class PostgresPrograma:
             return self._insertar(nombre, programa, calendario, usuario, rol)
 
     def importar_version(self, anterior_id: int, nombre: str, programa: Programa, calendario: Calendario, *, usuario: str, rol: str,
-                         heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int) -> int:
+                         heredadas: Sequence[Heredada], traspaso: Mapping[str, Any], esperaba: int,
+                         presupuesto_id: Optional[int] = None, enlaces: Sequence[Enlace] = ()) -> int:
         with self.conn.transaction():
             self._bloquear(anterior_id, esperaba)  # el anterior, con su fila bloqueada: nadie edita mientras se hereda
             self._sin_sucesor(anterior_id)
             pid = self._insertar(nombre, programa, calendario, usuario, rol, anterior_id, traspaso, len(heredadas))
+            if presupuesto_id is not None:
+                self._poner_enlaces(pid, presupuesto_id, enlaces)
+                self.conn.execute(
+                    "INSERT INTO programa_colgadura (programa_id, presupuesto_id, usuario, rol, nuevos, resumen) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (pid, presupuesto_id, usuario, rol, len(enlaces), Jsonb({"heredada_de": anterior_id, "enlaces": len(enlaces)})))
             for i, h in enumerate(heredadas, start=1):
                 datos = edicion_a_dict(h.edicion)
                 tipo = datos.pop("edicion")
@@ -137,12 +146,15 @@ class PostgresPrograma:
                          AND f.tipo = 'Concepto' AND f.inicio IS NOT NULL AND f.dias > 0),
                        (SELECT count(*) FROM programa_vinculo v WHERE v.programa_id = p.id AND v.estado = 'vigente'),
                        (SELECT count(*) FROM programa_vinculo v WHERE v.programa_id = p.id AND v.estado = 'rechazado'),
-                       (SELECT count(*) FROM edicion_programa e WHERE e.programa_id = p.id AND e.estado = 'aplicada')
+                       (SELECT count(*) FROM edicion_programa e WHERE e.programa_id = p.id AND e.estado = 'aplicada'),
+                       p.presupuesto_id,
+                       (SELECT count(*) FROM programa_fila f WHERE f.programa_id = p.id AND (f.nodo_id IS NOT NULL OR f.renglon_id IS NOT NULL))
                   FROM programa p ORDER BY p.id
                 """).fetchall()
         return [
             ResumenPrograma(id=r[0], nombre=r[1], version=r[2], creado_en=r[3], importado_por=r[4], importado_con_rol=r[5],
-                            version_de=r[6], partidas=r[7], vinculos=r[8], rechazados=r[9], ediciones=r[10])
+                            version_de=r[6], partidas=r[7], vinculos=r[8], rechazados=r[9], ediciones=r[10],
+                            presupuesto_id=r[11], enlazadas=r[12])
             for r in filas
         ]
 
@@ -150,11 +162,11 @@ class PostgresPrograma:
     def leer_programa(self, programa_id: int) -> ProgramaGuardado:
         with self.conn.transaction():
             fila = self.conn.execute(
-                "SELECT nombre, calendario, version, version_de, traspaso, (SELECT s.id FROM programa s WHERE s.version_de = p.id)"
-                " FROM programa p WHERE p.id = %s", (programa_id,)).fetchone()
+                "SELECT nombre, calendario, version, version_de, traspaso, (SELECT s.id FROM programa s WHERE s.version_de = p.id),"
+                " presupuesto_id FROM programa p WHERE p.id = %s", (programa_id,)).fetchone()
             if fila is None:
                 raise ProgramaNoExiste(programa_id)
-            nombre, cal, version, version_de, traspaso, reemplazado_por = fila
+            nombre, cal, version, version_de, traspaso, reemplazado_por, presupuesto_id = fila
             filas = [
                 Fila(llave=r[0], fila=r[1], nivel=r[2], tipo=r[3], clave=r[4], descripcion=r[5], inicio=r[6], termino=r[7],
                      dias=_a_fraction(r[8]), frente=r[9], etapa=r[10])
@@ -175,8 +187,84 @@ class PostgresPrograma:
                     "SELECT sucesora_oid, texto_fuente, motivo FROM programa_vinculo"
                     " WHERE programa_id = %s AND estado = 'rechazado' ORDER BY id", (programa_id,))
             ]
+            enlaces = [
+                Enlace(r[0], nodo_id=r[1], renglon_id=r[2])
+                for r in self.conn.execute(
+                    "SELECT oid, nodo_id, renglon_id FROM programa_fila"
+                    " WHERE programa_id = %s AND (nodo_id IS NOT NULL OR renglon_id IS NOT NULL) ORDER BY orden", (programa_id,))
+            ]
+            colgaduras = [
+                Colgadura(usuario=r[0], rol=r[1], presupuesto_id=r[2], nuevos=r[3], resumen=r[4], creada_en=r[5])
+                for r in self.conn.execute(
+                    "SELECT usuario, rol, presupuesto_id, nuevos, resumen, creada_en FROM programa_colgadura"
+                    " WHERE programa_id = %s ORDER BY id", (programa_id,))
+            ]
         return ProgramaGuardado(programa_id, nombre, filas, vinculos, rechazados, Calendario.desde_dict(cal), version, version_de, traspaso,
-                                reemplazado_por)
+                                reemplazado_por, presupuesto_id, enlaces, colgaduras)
+
+    # ------------------------------------------------------------------ colgar
+    def colgar(self, programa_id: int, presupuesto_id: int, enlaces: Sequence[Enlace], *, usuario: str, rol: str,
+               resumen: Mapping[str, Any]) -> int:
+        with self.conn.transaction():
+            actual = self.conn.execute("SELECT presupuesto_id FROM programa WHERE id = %s FOR UPDATE", (programa_id,)).fetchone()
+            if actual is None:
+                raise ProgramaNoExiste(programa_id)
+            self._sin_sucesor(programa_id)
+            if actual[0] is not None and actual[0] != presupuesto_id:
+                raise YaColgado(f"el programa {programa_id} ya cuelga del presupuesto {actual[0]}: no se cambia, se sube otro programa", actual[0])
+            puestos = {r[0]: Enlace(r[0], nodo_id=r[1], renglon_id=r[2]) for r in self.conn.execute(
+                "SELECT oid, nodo_id, renglon_id FROM programa_fila"
+                " WHERE programa_id = %s AND (nodo_id IS NOT NULL OR renglon_id IS NOT NULL)", (programa_id,))}
+            oids = {r[0] for r in self.conn.execute("SELECT oid FROM programa_fila WHERE programa_id = %s", (programa_id,))}
+            nuevos: List[Enlace] = []
+            for e in enlaces:
+                if e.oid not in oids:
+                    raise ValueError(f"el programa {programa_id} no tiene la fila {e.oid}")
+                if e.oid in puestos:
+                    if puestos[e.oid] != e:
+                        raise YaColgado(f"la fila {e.oid} del programa {programa_id} ya está enlazada: un enlace puesto no se mueve", actual[0])
+                elif e not in nuevos:
+                    nuevos.append(e)
+            # lo que se enlaza es de una sola fila: dos filas del programa no ocupan el mismo nodo ni el mismo renglón (los índices
+            # de la migración 0006 lo garantizan también, pero aquí se dice con el mismo error que en memoria)
+            ocupados = {(x.nodo_id, x.renglon_id) for x in puestos.values()}
+            for e in nuevos:
+                if (e.nodo_id, e.renglon_id) in ocupados:
+                    raise YaColgado(f"el nodo o el renglón de la fila {e.oid} ya lo ocupa otra fila del programa {programa_id}", actual[0])
+                ocupados.add((e.nodo_id, e.renglon_id))
+            if not nuevos:
+                return 0
+            self._poner_enlaces(programa_id, presupuesto_id, nuevos)
+            self.conn.execute(
+                "INSERT INTO programa_colgadura (programa_id, presupuesto_id, usuario, rol, nuevos, resumen) VALUES (%s, %s, %s, %s, %s, %s)",
+                (programa_id, presupuesto_id, usuario, rol, len(nuevos), Jsonb(dict(resumen))))
+        return len(nuevos)
+
+    def _poner_enlaces(self, programa_id: int, presupuesto_id: int, enlaces: Sequence[Enlace]) -> None:
+        """Con la transacción abierta. La base verifica lo que el puerto no sabe: que cada nodo y cada renglón sean del presupuesto
+        y que cada oid sea del programa; lo demás —que una fila no tenga dos enlaces, que un nodo no lo ocupen dos filas— lo
+        verifican sus índices."""
+        nodos = [e.nodo_id for e in enlaces if e.nodo_id is not None]
+        renglones = [e.renglon_id for e in enlaces if e.renglon_id is not None]
+        if nodos:
+            hallados = self.conn.execute(
+                "SELECT count(*) FROM nodo WHERE id = ANY(%s) AND presupuesto_id = %s", (nodos, presupuesto_id)).fetchone()[0]
+            if hallados != len(set(nodos)):
+                raise ValueError(f"hay nodos enlazados que no son del presupuesto {presupuesto_id}")
+        if renglones:
+            hallados = self.conn.execute(
+                "SELECT count(*) FROM composicion c JOIN nodo p ON p.id = c.padre_id"
+                " WHERE c.id = ANY(%s) AND c.version_id IS NULL AND p.presupuesto_id = %s", (renglones, presupuesto_id)).fetchone()[0]
+            if hallados != len(set(renglones)):
+                raise ValueError(f"hay renglones enlazados que no son del presupuesto {presupuesto_id}")
+        self.conn.execute("UPDATE programa SET presupuesto_id = %s WHERE id = %s", (presupuesto_id, programa_id))
+        with self.conn.cursor() as cur:
+            for e in enlaces:
+                cur.execute(
+                    "UPDATE programa_fila SET nodo_id = %s, renglon_id = %s WHERE programa_id = %s AND oid = %s",
+                    (e.nodo_id, e.renglon_id, programa_id, e.oid))
+                if cur.rowcount != 1:
+                    raise ValueError(f"el programa {programa_id} no tiene la fila {e.oid}")
 
     def ediciones(self, programa_id: int) -> List[EdicionGuardada]:
         with self.conn.transaction():
