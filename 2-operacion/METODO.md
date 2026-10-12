@@ -263,6 +263,8 @@ declaran doce en su frase de identidad.
 
 > **Ninguna de las tres revisiones anteriores lo vio.** Cada una comprobaba que las
 > partes encajaran, no que dijeran lo mismo.
+>
+> Qué cifras viven en más de un sitio y quién las guarda: `METACOGNICION.md` §2.
 
 ## 3.7 Una referencia se audita por tema, no por que resuelva
 
@@ -305,6 +307,9 @@ Están completos en `MEMORIA.md` §3. Los que más enseñan:
 > **Seis de ocho las detectó el usuario, no el sistema.** Por eso el patrón de
 > proponer y esperar aprobación no es cortesía: es el mecanismo que atrapa estos
 > errores.
+>
+> Las familias en que se agrupan los errores posteriores, y qué atrapa cada una:
+> `METACOGNICION.md` §5.
 
 ---
 

@@ -123,5 +123,5 @@ alcances — no uno:
 | Material | $1,439,761.33 |
 
 Aparte, $394,172.93 del catálogo reconstruido **no entran en ninguno de los
-dos** — todavía no tienen matriz para esta capa (`PENDIENTES-MEJORAS.md` B-69):
+dos** — todavía no tenían matriz para esta capa (`PENDIENTES-MEJORAS.md` B-69, que después los clasificó y explotó donde procedía):
 no es un tercer alcance, es lo que se queda fuera de los dos de arriba.

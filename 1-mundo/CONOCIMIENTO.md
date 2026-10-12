@@ -4366,7 +4366,7 @@ losa 0.72); como el plazo solo crece 2, parte se traslapa con la planta baja
 o se compensa en acabados, y eso lo decide el planeador. Si prefiere repartir
 los 10 días con la obra gris o los pisos, la cadena lo permite.
 
-**Pendiente de validar (B-86).** (a) La cadena, en especial los relevos de
+**Pendiente de validar (B-86).** *(B-86 se resolvió en D-442; lo que queda es del planeador.)* (a) La cadena, en especial los relevos de
 origen recurso o decisión: el orden de los pisos, la cancelería tras el piso
 de áreas comunes, la carpintería tras la cancelería. (b) Dónde se escriben
 los vínculos entre bloques: la propuesta es en la fila del bloque; hoy todos
@@ -4477,7 +4477,7 @@ cimentación con la ventana de su bloque, las losas por altura iguales a las de
 Zafiro y los resúmenes consistentes; de la red, formato, predecesora dentro del
 bloque, cumplimiento con las fechas y que solo cambie la columna `Vínculos`.
 
-**Pendiente de validar (B-84).** Once supuestos, en la hoja «A validar» del libro
+**Pendiente de validar (B-84).** *(B-84 se resolvió en D-449; lo que queda es del planeador.)* Once supuestos, en la hoja «A validar» del libro
 de revisión: la ventana, la cuadrilla de la estructura de PA, el colado y
 descimbrado de la losa de azotea (8 días de fraguado), los pretiles antes del
 descimbrado, el plafón de PA, las instalaciones de PA, los acabados de PA con
@@ -5025,7 +5025,7 @@ una fecha ya decidida —D-437 ya cerró que Plus cierra a las 30
 semanas—: es el costo en personal de una decisión que ya se tomó, no
 una corrección sobre ella.
 
-**Lo que esto no resuelve.** Instalaciones (B-83) sigue sin un cruce
+**Lo que esto no resuelve.** *(Dicho antes de D-439, que cierra B-83.)* Instalaciones (B-83) sigue sin un cruce
 clave↔`MO-` propio —la semilla solo tiene 7 destajos de
 electricidad/sanitario, genéricos, nunca emparejados contra una
 `Clave` de catálogo—, así que la mitad de la hipótesis de B-84 (3)
@@ -5525,7 +5525,7 @@ incumplidos:
 |---|---|
 | Descartes (3) y reasignaciones (5) en Zafiro | **No tocar Zafiro.** |
 | Inversiones (4) | **Ninguna.** Con lo anterior, tampoco se descartan: los vínculos se quedan como están |
-| `SF` (B-81) | **«Zafiro queda desde origen, solo anotar todo lo encontrado».** No se convierte `SF` al revés ni se agrega al enum; B-81 sigue abierto con la evidencia anotada |
+| `SF` (B-81) | **«Zafiro queda desde origen, solo anotar todo lo encontrado».** No se convierte `SF` al revés ni se agrega al enum; B-81 sigue abierto con la evidencia anotada *(se resolvió en D-445)* |
 | `P16` y la segunda ruta | `P16` sigue pendiente (D-437); la segunda ruta se arma como borrador, sin escribirla |
 
 **Zafiro es el original y no se corrige: la lista de D-442/D-443 pasa de
@@ -6106,7 +6106,7 @@ gremio**, y **lo del catálogo de conceptos-frentes se va a revisar**.
 **Lo confirmado.** La definición de D-450 queda firme en sus tres niveles: frente =
 nivel constructivo (Subcapítulo, Nivel 1); sub-frente = las etapas (Nivel 2) del frente
 agrupadas por gremio; detalle = la etapa y, debajo, sus partidas. De B-88 sigue abierto
-el mapa de qué gremio es cada etapa y la marca de los frentes que son paquete.
+el mapa de qué gremio es cada etapa y la marca de los frentes que son paquete *(B-88 se resolvió en D-455)*.
 
 **Lo que D-450 dio por resuelto de más.** Dijo que el «Catálogo de conceptos-frentes» «no
 hace falta» y el glosario que «no hay» tal catálogo. Lo único que se comprobó es que **no
@@ -6807,7 +6807,7 @@ parte de la máquina (`CATALOGOS.md`, «Qué archivos de OPUS están en el repo�
   cuadrillas. Es la primera vez que B-02 se prueba con algo más que un caso trabajado.
 - **`ANALISIS_DE_BASICOS_COMPUESTOS` no aporta nada que `_CONCEPTOS` no traiga**, y `Origen` ahí es la clase del padre.
 - **P-09 sigue sin resolverse y P-11 ya se puede ejecutar:** los cuatro conceptos sin matriz no están en ningún archivo que
-  haya; las 79 claves `AUX-` son las reales y están completas.
+  haya; las 79 claves `AUX-` son las reales y están completas. *(P-11 se ejecutó en D-478.)*
 
 `CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-02, B-06, P-09 y P-11.
 

@@ -9,7 +9,7 @@ tools: Read, Grep, Glob, Write
 capa:       II — Operación
 pregunta:   ¿qué forma darle antes de moverse?
 tiempo:     se hace así
-corte:      2026-10-11
+corte:      2026-10-12
 verificado: Diseña, no implementa
 ```
 
@@ -19,6 +19,9 @@ Tu trabajo es **decidir la forma de los datos**, no escribir la aplicación. Ent
 esquemas, relaciones y el razonamiento detrás. Otro agente implementa.
 
 ## Antes de proponer nada
+
+**Primero, el foco.** Leé «El foco» de `4-direccion/ESTADO.md`: si dice que la aplicación no se construye (D-487), un diseño
+nuevo de módulo, ruta o pantalla no se entrega; devolvé la decisión que haría falta y qué la desbloquea.
 
 Leé el skill `erp-construccion` y `CONOCIMIENTO.md`. Contienen reglas **verificadas
 contra datos reales**, no supuestos. No las re-derives. Si un dato del proyecto
@@ -31,9 +34,9 @@ diccionario de datos (§4b), alerta (§5a), roles y permisos (§5b), programa
 ya están diseñados. Proponer de nuevo lo que ya está cerrado es el mismo
 error que ignorar `MEMORIA.md` §2.
 
-**Y lo que ya se construyó tiene su esquema en la base** (`database/migraciones/0001` a `0009`): la persistencia del catálogo, las matrices y los
+**Y lo que ya se construyó tiene su esquema en la base** (`database/migraciones/0001` a `0010`): la persistencia del catálogo, las matrices y los
 presupuestos (`MODELO.md` §4a, D-473), el programa que cuelga del presupuesto (D-474), el estado de congelamiento (D-475), la reconciliación
-(D-476) y `CLON` (`MODELO.md` §4b, D-478). Cambiar algo de eso ya no es un diseño en papel: es **una migración nueva** que arrastra datos reales, y
+(D-476), `CLON` (`MODELO.md` §4b, D-478) y la bandeja de propuestas y alertas (`MODELO.md` §5 y §5a, D-485). Cambiar algo de eso ya no es un diseño en papel: es **una migración nueva** que arrastra datos reales, y
 lo que no se reescribe (versiones, líneas de matriz, bitácoras, clones) lo defiende un disparador. Las funciones atómicas nuevas
 (`cargar_catalogo_opus`, `contratar_subarbol`, `clonar_insumo`) se proponen en `MODELO.md` §5b y se corrigen en la tabla, sin tocar esquema.
 

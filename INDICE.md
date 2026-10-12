@@ -4,7 +4,7 @@
 órgano:     cuerpo calloso — conecta las capas, no pertenece a ninguna
 capa:       —
 pregunta:   ¿dónde va cada cosa?
-corte:      2026-09-26
+corte:      2026-10-12
 ```
 
 > **Regla de oro: cada hecho vive en un solo archivo. Los demás lo referencian.**
@@ -21,7 +21,7 @@ nombrarlo.
 | Capa | Tiempo | Qué contiene | Archivos |
 |---|---|---|---|
 | **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `PROGRAMA-CPM` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
-| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `WORKFLOWS` · `skills/` · `agentes/` |
+| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `METACOGNICION` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `WORKFLOWS` · `skills/` · `agentes/` |
 | **III · Historia** | *Fue así* | Lo consolidado y lo que enseñó | `MEMORIA` · `CASO-TRABAJADO` · `APRENDIZAJE` |
 | **IV · Dirección** | *Vamos aquí* | Dónde estoy, qué falta, qué merece el enfoque | `ESTADO` · `PENDIENTES` · `PRIORIDADES` · `IDEAS` · `PROPUESTA-…` |
 
@@ -44,9 +44,10 @@ cerebro/
 │   ├── programas/             los siete programas y sus listas, en CSV (13 archivos)
 │   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices e ingenierías de ALAMO 18 (14 archivos)
 │   └── fuentes/               las demás tablas que el usuario compartió, a salvo (D-479): almacén, avance, precio real, semilla y programa, cada libro tal cual y cada hoja en CSV, con su MANIFIESTO de huellas
-├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
+├── 2-operacion/               METODO · METACOGNICION · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
-│   ├── skills/                erp-construccion + importacion · rediseno · parametrico
+│   ├── red-del-cerebro.py      ← mide cómo está conectado: referencias, cambios que van juntos, qué se lee primero
+│   ├── skills/                erp-construccion + importacion · rediseno · parametrico · cuantificador · programa
 │   └── agentes/               gravity (orquesta) · arquitecto · constructor · migrador · auditor
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
@@ -98,6 +99,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | **ESTADO** | IV | ¿Dónde vamos y cómo retomar? | Propiocepción |
 | **MÉTODO** | II | ¿Cómo se piensa aquí? · identidad | Función ejecutiva |
 | **RAZONAMIENTO** | II | ¿Cómo se responde una pregunta que el cerebro no tiene guardada? | Corteza prefrontal |
+| **METACOGNICION** | II | ¿Qué sabe el cerebro de sí mismo y cómo le llega a cada parte lo que cambia? | Corteza prefrontal anterior |
 | **CONOCIMIENTO** | I | ¿Cómo funciona el sistema? | Corteza asociativa |
 | **CATALOGOS** | I | ¿Qué trae cada catálogo de origen? | Memoria perceptiva |
 | **MODELO** | I | ¿Qué forma tienen los datos? | Esquema corporal |
@@ -242,11 +244,12 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `ESTADO.md` | IV | ✅ Punto de entrada · punto de corte |
 | `METODO.md` | II | ✅ Razonamiento e identidad |
 | `RAZONAMIENTO.md` | II | 🆕 Cómo responder preguntas operativas con el cerebro ya construido |
+| `METACOGNICION.md` | II | 🆕 La difusión, las conexiones y lo que el cerebro sabe de sí mismo, medido |
 | `MODELO.md` | I | ✅ Aprobado, 15 hallazgos resueltos |
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 490 decisiones · 12 descartes · 33 correcciones |
+| `MEMORIA.md` | III | ✅ 491 decisiones · 12 descartes · 34 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
@@ -270,6 +273,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `agentes/gravity-obra.md` | II | 🆕 Orquestador interno · Ollama local, Groq red · diseñado, no construido |
 | `agentes/auditor-erp.md` | II | 🆕 Corre las invariantes — **de los datos y del cerebro** |
 | `verificar-cerebro.py` | II | 🆕 9 comprobaciones mecánicas de coherencia |
+| `red-del-cerebro.py` | II | 🆕 Mide la red: conexiones escritas, cambios que van juntos, capacidad |
 | `IDEAS.md` | IV | 🆕 8 ideas sin diseñar · dividido de CONOCIMIENTO |
 | `PROPUESTA-CUATRO-MODULOS.md` | IV | ✅ **22 decisiones cerradas** · pendiente diseño formal |
 | `agentes/` | II | Gravity, arquitecto, constructor, migrador, auditor |

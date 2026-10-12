@@ -16,7 +16,7 @@ from pathlib import Path
 RAIZ = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent)
 HOY = datetime.date.today()
 
-fallas, avisos = [], []
+fallas, avisos, notas = [], [], []
 
 
 def falla(archivo, msg):
@@ -25,6 +25,10 @@ def falla(archivo, msg):
 
 def aviso(archivo, msg):
     avisos.append((archivo, msg))
+
+
+def nota(msg):
+    notas.append(msg)
 
 
 def archivos():
@@ -197,6 +201,102 @@ def check_conteos(textos):
                     aviso(arch, f"línea {n}: declara {m.group(1)} términos; conté {terminos} encabezados")
 
 
+def check_migraciones(textos):
+    """Lo que el cerebro dice de las migraciones (cuántas, cuáles) contra la carpeta (D-491: dos agentes decían 0009 y había 0010)."""
+    carpeta = RAIZ / "database" / "migraciones"
+    reales = sorted(p.name for p in carpeta.glob("*.sql")) if carpeta.is_dir() else []
+    if not reales:
+        return
+    ultima = max(int(n[:4]) for n in reales)
+    for arch, t in textos.items():
+        for n, linea in enumerate(t.split("\n"), 1):
+            for m in re.finditer(r"0001`?\s*(?:…|\.\.\.|a)\s*`?(\d{4})", linea):
+                # las filas de MEMORIA cuentan lo que era cierto el día de cada decisión
+                if arch != "MEMORIA.md" and int(m.group(1)) != ultima:
+                    falla(arch, f"línea {n}: dice que las migraciones llegan a {m.group(1)}; llegan a {ultima:04d}")
+            for nombre in re.findall(r"\b(\d{4}_[a-z0-9_]+\.sql)\b", linea):
+                if nombre not in reales:
+                    falla(arch, f"línea {n}: nombra la migración {nombre}, que no existe")
+    en_indice = set(re.findall(r"\b(\d{4}_[a-z0-9_]+\.sql)\b", textos.get("INDICE.md", "")))
+    for nombre in reales:
+        if en_indice and nombre not in en_indice:
+            falla("INDICE.md", f"no lista la migración {nombre}")
+
+
+SIMBOLOS_DE_ETAPA = {"✅": "pasan", "⚠": "con matices", "🔶": "diseñadas", "⛔": "sin poder probarse"}
+
+
+def check_tallas(textos):
+    """El recuento de cada prueba de flujo contra los símbolos de su tabla, y la suma de las tres contra lo que dicen ESTADO y PENDIENTES
+    (D-489 movió una etapa de ⚠️ a ✅ y hubo que cambiar el número en cinco sitios a mano)."""
+    suma = dict.fromkeys(SIMBOLOS_DE_ETAPA.values(), 0)
+    suma["etapas"] = 0
+    for arch, t in textos.items():
+        if not arch.startswith("PRUEBA-"):
+            continue
+        cuenta = dict.fromkeys(SIMBOLOS_DE_ETAPA.values(), 0)
+        for fila in re.findall(r"^\| \d+ \| [^|]+ \| (\S+)", t, re.M):
+            for simbolo, nombre in SIMBOLOS_DE_ETAPA.items():
+                if fila.startswith(simbolo):
+                    cuenta[nombre] += 1
+        linea = re.search(r"^verificado:.*$", t, re.M)
+        if not linea or not sum(cuenta.values()):
+            continue
+        dice = {"pasan": r"(\d+) pasan", "con matices": r"(\d+) con matices", "diseñadas": r"(\d+) diseñadas?", "sin poder probarse": r"(\d+) sin poder probarse"}
+        for nombre, patron in dice.items():
+            m = re.search(patron, linea.group(0))
+            if int(m.group(1) if m else 0) != cuenta[nombre]:
+                falla(arch, f"el encabezado dice {m.group(1) if m else 0} «{nombre}» y la tabla de etapas trae {cuenta[nombre]}")
+        for nombre, n in cuenta.items():
+            suma[nombre] += n
+        suma["etapas"] += sum(cuenta.values())
+    if not suma["etapas"]:
+        return
+    esperado = (f"{suma['etapas']} etapas — {suma['pasan']} pasan, {suma['con matices']} con matices, {suma['diseñadas']} diseñadas sin caso real que las ejerciten, "
+                f"{suma['sin poder probarse']} sin poder probarse")
+    for arch in ("ESTADO.md", "PENDIENTES-MEJORAS.md"):
+        for n, linea in enumerate(textos.get(arch, "").split("\n"), 1):
+            m = re.search(r"\d+ etapas — \d+ pasan, \d+ con matices, \d+ diseñadas sin caso real que las ejerciten, \d+ sin poder probarse", linea)
+            if m and m.group(0) != esperado:
+                falla(arch, f"línea {n}: dice «{m.group(0)}»; las tres pruebas de flujo suman «{esperado}»")
+
+
+LIMITE_DE_FILA = 2500  # caracteres; el espacio de trabajo es de capacidad limitada (D-491)
+
+
+def check_capacidad(textos):
+    """ESTADO.md e INDICE.md se leen primero y por todos: una fila de tabla no puede ser una cronología. La cronología es de MEMORIA.md.
+    (D-491: una sola celda de ESTADO.md llegó a 35,438 caracteres, de D-383 a D-489.)"""
+    for arch in ("ESTADO.md", "INDICE.md"):
+        for n, linea in enumerate(textos.get(arch, "").split("\n"), 1):
+            if linea.startswith("|") and len(linea) > LIMITE_DE_FILA:
+                falla(arch, f"línea {n}: una fila de {len(linea):,} caracteres (el límite es {LIMITE_DE_FILA:,}); el qué pasó va a MEMORIA.md y aquí queda cómo está hoy")
+
+
+def check_cortes_contra_git():
+    """Cuántos archivos cambiaron después de su `corte`. Es una nota y no un aviso: el corte se mueve cuando se verifica el archivo,
+    no en cada edición. Solo con historia completa (en el CI el clon es superficial y todos los archivos parecerían de hoy)."""
+    import subprocess
+    try:
+        if subprocess.run(["git", "-C", str(RAIZ), "rev-parse", "--is-shallow-repository"], capture_output=True, text=True).stdout.strip() != "false":
+            return
+        tarde = []
+        for p in archivos():
+            m = re.search(r"^corte:\s+(\d{4}-\d{2}-\d{2})", p.read_text(), re.M)
+            if not m:
+                continue
+            sucio = subprocess.run(["git", "-C", str(RAIZ), "status", "--porcelain", "--", str(p)], capture_output=True, text=True).stdout.strip()
+            ultimo = HOY.isoformat() if sucio else subprocess.run(
+                ["git", "-C", str(RAIZ), "log", "-1", "--format=%ad", "--date=short", "--", str(p)], capture_output=True, text=True).stdout.strip()
+            if ultimo and ultimo > m.group(1):
+                tarde.append((p.name, (datetime.date.fromisoformat(ultimo) - datetime.date.fromisoformat(m.group(1))).days))
+        if tarde:
+            tarde.sort(key=lambda x: -x[1])
+            nota(f"{len(tarde)} archivos cambiaron después de su corte; los más atrasados: " + ", ".join(f"{n} (+{d} d)" for n, d in tarde[:4]))
+    except (OSError, ValueError):
+        pass
+
+
 # ─────────────────────────────────────────────────────────────
 # 5 · Las cifras de control siguen en su fuente
 # ─────────────────────────────────────────────────────────────
@@ -313,6 +413,10 @@ def main():
         check_tablas(p, t)
 
     check_conteos(textos)
+    check_migraciones(textos)
+    check_tallas(textos)
+    check_capacidad(textos)
+    check_cortes_contra_git()
     check_cifras(textos)
     check_contradicciones(textos)
     check_duplicacion(textos)
@@ -330,6 +434,8 @@ def main():
         print()
     if not fallas and not avisos:
         print("Todo cuadra.")
+    for n in notas:
+        print(f"Nota: {n}")
     return 1 if fallas else 0
 
 

@@ -98,7 +98,7 @@ de siete comparten tasa; los dos que se salen están **1.71× por debajo** — e
 dispersión, es otra población.
 
 > **Hallazgo doble.** Uno de dominio: la cohorte de cimentación no es el número de
-> plantas, y qué es sigue sin saberse (**B-52**). Y uno de método: **una partición que
+> plantas, y qué es sigue sin saberse (**B-52**; D-312: es el desplante). Y uno de método: **una partición que
 > mejora el número no queda probada por mejorarlo.** El 32% que quedaba en el otro
 > subgrupo era la señal de que faltaba explicación, y se leyó como ruido.
 

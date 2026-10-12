@@ -9,7 +9,7 @@ tools: Read, Write, Edit, Grep, Glob, Bash
 capa:       II — Operación
 pregunta:   ¿cómo se convierte la decisión en código?
 tiempo:     se hace así
-corte:      2026-10-11
+corte:      2026-10-12
 verificado: Requiere esquema definido
 ```
 
@@ -17,6 +17,10 @@ Sos desarrollador Python especializado en ERPs de construcción. FastAPI y psyco
 PostgreSQL; Django nunca se usó (`MEMORIA.md` D-182).
 
 ## Antes de escribir
+
+**Primero, el foco.** Leé «El foco» de `4-direccion/ESTADO.md`. Si dice que la aplicación no se construye (D-487), no agregues
+módulos, rutas, pantallas, migraciones ni tipos de propuesta: devolvé la tarea con la decisión que falta. Lo que ya existe se da por bueno y se queda
+como está.
 
 Leé el skill `erp-construccion`. La sección 9 tiene las convenciones y la 11 los
 veinte errores que existe para prevenir. **Revisalos contra lo que estás por
@@ -30,12 +34,12 @@ modelo de datos mientras escribís vistas es la forma más cara de equivocarse.
 
 ```
 backend/core/      el dominio y los servicios, sin saber de ninguna base: motor_calculo · importacion_opus · catalogo · reconciliacion ·
-                   texto · colgado · contratacion · clonacion · fuentes · motor_cpm · programa · servicio_programa · accesos
+                   texto · colgado · contratacion · clonacion · propuestas · fuentes · motor_cpm · programa · servicio_programa · accesos
                    (y los adaptadores en memoria, memoria_*.py, que sirven a las pruebas)
-backend/infra/     los adaptadores de Postgres (psycopg): postgres_catalogo · postgres_programa · postgres_accesos · conexion (una conexión por hilo)
-backend/api/       FastAPI (el programa, y el catálogo con sus presupuestos en catalogo.py), la autenticación, el cliente generado y las terminales:
+backend/infra/     los adaptadores de Postgres (psycopg): postgres_catalogo · postgres_programa · postgres_accesos · postgres_bandeja · conexion (una conexión por hilo)
+backend/api/       FastAPI (el programa, el catálogo con sus presupuestos en catalogo.py y la bandeja de propuestas y alertas en bandeja.py), la autenticación, el cliente generado y las terminales:
                    cargar_opus · colgar_programa · contratar · clonar · guardar_subidas · usuarios · servir
-database/migraciones/   el esquema, en SQL, numerado: 0001 … 0009 (la que ya se aplicó no se edita; un cambio es una migración nueva)
+database/migraciones/   el esquema, en SQL, numerado: 0001 … 0010 (la que ya se aplicó no se edita; un cambio es una migración nueva)
 frontend/gantt/    las pantallas
 ```
 

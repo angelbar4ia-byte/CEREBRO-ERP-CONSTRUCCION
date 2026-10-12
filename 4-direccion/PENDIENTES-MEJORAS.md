@@ -5,7 +5,7 @@
 capa:       IV — Dirección
 pregunta:   ¿qué falta?
 tiempo:     vamos aquí
-corte:      2026-10-10
+corte:      2026-10-12
 verificado: 38 de decisión · 14 de datos · 25 módulos
 ```
 
