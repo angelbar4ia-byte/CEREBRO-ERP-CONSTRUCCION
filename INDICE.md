@@ -21,7 +21,7 @@ nombrarlo.
 | Capa | Tiempo | Qué contiene | Archivos |
 |---|---|---|---|
 | **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `PROGRAMA-CPM` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
-| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `skills/` · `agentes/` |
+| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `WORKFLOWS` · `skills/` · `agentes/` |
 | **III · Historia** | *Fue así* | Lo consolidado y lo que enseñó | `MEMORIA` · `CASO-TRABAJADO` · `APRENDIZAJE` |
 | **IV · Dirección** | *Vamos aquí* | Dónde estoy, qué falta, qué merece el enfoque | `ESTADO` · `PENDIENTES` · `PRIORIDADES` · `IDEAS` · `PROPUESTA-…` |
 
@@ -44,7 +44,7 @@ cerebro/
 │   ├── programas/             los siete programas y sus listas, en CSV (13 archivos)
 │   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices e ingenierías de ALAMO 18 (14 archivos)
 │   └── fuentes/               las demás tablas que el usuario compartió, a salvo (D-479): almacén, avance, precio real, semilla y programa, cada libro tal cual y cada hoja en CSV, con su MANIFIESTO de huellas
-├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD
+├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
 │   ├── skills/                erp-construccion + importacion · rediseno · parametrico
 │   └── agentes/               gravity (orquesta) · arquitecto · constructor · migrador · auditor
@@ -111,6 +111,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | **APRENDIZAJE** | III | ¿Cómo lo aprobado cambia lo que creemos? | Lazo hebbiano |
 | **SKILL** | II | ¿Qué respetar al construir? | Reflejo medular |
 | **ESCALABILIDAD** | II | ¿Cómo se agrega un módulo nuevo? | Plasticidad |
+| **WORKFLOWS** | II | ¿Cómo trabajan juntos las personas, el sistema, el agente interno y las skills? | Comisuras |
 | **INVARIANTES** | II | ¿Esto sigue cuadrando? ¿Ya terminé? | Nocicepción |
 | **PENDIENTES** | IV | ¿Qué falta? | Cola de impulsos |
 | **PRIORIDADES** | IV | ¿En qué se gasta el enfoque? | Atención selectiva |
@@ -143,6 +144,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | Los datos de un programa, su red, su ruta o el motor que los calcula | PROGRAMA-CPM | *«La ruta de relevos de Zafiro son 28 pasos»* |
 | Un módulo propuesto y sin aprobar | PROPUESTA | *«El factorizador primero»* |
 | **Cómo encaja un módulo que no existe** | **ESCALABILIDAD** | *«¿Qué dimensión agrega y de qué nodos cuelga?»* |
+| **Cómo se relacionan personas, sistema, agente y skills** | **WORKFLOWS** | *«Aprobar una propuesta pide la función de la acción que propone»* |
 
 ---
 
@@ -244,7 +246,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 483 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 484 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 787 pruebas · los siete programas reproducen las cifras publicadas |
@@ -255,6 +257,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `PRIORIDADES.md` | IV | 🆕 Criterio de orden |
 | `APRENDIZAJE.md` | III | 🆕 Diseñado, no construido |
 | `ESCALABILIDAD.md` | II | 🆕 Contrato de módulo · dos escenarios de crecimiento |
+| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir |
 | `skills/erp-importacion.md` | II | 🆕 Compilado · carga desde OPUS |
 | `skills/erp-rediseno.md` | II | 🆕 Compilado · las seis operaciones y las tres capas |
 | `skills/erp-parametrico.md` | II | 🆕 Compilado · ensambles, cohorte, dispersión |
