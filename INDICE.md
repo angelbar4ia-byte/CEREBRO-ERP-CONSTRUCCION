@@ -47,6 +47,7 @@ cerebro/
 ├── 2-operacion/               METODO · METACOGNICION · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
 │   ├── red-del-cerebro.py      ← mide cómo está conectado: referencias, cambios que van juntos, qué se lee primero, a quién releer (--vigencia), cuánto se puede partir (--integracion), si lo compilado oye a su fuente (--reentrada)
+│   ├── preparar-para-github.py ← revisa la carpeta de una app, aparta claves y datos reales y la deja lista para subir a GitHub (D-496)
 │   ├── skills/                erp-construccion + importacion · rediseno · parametrico · cuantificador · programa
 │   └── agentes/               gravity (orquesta) · arquitecto · constructor · migrador · auditor
 │                               gravity-obra (interno, Agent SDK)
@@ -249,7 +250,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 495 decisiones · 12 descartes · 35 correcciones |
+| `MEMORIA.md` | III | ✅ 496 decisiones · 12 descartes · 35 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
@@ -274,6 +275,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `agentes/auditor-erp.md` | II | 🆕 Corre las invariantes — **de los datos y del cerebro** |
 | `verificar-cerebro.py` | II | 🆕 9 comprobaciones mecánicas de coherencia |
 | `red-del-cerebro.py` | II | 🆕 Mide la red: conexiones escritas, cambios que van juntos, capacidad; con `--vigencia` a quién releer, con `--integracion` cuánto se puede partir y qué se repite, con `--reentrada` si lo compilado oye a su fuente |
+| `preparar-para-github.py` | II | 🆕 Deja la carpeta de una app lista para GitHub: aparta `.env`, llaves, bases y hojas de datos, busca claves dentro del texto (valores tapados) y arma `.gitignore`, `.env.example` y una ficha por llenar; con `--autoprueba` se prueba con claves falsas (D-496) |
 | `IDEAS.md` | IV | 🆕 8 ideas sin diseñar · dividido de CONOCIMIENTO |
 | `PROPUESTA-CUATRO-MODULOS.md` | IV | ✅ **22 decisiones cerradas** · pendiente diseño formal |
 | `agentes/` | II | Gravity, arquitecto, constructor, migrador, auditor |
