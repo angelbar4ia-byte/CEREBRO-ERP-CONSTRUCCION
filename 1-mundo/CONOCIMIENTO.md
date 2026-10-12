@@ -29,7 +29,7 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §11 | Los flujos entre sistemas | 6203 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
 | §13 | Contratación, cambios y obra en marcha | 458 | 8 |
-| §14 | La propuesta | 66 | 5 |
+| §14 | La propuesta | 75 | 6 |
 | §15 | La ruta crítica ya está en el modelo | 81 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
 | §17 | Cuantificación gráfica — de inventario a regla verificada | 72 | 4 |
@@ -8897,6 +8897,15 @@ Sin él, solo puede consultar; con él, puede sugerir sin poder romper nada.
 
 Y hace verificable su aprendizaje: **el corpus del agente son las propuestas
 aprobadas**, con su evidencia y su historia de rechazos.
+
+## 14.6 Ya está en código (D-485)
+
+La bandeja dejó de ser solo una regla: `backend/core/propuestas.py`, la migración `0010` y `backend/api/bandeja.py`. Lo que §14.2
+y §14.3 dicen, el sistema lo hace cumplir: una propuesta con la evidencia en blanco no entra; una rechazada no se borra, lleva la
+nota de quien la rechazó y no vuelve a entrar con las mismas palabras. Y se agregó lo que §14.4 daba por supuesto: **aprobar es
+hacer** —el sistema ejecuta lo propuesto con la identidad de quien aprueba, que necesita la función de esa acción además de la de
+resolver la bandeja— y **quien propone no aprueba lo suyo**. La alerta que reaparece se cuenta en vez de repetirse. La forma
+exacta, en `MODELO.md` §5 y `MODELO.md` §5a; cómo se conecta con las personas y el agente, en `WORKFLOWS.md` §3.1.
 
 ---
 

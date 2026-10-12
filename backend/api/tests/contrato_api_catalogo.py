@@ -601,6 +601,17 @@ class ContratoApiCatalogo:
         # una propuesta que no se puede hacer no trae base: no hay nada que aplicar
         self.assertIsNone(self.c.post("/clonaciones/propuestas", json={"original": "AUX-00001", "clave": "PRE-00121"}, headers=CO).json()["base"])
 
+    def test_la_correccion_de_prefijo_tambien_ata_lo_aplicado_a_lo_visto(self):
+        self.cargado()
+        cuerpo = {"viejo": "AUX", "nuevo": "PRE", "desde": 120}
+        self.assertEqual(self.c.post("/correcciones-de-prefijo/propuestas", json=cuerpo, headers=CO).json()["base"], 1)
+        self.mover_el_acero("1.02")  # alguien más carga: ahora va en la 2
+        r = self.c.post("/correcciones-de-prefijo", json={**cuerpo, "esperaba": 1}, headers=CO)
+        self.assertEqual((r.status_code, self.codigo(r)), (409, "conflicto"))
+        self.assertEqual(self.c.get("/clones").json(), [])  # no se escribió nada
+        ok = self.c.post("/correcciones-de-prefijo", json={**cuerpo, "esperaba": 2}, headers=CO)
+        self.assertEqual((ok.status_code, len(ok.json()["hechos"])), (201, 79))
+
     def test_la_api_sin_catalogo_no_tiene_estas_rutas(self):
         solo = TestClient(crear_app(self.servicio))
         for ruta in ("/presupuestos", "/cargas", "/clones", "/catalogo/AUX-00001"):

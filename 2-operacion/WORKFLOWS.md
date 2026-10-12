@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-12
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-482 · tres propuestas sin confirmar (D-484)
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485)
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -35,8 +35,8 @@ verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y
 | Quién | Qué hace | Qué no hace nunca | De dónde sale su autoridad | Estado |
 |---|---|---|---|---|
 | **La persona** | Decide, aprueba, carga, contrata, clona, edita | Aprobar lo que ella misma originó (D-269) | Sus roles → las funciones de `ROL_FUNCION`; y qué obras ve, por la jerarquía | Roles y funciones, construidos (D-469); el alcance por obra, no (B-98) |
-| **El sistema** (servicios y API) | Calcula, valida, escribe todo o nada, deja la bitácora | Escribir sin una persona con la función | Comprueba la función **de quien llama**, en cada acción, leyendo la tabla de hoy | Construido para programa, catálogo, presupuesto, colgado, contratación y clonación (D-461 a D-482) |
-| **El agente interno** (Gravity) | Lee, detecta, explica, simula y propone | Escribir, calcular dinero, aprobar lo suyo, reabrir lo rechazado sin evidencia nueva | **Ninguna propia**: lo que propone solo se aplica si una persona con la función lo aprueba | Diseñado, fase 2 (`gravity-obra.md`) |
+| **El sistema** (servicios y API) | Calcula, valida, escribe todo o nada, deja la bitácora | Escribir sin una persona con la función | Comprueba la función **de quien llama**, en cada acción, leyendo la tabla de hoy | Construido para programa, catálogo, presupuesto, colgado, contratación, clonación (D-461 a D-482) y la bandeja (D-485) |
+| **El agente interno** (Gravity) | Lee, detecta, explica, simula y propone | Escribir, calcular dinero, aprobar lo suyo, reabrir lo rechazado sin evidencia nueva | **Ninguna propia**: lo que propone solo se aplica si una persona con la función lo aprueba | Diseñado, fase 2 (`gravity-obra.md`); la bandeja donde deja sus propuestas ya existe (D-485) |
 | **Las skills y los agentes de desarrollo** | Hacen que quien construye el sistema no repita errores ya pagados | Tocar datos del producto | Ninguna: son conocimiento compilado, no actores del producto | Cinco skills y cinco agentes escritos (y `gravity-obra`, diseñado) |
 
 ---
@@ -59,16 +59,16 @@ Derivado de la tabla de `MODELO.md` §5b; no agrega ninguna asignación.
 | Rol | Ve | Hace (funciones asignadas) |
 |---|---|---|
 | **Residente** | Sus obras (`RESIDENTE_OBRA`) | `trazar` · `anotar_plano` · `originar_incidencia` · `ejecutar_incidencia` · `solicitar_cierre_frente` · `editar_fechas_programa` |
-| **Supervisor** | Las de los residentes que supervisa (`SUPERVISION`) | `trazar` · `anotar_plano` · `originar_incidencia` · `aprobar_incidencia` · `cerrar_incidencia` · `aprobar_cierre_frente` |
+| **Supervisor** | Las de los residentes que supervisa (`SUPERVISION`) | `trazar` · `anotar_plano` · `originar_incidencia` · `aprobar_incidencia` · `cerrar_incidencia` · `aprobar_cierre_frente` · `resolver_alerta` (propuesta, D-485) |
 | **Superintendente** | Las de los supervisores que le reportan | Solo `aprobar_precio_nuevo`, junto con Control de obra. §5b dice «mismos privilegios que Supervisor», pero la tabla no lo escribe (§7, hueco 2) |
 | **Costos** | Todas | `trazar` · `proponer_precio_nuevo` · `cargar_catalogo_opus` (propuesta) |
 | **Cotizador** | No es un rol activo | Hoy lo ejecuta Control de obra |
-| **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `validar_estimacion` · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` |
+| **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `validar_estimacion` · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · `aprobar_propuesta` y `resolver_alerta` (propuestas, D-485) · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` |
 
 **Lo que se ve de un vistazo:** el trabajo de obra se reparte en cadena —Residente ejecuta y pide, Supervisor aprueba
-y cierra, Control de obra valida— y **el gobierno cruzado entre obras cae en Control de obra** (diecisiete de las
-veinticinco funciones asignadas). Doce funciones existen sin dueño (§7, hueco 1): entre ellas, las tres que el lazo
-del agente necesita.
+y cierra, Control de obra valida— y **el gobierno cruzado entre obras cae en Control de obra** (diecinueve de las
+veintisiete funciones asignadas). Diez funciones existen sin dueño (§7, hueco 1): entre ellas `registrar_avance`, la que
+alimenta las alertas de frente y de atraso.
 
 ## 2.3 Los módulos, y qué tan hechos están
 
@@ -83,7 +83,7 @@ del agente necesita.
 | **Precios nuevos** | Costos propone; Control de obra y Superintendente aprueban | 3 | Diseñado |
 | **Estimación** | Capturar, devolver, validar, pagar; con el cruce contra almacén antes del pago | 6 | Diseñado; las funciones de capturar y devolver no tienen clave |
 | **Avance y almacén** | Registrar avance físico y pagado; leer surtido contra consumido | — | Diseñado; los datos reales están en `1-mundo/fuentes/` |
-| **La bandeja** (`PROPUESTA`, `ALERTA`) | Resolver lo que el agente o una persona propone, y las alertas | 4 y 5 | Diseñada (`MODELO.md` §5 y §5a); sin construir |
+| **La bandeja** (`PROPUESTA`, `ALERTA`) | Dejar una propuesta con su evidencia; aprobarla (y el sistema la hace a nombre de quien aprueba) o rechazarla; cerrar las alertas | 4 y 5 | ✅ Servicio, API (D-485) y terminal; sin pantalla. Hoy solo se aprueba `clonacion`; ningún detector deja alertas todavía |
 | **Consulta** | Preguntar en lenguaje natural | — | Diseñada; once herramientas definidas (`gravity-obra.md` §6) |
 
 ---
@@ -98,8 +98,8 @@ propone y el humano decide**; cambia cuántos pasos hay y quién da cada uno.
 | 1 | **Propuesta y aplicación del sistema** | `…/propuestas` calcula qué pasaría y no escribe. La aplicación vuelve a revisar, comprueba la función de quien la pide y escribe todo o nada con su correo y su rol. `esperaba` ata lo aplicado a lo que se vio: si algo cambió en medio, 409 y no se escribe | Cargar, reconciliar, colgar, contratar, clonar, corregir un prefijo, editar el programa | ✅ (D-473 a D-482) |
 | 2 | **Cadena de pasos con salto** | Originar → aprobar → validar → ejecutar → cerrar. Quien origina se salta su propio paso; el Supervisor da seguimiento hasta el cierre sin excepción (D-269) | Incidencia, cierre de frente, trazo | Diseñado |
 | 3 | **Doble aprobación obligatoria** | Los dos aprueban, no uno de dos: el estado pasa a `aprobada` solo cuando están los dos | Precio nuevo | Diseñado |
-| 4 | **Bandeja de propuestas** | Una persona o el agente deja una `PROPUESTA` con evidencia; otra persona la aprueba o la rechaza; el rechazo se conserva | Nueve tipos, más `precio_nuevo` (`CONOCIMIENTO.md` §14) | Diseñado |
-| 5 | **Alerta** | Detectar no pide permiso; resolver sí. Una alerta no sugiere valor, solo señala; nunca se resuelve sola | Veinte alertas especificadas (`MODELO.md` §5a) | Diseñado |
+| 4 | **Bandeja de propuestas** | Una persona o el agente deja una `PROPUESTA` con evidencia; otra persona la aprueba o la rechaza; el rechazo se conserva | Nueve tipos, más `precio_nuevo` (`CONOCIMIENTO.md` §14) | ✅ Construida (D-485); solo `clonacion` se puede aprobar |
+| 5 | **Alerta** | Detectar no pide permiso; resolver sí. Una alerta no sugiere valor, solo señala; nunca se resuelve sola | Veinte alertas especificadas (`MODELO.md` §5a) | ✅ La bandeja las guarda y las cuenta (D-485); los detectores, sin construir |
 | 6 | **Validación con cruce** | Capturada → devuelta → validada → pagada, y antes de pagar se cruza contra lo que salió de almacén | Estimación | Diseñado |
 
 ## 3.1 Las formas 1 y 4 son la misma acción vista desde dos lados
@@ -120,8 +120,9 @@ aprobar quien puede clonar.
 | `orden_cambio` | Sin construir | `autorizar_orden_cambio` (sin asignar) | Diseñada |
 | `equivalencia` · `reparto` · `conversion` · `matriz_generada` · `fusion` · `patron_carga` | Sin construir | Sin función todavía | Diseñadas |
 
-`aprobar_propuesta` (sin asignar) sería, con esta regla, **la función de resolver la bandeja** —ver y descartar—, no de
-aplicar: aplicar siempre pide la función de la acción. *Propuesta sin confirmar (D-484).*
+`aprobar_propuesta` es, con esta regla, **la función de resolver la bandeja** —aprobar o rechazar—, no de aplicar: aplicar
+siempre pide la función de la acción, y por eso aprobar una clonación pide las dos. *Propuesta de D-484, construida así en
+D-485 (`api/bandeja.py`); el usuario no la ha confirmado, y cambiar quién la tiene es una fila de `ROL_FUNCION`.*
 
 ---
 
@@ -140,7 +141,7 @@ y Costos**, que ven todo, y no con Residente ni Supervisor.
 |---|---|---|---|
 | **Lee** | Resultados ya calculados | Las operaciones `listar_*` y `ver_*` | El agente no ve registros para recorrer, sino cifras: no puede equivocarse sumando |
 | **Simula** | «¿Qué pasaría si…?» | Las operaciones `…/propuestas`: calculan, no escriben y piden la función de quien pregunta | Puede explicar una consecuencia antes de que nadie decida. Si quien pregunta no tiene la función, el 403 es la respuesta: «eso lo puede hacer Control de obra» |
-| **Propone** | Deja una `PROPUESTA` o una `ALERTA` en la bandeja | **No existe todavía** | Es la única vía de entrada al sistema (`gravity-obra.md` §7) |
+| **Propone** | Deja una `PROPUESTA` o una `ALERTA` en la bandeja | El servicio ya acepta `origen=agente` (con su modelo); **la API todavía no lo deja entrar**: falta la credencial del agente (§7, hueco 6) | Es la única vía de entrada al sistema (`gravity-obra.md` §7) |
 
 Las operaciones que **aplican** (`aplicar_*`, `colgar_programa`, `contratar_subarbol`, `clonar_insumo`, `corregir_prefijo`,
 `aplicar_edicion`…) **no se le dan**. Cuando exista el MCP, «el agente no escribe» deja de ser una regla que alguien
@@ -220,10 +221,10 @@ base congela el bloque. Lo que cambie después va por control de cambio (`orden_
 valor que proponer—. El Residente solicita el cierre, el Supervisor aprueba, Control de obra valida; quien origina se
 salta su paso. El agente puede mostrar la alerta en Consulta; **no solicita nada**.
 
-**d · El agente propone corregir un prefijo** *(la mitad construida)*. Un detector ve claves cuyo prefijo no corresponde
+**d · El agente propone corregir un prefijo** *(casi toda construida)*. Un detector ve claves cuyo prefijo no corresponde
 a lo que son —como las 79 `AUX-` que eran materiales—, llama a la mano que simula y deja una `PROPUESTA(clonacion)` con
 la simulación como evidencia y su `base`. Control de obra la aprueba; corre `corregir_prefijo` con su identidad y
-`esperaba`. Lo que falta es la bandeja y el MCP; la operación, la simulación y los permisos ya existen.
+`esperaba`. Lo que falta es el detector, la credencial del agente y el MCP; la bandeja, la operación, la simulación y los permisos ya existen.
 
 ---
 
@@ -231,17 +232,17 @@ la simulación como evidencia y su `base`. Control de obra la aprueba; corre `co
 
 | # | Hueco | Quién lo mueve | Por qué importa |
 |---|---|---|---|
-| 1 | **Tres funciones del lazo del agente sin dueño**: `aprobar_propuesta` (quién resuelve la bandeja), `resolver_alerta` (quién cierra una alerta) y `registrar_avance` (quién captura el avance que alimenta las alertas de frente y de atraso). Recomendación, siguiendo lo que ya hay: `registrar_avance` a Residente y Supervisor, que ejecutan y dan seguimiento; `aprobar_propuesta` a Control de obra, que ya gobierna entre obras; `resolver_alerta` a Supervisor y Control de obra | **El usuario** | Sin ellas el agente no tiene a quién entregarle nada. Corregirlas después no toca esquema (`gestionar_rol_funcion`) |
+| 1 | **`registrar_avance` sigue sin dueño** (quién captura el avance que alimenta las alertas de frente y de atraso). Recomendación, siguiendo lo que ya hay: Residente y Supervisor, que ejecutan y dan seguimiento. *D-485 asignó, como propuestas, las otras dos del lazo: `aprobar_propuesta` a Control de obra, que ya gobierna entre obras, y `resolver_alerta` a Supervisor y Control de obra* | **El usuario** | Confirmar o cambiar las dos asignadas, y decidir la tercera. Corregirlas no toca esquema (`gestionar_rol_funcion`) |
 | 2 | **Superintendente tiene una sola función en la tabla**, aunque §5b le da «los mismos privilegios que Supervisor» | **El usuario** | Hoy un Superintendente no puede aprobar una incidencia que su Supervisor sí |
 | 3 | **El alcance por obra no se aplica en código** (B-98) | Construir | Mientras no esté, el agente y cualquier herramienta de lectura solo se pueden dar a quien ve todo |
-| 4 | **La bandeja no existe** (`PROPUESTA`, `ALERTA`; B-24 la define) | Construir | Es lo primero que necesita el agente para proponer; los servicios que la ejecutan al aprobar ya están |
-| 5 | **El MCP no existe** (B-63) | Construir, después de la bandeja | La API de D-482 es su base. Para no escribir a mano su catálogo, cada operación de la API puede declarar su **efecto** (lee, simula o aplica) y su **función**, y de ahí se derivan las herramientas |
-| 6 | **Con qué credencial actúa el agente**: la de quien pregunta para leer y simular (así se respeta su alcance y su función), y la suya propia, marcada `origen=agente`, para dejar propuestas | El usuario confirma | Es lo que hace que «quien decidió» siga siendo una persona |
+| 4 | **~~La bandeja no existe~~ — construida (D-485).** Quedan tres cosas: aprobar los demás tipos de propuesta (cada uno pide su operación y su función; hoy solo `clonacion`), los detectores que dejan alertas, y la pantalla (B-99) | Construir | La bandeja es el lugar; lo que la llena y lo que ejecuta cada tipo se construye tipo por tipo, no de golpe |
+| 5 | **El MCP no existe** (B-63) | Construir; la bandeja ya está | La API de D-482 es su base. Para no escribir a mano su catálogo, cada operación de la API puede declarar su **efecto** (lee, simula o aplica) y su **función**, y de ahí se derivan las herramientas |
+| 6 | **Con qué credencial actúa el agente**: la de quien pregunta para leer y simular (así se respeta su alcance y su función), y la suya propia, marcada `origen=agente`, para dejar propuestas | El usuario confirma | Es lo que hace que «quien decidió» siga siendo una persona. Mientras no exista, `dejar_propuesta` solo deja propuestas de personas: el servicio ya sabe recibir las del agente, la API no se las abre |
 | 7 | **Las funciones de capturar y devolver una estimación**, y las de capturar avance, no tienen clave (`MODELO.md` §5d) | El usuario | Estimación y avance no se pueden construir sin saber quién las escribe |
 | 8 | **`programa` ya tiene sus reglas decididas y escritas** (`PROGRAMA-CPM.md`); `ESCALABILIDAD.md` §9 lo dejaba fuera de los skills porque no lo estaban | Compilar | Es candidato a skill propio, el sexto |
 
-**En qué orden**, con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, y qué cuesta deshacerlo): primero el hueco 1
-—es una decisión, no cuesta código y deshacerla es una fila de `ROL_FUNCION`—; después la bandeja (4) y el filtro por obra
-(3); después el MCP de lectura y simulación con las herramientas de Consulta (5), que no propone nada y por eso es lo
+**En qué orden**, con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, y qué cuesta deshacerlo): primero confirmar lo
+del hueco 1 —es una decisión, no cuesta código y deshacerla es una fila de `ROL_FUNCION`—; la bandeja (4) ya está, así que
+sigue el filtro por obra (3); después el MCP de lectura y simulación con las herramientas de Consulta (5), que no propone nada y por eso es lo
 primero seguro de soltar; y al final el primer detector que propone. Cada paso necesita su cifra de paro antes de
 empezar (`INVARIANTES.md`).

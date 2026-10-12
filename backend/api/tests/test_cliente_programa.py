@@ -14,6 +14,7 @@ from decimal import Decimal
 from api.generar_cliente import DESTINO, generar, spec_de_la_api
 from api.tests.servidor import ServidorDePrueba
 from core.catalogo import ServicioCarga
+from core.propuestas import ServicioBandeja
 from core.tests.contrato_programa import CAL, programa
 from core.tests.datos_opus import CONCEPTOS, PRESUPUESTO, reescalar_costo, texto
 
@@ -170,6 +171,94 @@ class PruebasClienteDelCatalogo(unittest.TestCase):
         self.assertEqual(s["precio"], "24.68")
 
 
+SCRIPT_BANDEJA = r"""
+const C = require(process.argv[1]);
+C.base = process.argv[2];
+const CO = { "x-rol": "control_de_obra", "x-usuario": "luis@obra.mx" };
+const RES = { "x-rol": "residente", "x-usuario": "ana@obra.mx" };
+const SUP = { "x-rol": "supervisor", "x-usuario": "sofia@obra.mx" };
+const clonar = { tipo: "clonacion", objeto: "AUX-00001", valor_propuesto: { original: "AUX-00001", clave: "PRE-00120" }, evidencia: "AUX-00001 es una trabe terminada: un material" };
+(async () => {
+  const sal = {};
+  const v0 = await C.ver_bandeja({});
+  sal.vacia = [v0.propuestas_pendientes, v0.alertas_activas, v0.alerta_mas_vista];
+  const base = Math.max(...(await C.listar_cargas({})).map(x => x.id));
+  const p = await C.dejar_propuesta({ cuerpo: { ...clonar, base }, ...RES });
+  sal.propuesta = [p.id, p.estado, p.propuesto_por, p.propuesto_con_rol, p.base === base, p.se_puede_aprobar];
+  try { await C.dejar_propuesta({ cuerpo: clonar, ...RES }); } catch (e) { sal.repetida = [e instanceof C.ErrorApi, e.status, e.codigo, e.detalle.propuesta_id]; }
+  try { await C.dejar_propuesta({ cuerpo: { ...clonar, evidencia: "  " }, ...RES }); } catch (e) { sal.sinEvidencia = [e.status, e.codigo]; }
+  try { await C.dejar_propuesta({ cuerpo: clonar }); } catch (e) { sal.sinIdentidad = [e.status, e.codigo]; }
+  sal.pendientes = (await C.listar_propuestas({ estado: "pendiente" })).map(x => x.id);
+  sal.ninguna = (await C.listar_propuestas({ estado: "aprobada" })).length;
+  try { await C.resolver_propuesta({ propuesta_id: p.id, cuerpo: { decision: "aprobar" }, ...RES }); } catch (e) { sal.permiso = [e.status, e.codigo]; }
+  const propia = await C.dejar_propuesta({ cuerpo: { ...clonar, objeto: "AUX-00002", valor_propuesto: { original: "AUX-00002", clave: "PRE-00121" } }, ...CO });
+  try { await C.resolver_propuesta({ propuesta_id: propia.id, cuerpo: { decision: "aprobar" }, ...CO }); } catch (e) { sal.propia = [e.status, e.codigo]; }
+  const rechazada = await C.resolver_propuesta({ propuesta_id: propia.id, cuerpo: { decision: "rechazar", nota: "la retiro" }, ...CO });
+  sal.rechazada = [rechazada.estado, rechazada.resuelto_por, rechazada.nota];
+  const ok = await C.resolver_propuesta({ propuesta_id: p.id, cuerpo: { decision: "aprobar", nota: "de acuerdo" }, ...CO });
+  sal.aprobada = [ok.estado, ok.resuelto_por, ok.resuelto_con_rol, ok.resultado.clon, ok.resultado.versiones_nuevas];
+  try { await C.resolver_propuesta({ propuesta_id: p.id, cuerpo: { decision: "aprobar" }, ...CO }); } catch (e) { sal.otraVez = [e.status, e.codigo, e.detalle.estado]; }
+  try { await C.ver_propuesta({ propuesta_id: 999 }); } catch (e) { sal.noExiste = [e.status, e.codigo]; }
+  sal.clones = (await C.listar_clones({})).map(x => [x.original, x.clon, x.usuario]);
+  const alertas = await C.listar_alertas({ estado: "activa" });
+  sal.alertas = alertas.map(a => [a.tipo, a.objeto, a.veces_vista]);
+  try { await C.resolver_alerta({ alerta_id: alertas[0].id, cuerpo: { estado: "resuelta", nota: "x" }, ...RES }); } catch (e) { sal.alertaPermiso = [e.status, e.codigo]; }
+  const cerrada = await C.resolver_alerta({ alerta_id: alertas[0].id, cuerpo: { estado: "resuelta", nota: "se capturó la orden" }, ...SUP });
+  sal.cerrada = [cerrada.estado, cerrada.resuelto_por, cerrada.nota_resolucion];
+  try { await C.resolver_alerta({ alerta_id: alertas[0].id, cuerpo: { estado: "descartada", nota: "otra vez" }, ...SUP }); } catch (e) { sal.alertaOtraVez = [e.status, e.codigo]; }
+  sal.alerta = (await C.ver_alerta({ alerta_id: alertas[0].id })).estado;
+  const v1 = await C.ver_bandeja({});
+  sal.final = [v1.propuestas_pendientes, v1.alertas_activas];
+  process.stdout.write(JSON.stringify(sal));
+})().catch(e => { process.stderr.write(String(e && e.stack || e)); process.exit(1); });
+"""
+
+
+@unittest.skipUnless(shutil.which("node"), "no hay node")
+class PruebasClienteDeLaBandeja(unittest.TestCase):
+    """Las operaciones de la bandeja (D-485) por el cliente generado, contra un servidor que atiende de verdad."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.servidor = ServidorDePrueba().arrancar()
+        ServicioCarga(cls.servidor.catalogo).aplicar(texto(CONCEPTOS), texto(PRESUPUESTO), None, rol="costos", usuario="ana@obra.mx")
+        cls.servidor.accesos.agregar_usuario("Sofía Ruiz", "sofia@obra.mx", ["supervisor"])
+        # las alertas no se dejan por la API: las deja un detector del sistema, y reaparecer la cuenta
+        detector = ServicioBandeja(cls.servidor.bandeja)
+        detector.alertar("avance_sin_orden", {"visto": 1}, objeto="EST-21011")
+        detector.alertar("avance_sin_orden", {"visto": 2}, objeto="EST-21011")
+        detector.alertar("frente_listo_para_cierre", {"avance": 0.91}, objeto="FRENTE-1")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.apagar()
+
+    def test_deja_aprueba_y_rechaza_y_los_errores_llegan_con_su_codigo(self):
+        r = subprocess.run(["node", "-e", SCRIPT_BANDEJA, str(DESTINO), self.servidor.url], capture_output=True, text=True, timeout=300)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        s = json.loads(r.stdout)
+        self.assertEqual(s["vacia"][:2], [0, 2])  # ninguna propuesta, dos alertas activas
+        self.assertEqual((s["vacia"][2]["tipo"], s["vacia"][2]["veces_vista"]), ("avance_sin_orden", 2))  # la que más volvió
+        self.assertEqual(s["propuesta"], [1, "pendiente", "ana@obra.mx", "residente", True, True])
+        self.assertEqual(s["repetida"], [True, 409, "ya_propuesta", 1])
+        self.assertEqual(s["sinEvidencia"], [422, "propuesta_invalida"])
+        self.assertEqual(s["sinIdentidad"], [401, "sin_identidad"])
+        self.assertEqual((s["pendientes"], s["ninguna"]), ([1], 0))
+        self.assertEqual(s["permiso"], [403, "permiso_denegado"])
+        self.assertEqual(s["propia"], [403, "autoaprobacion"])
+        self.assertEqual(s["rechazada"], ["rechazada", "luis@obra.mx", "la retiro"])
+        self.assertEqual(s["aprobada"], ["aprobada", "luis@obra.mx", "control_de_obra", "PRE-00120", 9])
+        self.assertEqual(s["otraVez"], [409, "ya_resuelta", "aprobada"])
+        self.assertEqual(s["noExiste"], [404, "propuesta_inexistente"])
+        self.assertEqual(s["clones"], [["AUX-00001", "PRE-00120", "luis@obra.mx"]])
+        self.assertEqual(s["alertas"], [["avance_sin_orden", "EST-21011", 2], ["frente_listo_para_cierre", "FRENTE-1", 1]])
+        self.assertEqual(s["alertaPermiso"], [403, "permiso_denegado"])
+        self.assertEqual(s["cerrada"], ["resuelta", "sofia@obra.mx", "se capturó la orden"])
+        self.assertEqual(s["alertaOtraVez"], [409, "ya_resuelta"])
+        self.assertEqual(s["alerta"], "resuelta")
+        self.assertEqual(s["final"], [0, 1])
+
+
 SCRIPT_TOKEN = r"""
 const C = require(process.argv[1]);
 C.base = process.argv[2];
@@ -211,7 +300,7 @@ class PruebasClienteConToken(unittest.TestCase):
         s = json.loads(r.stdout)
         self.assertEqual(s["sinToken"], [401, "sin_token", "https://proveedor.example/entrar"])
         self.assertEqual(s["malo"], [401, "token_invalido"])
-        self.assertEqual(s["yo"], ["luis@obra.mx", ["control_de_obra"], ["cargar_catalogo_opus", "clonar_insumo", "contratar_subarbol", "editar_estructura_programa"], "token"])
+        self.assertEqual(s["yo"], ["luis@obra.mx", ["control_de_obra"], ["aprobar_propuesta", "cargar_catalogo_opus", "clonar_insumo", "contratar_subarbol", "editar_estructura_programa", "resolver_alerta"], "token"])
         self.assertEqual((s["lista"], s["sinTokenOtraVez"], s["pantalla"]), (1, 401, True))
 
 

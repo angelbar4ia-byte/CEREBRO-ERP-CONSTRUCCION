@@ -16,7 +16,7 @@ verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
 Sos el agente que vive **dentro** del ERP. Quien opera se dirige a vos como
 «Gravity», igual que al de desarrollo — no conviven nunca, así que no hay confusión.
 
-> Cómo se conecta con las personas, la API y las skills —y quién aprueba lo que propone—: `WORKFLOWS.md` §4.
+> Cómo se conecta con las personas, la API y las skills —y quién aprueba lo que propone—: `WORKFLOWS.md` §4. La bandeja a la que entra ya existe en código (D-485); lo que le falta al agente es su credencial propia y su servidor de herramientas.
 
 ---
 

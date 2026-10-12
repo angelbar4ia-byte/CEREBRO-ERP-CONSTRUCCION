@@ -4,7 +4,8 @@ La API del programa — la única superficie pública (D-54), escrita sobre `Ser
 Todo pasa por el servicio: listar los programas y subir uno, ver un programa con lo que ya se aplicó, preguntar
 qué pasaría con una edición (`propuestas`, no guarda nada), aplicarla (`ediciones`) o deshacerla.
 Con un catálogo (`catalogo=`) la misma API también carga los archivos de OPUS, cuelga un programa del presupuesto, contrata un subárbol y
-clona un insumo (`catalogo.py`, D-482).
+clona un insumo (`catalogo.py`, D-482); con una bandeja (`bandeja=`), la misma API deja, aprueba y rechaza propuestas y resuelve alertas
+(`bandeja.py`, D-485).
 El cliente de la pantalla se genera de este mismo spec y no se edita a mano (`generar_cliente.py`, D-55).
 
 **Quién llama** (B-96, D-469). En `modo="token"` —el que se despliega— toda ruta de datos pide el token que entregó el
@@ -23,10 +24,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from api.autenticacion import Autenticacion, Identidad, por_cabeceras
+from api.bandeja import registrar_bandeja
 from api.catalogo import registrar_catalogo
 from api.errores import _error
 from core.catalogo import RepositorioCatalogo
 from core.gantt_pagina import pagina_gantt_en_vivo, pagina_programas
+from core.propuestas import RepositorioBandeja
 from core.motor_cpm import Calendario
 from core.programa import (
     ImportacionInvalida,
@@ -229,13 +232,20 @@ def _propuesta_salida(p: Propuesta) -> PropuestaSalida:
 # --------------------------------------------------------------------------- la aplicación
 
 
-def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion] = None, catalogo: Optional[RepositorioCatalogo] = None) -> FastAPI:
+def crear_app(
+    servicio: ServicioPrograma,
+    autenticacion: Optional[Autenticacion] = None,
+    catalogo: Optional[RepositorioCatalogo] = None,
+    bandeja: Optional[RepositorioBandeja] = None,
+) -> FastAPI:
     """`autenticacion` decide cómo se sabe quién llama (`autenticacion.por_token` en producción); sin ella, las cabeceras.
-    `catalogo` agrega las rutas del catálogo y los presupuestos de OPUS (`catalogo.py`); sin él, la API es solo la del programa."""
+    `catalogo` agrega las rutas del catálogo y los presupuestos de OPUS (`catalogo.py`); sin él, la API es solo la del programa.
+    `bandeja` agrega las de las propuestas y las alertas (`bandeja.py`); con `catalogo`, sabe además ejecutar lo que se aprueba."""
     auth = autenticacion or por_cabeceras()
     identidad, lectura = auth.identidad, auth.lectura
     app = FastAPI(title="Programa", version="1", description="El programa de obra: verlo, proponer una edición, aplicarla y deshacerla. "
-                  "Con catálogo: cargar los archivos de OPUS, colgar el programa del presupuesto, contratar y clonar.")
+                  "Con catálogo: cargar los archivos de OPUS, colgar el programa del presupuesto, contratar y clonar. "
+                  "Con bandeja: dejar, aprobar y rechazar propuestas y resolver alertas.")
 
     def edicion_de(entrada: EdicionEntrada):
         try:
@@ -401,4 +411,6 @@ def crear_app(servicio: ServicioPrograma, autenticacion: Optional[Autenticacion]
 
     if catalogo is not None:
         registrar_catalogo(app, servicio, catalogo, auth)
+    if bandeja is not None:
+        registrar_bandeja(app, servicio, bandeja, catalogo, auth)
     return app

@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
 corte:      2026-10-10
-verificado: 787 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+verificado: 886 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya
@@ -38,6 +38,7 @@ verificado: 787 pruebas · los siete programas reales (832 vínculos) reproducen
 | **Editar y reprogramar** | **§4.6 y `backend/core/programa.py`** |
 | **Guardar lo que se edita** | **§4.7, `backend/core/servicio_programa.py` y `database/migraciones/`** |
 | **La API, subir un programa, su versión nueva y el cliente generado** | **§4.8, `backend/api/` y `frontend/gantt/cliente_programa.js`** |
+| **La bandeja de propuestas y de alertas, y su API** | **§4.8, `backend/core/propuestas.py`, `backend/api/bandeja.py` y `database/migraciones/0010_bandeja_de_propuestas.sql`** |
 | **Quién es cada quien: usuarios, roles, permisos y la autenticación por token** | **§4.8, `backend/core/accesos.py`, `backend/api/autenticacion.py` y `database/migraciones/0004_usuarios_y_permisos.sql`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
 
@@ -468,6 +469,34 @@ humano decide.*
   programa se guarda en Postgres; una carga de OPUS tarda segundos y lo vuelve probable. `infra/conexion.py` (`ConexionPorHilo`) da a cada hilo la
   suya y `api.servir` la usa.
 
+**La bandeja (D-485).** `crear_app(servicio, autenticacion, catalogo, bandeja)` agrega **ocho operaciones** (`backend/api/bandeja.py`; sin bandeja la API es la de arriba),
+escritas sobre `ServicioBandeja` (`core/propuestas.py`) y nada más. Es el lugar donde cae lo que una persona o el agente sugiere (`PROPUESTA`) y lo que el sistema
+detecta que no cuadra (`ALERTA`): `MODELO.md` §5 y `MODELO.md` §5a dan la forma, y `WORKFLOWS.md` §3.1 dice cómo se conecta con las acciones de arriba.
+
+| Operación | Método y ruta | Qué hace | Pide |
+|---|---|---|---|
+| `ver_bandeja` | `GET /bandeja` | Lo que hay pendiente: propuestas por tipo, alertas activas por tipo y la que más veces volvió | — |
+| `listar_propuestas` · `ver_propuesta` | `GET /bandeja/propuestas?estado&tipo` · `GET /bandeja/propuestas/{id}` | Las propuestas, de la más vieja a la más nueva · una con su evidencia, quién la dejó y, si ya se resolvió, quién y por qué. `se_puede_aprobar` dice si el sistema sabe ejecutar su tipo | — |
+| `dejar_propuesta` | `POST /bandeja/propuestas` (201) | Deja una propuesta pendiente. Cuerpo: `tipo`, `objeto`, `valor_propuesto`, `evidencia`, `base` | Un rol cualquiera: proponer no cambia nada |
+| `resolver_propuesta` | `POST /bandeja/propuestas/{id}/resolucion` | **Aprobar:** el sistema hace lo propuesto —hoy una clonación o la corrección de un prefijo— con la identidad de quien aprueba, atado a lo que se vio. **Rechazar:** queda con su nota. Cuerpo: `decision`, `nota`, `esperaba` | `aprobar_propuesta`; aprobar pide además la función de la acción (`clonar_insumo`) |
+| `listar_alertas` · `ver_alerta` | `GET /bandeja/alertas?estado&tipo` · `GET /bandeja/alertas/{id}` | Las alertas, con su evidencia, el umbral que las disparó y cuántas veces volvieron · una | — |
+| `resolver_alerta` | `POST /bandeja/alertas/{id}/resolucion` | Resolverla o descartarla, diciendo qué era. Cuerpo: `estado`, `nota` | `resolver_alerta` |
+
+- **Aprobar es hacer, y lo hace quien aprueba.** La clonación que corre al aprobar queda con el correo y el rol de quien aprobó, no de quien propuso; si esa persona no tiene
+  `clonar_insumo`, 403, aunque pueda resolver la bandeja. **Quien propone no aprueba lo suyo** (403 `autoaprobacion`), y la base también lo impide.
+  La `base` de la propuesta viaja como `esperaba`: si entre una y otra alguien cargó, contrató o clonó, 409 `conflicto` y la propuesta sigue pendiente.
+- **Solo se aprueba lo que el sistema sabe ejecutar.** Los otros nueve tipos se pueden dejar y rechazar; aprobarlos responde 422 `sin_operacion`, porque marcar aprobado algo que
+  nada ejecutó sería decir que se hizo lo que no se hizo. Cuando un tipo gane su operación, entra en `tipos_de_propuesta` y esta ruta lo aprueba sin cambiar.
+- **Los códigos.** 403 `permiso_denegado`, `autoaprobacion`; 404 `propuesta_inexistente`, `alerta_inexistente`; **409** `ya_propuesta` y `rechazada_antes` (con el `propuesta_id` de la que ya
+  existe), `ya_resuelta` (con el `estado`), `conflicto`; **422** `propuesta_invalida` (sin evidencia, sin valor, un tipo que no existe, un rechazo sin nota…),
+  `sin_operacion`, `clonacion_no_procede` (con sus `problemas`; la propuesta sigue pendiente para corregirla o rechazarla), `peticion_invalida`.
+- **Dos cosas que la API no abre todavía.** Las alertas no se crean por ella: las dejan los detectores con `ServicioBandeja.alertar` (ninguno está construido), y reaparecer
+  las cuenta. Y las propuestas «del agente» tampoco: el servicio las recibe, con su modelo, pero el agente interno no tiene una credencial propia (`WORKFLOWS.md` §7, hueco 6).
+- **Lo que salió de escribirla.** `corregir_prefijo` no tenía `esperaba`, aunque `clonar` sí: una propuesta de corregir un prefijo se habría aprobado sobre un catálogo que ya
+  era otro. Ahora la propuesta de corrección trae `base` y la aplicación acepta `esperaba`, también por `POST /correcciones-de-prefijo`.
+  **Una limitación que queda:** ejecutar lo propuesto y marcarlo aprobado no es una sola transacción; si el proceso muriera entre las dos, la propuesta seguiría pendiente
+  con la clonación ya hecha, y al volver a aprobarla el sistema diría que esa clave ya existe. Se rechaza con esa nota.
+
 **Quién llama (B-96, D-469; confirmado en D-470 con Supabase Auth como proveedor).** La API **no emite tokens ni tiene contraseñas**: verifica los
 que entrega un proveedor de identidad (Supabase Auth, Auth0, Keycloak, el que se elija) y de ellos toma solo el
 correo que el proveedor ya comprobó. Con el correo busca al `USUARIO` (`core/accesos.py`), y de él salen sus roles y,
@@ -530,9 +559,9 @@ un proveedor, `python3 -m api.emitir_token --secreto … --correo …` da un tok
 
 ## 4.9 Cómo se prueba
 
-`cd backend && python3 -m unittest discover` corre 787 pruebas. Las del CPM están en
+`cd backend && python3 -m unittest discover` corre 886 pruebas. Las del CPM están en
 `backend/core/tests/test_motor_cpm.py`, las del cargador, la reprogramación y el Gantt en `test_programa.py` y
-la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas —las del catálogo con un contrato propio (`contrato_api_catalogo.py`), que corre contra la memoria y contra Postgres de verdad—, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
+la del motor del navegador en `test_motor_gantt_js.py` (usa `node`, que el CI trae); la API en `api/tests/`: sus operaciones y sus errores con un cliente de pruebas —las del catálogo y las de la bandeja con un contrato propio cada una (`contrato_api_catalogo.py`, `contrato_api_bandeja.py`), que corre contra la memoria y contra Postgres de verdad—, el cliente generado ejecutado en `node` contra un servidor de verdad y **las pantallas en un Chromium de verdad** (Playwright; el CI lo instala con `backend/requirements.txt`) contra ese servidor y los programas reales: el Gantt, la lista, subir un archivo y el texto hecho para ejecutar código; el archivo que se sube se arma con las filas reales de `PROGRAMAS-PROTOTIPOS.csv`; la persistencia se prueba
 con un mismo contrato (`contrato_programa.py`) contra el adaptador en memoria y contra un **Postgres de
 verdad** (`pgserver`, embebido, que el CI instala), más lo que solo Postgres garantiza; siguen el principio del repositorio —datos reales del
 proyecto, no fixtures inventadas—: los casos chicos son aritmética de las fórmulas de D-445 verificada
@@ -988,6 +1017,7 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | La bitácora cita al usuario como texto | Lo que queda es el correo, que es único, pero `MODELO.md` pide una clave foránea a `USUARIO`; migrarlo cuando `PRESUPUESTO` tenga tabla |
 | `CALENDARIO_OBRA`, y que `programa_fila` se vuelva `ACTIVIDAD` y `TRAMO` | El programa ya cuelga de `NODO` y `PRESUPUESTO` (D-474, migración `0006`: cada fila, de un bloque o de un renglón); falta la tabla del calendario y el paso a `ACTIVIDAD`, que no toca la bitácora |
 | Las pantallas de lo que la API del catálogo ya hace (B-99) | Cargar los archivos de OPUS y decidir lo detenido, ver un presupuesto, colgar un programa, contratar un bloque y clonar un insumo tienen su API y su cliente generado (D-482, §4.8); ninguna tiene todavía pantalla |
+| La bandeja solo aprueba `clonacion` (B-102) | Los otros nueve tipos de propuesta se pueden dejar y rechazar, no aprobar: cada uno espera su operación y su función. Tampoco hay detectores que dejen alertas, ni credencial del agente para dejar propuestas, ni pantalla (D-485, §4.8) |
 | Dos diferencias que salieron de colgar a Zafiro | `ACA-02034` está en el programa y en ningún presupuesto, y `OBE-04010` dice 4 en el programa y 1 en el presupuesto: lo deciden el planeador y Costos |
 | `origen` del vínculo que se edita | Implementado como se propuso (lo que declare quien edita y, si no, `decision`) y la pantalla en vivo lo pregunta; sin confirmar |
 | `P16` en Zafiro Plus | Pide mover el plazo a 32 semanas o relajar el vínculo; lo decide el planeador por obra (§6.5) |
@@ -1024,3 +1054,4 @@ guardar sigue a la vista para descartarlo o repetirlo en la nueva.
 | **El programa con versión nueva se cierra a ediciones y las partidas se reconocen solo por `oid`** | **D-471** |
 | **El programa cuelga del presupuesto: cada fila, de un bloque o de un renglón** | **D-474** |
 | **La API del catálogo y los presupuestos: cargar, colgar, contratar y clonar con propuesta y aplicación, `esperaba` y una conexión por hilo** | **D-482** |
+| **La bandeja de propuestas y de alertas: se deja con evidencia, se aprueba a nombre de quien aprueba o se rechaza con nota, y lo que reaparece se cuenta** | **D-485** |

@@ -122,6 +122,7 @@ class CorreccionEntrada(BaseModel):
     viejo: str = Field(min_length=1, description="El prefijo que se corrige, p. ej. AUX")
     nuevo: str = Field(min_length=1, description="El prefijo nuevo, p. ej. PRE")
     desde: int = Field(1, ge=1, description="El número con que empieza la numeración nueva; se saltan los ocupados")
+    esperaba: Optional[int] = Field(None, description=ESPERABA)
 
 
 # --------------------------------------------------------------------------- lo que sale: una carga
@@ -380,6 +381,7 @@ class ParHecho(BaseModel):
 
 
 class CorreccionPropuestaSalida(BaseModel):
+    base: int = Field(description="La última carga que vio quien revisó: se manda en `esperaba` al corregir el prefijo")
     viejo: str
     nuevo: str
     pares: List[ParDeCorreccion] = Field(description="Lo que falta por hacer, en el orden en que se hace, cada uno con lo que haría hoy")
@@ -809,7 +811,7 @@ def registrar_catalogo(app: FastAPI, servicio: ServicioPrograma, catalogo: Repos
             raise _error(422, "peticion_invalida", str(e)) from None
         por_original = {p.original: p for p in c.propuestas}
         return CorreccionPropuestaSalida(
-            viejo=c.viejo, nuevo=c.nuevo, hechos=[ParHecho(original=o, clon=k) for o, k in c.hechos], omitidos=list(c.omitidos),
+            base=c.base, viejo=c.viejo, nuevo=c.nuevo, hechos=[ParHecho(original=o, clon=k) for o, k in c.hechos], omitidos=list(c.omitidos),
             rechazadas=len(c.rechazadas), informe=informe_de_correccion(c),
             pares=[ParDeCorreccion(original=o, clon=k, descripcion=por_original[o].descripcion, aplicable=por_original[o].aplicable,
                                    renglones=por_original[o].renglones, versiones_nuevas=len(por_original[o].redirigidos),
@@ -819,7 +821,7 @@ def registrar_catalogo(app: FastAPI, servicio: ServicioPrograma, catalogo: Repos
               summary="Sustituir cada clave de un prefijo por su clon con el prefijo nuevo; lo que hoy no se puede se salta y se dice")
     def corregir_prefijo(entrada: CorreccionEntrada, quien: Identidad = Depends(identidad)) -> CorreccionSalida:
         try:
-            r = clonacion.corregir_prefijo(entrada.viejo, entrada.nuevo, entrada.desde, quien.roles, quien.usuario)
+            r = clonacion.corregir_prefijo(entrada.viejo, entrada.nuevo, entrada.desde, quien.roles, quien.usuario, entrada.esperaba)
         except PermisoDenegado as e:
             raise _denegado(e) from None
         except CatalogoCambio as e:

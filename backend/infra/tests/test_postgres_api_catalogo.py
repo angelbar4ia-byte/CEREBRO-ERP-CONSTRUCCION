@@ -68,9 +68,10 @@ class PruebasPostgres(ContratoApiCatalogo, unittest.TestCase):
         from infra.conexion import ConexionPorHilo
 
         self.conn.execute(f"TRUNCATE {TABLAS} RESTART IDENTITY CASCADE")
-        repo, accesos, catalogo = adaptadores_postgres(self.servidor.get_uri())
-        self.assertTrue(all(isinstance(x.conn, ConexionPorHilo) for x in (repo, accesos, catalogo)))
+        repo, accesos, catalogo, bandeja = adaptadores_postgres(self.servidor.get_uri())
+        self.assertTrue(all(isinstance(x.conn, ConexionPorHilo) for x in (repo, accesos, catalogo, bandeja)))
         self.assertIs(repo.conn, catalogo.conn)
+        self.assertIs(repo.conn, bandeja.conn)
         errores, ids = [], []
 
         def larga():  # una escritura que tarda y se revierte

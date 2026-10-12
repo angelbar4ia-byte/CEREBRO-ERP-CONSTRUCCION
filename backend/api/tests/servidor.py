@@ -10,6 +10,7 @@ import uvicorn
 from api.app import crear_app
 from api.autenticacion import VerificadorJWT, emitir_token, por_cabeceras, por_token
 from core.accesos import MemoriaAccesos
+from core.memoria_bandeja import MemoriaBandeja
 from core.memoria_catalogo import MemoriaCatalogo
 from core.memoria_programa import MemoriaPrograma
 from core.servicio_programa import ServicioPrograma
@@ -33,13 +34,14 @@ class ServidorDePrueba:
     def __init__(self, modo: str = "cabeceras") -> None:
         self.repo = MemoriaPrograma()
         self.catalogo = MemoriaCatalogo()
+        self.bandeja = MemoriaBandeja()
         self.accesos = MemoriaAccesos()
         for correo, nombre, roles in USUARIOS:
             self.accesos.agregar_usuario(nombre, correo, roles)
         autenticacion = por_token(VerificadorJWT(secreto=SECRETO), self.accesos, LOGIN) if modo == "token" else por_cabeceras()
         self.puerto = _puerto_libre()
         self.url = f"http://127.0.0.1:{self.puerto}"
-        config = uvicorn.Config(crear_app(ServicioPrograma(self.repo, permisos=self.accesos.permisos), autenticacion, self.catalogo), host="127.0.0.1", port=self.puerto, log_level="error")
+        config = uvicorn.Config(crear_app(ServicioPrograma(self.repo, permisos=self.accesos.permisos), autenticacion, self.catalogo, self.bandeja), host="127.0.0.1", port=self.puerto, log_level="error")
         self._servidor = uvicorn.Server(config)
         self._hilo = threading.Thread(target=self._servidor.run, daemon=True)
 

@@ -86,6 +86,18 @@ const OPERACIONES = {
     "cuerpo": true,
     "seguridad": true
   },
+  "dejar_propuesta": {
+    "metodo": "POST",
+    "ruta": "/bandeja/propuestas",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
   "deshacer_edicion": {
     "metodo": "DELETE",
     "ruta": "/programas/{programa_id}/ediciones/{edicion_id}",
@@ -111,6 +123,18 @@ const OPERACIONES = {
       "x-usuario"
     ],
     "cuerpo": true,
+    "seguridad": true
+  },
+  "listar_alertas": {
+    "metodo": "GET",
+    "ruta": "/bandeja/alertas",
+    "ruta_params": [],
+    "consulta": [
+      "estado",
+      "tipo"
+    ],
+    "cabeceras": [],
+    "cuerpo": false,
     "seguridad": true
   },
   "listar_cargas": {
@@ -145,6 +169,18 @@ const OPERACIONES = {
     "ruta": "/programas",
     "ruta_params": [],
     "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "listar_propuestas": {
+    "metodo": "GET",
+    "ruta": "/bandeja/propuestas",
+    "ruta_params": [],
+    "consulta": [
+      "estado",
+      "tipo"
+    ],
     "cabeceras": [],
     "cuerpo": false,
     "seguridad": true
@@ -259,6 +295,34 @@ const OPERACIONES = {
     "cuerpo": false,
     "seguridad": true
   },
+  "resolver_alerta": {
+    "metodo": "POST",
+    "ruta": "/bandeja/alertas/{alerta_id}/resolucion",
+    "ruta_params": [
+      "alerta_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
+  "resolver_propuesta": {
+    "metodo": "POST",
+    "ruta": "/bandeja/propuestas/{propuesta_id}/resolucion",
+    "ruta_params": [
+      "propuesta_id"
+    ],
+    "consulta": [],
+    "cabeceras": [
+      "x-rol",
+      "x-usuario"
+    ],
+    "cuerpo": true,
+    "seguridad": true
+  },
   "subir_version": {
     "metodo": "POST",
     "ruta": "/programas/{programa_id}/versiones",
@@ -271,6 +335,26 @@ const OPERACIONES = {
       "x-usuario"
     ],
     "cuerpo": true,
+    "seguridad": true
+  },
+  "ver_alerta": {
+    "metodo": "GET",
+    "ruta": "/bandeja/alertas/{alerta_id}",
+    "ruta_params": [
+      "alerta_id"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
+  "ver_bandeja": {
+    "metodo": "GET",
+    "ruta": "/bandeja",
+    "ruta_params": [],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
     "seguridad": true
   },
   "ver_bitacora": {
@@ -339,6 +423,17 @@ const OPERACIONES = {
     "cuerpo": false,
     "seguridad": true
   },
+  "ver_propuesta": {
+    "metodo": "GET",
+    "ruta": "/bandeja/propuestas/{propuesta_id}",
+    "ruta_params": [
+      "propuesta_id"
+    ],
+    "consulta": [],
+    "cabeceras": [],
+    "cuerpo": false,
+    "seguridad": true
+  },
   "ver_versiones_de_matriz": {
     "metodo": "GET",
     "ruta": "/catalogo/{clave}/versiones",
@@ -400,10 +495,14 @@ const ClientePrograma = (() => {
   cliente.contratar_subarbol = args => llamar("contratar_subarbol", args || {});
   /** POST /correcciones-de-prefijo — Sustituir cada clave de un prefijo por su clon con el prefijo nuevo; lo que hoy no se puede se salta y se dice */
   cliente.corregir_prefijo = args => llamar("corregir_prefijo", args || {});
+  /** POST /bandeja/propuestas — Dejar una propuesta con su evidencia: queda pendiente hasta que otra persona la apruebe o la rechace */
+  cliente.dejar_propuesta = args => llamar("dejar_propuesta", args || {});
   /** DELETE /programas/{programa_id}/ediciones/{edicion_id} — Deshacer una edición aplicada */
   cliente.deshacer_edicion = args => llamar("deshacer_edicion", args || {});
   /** POST /programas — Subir un programa: se carga, se guardan sus vínculos y se dice cuáles no entraron */
   cliente.importar_programa = args => llamar("importar_programa", args || {});
+  /** GET /bandeja/alertas — Las alertas, de la más vieja a la más nueva; se filtran por estado y por tipo */
+  cliente.listar_alertas = args => llamar("listar_alertas", args || {});
   /** GET /cargas — Todo lo que se ha cargado, contratado o clonado, con quién y cuándo */
   cliente.listar_cargas = args => llamar("listar_cargas", args || {});
   /** GET /clones — Los insumos clonados y sustituidos, y quién lo decidió */
@@ -412,6 +511,8 @@ const ClientePrograma = (() => {
   cliente.listar_presupuestos = args => llamar("listar_presupuestos", args || {});
   /** GET /programas — Los programas que hay, del más viejo al más nuevo */
   cliente.listar_programas = args => llamar("listar_programas", args || {});
+  /** GET /bandeja/propuestas — Las propuestas, de la más vieja a la más nueva; se filtran por estado y por tipo */
+  cliente.listar_propuestas = args => llamar("listar_propuestas", args || {});
   /** GET /programas/{programa_id}/gantt — La pantalla del Gantt de este programa */
   cliente.pantalla_gantt = args => llamar("pantalla_gantt", args || {});
   /** GET / — La pantalla de los programas: la lista y subir uno */
@@ -430,8 +531,16 @@ const ClientePrograma = (() => {
   cliente.proponer_edicion = args => llamar("proponer_edicion", args || {});
   /** GET /yo — Quién eres y qué puedes hacer */
   cliente.quien_soy = args => llamar("quien_soy", args || {});
+  /** POST /bandeja/alertas/{alerta_id}/resolucion — Resolver una alerta (era real y se atendió) o descartarla (no era nada), diciendo qué era */
+  cliente.resolver_alerta = args => llamar("resolver_alerta", args || {});
+  /** POST /bandeja/propuestas/{propuesta_id}/resolucion — Aprobar (el sistema hace lo propuesto, a nombre de quien aprueba) o rechazar (y decir por qué) */
+  cliente.resolver_propuesta = args => llamar("resolver_propuesta", args || {});
   /** POST /programas/{programa_id}/versiones — Subir la versión nueva de un programa: las ediciones que siguen teniendo sentido pasan a ella */
   cliente.subir_version = args => llamar("subir_version", args || {});
+  /** GET /bandeja/alertas/{alerta_id} — Una alerta: qué se comparó, con qué umbral, cuántas veces volvió a aparecer y, si ya se cerró, quién y qué era */
+  cliente.ver_alerta = args => llamar("ver_alerta", args || {});
+  /** GET /bandeja — Lo que hay pendiente de decidir: propuestas por tipo y alertas activas */
+  cliente.ver_bandeja = args => llamar("ver_bandeja", args || {});
   /** GET /programas/{programa_id}/ediciones — Todo lo que se ha editado, también lo revertido */
   cliente.ver_bitacora = args => llamar("ver_bitacora", args || {});
   /** GET /presupuestos/{presupuesto_id}/contratados — Los bloques del presupuesto que ya se contrataron */
@@ -444,6 +553,8 @@ const ClientePrograma = (() => {
   cliente.ver_presupuesto = args => llamar("ver_presupuesto", args || {});
   /** GET /programas/{programa_id} — El programa base y su bitácora */
   cliente.ver_programa = args => llamar("ver_programa", args || {});
+  /** GET /bandeja/propuestas/{propuesta_id} — Una propuesta, con su evidencia, quién la dejó y, si ya se resolvió, quién y por qué */
+  cliente.ver_propuesta = args => llamar("ver_propuesta", args || {});
   /** GET /catalogo/{clave}/versiones — Las versiones de la matriz (APU) de un concepto o compuesto, con sus líneas */
   cliente.ver_versiones_de_matriz = args => llamar("ver_versiones_de_matriz", args || {});
   return cliente;

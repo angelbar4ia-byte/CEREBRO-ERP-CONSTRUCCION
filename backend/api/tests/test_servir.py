@@ -29,7 +29,7 @@ class PruebasServir(unittest.TestCase):
         c = TestClient(app)
         h = {"X-Rol": "control_de_obra", "X-Usuario": "luis"}
         self.assertEqual(c.get("/programas").status_code, 200)  # en modo cabeceras ver no pide identidad
-        self.assertEqual(c.get("/yo", headers=h).json()["funciones"], ["cargar_catalogo_opus", "clonar_insumo", "contratar_subarbol", "editar_estructura_programa"])
+        self.assertEqual(c.get("/yo", headers=h).json()["funciones"], ["aprobar_propuesta", "cargar_catalogo_opus", "clonar_insumo", "contratar_subarbol", "editar_estructura_programa", "resolver_alerta"])
 
     def test_la_aplicacion_trae_las_rutas_del_catalogo_con_los_mismos_permisos(self):
         app, _ = armar(None, [], usuarios=["ana@obra.mx|Ana Soto|costos", "rosa@obra.mx|Rosa Díaz|residente"], verificador=VerificadorJWT(secreto=SECRETO))
@@ -41,6 +41,16 @@ class PruebasServir(unittest.TestCase):
         self.assertEqual(c.post("/cargas", json=cuerpo, headers=rosa).status_code, 403)
         self.assertEqual(c.post("/cargas", json=cuerpo, headers=ana).status_code, 201)
         self.assertEqual(len(c.get("/presupuestos", headers=rosa).json()), 7)
+
+    def test_la_aplicacion_trae_la_bandeja_y_aprobar_pide_la_funcion_de_la_tabla(self):
+        app, _ = armar(None, [], usuarios=["ana@obra.mx|Ana Soto|costos", "luis@obra.mx|Luis Pérez|control_de_obra"])
+        c = TestClient(app)
+        ana, luis = ({"X-Rol": rol, "X-Usuario": correo} for rol, correo in (("costos", "ana@obra.mx"), ("control_de_obra", "luis@obra.mx")))
+        self.assertEqual(c.get("/bandeja").json()["propuestas_pendientes"], 0)
+        propuesta = {"tipo": "equivalencia", "objeto": "ISN-02005", "valor_propuesto": {"equivale_a": "ISN-02001"}, "evidencia": "Descripciones idénticas"}
+        self.assertEqual(c.post("/bandeja/propuestas", json=propuesta, headers=ana).status_code, 201)
+        self.assertEqual(c.post("/bandeja/propuestas/1/resolucion", json={"decision": "rechazar", "nota": "x"}, headers=ana).status_code, 403)
+        self.assertEqual(c.post("/bandeja/propuestas/1/resolucion", json={"decision": "rechazar", "nota": "x"}, headers=luis).status_code, 200)
 
     def test_dar_de_alta_no_pisa_a_los_que_ya_estan_y_pide_el_formato(self):
         a = MemoriaAccesos()

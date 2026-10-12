@@ -115,6 +115,6 @@ class ContratoAccesos:
         a.dar_funcion("supervisor", ESTRUCTURA)
         a.dar_funcion("control_de_obra", ESTRUCTURA)
         self.assertEqual(sv.aplicar(pid, CambiarDuracion(f[982], Fraction(12)), ["supervisor", "control_de_obra"], "ana").guardada.rol, "control_de_obra")
-        self.assertEqual(sv.funciones_de(["supervisor", "residente"]), [ESTRUCTURA, FECHAS])
+        self.assertEqual(sv.funciones_de(["supervisor", "residente"]), [ESTRUCTURA, FECHAS, "resolver_alerta"])  # D-485: el Supervisor cierra alertas
         self.assertEqual(sv.funciones_de("costos"), ["cargar_catalogo_opus"])  # D-473: Costos carga el catálogo de OPUS
         self.assertEqual(sv.funciones_de("cotizador"), [])

@@ -1335,6 +1335,28 @@ conversión es un factor). Modelarlo con una tabla por tipo sería más limpio p
 son nueve tablas para una entidad que hoy no tiene volumen. **Queda anotado como
 deuda técnica**, no como error.
 
+### La bandeja construida: lo que cambió de la tabla al llevarla a código (D-485)
+
+La tabla de arriba es el diseño de D-71; `database/migraciones/0010_bandeja_de_propuestas.sql` y `backend/core/propuestas.py` la
+llevaron a código y cambiaron esto. Lo de arriba no se reescribe: esta es la forma que rige.
+
+| Diseño | Construido | Por qué |
+|---|---|---|
+| `objeto_id` — a qué nodo o línea aplica | **`objeto`, texto** (la clave, la ruta del bloque, el prefijo) | Una corrección de prefijo recae en `AUX`, que no es un nodo; una llave foránea no podía decirlo |
+| `tipo` — enum | **Abierto, validado por el servicio** contra los diez que conoce (los nueve de arriba y `precio_nuevo`) | Agregar un tipo no debe ser una migración: es lo que `ALERTA.tipo` ya hace |
+| `resuelto_por`, `resuelto_en` | `resuelto_por`, **`resuelto_con_rol`**, `resuelta_en` | Igual que toda bitácora del sistema: quién y con qué rol |
+| — | **`propuesto_por`, `propuesto_con_rol`, `creada_en`** | Sin ellos no se puede hacer valer que quien propone no aprueba (D-269). Del agente, `propuesto_por` es su nombre y el rol es `agente` |
+| — | **`base`** | La última carga que vio quien propuso; al aprobar viaja a la aplicación como `esperaba` |
+| — | **`nota`** (obligatoria al rechazar) y **`resultado`** (obligatorio al aprobar) | Lo rechazado se conserva *con su porqué*; lo aprobado, con lo que el sistema hizo |
+
+**Reglas que sostiene la base y no solo el código:** una propuesta resuelta no se reescribe ni se borra (disparador); el estado
+`aprobada` exige que quien la resolvió no sea quien la propuso, sin importar mayúsculas; `rechazada` exige nota; un agente trae
+`modelo` y una persona no; la evidencia no puede ser blanco. **Reglas del servicio:** una propuesta igual pendiente no se repite;
+una igual rechazada no vuelve a entrar con la misma evidencia (comparada sin importar espacios ni mayúsculas); y **solo se aprueba
+un tipo que el sistema sabe ejecutar** —hoy `clonacion`, una clonación o la corrección de un prefijo entero—, con la identidad
+de quien aprueba y las dos funciones: `aprobar_propuesta` y la de la acción (`WORKFLOWS.md` §3.1). Un tipo sin operación se puede
+proponer y rechazar, no aprobar.
+
 ### `patron_carga` cierra P-27 — confirmar una vez, no una vez por archivo
 
 El cargador reconoce una tabla sin encabezados por los datos, según ya
@@ -1498,6 +1520,17 @@ usuario: la resuelve Control de obra, mismo criterio de gobierno cruzado
 entre obras que ya asignó `gestionar_rol_funcion`/`asignar_residente`
 (D-330) — nueva función atómica `renovar_invariante_valor` → Control de
 obra, en la lista de §5b.
+
+### La alerta construida: lo que cambió de la tabla al llevarla a código (D-485)
+
+Misma tabla que arriba, con tres cambios y una garantía. **`objeto` es texto**, vacío (`''`) si no hay nada a qué apuntar, y no
+`objeto_id` nullable: igual que en `PROPUESTA`, la clave de un concepto, la de un frente o una ruta no siempre son un nodo, y
+con `''` la regla «una activa por tipo y objeto» se sostiene con un índice único, que con `NULL` no. Se agrega `resuelto_con_rol`.
+**La garantía:** una alerta activa por `(tipo, objeto)` es una sola fila, y volver a verla la cuenta con un
+`INSERT … ON CONFLICT` —sin carrera: dos procesos que la ven a la vez suman las dos veces—, le pone la evidencia de hoy y conserva
+el umbral que la disparó. Una alerta resuelta o descartada no se reabre, ni se reescribe, ni se borra: si el mismo aviso
+reaparece después, nace otra, con su propia cuenta. Cerrarla pide `resolver_alerta` y una nota que diga qué era. **Las alertas no
+se crean por la API:** las deja un detector con `ServicioBandeja.alertar`, y aquí solo se ven y se cierran.
 
 ### `estimacion_sin_respaldo_material` cierra B-70 — mover el cruce de después del pago a antes
 
@@ -1773,12 +1806,12 @@ fecha, en un solo lugar.
 | `pactar_precio_contratista` | **Sin asignar** | P-21 |
 | `aplicar_descuento` | **Sin asignar** | P-21 |
 | `autorizar_orden_cambio` | **Sin asignar** | P-21 |
-| `aprobar_propuesta` | **Sin asignar** | P-21 |
-| `resolver_alerta` | **Sin asignar** | P-21 |
+| `aprobar_propuesta` | Control de obra — propuesto | D-485: resolver la bandeja (aprobar o rechazar). No aplica: aplicar pide además la función de la acción |
+| `resolver_alerta` | Supervisor y Control de obra — propuesto | D-485: el Supervisor da seguimiento hasta el cierre; Control de obra gobierna entre obras |
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin

@@ -101,6 +101,7 @@ class PropuestaDeCorreccion:
     hechos: Tuple[Tuple[str, str], ...]  # lo que ya se sustituyó
     omitidos: Tuple[str, ...]  # claves del prefijo cuyo número no se sabe leer: no se proponen
     propuestas: Tuple[PropuestaDeClonacion, ...]  # lo que cada una haría hoy; las que dependen de otra se rehacen al llegar a ellas
+    base: int = 0  # la última carga que vio quien revisó: si al aplicar hay otra, `CatalogoCambio` (D-485)
 
     @property
     def rechazadas(self) -> Tuple[PropuestaDeClonacion, ...]:
@@ -238,12 +239,16 @@ class ServicioClonacion:
             ocupadas.add(clave)
             pares.append((c, clave))
         propuestas = tuple(self.proponer(o, k, "sustituir", rol, usuario) for o, k in pares)
-        return PropuestaDeCorreccion(viejo, nuevo, tuple(pares), hechos, tuple(sorted(omitidos)), propuestas)
+        return PropuestaDeCorreccion(viejo, nuevo, tuple(pares), hechos, tuple(sorted(omitidos)), propuestas, estado.ultima_carga)
 
-    def corregir_prefijo(self, viejo: str, nuevo: str, desde: int, rol: Roles, usuario: str) -> ResultadoDeCorreccion:
+    def corregir_prefijo(self, viejo: str, nuevo: str, desde: int, rol: Roles, usuario: str,
+                         esperaba: Optional[int] = None) -> ResultadoDeCorreccion:
         """Sustituye cada clave `viejo-NNNNN` por su clon `nuevo-NNNNN`, una clonación completa tras otra. Lo que no se puede (algo
-        contratado lo cita) se salta y se dice; el resto se hace. Si se interrumpe, se reanuda: lo ya sustituido no se repite."""
+        contratado lo cita) se salta y se dice; el resto se hace. Si se interrumpe, se reanuda: lo ya sustituido no se repite.
+        `esperaba` es la última carga que vio quien decide (`PropuestaDeCorreccion.base`): si el catálogo ya va en otra, `CatalogoCambio`."""
         propuesta = self.proponer_correccion_de_prefijo(viejo, nuevo, desde, rol, usuario)
+        if esperaba is not None and propuesta.base != esperaba:
+            raise CatalogoCambio(f"la última carga es la {propuesta.base} y esta se revisó sobre la {esperaba}")
         hechos: List[Tuple[str, str, ResultadoClonacion]] = []
         rechazados: List[PropuestaDeClonacion] = []
         for original, clave in propuesta.pares:
