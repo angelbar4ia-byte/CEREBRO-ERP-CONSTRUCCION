@@ -5,7 +5,7 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-28
+corte:      2026-10-12
 verificado: 12 etapas recorridas · 4 pasan · 2 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
 ```
 
@@ -40,7 +40,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 5 | Carga de la ingeniería del lote | ✅ Pasa |
 | 6 | Reversión por destajo | ⚠️ **Pasa al 84% — falta qué hacer con el 16%** |
 | 7 | Comparación contra prototipo | ✅ Pasa, y encuentra un hecho real |
-| 8 | Factorizador | ⚠️ **No resuelve el problema que parecía suyo — la política de consolidar ya cerró (P-36, 26/09), la comparación no se ha vuelto a correr con ella** |
+| 8 | Factorizador | ⚠️ **Vuelta a correr el 12/10 (D-488): sí es del factorizador, pero no por lo que se creyó — no era profundidad ni consolidar (P-36 no mueve ninguna cifra), era el camión: dos claves de arena, de 7 y de 14 m³. Falta una fila poblada que lo ejerza** |
 | 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse *(D-461: ya existe, `backend/core/motor_cpm.py`)*, y esta obra no tiene actividades cargadas para correrlo |
 | 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
 | 11 | Contratación y congelamiento | ⛔ Sin probar con esta obra *(D-475: contratar un bloque y congelar sus PU se probó con los siete presupuestos de plantilla; con una obra en ejecución sigue sin probarse)* |
@@ -262,7 +262,10 @@ el mortero solo suma $184,587.
 
 ---
 
-## 8 · Factorizador — ⚠️ no resuelve lo que parecía suyo
+## 8 · Factorizador — ⚠️ el 20/09 se dijo que no lo resolvía; vuelto a correr el 12/10, sí era suyo
+
+> **Lo que sigue hasta la actualización del 26/09 es la lectura del 20/09, y la causa que da
+> —la profundidad— no resistió volver a correrla.** La corrección está en «Vuelta a correr».
 
 `PET-00002 Arena` sale **150 veces mayor** en ALAMO que en el prototipo: $49,755
 contra $332.
@@ -286,8 +289,40 @@ cúbicos hay.
 > **consolidar** insumos repetidos como esta arena al importar. Dato del
 > usuario: depende de quién lee, no del insumo — compras/obra necesitan el
 > consolidado, costos/control necesitan el detalle crudo. No se consolida al
-> cargar; cada lector agrupa a su modo (`CONOCIMIENTO.md` §11.11, D-340). No
-> se volvió a correr la comparación de esta etapa con la regla ya aplicada.
+> cargar; cada lector agrupa a su modo (`CONOCIMIENTO.md` §11.11, D-340). La
+> comparación de esta etapa se volvió a correr con esa regla el 12/10, abajo.
+
+### Vuelta a correr con P-36 cerrada — 2026-10-12 (D-488)
+
+Con los archivos que están en el repo: las once ingenierías (la azotea, que
+`CONOCIMIENTO.md` §11.8 dice que se subió después, no está) contra el Diamante con
+chimenea explotado a fondo. **Salen exactos los 519, 361, 29 y 129 de la etapa 7**; la
+arena de la obra pesa $48,239.51 y no $49,755 por la ingeniería que falta.
+
+| La arena de 7 m³, leída… | Obra | Prototipo | |
+|---|---:|---:|---|
+| por clave (como el 20/09) | $48,239.51 | $332.05 | ×145 |
+| agrupando al leer, como manda P-36 | $48,239.51 | $332.05 | igual: la política decide dónde se suma, no qué |
+| junto con la de 14 m³, en metros cúbicos | 150.08 m³ | 118.83 m³ | **×1.26** |
+
+Lo que se creyó el 20/09 era cierto a medias: la arena **sí** está distinta en los dos
+archivos, pero no porque en el prototipo viva dentro de compuestos —abiertos a fondo,
+esos compuestos piden **otra** arena—. Las recetas piden `PET-00015` «Arena de Río
+14 M3» y la obra compró siempre `PET-00002` «Arena 7 M3»: **dos camiones, a $321.43 el
+metro cúbico los dos**. El factorizador, del que el 20/09 se dijo que aquí no ayudaba, es la
+herramienta de este caso: su propuesta decía que con él desaparecen las claves
+duplicadas por presentación.
+
+| El factorizador resuelve… | …y esto queda para una persona o para después |
+|---|---|
+| Camión de 7 m³ y camión de 14 m³ como presentaciones de una arena en m³ | Decidir que las dos claves son un solo material |
+| El factor, sugerido de la descripción («7 M3») | La unidad del catálogo es `SERV`, el viaje: la base no viene en la clave |
+| Fusionar convirtiendo cantidades por el cociente de factores | La clonación de D-478 copia la receta tal cual y duplicaría la arena de `MEZ-03020` |
+
+Sigue en ⚠️ y no sube a ✅: **no hay una sola fila de `PRESENTACION_COMPRA` poblada**,
+y el cerebro no construye la app (D-487). Lo que cambió es que el caso real que
+faltaba existe, está medido y cabe en el diseño tal como estaba
+(`MODELO.md` §2a).
 
 ---
 
@@ -611,6 +646,7 @@ caso real corriendo encima.
 | 11 | **El mismo cruce de tres fuentes no siempre resuelve la anomalía — a veces la confirma más limpia.** `ALB-01010` se resolvió igual que K1; `ALB-01212`, con las tres fuentes ya de acuerdo en que el trabajo terminó, resultó tener cero material — el caso real que la alerta necesitaba. `ALB-01012` no se resolvió: quedó adelantado a las tres fuentes a la vez, distinto de todo lo visto antes | D-378 |
 | 12 | **Confirmar el testigo correcto puede cambiar el sentido del hallazgo sin cambiar el número.** `ALB-01012` comparaba contra mortero, que la obra nunca usa; con cemento (dato del usuario, la matriz genérica) el +2.8% contra diseño completo se sostuvo — pero adelantado a todas las fuentes de avance a la vez es el caso real de `consumo_material_sin_respaldo_avance`, con un riesgo de fondo que no se ve hasta el cierre de obra | D-379 |
 | 13 | **El mismo patrón se repite fuera de estructura — B-70 no era un caso aislado de repellado.** Extendido a instalaciones con un método nuevo (alcance ponderado en $, para conceptos que agrupan varias sub-actividades bajo una clave), eléctrica/hidráulica/gas confirman; sanitaria repite, por tercera vez, avance facturado sin material que lo respalde — ahora en un dominio distinto al que lo motivó | D-381, D-382 |
+| 14 | **Una desproporción de 150× no era de profundidad ni de consolidar: eran dos claves de camión de un mismo material, con la unidad `SERV` y los metros cúbicos en el texto** — leída en m³, la obra tiene 1.26 veces la arena del prototipo | D-488, B-25 |
 
 ## Lo que la prueba validó
 

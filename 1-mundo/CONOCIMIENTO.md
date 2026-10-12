@@ -1874,6 +1874,10 @@ material sólo se ve abajo.
 > **Sin ese orden aparece la desproporción de `PET-00002 Arena`:** $49,755 contra
 > $332, 150×. No es un hallazgo — es comparar una fuente donde la arena está suelta
 > contra otra donde vive dentro de mezclas.
+>
+> *Corregido en D-488: el orden sigue siendo el bueno, pero este ejemplo no lo
+> ilustra. Con las dos fuentes ya a la misma profundidad el 150× sigue ahí —la arena
+> de las mezclas es otra clave— (§11.11).*
 
 Y hay un caso peor que la desproporción: `ACR-00002 Varilla` aparece **en dos
 profundidades a la vez** — negativa en la matriz del concepto, positiva dentro de la
@@ -2406,6 +2410,10 @@ contra $332.
 > aparece suelta, repetida en cada bloque.** Es un artefacto de cómo se construye el
 > archivo, no un hecho de la obra.
 
+> **Lo primero es cierto y lo segundo no, D-488.** No es una obra con 150 veces más
+> arena. Pero la causa no es que el prototipo la guarde dentro de compuestos: abiertos
+> hasta el insumo, esos compuestos piden **otra** arena. Se volvió a correr abajo.
+
 ### P-36 cierra: no se consolida al cargar — cada lector agrupa a su modo
 
 **Depende del proceso que lee, no del insumo** (dato del usuario). Compras y obra
@@ -2420,6 +2428,66 @@ llegó (§12.1: lo cargado no se toca) — la vista consolidada de compras/obra 
 una agregación (`SUM(cantidad) GROUP BY clave`) al leer, nunca un segundo lugar
 donde el dato pueda desincronizarse del original. Mismo principio que
 `ESTADO_CARGA.porcentaje_cargado`: se calcula, no se guarda.
+
+### Vuelta a correr con P-36 cerrada (D-488): la arena no era el archivo, era el camión
+
+La comparación de esta sección se volvió a sacar de los archivos del repo, con el
+motor del repo (`backend/core/tests/test_comparacion_alamo18.py` la deja
+comprobable en el CI): las once ingenierías de `ALAMO 18` —$2,604,015.74, la línea
+base de §11.8— contra el Diamante con chimenea explotado hasta el insumo, con el
+volumen real de cada renglón. **Salen exactos los 519, los 361, los 29 y los 129.**
+Los pesos de la obra salen menores que los de arriba porque el repo no tiene la
+doceava ingeniería (la azotea): la arena, $48,239.51 y no $49,755.
+
+| Cómo se lee la arena de 7 m³ (`PET-00002`) | Obra | Prototipo | Razón |
+|---|---:|---:|---:|
+| Por clave, como en esta sección | $48,239.51 | $332.05 | ×145 |
+| Por clave, agrupando al leer (P-36) | $48,239.51 | $332.05 | ×145 — **no cambia** |
+| Con el prototipo ya abierto a fondo | $48,239.51 | $332.05 | ×145 — **ya estaba abierto** |
+| Las dos arenas juntas, en m³ | 150.08 m³ | 118.83 m³ | **×1.26** |
+
+**P-36 no mueve ninguna cifra**, porque esta comparación ya sumaba por clave en los
+dos lados: la política decide dónde se suma, no qué se suma, y deja el detalle
+donde estaba (la arena de 7 m³ es un total de 21.44 viajes para compras y 85
+líneas para costos). **La profundidad tampoco era la causa**: ya estaba normalizada
+y el 150× sigue en pie. Lo que quedaba eran dos claves:
+
+| Clave | Descripción | Unidad | PU | Por m³ | En la obra | En el prototipo | La piden |
+|---|---|---|---:|---:|---:|---:|---|
+| `PET-00002` | ARENA 7 M3 | `SERV` | $2,250 | $321.43 | 21.44 viajes · $48,239.51 | 0.15 · $332.05 | `MEZ-03020` |
+| `PET-00015` | ARENA DE RIO 14 M3 | `SERV` | $4,500 | $321.43 | — | 8.41 · $37,862.83 | `MEZ-01010`, `01020`, `01030`, `03060`, `07010` |
+
+> **Son dos camiones de arena, uno de 7 m³ y otro de 14, al mismo precio por metro
+> cúbico.** Las recetas del catálogo piden casi siempre el de 14 y la obra compró
+> siempre el de 7 (§11.14, el mismo mecanismo del mortero). Comparada por clave
+> parece que la obra tiene 150 veces más arena; comparada en metros cúbicos, tiene
+> 1.26 veces la del prototipo, como crece cualquier otro insumo.
+
+**Es lo único de esa forma que hay.** De las 361 claves que están en ambos lados,
+solo dos pasan de 10× con más de $1,000 de por medio: esta arena y `MOA-00214` (un
+destajo de boquilla de pretil: $1,298.15 contra $120.00). Quitada la arena, queda
+una.
+
+**El factorizador sí era la herramienta.** Su propuesta ya decía que con él
+«desaparecen las claves duplicadas por presentación» (`PROPUESTA-CUATRO-MODULOS.md`
+§1): una clave por material y el camión como presentación. Lo que el 20/09 se dio
+por «no lo resuelve el factorizador» era justo su caso. Lo que el caso real
+agrega al diseño de `MODELO.md` §2a, sin una regla nueva:
+
+- **Seis claves del catálogo son un camión** —arena de 7 y de 14, grava de 7, piedra
+  de cerro de 6, arenilla de 14, tezontle de 7— y las seis traen la **unidad `SERV`,
+  el viaje, con los metros cúbicos solo en la descripción**. La pipa (`SER-00003`,
+  «PIPA 10000») es otro viaje, con la capacidad en litros. F-1 dice que la unidad que
+  trae el catálogo es la definida; aquí esa unidad no es la base (el m³), y el caso
+  cae en su cláusula siguiente: *sin unidad detectable, se sugiere y se marca solo si
+  es ambiguo*. Cinco de los seis dicen «N M3» y se sugieren sin duda; el tezontle
+  escribe «7 MTS» y se marca.
+- **Fusionar dos claves de un mismo material no copia cantidades: las convierte por
+  el cociente de los factores.** `MEZ-03020` pide 0.138571 viajes de 7 m³ (0.97 m³);
+  pasada a la clave de 14 m³ sin convertir, pediría 1.94 m³, el doble. La clonación
+  (§16.2) copia receta y precio, no convierte: no sirve para esto.
+  Que las dos claves cuesten lo mismo por m³ es la pista de que son un material, no la
+  prueba; quien lo decide es una persona.
 
 ### Un caso que rompe el patrón, y por eso destaca
 
@@ -3025,6 +3093,11 @@ por `MEZ-07010`, no tienen por qué cambiar.
 > queda explicado por este grupo — no todo. Lo que resta ($142,071) sigue
 > siendo una cola larga sin un patrón tan limpio como este. D-310 (extiende
 > D-308).
+>
+> *D-488 corrige un detalle: de las tres mezclas que se nombran, `MEZ-07010` y
+> `MEZ-01020` piden `PET-00015`, pero `MEZ-03020` pide `PET-00002` —la arena de 7 m³
+> que la obra sí compró—, así que «ninguna receta la referencia» no es cierto. Las
+> cifras del grupo se sostienen: se midieron por clave, no por receta (§11.11).*
 
 Queda la Piedra Galarza 40×40/60×40 (-$134,114/-$95,968) sin revisar —
 mismo patrón sospechado, sin confirmar. D-308.

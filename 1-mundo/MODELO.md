@@ -692,6 +692,30 @@ para poblar `PRESENTACION_COMPRA` con datos reales, más allá del ejemplo
 de la arena que ya trae `PROPUESTA-CUATRO-MODULOS.md` §1. El diseño
 queda completo; el caso real que lo ejerza, no.
 
+> **Actualización D-488 — el caso real apareció, y no en el almacén sino en el
+> catálogo.** Seis claves `PET-` son un camión: arena de 7 m³ (`PET-00002`), grava de
+> 7 (`PET-00003`), piedra de cerro de 6 (`PET-00004`), arenilla de 14 (`PET-00007`),
+> arena de río de 14 (`PET-00015`) y tezontle de 7 (`PET-00069`). Las seis traen la
+> **unidad `SERV`** —el viaje— y los metros cúbicos solo en la descripción. Dos son el
+> mismo material en dos presentaciones: las recetas piden la de 14 m³ y la obra
+> compró siempre la de 7, a $321.43 el m³ las dos (`CONOCIMIENTO.md` §11.11). Lo que
+> el diseño ya decía, con dato:
+>
+> - **F-1 no da la unidad base aquí.** «La unidad que trae el catálogo es la definida»
+>   no sirve cuando esa unidad es el viaje. El caso cae en la cláusula siguiente de F-1,
+>   *sin unidad detectable*: se sugiere y se marca solo si es ambiguo. Cinco camiones
+>   dicen «N M3» —factor N, conversión de transporte, captura directa, nadie
+>   aprueba—; el tezontle dice «7 MTS» y se marca.
+> - **Fusionar dos claves de un mismo material convierte las cantidades, no las
+>   copia**: el factor es razón, no cantidad (`PROPUESTA-CUATRO-MODULOS.md` §1, «Qué
+>   cuesta»). `MEZ-03020` pide 0.138571 viajes de 7 m³; sobre la clave de 14 m³ pide
+>   0.069286. La clonación de `CONOCIMIENTO.md` §16.2 copia receta y precio tal cual,
+>   y aquí duplicaría la arena. Que dos claves cuesten lo mismo por m³ es una pista
+>   de que son un material, no la prueba: lo decide una persona.
+> - **Lo que sigue sin existir:** una sola fila de `PRESENTACION_COMPRA` poblada.
+>   Falta el caso del lado de la compra (un movimiento de almacén en presentación
+>   distinta de la base), pero el del lado de la comparación ya está medido.
+
 ---
 
 # 3. Presupuesto y proyecto
