@@ -246,7 +246,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 489 decisiones · 12 descartes · 32 correcciones |
+| `MEMORIA.md` | III | ✅ 490 decisiones · 12 descartes · 33 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
@@ -278,9 +278,12 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 
 # Archivos retirados
 
-Se conservan como historia, **no se consultan ni se actualizan**:
+Se retiraron antes del primer commit de este repo, por «incorporados al conocimiento»:
 `ANALISIS-CATALOGOS-BASE.md` · `ANALISIS-MATRIZ-Y-ARBOL.md` ·
-`DICCIONARIO-CONCEPTOS.md` · `ERP-CONSTRUCCION-PLAN.md`.
+`DICCIONARIO-CONCEPTOS.md` · `ERP-CONSTRUCCION-PLAN.md`. **No hay copia de ellos en el repo
+ni en su historia** (B-30, D-490): no se consultan ni se actualizan, y ningún otro archivo del
+cerebro se apoya en ellos —el verificador lo comprueba—. Si alguno apareciera, se coteja
+contra el cerebro antes de fusionar nada.
 
 ---
 

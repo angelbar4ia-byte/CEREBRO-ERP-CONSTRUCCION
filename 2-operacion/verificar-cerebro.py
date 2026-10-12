@@ -76,19 +76,26 @@ def check_organo(p, texto):
 
 
 # ─────────────────────────────────────────────────────────────
-# 2 · Referencias a archivos que existan
+# 2 · Referencias a archivos que existan (y los retirados, solo donde se cuenta que se retiraron)
 # ─────────────────────────────────────────────────────────────
 RETIRADOS = {
     "ANALISIS-CATALOGOS-BASE.md", "ANALISIS-MATRIZ-Y-ARBOL.md",
     "DICCIONARIO-CONCEPTOS.md", "ERP-CONSTRUCCION-PLAN.md",
     "REDISEÑO.md", "PROPUESTAS.md",
 }
+# Los cuatro primeros fueron archivos de verdad y no tienen copia en el repo ni en su historia (B-30, D-490): el cerebro no se
+# apoya en ellos. Solo se nombran donde se cuenta que se retiraron. Los dos últimos nunca fueron archivos: son secciones.
+SIN_COPIA = RETIRADOS - {"REDISEÑO.md", "PROPUESTAS.md"}
+DONDE_SE_NOMBRAN = {"INDICE.md", "3-historia/MEMORIA.md", "4-direccion/PENDIENTES-MEJORAS.md"}
 
 
 def check_refs_archivo(p, texto, existentes):
     for n, linea in enumerate(texto.split("\n"), 1):
         for ref in re.findall(r"`([A-Za-zÑÁÉÍÓÚñáéíóú0-9_.\-]+\.md)`", linea):
             if ref in RETIRADOS:
+                if ref in SIN_COPIA and rel(p) not in DONDE_SE_NOMBRAN:
+                    falla(rel(p), f"línea {n}: se apoya en `{ref}`, un archivo retirado sin copia; "
+                                  f"solo se nombra en {', '.join(sorted(DONDE_SE_NOMBRAN))}")
                 continue
             if ref not in existentes:
                 falla(rel(p), f"línea {n}: referencia a `{ref}`, que no existe")
