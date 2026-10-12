@@ -322,6 +322,7 @@ puede escribir de lo que primero hay que definir.
 | ✅ B-30 | ~~Auditar los cuatro archivos retirados antes de darlos por absorbidos~~ | ✅ **Cerrado sin el original (D-490).** No existe copia de ellos en el repo, en sus dos ramas, en su historia de git, en el disco, en la carpeta de subidas ni en las transcripciones, que solo los nombran; `INDICE.md` decía que «se conservan como historia» y no era cierto. Las dos pérdidas conocidas están recuperadas (el diccionario, B-29; la restricción de los subagentes, `agentes/gravity.md` y D-64) y el verificador comprueba que ningún archivo del cerebro se apoya en ellos. Lo que no se puede saber es si había un tercer hecho perdido; si alguno de los cuatro apareciera, se coteja contra el cerebro antes de fusionar |
 
 ---
+| ⏸️ B-104 | **Cómo se ordenan los repos de los ERPs del usuario** | Propuesto en D-495: polirepo con el cerebro como centro. `CONTROL-AVANCE` (ObraCtrl) y `ERP-ESTIMACI-N` no se mueven; los dos sistemas que corren en la computadora del usuario suben a repos privados nuevos; los prototipos viejos (`obractrl-deploy`, `MAGNOLIA-AVANCES`, `MAGNOLIA-AVANCE-DE-OBRA`) se archivan, y `AVANCE-EJEMPLO`, que es público, pasa a privado; `Multi-erp`, vacío, se archiva o se vuelve un índice | ⏸️ **Espera al usuario.** Nada se movió ni se creó |
 
 ### Lo que se puede empezar hoy
 

@@ -322,7 +322,10 @@ Un ERP sube un peldaño a la vez, con una decisión del usuario por peldaño. De
 |---|---|---|---|
 | **OPUS 2025** | 1 | Por archivo; «fuente, nunca destino» (`WORKFLOWS.md` §2.1) | Los cuatro catálogos que no se subieron (`MEMORIA.md` D-472) |
 | **ERP externo** | 1, y parte del 3 | Por archivo, y devuelve tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3) | Archivo contra API, `Flete` y los cuatro catálogos de salida |
-| *Los demás* | — | — | Sin declarar: las siete preguntas de arriba |
+| **ObraCtrl** (control de obra por avance) | 1, por ahora | Su base es PostgreSQL con RLS en Supabase y su API es FastAPI; repo `CONTROL-AVANCE`. La parte 10 de su especificación define un set de catálogos canónicos | Reconciliar sus catálogos con el canon de aquí; ficha pendiente |
+| **Concentrador de estimaciones** | — | Flask con SQLite en la computadora del usuario; repo `ERP-ESTIMACI-N` | Ficha pendiente; la base y los Excel reales están dentro del repo |
+| **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor en la computadora del usuario, dos usuarios por wifi; **sin repo** | Pila, base de datos y cómo se llega a ella |
+| **Control de obra, auditoría** | — | En la computadora del usuario; **sin repo**. La especificación de ObraCtrl habla de un «Sistema de Control y Auditoría de Obra» como *Fuente de la Verdad*: parece ser este, por confirmar | Pila, base de datos y cuál es su relación con el «ERP externo» |
 
 ---
 
