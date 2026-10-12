@@ -50,7 +50,8 @@ trabajo final, `verificar`, las suma.
 > trabajo de lectura — ver `2-operacion/agentes/auditor-erp.md`.
 
 `python3 2-operacion/red-del-cerebro.py .` no comprueba: mide cómo está conectado el cerebro —qué se nombra con qué, qué cambia
-junto, qué se lee primero— y `2-operacion/METACOGNICION.md` explica qué hacer con lo que mide.
+junto, qué se lee primero— y `2-operacion/METACOGNICION.md` explica qué hacer con lo que mide. Con `--integracion` dice cuánto cuesta
+partir la red y qué párrafos se repiten entre archivos; con `--reentrada`, si un archivo compilado oyó el último cambio de la sección de la que sale.
 
 ## Los agentes
 

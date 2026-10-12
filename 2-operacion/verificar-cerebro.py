@@ -297,6 +297,93 @@ def check_cortes_contra_git():
         pass
 
 
+def rangos_de_seccion(texto):
+    """{'5c': (primera línea, última línea)} de cada encabezado numerado; una sección llega hasta el siguiente encabezado de su nivel o de uno más alto."""
+    lineas = texto.split("\n")
+    hs = []
+    for i, l in enumerate(lineas, 1):
+        m = re.match(r"^(#{1,4})\s+(\d+[a-z]?(?:\.\d+[a-z]?)*)[.\s]", l)
+        if m:
+            hs.append((i, len(m.group(1)), m.group(2)))
+    rangos = {}
+    for k, (i, nivel, clave) in enumerate(hs):
+        fin = len(lineas)
+        for j, nivel2, _ in hs[k + 1:]:
+            if nivel2 <= nivel:
+                fin = j - 1
+                break
+        rangos.setdefault(clave, (i, fin))
+    return rangos
+
+
+def fuentes_de_los_derivados(textos):
+    """De qué secciones dice cada archivo que sale: el campo `compilado:` o `derivado:` de su bloque de órgano.
+
+    Devuelve [(derivado, corte, fuente, texto de la sección, primera línea, última línea)]. Solo cuentan las fuentes con sección
+    (`X.md` §N, o §N a §M): «el archivo entero» cambia a cada paso y no dice nada. Lo que sigue a «lo que D-…» o a un guion largo
+    ya no es una fuente sino un comentario."""
+    salida = []
+    for p in archivos():
+        t = textos.get(p.name) or p.read_text()
+        campo = re.search(r"^(?:compilado|derivado):\s+(.*)$", t, re.M)
+        corte = re.search(r"^corte:\s+(\d{4}-\d{2}-\d{2})", t, re.M)
+        if not campo or not corte:
+            continue
+        linea = re.split(r"\s(?:y|·)\s+lo que\s|\s—\s", campo.group(1))[0]
+        for fuente, desde, hasta in re.findall(r"`?([A-Za-zÑ0-9_\-]+\.md)`?\s*§\s*(\d+[a-z]?(?:\.\d+[a-z]?)*)(?:\s+a\s+§\s*(\d+))?", linea):
+            if fuente == p.name or fuente not in textos:
+                continue
+            rangos = rangos_de_seccion(textos[fuente])
+            if hasta:
+                claves = [k for k in rangos if k.split(".")[0].isdigit() and int(desde) <= int(k.split(".")[0]) <= int(hasta)]
+            else:
+                claves = [desde] if desde in rangos else []
+            if not claves:
+                continue
+            salida.append((p.name, corte.group(1), fuente, desde + (f" a §{hasta}" if hasta else ""),
+                           min(rangos[k][0] for k in claves), max(rangos[k][1] for k in claves)))
+    return salida
+
+
+def ultimo_cambio_de_lineas(archivo, ini, fin):
+    """Fecha (AAAA-MM-DD) del cambio más reciente entre esas líneas, según git blame; hoy si hay algo sin guardar."""
+    import subprocess
+    r = subprocess.run(["git", "-C", str(RAIZ), "blame", "--line-porcelain", "-L", f"{ini},{fin}", "--", str(archivo)], capture_output=True, text=True)
+    if r.returncode != 0:
+        return None
+    if "Not Committed Yet" in r.stdout:
+        return HOY.isoformat()
+    tiempos = [int(l.split()[1]) for l in r.stdout.split("\n") if l.startswith("committer-time ")]
+    return datetime.datetime.fromtimestamp(max(tiempos), datetime.timezone.utc).date().isoformat() if tiempos else None
+
+
+def derivados_que_no_oyeron(textos):
+    """[(derivado, corte, fuente, sección, último cambio de esa sección)] de lo que cambió después del corte del derivado. Vacío sin historia completa."""
+    import subprocess
+    if subprocess.run(["git", "-C", str(RAIZ), "rev-parse", "--is-shallow-repository"], capture_output=True, text=True).stdout.strip() != "false":
+        return []
+    tarde = []
+    for deriv, corte, fuente, sec, ini, fin in fuentes_de_los_derivados(textos):
+        ultimo = ultimo_cambio_de_lineas(RAIZ / next(str(p.relative_to(RAIZ)) for p in archivos() if p.name == fuente), ini, fin)
+        if ultimo and ultimo > corte:
+            tarde.append((deriv, corte, fuente, sec, ultimo))
+    return tarde
+
+
+def check_derivados_contra_fuente(textos):
+    """La reentrada: un archivo compilado u derivado «oye» cuando cambia la sección de la que sale. Es una nota y no un aviso, igual que el
+    corte: el derivado se revisa y su corte se mueve cuando se verifica, no en cada edición de la fuente (D-493)."""
+    try:
+        tarde = derivados_que_no_oyeron(textos)
+    except (OSError, ValueError, StopIteration):
+        return
+    if tarde:
+        por = {}
+        for deriv, corte, fuente, sec, ultimo in tarde:
+            por.setdefault(deriv, []).append(f"{fuente} §{sec}")
+        nota(f"{len(por)} {'archivo compilado no ha oído' if len(por) == 1 else 'archivos compilados no han oído'} un cambio en la sección de la que salen: " + "; ".join(f"{d} ({', '.join(s)})" for d, s in por.items()))
+
+
 # ─────────────────────────────────────────────────────────────
 # 5 · Las cifras de control siguen en su fuente
 # ─────────────────────────────────────────────────────────────
@@ -417,6 +504,7 @@ def main():
     check_tallas(textos)
     check_capacidad(textos)
     check_cortes_contra_git()
+    check_derivados_contra_fuente(textos)
     check_cifras(textos)
     check_contradicciones(textos)
     check_duplicacion(textos)

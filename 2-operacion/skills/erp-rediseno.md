@@ -8,7 +8,8 @@ description: Operaciones de autoría sobre un presupuesto cargado — fusión, d
 capa:       II — Operación
 pregunta:   ¿cómo se transforma lo cargado sin perderlo?
 tiempo:     se hace así
-corte:      2026-10-11
+corte:      2026-10-12
+verificado: releído el 2026-10-12 contra el cambio que `CONOCIMIENTO.md` §8 tuvo ese día (seis operaciones, no cuatro): el skill ya decía seis
 compilado:  `CONOCIMIENTO.md` §6.4 · `CONOCIMIENTO.md` §8 · `CONOCIMIENTO.md` §9 · `CONOCIMIENTO.md` §12 · `CONOCIMIENTO.md` §16.2 y lo que D-478 agregó (la clonación construida) — no se escribe a mano
 ```
 

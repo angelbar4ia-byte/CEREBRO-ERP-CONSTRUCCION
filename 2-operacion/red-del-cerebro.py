@@ -11,6 +11,10 @@ pueda volver a sacar. Dos clases de conexión, como en un cerebro de verdad:
 Uso:  python3 2-operacion/red-del-cerebro.py [ruta-al-cerebro]
 Con --vigencia (necesita la historia completa de git) añade, por archivo, cuánto se ha movido desde su `corte` él y los archivos en
 los que se apoya.
+Con --integracion mide cuánto se puede partir la red sin perder referencias (la idea de la información integrada) y dónde dos
+archivos dicen casi lo mismo (lo que le falta para estar diferenciada).
+Con --reentrada dice, para cada archivo compilado o derivado, si la sección de la que sale cambió después de su `corte` (la idea del
+núcleo dinámico: lo que sale vuelve a entrar).
 La parte funcional necesita la historia completa de git (en un clon superficial no hay nada que medir y se omite).
 """
 import collections
@@ -153,6 +157,164 @@ def mostrar_vigencia(archivos):
             print(f"  {n:30} corte {c} · él +{propio:3} d · {nf:2} fuentes movidas  " + ", ".join(f"{b}×{w}" for w, b in fuentes))
 
 
+def particion_mas_debil(nombre, aristas, minimo, intentos=60):
+    """La partición de la red en dos lados, con al menos `minimo` archivos cada uno, que menos referencias corta. Búsqueda local desde
+    arranques al azar con semilla fija: no prueba que sea la mejor, pero se repite igual."""
+    import random
+    peso = collections.Counter()
+    for (a, b), w in aristas.items():
+        peso[frozenset((a, b))] += w
+    nodos = sorted(nombre)
+    n = len(nodos)
+
+    def corte(lado):
+        return sum(w for k, w in peso.items() if (next(iter(k)) in lado) != (list(k)[1] in lado))
+
+    azar, mejor = random.Random(1), (None, None)
+    for _ in range(intentos):
+        lado = set(azar.sample(nodos, azar.randint(minimo, n - minimo)))
+        actual = corte(lado)
+        mejora = True
+        while mejora:
+            mejora = False
+            for x in nodos:
+                prueba = set(lado)
+                if x in prueba:
+                    if len(prueba) <= minimo:
+                        continue
+                    prueba.remove(x)
+                else:
+                    if n - len(prueba) <= minimo:
+                        continue
+                    prueba.add(x)
+                c = corte(prueba)
+                if c < actual:
+                    lado, actual, mejora = prueba, c, True
+        if mejor[0] is None or actual < mejor[0]:
+            mejor = (actual, lado)
+    chico = mejor[1] if len(mejor[1]) <= n / 2 else set(nodos) - mejor[1]
+    return mejor[0], sorted(chico), sum(peso.values())
+
+
+def articulaciones(nombre, aristas):
+    """Archivos cuya salida desconecta la red (sin mirar el sentido de la referencia)."""
+    vecinos = collections.defaultdict(set)
+    for a, b in aristas:
+        vecinos[a].add(b)
+        vecinos[b].add(a)
+    return [n for n in sorted(nombre) if len(distancias({k: v - {n} for k, v in vecinos.items() if k != n}, next(x for x in sorted(nombre) if x != n))) < len(nombre) - 1]
+
+
+def parrafos_largos(archivos, minimo=280):
+    """[(archivo, línea, texto)] de los párrafos de prosa de al menos `minimo` caracteres; tablas y código fuera, y MEMORIA también
+    (la historia repite todo a propósito)."""
+    salida = []
+    for p in archivos:
+        if p.name == "MEMORIA.md":
+            continue
+        buf, ini = [], 1
+        lineas = p.read_text(encoding="utf-8").split("\n") + [""]
+        for i, l in enumerate(lineas, 1):
+            if l.strip() == "":
+                texto = " ".join(buf)
+                if len(texto) >= minimo and not texto.lstrip().startswith(("|", "```")):
+                    salida.append((p.name, ini, texto))
+                buf = []
+            else:
+                if not buf:
+                    ini = i
+                buf.append(l.strip())
+    return salida
+
+
+def pares_casi_iguales(parrafos, umbral=0.55):
+    """Pares de párrafos de archivos distintos con coseno TF-IDF de al menos `umbral`. Los idénticos también salen: aquí no se distingue."""
+    import math
+    import unicodedata
+    parar = set("de la el los las un una y o en a que se por con para del al es no lo su sus como mas si ya cada son sin sobre entre este esta esto estos estas hay ser fue era solo muy tambien pero todo todos todas cuando donde quien cual otra otro otros otras mismo misma ver".split())
+
+    def palabras(t):
+        t = unicodedata.normalize("NFKD", t.lower())
+        t = "".join(c for c in t if not unicodedata.combining(c))
+        return [w for w in re.findall(r"[a-z0-9]{4,}", t) if w not in parar]
+
+    cuentas = [collections.Counter(palabras(t)) for _, _, t in parrafos]
+    df = collections.Counter()
+    for c in cuentas:
+        df.update(c.keys())
+    n = len(cuentas)
+    vectores = []
+    for c in cuentas:
+        v = {w: (1 + math.log(f)) * math.log(n / df[w]) for w, f in c.items()}
+        norma = math.sqrt(sum(x * x for x in v.values())) or 1
+        vectores.append({w: x / norma for w, x in v.items()})
+    inv = collections.defaultdict(list)
+    for i, v in enumerate(vectores):
+        for w in v:
+            inv[w].append(i)
+    pares = []
+    for i, v in enumerate(vectores):
+        cand = collections.Counter()
+        for w in v:
+            if df[w] > 40:
+                continue
+            for j in inv[w]:
+                if j > i and parrafos[j][0] != parrafos[i][0]:
+                    cand[j] += v[w] * vectores[j][w]
+        pares += [(s, i, j) for j, s in cand.items() if s >= umbral]
+    return sorted(pares, reverse=True)
+
+
+def mostrar_integracion(archivos):
+    nombre, aristas = estructural(archivos)
+    total = sum(aristas.values())
+    print("\nINTEGRACIÓN · cuánto se puede partir la red sin perder referencias")
+    art = articulaciones(nombre, aristas)
+    print(f"  archivos cuya salida desconecta la red: {art or 'ninguno'}")
+    for minimo in (5, 10, 15):
+        corte, chico, _ = particion_mas_debil(nombre, aristas, minimo)
+        print(f"  la partición más floja con al menos {minimo} por lado corta {corte} de {total} referencias ({100 * corte / total:.1f}%); el lado chico: " + ", ".join(chico))
+    print("  (una red integrada no se parte barato; el lado que sale casi suelto es donde la sincronía se rompe primero)")
+    ps = parrafos_largos(archivos)
+    pares = pares_casi_iguales(ps)
+    print(f"\nDIFERENCIACIÓN · {len(ps)} párrafos de prosa de 280 caracteres o más; {len(pares)} pares de archivos distintos con parecido de 0.55 o más")
+    por = collections.Counter(tuple(sorted((ps[i][0], ps[j][0]))) for _, i, j in pares)
+    for (a, b), c in por.most_common(8):
+        print(f"    {a} ~ {b}: {c}")
+    print("  (los compilados repiten a su fuente a propósito; lo que preocupa es el parecido entre dos archivos que ninguno deriva del otro)")
+
+
+def mostrar_reentrada(archivos):
+    """Por archivo compilado o derivado: de qué secciones sale y cuándo cambió cada una. La lógica es la del verificador."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("verificar_cerebro", Path(__file__).resolve().parent / "verificar-cerebro.py")
+    v = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(v)
+    v.RAIZ = RAIZ
+    textos = {p.name: p.read_text(encoding="utf-8") for p in archivos}
+    print("\nREENTRADA · de qué sección sale cada archivo compilado y cuándo cambió esa sección")
+    if subprocess.run(["git", "-C", str(RAIZ), "rev-parse", "--is-shallow-repository"], capture_output=True, text=True).stdout.strip() != "false":
+        print("  sin historia completa de git: se omite")
+        return
+    ruta = {p.name: p for p in archivos}
+    for deriv, corte, fuente, sec, ini, fin in v.fuentes_de_los_derivados(textos):
+        ultimo = v.ultimo_cambio_de_lineas(ruta[fuente], ini, fin)
+        marca = "   ◄ cambió después de su corte" if ultimo and ultimo > corte else ""
+        print(f"  {deriv:28} corte {corte} · {fuente} §{sec} (líneas {ini}-{fin}) cambió el {ultimo}{marca}")
+    cortex, relevo = {"CONOCIMIENTO.md", "MODELO.md"}, {"INDICE.md", "ESTADO.md"}
+    salida = subprocess.run(["git", "-C", str(RAIZ), "log", "--name-only", "--format=@@%h"], capture_output=True, text=True).stdout
+    commits, actual = [], None
+    for linea in salida.split("\n"):
+        if linea.startswith("@@"):
+            actual = set()
+            commits.append(actual)
+        elif linea.strip().endswith(".md") and actual is not None:
+            actual.add(linea.strip().split("/")[-1])
+    tocan = [c for c in commits if c & cortex]
+    sin_relevo = [c for c in tocan if not c & relevo]
+    print(f"  el relevo: de {len(tocan)} commits que tocan `CONOCIMIENTO` o `MODELO`, {len(sin_relevo)} no tocan ni `INDICE` ni `ESTADO`")
+
+
 def mostrar_capacidad(archivos):
     print("\nCAPACIDAD · la fila de tabla más larga de lo que se lee primero")
     for p in archivos:
@@ -168,3 +330,7 @@ if __name__ == "__main__":
     mostrar_capacidad(todos)
     if "--vigencia" in sys.argv:
         mostrar_vigencia(todos)
+    if "--integracion" in sys.argv:
+        mostrar_integracion(todos)
+    if "--reentrada" in sys.argv:
+        mostrar_reentrada(todos)

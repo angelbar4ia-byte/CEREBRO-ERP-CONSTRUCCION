@@ -8,7 +8,8 @@ description: Cargar presupuestos y catálogos desde OPUS, Neodata u otros sistem
 capa:       II — Operación
 pregunta:   ¿cómo entra un dato ajeno sin romper lo que ya existe?
 tiempo:     se hace así
-corte:      2026-10-11
+corte:      2026-10-12
+verificado: releído el 2026-10-12 contra el cambio que `CONOCIMIENTO.md` §2 tuvo ese día (la huella sin la unidad): el skill ya lo decía
 compilado:  `CONOCIMIENTO.md` §2 · `CATALOGOS.md` §11 · `CONOCIMIENTO.md` §4.2 · lo que D-472 a D-479 agregaron a `CONOCIMIENTO.md` (la carga persistida,
             la reconciliación, la alerta de texto, la clonación) y `METODO.md` §2.6 — no se escribe a mano
 ```
