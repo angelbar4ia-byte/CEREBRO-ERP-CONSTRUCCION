@@ -21,7 +21,7 @@ PostgreSQL; Django nunca se usó (`MEMORIA.md` D-182).
 Leé el skill `erp-construccion`. La sección 9 tiene las convenciones y la 11 los
 veinte errores que existe para prevenir. **Revisalos contra lo que estás por
 escribir.** Y el satélite que toque tu tarea: `erp-importacion` si cargás o leés exports
-de OPUS, `erp-rediseno` si clonás, fusionás, dividís o borrás.
+de OPUS, `erp-rediseno` si clonás, fusionás, dividís o borrás, `erp-programa` si tocás el CPM, la reprogramación, la bitácora de ediciones o el Gantt.
 
 Si no hay un esquema definido para lo que te piden, **pará y pedilo**. Improvisar el
 modelo de datos mientras escribís vistas es la forma más cara de equivocarse.

@@ -306,17 +306,19 @@ mano.
 | `erp-importacion` | `CONOCIMIENTO.md` §2 · `CATALOGOS.md` §11 · `CONOCIMIENTO.md` §4.2 | ✅ |
 | `erp-rediseno` | `CONOCIMIENTO.md` §6.4 · `CONOCIMIENTO.md` §8 · `CONOCIMIENTO.md` §9 · `CONOCIMIENTO.md` §12 | ✅ |
 | `erp-parametrico` | `CONOCIMIENTO.md` §5 | ✅ |
+| `erp-cuantificador` | `CONOCIMIENTO.md` §17 | ✅ |
+| `erp-programa` | `PROGRAMA-CPM.md` §3 a §8 · `MODELO.md` §5c · `MODELO.md` §5a | ✅ D-486 |
 | `erp-diccionario` | — | ⛔ **Bloqueado: su diseño no está en el conocimiento** |
 
-*D-480: cuatro de los skills se recompilaron el 2026-10-11 (`erp-importacion` con lo que D-472 a D-479 construyeron; `erp-rediseno` con la clonación; `erp-parametrico`, que repetía una explicación que `CONOCIMIENTO.md` §5.7 ya había retirado; y el base). `erp-cuantificador` se verificó y quedó igual. Un skill puede quedar viejo sin que nadie lo note: cuando cambia la sección de la que sale, hay que recompilarlo.*
+*D-480: cuatro de los skills se recompilaron el 2026-10-11 (`erp-importacion` con lo que D-472 a D-479 construyeron; `erp-rediseno` con la clonación; `erp-parametrico`, que repetía una explicación que `CONOCIMIENTO.md` §5.7 ya había retirado; y el base). `erp-cuantificador` se verificó y quedó igual. Un skill puede quedar viejo sin que nadie lo note: cuando cambia la sección de la que sale, hay que recompilarlo. D-486: `programa` pasó a tener su skill —`erp-programa`—, compilado de `PROGRAMA-CPM.md` y `MODELO.md` §5c, y la tabla recupera la fila de `erp-cuantificador`, que existía y no estaba.*
 
 **Lo que califica para skill propio:** reglas verificadas que los demás módulos no
 necesitan leer. El motor, el APU, el catálogo y el presupuesto **no califican** — son
 núcleo, y sacarlos del base los vuelve opcionales. `programa`, `exportacion`,
 estimaciones y almacén **todavía no**: sus reglas están sin decidir, y escribirles
-skill hoy sería inventar hechos.
+skill hoy sería inventar hechos. *(`programa` ya calificó: sus reglas se decidieron y se escribieron entre D-441 y D-471, y las usan el motor, el cargador, la API y la pantalla; D-486.)*
 
-**El costo de partir de más:** un skill se dispara por su descripción. Con cuatro
+**El costo de partir de más:** un skill se dispara por su descripción. Con cinco
 satélites bien separados no hay solape; con doce, se carga el equivocado y el skill
 pasa de prevenir errores a causarlos.
 

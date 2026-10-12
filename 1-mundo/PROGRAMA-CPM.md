@@ -41,6 +41,7 @@ verificado: 886 pruebas · los siete programas reales (832 vínculos) reproducen
 | **La bandeja de propuestas y de alertas, y su API** | **§4.8, `backend/core/propuestas.py`, `backend/api/bandeja.py` y `database/migraciones/0010_bandeja_de_propuestas.sql`** |
 | **Quién es cada quien: usuarios, roles, permisos y la autenticación por token** | **§4.8, `backend/core/accesos.py`, `backend/api/autenticacion.py` y `database/migraciones/0004_usuarios_y_permisos.sql`** |
 | **La pantalla del Gantt y sus reglas** | **§8 y `frontend/gantt/`** |
+| **El skill del módulo, compilado de este archivo y de `MODELO.md` §5c** | **`2-operacion/skills/erp-programa.md`** (D-486) |
 
 ---
 

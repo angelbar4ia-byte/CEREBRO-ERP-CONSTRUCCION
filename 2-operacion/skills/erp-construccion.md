@@ -139,10 +139,12 @@ duración = volumen ÷ (rendimiento × número de cuadrillas)
 **La relación no es lineal**: duplicar cuadrillas no parte el tiempo a la mitad — el
 frente tiene un límite físico. Modelá un tope o un factor de eficiencia.
 
-> **No hay precedencias en el modelo.** La fórmula da cuánto tarda cada actividad,
-> pero nada dice **qué va antes que qué**. Sin precedencias no hay ruta crítica, y la
-> suma de duraciones es una lista, no un programa. **Pendiente con el módulo de
-> programa.**
+> **Las precedencias son parte del modelo** (`PRECEDENCIA`, con cuatro tipos de
+> vínculo: `MODELO.md` §5c) y el CPM está escrito (`backend/core/motor_cpm.py`). La
+> fórmula da cuánto tarda cada actividad; los vínculos dicen **qué va antes que qué**,
+> y de ahí salen la holgura y la ruta crítica. Sin ellos, la suma de duraciones es una
+> lista, no un programa. Las reglas del programa y los errores que previenen viven en
+> `erp-programa`.
 
 **El programa reagrupa; no reasigna.** Mover un concepto entre actividades cambia
 *cuándo* se ejecuta, no cuánto cuesta ni a qué etapa pertenece.

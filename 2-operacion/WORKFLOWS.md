@@ -37,7 +37,7 @@ verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y
 | **La persona** | Decide, aprueba, carga, contrata, clona, edita | Aprobar lo que ella misma originó (D-269) | Sus roles → las funciones de `ROL_FUNCION`; y qué obras ve, por la jerarquía | Roles y funciones, construidos (D-469); el alcance por obra, no (B-98) |
 | **El sistema** (servicios y API) | Calcula, valida, escribe todo o nada, deja la bitácora | Escribir sin una persona con la función | Comprueba la función **de quien llama**, en cada acción, leyendo la tabla de hoy | Construido para programa, catálogo, presupuesto, colgado, contratación, clonación (D-461 a D-482) y la bandeja (D-485) |
 | **El agente interno** (Gravity) | Lee, detecta, explica, simula y propone | Escribir, calcular dinero, aprobar lo suyo, reabrir lo rechazado sin evidencia nueva | **Ninguna propia**: lo que propone solo se aplica si una persona con la función lo aprueba | Diseñado, fase 2 (`gravity-obra.md`); la bandeja donde deja sus propuestas ya existe (D-485) |
-| **Las skills y los agentes de desarrollo** | Hacen que quien construye el sistema no repita errores ya pagados | Tocar datos del producto | Ninguna: son conocimiento compilado, no actores del producto | Cinco skills y cinco agentes escritos (y `gravity-obra`, diseñado) |
+| **Las skills y los agentes de desarrollo** | Hacen que quien construye el sistema no repita errores ya pagados | Tocar datos del producto | Ninguna: son conocimiento compilado, no actores del producto | Seis skills y cinco agentes escritos (y `gravity-obra`, diseñado) |
 
 ---
 
@@ -172,7 +172,7 @@ marcado bajo, la confianza no significa nada (`gravity-obra.md` §5).
 
 Una skill es **conocimiento compilado** de `CONOCIMIENTO.md`, no escrito a mano: una base (`erp-construccion`, se carga
 siempre) y satélites que se disparan por su descripción (`erp-importacion`, `erp-rediseno`, `erp-parametrico`,
-`erp-cuantificador`). **Nunca introduce un hecho que no esté en el conocimiento** (`ESCALABILIDAD.md` §9): por eso,
+`erp-cuantificador`, `erp-programa`). **Nunca introduce un hecho que no esté en el conocimiento** (`ESCALABILIDAD.md` §9): por eso,
 cuando cambia la sección de la que sale, hay que recompilarla —D-480 encontró cuatro viejas—.
 
 Dos cosas que conviene tener claras:
@@ -239,7 +239,7 @@ la simulación como evidencia y su `base`. Control de obra la aprueba; corre `co
 | 5 | **El MCP no existe** (B-63) | Construir; la bandeja ya está | La API de D-482 es su base. Para no escribir a mano su catálogo, cada operación de la API puede declarar su **efecto** (lee, simula o aplica) y su **función**, y de ahí se derivan las herramientas |
 | 6 | **Con qué credencial actúa el agente**: la de quien pregunta para leer y simular (así se respeta su alcance y su función), y la suya propia, marcada `origen=agente`, para dejar propuestas | El usuario confirma | Es lo que hace que «quien decidió» siga siendo una persona. Mientras no exista, `dejar_propuesta` solo deja propuestas de personas: el servicio ya sabe recibir las del agente, la API no se las abre |
 | 7 | **Las funciones de capturar y devolver una estimación**, y las de capturar avance, no tienen clave (`MODELO.md` §5d) | El usuario | Estimación y avance no se pueden construir sin saber quién las escribe |
-| 8 | **`programa` ya tiene sus reglas decididas y escritas** (`PROGRAMA-CPM.md`); `ESCALABILIDAD.md` §9 lo dejaba fuera de los skills porque no lo estaban | Compilar | Es candidato a skill propio, el sexto |
+| 8 | **~~`programa` no tenía skill~~ — compilado (D-486).** `2-operacion/skills/erp-programa.md` sale de `PROGRAMA-CPM.md` y `MODELO.md` §5c; `ESCALABILIDAD.md` §9 lo dejaba fuera porque sus reglas no estaban decididas | Hecho | Quien construya o cambie el motor del CPM, la reprogramación, la bitácora o el Gantt tiene sus reglas y sus 25 errores en un solo lugar |
 
 **En qué orden**, con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, y qué cuesta deshacerlo): primero confirmar lo
 del hueco 1 —es una decisión, no cuesta código y deshacerla es una fila de `ROL_FUNCION`—; la bandeja (4) ya está, así que
