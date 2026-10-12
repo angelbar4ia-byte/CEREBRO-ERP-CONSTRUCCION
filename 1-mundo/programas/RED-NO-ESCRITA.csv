@@ -1,0 +1,78 @@
+prototipo,id,origen,fila_zafiro,clave,descripcion,estado,motivo
+Zafiro Plus,V05,heredado (D-425),137,IGAS-03010,TANQUE ESTACIONARIO LOSA GAS / 8M,sin equivalente,sucesora sin gemelo en el prototipo
+Zafiro Plus,V12,heredado (D-425),162,ACA-07012,MARCOS DE CANTERA INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Zafiro Plus,V19,heredado (D-425),186,ACA-07011,MARCOS DE CANTERA,sin equivalente,la predecesora solo existe en otro piso (AZ) y no se cumple (déficit 17.0)
+Zafiro Plus,V25,heredado (D-425),201,ACA-10020,PIEDRA LAJA EN MURO,sin equivalente,sucesora sin gemelo en el prototipo
+Zafiro Plus,V46,heredado (D-425),371,ACA-30010,LIJADO Y SELLADO DE MURO INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Zafiro Plus,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Zafiro Plus,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Zafiro Plus,P05,red (D-426),166,EST-02010,MURO TABIQUE DE 14 CM,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Zafiro Plus,P06,red (D-426),167,EST-02110,CASTILLO K-1 15X15,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Zafiro Plus,P16,red (D-426),192,ACA-01110,VERTEDERO SARDINEL 10X10,no se cumple,déficit 10
+Zafiro Plus,P28,red (D-426),383,ACA-10030,LIMPIEZA Y SELLADO PIEDRA LAJA,sin equivalente,sucesora sin gemelo en el prototipo
+Zafiro Plus,P29,red (D-426),327,ACA-02034,CUBIERTA DE COCINA,sin equivalente,sucesora sin gemelo en el prototipo
+Zafiro Plus,P30,red (D-426),316,EQU-02010,ESTUFA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Zafiro Plus,P30,red (D-426),317,EQU-02020,CAMPANA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Diamante sin chimenea,V02,heredado (D-425),81,EST-10013,K1 - 1.00 ACERO,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,V05,heredado (D-425),137,IGAS-03010,TANQUE ESTACIONARIO LOSA GAS / 8M,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,V06,heredado (D-425),148,ALB-01012,REPELLADO MURO +3.00,sin equivalente,la predecesora solo existe en otro piso (PA) y no se cumple (déficit 13.0)
+Diamante sin chimenea,V11,heredado (D-425),161,ACA-01060,BOQUILLA FINA INTERIOR,sin equivalente,predecesora 156 ACA-07050: sin gemelo
+Diamante sin chimenea,V11,heredado (D-425),161,ACA-01060,BOQUILLA FINA INTERIOR,sin equivalente,predecesora 156 ACA-07050: sin gemelo
+Diamante sin chimenea,V12,heredado (D-425),162,ACA-07012,MARCOS DE CANTERA INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,V19,heredado (D-425),186,ACA-07011,MARCOS DE CANTERA,sin equivalente,la predecesora solo existe en otro piso (PA) y no se cumple (déficit 7.0)
+Diamante sin chimenea,V25,heredado (D-425),201,ACA-10020,PIEDRA LAJA EN MURO,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,V26,heredado (D-425),204,ACA-01052,BOQUILLA EN FACHADA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,V46,heredado (D-425),371,ACA-30010,LIJADO Y SELLADO DE MURO INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Diamante sin chimenea,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Diamante sin chimenea,V50,heredado (D-425),409,ACA-09020,COLUMNA FORRADA 25X25 CM DE  3.00M ARMADA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante sin chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante sin chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante sin chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante sin chimenea,P05,red (D-426),166,EST-02010,MURO TABIQUE DE 14 CM,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Diamante sin chimenea,P06,red (D-426),167,EST-02110,CASTILLO K-1 15X15,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Diamante sin chimenea,P28,red (D-426),383,ACA-10030,LIMPIEZA Y SELLADO PIEDRA LAJA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,P29,red (D-426),327,ACA-02034,CUBIERTA DE COCINA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante sin chimenea,P30,red (D-426),316,EQU-02010,ESTUFA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Diamante sin chimenea,P30,red (D-426),317,EQU-02020,CAMPANA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Diamante con chimenea,V02,heredado (D-425),81,EST-10013,K1 - 1.00 ACERO,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,V05,heredado (D-425),137,IGAS-03010,TANQUE ESTACIONARIO LOSA GAS / 8M,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,V06,heredado (D-425),148,ALB-01012,REPELLADO MURO +3.00,sin equivalente,la predecesora solo existe en otro piso (PA) y no se cumple (déficit 13.0)
+Diamante con chimenea,V11,heredado (D-425),161,ACA-01060,BOQUILLA FINA INTERIOR,sin equivalente,predecesora 156 ACA-07050: sin gemelo
+Diamante con chimenea,V11,heredado (D-425),161,ACA-01060,BOQUILLA FINA INTERIOR,sin equivalente,predecesora 156 ACA-07050: sin gemelo
+Diamante con chimenea,V12,heredado (D-425),162,ACA-07012,MARCOS DE CANTERA INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,V19,heredado (D-425),186,ACA-07011,MARCOS DE CANTERA,sin equivalente,la predecesora solo existe en otro piso (PA) y no se cumple (déficit 7.0)
+Diamante con chimenea,V25,heredado (D-425),201,ACA-10020,PIEDRA LAJA EN MURO,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,V26,heredado (D-425),204,ACA-01052,BOQUILLA EN FACHADA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,V46,heredado (D-425),371,ACA-30010,LIJADO Y SELLADO DE MURO INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Diamante con chimenea,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Diamante con chimenea,V50,heredado (D-425),409,ACA-09020,COLUMNA FORRADA 25X25 CM DE  3.00M ARMADA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante con chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante con chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante con chimenea,P04,red (D-426),83,EST-21031,LOSA NERVADA ZAFIRO 4.20 (40 M2),no aplica,Diamante tiene una sola altura de losa (4.20) y una sola ventana para todas: no hay losa de 3.00 que separar
+Diamante con chimenea,P05,red (D-426),166,EST-02010,MURO TABIQUE DE 14 CM,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Diamante con chimenea,P06,red (D-426),167,EST-02110,CASTILLO K-1 15X15,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Diamante con chimenea,P28,red (D-426),383,ACA-10030,LIMPIEZA Y SELLADO PIEDRA LAJA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,P29,red (D-426),327,ACA-02034,CUBIERTA DE COCINA,sin equivalente,sucesora sin gemelo en el prototipo
+Diamante con chimenea,P30,red (D-426),316,EQU-02010,ESTUFA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Diamante con chimenea,P30,red (D-426),317,EQU-02020,CAMPANA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Oro,V03,heredado (D-425),84,EST-10072,K7 - 2.00 ACERO,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V04,heredado (D-425),85,EST-10013,K1 - 1.00 ACERO,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V05,heredado (D-425),137,IGAS-03010,TANQUE ESTACIONARIO LOSA GAS / 8M,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V12,heredado (D-425),162,ACA-07012,MARCOS DE CANTERA INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V19,heredado (D-425),186,ACA-07011,MARCOS DE CANTERA,sin equivalente,la predecesora solo existe en otro piso (AZ) y no se cumple (déficit 7.0)
+Oro,V25,heredado (D-425),201,ACA-10020,PIEDRA LAJA EN MURO,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V26,heredado (D-425),204,ACA-01052,BOQUILLA EN FACHADA,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V46,heredado (D-425),371,ACA-30010,LIJADO Y SELLADO DE MURO INTERIOR,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Oro,V47,heredado (D-425),376,ACA-30022,PINTURA PLAFOND 2DA MANO,no aplica,la pintura de muro y la de plafón son una sola partida de 2 manos: el orden entre las manos ya no es un vínculo
+Oro,V50,heredado (D-425),409,ACA-09020,COLUMNA FORRADA 25X25 CM DE  3.00M ARMADA,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,P05,red (D-426),166,EST-02010,MURO TABIQUE DE 14 CM,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Oro,P06,red (D-426),167,EST-02110,CASTILLO K-1 15X15,no aplica,"los pretiles van sobre la losa de azotea, no sobre las de entrepiso (PX04)"
+Oro,P28,red (D-426),383,ACA-10030,LIMPIEZA Y SELLADO PIEDRA LAJA,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,P29,red (D-426),327,ACA-02034,CUBIERTA DE COCINA,sin equivalente,sucesora sin gemelo en el prototipo
+Oro,P30,red (D-426),316,EQU-02010,ESTUFA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo
+Oro,P30,red (D-426),317,EQU-02020,CAMPANA ESTANDAR,sin equivalente,predecesora 327 ACA-02034: sin gemelo

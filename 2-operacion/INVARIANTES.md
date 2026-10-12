@@ -5,8 +5,9 @@
 capa:       II — Operación
 pregunta:   ¿esto sigue cuadrando?
 tiempo:     tiene que dar esto
-corte:      2026-09-15
+corte:      2026-10-12
 derivado:   CONOCIMIENTO.md · ESTADO.md · SKILL.md · agentes/ · backend/core/
+verificado: las cifras de §1, §2, §3 y §6 que tienen fuente en el repo vueltas a sacar de los CSV de `1-mundo/opus/` el 2026-10-12; sin fuente en el repo: los catálogos de materiales, trabajos, mano de obra y fletes de §6, el Δ $4.30 de §1 y toda la §5
 ```
 
 > **Las cifras contra las cuales se para.** Nada de aquí es nuevo: todo estaba
@@ -62,7 +63,7 @@ se verificó, no es invariante: es una creencia.
 | Los 7 prototipos suman el 100% | Exacto | `CATALOGOS.md` §1 | Falta o sobra un capítulo |
 | Prototipo Zafiro 1.0 (`CAS-00004`) | **$1,842,426.01** · 172 m² | `CATALOGOS.md` §1 | Es la cifra de prueba del artefacto |
 | Artefacto contra declarado | **$1,842,430.31 vs $1,842,426.01** · Δ $4.30 | `ESTADO.md` | **Hipótesis: PU redondeado a centavos × cantidad** (B-49). Predicción: sobre los 7 prototipos la deriva debe rondar $11, no $30 |
-| Conceptos, compuestos y cuadrillas | **467 · 89 · 39**, cuadran al centavo | `ESTADO.md` · `erp-construccion.md` | Se rompió la cadena de costo |
+| Conceptos, compuestos y cuadrillas | **467 · 89 · 39**, cuadran al centavo (467 de los 471 conceptos del presupuesto tienen matriz) | `ESTADO.md` · `erp-construccion.md` | Se rompió la cadena de costo |
 
 > **Son dos verificaciones distintas y hay que hacer las dos:** que el árbol sume
 > bien, y que el PU de cada concepto corresponda a su explosión. La primera cierra;
@@ -79,10 +80,10 @@ suciedad. **Un cargador que las rechace está mal el cargador, no el dato.**
 |---|---|---|---|
 | Cantidades negativas son legítimas | **58 líneas en 23 conceptos** | `METODO.md` §2.3 · `erp-construccion.md` §1 | Un validador de solo-positivos las está tirando |
 | El mismo insumo se repite en una matriz | **26 casos** (`AUX-00001`, alambre recocido) | `CATALOGOS.md` §7 | La llave es `(padre, hijo)` en vez de posición |
-| Fila en blanco = separador de bloque | **155 casos, sin una sola excepción** | `CONOCIMIENTO.md` §11.8 | Se están cargando como nodos fantasma |
+| Fila en blanco = separador de bloque | **155 bloques, sin una sola excepción**: 151 con un agrupador detrás y 4 que cierran el archivo | `CONOCIMIENTO.md` §11.8 | Se están cargando como nodos fantasma |
 | Placeholders de OPUS descartables | **121 filas · 3.7%** — importe cero **y** sin descendientes con clave | `CONOCIMIENTO.md` §2.5 | Si una tiene hijo costeado, **es error que se reporta, no fila que se tira** |
 | El prefijo no es llave | **79 claves `AUX-` son `Tipo = Material`** | `METODO.md` §2.1 | Alguien dedujo categoría del prefijo |
-| Profundidad libre | **1,233 conceptos en Nivel 2 · 1,219 en Nivel 3** | `erp-construccion.md` §1 | Una consulta asumió el número de capas |
+| Profundidad libre | **1,233 conceptos cuelgan de un Nivel 2 · 1,219 de un Nivel 3** | `erp-construccion.md` §1 | Una consulta asumió el número de capas |
 
 ---
 

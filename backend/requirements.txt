@@ -1,0 +1,12 @@
+# Lo que el backend necesita para correr sus pruebas (y, salvo pgserver y playwright, para servirse).
+# pgserver: un Postgres embebido para probar el adaptador contra una base de verdad.
+# playwright: el navegador de las pruebas de la pantalla (después: playwright install chromium).
+# openpyxl: guardar las tablas de Excel que el usuario sube y comprobar que su CSV es lo que la hoja muestra (core/fuentes.py).
+fastapi
+uvicorn
+httpx
+psycopg[binary]
+pyjwt[crypto]
+pgserver
+playwright
+openpyxl

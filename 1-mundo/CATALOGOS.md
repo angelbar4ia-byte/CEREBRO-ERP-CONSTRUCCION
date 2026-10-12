@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿qué trae cada catálogo de OPUS y qué trampas tiene?
 tiempo:     es así
-corte:      2026-09-21
-verificado: 8 catálogos de OPUS 2025 · aritmética comprobada
+corte:      2026-10-12
+verificado: §1, §7, §8, §9 y la semilla de §10 vueltos a sacar de los CSV del repo el 2026-10-12 · §2 a §6 sin fuente en el repo, como se comprobaron el 2026-09-21
 ```
 
 > **Lo que entrega OPUS 2025.** Punto de partida, no alcance final. Las reglas del
@@ -41,6 +41,42 @@ siguen siendo referenciados**:
 | `CATALOGO_DE_ETAPAS_DE_CONSTRUCCIÓN` (50) | **Desactualizado:** el presupuesto usa 52 etapas y **tres no están en el catálogo** — `ECO-00029`, `ECO-00035`, `ECO-00051` |
 | `CATALOGO_DE_FAMILIAS` (35) | Es el vocabulario maestro, con prefijo. **Desactualizado:** 20 de 35 coinciden con las familias vigentes, y sin acentos |
 | `CATALOGO_DE_CONTRATISTAS` (29) | Sin equivalente en OPUS 2025 |
+
+*D-453: las etapas de instalaciones se quedan separadas; solo Hidráulicas y Sanitarias se fusionarán después en Hidrosanitarias, con claves nuevas y sin reescribir las actuales (B-91). `ECO-00039` «HIDRO-SANITARIOS» ya existe, en Muebles / Iluminación.*
+
+*D-460 diseña la fusión: «INSTALACIONES HIDROSANITARIAS» más CIM, PB o PA, con claves ECO nuevas (no choca con `ECO-00039`); convive con las dos originales, se usa en versiones nuevas de la plantilla y solo en presupuestos en diseño; ninguna partida cambia de fecha. Detalle en `CONOCIMIENTO.md` §11.14.*
+
+### Qué archivos de OPUS están en el repo, y cuáles no (D-472)
+
+Los archivos que se suben a una sesión viven en una carpeta temporal de la máquina y se pierden con ella. Lo que sirve de
+dato para probar se guarda en el repo, tal cual.
+
+| Archivo | Filas | Dónde está |
+|---|---|---|
+| `CATALOGO_DE_PRESUPUESTO` | 3,231 | `1-mundo/opus/CATALOGO_DE_PRESUPUESTO.csv` |
+| `ANALISIS_DE_BASICOS_CONCEPTOS` | 2,568 | `1-mundo/opus/ANALISIS_DE_BASICOS_CONCEPTOS.csv` — trae también los compuestos y las 39 cuadrillas |
+| `ANALISIS_DE_BASICOS_COMPUESTOS` | 267 | `1-mundo/opus/ANALISIS_DE_BASICOS_COMPUESTOS.csv` — son las líneas de `Origen = Material` del anterior, idénticas |
+| `INGENIERIA - ALAMO 18 - …` | 11 archivos | `1-mundo/opus/ingenieria-alamo-18/` |
+| `CATALOGO_DE_MATERIALES` (387), `_TRABAJOS`, `_MANO_DE_OBRA`, `_FLETES`, `_CONCEPTOS` | — | **No están.** Se describen arriba porque se leyeron en sesiones anteriores; el archivo no está ni en el repo ni en la máquina |
+| Los de la generación anterior: unidades (16), niveles (15), etapas (50), familias (35), contratistas (29), cuadrillas, auxiliares, materiales (325), subcontratos | — | **No están**, por lo mismo |
+
+*Lo que falta bloquea P-09, P-32, M-14, B-07 y el cierre de P-14. Quien los tenga puede subirlos tal cual (`.xlsx` o `.csv`).*
+
+*D-479: por indicación del usuario esto ya no es una petición —son temas menores y no se vuelve a preguntar por ellos—; se registran como no disponibles. Lo que el usuario sí compartió está completo en el repo, con la lista de abajo.*
+
+### Las demás tablas que el usuario compartió, a salvo (D-479)
+
+Además de los 14 CSV de OPUS (arriba), el usuario subió 14 libros de Excel que solo vivían en la carpeta temporal de la sesión. Cada uno está **tal cual** (la huella lo prueba) y cada hoja, también como CSV, en `1-mundo/fuentes/`; `1-mundo/fuentes/MANIFIESTO.csv` lista los 59 archivos con su huella sha256.
+
+| Tabla | Qué es | Dónde está |
+|---|---|---|
+| `03_MARZO` a `07_JULIO_MOVIMIENTOS_DE_ALMACEN` | El export de movimientos de almacén del ERP externo, un mes por archivo (hoja `Consulta`, 46 columnas; la de julio trae una 47ª) | `1-mundo/fuentes/almacen/` |
+| `grid_AvanceOPEventosOpr_MARZO`, `_28` (abril), `_MAYO`, `_JUNIO`, `_JULIO` | El avance de operación por evento, todas las obras (hoja `Consulta`, 25 columnas) | `1-mundo/fuentes/avance/` |
+| `PRECIO_REAL_ALAMO_18` (dos versiones) | Lo realmente pagado en ALAMO 18, nueve hojas. **La primera que se subió (27 KB) es la chica; `__2` (89 KB, cinco minutos después) es la completa** | `1-mundo/fuentes/precio-real/` |
+| `SEMILLA-cuadrilla-rendimiento` | La semilla de cuadrillas y rendimientos (hoja `Semilla`) | `1-mundo/fuentes/semilla/` |
+| `PROGRAMA_ZAFIRO` | El programa de Zafiro del que salen los siete (hojas `Hoja1`, 222 columnas, y `Hoja2`) | `1-mundo/fuentes/programa/` |
+
+Las notas de lectura que se escribieron al recibir almacén y precio real están en `1-mundo/fuentes/notas/`. **Una prueba del CI vigila todo esto**: falla si falta una tabla, si cambió o si llega una que el manifiesto no conoce. `METODO.md` §2.6 dice qué hacer cuando llega una nueva.
 
 ### Lo que OPUS tiene y aún no está en este proyecto
 
@@ -618,11 +654,20 @@ ayudante sirve a Estructura y a Obra Exterior; un frente ocupa varias cuadrillas
 > Debe quedar marcada como informativa **desde el principio**. Si no, alguien la
 > tomará como restricción y construirá encima algo que no la soporta.
 
+
 Sirve para filtrar 39 cuadrillas por frente al programar, en vez de recorrer 97
 registros. **Las relaciones operativas se definen después.**
 
 > Dónde se definen: `PROPUESTA-CUATRO-MODULOS.md` §4 · P-6, el tope de cuadrillas
 > por oficio dentro del frente.
+
+*Nota (D-450): «frente» quedó definido como el nivel constructivo de la obra
+(Cimentación, Planta baja…); el gremio es el **sub-frente**, lo que trabaja dentro de un
+frente. Esta relación cuadrilla–frente es la del gremio de arriba y sigue siendo
+informativa. D-451: cómo queda este catálogo ahora que «frente» cambió de significado
+se revisa con el usuario (B-89); no se renombra ni se reinterpreta mientras tanto.*
+
+*D-452: el usuario aclara que no existe catálogo de conceptos-frentes. Esta relación queda como la intención de filtrar cuadrillas por lo que se ejecuta —el sub-frente—, a definir cuando se programe.*
 
 ### La unidad `%MO`
 
@@ -924,6 +969,8 @@ una** — lo dice la columna `Origen`:
 
 **Cero diferencias.** No hay PU congelado ni desfasado: OPUS recalcula (§1).
 
+*Por qué la tabla de arriba cuenta 468 padres de concepto y 467 con explosión: `ACA-01070` trae matriz y no aparece en ninguna fila del presupuesto. Es una matriz prestada, de las que `CONOCIMIENTO.md` §11.14 describe, y no un concepto más (vuelto a contar contra los CSV el 2026-10-12).*
+
 Los **4 conceptos sin explosión** son los de precio cero: `IGAS-02131`,
 `IGAS-02132`, `ISN-02061` y `ACC-00003`. Pendientes de costear (`CONOCIMIENTO.md` §4.1).
 
@@ -977,7 +1024,7 @@ dentro de los datos de OPUS 2025**. No hay que pedirlos ni mantenerlos aparte.
 
 | Vocabulario viejo | Se reemplaza con | Resultado |
 |---|---|---|
-| `Catalogo_de_unidades` (16) | Las unidades en uso en los catálogos vigentes | **17 en uso**, todas en el catálogo salvo `(%)mo` |
+| `Catalogo_de_unidades` (16) | Las unidades en uso en los catálogos vigentes | **17 en uso**, todas en el catálogo salvo `(%)mo` *(en los archivos del repo se cuentan 19 formas en minúsculas; `pz`/`pza` y `ser`/`serv` son la misma unidad escrita de dos maneras)* |
 | `CATALOGO_DE_NIVELES` (15) | Las filas `Subcapítulo` del presupuesto, con su `Nivel ERP` | **15** — coinciden |
 | `CATALOGO_DE_ETAPAS` (50) | Las filas `Nivel 2` del presupuesto | **52** — aparecen las tres que faltaban |
 | `CATALOGO_DE_FAMILIAS` (35) | Los campos `Familia` y `Subfamilia` de los cuatro catálogos de insumo | **50** familias y **243** subfamilias, por categoría |
@@ -1030,6 +1077,35 @@ calculado, jornadas por unidad, la razón entre teórico y calculado.
 **Los únicos dos que no existen en ningún lado son `Cuadrilla` y `Rendimiento
 teórico`.**
 
+### `Rendimiento calculado` ya tenía fórmula — D-404 la inventó mal
+
+**Corrige D-404.** La fórmula que D-404 propuso (`Rendimiento teórico`
+× `Unidades ejecutoras`) nunca hacía falta: `Rendimiento calculado` ya
+estaba definido, desde antes de esta sesión, en `CONOCIMIENTO.md` §6.2
+— `Costo de la cuadrilla` ÷ `Precio del destajo` —. No pasa por
+`Unidades ejecutoras` en absoluto: es el precio ya negociado visto al
+revés, para **una** cuadrilla tal como cuesta hoy. D-404 lo redefinió
+sin cruzarlo contra esa sección, y el resultado no coincidía con
+ninguno de los cuatro rendimientos que §6.2 ya distingue (Calculado,
+Teórico, Real, Requerido).
+
+**Lo que D-404 de verdad necesitaba nombrar era otra fórmula, para otro
+campo:** cómo entra `Unidades ejecutoras` en la *duración* de
+`calculada_rendimiento` — `Duración` = `Cantidad` ÷ (`Rendimiento
+teórico` × `Unidades ejecutoras`) —, que no toca `Rendimiento
+calculado`. Y el lado que motivó la confusión (`PROGRAMA_ZAFIRO.xlsx`,
+cantidad entre duración capturada a mano) ya tenía nombre en §6.2 sin
+un caso real que lo probara: es `Rendimiento Requerido`. Con números
+reales de los dos lados, `CONOCIMIENTO.md` §6.2 (D-406).
+
+**Los dos límites de alcance, dato del usuario, siguen de pie —solo
+cambia a qué fórmula se atan—:** `Rendimiento calculado` solo existe
+cuando el destajo tiene su propia línea de mano de obra en la matriz
+—si un concepto se contrata completo (`preestablecida_nivel`, B-48,
+sin línea `MO-` propia, como Cancelería o Domos, D-400), no hay nada
+que dividir—; y el mismo mecanismo aplica a maquinaria, no solo a
+cuadrillas de personas.
+
 ### Es una semilla, no un cargador
 
 > OPUS no entrega esos dos datos **y nunca los va a entregar.**
@@ -1051,6 +1127,153 @@ cada vez; este llega una vez.
 rendimiento teórico. No hace falta tabla aparte: son dos campos más — exactamente
 como los tenía el catálogo anterior.
 
+### La semilla, guardada — mismo criterio que `TESTIGO_MATERIAL`
+
+`SEMILLA-cuadrilla-rendimiento.xlsx` llega como archivo aparte de este cerebro;
+dato del usuario, se guarda aquí para no depender de que el archivo original
+siga disponible. Mismo principio que `TESTIGO_MATERIAL` (§12): **se carga con lo
+ya cruzado contra ejecución real, y crece fila por fila** — no un volcado
+mecánico de las 265 filas completas.
+
+| Clave | Descripción | Cuadrilla | Rendimiento teórico | Unidad | Costo unitario |
+|---|---|---|---:|---|---:|
+| `MOA-00001` | MO repellado muro 0-3.00 | `MOCU-005` | 18.53 | M2 | $85.00 |
+| `MOA-00020` | MO repellado muro fachada 0-3.00 | `MOCU-005` | 18.53 | M2 | $85.00 |
+| `MOA-00022` | MO repellado muro fachada +3.00 | `MOCU-005` | 15.00 | M2 | $105.00 |
+| `MOC-10040` | MO gualdra chica | `MOCU-033` | 4.77 | PZ | $330.00 |
+| `MOE-01008` | MO ranura acometida voz y datos | `MOCU-009` | 30.00 | PZ | $50.00 |
+| `MOE-01013` | MO ranura TV | `MOCU-009` | 2.50 | PZ | $50.00 |
+| `MOE-01015` | MO salida spot muro | `MOCU-009` | 0.96 | PZ | $130.00 |
+| `MOE-01041` | MO ranura acometida principal a 220V | `MOCU-009` | 1.56 | PZ | $160.00 |
+| `MOE-01111` | MO ranura eléctrica contacto | `MOCU-009` | 1.56 | PZ | $80.00 |
+| `MOE-01121` | MO ranura eléctrica apagador | `MOCU-009` | 1.56 | PZ | $80.00 |
+| `MOE-02010` | MO muro de tabique - hilo | `MOCU-005` | 10.50 | M2 | $150.00 |
+| `MOE-02020` | MO castillos K1 (15x15) | `MOCU-005` | 12.12 | M | $130.00 |
+| `MOE-02021` | MO castillos K2 (15x15) | `MOCU-005` | 12.12 | M | $130.00 |
+| `MOE-02027` | MO castillos K7 (15x20) | `MOCU-005` | 11.25 | M | $140.00 |
+| `MOE-02102` | MO cadena CE2 (15x20) | `MOCU-005` | 10.50 | M | $150.00 |
+| `MOE-02211` | MO armado de losa nervada | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02212` | MO descimbrado de losa nervada | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOE-02213` | MO armado de losa maciza | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02214` | MO descimbrado de losa maciza | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOE-02217` | MO armado y cimbrado losa 4.20 | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02311` | MO armado y colado escalera | `MOCU-005` | 6.19 | PZ | $254.50 |
+| `MOE-02312` | MO descimbra escalera | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOS-01030` | MO bajadas sanitarias | `MOCU-010` | 1.39 | PZ | $225.00 |
+| `MOS-02040` | MO conexión san minisplit | `MOCU-025` | 0.78 | PZ | $1,000.00 |
+| `MOS-07030` | MO conexión san lavamanos | `MOCU-010` | 2.50 | PZ | $50.00 |
+| `MOS-07060` | MO conexión san tarja cocina | `MOCU-010` | 2.50 | PZ | $50.00 |
+| `MOC-01010` | MO losa de cimentación | `MOCU-005` | 6.85 | M2 | $230.00 |
+| `MOC-12010` | MO zapata ZA-1 (100x100x25) | `MOCU-005` | 3.42 | PZ | $460.00 |
+| `MOE-02022` | MO castillos K3 (15x30) | `MOCU-005` | 10.50 | M | $150.00 |
+| `MOE-02028` | MO castillos K8 (15x40) | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOE-02101` | MO cadena CE1 (15x20) | `MOCU-005` | 11.25 | M | $140.00 |
+| `MOC-02010` | MO firme de concreto de 10 cm | `MOCU-005` | 15.75 | M2 | $100.00 |
+| `MOA-09020` | MO columna forrada | `MOCU-005` | 1.89 | PZ | $835.00 |
+| `MOE-05010` | MO zapata aislada (60x60x20) pérgola | `MOCU-005` | 2.63 | PZ | $600.00 |
+| `MOA-01510` | MO fabricación de asador | `MOCU-005` | 0.63 | PZ | $2,500.00 |
+| `MOA-02510` | MO forrado de asador con cantera | `MOCU-008` | 0.68 | PZ | $2,300.00 |
+| `MOA-00115` | MO finas en muros exteriores 0-3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOA-05021` | MO chaflán teja | `MOCU-005` | 26.25 | M | $60.00 |
+| `MOE-02016` | MO muro de sillar - hilo | `MOCU-005` | 8.29 | M2 | $190.00 |
+| `MOE-02025` | MO castillos K9 (15x25) aparente | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOE-02103` | MO cadena CE1 aparente (20x25) | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOE-02202` | MO cadena CD-1 aparente (20x25) | `MOCU-005` | 9.84 | M | $160.00 |
+| `MOA-00002` | MO repellado muro +3.00 | `MOCU-005` | 15.00 | M2 | $105.00 |
+| `MOA-00010` | MO repellado plafón 0-3.00 | `MOCU-005` | 15.00 | M2 | $105.00 |
+| `MOA-00011` | MO repellado plafón +3.00 | `MOCU-005` | 14.32 | M2 | $110.00 |
+| `MOA-00112` | MO finas interiores en muros 0-3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOA-00113` | MO finas interiores en muros +3.00 | `MOCU-005` | 27.16 | M2 | $58.00 |
+| `MOA-00114` | MO finas en muros de fachada 0-3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOA-00120` | MO finas en plafón 0-3.00 | `MOCU-005` | 30.29 | M2 | $52.00 |
+| `MOA-00121` | MO finas en plafón +3.00 | `MOCU-005` | 26.25 | M2 | $60.00 |
+| `MOA-00211` | MO boquillas interiores | `MOCU-005` | 39.38 | M | $40.00 |
+| `MOA-00212` | MO boquilla fina estuco vanos | `MOCU-005` | 315.00 | M | $5.00 |
+| `MOA-00213` | MO boquilla gruesa pretil | `MOCU-005` | 39.38 | M | $40.00 |
+| `MOA-01010` | MO muro chapeado piedra | `MOCU-005` | 2.72 | M2 | $580.00 |
+| `MOA-02010` | MO pórfido en cocheras | `MOCU-005` | 19.69 | M2 | $80.00 |
+| `MOA-02020` | MO boquilla pórfido | `MOCU-005` | 52.50 | M2 | $30.00 |
+| `MOA-02030` | MO rodapié cantera 60 cm | `MOCU-005` | 8.56 | M | $184.00 |
+| `MOA-02031` | MO rodapié cantera 20 cm | `MOCU-005` | 35.00 | M | $45.00 |
+| `MOA-02070` | MO columna de cantera | `MOCU-005` | 1.58 | PZ | $1,000.00 |
+| `MOA-02080` | MO forjado de jardinera | `MOCU-024` | 21.00 | M | $75.00 |
+| `MOA-02081` | MO zoclo pórfido en laja | `MOCU-008` | 35.00 | M | $45.00 |
+| `MOA-05020` | MO chaflán azotea | `MOCU-005` | 39.38 | M | $40.00 |
+| `MOE-02201` | MO cadena CD-1 (15x25) | `MOCU-005` | 11.25 | M | $140.00 |
+| `MOE-31010` | MO registros sanitarios | `MOCU-005` | 4.50 | PZ | $350.00 |
+| `MOE-31110` | MO tapa registros sanitarios/cisterna | `MOCU-005` | 15.75 | PZ | $100.00 |
+| `MOP-00301` | MO murete de instalaciones | `MOCU-005` | 0.55 | PZ | $2,850.00 |
+| `MOE-02215` | MO armado y cimbrado losa 3.00 | `MOCU-005` | 5.57 | M2 | $283.00 |
+| `MOE-02216` | MO descimbrado de losa 3.00 | `MOCU-005` | 31.50 | M2 | $50.00 |
+| `MOE-02218` | MO descimbrado de losa 4.20 | `MOCU-005` | 31.50 | M2 | $50.00 |
+
+**69 filas, todas `Origen=migrado`** — ninguna de las 5 filas `completado` (factor
+1.085 de `MOCU-023`/`MOCU-005`) se ha cruzado todavía contra ejecución real.
+
+### El costo de la cuadrilla no era anónimo — tres niveles en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`
+
+Dato del usuario, buscar si existe un catálogo de cuadrillas con precio
+propio. Existe, y ya estaba cargado: §8 ya lo señalaba en una fila
+(`Origen=ManoDeObra`, 112 filas, 39 padres, "Las cuadrillas") sin
+desarrollarla. Son tres niveles, no uno:
+
+```
+MOCA-xxx         rol/oficio con su jornal     Albañil $760, Ayudante $560,
+  ↓ compone                                   Fierrero $760… (44 roles)
+MOCU-xxx/CUAD-   cuadrilla (39 en total)      MOCU-005 = 1 Albañil + 1
+  ↓ liga (semilla, tabla de arriba)            Ayudante + 10% contratista
+MOA-/MOE-/MOC-…  destajo con su teórico       MOE-02020 (castillo K1) → MOCU-005
+```
+
+`MOCU-005` suma **$1,452.00/jornada** exacto (760 + 560 + 132 de
+contratista) — el mismo número que el ejemplo de `CONOCIMIENTO.md` §6.2
+ya usaba sin decir de dónde salía. De las 39 cuadrillas con composición
+propia, solo 14 están ligadas hoy a algún destajo en la semilla
+cargada; **25 existen y nadie las usa todavía.**
+
+**Primera validación: castillo K1 (`ALAMO 18`) cierra exacto, 1.00 cuadrilla.**
+`MOE-02020` a 12.12 M/día contra las 339.20 M de sus tres niveles da 28.0 días
+teóricos — que coinciden con los 28 días reales activos que quedan una vez
+descontados los dos huecos que `CONOCIMIENTO.md` §11.14/D-385 ya había
+encontrado (56 de los 84 días de calendario). Confirma el rendimiento de la
+semilla y el método de huecos, los dos a la vez, con el mismo caso.
+`CONOCIMIENTO.md` §11.14.
+
+**Segundo uso: primer programa completo de prototipo, 30 semanas para
+Diamante.** Las 16 filas nuevas (cimentación, K3/K8/CE-1, firme, zapatas,
+barda perimetral, asador) reconstruyen Cimentación→Azotea en 21 semanas
+y encuentran que eléctrica en muro PB necesita 2 cuadrillas —no 1— para
+no repetir la deficiencia de calidad de D-387/D-388. `CONOCIMIENTO.md`
+§11.14.
+
+**Tercer uso: contra el plan manual de Zafiro 1.0, no contra ejecución
+real.** Las 24 filas nuevas (acabados, boquillas, pórfido, registros
+sanitarios, murete) salen al cruzar las 317 líneas de
+`PROGRAMA_ZAFIRO.xlsx` contra esta semilla — 50 pares concepto×`MO-` en
+total. A
+diferencia de castillo K1, este cruce no cierra limpio: mediana 0.83-1.25
+cuadrillas implícitas según el filtro, con 67-74% fuera de una banda
+razonable. No es que el rendimiento esté mal — es que un plan manual no
+pasa por rendimiento × cuadrillas de forma sistemática, que es justo la
+brecha que un programa calculado cerraría. `CONOCIMIENTO.md` §11.14.
+
+**Cuarto uso: completar los conceptos "act" que el tercer uso no pudo
+ver.** `MOE-02215`/`MOE-02216` (losa maciza 3.00) y `MOE-02218` (losa
+nervada 4.20) llegan al comprobar cuadrillas concepto por concepto
+—`MOE-02217` ya estaba—: los conceptos en unidad "act" (lump sum) no
+tienen unidad que coincida con ninguna línea `MO-`, así que el tercer
+uso los dejó fuera sin darse cuenta. `CONOCIMIENTO.md` §11.14.
+
+**Quinto uso: el costo del destajo, comprobado contra duración real y
+de diseño a la vez, con el mismo concepto.** Dato del usuario. Castillo
+K1 conecta, con números reales, el costo y el tiempo —
+`CONOCIMIENTO.md` §6.2 trae la tabla completa. El caso real
+(`ALAMO 18`) cierra los tres rendimientos entre 11.17 y 12.12; los dos
+tramos de diseño (`PROGRAMA_ZAFIRO.xlsx`) se disparan en direcciones
+opuestas (18.13 y 4.20) — confirma por el lado del dinero lo que D-397
+ya probaba por el lado del tiempo: el plan manual no pasa
+sistemáticamente por esta tabla, el destajo no está mal fijado.
+`CONOCIMIENTO.md` §6.2 (D-406).
 
 ## 10b El prefijo no determina la familia — segunda prueba
 

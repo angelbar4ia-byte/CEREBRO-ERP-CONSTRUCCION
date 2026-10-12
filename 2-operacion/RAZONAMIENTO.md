@@ -5,8 +5,8 @@
 capa:       II — Operación
 pregunta:   ¿cómo se responde una pregunta que el cerebro no tiene guardada?
 tiempo:     se hace así
-corte:      2026-09-26
-verificado: 3 preguntas de prueba sobre ALAMO 18
+corte:      2026-10-12
+verificado: 3 preguntas de prueba sobre ALAMO 18 · referencias a `CONOCIMIENTO.md` §11 y a `MODELO.md` §5f releídas el 2026-10-12 contra su destino (una estaba mal) · las cifras de §5 vienen de un archivo de comparación que no está en el repositorio y no se pudieron volver a sacar
 ```
 
 > **`METODO.md` dice cómo se construyó y se audita el cerebro** — mirando hacia
@@ -52,7 +52,7 @@ tomar **antes** de calcular, no después:
 Ejemplo real, verificado sobre `ALAMO 18`: «¿cuál es el rendimiento del
 cemento?» tiene al menos tres respuestas distintas y válidas — 35% consolidado
 de toda la obra (que además resultó ser sustitución, no rendimiento,
-`CONOCIMIENTO.md` §11.7), 0% en una orden específica de abril
+`CONOCIMIENTO.md` §11.11), 0% en una orden específica de abril
 (`CONOCIMIENTO.md` §11.16), y una tasa teórica de referencia usada en un corte
 semanal (`CONOCIMIENTO.md` §11.17). Ninguna es «la» respuesta.
 
@@ -111,6 +111,13 @@ artefacto de comparación (§4), corte 2026-09-21, para `NIV-00001`:
 Tres respuestas correctas y distintas — «cuánto falta» no significa nada sin
 decir contra cuál de las tres.
 
+> *Releído el 2026-10-12.* Las cifras son del corte 2026-09-21 y de un archivo que no está en
+> el repo. La hoja de mano de obra que sí está (`1-mundo/fuentes/precio-real/PRECIO_REAL_ALAMO_18__2/Mano_de_Obra.csv`)
+> suma $79,228.00 con ubicación `CIMENTACIÓN` y $79,728.00 con `HIDROSANITARIAS CIM`; ninguna
+> es $80,030.50. Con lo que hay en el repo no se puede saber cómo se asignaba cada clave a su
+> nivel, y por eso el número no se puede volver a sacar. Lo que sí se sostiene es la forma: tres
+> referencias, tres respuestas.
+
 ### 3 · ¿Cuál es el Presupuesto Formado?
 
 Mitad método, mitad valor. El método es fijo (`CONOCIMIENTO.md` §11.14); el
@@ -123,5 +130,5 @@ alcances — no uno:
 | Material | $1,439,761.33 |
 
 Aparte, $394,172.93 del catálogo reconstruido **no entran en ninguno de los
-dos** — todavía no tienen matriz para esta capa (`PENDIENTES-MEJORAS.md` B-69):
+dos** — todavía no tenían matriz para esta capa (`PENDIENTES-MEJORAS.md` B-69, que después los clasificó y explotó donde procedía):
 no es un tercer alcance, es lo que se queda fuera de los dos de arriba.

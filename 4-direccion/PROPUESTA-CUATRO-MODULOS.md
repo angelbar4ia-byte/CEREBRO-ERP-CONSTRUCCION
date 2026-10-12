@@ -6,7 +6,7 @@ capa:       IV — Dirección
 pregunta:   ¿qué se propone construir?
 tiempo:     vamos aquí
 corte:      2026-09-26
-verificado: ✅ 22 decisiones cerradas · pendiente diseño formal
+verificado: ✅ 22 decisiones cerradas · pendiente diseño formal · referencias a `CONOCIMIENTO.md` y `MODELO.md` releídas contra su destino el 2026-10-12 (una de M-4 apuntaba a la parte equivocada)
 ```
 
 > **Para revisar y decidir, no para construir todavía.**
@@ -236,7 +236,7 @@ Herrería                 38%                  ← es una adivinanza
 | ~~M-2~~ | ~~¿Quién define la cohorte?~~ | **La primera vez la declara el usuario.** De ahí en adelante el sistema la deduce de los datos y la ofrece como propuesta. Mismo patrón que el resto: detecta solo, corrige con permiso |
 | ~~M-nueva~~ | ~~¿De qué presupuestos aprende la tasa?~~ | **De cualquiera, incluso en diseño.** Con la consecuencia asumida: un presupuesto en diseño no es evidencia de ejecución, así que **la dispersión es la única señal de calidad del corpus** |
 | ~~M-3~~ | ~~¿Qué pasa con dispersión alta?~~ | **La dispersión alta no se publica ni se bloquea: dice que el parámetro es el equivocado.** Herrería (38%), cancelería (20%), carpintería (11%) y pérgolas no escalan con el m² — **cada uno lleva parámetro propio**: unidad distinta, matriz o diseño. El sistema propone cambiar el divisor, no maquillar el número |
-| ~~M-4~~ | ~~Al regenerar, ¿qué pasa con lo editado a mano?~~ | **Resuelta** — `CONOCIMIENTO.md` §6: se marca *desvinculado* y se muestra la divergencia |
+| ~~M-4~~ | ~~Al regenerar, ¿qué pasa con lo editado a mano?~~ | **Resuelta** — `CONOCIMIENTO.md` §5.8: se marca *desvinculado* y se muestra la divergencia |
 
 ---
 

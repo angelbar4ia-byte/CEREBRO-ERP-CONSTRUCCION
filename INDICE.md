@@ -4,7 +4,7 @@
 órgano:     cuerpo calloso — conecta las capas, no pertenece a ninguna
 capa:       —
 pregunta:   ¿dónde va cada cosa?
-corte:      2026-09-26
+corte:      2026-10-12
 ```
 
 > **Regla de oro: cada hecho vive en un solo archivo. Los demás lo referencian.**
@@ -20,8 +20,8 @@ nombrarlo.
 
 | Capa | Tiempo | Qué contiene | Archivos |
 |---|---|---|---|
-| **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
-| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `skills/` · `agentes/` |
+| **I · Mundo** | *Es así* | El modelo de la realidad | `CONOCIMIENTO` · `CATALOGOS` · `MODELO` · `PROGRAMA-CPM` · `LENGUAJE` · `GLOSARIO` · `DICCIONARIO-DATOS` |
+| **II · Operación** | *Se hace así* | Cómo se razona y cómo se actúa. Reflejo, sin deliberar | `METODO` · `METACOGNICION` · `RAZONAMIENTO` · `INVARIANTES` · `ESCALABILIDAD` · `WORKFLOWS` · `skills/` · `agentes/` |
 | **III · Historia** | *Fue así* | Lo consolidado y lo que enseñó | `MEMORIA` · `CASO-TRABAJADO` · `APRENDIZAJE` |
 | **IV · Dirección** | *Vamos aquí* | Dónde estoy, qué falta, qué merece el enfoque | `ESTADO` · `PENDIENTES` · `PRIORIDADES` · `IDEAS` · `PROPUESTA-…` |
 
@@ -40,14 +40,21 @@ va sin archivo: `§3.2` dentro de su propio archivo es legible y no se rompe.
 cerebro/
 ├── README.md                  ← puerta de entrada del repositorio
 ├── INDICE.md                  ← fuera de las capas: las conecta
-├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
-├── 2-operacion/               METODO · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD
+├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
+│   ├── programas/             los siete programas y sus listas, en CSV (13 archivos)
+│   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices e ingenierías de ALAMO 18 (14 archivos)
+│   └── fuentes/               las demás tablas que el usuario compartió, a salvo (D-479): almacén, avance, precio real, semilla y programa, cada libro tal cual y cada hoja en CSV, con su MANIFIESTO de huellas
+├── 2-operacion/               METODO · METACOGNICION · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
-│   ├── skills/                erp-construccion + importacion · rediseno · parametrico
+│   ├── red-del-cerebro.py      ← mide cómo está conectado: referencias, cambios que van juntos, qué se lee primero, a quién releer (--vigencia), cuánto se puede partir (--integracion), si lo compilado oye a su fuente (--reentrada)
+│   ├── skills/                erp-construccion + importacion · rediseno · parametrico · cuantificador · programa
 │   └── agentes/               gravity (orquesta) · arquitecto · constructor · migrador · auditor
 │                               gravity-obra (interno, Agent SDK)
 ├── 3-historia/                MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-* (3)
-└── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
+├── 4-direccion/               ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-…
+├── backend/                   el código que el cerebro especifica: core/ (motor_calculo · motor_cpm · programa · servicio_programa · accesos · importacion_opus · catalogo · colgado · contratacion · reconciliacion · texto · clonacion · propuestas · fuentes, con sus pruebas) · infra/ (adaptadores de Postgres y la conexión por hilo) · api/ (FastAPI: el programa, el catálogo con sus presupuestos y la bandeja, autenticación por token, el cliente generado, servir y las terminales) · requirements.txt
+├── database/migraciones/      el esquema, en SQL: 0001_programa.sql · 0002_programa_importado_por.sql · 0003_version_nueva_del_programa.sql · 0004_usuarios_y_permisos.sql · 0005_catalogo_apu_presupuesto.sql · 0006_programa_cuelga_del_presupuesto.sql · 0007_estado_de_congelamiento.sql · 0008_reconciliar_un_presupuesto.sql · 0009_clonar_un_insumo.sql · 0010_bandeja_de_propuestas.sql
+└── frontend/gantt/            las pantallas del programa: gantt.html · programas.html (la lista y subir uno) · tokens.css (los colores) · motor_gantt.js (reprograma en el navegador; una prueba lo contrasta con Python) · cliente_programa.js (generado del spec de la API) · sesion.js (quién eres, compartida por las pantallas)
 ```
 
 **Este archivo queda fuera de las cuatro.** Un órgano que se clasifica a sí mismo
@@ -92,9 +99,11 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | **ESTADO** | IV | ¿Dónde vamos y cómo retomar? | Propiocepción |
 | **MÉTODO** | II | ¿Cómo se piensa aquí? · identidad | Función ejecutiva |
 | **RAZONAMIENTO** | II | ¿Cómo se responde una pregunta que el cerebro no tiene guardada? | Corteza prefrontal |
+| **METACOGNICION** | II | ¿Qué sabe el cerebro de sí mismo y cómo le llega a cada parte lo que cambia? | Corteza prefrontal anterior |
 | **CONOCIMIENTO** | I | ¿Cómo funciona el sistema? | Corteza asociativa |
 | **CATALOGOS** | I | ¿Qué trae cada catálogo de origen? | Memoria perceptiva |
 | **MODELO** | I | ¿Qué forma tienen los datos? | Esquema corporal |
+| **PROGRAMA-CPM** | I | ¿Cómo se calcula el programa y qué cifras lo prueban? | Cerebelo |
 | **LENGUAJE** | I | ¿Cómo se nombra en cada sistema? | Área de Wernicke |
 | **GLOSARIO** | I | ¿Cómo lo dicen las personas? | Léxico social |
 | **DICCIONARIO-DATOS** | I | Los renglones concretos a corregir | — |
@@ -104,6 +113,7 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | **APRENDIZAJE** | III | ¿Cómo lo aprobado cambia lo que creemos? | Lazo hebbiano |
 | **SKILL** | II | ¿Qué respetar al construir? | Reflejo medular |
 | **ESCALABILIDAD** | II | ¿Cómo se agrega un módulo nuevo? | Plasticidad |
+| **WORKFLOWS** | II | ¿Cómo trabajan juntos las personas, el sistema, el agente interno y las skills? | Comisuras |
 | **INVARIANTES** | II | ¿Esto sigue cuadrando? ¿Ya terminé? | Nocicepción |
 | **PENDIENTES** | IV | ¿Qué falta? | Cola de impulsos |
 | **PRIORIDADES** | IV | ¿En qué se gasta el enfoque? | Atención selectiva |
@@ -133,8 +143,10 @@ caducidad no necesita archivo propio — vive en el encabezado de cada uno.
 | Una regla para quien programa | SKILL | *«`Decimal`, nunca `float`»* |
 | Cómo se averigua algo | MÉTODO | *«Hay que calcular con el catálogo, no leerlo»* |
 | Una entidad del esquema | MODELO | *«`reporta_a` vive en la línea, no en el insumo»* |
+| Los datos de un programa, su red, su ruta o el motor que los calcula | PROGRAMA-CPM | *«La ruta de relevos de Zafiro son 28 pasos»* |
 | Un módulo propuesto y sin aprobar | PROPUESTA | *«El factorizador primero»* |
 | **Cómo encaja un módulo que no existe** | **ESCALABILIDAD** | *«¿Qué dimensión agrega y de qué nodos cuelga?»* |
+| **Cómo se relacionan personas, sistema, agente y skills** | **WORKFLOWS** | *«Aprobar una propuesta pide la función de la acción que propone»* |
 
 ---
 
@@ -232,13 +244,15 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `ESTADO.md` | IV | ✅ Punto de entrada · punto de corte |
 | `METODO.md` | II | ✅ Razonamiento e identidad |
 | `RAZONAMIENTO.md` | II | 🆕 Cómo responder preguntas operativas con el cerebro ya construido |
-| `MODELO.md` | I | ✅ Aprobado, 6 hallazgos |
-| `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
+| `METACOGNICION.md` | II | 🆕 La difusión, las conexiones, la integración, la reentrada y lo que el cerebro sabe de sí mismo, medido |
+| `MODELO.md` | I | ✅ Aprobado, 15 hallazgos resueltos |
+| `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 384 decisiones · 12 descartes · 20 correcciones |
+| `MEMORIA.md` | III | ✅ 493 decisiones · 12 descartes · 35 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
-| `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
+| `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
+| `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |
@@ -246,16 +260,20 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `PRIORIDADES.md` | IV | 🆕 Criterio de orden |
 | `APRENDIZAJE.md` | III | 🆕 Diseñado, no construido |
 | `ESCALABILIDAD.md` | II | 🆕 Contrato de módulo · dos escenarios de crecimiento |
+| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir |
 | `skills/erp-importacion.md` | II | 🆕 Compilado · carga desde OPUS |
 | `skills/erp-rediseno.md` | II | 🆕 Compilado · las seis operaciones y las tres capas |
 | `skills/erp-parametrico.md` | II | 🆕 Compilado · ensambles, cohorte, dispersión |
+| `skills/erp-cuantificador.md` | II | Compilado · trazar sobre el plano |
+| `skills/erp-programa.md` | II | 🆕 Compilado · el CPM, los vínculos, reprogramar, guardar y el Gantt |
 | `agentes/arquitecto-erp.md` | II | Diseña el esquema · evalúa skills y agentes de un módulo nuevo |
 | `agentes/constructor-erp.md` | II | Escribe el código |
 | `agentes/migrador-erp.md` | II | Lee los exports ajenos |
 | `agentes/gravity.md` | II | 🆕 Orquestador externo · entrega plan de ruta, no ejecuta |
 | `agentes/gravity-obra.md` | II | 🆕 Orquestador interno · Ollama local, Groq red · diseñado, no construido |
 | `agentes/auditor-erp.md` | II | 🆕 Corre las invariantes — **de los datos y del cerebro** |
-| `verificar-cerebro.py` | II | 🆕 7 comprobaciones mecánicas de coherencia |
+| `verificar-cerebro.py` | II | 🆕 9 comprobaciones mecánicas de coherencia |
+| `red-del-cerebro.py` | II | 🆕 Mide la red: conexiones escritas, cambios que van juntos, capacidad; con `--vigencia` a quién releer, con `--integracion` cuánto se puede partir y qué se repite, con `--reentrada` si lo compilado oye a su fuente |
 | `IDEAS.md` | IV | 🆕 8 ideas sin diseñar · dividido de CONOCIMIENTO |
 | `PROPUESTA-CUATRO-MODULOS.md` | IV | ✅ **22 decisiones cerradas** · pendiente diseño formal |
 | `agentes/` | II | Gravity, arquitecto, constructor, migrador, auditor |
@@ -264,9 +282,12 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 
 # Archivos retirados
 
-Se conservan como historia, **no se consultan ni se actualizan**:
+Se retiraron antes del primer commit de este repo, por «incorporados al conocimiento»:
 `ANALISIS-CATALOGOS-BASE.md` · `ANALISIS-MATRIZ-Y-ARBOL.md` ·
-`DICCIONARIO-CONCEPTOS.md` · `ERP-CONSTRUCCION-PLAN.md`.
+`DICCIONARIO-CONCEPTOS.md` · `ERP-CONSTRUCCION-PLAN.md`. **No hay copia de ellos en el repo
+ni en su historia** (B-30, D-490): no se consultan ni se actualizan, y ningún otro archivo del
+cerebro se apoya en ellos —el verificador lo comprueba—. Si alguno apareciera, se coteja
+contra el cerebro antes de fusionar nada.
 
 ---
 

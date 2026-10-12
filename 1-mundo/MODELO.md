@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-26
-verificado: Aprobado · 15 hallazgos resueltos
+verificado: Aprobado · 15 hallazgos resueltos · releído el 2026-10-12 contra el SQL y el código, sin mover el corte: los bloques «Cómo quedó en la base», la bandeja construida, la huella de la parte 4 y la lista de alertas de 5a; lo demás es diseño y no se releyó
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -208,7 +208,7 @@ CUAD-001: $1,880 → $188).
 
 Las capas de sobrecosto (indirectos, utilidad): la base **sí es acumulativa** en la
 convención mexicana — cada capa se calcula sobre lo que dejaron las anteriores
-(`CONOCIMIENTO.md` §5).
+(`erp-construccion.md` §6; antes decía `CONOCIMIENTO.md` §5, que es el paramétrico).
 
 > Si `COMPOSICION` y la futura tabla de capas comparten un solo campo genérico
 > `porcentaje_sobre`, alguien va a copiar la lógica de una a la otra y romper el
@@ -557,7 +557,18 @@ SUBFAMILIA
   id, familia_id, nombre                                                firme
 
 FRENTE
-  id, nombre                                                            firme — hoy sin uso operativo, pendiente ligar a programa
+  id, nombre                                                            firme — hoy sin uso operativo, pendiente ligar a programa;
+                                                                         el cerebro lo usa en tres sentidos y falta decidir cuál (D-448, B-82)
+                                                                         *Decidido (D-450): es el nivel constructivo —Subcapítulo, Nivel 1,
+                                                                         catálogo de 15 niveles—; sus sub-frentes son los gremios que trabajan
+                                                                         dentro, una vista del árbol y no una tabla; sin `frente_id` en ACTIVIDAD*
+                                                                         *D-451: si FRENTE es este catálogo de niveles o el «Catálogo de conceptos-frentes»
+                                                                         del usuario queda en revisión (B-89)*
+                                                                         *D-452: no existe tal catálogo (B-89 cerrado). El frente es por obra: el nodo de Nivel 1 del
+                                                                         presupuesto de esa obra; el sub-frente es la etapa (Nivel 2). Un sub-frente con dos contratistas
+                                                                         se divide en uno por contratista; dónde vive el contratista queda abierto (B-90)*
+                                                                         *D-453: el sub-frente es la etapa, sin agrupar por gremio; el contratista se asigna de lo general
+                                                                         a lo particular y la división se calcula, ver ASIGNACION_CONTRATISTA (§4a)*
 
 CLASE_TRABAJO
   id, nombre        destajo · acarreo · subcontrato…                    firme — nuevo (P-02/P-03), ver hallazgo 7
@@ -681,6 +692,30 @@ para poblar `PRESENTACION_COMPRA` con datos reales, más allá del ejemplo
 de la arena que ya trae `PROPUESTA-CUATRO-MODULOS.md` §1. El diseño
 queda completo; el caso real que lo ejerza, no.
 
+> **Actualización D-488 — el caso real apareció, y no en el almacén sino en el
+> catálogo.** Seis claves `PET-` son un camión: arena de 7 m³ (`PET-00002`), grava de
+> 7 (`PET-00003`), piedra de cerro de 6 (`PET-00004`), arenilla de 14 (`PET-00007`),
+> arena de río de 14 (`PET-00015`) y tezontle de 7 (`PET-00069`). Las seis traen la
+> **unidad `SERV`** —el viaje— y los metros cúbicos solo en la descripción. Dos son el
+> mismo material en dos presentaciones: las recetas piden la de 14 m³ y la obra
+> compró siempre la de 7, a $321.43 el m³ las dos (`CONOCIMIENTO.md` §11.11). Lo que
+> el diseño ya decía, con dato:
+>
+> - **F-1 no da la unidad base aquí.** «La unidad que trae el catálogo es la definida»
+>   no sirve cuando esa unidad es el viaje. El caso cae en la cláusula siguiente de F-1,
+>   *sin unidad detectable*: se sugiere y se marca solo si es ambiguo. Cinco camiones
+>   dicen «N M3» —factor N, conversión de transporte, captura directa, nadie
+>   aprueba—; el tezontle dice «7 MTS» y se marca.
+> - **Fusionar dos claves de un mismo material convierte las cantidades, no las
+>   copia**: el factor es razón, no cantidad (`PROPUESTA-CUATRO-MODULOS.md` §1, «Qué
+>   cuesta»). `MEZ-03020` pide 0.138571 viajes de 7 m³; sobre la clave de 14 m³ pide
+>   0.069286. La clonación de `CONOCIMIENTO.md` §16.2 copia receta y precio tal cual,
+>   y aquí duplicaría la arena. Que dos claves cuesten lo mismo por m³ es una pista
+>   de que son un material, no la prueba: lo decide una persona.
+> - **Lo que sigue sin existir:** una sola fila de `PRESENTACION_COMPRA` poblada.
+>   Falta el caso del lado de la compra (un movimiento de almacén en presentación
+>   distinta de la base), pero el del lado de la comparación ya está medido.
+
 ---
 
 # 3. Presupuesto y proyecto
@@ -690,6 +725,15 @@ PRESUPUESTO
   id, nombre, estado (por SUBÁRBOL, ver hallazgo 6)                    firme
   raiz_id            FK Nodo                                            firme
   tipo               enum: plantilla · obra                             nuevo — cierra P-40, ver abajo
+  plantas            INTEGER, nullable — solo si tipo=plantilla: cuántas
+                      plantas tiene el prototipo. Ya decidía el plazo
+                      (28 semanas una, 30 dos, D-419) y es el filtro del
+                      alcance «1 planta» / «2 plantas» de una duración
+                      editada (§5c)                                      nuevo — D-441, cierra B-85
+  plazo_semanas      NUMERIC, nullable — el plazo prometido del programa, en
+                      semanas. El sistema lo propone desde plantas (una 28,
+                      dos 30, D-419) y el planeador lo edita; cómo se cuenta
+                      lo dice CALENDARIO_OBRA.plazo_medido_en (§5c)      nuevo — D-447, cierra B-87
 
 ESTADO_CONGELAMIENTO   (por nodo, no por presupuesto)
   nodo_id            FK Nodo
@@ -889,7 +933,7 @@ pasó suelto.
 ```
 VERSION_CONCEPTO
   id, concepto_id (nodo), version, vigente_desde
-  huella          hash de (unidad, insumos, cantidades) — NO incluye descripción   firme
+  huella          hash de (insumos, cantidades) — NO incluye descripción ni unidad   firme (la unidad se compara aparte, D-473)
 
 EQUIVALENCIA
   id, concepto_a_id, concepto_b_id, tipo (duplicado_exacto|casi_identico|variante_dimensional)
@@ -938,7 +982,7 @@ la fila vigente, nunca fuente de verdad — mismo principio que
 ```
 VERSION_CONCEPTO
   id, concepto_id (nodo), version, vigente_desde
-  huella          hash de (unidad, insumos, cantidades) — NO incluye descripción   firme
+  huella          hash de (insumos, cantidades) — NO incluye descripción ni unidad   firme (la unidad se compara aparte, D-473)
   pu              NUMERIC — el PU resuelto al crear esta versión, usando
                    PRECIO_HISTORICO de cada insumo a esa fecha. Se congela,
                    nunca se recalcula                                        firme — nuevo
@@ -958,6 +1002,100 @@ descartar la versión, porque su precio nace de una negociación puntual, no
 de un mercado que fluctúa.
 
 **Solo `ORDEN DE CAMBIO` mueve un PU ya contratado** — `CONOCIMIENTO.md` §13.4, ya firme — con causa, impacto en monto, quién autoriza.
+
+### La matriz es de una versión, el renglón fija la versión y la unidad puede no saberse (D-473)
+
+*Cómo quedó en la base (`database/migraciones/0005_catalogo_apu_presupuesto.sql`), con los archivos de OPUS que hay:*
+
+```
+COMPOSICION   gana    version_id        la versión de la matriz a la que pertenece la línea; nulo en un presupuesto
+                       hijo_version_id   solo en un presupuesto: la versión del concepto que el renglón fijó al cargarse
+NODO          no usa   cantidad          la cantidad es de la línea (las 58 negativas son de matrices); no hay padre_id
+                                        materializado: todo el árbol son líneas de COMPOSICION, y el WBS se calcula por posición
+NODO          gana     presupuesto_id    solo los estructurales: son de un presupuesto, no del catálogo (ECO-00001 está en los siete)
+                       ruta_natural      clave#n/clave#n… dentro del presupuesto: la llave con que se reconocen al volver a cargar
+                       tipo_opus         Capítulo · Subcapítulo · Nivel 2 · Nivel 3
+              unidad_id  puede ser nulo  ni las cuadrillas ni un concepto fuera de todo presupuesto la traen, y no está el catálogo
+CARGA         nueva    quién, con qué rol, los archivos (huella sha256) y qué quedó pendiente con su motivo
+PRESUPUESTO   gana     clave, huella     la del capítulo; la huella es de estructura y cantidades, para saber si lo que llega es lo mismo
+VERSION_CONCEPTO       la huella ya no lleva la unidad: f(insumos, cantidades); la unidad se compara aparte y antes (§2.7)
+```
+
+La clave es única solo entre los nodos del catálogo. Cada capítulo del archivo es un `PRESUPUESTO`. Una versión, sus líneas, una carga y
+los precios cerrados no se reescriben ni se borran: lo garantizan disparadores. Un concepto sin matriz es un nodo sin versiones y vale cero.
+
+### El programa cuelga del presupuesto: cada fila dice a qué se refiere (D-474)
+
+*Cómo quedó en la base (`database/migraciones/0006_programa_cuelga_del_presupuesto.sql`), con los siete programas contra los siete presupuestos:*
+
+```
+PROGRAMA            presupuesto_id   FK PRESUPUESTO — de qué presupuesto es; se pone al colgarlo y no se cambia
+PROGRAMA_FILA       nodo_id          un bloque (Capítulo, Subcapítulo, Nivel 2 o 3) → el NODO estructural del presupuesto
+                    renglon_id       una partida → la línea de COMPOSICION del bloque al concepto; el concepto es su hijo_id
+                                     (una fila tiene uno de los dos o ninguno; un nodo o un renglón lo ocupa a lo más una fila por programa)
+PROGRAMA_COLGADURA  nueva            quién, con qué rol, cuándo, cuántos enlaces puso y qué cuadró y qué no; solo se agrega
+```
+
+`ACTIVIDAD.concepto_id` (§5c) es el `hijo_id` del renglón y `ACTIVIDAD.presupuesto_id` es el del programa: la partida **no** apunta al
+concepto a secas, porque el mismo concepto está en muchos lugares de un presupuesto y cada lugar tiene su cantidad y su sitio en el
+programa. La identidad de una fila dentro del programa sigue siendo su `oid`, así que la bitácora de ediciones no se toca; el enlace es
+un atributo de la fila y **un enlace puesto no se mueve** (lo garantiza un disparador): se agrega uno nuevo, no se cambia el viejo.
+Se casan por ruta natural —no por posición— y lo que no casa se queda sin enlace y se dice, de los dos lados (`MEMORIA.md` D-474).
+
+### El estado de congelamiento: contratar un bloque fija sus PU y lo congela (D-475)
+
+*Cómo quedó en la base (`database/migraciones/0007_estado_de_congelamiento.sql`), con los siete presupuestos de OPUS:*
+
+```
+ESTADO_CONGELAMIENTO   (por nodo estructural, no por presupuesto — hallazgo 6)
+  nodo_id        FK Nodo — el bloque que se contrata; su subárbol se contrata completo y lo hereda hacia abajo
+  estado         diseño · contratado    todo bloque sin fila está en diseño; «descontratar» no está definido (sería un control de cambio)
+  fecha, usuario, rol                   quién contrató y con qué rol
+  carga_id       FK CARGA               la contratación que lo fijó: de ahí salen las versiones nuevas
+  resumen        jsonb                  qué se fijó: los totales de antes y de después y los PU que se movieron
+CARGA            gana   tipo            archivos · contratacion — una contratación también deja su carga, sin archivos
+```
+
+Un bloque se contrata una vez (índice único). **Contratar tiene dos efectos** (§4a, «dos disparadores de versión»): cada concepto del
+subárbol queda con su PU fijado a ese momento —si el que da el motor hoy no es el de la versión vigente, nace una versión nueva con **la misma
+receta** y el PU de hoy— y cada renglón fija la versión vigente; y el subárbol queda **congelado**: ni su cantidad, ni la versión que fija, ni
+su lugar se editan o se borran —lo garantiza un disparador— aunque se intente con SQL. Agregar sí se puede (§1.4: «solo admite adiciones al
+final»). Si el PU de un concepto se mueve más de 5 %, o no tiene matriz y valdría cero, **pide confirmación** y el bloque no se contrata a
+medias. La función es `contratar_subarbol` (§5b, propuesta): Control de obra. Y la carga ya no le cambia la receta a un concepto que fija un
+renglón contratado: esa versión se detiene y va a control de cambio (`MEMORIA.md` D-475).
+
+### Reconciliar un presupuesto que ya existe: la baja no borra y la historia solo se agrega (D-476)
+
+*Cómo quedó en la base (`database/migraciones/0008_reconciliar_un_presupuesto.sql`):*
+
+```
+COMPOSICION     gana   baja_carga_id    solo en un renglón de presupuesto: la carga que lo dio de baja; nulo si está vivo
+NODO            gana   baja_carga_id    ídem para un bloque; su ruta natural queda libre (se le agrega «~baja<carga>»)
+RENGLON_HISTORIA nueva renglon_id, carga_id, campo (alta · cantidad · orden · baja), antes, despues — solo se agrega
+```
+
+El lugar de un renglón (`orden`) es único entre los vivos de su bloque; el de uno dado de baja ya no cuenta. **Lo dado de baja no se
+borra** porque el programa lo puede citar (`programa_fila.renglon_id`, `nodo_id`, D-474) y porque la historia es de quien la lea
+después; pero no sale en el presupuesto, ni en el motor de cálculo, ni ocupa lugar. Reglas completas en `MEMORIA.md` D-476.
+
+### Clonar un insumo: lo que guarda `CLON` y cómo se lee la clave vieja (D-478)
+
+*Cómo quedó en la base (`database/migraciones/0009_clonar_un_insumo.sql`):*
+
+```
+CLON    nueva   original_id, clon_id (único: un clon nace de un solo original), modo (mantener · sustituir),
+                reconoce_clave_vieja_al_importar (solo si es sustituir), exporta_clave_vieja (nace en verdadero),
+                usuario, rol, carga_id, resumen (qué se redirigió, concepto por concepto), creada_en
+CARGA   gana    tipo = clonacion
+NODO    ya traía procedencia = clonacion: la lleva el clon
+```
+
+Un clon **no se reescribe ni se borra** —lo garantiza un disparador—; lo único que cambia es `exporta_clave_vieja`, que pasa a falso **una vez**
+(alguien autoriza dejar de usar la clave vieja) y no se vuelve a abrir. El clon copia la receta, la huella y el PU del original; *sustituir* le
+agrega una **versión nueva** a cada concepto o compuesto que citaba al original (la misma receta con el clon, el mismo PU) y los renglones de presupuesto
+que fijaban esa versión pasan a fijar la nueva. Las versiones viejas, el original y todo lo contratado quedan como estaban. **La carga lee los archivos
+con las claves vigentes**: la vieja entra como el clon, y lo retirado no se cuenta como «ausente» (`MEMORIA.md` D-478). Y `armar_arbol` guarda un compuesto
+de material como **`material`**, no como `auxiliar` (`CONOCIMIENTO.md` §10.4): la migración corrige lo que ya estuviera guardado.
 
 ### El tabulador por contratista no toca el PU
 
@@ -1012,6 +1150,51 @@ agrupa uniendo `nodo_id` contra `TABULADOR_CONTRATISTA.contratista_id`,
 sin campo nuevo en `DESVIACION` — mismo criterio de «se calcula al
 preguntar» que ya evitó una tabla de comparación en `MODELO.md` §5f.
 
+### `ASIGNACION_CONTRATISTA` — quién ejecuta qué, de lo general a lo particular (D-453)
+
+La regla es del usuario: el contratista se asigna por obra y tipo de trabajo, de ahí por
+etapa, salvo que un concepto o una actividad se asigne a otro; se reasigna en cualquier
+momento por abandono de obra o por logística, y se puede dividir hasta el concepto y la
+cantidad. Los campos son propuesta del sistema.
+
+```
+ASIGNACION_CONTRATISTA
+  id
+  presupuesto_id     FK PRESUPUESTO — la obra (tipo=obra)                    propuesta — D-453
+  alcance            enum: obra_tipo · etapa · concepto                       propuesta
+  familia_id         FK Familia — el tipo de trabajo (el oficio); solo si
+                      alcance=obra_tipo                                       propuesta
+  nodo_id            FK Nodo — la etapa o el concepto; nulo si obra_tipo       propuesta
+  cantidad           NUMERIC, nullable — solo si alcance=concepto: la parte
+                      del concepto que se asigna; nulo es toda                propuesta
+  contratista_id     FK CONTRATISTA                                           propuesta
+  vigente_desde      DATE                                                     propuesta
+  vigente_hasta      DATE, nullable                                           propuesta
+  motivo             enum: inicial · abandono · logistica · otro              propuesta
+  reemplaza_id       FK ASIGNACION_CONTRATISTA, nullable — la cadena          propuesta
+```
+
+- **Quién ejecuta una partida en una fecha:** la asignación vigente más particular —concepto,
+  luego etapa, luego obra × tipo de trabajo—. Una de concepto con `cantidad` toma esa
+  cantidad y el resto sigue el siguiente nivel.
+- **Reasignar:** se cierra la vigente en esa fecha y se abre otra con su motivo; nada se
+  borra. Lo avanzado hasta la fecha se queda con quien lo hizo y lo que falta pasa al nuevo, así
+  que un concepto puede partir su cantidad en el tiempo.
+- **La división de un sub-frente no se guarda:** son las partidas de la etapa agrupadas por su
+  contratista a la fecha. Con uno no se divide; con dos o más aparecen sub-frentes por
+  contratista, a cualquier fecha.
+- **Quien avanza distinto del asignado es un aviso**, no un cambio: el avance registra al
+  contratista real y el sistema lo compara con el asignado.
+- **El sistema propone** al contratista con la especialidad del tipo de trabajo
+  (`CATALOGO_DE_CONTRATISTAS`); el humano decide.
+
+El frente y el sub-frente no se guardan: son el nodo de Nivel 1 y el de Nivel 2 de la obra
+(D-450 a D-452). `CONOCIMIENTO.md` §11.14.
+
+*D-454: el usuario confirmó los campos de arriba; pasan de propuesta a firmes.*
+
+*D-459: `ASIGNACION_CONTRATISTA` gana `corte_inicio_id` (FK `CORTE_RETRASO`, nullable), firme: el corte con que empezó el contratista. Al reasignar, el retraso del anterior se congela y el nuevo ve el propio, igual que con el residente (§5c).*
+
 ### Lo que ya quedaba resuelto por otro lado
 
 «Prototipo» es una convención de nombre, no un campo (P-40) — resuelto:
@@ -1044,6 +1227,8 @@ CLON   (ya existía — gana dos campos, CONOCIMIENTO.md §16.2, CONOCIMIENTO.md
                                        usuario autorice — individual por
                                        sistema externo, o total             nuevo
 ```
+
+*D-478: `reconoce_clave_vieja_al_importar` se resuelve **al clon**, no «al original» como dice la línea de arriba —la clave vieja entra y se lee como la nueva—; así quedó en la base y en la carga (`MEMORIA.md` D-478).*
 
 **Solo homologación viaja de vuelta; normalización no** (`CONOCIMIENTO.md` §16.3):
 `pza` no sale como `pza`, sale `PZ` siempre — es forma, no identidad. La clave sí
@@ -1173,6 +1358,28 @@ Cada `tipo` de propuesta tiene forma distinta (una equivalencia son dos claves; 
 conversión es un factor). Modelarlo con una tabla por tipo sería más limpio pero
 son nueve tablas para una entidad que hoy no tiene volumen. **Queda anotado como
 deuda técnica**, no como error.
+
+### La bandeja construida: lo que cambió de la tabla al llevarla a código (D-485)
+
+La tabla de arriba es el diseño de D-71; `database/migraciones/0010_bandeja_de_propuestas.sql` y `backend/core/propuestas.py` la
+llevaron a código y cambiaron esto. Lo de arriba no se reescribe: esta es la forma que rige.
+
+| Diseño | Construido | Por qué |
+|---|---|---|
+| `objeto_id` — a qué nodo o línea aplica | **`objeto`, texto** (la clave, la ruta del bloque, el prefijo) | Una corrección de prefijo recae en `AUX`, que no es un nodo; una llave foránea no podía decirlo |
+| `tipo` — enum | **Abierto, validado por el servicio** contra los diez que conoce (los nueve de arriba y `precio_nuevo`) | Agregar un tipo no debe ser una migración: es lo que `ALERTA.tipo` ya hace |
+| `resuelto_por`, `resuelto_en` | `resuelto_por`, **`resuelto_con_rol`**, `resuelta_en` | Igual que toda bitácora del sistema: quién y con qué rol |
+| — | **`propuesto_por`, `propuesto_con_rol`, `creada_en`** | Sin ellos no se puede hacer valer que quien propone no aprueba (D-269). Del agente, `propuesto_por` es su nombre y el rol es `agente` |
+| — | **`base`** | La última carga que vio quien propuso; al aprobar viaja a la aplicación como `esperaba` |
+| — | **`nota`** (obligatoria al rechazar) y **`resultado`** (obligatorio al aprobar) | Lo rechazado se conserva *con su porqué*; lo aprobado, con lo que el sistema hizo |
+
+**Reglas que sostiene la base y no solo el código:** una propuesta resuelta no se reescribe ni se borra (disparador); el estado
+`aprobada` exige que quien la resolvió no sea quien la propuso, sin importar mayúsculas; `rechazada` exige nota; un agente trae
+`modelo` y una persona no; la evidencia no puede ser blanco. **Reglas del servicio:** una propuesta igual pendiente no se repite;
+una igual rechazada no vuelve a entrar con la misma evidencia (comparada sin importar espacios ni mayúsculas); y **solo se aprueba
+un tipo que el sistema sabe ejecutar** —hoy `clonacion`, una clonación o la corrección de un prefijo entero—, con la identidad
+de quien aprueba y las dos funciones: `aprobar_propuesta` y la de la acción (`WORKFLOWS.md` §3.1). Un tipo sin operación se puede
+proponer y rechazar, no aprobar.
 
 ### `patron_carga` cierra P-27 — confirmar una vez, no una vez por archivo
 
@@ -1316,6 +1523,20 @@ Los dos primeros usos, con su regla completa en `CONOCIMIENTO.md` §11.7:
 | `estimacion_sin_respaldo_material` | Al correr `validar_estimacion`, la salida de almacén del insumo testigo (`MOVIMIENTO_ALMACEN`, `motivo` ∈ {`salida_produccion`, `implosion`}) del periodo no alcanza, contra el rendimiento teórico, para los m² que la estimación reclama — más del `umbral_pct` de faltante | B-70 |
 | `consumo_material_sin_respaldo_avance` | Mismo cruce, dirección contraria: el insumo testigo consumido excede, contra el rendimiento teórico, lo que el avance reclamado necesita — más del `umbral_pct` de exceso | B-79 |
 | `subcontrato_fuera_de_base` | El Real de un subcontrato (D-313) difiere de su Base, en cualquier dirección — sin umbral por %, dato del usuario | B-78 |
+| `pago_sin_respaldo_avance` | El % pagado (`ESTIMACION_LINEA`) excede, contra el `% avance físico` calculado de `TRAMO`, lo que la actividad realmente lleva — más del `umbral_pct` de adelanto | D-395 |
+| `avance_sin_respaldo_pago` | Mismo cruce, dirección contraria: el avance físico real excede, contra lo pagado, más del `umbral_pct` | D-395 |
+| `rendimiento_bajo_para_destajo` | El Rendimiento Real (mano de obra) de la actividad cae, contra (`Rendimiento teórico` × `Unidades ejecutoras`), más del `umbral_pct` | D-408 |
+| `rendimiento_excede_destajo` | Mismo cruce, dirección contraria: el Rendimiento Real excede ese mismo punto más del `umbral_pct` | D-408 |
+| `rendimiento_en_perdida` | El Rendimiento Real cae por debajo de (`Rendimiento calculado` × `Unidades ejecutoras`) — sin umbral, cualquier margen negativo | D-408 |
+| `vinculo_incumplido` | Las fechas de la sucesora contradicen un vínculo (holgura negativa, según `tipo_vinculo` y `traslape_espera`; las cuatro fórmulas, en §5c) — sin umbral, el plan hecho a mano puede no pasar por el CPM (D-409); la corrección la propone quien programa | B-86 |
+| `plazo_excedido` | El cierre del programa pasa del límite del plazo, contado como diga `CALENDARIO_OBRA.plazo_medido_en` (§5c) — sin umbral, y sin alerta por cerrar antes: «ni antes ni después» (D-437) es regla de diseño de este ejercicio, no del sistema | B-87 |
+| `ritmo_sobre_referencia` | En una ventana de actividades que heredan sus días (`ACTIVIDAD.duracion_origen=heredada`), las cuadrillas efectivas son al menos `razon` veces las de la ventana de su referencia y al menos `cuadrillas_mas` más —por defecto 2 y 1, en `ALERTA.parametro_usado`—; ventana = las actividades del mismo oficio con las mismas fechas de inicio y término (§5c) | B-84 |
+| `duracion_propia_en_herencia` | Al propagar la edición de una duración con alcance a otros programas, la gemela de uno de ellos es `propia` (`ACTIVIDAD.duracion_origen`): no se pisa, se avisa — sin umbral, el planeador decide si la suelta o la conserva | B-85 |
+| `frente_listo_para_cierre` | El avance del frente (ejecutado ÷ ingeniería, ponderado por costo) llega al porcentaje de `solicitar_cierre_frente` —90%, D-261— y no se ha solicitado el cierre; la evidencia lista los sub-frentes que siguen pendientes. Avisa, no cierra: `CIERRE_FRENTE` pregunta, no impide | B-88 |
+| `subfrente_detenido` | Un sub-frente (etapa) con avance mayor que 0 y menor que 100% lleva al menos `dias_sin_avance` sin una operación de avance —por defecto 21, en `ALERTA.parametro_usado`—. Es un aviso: el avance puede no haberse capturado | B-88 |
+| `ejecutado_sobre_ingenieria` | En una línea de destajo, el ejecutado valuado excede el costo de la ingeniería del lote — sin umbral, cualquier excedente | B-88 |
+| `subfrente_atrasado` | Un sub-frente (etapa) cuyo avance está por debajo del programa de la obra, en tres casos: su término planeado ya pasó y no llega a `porcentaje_terminado` (90% por defecto); debía haber arrancado y no arrancó; o va en curso `puntos_rezago` puntos o más por debajo de lo planeado (20 por defecto). Se ordena por valor rezagado, (planeado − ejecutado) × ingeniería *(D-457: sin `puntos_rezago` ni `porcentaje_terminado`; real desde un día hábil. D-458: sigue avisando por sí solo, además de `obra_atrasada`)* | D-456 |
+| `obra_atrasada` | La obra va al menos un paso del calendario (`CALENDARIO_OBRA.paso_dias`, un día hábil) detrás de su programa, medido por tiempo ganado —hoy menos el último día en que el plan estaba en el avance ejecutado— y neto: lo adelantado compensa a lo atrasado. Sin umbral. `objeto_id` es la raíz de la obra y la `evidencia` trae los días, el retraso neto, lo atrasado y lo adelantado en $, y su desglose por frente, sub-frente, contratista y residente, que suma exacto | D-457 |
 
 **`invariante_por_vencer` no necesita `objeto_id`** — ya es nullable, y aquí
 no hay un nodo al que apuntar: es sobre el archivo completo. Dato del
@@ -1323,6 +1544,17 @@ usuario: la resuelve Control de obra, mismo criterio de gobierno cruzado
 entre obras que ya asignó `gestionar_rol_funcion`/`asignar_residente`
 (D-330) — nueva función atómica `renovar_invariante_valor` → Control de
 obra, en la lista de §5b.
+
+### La alerta construida: lo que cambió de la tabla al llevarla a código (D-485)
+
+Misma tabla que arriba, con tres cambios y una garantía. **`objeto` es texto**, vacío (`''`) si no hay nada a qué apuntar, y no
+`objeto_id` nullable: igual que en `PROPUESTA`, la clave de un concepto, la de un frente o una ruta no siempre son un nodo, y
+con `''` la regla «una activa por tipo y objeto» se sostiene con un índice único, que con `NULL` no. Se agrega `resuelto_con_rol`.
+**La garantía:** una alerta activa por `(tipo, objeto)` es una sola fila, y volver a verla la cuenta con un
+`INSERT … ON CONFLICT` —sin carrera: dos procesos que la ven a la vez suman las dos veces—, le pone la evidencia de hoy y conserva
+el umbral que la disparó. Una alerta resuelta o descartada no se reabre, ni se reescribe, ni se borra: si el mismo aviso
+reaparece después, nace otra, con su propia cuenta. Cerrarla pide `resolver_alerta` y una nota que diga qué era. **Las alertas no
+se crean por la API:** las deja un detector con `ServicioBandeja.alertar`, y aquí solo se ven y se cierran.
 
 ### `estimacion_sin_respaldo_material` cierra B-70 — mover el cruce de después del pago a antes
 
@@ -1577,7 +1809,7 @@ fecha, en un solo lugar.
 | `solicitar_cierre_frente` | Residente | §5c, D-329 |
 | `aprobar_cierre_frente` | Supervisor | §5c, D-329 |
 | `validar_cierre_frente` | Control de obra | §5c, D-329 |
-| `editar_estructura_programa` | Control de obra | §5c, D-329 |
+| `editar_estructura_programa` | Control de obra | §5c, D-329; D-466: también subir un programa |
 | `editar_fechas_programa` | Residente | §5c, D-329 |
 | `proponer_precio_nuevo` | Costos | D-329 |
 | `aprobar_precio_nuevo` | Control de obra **y** Superintendente (los dos) | D-329 |
@@ -1587,6 +1819,9 @@ fecha, en un solo lugar.
 | `reclasificar_familia` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
 | `resolver_revisar_parametro` | Control de obra — propuesto, menos firme | dato del usuario, extendido |
 | `renovar_invariante_valor` | Control de obra | dato del usuario, D-345 |
+| `cargar_catalogo_opus` | Control de obra y Costos — propuesto | D-473: la carga del catálogo y los presupuestos de OPUS |
+| `contratar_subarbol` | Control de obra — propuesto | D-475: contratar un bloque del presupuesto fija sus PU y lo congela |
+| `clonar_insumo` | Control de obra — propuesto | D-478: clonar un insumo y sustituir el original cambia lo que citan los conceptos de todas las obras: gobierno cruzado |
 | `registrar_avance` | **Sin asignar** | P-21 |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
@@ -1595,12 +1830,12 @@ fecha, en un solo lugar.
 | `pactar_precio_contratista` | **Sin asignar** | P-21 |
 | `aplicar_descuento` | **Sin asignar** | P-21 |
 | `autorizar_orden_cambio` | **Sin asignar** | P-21 |
-| `aprobar_propuesta` | **Sin asignar** | P-21 |
-| `resolver_alerta` | **Sin asignar** | P-21 |
+| `aprobar_propuesta` | Control de obra — propuesto | D-485: resolver la bandeja (aprobar o rechazar). No aplica: aplicar pide además la función de la acción |
+| `resolver_alerta` | Supervisor y Control de obra — propuesto | D-485: el Supervisor da seguimiento hasta el cierre; Control de obra gobierna entre obras |
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.**
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -1670,12 +1905,20 @@ otro.
 cerrando la asignación que C-3 (`PROPUESTA-CUATRO-MODULOS.md` §2) ya había
 anotado sin tabla.
 
+*D-457 (propuesta): `RESIDENTE_OBRA` gana `vigente_desde` y `vigente_hasta` (DATE; el segundo, nullable), igual que `ASIGNACION_CONTRATISTA` (§4a): sin ellos, auditar el retraso de la obra por residente le carga la historia al residente nuevo.*
+
+*D-458: `vigente_desde` y `vigente_hasta` quedan firmes (cierra B-93). Se agrega, como propuesta, `corte_inicio_id` (FK `CORTE_RETRASO`, nullable): el corte con que empezó el residente; el del anterior al salir es ese mismo (§5c).*
+
+*D-459: `corte_inicio_id` queda firme.*
+
 **`SUPERVISION` es una sola tabla para los dos niveles de la cascada**, no
 dos — Supervisor-sobre-Residente y Superintendente-sobre-Supervisor tienen
 la misma forma (`usuario` que supervisa a `usuario`); cuál de los dos es
 cada fila lo dice el rol de cada quien en `USUARIO_ROL`, no un campo nuevo.
 El alcance de Superintendente y Control (D-277 a D-279) se calcula
 recorriendo esta tabla, no se declara aparte.
+
+*D-469 (propuesta): las tablas de arriba ya existen en `database/migraciones/0004_usuarios_y_permisos.sql`, con tres precisiones. `ROL` gana `clave` —el nombre de máquina: `control_de_obra` es el «Control» del enum y el «Control de obra» del texto—. `USUARIO.correo` va en minúsculas y no se repite, y es con lo que se encuentra a la persona cuando el proveedor de identidad comprueba un correo. Se siembran los seis roles y solo las dos funciones que hoy tienen código (`editar_estructura_programa` y `editar_fechas_programa`, con quién las tiene según la tabla de arriba): las demás se agregan cuando haya un módulo que las use. Quien tiene más de un rol puede lo que alguno pueda, y la acción queda registrada con el primero, en orden alfabético, que tiene la función. Lo que queda en las bitácoras como «quién» es hoy el correo, texto; la clave foránea a `USUARIO` llega con `PRESUPUESTO`.* *D-470 confirmó la propuesta: el proveedor de identidad es Supabase Auth y el modelo se acepta.*
 
 **Cierra aquí: `asignar_residente` y `asignar_supervision`, a Control de
 obra.** Mismo criterio que el usuario dio para `validar_estimacion` y
@@ -1765,17 +2008,33 @@ cuantificadores que P-9 ya distinguía sin tabla donde vivir.
 ```
 ACTIVIDAD
   id
-  concepto_id           FK Nodo                                             firme
+  concepto_id           FK Nodo — en la base es `renglon_id`, la línea de
+                         COMPOSICION del bloque al concepto (D-474)          firme
   presupuesto_id        FK PRESUPUESTO                                      firme
   origen_captura        enum: manual_con_diseño · manual_sin_diseño ·
                          por_carga_estructura · por_carga_fechas — el mismo
                          patrón en los dos orígenes: Control de obra edita
                          estructura, Residente edita fechas                 firme
   modo_duracion         enum: capturada · calculada_rendimiento ·
-                         preestablecida_nivel · derivada_fechas — la cuarta
-                         es «manual sin diseño»: no hay días ni rendimiento,
-                         se derivan de fecha_fin − fecha_inicio              firme
-  duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas   firme
+                         preestablecida_nivel · derivada_fechas ·
+                         derivada_de_hijos — la cuarta es «manual sin
+                         diseño»: no hay días ni rendimiento, se derivan de
+                         fecha_fin − fecha_inicio; la quinta es la de un
+                         bloque (Nivel 2 o 3), que solo existe como
+                         predecesora: sus fechas son el mínimo y el máximo
+                         de las de sus partidas, nunca se capturan (D-442)    firme
+  duracion_dias         NUMERIC, nullable si modo_duracion=derivada_fechas —
+                         la duración que usa el plan: en calculada_rendimiento,
+                         cantidad ÷ (rendimiento × cuadrillas) puesta en el paso
+                         del calendario (D-446)                               firme
+  duracion_origen       enum: heredada · propia — `heredada`: el valor sigue
+                         al de su referencia; `propia`: la fijó el planeador
+                         en este programa, o no tiene referencia; nulo si
+                         modo_duracion=derivada_de_hijos                      firme — D-441, cierra B-85
+  duracion_referencia_id  FK ACTIVIDAD, nullable — la actividad de la que
+                         hereda (o de la que se apartó, si es `propia`, para
+                         mostrar la diferencia y poder volver a heredar).
+                         Explícita, no se deduce por `Clave`                  firme — D-441
   disparador_fecha      enum: precedencia · recurso · contractual — el
                          contractual lo fija el anticipo o la junta de
                          arranque, no una precedencia técnica ni una
@@ -1809,6 +2068,139 @@ cargada» y «se contrata terminado» resultaron ejes independientes, no el
 mismo (`CONOCIMIENTO.md` §11.13). Muebles/Iluminación no entra aquí: se
 programa como el resto, con `modo_duracion` calculada o capturada.
 
+**El valor de esa duración ya tiene fuente (dato del usuario, D-419, D-420
+y D-421).** «La misma para ese nivel en cualquier obra» no decía de dónde
+sale el número: sale de Zafiro 1.0. Los seis niveles que D-353 manda por
+esta ruta —Cancelería, Carpintería, Herrería, Cubiertas, Pérgolas e
+Impermeabilización— duran lo mismo que en Zafiro en todos los prototipos
+—Cancelería 10 días hábiles (2 semanas), Carpintería 15 (3 semanas),
+Herrería 5 (1 semana), Pérgola Asador 4, Pérgola Cochera 5, Cubiertas
+partida por partida (sencilla 5, doble 2, de cocina 8) e
+Impermeabilización 2—, aunque el prototipo tenga más metros cuadrados u
+otra cantidad de piezas. `CONOCIMIENTO.md` §11.14.
+
+**Es un punto de partida, no un candado (dato del usuario, D-421).** En
+cualquier programa el planeador puede cambiar cualquier duración
+—también la de estos seis niveles— y **decide si el cambio se hereda a
+los demás prototipos o solo vale en ese programa.** Hoy `ACTIVIDAD`
+guarda `duracion_dias` y `modo_duracion`, pero no de dónde viene el
+valor ni a quién alcanza un cambio. El alcance se elige entre cuatro
+opciones, dato del usuario (D-422): todos los prototipos, los de 1
+planta, los de 2 plantas, o los prototipos que el planeador señale.
+Propuesta del sistema (B-85), decidida en D-441 —mecanismo abajo—: que cada duración lleve su
+origen —`heredada`, la lee de un programa de referencia, Zafiro por
+defecto, o `propia`, la fijó el planeador ahí— y que al editarla el
+sistema pregunte una sola cosa, ¿a quién alcanza? Si a ningún otro
+prototipo, la marca `propia`; si a un grupo —todos, 1 planta, 2 plantas o
+los elegidos—, cambia el valor de referencia para ese grupo y la siguen
+las que sigan `heredada` dentro de él. Las que ya eran `propia` no se
+pisan: se avisan con `ALERTA` para que el planeador decida. Primer caso aplicado: la losa de 4.20 de Rubí,
+que el planeador sube de 7 a 9 días (`CONOCIMIENTO.md` §11.14).
+
+### La bitácora de ediciones del programa: lo que se guarda es lo que se editó, no las fechas (D-464)
+
+El programa vigente no se guarda: es el programa base más las ediciones aplicadas, repetidas por el motor
+(`reprogramar`, `PROGRAMA-CPM.md` §4.6). Lo único que se persiste de nuevo es la bitácora.
+
+```
+EDICION_PROGRAMA   — solo se agrega                                          propuesta, D-464
+  id
+  programa_id           hoy `programa`; cuelga de PRESUPUESTO cuando exista (B-03)
+  secuencia             1, 2, 3… dentro del programa
+  edicion               enum: cambiar_duracion · fijar_inicio · agregar_vinculo ·
+                         quitar_vinculo · cambiar_vinculo
+  datos                 JSONB — la edición tal como se pidió, citando la llave
+                         estable (`oid`) de la actividad y nunca su número de fila
+  origen                mismo enum que `PRECEDENCIA.origen` — solo en las dos que
+                         agregan o cambian un vínculo, y ahí obligatorio; sin
+                         declarar, `decision`
+  rol, usuario          quién la hizo y con qué permiso (§5b)
+  estado                enum: aplicada · revertida
+  impacto               JSONB — lo que el sistema mostró al decidir: partidas movidas,
+                         cierre antes y después, si cambia la ruta
+  creada_en, revertida_en, revertida_por
+  heredada_de           FK EDICION_PROGRAMA, nullable — si pasó de la versión anterior
+                         de un programa, la edición de la que viene               propuesta, D-467
+```
+
+**Reglas.** (1) La bitácora no se borra ni se reescribe; lo único que cambia en una fila es pasar de `aplicada`
+a `revertida`. (2) Estructura —duración y vínculos— es de Control de obra y fechas, del Residente; ningún otro
+rol edita. (3) Una edición que no se puede aplicar no se guarda. (4) Se guarda con la versión del programa que
+vio quien decidió; si alguien editó entre medio, el conflicto se dice y no se pisa. (5) Deshacer repite la
+cuenta sin la edición y no se permite si otras posteriores dependen de ella. (6) **`PRECEDENCIA.origen` es
+nulo en lo importado** —el libro no dice por qué existe cada uno de sus 832 vínculos— **y obligatorio en lo
+que alguien edita**: el que no declara nada deja `decision`, la de menor confianza, que se revisa primero.
+Hasta que `NODO` y `PRESUPUESTO` tengan tabla, el programa se guarda como libro (`programa_fila`) y
+`programa_vinculo`, con la migración `database/migraciones/0001_programa.sql`.
+
+*D-465: la regla (4) la cumple quien llama, no solo el servicio —la API recibe en `esperaba` la versión que vio la
+pantalla y, si ya es otra, responde conflicto—.*
+
+*D-466: el programa dice quién lo subió (`programa.importado_por` e `importado_con_rol`, nulos si se cargó del repositorio), y subirlo pide `editar_estructura_programa`.*
+
+*D-467: la versión nueva de un programa es otro programa (`programa.version_de`, único: la cadena es una sola) con su `traspaso` —cuántas ediciones pasaron y cuáles no, con su motivo—. Las ediciones aplicadas pasan con su autor, su rol y su fecha, cada una con `heredada_de`; pasar no pide el permiso de nuevo, se decidió con el de quien la hizo.*
+
+### La herencia de una duración: referencia explícita, y el que edita pasa a ser la referencia de su alcance (D-441, cierra B-85)
+
+Dos campos en `ACTIVIDAD` (arriba), sin tabla nueva. **La referencia es una
+`ACTIVIDAD` concreta, no "Zafiro":** Zafiro es la referencia por defecto
+—el Programa Base—, pero puede ser cualquier otra actividad de otro
+programa, y es una llave explícita, no se deduce por `Clave`: 478 de las
+2,130 duraciones de los seis derivados no tienen gemela por `Clave`
+(las losas por altura, las piezas de carpintería con nombre de prototipo,
+la planta alta), y a esas se les empareja por rol o por nivel
+(`CONOCIMIENTO.md` §11.14, D-441).
+
+**Al editar una duración, el sistema pregunta una sola cosa —¿a quién
+alcanza?— y las opciones son las cuatro de D-422 más una que ya estaba
+implícita:**
+
+| Alcance | Qué pasa en el programa que edita | Qué pasa en los demás |
+|---|---|---|
+| Solo este programa | La actividad queda `propia`; conserva su referencia para mostrar la diferencia | Nada |
+| Todos / 1 planta / 2 plantas / los que el planeador señale | Igual: `propia` | En cada programa del alcance, la gemela que sea `heredada` toma el valor nuevo y **su referencia pasa a ser la actividad editada** (hereda de quien la cambió, no de Zafiro); la que sea `propia` **no se pisa**: se avisa con `ALERTA(tipo=duracion_propia_en_herencia)` |
+
+Que el editor pase a ser la referencia de su alcance es lo que hizo Jade con
+la losa de 4.20 de Rubí (D-423): la referencia de esa parte no es Zafiro,
+es Rubí. La cadena (Jade → Rubí → Zafiro) se corta donde alguien es
+`propia`, y no puede formar ciclos.
+
+**«1 planta» y «2 plantas» necesitan saber cuántas plantas tiene cada
+prototipo** — `PRESUPUESTO.plantas` (INTEGER, nullable, solo `tipo=plantilla`;
+nuevo, D-441): el mismo dato que ya decide el plazo (28 semanas una planta,
+30 dos, D-419) y que hasta hoy vivía solo como convención. El alcance
+«señalados» no lo necesita.
+
+En el ejercicio, Zafiro queda de raíz de solo lectura (regla vigente:
+nunca se modifica); en el sistema la raíz de la cadena es la que el
+planeador elija.
+
+**Heredar los días no hereda el ritmo (D-449).** Cuando un programa hereda los días
+de su referencia con otra cantidad, las cuadrillas efectivas cambian en la misma
+proporción (D-419: los m² de más se absorben con más gente). `ALERTA(tipo=
+ritmo_sobre_referencia)` lo avisa **por ventana de trabajo y no por línea de
+catálogo**: una línea comparte los días de las demás de su oficio (el acero K1-6.00
+pasa de 6 a 61 piezas, 10×, pero es una de las líneas de una misma tarea de 11
+días). Una ventana es el conjunto de actividades del mismo oficio (prefijo de
+`Clave`) con las mismas fechas de inicio y término; sus cuadrillas son la suma de las
+`TRAMO.cuadrillas` de las que tienen rendimiento emparejado, así que es una cota
+inferior y lo que no tiene rendimiento no lo ve la alerta. La propuesta del sistema
+son dos: conservar los días con las cuadrillas que la ventana pide, o alargar a los
+días que tendría con las cuadrillas de la referencia (acomodados al paso del
+calendario, D-446); el planeador decide o captura otros días y las cuadrillas se
+acomodan.
+
+### `modo_duracion=calculada_rendimiento` tiene su primer caso real: 30 semanas para el prototipo Diamante
+
+Dato del usuario, primer programa completo por **prototipo** (no por
+lote): cimentación, muros, castillos, cadenas, losas, barda perimetral y
+la estructura del asador se programan con `calculada_rendimiento`
+—cantidad del prototipo ÷ rendimiento de la cuadrilla, ver `CATALOGOS.md` §10— y reconstruyen Cimentación→Azotea en 21 semanas. Cancelería,
+Carpintería, Herrería y Pérgola Cochera se quedan en
+`preestablecida_nivel` (B-48, arriba): sus semanas son dato del usuario,
+no derivadas de rendimiento — confirma que las dos formas de duración
+coexisten en el mismo programa sin pisarse. `CONOCIMIENTO.md` §11.14.
+
 ### ⚠ Precedencia, calendario y tramo comparten el mismo eje de confianza
 
 Precedencia (P-1), tramo (P-5) y el origen de una duración (arriba) usan
@@ -1822,8 +2214,11 @@ del árbol. Un solo enum se reutiliza en las tres tablas.
 PRECEDENCIA
   id
   predecesora_id        FK ACTIVIDAD                                        firme
-  sucesora_id            FK ACTIVIDAD                                       firme
-  tipo_vinculo            enum: fin_inicio · inicio_inicio · fin_fin         firme
+  sucesora_id            FK ACTIVIDAD — siempre una partida, nunca un
+                          bloque (D-442)                                     firme
+  tipo_vinculo            enum: fin_inicio · inicio_inicio · fin_fin ·
+                          inicio_fin — uno por cada FS · SS · FF · SF del
+                          formato fuente, sin conversión (D-445)             firme
   traslape_espera         NUMERIC — días; negativo es traslape, positivo
                           es espera                                          firme
   origen                  enum: tecnica · recurso · decision                 firme — P-1
@@ -1856,7 +2251,259 @@ TRAMO
   reparto_material             NUMERIC o % — calculado por default,
                              editable (`MEMORIA.md` D-259, «declarado
                              menos calculado»)                                firme — P-5
+  cuadrillas                   NUMERIC, fraccionario — la otra mitad de
+                             `calculada_rendimiento` que se perdía
+                             (`duracion_dias` = cantidad ÷ rendimiento ÷
+                             cuadrillas, pero el divisor nunca se guardaba,
+                             D-392). El sistema la propone —método mixto,
+                             `CONOCIMIENTO.md` §11.14, D-438/D-439— y el
+                             planeador la confirma o la corrige, mismo
+                             principio que el resto del cerebro; con ella,
+                             `esfuerzo_real = Σ(tramo.días × cuadrillas × 8)`
+                             es acumulable de abajo hacia arriba, a
+                             diferencia de `Esfuerzo` (D-392). Son las
+                             efectivas: cantidad ÷ (rendimiento × días
+                             programados), así que redondear la duración
+                             no cambia el esfuerzo (D-446)                     firme — D-440, cierra B-82
 ```
+
+### El calendario de obra es configurable: los fines de semana y los días no laborables se agregan o se quitan (D-428)
+
+Dato del usuario (D-428): el 25-dic y el 1-ene no se trabajan —en este
+ejercicio—, pero el sistema debe dejar como **opción** agregar o quitar días no
+laborables y también los fines de semana, "solo como opción, no para este
+ejercicio". `CALENDARIO_OBRA.dias_no_habiles` ya existía como "definición"; así
+se concreta:
+
+```
+CALENDARIO_OBRA
+  dias_laborables_semana   los días de la semana que se trabajan, de lunes a
+                           domingo; por defecto lunes a viernes. El sábado y el
+                           domingo se agregan o se quitan como cualquier otro   firme — D-428
+  paso_dias                NUMERIC, nullable — la resolución del plan: 1 = día
+                           hábil completo (los siete programas), 0.5 = medios
+                           días, 0.125 = horas (la jornada es de 8); nulo = sin
+                           redondeo. Por defecto 1                              firme — D-446
+  sentido_redondeo         enum: cercano · arriba · abajo — hacia dónde se
+                           acomoda una duración que no cae en un múltiplo del
+                           paso. Por defecto cercano                            firme — D-446
+  plazo_medido_en          enum: dias_habiles · semanas_calendario — cómo se
+                           cuenta PRESUPUESTO.plazo_semanas. Por defecto
+                           dias_habiles                                         firme — D-447
+
+CALENDARIO_DIA_NO_HABIL
+  calendario_obra_id       FK CALENDARIO_OBRA
+  fecha                    DATE — un día que no se trabaja (feriado, paro,
+                           lluvia); se agrega o se quita sin tocar el resto     firme — D-428
+  motivo                   texto libre
+
+FERIADO_PLANTILLA          semilla editable que el sistema ofrece y nunca aplica
+  nombre                   texto — «Independencia»
+  regla                    texto — «16 de septiembre», «tercer lunes de
+                           noviembre»; se expande al año de cada programa
+  origen                   enum: ley · costumbre                                firme — D-447
+```
+
+Todo cálculo con días hábiles —el número de día hábil de una fecha, la fecha de
+un día hábil, `Días laborables`, el `0` explícito de cada día sin trabajo dentro
+de un tramo— pasa por este calendario y por ningún otro; `CALENDARIO_EXCEPCION`
+sigue siendo el override por cuadrilla. En el ejercicio la configuración es lunes
+a viernes sin el 25-dic y el 1-ene (el 16-sep y el 17-nov se trabajan, como en
+Zafiro): los dos feriados mueven la fecha de cierre, no la cantidad de trabajo
+(`CONOCIMIENTO.md` §11.14). Cómo se cuenta el plazo de 28 o de 30 semanas cuando
+el calendario cambia, y qué pasa con la cantidad por día, abajo (D-447).
+
+### ✅ El plazo se cuenta en días hábiles, el calendario mueve la fecha y no el trabajo, y la cantidad por día se deriva (D-447, cierra B-87)
+
+El plazo —28 semanas una planta, 30 dos, D-419— vivía solo como convención. Se
+define con dos cuentas, y `CALENDARIO_OBRA.plazo_medido_en` decide cuál manda:
+
+```
+dias_habiles          límite = plazo_semanas × días laborables por semana, contados en el
+                      calendario de la obra desde el arranque (140 y 150 de lunes a viernes)
+semanas_calendario    límite = el último día hábil en o antes del domingo de la semana N,
+                      contada desde el arranque (vie 19-dic y vie 2-ene en el ejercicio)
+```
+
+```
+Reglas (sin tabla nueva salvo FERIADO_PLANTILLA, arriba)
+  · el programa muestra siempre las dos cuentas («149 de 150 días hábiles; un día hábil
+    después del último de la semana 30»); plazo_medido_en decide cuál dispara
+    ALERTA(tipo=plazo_excedido). Por defecto dias_habiles
+  · con dias_habiles el calendario mueve la fecha de cierre y no el trabajo: los feriados
+    no cuentan y el límite sigue a la semana laboral (28 × 6 = 168 con sábado). Con
+    semanas_calendario cada feriado se come un día del plazo
+  · el sistema ofrece una plantilla de feriados (FERIADO_PLANTILLA) y nunca la aplica: un
+    calendario nuevo sale de lunes a viernes sin ningún feriado, como Zafiro. «Agregar los
+    feriados del año» los expande al rango del programa y el planeador acepta los que
+    quiera, uno por uno
+  · la cantidad por día no se guarda: es cantidad ÷ días hábiles del tramo en el calendario
+    vigente (uniforme; el último día absorbe el residuo, D-433). Si el calendario cambia,
+    lo que se conserva depende de lo que se capturó: una duración (capturada,
+    calculada_rendimiento, preestablecida_nivel, heredada) conserva sus días hábiles, las
+    fechas se mueven y la cantidad por día no cambia; las fechas (derivada_fechas, lo que
+    se carga de Zafiro) se conservan, los días hábiles cambian y la cantidad por día se
+    redistribuye
+```
+
+**Con los siete programas** (`CONOCIMIENTO.md` §11.14, D-447): los de una planta
+cierran el jueves 18-dic con 139 de 140 días hábiles y los de dos el lunes 5-ene con
+149 de 150, un día hábil antes del límite de `dias_habiles` en todos; contados en
+semanas de calendario, los de una planta sobran un día hábil y los de dos se pasan
+uno (el viernes 2-ene era el último). No cambia nada en los programas.
+
+### ✅ Los días teóricos quedan fraccionarios y el redondeo es del calendario, no de la fórmula (D-446, cierra B-80)
+
+Dato del usuario, que `CONOCIMIENTO.md` §11.14 guardaba como conocimiento: los
+días teóricos de `calculada_rendimiento` pueden quedar fraccionarios cuando así es
+la operación, y el redondeo, si hace falta uno, es un parámetro editable y no algo
+implícito en la fórmula (`PENDIENTES-MEJORAS.md` B-80). Se define así:
+
+```
+días teóricos         = cantidad ÷ (rendimiento × cuadrillas)       fraccionarios, sin redondear
+duración programada   = acomodar(días teóricos, paso_dias, sentido_redondeo)
+                        — lo que guarda ACTIVIDAD.duracion_dias; nunca menos de un paso
+cuadrillas efectivas  = cantidad ÷ (rendimiento × duración programada)
+                        — lo que guarda TRAMO.cuadrillas
+esfuerzo              = duración programada × cuadrillas efectivas × 8
+                      = cantidad ÷ rendimiento × 8, sea cual sea el paso
+```
+
+```
+Reglas (sin tabla nueva: `CALENDARIO_OBRA` gana dos campos, arriba)
+  · la fórmula no redondea: `duracion_dias` ya era NUMERIC; los días teóricos se
+    calculan y se muestran siempre, aunque el plan use otro número
+  · el paso y el sentido son del calendario de la obra, editables; ninguna
+    actividad lleva su propio redondeo. Si el planeador quiere una duración
+    concreta la captura (`modo_duracion=capturada`) y las cuadrillas se acomodan;
+    el paso aplica igual a una duración capturada que a una calculada
+  · por defecto, paso 1 (día hábil completo, como están los siete programas) y
+    sentido cercano (el medio va hacia arriba); un múltiplo exacto no se mueve.
+    En arriba y abajo, un excedente menor a 0.01 día no sube ni baja un paso:
+    183.83 ÷ 26.25 = 7.003 días se programan en 7, no en 8
+  · el redondeo mueve las cuadrillas, no el esfuerzo. Con cercano o abajo las
+    efectivas pueden pasar de las que pidió el planeador (36 m² ÷ 26.25 = 1.37
+    días, que cercano programa en 1: 1.37 cuadrillas): el sistema las muestra
+    junto a las pedidas y las compara con el tope de FRENTE_TOPE_CUADRILLA; decide
+    el planeador
+  · con paso 1 bastan las fechas: la cantidad por día es uniforme y el último día
+    absorbe el residuo (D-433). Con un paso menor el tramo necesitaría hora de
+    inicio y de fin; no se define hasta que un programa lo pida (la convención de
+    instantes de D-445 ya admite fracciones: un tramo es [inicio, inicio + duración])
+  · la cuadrícula día por día es una vista, no un dato: va del primer día del programa
+    más temprano que muestra al último del más tardío, y no se fija (D-449)
+```
+
+**Por qué `cercano`, y por qué el redondeo no puede tocar el esfuerzo** (1,382 pares
+concepto × `MO-` de los siete prototipos, `CONOCIMIENTO.md` §11.14, D-446). El 74%
+dura menos de un día a una cuadrilla: 90% de las instalaciones (mediana 0.17 día) y
+32% de la obra gruesa y los acabados (mediana 1.82). Llevarlos a días enteros
+triplica los días de instalaciones (3.1×) y suma 11% a obra gruesa con `arriba`, y
+si esos días se cobraran como cuadrilla completa el esfuerzo se inflaría igual. En
+las actividades de un día o más, el sesgo medio contra el exacto es de +0.52 día con
+`arriba`, +0.03 con `cercano` y −0.45 con `abajo`: calculada y redondeada paso por
+paso, la ruta crítica de 28 pasos de Zafiro ganaría 14.6 días hábiles con `arriba`
+—casi tres semanas de un plazo de 28— o perdería 12.6 con `abajo`; `cercano` suma
+0.8. Los siete programas no cambian: 2,443 partidas programadas, todas de días
+enteros y ninguna de menos de 1; las 1,382 con rendimiento ya traen cuadrillas
+efectivas (D-438, D-439), y la fórmula devuelve sus días tal cual.
+
+### ✅ Un vínculo entre bloques: `ACTIVIDAD` resumen en Nivel 2 y 3, solo como predecesora (D-425, cierra en D-442)
+
+La red mínima propuesta en D-425 (`CONOCIMIENTO.md` §11.14) liga bloques
+—Nivel 2 y 3, y a veces una partida con un bloque—, y que el bloque se mueva
+entero como una ventana es lo que la hace corta: 18 vínculos en lugar de
+varias decenas. `PRECEDENCIA` apunta a `ACTIVIDAD` y esta a un `Nodo`, pero
+nada dice si un nodo de Nivel 2 o 3 puede tener `ACTIVIDAD`: hoy son filas de
+resumen, con fechas que son el mínimo y el máximo de sus hijos, y todas las
+sucesoras de `PROGRAMA_ZAFIRO.xlsx` son partidas. Dos lecturas, sin decidir
+(`PENDIENTES-MEJORAS.md` B-86): (a) `ACTIVIDAD` resumen en Nivel 2 y 3, con
+fechas derivadas de sus hijos —`modo_duracion` no tiene hoy un valor para
+eso— y vínculos que la mueven completa; (b) vínculos solo entre partidas, y
+cada vínculo de bloque se expande a las partidas de cabecera de ese bloque.
+La primera es más corta de capturar y la segunda no toca el esquema. Dato del
+usuario (D-426): por ahora los vínculos se escriben como en Zafiro, en las
+partidas, con la predecesora partida o bloque; la pregunta se resuelve después.
+
+**Decisión (D-442, con los siete programas ya escritos): la lectura (a).** De
+los 832 vínculos de los siete prototipos, 263 (32%) tienen un bloque como
+predecesora —201 de Nivel 2, 62 de Nivel 3— y los 832 tienen una partida como
+sucesora. En 219 de los 263 la ventana la fija una sola partida, pero en 44
+la fijan entre 2 y 12 empatadas el mismo día (carpintería de planta baja,
+hasta 12; estructura de cimentación, hasta 10): la lectura (b) convertiría los
+263 en 468 vínculos entre partidas (+78%) que además cambian con cada
+prototipo —en 18 de los 35 casos comparables entre prototipos las partidas
+que fijan la ventana son otras: la que cierra la cancelería de planta baja es
+`CAN-01008` en un Diamante, `CAN-01004` en Jade, `CAN-01001` en Oro—, mientras que el
+vínculo a un bloque sigue diciendo lo mismo en todos: «cuando termine toda
+esta etapa».
+
+```
+Reglas (sin tabla nueva, `ACTIVIDAD` y `PRECEDENCIA` de arriba):
+  · un nodo de Nivel 2 o 3 tiene `ACTIVIDAD` con modo_duracion=derivada_de_hijos
+    solo si algún vínculo lo cita; no se captura nada de ella
+  · un bloque solo puede ser predecesora; la sucesora es siempre una partida
+  · fin_inicio y fin_fin leen el máximo de las fechas de fin de sus partidas;
+    inicio_inicio e inicio_fin, el mínimo de las de inicio; la ruta crítica
+    sigue por la partida que de verdad fija esa fecha, no por el bloque
+  · una predecesora que es el bloque de su propia sucesora se lee SIN la
+    sucesora: la ventana es la de las demás partidas del bloque, «después de
+    lo demás del grupo» (D-443 corrige D-442, que la rechazaba: 39 de los 832
+    vínculos son así y 32 se cumplen tal como están escritos)
+  · al cargar un vínculo se rechazan los que no se pueden calcular: una
+    actividad como su propia predecesora y cualquier ciclo, calculado con esa
+    lectura — el motor del CPM no los resuelve
+```
+
+**Un vínculo cuya intención es un hecho físico concreto cita la partida, no el
+bloque** (D-442): la ventana de un bloque es lo que el catálogo mete adentro,
+y a veces mete de más. El ojo de buey (`ACA-07050`) es obra gris en Zafiro y
+va dentro de la estructura de planta baja en Rubí y Zafiro Plus (y de planta
+alta en Oro), así que ahí esa ventana termina en su fecha (18-ago, 26-ago,
+1-sep) y no cuando termina la estructura. Hoy ningún vínculo de los 832 cita
+esos bloques, así que no hay efecto; la regla evita que lo tenga.
+
+**Un vínculo cuyas fechas lo contradicen no se rechaza: se avisa.** En el
+programa de Zafiro, hecho a mano, hay 15 (18 en D-442 y 16 en D-443, corregidos
+en D-445; D-424, D-426); nadie hizo mal el
+vínculo ni la fecha, el plan no pasa por ningún CPM (D-409). `ALERTA` gana
+`vinculo_incumplido`, sin umbral, y la propuesta de corrección es de quien
+programa (`CONOCIMIENTO.md` §11.14, D-442). En Zafiro se quedan tal cual: el
+usuario decidió que el original no se toca y solo se anota (D-444).
+
+### ✅ `inicio_fin` entra al enum y la holgura se mide en instantes (D-445, cierra B-81)
+
+`PROGRAMA_ZAFIRO.xlsx` usa los cuatro tipos del formato de MS Project —`FS`,
+`SS`, `FF` y `SF`— y el enum solo tenía tres. **Decisión: el enum gana
+`inicio_fin`.** La importación es uno a uno (`FS`→`fin_inicio`,
+`SS`→`inicio_inicio`, `FF`→`fin_fin`, `SF`→`inicio_fin`) y no convierte ni
+descarta ningún vínculo: el usuario decidió que Zafiro, el original, no se
+toca (D-444). Los 832 vínculos de los siete prototipos son 680 `FS`, 91 `SS`,
+53 `FF` y 8 `SF`.
+
+```
+Holgura de un vínculo (negativa = no se cumple). abre(x) = inicio del primer día
+hábil de x; cierra(x) = fin de su último día. Un bloque abre con su primera
+partida y cierra con la última (si contiene a la sucesora, sin ella, D-443).
+  fin_inicio     abre(sucesora)   − (cierra(predecesora) + desfase)    bc(fin_p, ini_s) − 1 − desfase
+  inicio_inicio  abre(sucesora)   − (abre(predecesora)   + desfase)    bc(ini_p, ini_s)     − desfase
+  fin_fin        cierra(sucesora) − (cierra(predecesora) + desfase)    bc(fin_p, fin_s)     − desfase
+  inicio_fin     cierra(sucesora) − (abre(predecesora)   + desfase)    bc(ini_p, fin_s) + 1 − desfase
+  (bc = días hábiles entre dos fechas del calendario de obra; la columna de
+   la derecha es lo mismo con fechas)
+```
+
+`inicio_fin` es el «a tiempo» de MS Project: la sucesora no termina antes de que
+empiece la predecesora. Como `fin_fin`, le pone el piso al *término* de la
+sucesora y no a su inicio (para el CPM: término ≥ inicio de la predecesora +
+desfase). Con fechas, los dos tipos que comparan un cierre contra una apertura
+llevan una corrección de un día —`fin_inicio` un `− 1`, `inicio_fin` un `+ 1`— y
+los dos que comparan igual con igual no llevan ninguna; D-424 a D-444 midieron
+`inicio_fin` sin ella y contaron 1 de menos. Una holgura negativa es una sucesora que
+terminó antes de lo que el vínculo pide, no una contradicción física:
+`ALERTA(tipo=vinculo_incumplido)` la avisa como a cualquier otra. En el libro, 5
+de los 8 se cumplen con holgura 0 (las gualdras, que terminan la víspera de que
+empiece el resto de su losa) y 3, de Zafiro, no (`CONOCIMIENTO.md` §11.14, D-445).
 
 ### El segundo cuantificador no es tabla nueva, es otro destino del mismo trazo
 
@@ -1968,6 +2615,64 @@ existe:**
 > en todo el módulo: aprobar/validar/ejecutar una incidencia, solicitar o
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
+
+### El tablero del frente se calcula, no se guarda (D-455, cierra B-88)
+
+El frente (obra, nivel) y el sub-frente (etapa) son el nodo de Nivel 1 y el de Nivel 2; su
+contratista sale de `ASIGNACION_CONTRATISTA` (§4a) y su avance de `REGISTRO_AVANCE`
+(`fuente=fisico`). **No hay tabla nueva ni captura nueva:** cada cifra de un nodo es la suma de
+las de sus partidas, y se lee a cualquier fecha.
+
+- **Por nodo:** presupuesto base, ingeniería del lote, ejecutado valuado, ejecutado (%) ponderado por
+  costo (ejecutado ÷ ingeniería), pendiente, primera y última operación, días sin avance,
+  contratista(s) y lo ejecutado sobre la ingeniería.
+- **Cola de atención:** las alertas `frente_listo_para_cierre`, `subfrente_detenido` y
+  `ejecutado_sobre_ingenieria` (§5a), ordenadas por cuántos motivos tiene el nodo y por lo que falta.
+  Con un programa de la obra, la fecha de término del sub-frente da además el atraso, sin campo nuevo.
+- **Sin marca de paquete:** un frente contratado terminado ya es `modo_duracion=preestablecida_nivel`.
+- Probado sobre `ALAMO 18` (`CONOCIMIENTO.md` §11.14): 45.2% de su mano de obra, 38 sub-frentes, 8 filas en
+  la cola.
+
+*D-456 completa el tablero:* el atraso sale de comparar el avance con el programa de la obra (`subfrente_atrasado`,
+§5a), y los parámetros de las alertas de sub-frente viven en `ALERTA.parametro_usado`:
+`{"dias_sin_avance": 21, "porcentaje_terminado": 90, "puntos_rezago": 20}`; el cierre es el 90% de
+`solicitar_cierre_frente`. Las alertas de sub-frente llevan su evidencia —material surtido después de la última
+operación, avance del frente siguiente, contratista en otras obras— y el residente las resuelve con una causa en
+`nota_resolucion` (terminado sin capturar · detenido de verdad · esperando un predecesor · contratista reasignado);
+sin campo nuevo.
+
+*D-457 corrige lo de arriba:* `porcentaje_terminado` y `puntos_rezago` no existen; el retraso real se avisa desde un
+día hábil (tiempo ganado) y es **una alerta por obra** (`obra_atrasada`, §5a): los sub-frentes de `subfrente_atrasado`
+pasan a ser su evidencia. Los parámetros quedan en `{"dias_sin_avance": 21}` y el 90% de `solicitar_cierre_frente`.
+**El retraso de la obra se audita por contratista y por residente** agrupando la misma evidencia: el retraso de una
+línea de destajo es (planeado de su etapa − ejecutado) × su costo, y la suma de las líneas es el retraso de la obra;
+cada línea cae con el contratista de `ASIGNACION_CONTRATISTA` vigente (o «sin contratista asignado») y cada obra con
+su `RESIDENTE_OBRA`. Es una lectura, no un campo, como la de `DESVIACION` por contratista (§5g).
+
+*D-458 corrige y completa lo de arriba:* `subfrente_atrasado` sigue avisando por sí solo, además de `obra_atrasada`.
+La unidad de la auditoría es el **sub-frente por contratista**, y al cambiar de residente el retraso anterior se
+congela y la mejora es del nuevo:
+
+```
+CORTE_RETRASO   (inmutable; nace al cambiar de residente, y de contratista si se confirma)
+  id
+  presupuesto_id   FK PRESUPUESTO — la obra                                          propuesta — D-458
+  fecha            DATE — el corte                                                    propuesta
+  motivo           enum: cambio_residente · cambio_contratista · otro                 propuesta
+  dias_obra        INTEGER — días hábiles detrás de la obra (tiempo ganado)           propuesta
+  detalle          JSON — por sub-frente y contratista: planeado, ejecutado,
+                    retraso y adelanto en $, días                                     propuesta
+```
+
+- **Retraso propio del residente** = retraso(hoy) − retraso(corte de inicio), por sub-frente por contratista; positivo
+  empeora, negativo mejora y se le acredita, sin pasar de lo heredado. El anterior conserva el congelado. Se cuenta el
+  retraso y no el adelanto, que el plan va alcanzando.
+- En $ se suma entre sub-frentes; los días se restan dentro de cada nivel y no se suman entre niveles.
+- `obra_atrasada` y `subfrente_atrasado` llevan en su `evidencia` lo heredado y lo propio.
+
+*D-459: los campos de `CORTE_RETRASO` quedan firmes y el motivo `cambio_contratista` vale desde ya: la misma regla se aplica a la reasignación de un contratista, que enlaza el corte en `ASIGNACION_CONTRATISTA.corte_inicio_id`. Entre dos cortes, el cambio del retraso de un sub-frente es de quien estaba al frente de la obra y del sub-frente en ese periodo; la suma de los periodos, por residente o por contratista, es el retraso de hoy. Si el residente y el contratista cambian el mismo día comparten el corte.*
+
+*D-460:* en una etapa de instalaciones, `subfrente_detenido` lleva una lectura propia porque las instalaciones no reanudan después de 21 días (26 pausas, máximo 14): **probable terminado sin capturar** si el nivel siguiente va al `siguiente_frente_pct` (50) o más y la etapa lleva `captura_tipica_pct` (50) o más; **pendiente real** si el nivel siguiente no llega; **atípico, se pregunta** si el nivel siguiente avanzó pero la etapa lleva menos. Parámetros en `ALERTA.parametro_usado`: `{"dias_sin_avance": 21, "siguiente_frente_pct": 50, "captura_tipica_pct": 50}`.
 
 ### ⏸ Lo que esto sigue sin resolver
 
@@ -2406,6 +3111,49 @@ lo esconde una proyección por fecha.
 > silencio — queda para cuando haya un caso real que la fuerce a
 > decidirse.
 
+### Programa de suministro — un reporte, dos mecanismos que vivían separados
+
+Dato del usuario: lo que OPUS ya hace, y este sistema también debe
+hacer. `B-41` (arriba) ya proyecta cuánto material se necesita, por
+fecha. `TESTIGO_MATERIAL` (`CATALOGOS.md` §12) ya mide cuánto salió
+realmente de almacén. Nunca se pidieron como una sola tabla — este
+reporte es esa tabla, sin dato nuevo que capturar:
+
+```
+PROGRAMA_SUMINISTRO (reporte, no tabla — mismo principio que el resto de §5f)
+  escala         enum: dia · semana · mes
+                 agrupa TRAMO.reparto_material (§5c, P-5) en baldes de
+                 ese tamaño — el reparto ya es diario, agrupar es sumar
+  agregacion     enum: insumo · familia · total
+                 agrupa la explosión de COMPOSICION (§1) por ese nivel
+  utilizacion    enum: necesario · real · comparado
+                 necesario = Material por fecha (B-41, arriba)
+                 real      = salida de almacén (TESTIGO_MATERIAL, CATALOGOS.md §12)
+                 comparado = las dos columnas, lado a lado
+  por período:   cantidad del período + arrastre
+                 arrastre = acumulado hasta ese período, no solo el balde
+```
+
+**El arrastre no es cosmético — es el que de verdad se sostiene.**
+`CONOCIMIENTO.md` §11.17 ya lo probó con cemento: semana por semana el
+respaldo erró de 0% a 184% ("ninguna semana suelta se sostiene sin ver
+el acumulado"), pero el acumulado de ocho semanas cerró en 99.83%. El
+reporte muestra el balde porque se pide, no porque sea el dato
+confiable — el arrastre es la columna que sí lo es.
+
+**Nada de esto pide dato nuevo.** Las tres escalas leen la misma fecha
+diaria que ya tiene `TRAMO`; los tres niveles de agregación leen la
+misma `COMPOSICION` que ya tiene cada concepto; `necesario`/`real` son
+`B-41`/`TESTIGO_MATERIAL`, ya decididos los dos. Lo único nuevo es el
+reporte que los junta.
+
+**Ajustes pendientes, dato del usuario — no se deciden aquí todavía:**
+el corte exacto de cada balde (semana de lunes a domingo, o de jueves
+a miércoles como trae `PRECIO_REAL_ALAMO_18.xlsx`; mes calendario o
+mes de cuatro semanas) y qué hacer cuando un `TRAMO` cruza el límite de
+un balde. Mismo criterio que la ambigüedad de «inicio» de arriba:
+quedan para cuando haya un caso real que fuerce la decisión.
+
 ---
 
 ## 5g. Desviación — la comprobación más fuerte, con causa opcional y patrones que se leen sin ella
@@ -2560,9 +3308,9 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 | No incluido | Por qué |
 |---|---|
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
-| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
+| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`erp-construccion.md` §6) |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
-| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad) |
+| Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). *Resuelto en parte (D-461): el motor existe en `backend/core/motor_cpm.py`, probado contra los siete programas reales; la visualización del Gantt cierra en D-463 (`PROGRAMA-CPM.md` §8). D-462: el cargador con las reglas de D-442 y D-443 está en `backend/core/programa.py`; D-463: la reprogramación por empuje mínimo, también; D-464: la bitácora de ediciones y su persistencia.* `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos; antes hay que decidir qué es un frente (D-448)*Resuelto (D-450): el frente es el nivel constructivo y se lee subiendo por el árbol desde la partida, así que `ACTIVIDAD` no necesita `frente_id`; el tope se compara por frente y oficio, por ventana de trabajo (D-449).* |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |
 | Moneda extranjera (`Costo base M. E.`) | Cero en los 387 materiales — sin evidencia de uso hoy. **Distinto del `OID`:** no es un descarte permanente. Se modela en cuanto haga falta convertir a moneda extranjera, no antes. M-13 |
 
@@ -2584,6 +3332,9 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 | 10 | La alerta no tenía dónde vivir, y se perdía al cerrar la sesión que la detectaba | Tabla `ALERTA`, peldaño de abajo de `PROPUESTA`, con `veces_vista` para saber si reaparece | ✅ |
 | 11 | `NODO.modo_cantidad = medida` no tenía mecanismo que lo alimentara | Tablas `TRAZO` y `ENLACE_CUANTIFICACION` — el trazo es evidencia, el enlace tipa qué mide y con qué factor | ✅ |
 | 12 | `modo_cantidad` no tenía sus casos escritos, y faltaba uno (ingeniería cargada) | Ciclo de vida completo con evidencia; quinto valor `cargada`, verificable contra `medida` | ✅ |
+| 13 | La receta fija no basta cuando el múltiplo depende de esta obra | `COMPOSICION.formula_personalizada` y `NODO.variables`, evaluadas en el motor y nunca en SQL (§1a, D-215) | ✅ |
+| 14 | Quién puede qué no tenía dónde vivir | `ROL`, `FUNCION_ATOMICA` y `ROL_FUNCION`, de muchos a muchos y sin tope por monto (§5b, D-225) | ✅ |
+| 15 | El precio de un insumo y la receta de un concepto cambian por razones distintas | `PRECIO_HISTORICO` independiente de `VERSION_CONCEPTO`; la versión congela su `pu` (§4a, D-226) | ✅ |
 
 **Los seis primeros hallazgos fueron revisados y aprobados el 2026-09-10**, con dos
 ajustes sobre la propuesta original:
@@ -2598,6 +3349,10 @@ Los hallazgos 1, 4, 5 y 6 quedan tal como se propusieron.
 **Los hallazgos 7 a 12 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
 P-25, P-29, P-30 y B-19 en una sesión de trabajo con el usuario — no en la revisión
 original del 09-10. Los seis aprobados en la misma conversación que los originó.
+
+**Los hallazgos 13 a 15 se agregaron entre el 2026-09-15 y el 09-18** (D-215, D-225 y
+D-226) y esta tabla no los traía: el encabezado decía 15, el índice 6 y los pendientes
+13. Los tres viven donde se resolvieron, no en un apartado propio (D-487).
 
 > **Este modelo puede pasar a la siguiente fase**: tipos de columna concretos,
 > índices, y el motor de cálculo como funciones sobre este schema. Eso no se hace

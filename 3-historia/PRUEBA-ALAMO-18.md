@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
-corte:      2026-09-28
-verificado: 12 etapas recorridas · 4 pasan · 2 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
+corte:      2026-10-12
+verificado: 12 etapas recorridas · 5 pasan · 1 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
 ```
 
 > **Escenario de prueba** en el sentido de B-42: un caso real recorrido de punta a
@@ -38,12 +38,12 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 3 | Cuantificación de volúmenes | ⛔ No existe |
 | 4 | Paramétrico | 🔶 **Diseñado desde el 26/09** (`NODO`(rol=ensamble)+`COMPOSICION`+`ENSAMBLE_PARAMETRO`, `MODELO.md` §1c) — sin correr todavía contra la cimentación de dos plantas de este lote |
 | 5 | Carga de la ingeniería del lote | ✅ Pasa |
-| 6 | Reversión por destajo | ⚠️ **Pasa al 84% — falta qué hacer con el 16%** |
+| 6 | Reversión por destajo | ✅ **Pasa — vuelta a correr el 12/10 (D-489): 37 de 38 destajos de la cimentación se resuelven por evidencia; el 38.º, `MOS-2079`, queda como propuesta que ya trae la suya. Los «ambiguos» eran sumas que cierran con el presupuesto** |
 | 7 | Comparación contra prototipo | ✅ Pasa, y encuentra un hecho real |
-| 8 | Factorizador | ⚠️ **No resuelve el problema que parecía suyo — la política de consolidar ya cerró (P-36, 26/09), la comparación no se ha vuelto a correr con ella** |
-| 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse, y esta obra no tiene actividades cargadas para correrlo |
+| 8 | Factorizador | ⚠️ **Vuelta a correr el 12/10 (D-488): sí es del factorizador, pero no por lo que se creyó — no era profundidad ni consolidar (P-36 no mueve ninguna cifra), era el camión: dos claves de arena, de 7 y de 14 m³. Falta una fila poblada que lo ejerza** |
+| 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse *(D-461: ya existe, `backend/core/motor_cpm.py`)*, y esta obra no tiene actividades cargadas para correrlo |
 | 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
-| 11 | Contratación y congelamiento | ⛔ Sin probar |
+| 11 | Contratación y congelamiento | ⛔ Sin probar con esta obra *(D-475: contratar un bloque y congelar sus PU se probó con los siete presupuestos de plantilla; con una obra en ejecución sigue sin probarse)* |
 | 12 | Salidas y desviación | ✅ **Pasa — cinco meses de almacén y cuatro de avance, el triángulo material-avance cuadra en acumulado al 99.8%** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g). El 27/09 pasó de uno a cinco meses de almacén; el 28/09 cerró el avance —y con él, un falso positivo propio: el 68.5% sin respaldo que parecía un hallazgo real era la ventana de datos incompleta (D-375) |
 
 ---
@@ -150,7 +150,11 @@ ingeniería — cancelería, carpintería, muebles, herrería y consumibles.
 
 ---
 
-## 6 · Reversión por destajo — ⚠️
+## 6 · Reversión por destajo — ✅ (era ⚠️ hasta el 12/10)
+
+> **Lo que sigue hasta «Escalado a diez niveles» es la lectura del 18/09**, cuando el residuo no tenía
+> regla. La regla se escribió después (B-46, `CONOCIMIENTO.md` §11.9) y se comprobó con los datos
+> del repo el 12/10: «Vuelta a correr», al final de esta etapa.
 
 Sobre la cimentación: **32 de 38 destajos · 84%**, filtrando por el prototipo
 correcto. Sin filtrar, 42%.
@@ -243,6 +247,30 @@ ninguna ingeniería cargada. Contados en dinero, no en etapas, son
 > original ($658.28), con la duda abierta y sin forma de cerrarla con los
 > datos de hoy.
 
+### Vuelta a correr con los datos del repo — 2026-10-12 (D-489)
+
+Con las matrices, el Diamante con chimenea y la ingeniería de la cimentación, tal como
+están en el repo. **Salen exactos los 32, los 4 y los 2 de arriba**, y el residuo cambia
+de naturaleza:
+
+| Lo que el 18/09 era «residuo» | Lo que es con los datos |
+|---|---|
+| 4 ambiguos — «no definido» | **Cuatro sumas, y las cuatro cierran exacto con el presupuesto del prototipo** (10 = 9 + 1, 4 = 3 + 1, 2 = 1 + 1 y 2 = 1 + 1). La ingeniería trae los insumos de la etapa sumados: un destajo con dos conceptos es lo que hicieron los dos. El reparto de las bajadas sanitarias lo confirman además cuatro materiales |
+| `MOC-12010` — sin candidato | Vive en el compuesto de la zapata y cae en `EST-01053`: 1 × 6 zapatas = 6 |
+| `MOS-2079` — formato roto | **El único destajo que sobra frente al único que falta**: el presupuesto pide `MOS-02020` «MO SALIDA SAN LAVADERO» y la ingeniería trae `MOS-2079` con el mismo texto, una pieza y $312.50. Propuesta con las dos lecturas y sin tocar, pero ya con su evidencia |
+
+**37 de 38 se resuelven por evidencia (97 %); el que falta es una confirmación, no una
+laguna.** A escala, en las once ingenierías, hay 15 destajos con varios candidatos: 10
+cierran exacto y 5 no —la losa nervada y la maciza de Planta Baja y dos de cableado de
+Planta Alta—, que son lo que la obra hizo de más o de menos con la suma conocida y el
+reparto no. Ese es el residuo verdadero del método. La explicación completa y el detalle
+están en `CONOCIMIENTO.md` §11.9.
+
+> **Una trampa que apareció al volver a correrla:** la cantidad del presupuesto se toma de
+> la etapa, no de la clave en todo el capítulo. `ISN-01111` está también en Planta Baja y
+> sumada daba 11 donde la cimentación pide 9: con ella, la obra parecía haber construido
+> menos de lo presupuestado en cuatro destajos que en realidad cierran.
+
 ---
 
 ## 7 · Comparación contra el prototipo — ✅
@@ -262,7 +290,10 @@ el mortero solo suma $184,587.
 
 ---
 
-## 8 · Factorizador — ⚠️ no resuelve lo que parecía suyo
+## 8 · Factorizador — ⚠️ el 20/09 se dijo que no lo resolvía; vuelto a correr el 12/10, sí era suyo
+
+> **Lo que sigue hasta la actualización del 26/09 es la lectura del 20/09, y la causa que da
+> —la profundidad— no resistió volver a correrla.** La corrección está en «Vuelta a correr».
 
 `PET-00002 Arena` sale **150 veces mayor** en ALAMO que en el prototipo: $49,755
 contra $332.
@@ -286,8 +317,40 @@ cúbicos hay.
 > **consolidar** insumos repetidos como esta arena al importar. Dato del
 > usuario: depende de quién lee, no del insumo — compras/obra necesitan el
 > consolidado, costos/control necesitan el detalle crudo. No se consolida al
-> cargar; cada lector agrupa a su modo (`CONOCIMIENTO.md` §11.11, D-340). No
-> se volvió a correr la comparación de esta etapa con la regla ya aplicada.
+> cargar; cada lector agrupa a su modo (`CONOCIMIENTO.md` §11.11, D-340). La
+> comparación de esta etapa se volvió a correr con esa regla el 12/10, abajo.
+
+### Vuelta a correr con P-36 cerrada — 2026-10-12 (D-488)
+
+Con los archivos que están en el repo: las once ingenierías (la azotea, que
+`CONOCIMIENTO.md` §11.8 dice que se subió después, no está) contra el Diamante con
+chimenea explotado a fondo. **Salen exactos los 519, 361, 29 y 129 de la etapa 7**; la
+arena de la obra pesa $48,239.51 y no $49,755 por la ingeniería que falta.
+
+| La arena de 7 m³, leída… | Obra | Prototipo | |
+|---|---:|---:|---|
+| por clave (como el 20/09) | $48,239.51 | $332.05 | ×145 |
+| agrupando al leer, como manda P-36 | $48,239.51 | $332.05 | igual: la política decide dónde se suma, no qué |
+| junto con la de 14 m³, en metros cúbicos | 150.08 m³ | 118.83 m³ | **×1.26** |
+
+Lo que se creyó el 20/09 era cierto a medias: la arena **sí** está distinta en los dos
+archivos, pero no porque en el prototipo viva dentro de compuestos —abiertos a fondo,
+esos compuestos piden **otra** arena—. Las recetas piden `PET-00015` «Arena de Río
+14 M3» y la obra compró siempre `PET-00002` «Arena 7 M3»: **dos camiones, a $321.43 el
+metro cúbico los dos**. El factorizador, del que el 20/09 se dijo que aquí no ayudaba, es la
+herramienta de este caso: su propuesta decía que con él desaparecen las claves
+duplicadas por presentación.
+
+| El factorizador resuelve… | …y esto queda para una persona o para después |
+|---|---|
+| Camión de 7 m³ y camión de 14 m³ como presentaciones de una arena en m³ | Decidir que las dos claves son un solo material |
+| El factor, sugerido de la descripción («7 M3») | La unidad del catálogo es `SERV`, el viaje: la base no viene en la clave |
+| Fusionar convirtiendo cantidades por el cociente de factores | La clonación de D-478 copia la receta tal cual y duplicaría la arena de `MEZ-03020` |
+
+Sigue en ⚠️ y no sube a ✅: **no hay una sola fila de `PRESENTACION_COMPRA` poblada**,
+y el cerebro no construye la app (D-487). Lo que cambió es que el caso real que
+faltaba existe, está medido y cabe en el diseño tal como estaba
+(`MODELO.md` §2a).
 
 ---
 
@@ -300,7 +363,7 @@ ejercitado todavía:
 - **Programa** (`MODELO.md` §5c, D-327): `ACTIVIDAD` completa, `PRECEDENCIA`,
   `CALENDARIO_OBRA`/`CALENDARIO_EXCEPCION`, `TRAMO` — el motor de cálculo del
   CPM (fechas tempranas/tardías, ruta crítica) sigue siendo código, no
-  schema, y esta obra no tiene ni una `ACTIVIDAD` cargada para correrlo.
+  schema *(D-461: ya está escrito)*, y esta obra no tiene ni una `ACTIVIDAD` cargada para correrlo.
 - **Recursos por fecha** (`MODELO.md` §5f, D-336): la misma explosión leída
   por fecha, con `CONSTANTE_FISICA(categoria=tiempo_entrega)` para separar
   pedido de consumo — depende por completo de que 9 tenga datos que leer.
@@ -577,7 +640,7 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 
 # Resultado de la prueba
 
-**Cuatro etapas pasan, dos tienen matices, cuatro quedaron diseñadas sin caso real
+**Cinco etapas pasan, una tiene matices, cuatro quedaron diseñadas sin caso real
 que las ejercite, dos no se pueden probar.** El flujo aguanta completo desde la
 carga hasta la comparación entre planes, y donde empieza la ejecución ya hay
 modelo de datos completo y probado con cinco meses reales — el cuello de botella
@@ -611,6 +674,8 @@ caso real corriendo encima.
 | 11 | **El mismo cruce de tres fuentes no siempre resuelve la anomalía — a veces la confirma más limpia.** `ALB-01010` se resolvió igual que K1; `ALB-01212`, con las tres fuentes ya de acuerdo en que el trabajo terminó, resultó tener cero material — el caso real que la alerta necesitaba. `ALB-01012` no se resolvió: quedó adelantado a las tres fuentes a la vez, distinto de todo lo visto antes | D-378 |
 | 12 | **Confirmar el testigo correcto puede cambiar el sentido del hallazgo sin cambiar el número.** `ALB-01012` comparaba contra mortero, que la obra nunca usa; con cemento (dato del usuario, la matriz genérica) el +2.8% contra diseño completo se sostuvo — pero adelantado a todas las fuentes de avance a la vez es el caso real de `consumo_material_sin_respaldo_avance`, con un riesgo de fondo que no se ve hasta el cierre de obra | D-379 |
 | 13 | **El mismo patrón se repite fuera de estructura — B-70 no era un caso aislado de repellado.** Extendido a instalaciones con un método nuevo (alcance ponderado en $, para conceptos que agrupan varias sub-actividades bajo una clave), eléctrica/hidráulica/gas confirman; sanitaria repite, por tercera vez, avance facturado sin material que lo respalde — ahora en un dominio distinto al que lo motivó | D-381, D-382 |
+| 14 | **Una desproporción de 150× no era de profundidad ni de consolidar: eran dos claves de camión de un mismo material, con la unidad `SERV` y los metros cúbicos en el texto** — leída en m³, la obra tiene 1.26 veces la arena del prototipo | D-488, B-25 |
+| 15 | **El «residuo ambiguo» de la reversión no era una elección entre candidatos sino una suma**: la ingeniería trae los insumos de la etapa sumados, y los cuatro destajos con dos conceptos cierran exacto con el presupuesto; la clave que no existe era el único destajo que sobra frente al único que falta | D-489, B-46 |
 
 ## Lo que la prueba validó
 

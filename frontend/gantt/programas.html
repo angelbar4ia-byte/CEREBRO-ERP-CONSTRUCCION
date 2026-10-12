@@ -1,0 +1,210 @@
+<title>Programas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /*__TOKENS__*/
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.45;
+         padding-inline: 16px; padding-block: 20px 28px; }
+  .pagina { max-width: 1100px; margin-inline: auto; display: grid; gap: 16px; }
+  h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -.01em; margin: 0 0 4px; text-wrap: balance; }
+  h2 { font-size: 1rem; font-weight: 600; margin: 0; }
+  .nota { margin: 0; color: var(--muted); max-width: 78ch; }
+  code { font-family: var(--mono); font-size: .88em; }
+  .caja { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 10px; min-width: 0; }
+  .controles { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 8px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+  .controles .titulo, .campo > span.etq { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  button.b, select, input[type=text], textarea { font: inherit; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
+  button.b { cursor: pointer; }
+  button.b:hover:not(:disabled) { border-color: var(--acento); }
+  button.b:disabled { opacity: .45; cursor: default; }
+  button.b.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .mono { font-family: var(--mono); font-size: .85em; color: var(--muted); }
+  a.b { display: inline-block; font: inherit; border-radius: 4px; padding: 4px 12px; text-decoration: none; }
+  a.b.primario { background: var(--acento); border: 1px solid var(--acento); color: #fff; }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  .tabla { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .tabla th { text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; padding: 4px 10px 6px; border-bottom: 1px solid var(--line); }
+  .tabla td { padding: 7px 10px; border-bottom: 1px solid var(--grid); vertical-align: baseline; }
+  .tabla td.num, .tabla th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tabla a { color: var(--acento); font-weight: 500; text-decoration: none; }
+  .tabla a:hover { text-decoration: underline; }
+  .tabla .quien { color: var(--muted); font-size: .8rem; }
+  .vacio { color: var(--muted); padding: 6px 0; }
+  form { display: grid; gap: 12px; }
+  .campo { display: grid; gap: 4px; }
+  .campo input[type=text], .campo textarea { width: 100%; max-width: 560px; }
+  .campo textarea { min-height: 4.2em; font-family: var(--mono); font-size: .85rem; }
+  .campo .ayuda { color: var(--muted); font-size: .8rem; }
+  .fila-form { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+  .aviso { background: color-mix(in srgb, var(--aviso) 14%, var(--panel)); border: 1px solid var(--aviso); border-radius: 6px; padding: 6px 10px; font-size: .88rem; }
+  .reporte { border-color: var(--acento); }
+  .reporte .cifras { display: flex; flex-wrap: wrap; gap: 6px 22px; font-variant-numeric: tabular-nums; }
+  .nuevo { color: var(--muted); font-size: .78rem; margin-left: 6px; }
+  .reporte .cifras b { font-size: 1.15rem; font-weight: 600; }
+  .scroll { overflow: auto; max-height: 320px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="pagina">
+  <header>
+    <h1>Programas</h1>
+    <p class="nota">Cada programa se abre en su Gantt: ahí lo editas y lo que decides queda en su bitácora. Para subir uno, un archivo en el formato de <code>PROGRAMAS-PROTOTIPOS.csv</code> (<code>PROGRAMA-CPM.md</code> §2); el sistema lo carga, guarda los vínculos que entienden y te dice cuáles no. Si es una revisión de uno que ya está, dilo: las ediciones que ya decidiste pasan a la versión nueva cuando siguen teniendo sentido, y las que no, te las digo.</p>
+  </header>
+
+  <div class="controles" role="group" aria-label="Quién sube">
+    <span class="titulo">Quién sube</span>
+    <span id="sesion"></span>
+  </div>
+
+  <div class="aviso" id="aviso" role="status" hidden></div>
+
+  <section class="caja" aria-labelledby="t-lista">
+    <h2 id="t-lista">Los programas</h2>
+    <div id="lista"><p class="vacio">Cargando…</p></div>
+  </section>
+
+  <section class="caja" aria-labelledby="t-subir">
+    <h2 id="t-subir">Subir un programa</h2>
+    <form id="form" autocomplete="off">
+      <div class="fila-form">
+        <label class="campo"><span class="etq">Nombre en la lista</span>
+          <input type="text" id="f-nombre" maxlength="120" required placeholder="Zafiro, Alamo 18…"></label>
+        <label class="campo"><span class="etq">Archivo</span>
+          <input type="file" id="f-archivo" accept=".csv,text/csv,text/plain" required></label>
+      </div>
+      <label class="campo"><span class="etq">¿Es la versión nueva de uno que ya está?</span>
+        <select id="f-version-de"><option value="">No, es un programa nuevo</option></select>
+        <span class="ayuda">Las ediciones que ya decidieron pasan a la versión nueva con su autor y su fecha, salvo las que el archivo nuevo ya cambió o que ya no tienen sentido. El programa anterior se queda como estaba.</span></label>
+      <label class="campo"><span class="etq">¿Cuál programa del archivo?</span>
+        <input type="text" id="f-prototipo" placeholder="solo si el archivo trae varios">
+        <span class="ayuda">El archivo de los siete prototipos trae uno por cada valor de la columna <code>prototipo</code>.</span></label>
+      <label class="campo"><span class="etq">Días entre semana en que la obra no trabaja</span>
+        <textarea id="f-no-habiles" placeholder="2025-12-25&#10;2026-01-01" aria-describedby="a-no-habiles"></textarea>
+        <span class="ayuda" id="a-no-habiles">Uno por línea o separados por coma, como 2025-12-25. Sábados y domingos ya cuentan como no hábiles. Si es una versión nueva y lo dejas vacío, usa los de la anterior.</span></label>
+      <div><button class="b primario" type="submit" id="f-subir">Subir el programa</button></div>
+    </form>
+  </section>
+
+  <section class="caja reporte" id="reporte" aria-live="polite" hidden></section>
+</div>
+
+<script>
+/*__CLIENTE__*/
+</script>
+<script>
+/*__SESION__*/
+</script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const CFG = __CONFIG__;
+const MOTIVOS = {
+  formato: "No entiendo cómo está escrito (debe ser como 80FS, 68SS+16.0).",
+  autovinculo: "Una partida no puede esperarse a sí misma.",
+  predecesora_desconocida: "Cita una fila que no existe o que no es una partida.",
+  predecesora_sin_partidas: "Cita un bloque que no tiene partidas.",
+  sucesora_bloque: "Lo que espera es un bloque, y solo una partida puede esperar.",
+  cierra_un_ciclo: "Cada una esperaría a la otra: cierra un ciclo."
+};
+// por qué una edición de la versión anterior no pasó a la nueva
+const NO_PASO = {
+  la_version_nueva_ya_la_cambio: "El archivo nuevo ya cambió esa partida: gana el archivo. Si la quieres como estaba, edítala de nuevo.",
+  actividad_desconocida: "Esa partida ya no está en el programa nuevo.",
+  repetido: "Ese vínculo ya está en el archivo nuevo.",
+  vinculo_inexistente: "Ese vínculo ya no existe en el archivo nuevo.",
+  cierra_un_ciclo: "Con el archivo nuevo cerraría un ciclo.",
+  autovinculo: "Una partida no puede esperarse a sí misma.",
+  sucesora_no_es_partida: "Lo que espera ya no es una partida.",
+  predecesora_sin_partidas: "El bloque que citaba ya no tiene partidas.",
+  duracion_invalida: "La duración no es válida."
+};
+let programas = [];
+const llamar = (op, args) => Sesion.llamar(op, args);
+const aviso = t => { const a = $("aviso"); a.hidden = !t; a.textContent = t || ""; };
+const textoError = err => Sesion.esFaltaDeSesion(err) ? "Tu sesión no es válida: vuelve a entrar." : err instanceof ClientePrograma.ErrorApi ? err.mensaje : "Algo falló: " + err;
+const fmtFecha = s => { try { return new Date(s).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" }); } catch (_) { return s; } };
+
+async function lista() {
+  try {
+    const ps = programas = await llamar("listar_programas", {});
+    const nombre = id => { const x = ps.find(p => p.id === id); return x ? x.nombre : "#" + id; };
+    const elegida = $("f-version-de").value;
+    $("f-version-de").innerHTML = `<option value="">No, es un programa nuevo</option>` +
+      ps.filter(p => p.reemplazado_por === null).map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join("");
+    $("f-version-de").value = elegida;
+    $("lista").innerHTML = ps.length
+      ? `<div class="scroll"><table class="tabla"><thead><tr><th>Programa</th><th class="num">Partidas</th><th class="num">Vínculos</th><th class="num">Sin cargar</th><th class="num">Ediciones</th><th class="num">Versión</th><th>Subido</th></tr></thead><tbody>` +
+        ps.map(p => `<tr><td><a href="/programas/${p.id}/gantt">${esc(p.nombre)}</a>` +
+          (p.version_de !== null ? `<span class="nuevo">versión nueva de «${esc(nombre(p.version_de))}»</span>` : "") +
+          (p.reemplazado_por !== null ? `<span class="nuevo">· reemplazado por <a href="/programas/${p.reemplazado_por}/gantt">«${esc(nombre(p.reemplazado_por))}»</a></span>`
+            : ` <button class="b" type="button" data-version="${p.id}" style="font-size:.75rem;padding:1px 6px">subir versión nueva</button>`) + `</td><td class="num">${p.partidas}</td><td class="num">${p.vinculos}</td><td class="num">${p.rechazados}</td><td class="num">${p.ediciones}</td><td class="num">${p.version}</td>` +
+          `<td class="quien">${p.importado_por ? `${esc(p.importado_por)} (${esc(Sesion.nombreDeRol(p.importado_con_rol))}) · ` : ""}${esc(fmtFecha(p.creado_en))}</td></tr>`).join("") + `</tbody></table></div>`
+      : `<p class="vacio">Todavía no hay programas. Sube uno abajo.</p>`;
+  } catch (err) {
+    if (Sesion.esFaltaDeSesion(err)) { Sesion.pantallaDeEntrada(document.querySelector(".pagina")); return; }
+    $("lista").innerHTML = `<p class="vacio">No pude traer la lista: ${esc(textoError(err))}</p>`;
+  }
+}
+
+const fechas = texto => texto.split(/[\s,;]+/).filter(Boolean);
+
+function reporte(r) {
+  const s = r.resumen, caja = $("reporte");
+  caja.hidden = false;
+  const version = r.pasaron !== undefined;
+  caja.innerHTML = `<h2>Se subió «${esc(s.nombre)}»${version ? ` como versión nueva de «${esc((programas.find(p => p.id === s.version_de) || {}).nombre || "#" + s.version_de)}»` : ""}</h2>` +
+    (version ? `<div class="cifras"><span><b>${r.pasaron}</b> ${r.pasaron === 1 ? "edición pasó" : "ediciones pasaron"} a la versión nueva</span><span><b>${r.no_pasaron.length}</b> ${r.no_pasaron.length === 1 ? "no pasó" : "no pasaron"}</span></div>` +
+      `<p class="nota">${r.partidas_en_comun === 0 ? `<b>No comparte ninguna de las ${r.partidas_anterior} partidas</b> de la versión anterior —cada partida se reconoce por su <span class="mono">oid</span>—: ¿es el archivo correcto? Por eso ninguna edición pudo pasar.` : `Comparte ${r.partidas_en_comun} de las ${r.partidas_anterior} partidas de la versión anterior; cada partida se reconoce por su <span class="mono">oid</span>.`}</p>` +
+      (r.pasaron ? `<p class="nota">Las que pasaron conservan quién las decidió, con qué rol y cuándo; su impacto se calculó otra vez contra el programa nuevo.</p>` : "") +
+      (r.no_pasaron.length ? `<p class="nota">Estas no pasaron, y siguen en la bitácora de la versión anterior. El sistema no las fuerza: tú decides si se editan de nuevo.</p><div class="scroll"><table class="tabla"><thead><tr><th class="num">#</th><th>Edición</th><th>La hizo</th><th>Por qué no pasó</th></tr></thead><tbody>` +
+        r.no_pasaron.map(x => `<tr><td class="num">${x.secuencia}</td><td>${esc(x.texto)}</td><td class="quien">${esc(x.usuario)} (${esc(Sesion.nombreDeRol(x.rol))})</td><td>${esc(NO_PASO[x.motivo] || x.motivo)}</td></tr>`).join("") + `</tbody></table></div>` : "") : "") +
+    `<div class="cifras"><span><b>${s.partidas}</b> partidas</span><span><b>${s.vinculos}</b> vínculos cargados</span><span><b>${r.rechazados.length}</b> sin cargar</span><span><b>${r.incumplidos}</b> que las fechas escritas no cumplen</span></div>` +
+    (r.incumplidos ? `<p class="nota">Los que las fechas no cumplen sí se cargaron: son un aviso, no un error. En el Gantt se ven punteados.</p>` : "") +
+    (r.rechazados.length
+      ? `<p class="nota">Estos vínculos no se cargaron. El sistema no los corrige: tú decides si se escriben de otra forma o se agregan en el Gantt.</p><div class="scroll"><table class="tabla"><thead><tr><th class="num">Fila</th><th>Partida</th><th>Vínculo</th><th>Por qué no</th></tr></thead><tbody>` +
+        r.rechazados.map(x => `<tr><td class="num">${x.fila}</td><td><span class="mono">${esc(x.clave)}</span> ${esc(x.descripcion.toLowerCase())}</td><td><code>${esc(x.token)}</code></td><td>${esc(MOTIVOS[x.motivo] || x.motivo)}</td></tr>`).join("") + `</tbody></table></div>`
+      : `<p class="nota">Todos los vínculos se cargaron.</p>`) +
+    `<div><a class="b primario" href="/programas/${s.id}/gantt">Abrir el Gantt</a></div>`;
+  caja.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  aviso(null); $("reporte").hidden = true;
+  const falta = Sesion.falta(); if (falta) { aviso(falta); return; }
+  const archivo = $("f-archivo").files[0];
+  if (!archivo) { aviso("Elige el archivo del programa."); return; }
+  $("f-subir").disabled = true; $("f-subir").textContent = "Subiendo…";
+  try {
+    const csv = await archivo.text();
+    const de = $("f-version-de").value, nombre = $("f-nombre").value, prototipo = $("f-prototipo").value.trim() || null, dias = fechas($("f-no-habiles").value);
+    const r = de
+      ? await llamar("subir_version", { programa_id: +de, cuerpo: { nombre, csv, prototipo, no_habiles: dias.length ? dias : null,
+          esperaba: (programas.find(p => p.id === +de) || {}).version } })
+      : await llamar("importar_programa", { cuerpo: { nombre, csv, prototipo, no_habiles: dias } });
+    await lista(); reporte(r); $("form").reset();
+  } catch (err) {
+    if (err instanceof ClientePrograma.ErrorApi && err.codigo === "conflicto") { await lista(); }
+    aviso(err instanceof ClientePrograma.ErrorApi && err.codigo === "validacion" ? "Revisa los días no hábiles: cada uno debe ser una fecha como 2025-12-25." : textoError(err));
+  }
+  $("f-subir").disabled = false; $("f-subir").textContent = "Subir el programa";
+});
+$("lista").addEventListener("click", e => {
+  const b = e.target.closest("button[data-version]");
+  if (!b) return;
+  $("f-version-de").value = b.dataset.version;
+  const p = programas.find(x => x.id === +b.dataset.version);
+  if (p && !$("f-nombre").value) $("f-nombre").value = p.nombre;
+  $("f-nombre").focus(); $("form").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("f-version-de").addEventListener("change", () => {
+  const p = programas.find(x => x.id === +$("f-version-de").value);
+  if (p && !$("f-nombre").value) $("f-nombre").value = p.nombre;
+});
+Sesion.iniciar(CFG);
+Sesion.montar($("sesion"));
+lista();
+</script>

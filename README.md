@@ -5,8 +5,8 @@ Gobernanza del ERP: qué es verdad, cómo se piensa, qué se decidió y qué fal
 
 ```
 INDICE.md          ← empezar aquí. Dice dónde va cada cosa
-├── 1-mundo/       Es así        CONOCIMIENTO · CATALOGOS · MODELO · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
-├── 2-operacion/   Se hace así   METODO · INVARIANTES · ESCALABILIDAD · skills/ · agentes/
+├── 1-mundo/       Es así        CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
+├── 2-operacion/   Se hace así   METODO · METACOGNICION · INVARIANTES · ESCALABILIDAD · WORKFLOWS · skills/ · agentes/
 ├── 3-historia/    Fue así       MEMORIA · CASO-TRABAJADO · APRENDIZAJE · PRUEBA-*
 └── 4-direccion/   Vamos aquí    ESTADO · PENDIENTES · PRIORIDADES · IDEAS · PROPUESTA-*
 ```
@@ -38,15 +38,20 @@ python3 2-operacion/verificar-cerebro.py .
 
 Nueve comprobaciones mecánicas: bloque de órgano completo, capa igual a la carpeta,
 fechas de corte, referencias que resuelven, secciones que existen, conteos declarados
-contra reales, cifras de control en su fuente, tablas bien formadas y párrafos
+contra reales, cifras de control en su fuente, tablas bien formadas y legibles, y párrafos
 duplicados entre archivos.
 
-**Corre solo en cada push** (`.github/workflows/verificar.yml`). Sale con código 1 si
-hay fallas.
+**Corre solo** en cada pull request, en cada push a `main` y los lunes (`.github/workflows/verificar.yml`); también a mano desde la
+pestaña Actions. Sale con código 1 si hay fallas. Las pruebas del backend corren en tres partes a la vez (core · infra · api) y un
+trabajo final, `verificar`, las suma.
 
 > Lo que el verificador **no** ve: dos archivos que dicen lo mismo con palabras
 > distintas, y una referencia que resuelve a la sección equivocada. Eso sigue siendo
 > trabajo de lectura — ver `2-operacion/agentes/auditor-erp.md`.
+
+`python3 2-operacion/red-del-cerebro.py .` no comprueba: mide cómo está conectado el cerebro —qué se nombra con qué, qué cambia
+junto, qué se lee primero— y `2-operacion/METACOGNICION.md` explica qué hacer con lo que mide. Con `--integracion` dice cuánto cuesta
+partir la red y qué párrafos se repiten entre archivos; con `--reentrada`, si un archivo compilado oyó el último cambio de la sección de la que sale.
 
 ## Los agentes
 

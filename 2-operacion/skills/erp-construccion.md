@@ -1,6 +1,6 @@
 ---
 name: erp-construccion
-description: Modelo de datos, reglas de cálculo y convenciones para construir, clonar, migrar o extender ERPs de construcción en Python (Django/FastAPI) sobre PostgreSQL. Usar SIEMPRE que aparezcan conceptos, matrices, APU, precios unitarios, insumos, destajos, cuadrillas, compuestos, básicos de obra, presupuestos de obra, catálogos de conceptos, prototipos de vivienda, estimaciones, avance, programas de obra o Gantt de construcción — aunque no se nombre "ERP". También al importar o exportar desde OPUS, Neodata u otros sistemas de precios unitarios, y al modelar cualquier árbol presupuestal con partidas e insumos.
+description: Modelo de datos, reglas de cálculo y convenciones para construir, clonar, migrar o extender ERPs de construcción en Python (FastAPI; Django nunca se usó, D-182) sobre PostgreSQL. Usar SIEMPRE que aparezcan conceptos, matrices, APU, precios unitarios, insumos, destajos, cuadrillas, compuestos, básicos de obra, presupuestos de obra, catálogos de conceptos, prototipos de vivienda, estimaciones, avance, programas de obra o Gantt de construcción — aunque no se nombre "ERP". También al importar o exportar desde OPUS, Neodata u otros sistemas de precios unitarios, y al modelar cualquier árbol presupuestal con partidas e insumos.
 ---
 
 # ERP de construcción
@@ -10,8 +10,8 @@ description: Modelo de datos, reglas de cálculo y convenciones para construir, 
 capa:       II — Operación
 pregunta:   ¿qué respetar al construir?
 tiempo:     se hace así
-corte:      2026-09-15
-verificado: Derivado de CONOCIMIENTO · 16 errores que previene
+corte:      2026-10-11
+verificado: Derivado de CONOCIMIENTO · 20 errores que previene
 ```
 
 
@@ -111,6 +111,10 @@ $1,135.47; redondeando cada línea da **$1,135.48**, el costo exacto del catálo
 Confirma la hipótesis de D-124 — el PU se redondea a centavos antes de multiplicar.
 Es la misma deriva de `INVARIANTES.md` §4, ahora con la regla que la reproduce.
 
+La deriva se confirmó en los siete prototipos *(B-49, D-311)*: siempre negativa y creciente con la complejidad —la firma del redondeo
+acumulado, no de un error—. Los 8 conceptos de subcontrato (`CAR-`, `CAN-`, `HER-04010`) llevan una matriz de relleno que no llega al 1 % de su valor: no
+se construyen del catálogo y no se explotan para comparar.
+
 ### Los tres rendimientos
 
 | Rendimiento | De dónde viene | ¿Se captura? |
@@ -135,10 +139,12 @@ duración = volumen ÷ (rendimiento × número de cuadrillas)
 **La relación no es lineal**: duplicar cuadrillas no parte el tiempo a la mitad — el
 frente tiene un límite físico. Modelá un tope o un factor de eficiencia.
 
-> **No hay precedencias en el modelo.** La fórmula da cuánto tarda cada actividad,
-> pero nada dice **qué va antes que qué**. Sin precedencias no hay ruta crítica, y la
-> suma de duraciones es una lista, no un programa. **Pendiente con el módulo de
-> programa.**
+> **Las precedencias son parte del modelo** (`PRECEDENCIA`, con cuatro tipos de
+> vínculo: `MODELO.md` §5c) y el CPM está escrito (`backend/core/motor_cpm.py`). La
+> fórmula da cuánto tarda cada actividad; los vínculos dicen **qué va antes que qué**,
+> y de ahí salen la holgura y la ruta crítica. Sin ellos, la suma de duraciones es una
+> lista, no un programa. Las reglas del programa y los errores que previenen viven en
+> `erp-programa`.
 
 **El programa reagrupa; no reasigna.** Mover un concepto entre actividades cambia
 *cuándo* se ejecuta, no cuánto cuesta ni a qué etapa pertenece.
@@ -396,8 +402,12 @@ igual**:
 > todos los presupuestos dejan de significar lo mismo. **Ninguna suma falla — solo
 > están mal.**
 
-**Huella del concepto** = `f(unidad, insumos, cantidades)`. La descripción queda
-fuera a propósito: si entrara, cada acento generaría versión.
+**Huella del concepto** = `f(insumos, cantidades)`. La descripción queda fuera a propósito: si
+entrara, cada acento generaría versión. **La unidad también** *(D-473, corrige `CONOCIMIENTO.md` §2.7)*: se compara aparte y antes.
+
+**Esto ya está construido** (`backend/core/importacion_opus.py`, `catalogo.py`, `reconciliacion.py`, `texto.py`, `clonacion.py`): `revisar` no
+escribe, `aplicar` escribe todo o nada, un presupuesto que ya existe se reconcilia por ruta natural, y una clave sustituida por un clon sigue entrando. El
+detalle y los errores de la carga viven en `erp-importacion`.
 
 **La secuencia:** leer → comparar → diagnosticar → resolver lo detenido → aplicar
 todo junto. Cargar primero y corregir después no sirve: ya se pisó el dato.
@@ -415,6 +425,17 @@ todo junto. Cargar primero y corregir después no sirve: ya se pisó el dato.
   usan el mismo. Separarlos en servicios obligaría a duplicarlo o a una llamada
   remota por nodo. Las costuras que sí funcionan: importación, exportación,
   diccionario, contratos, programa.
+- **Dominio puro, puertos y adaptadores** *(D-182)*: lo que decide vive en `backend/core/` sin saber de ninguna base;
+  cada puerto tiene un adaptador en memoria y otro de Postgres (`backend/infra/`), y **los dos cumplen el mismo contrato**:
+  un `contrato_*.py` se corre contra ambos. Un cambio de esquema es una **migración numerada nueva** en
+  `database/migraciones/`; la que ya se aplicó no se edita.
+- **La base garantiza lo que el dominio promete**: lo que no se reescribe (versiones y líneas de matriz, la historia de precios y de
+  renglones, la bitácora, lo contratado, los clones) lo defiende un disparador, aunque alguien escriba SQL directo.
+- **Escribir es una transacción**: todo o nada, con un candado contra otra carga que se cuele entre revisar y aplicar. Lo que se va
+  a escribir se **revisa antes**, sin escribir nada, y el sistema propone: el humano decide.
+- **Se prueba con datos reales del proyecto** (los archivos de `1-mundo/opus/` y `1-mundo/fuentes/`, los siete presupuestos), no con
+  fixtures inventadas; los totales de los siete presupuestos no se mueven con una operación que no sea de dinero. Y una prueba nueva se
+  comprueba **rompiendo a propósito el código** que defiende: si nada falla, la prueba no prueba.
 - **PostgreSQL** con `parent_id` y `ltree`. `ltree` va **detrás de un puerto de
   repositorio**: el recorrido es infraestructura, la regla de qué suma a qué es
   dominio.
@@ -490,6 +511,11 @@ presupuesto sólo se puede preguntar qué porcentaje de sus nodos está contrata
 **En lo contratado el rediseño se detiene:** se congela la capa 3 y todo pasa por
 control de cambio.
 
+**Contratar ya está construido** *(D-475)*: el estado es de un bloque y su subárbol se contrata completo. Contratar **fija el PU** de cada concepto a ese momento
+—si el que da el motor hoy no es el de la versión vigente, nace una versión nueva con la misma receta y el PU de hoy— y **congela**: un renglón de un bloque
+contratado no se edita ni se borra (ni con SQL); agregar sí. Más de 5 % —o un concepto sin matriz, que vale cero— pide confirmación, y el bloque no se contrata
+a medias. Descontratar no está definido y no se ofrece.
+
 ---
 
 ## 9e. Reversión por destajo: el residuo son cuatro casos
@@ -546,7 +572,7 @@ cada mecanismo. Una entidad `propuesta` con: tipo, objeto, valor sugerido,
 
 ---
 
-## 11. Los dieciséis errores que este skill previene
+## 11. Los veinte errores que este skill previene
 
 1. Indexar el árbol por clave de insumo en vez de por posición.
 2. Asumir que la profundidad determina el tipo de nodo.
@@ -564,3 +590,7 @@ cada mecanismo. Una entidad `propuesta` con: tipo, objeto, valor sugerido,
 14. Codificar la cascada de sobrecostos de un solo país.
 15. Dejar que reorganizar el programa mueva dinero entre etapas.
 16. Rechazar o absolutizar las cantidades negativas.
+17. Meter la unidad en la huella del concepto.
+18. Clasificar como auxiliar un compuesto de material: la trabe no es un auxiliar.
+19. Leer una tabla que el usuario subió sin haberla guardado antes en el repo (`METODO.md` §2.6).
+20. Reescribir una versión o una línea de matriz ya guardada, en vez de agregar una nueva.

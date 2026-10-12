@@ -1,0 +1,22 @@
+eslabon,prototipo,predecesora,sucesora,tipo,desfase_dias,holgura,resultado,por_que
+R1,Zafiro,CABLEADO ELÉCTRICO (2025-10-06 a 2025-10-10),ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),FS,0,0,Se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R1,Rubí,CABLEADO ELÉCTRICO (2025-10-06 a 2025-12-12),ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),FS,0,-45,No se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R1,Zafiro Plus,CABLEADO ELÉCTRICO (2025-10-14 a 2025-12-29),ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),FS,0,-45,No se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R1,Jade,CABLEADO ELÉCTRICO (2025-10-06 a 2025-10-10),ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),FS,0,0,Se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R1,Diamante sin chimenea,CABLEADO ELÉCTRICO (2025-10-20 a 2025-10-24),ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),FS,0,0,Se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R1,Diamante con chimenea,CABLEADO ELÉCTRICO (2025-10-20 a 2025-10-24),ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),FS,0,0,Se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R1,Oro,CABLEADO ELÉCTRICO (2025-10-20 a 2025-12-29),ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),FS,0,-45,No se cumple,Misma cuadrilla: la barda arranca el día hábil siguiente al cableado
+R2,Zafiro,ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),INSTALACIONES (asador) (2025-10-20 a 2025-10-31),FS,0,0,Se cumple,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R2,Rubí,ESTRUCTURA BP (barda),INSTALACIONES (asador),FS,0,,No existe el bloque ECO-00044,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R2,Zafiro Plus,ESTRUCTURA BP (barda),INSTALACIONES (asador),FS,0,,No existe el bloque ECO-00044,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R2,Jade,ESTRUCTURA BP (barda),INSTALACIONES (asador),FS,0,,No existe el bloque ECO-00044,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R2,Diamante sin chimenea,ESTRUCTURA BP (barda),INSTALACIONES (asador),FS,0,,No existe el bloque ECO-00044,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R2,Diamante con chimenea,ESTRUCTURA BP (barda),INSTALACIONES (asador),FS,0,,No existe el bloque ECO-00044,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R2,Oro,ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),INSTALACIONES (asador) (2025-11-03 a 2025-11-14),FS,0,0,Se cumple,Misma cuadrilla: las instalaciones del asador arrancan el día hábil siguiente a la barda
+R3,Zafiro,ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-10-20 a 2025-11-12),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda
+R3,Rubí,ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-10-20 a 2025-11-12),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda
+R3,Zafiro Plus,ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-11-03 a 2025-11-26),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda
+R3,Jade,ESTRUCTURA BP (barda) (2025-10-13 a 2025-10-17),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-10-20 a 2025-11-12),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda
+R3,Diamante sin chimenea,ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-11-03 a 2025-11-26),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda
+R3,Diamante con chimenea,ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-11-03 a 2025-11-26),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda
+R3,Oro,ESTRUCTURA BP (barda) (2025-10-27 a 2025-10-31),ESTRUCTURA / ACABADO (pergolado de cochera) (2025-11-03 a 2025-11-26),FS,0,0,Se cumple,Misma cuadrilla: el pergolado de cochera arranca el día hábil siguiente a la barda

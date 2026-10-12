@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
 corte:      2026-09-26
-verificado: 17 partes · cada regla comprobada antes de escribirse
+verificado: 17 partes · cada regla comprobada antes de escribirse · releído el 2026-10-12 contra los CSV y el código, sin mover el corte: la parte 2 entera, el conteo de la parte 8, los bloques en blanco y las negativas de la 11, y los campos de la bandeja de la 14; lo demás no se releyó
 ```
 
 > **Las reglas del sistema.** Los catálogos de origen están en `CATALOGOS.md`; las
@@ -21,16 +21,16 @@ verificado: 17 partes · cada regla comprobada antes de escribirse
 | §3 | Notas de implementación | 129 | 5 |
 | §4 | Estados del nodo y exportación | 144 | 3 |
 | §5 | Presupuesto paramétrico — ensambles | 299 | 12 |
-| §6 | Destajos: precio, cuadrilla y fusión | 178 | 4 |
+| §6 | Destajos: precio, cuadrilla y fusión | 300 | 4 |
 | §7 | Modos de valuación | 82 | 3 |
 | §8 | Operaciones de rediseño | 133 | 5 |
 | §9 | Concepto compuesto — matriz dentro de matriz | 58 | 4 |
 | §10 | Categorías | 234 | 6 |
-| §11 | Los flujos entre sistemas | 2575 | 32 |
+| §11 | Los flujos entre sistemas | 6203 | 20 |
 | §12 | Las tres capas del rediseño | 52 | 3 |
-| §13 | Contratación, cambios y obra en marcha | 449 | 8 |
-| §14 | La propuesta | 66 | 5 |
-| §15 | La ruta crítica ya está en el modelo | 80 | 0 |
+| §13 | Contratación, cambios y obra en marcha | 458 | 8 |
+| §14 | La propuesta | 75 | 6 |
+| §15 | La ruta crítica ya está en el modelo | 81 | 0 |
 | §16 | Normalización, homologación y grupos funcionales | 60 | 4 |
 | §17 | Cuantificación gráfica — de inventario a regla verificada | 72 | 4 |
 
@@ -121,7 +121,7 @@ partes: cimentación entra a contrato mientras acabados sigue en diseño.
 Consecuencias:
 
 - El **rediseño sigue corriendo** en las ramas no congeladas.
-- Las tres capas (§11) aplican por subárbol.
+- Las tres capas (§12) aplican por subárbol.
 - Una regla de rediseño que toque un nodo congelado **queda «no aplicada»** y se
   reporta — el mecanismo de §12.2 ya lo cubre.
 
@@ -450,11 +450,13 @@ huella**, ya no es una descripción distinta.
 Defensa que no depende de comparar campo por campo:
 
 ```
-huella = f(unidad, insumos, cantidades)
+huella = f(insumos, cantidades)
 ```
 
 Se calcula al cargar y se compara con la anterior. **Si cambió, cambió** — aunque
 el texto sea idéntico y aunque el PU dé la misma cifra por coincidencia.
+
+> *Corregido en D-473: esta sección definía la huella como `f(unidad, insumos, cantidades)`. La unidad se compara aparte y antes (§2.7): cambiarla detiene el concepto, y saber una unidad que no se sabía no cambia la receta. Es lo que hace `huella` en `backend/core/importacion_opus.py`.*
 
 > **La descripción queda fuera de la huella a propósito.** Si entrara, cada
 > corrección de acento generaría versión y el versionado perdería sentido.
@@ -603,7 +605,7 @@ frontend/    ← web en Vercel · móvil en Google Studio
 | `apu` | Matrices, explosión, versionado (§2.2) |
 | `presupuesto` | Árbol, WBS, cantidades, estados |
 | `parametrico` | Ensambles: plantilla e instancia (§5) |
-| `rediseno` | Las cuatro operaciones y las tres capas (§8, §11) |
+| `rediseno` | Las seis operaciones y las tres capas (§8, §12) |
 | `programa` | Actividades, asignaciones, avance |
 | `contratos` | Contratación, estimaciones, control de cambio |
 | `diccionario` | Términos, equivalencias, homologación |
@@ -1212,6 +1214,128 @@ el precio (§13.1). Si el real de mano de obra diverge, el programa gana una
 **segunda proyección que convive con la teórica**, no un reemplazo —
 `PROPUESTA-CUATRO-MODULOS.md` §4.
 
+### El `$1,452/jornada` del ejemplo tiene fuente — no era anónimo
+
+Dato del usuario, buscar si existe un catálogo de cuadrillas con precio
+propio. El ejemplo de arriba nunca decía de dónde salía ese número.
+Existe, trazable: `ANALISIS_DE_BASICOS_CONCEPTOS.csv`, filas
+`Origen=ManoDeObra` (`CATALOGOS.md` §8, §10) — tres niveles que no
+estaban conectados con esta sección: rol/oficio con su jornal
+(`MOCA-xxx`: Albañil $760, Ayudante $560…) compone una cuadrilla
+(`MOCU-xxx`/`CUAD-`, 39 en total) que la semilla liga a un destajo.
+`MOCU-005` suma exacto 760 + 560 + 132 (10% contratista) = **$1,452.00
+— el mismo número del ejemplo.** `CATALOGOS.md` §10.
+
+### Castillo K1 conecta, con un caso real, lo que vivía separado entre destajo y programa
+
+Dato del usuario, comprobar si el costo del destajo es correcto contra
+la duración de diseño y la duración real. Los cuatro rendimientos de
+arriba, con números reales del mismo concepto (`MOE-02020`, castillo K1):
+
+| Rendimiento | Fórmula | Valor | Fuente |
+|---|---|---:|---|
+| Teórico | constante de catálogo | 12.12 M/día | semilla |
+| Calculado | costo cuadrilla ÷ precio destajo | 1,452.00 ÷ 130.00 = **11.17** | `MOCU-005` arriba |
+| Real de mano de obra | cantidad ÷ días reales (`Unidades ejecutoras`=1, D-403) | 339.20 ÷ 28 = **12.11** | `ALAMO 18`, D-386 |
+| Requerido (diseño, tramo 1) | cantidad ÷ días capturados a mano | 126.90 ÷ 7 = **18.13** | `PROGRAMA_ZAFIRO.xlsx` |
+| Requerido (diseño, tramo 2) | cantidad ÷ días capturados a mano | 25.20 ÷ 6 = **4.20** | `PROGRAMA_ZAFIRO.xlsx` |
+
+**El caso real cierra los tres a la vez.** Teórico, Calculado y Real de
+mano de obra caen entre 11.17 y 12.12 — la comparación de arriba
+("si el calculado y el teórico difieren…") no dispara ninguna alerta,
+y confirma otra vez el 1.085 ya documentado aquí mismo (22/22 pintor,
+58/78 albañil): 12.12 ÷ 11.17 = 1.085 exacto.
+
+**El diseño no cierra, y en direcciones opuestas.** Aplicando la tabla
+de "acortar la duración" de arriba (requerido vs. calculado): el tramo
+1 (Requerido 18.13 > Calculado 11.17) leería "la fecha exige más de lo
+pactado, o el destajo está barato"; el tramo 2 (Requerido 4.20 <
+Calculado 11.17) leería "hay holgura, o el destajo está caro". Las dos
+lecturas literales serían contradictorias para el mismo concepto en el
+mismo prototipo. La lectura real, ya establecida en D-397 con el
+tercer uso de la semilla contra `PROGRAMA_ZAFIRO.xlsx`, es que el plan
+manual de Zafiro no pasa por esta tabla en absoluto — no que el
+destajo esté mal fijado en ningún tramo.
+
+**No se repite igual fuera de mano de obra gruesa — dato que esta
+misma sección ya anotaba.** Cruzando Calculado contra Teórico para las
+cuadrillas del catálogo con más datos: `MOCU-005`/`008`/`023`
+(albañilería y acabado) dan 1.085 limpio; `MOCU-009`/`010`/`021`/
+`024`/`025`/`027`/`029` (eléctrico y variado) dan de 0.14 a 0.91 — la
+misma dispersión sin factor único que arriba se reporta para
+instalaciones (0.03 a 4.9 en eléctrico). Este mismo archivo, §11.14.
+`CATALOGOS.md` §10. `PENDIENTES-MEJORAS.md` B-82.
+
+### El margen no depende solo del precio — depende de a qué ritmo se avanza
+
+Dato del usuario. El precio del destajo nunca cambia, pero cuánto gana
+la cuadrilla **por día** sí, porque eso depende del ritmo, no del
+precio: `ingreso por día` = `Precio del destajo` × `Rendimiento` **al
+que de verdad se avanza ese día**. Con castillo K1 ($130/M, cuadrilla
+real $1,452/jornada):
+
+| Si el rendimiento es… | Ingreso/día | vs. costo real |
+|---|---:|---:|
+| 14.00 (más rápido que el teórico) | $1,820.00 | **+25.3%** |
+| 12.12 (el teórico) | $1,575.60 | +8.5% (el 1.085 de siempre) |
+| 12.00 (apenas debajo del teórico) | $1,560.00 | **+7.4%** |
+
+El 1.085 solo describe el punto medio —cuando se avanza justo al ritmo
+teórico—. En cuanto el ritmo real se aleja de ahí, el mismo precio por
+metro se convierte en más ganancia o en menos, sin que el destajo se
+haya movido. Y si el ritmo cae lo bastante, deja de ser "menos
+ganancia" y pasa a ser pérdida real: el punto exacto donde eso ocurre
+es `Rendimiento calculado` (`Costo de la cuadrilla` ÷ `Precio del
+destajo`) — por definición, el rendimiento al que el ingreso del día
+iguala el costo del día, ni gana ni pierde.
+
+### Justificar al contratista: tres alertas nuevas, no dos
+
+Dato del usuario. Falta una pieza simétrica a `estimacion_sin_respaldo_
+material`/`consumo_material_sin_respaldo_avance` (B-70/B-79), pero del
+lado de mano de obra: nada compara el Rendimiento Real de una
+actividad contra lo que su propio destajo necesita para no perder.
+Búsqueda en todo el cerebro de "contratista" + "rendimiento": sin
+resultado — es un hueco real, no uno ya cerrado. `ALERTA` gana tres
+filas (`MODELO.md` §5a):
+
+```
+rendimiento_bajo_para_destajo   Real cae, contra Teórico × Unidades
+                                 ejecutoras, más del umbral_pct
+                                 — aviso temprano, todavía no es pérdida
+rendimiento_excede_destajo       mismo cruce, dirección contraria
+                                 — gana más de lo normal
+rendimiento_en_perdida           Real cae por debajo de Calculado ×
+                                 Unidades ejecutoras — SIN umbral,
+                                 cualquier margen negativo ya es pérdida
+```
+
+**Por qué tres y no dos, dato del usuario:** las dos primeras comparan
+contra el Teórico —el punto "normal" del catálogo, igual para
+cualquiera que tenga ese destajo— y sirven de aviso temprano. La
+tercera compara contra el Calculado —el costo real de ESA cuadrilla,
+hoy— y no necesita umbral: cruzar esa línea, por poco que sea, ya es
+perder dinero por definición, el mismo criterio sin umbral que
+`subcontrato_fuera_de_base` (B-78).
+
+**El lado del material ya estaba resuelto — no es hueco, dato del
+usuario lo confirma.** `estimacion_sin_respaldo_material` (B-70) y
+`consumo_material_sin_respaldo_avance` (B-79) ya comparan, en las dos
+direcciones, la salida real de almacén del insumo testigo contra lo
+que el avance reclama —y ya se probó fuera de estructura, en eléctrica,
+hidráulica, gas y sanitaria (D-381, D-382)—. Es exactamente "si la
+salida del material cubre el avance o no"; no hacía falta nada nuevo.
+
+**Depende de `Unidades ejecutoras` estar bien capturado — mismo hueco
+que B-82.** El Rendimiento Real de mano de obra ya se define como
+`Cuadrillas × avance físico ÷ tiempo` (arriba): es una tasa de equipo,
+no de una sola cuadrilla. Las tres alertas nuevas multiplican por
+`Unidades ejecutoras` para que la comparación siga siendo válida con
+más de una cuadrilla — pero hoy ese campo vive sin que nadie lo toque
+nunca (D-403), así que en la práctica actual las tres comparan contra
+una sola cuadrilla, que es el caso universal que hay. `CONOCIMIENTO.md`
+§11.14, `MODELO.md` §5a, `PENDIENTES-MEJORAS.md` B-70, B-78, B-79, B-82.
+
 ## 6.3 Es un APU de un solo insumo
 
 El destajo enganchado no es un caso especial:
@@ -1354,7 +1478,7 @@ calculado*. Tres situaciones, un solo mecanismo.
 
 # 8. Operaciones de rediseño
 
-Cuatro operaciones de la misma familia. Todas reagrupan lo mismo con distinta forma.
+Seis operaciones de la misma familia. Las cuatro primeras reagrupan lo mismo con distinta forma; la clonación (§8.4) y el borrado (§8.5) se agregaron después. *(Esta sección decía «cuatro» y su tabla traía cinco filas; releída el 2026-10-12, `erp-rediseno.md` ya contaba seis.)*
 
 | Operación | Qué hace | Inversa |
 |---|---|---|
@@ -1363,6 +1487,7 @@ Cuatro operaciones de la misma familia. Todas reagrupan lo mismo con distinta fo
 | **Extracción** | Materiales sin destajo → concepto propio | — |
 | **Composición** | Varios conceptos → un concepto nuevo (§9) | Explosión |
 | **Clonación** | Un insumo → otro igual con clave nueva (§8.4) | — |
+| **Borrado** | Quita una clave que nada usa (§8.5) | — |
 
 ## 8.1 Las cuatro reglas comunes
 
@@ -1428,6 +1553,8 @@ qué presupuestos**, antes de aceptar.
 El clon apunta a su origen, en el diccionario. Sin eso, un año después nadie sabrá
 que `PRE-00120` y `AUX-00001` son la misma trabe: quedarían como dos insumos
 distintos con el mismo precio.
+
+*D-478: ya se ejecuta —`core/clonacion.py`, `python3 -m api.clonar`—; la equivalencia queda en `CLON` y la sustitución, en versiones nuevas que no mueven el PU.*
 
 ---
 
@@ -1750,6 +1877,10 @@ material sólo se ve abajo.
 > **Sin ese orden aparece la desproporción de `PET-00002 Arena`:** $49,755 contra
 > $332, 150×. No es un hallazgo — es comparar una fuente donde la arena está suelta
 > contra otra donde vive dentro de mezclas.
+>
+> *Corregido en D-488: el orden sigue siendo el bueno, pero este ejemplo no lo
+> ilustra. Con las dos fuentes ya a la misma profundidad el 150× sigue ahí —la arena
+> de las mezclas es otra clave— (§11.11).*
 
 Y hay un caso peor que la desproporción: `ACR-00002 Varilla` aparece **en dos
 profundidades a la vez** — negativa en la matriz del concepto, positiva dentro de la
@@ -2100,7 +2231,8 @@ niveles enteros sin ingeniería:
 ### La fila en blanco es el separador de bloque
 
 Verificado en los cuatro archivos grandes: **después de una fila vacía siempre viene
-un agrupador.** 155 casos, sin una sola excepción.
+un agrupador.** 155 bloques de filas vacías, sin una sola excepción: 151 con un agrupador
+detrás y 4 que cierran el archivo (releído contra los CSV el 2026-10-12).
 
 > **Es dato estructural, no adorno.** En `CEMENTO_EXTRA` dos filas en blanco separan
 > el cemento de fachada de un grupo distinto —pegapiso, rodapié y marco de cantera—
@@ -2154,7 +2286,7 @@ igual es lo que hace que el método parezca peor de lo que es.
 | Clase | Cuántos | Qué hace el sistema |
 |---|---|---|
 | **Resuelto** | 32 | Se aplica solo. Detectar no necesita permiso |
-| **Ambiguo** — varios candidatos | 4 | **Propuesta con todos los candidatos y su evidencia.** No se elige el más probable |
+| **Ambiguo** — varios candidatos | 4 | **Propuesta con todos los candidatos y su evidencia.** No se elige el más probable *(D-489: los cuatro eran una suma que cierra contra el presupuesto, ver abajo)* |
 | **Clave inexistente** | 1 · `MOS-2079` | **Propuesta con las dos lecturas** —errata o trabajo nuevo— **y se reporta sin tocar** |
 | **Destajo de compuesto** | 1 · `MOC-12010` | **No es residuo.** La reversión debe buscar también dentro de compuestos |
 
@@ -2173,7 +2305,8 @@ no en la del concepto. Buscando candidatos sólo entre conceptos nunca iba a ten
 candidatos, no uno.
 
 Y no está entre las 7 claves perdidas al migrar, así que lo más probable es que sea de
-las 19 nuevas del todo. Pero hay una tercera lectura que obliga a no tocarla:
+las 19 nuevas del todo *(D-489 corrige esta conjetura: es el destajo que le falta a la
+ingeniería, abajo)*. Pero hay una tercera lectura que obliga a no tocarla:
 
 > **Puede ser un cambio que nadie autorizó** — la *ausencia de causa* de §11.7. Si el
 > sistema la corrige o la da de alta solo, borra la evidencia de que alguien cambió
@@ -2228,10 +2361,83 @@ que salió al comparar la estructura contra el prototipo (§11.5).
 **Cada paso alimenta al siguiente.** Y con eso la ingeniería sí se puede cargar como
 presupuesto: **los conceptos son recuperables aunque el archivo no los traiga.**
 
+### Vuelta a correr con los datos del repo (D-489): el residuo del 16 % era una suma, no una elección
+
+Se volvió a sacar de los archivos del repo (`backend/core/tests/test_reversion_alamo18.py`
+la deja comprobable en el CI): los 38 destajos de la ingeniería de la cimentación
+contra las matrices y el Diamante con chimenea. **Salen exactos el 32, el 4 y los 2 de
+arriba**, con una condición que antes no estaba escrita: los candidatos de un destajo
+son los conceptos **de su misma etapa** (`ECO-`), y su cantidad es la de esa etapa en el
+presupuesto, no la de la clave en todo el capítulo. `ISN-01111` está también en Planta
+Baja, con 2; sumada a lo de la cimentación daba 11 en vez de 9 y la obra parecía haber
+construido menos de lo presupuestado.
+
+**La ingeniería trae los insumos de la etapa sumados.** Un destajo con varios
+conceptos candidatos no es «cuál de ellos»: es lo que hicieron todos juntos. Los cuatro
+«ambiguos» cierran exacto contra el presupuesto del prototipo:
+
+| Destajo | En la ingeniería | Conceptos de la etapa (cantidad en el presupuesto) | Suma |
+|---|---:|---|---:|
+| `MOS-01030` bajadas sanitarias | 10 | `ISN-01111` (9) + `ISN-01112` (1) | **10** |
+| `MOH-01030` salida de llave y refrigerador | 4 | `IHD-01070` (3) + `IHD-01080` (1) | **4** |
+| `MOH-01020` salida de hidroneumático y boiler | 2 | `IHD-01090` (1) + `IHD-01100` (1) | **2** |
+| `MOE-01101` salida de zumbador y timbre | 2 | `IEC-01020` (1) + `IEC-01030` (1) | **2** |
+
+> **El reparto de las bajadas sanitarias no depende del presupuesto: lo confirman
+> cuatro materiales.** Con 9 y 1, la matriz espera 10 codos de 3×90 (`SAN-00009`: 9 de
+> la bajada más 1 de `ISN-02001`), 1 tee (`SAN-00017`), 1 reducción (`SAN-00015`) y 7.000
+> de tubo de 3" (`SAN-00020`); la ingeniería compró 10, 1, 1 y 6.99985. Con 10 y 0 no
+> coincide ninguno. Es un material que solo usa un candidato: el tipo de insumo que
+> parte una suma, a diferencia de los materiales compartidos de §11.13, donde cualquier
+> ruido parece limpio.
+
+**La regla, entonces:** un destajo con varios candidatos en su etapa es una **suma**. Se
+prueba contra el presupuesto del prototipo: si cierra, cada candidato lleva su cantidad;
+si no, la suma real se sabe y el reparto no, y se busca un insumo que solo use uno de
+los candidatos; si tampoco lo hay, **propuesta con la suma y los candidatos**, y nunca se
+elige el más probable. Sigue sin ser proximidad de claves: es aritmética sobre lo que la
+ingeniería trae sumado.
+
+**`MOC-12010` encaja sin forzar nada.** `ZA1-000001` lo cita `EST-01053` (6 por unidad) y
+`EST-01054`, que es de otro nivel: en la cimentación hay un solo concepto, con cantidad
+1, y 1 × 6 son las 6 zapatas que la ingeniería trae. La losa dice 1.13 y las zapatas
+1.00, porque las zapatas se cuentan y no se miden; dos destajos de un mismo concepto en
+desacuerdo se resuelven por el de mayor costo (§11.13), y el de la losa cuesta $56,120
+contra $2,760.
+
+**`MOS-2079` es el destajo que sobra frente al único que falta.** El presupuesto de la
+cimentación pide un destajo que la ingeniería no trae: `MOS-02020` «MO SALIDA SAN
+LAVADERO» (`ISN-01020`, una pieza, $312.50). Y la ingeniería trae uno que no es de
+ningún concepto: `MOS-2079`, con el mismo texto, una pieza y $312.50. No es
+proximidad —`2079` y `02020` no se parecen—: es **exclusión más tres coincidencias**,
+texto, cantidad y precio, entre el único que sobra y el único que falta. Una clave nueva
+del todo no coincidiría en las tres con la que el prototipo echa de menos. La lectura de
+errata pasa de conjetura a la más probable. **No se aplica**: sigue siendo propuesta con
+las dos lecturas y reporte sin tocar, porque la tercera —un cambio que nadie autorizó— no
+se descarta con esto; lo nuevo es que la propuesta ya lleva su evidencia y quien decide
+solo confirma.
+
+| | Destajos |
+|---|---:|
+| Un candidato | 32 |
+| De compuesto (`MOC-12010`) | 1 |
+| Varios, suma que cierra con el presupuesto | 4 |
+| **Resuelto por evidencia** | **37 de 38 · 97 %** |
+| Clave inexistente, propuesta con evidencia (`MOS-2079`) | 1 |
+
+**A escala, en las once ingenierías:** hay 15 destajos con varios candidatos en su etapa;
+10 cierran exacto con el presupuesto y 5 no. Los cinco son lo que la obra hizo de más o
+de menos con la suma conocida y el reparto no: tres de las losas de Planta Baja, la
+nervada (`MOE-02211` armado y `MOE-02212` descimbrado, 182.40 contra 147) y la maciza
+(`MOE-02214`, 56.80 contra 63) —el caso «dos hijos, una sola ancla» de §11.14—, y dos
+de cableado eléctrico del archivo de Planta Alta (`MOE-01112` de contacto, 56 contra 59;
+`MOE-01122` de apagador, 24 contra 31). Esos cinco son el residuo verdadero del método,
+y ya se trataban como lote o como propuesta.
+
 
 ## 11.10 Sin cantidades negativas en la ingeniería del lote
 
-Se buscaron cantidades negativas en las 12 ingenierías de `ALAMO 18`. **Ninguna.**
+Se buscaron cantidades negativas en las 12 ingenierías de `ALAMO 18`. **Ninguna.** *(Releído el 2026-10-12 en las once que están en el repo: ninguna también. La doceava, la azotea, no se guardó —`MEMORIA.md` D-472—, así que esa no se pudo volver a mirar.)*
 
 > Contrasta con la matriz de conceptos, donde sí existen —58 líneas en 23
 > conceptos— para descontar material ya contado dentro de un compuesto (§8).
@@ -2282,6 +2488,10 @@ contra $332.
 > aparece suelta, repetida en cada bloque.** Es un artefacto de cómo se construye el
 > archivo, no un hecho de la obra.
 
+> **Lo primero es cierto y lo segundo no, D-488.** No es una obra con 150 veces más
+> arena. Pero la causa no es que el prototipo la guarde dentro de compuestos: abiertos
+> hasta el insumo, esos compuestos piden **otra** arena. Se volvió a correr abajo.
+
 ### P-36 cierra: no se consolida al cargar — cada lector agrupa a su modo
 
 **Depende del proceso que lee, no del insumo** (dato del usuario). Compras y obra
@@ -2296,6 +2506,66 @@ llegó (§12.1: lo cargado no se toca) — la vista consolidada de compras/obra 
 una agregación (`SUM(cantidad) GROUP BY clave`) al leer, nunca un segundo lugar
 donde el dato pueda desincronizarse del original. Mismo principio que
 `ESTADO_CARGA.porcentaje_cargado`: se calcula, no se guarda.
+
+### Vuelta a correr con P-36 cerrada (D-488): la arena no era el archivo, era el camión
+
+La comparación de esta sección se volvió a sacar de los archivos del repo, con el
+motor del repo (`backend/core/tests/test_comparacion_alamo18.py` la deja
+comprobable en el CI): las once ingenierías de `ALAMO 18` —$2,604,015.74, la línea
+base de §11.8— contra el Diamante con chimenea explotado hasta el insumo, con el
+volumen real de cada renglón. **Salen exactos los 519, los 361, los 29 y los 129.**
+Los pesos de la obra salen menores que los de arriba porque el repo no tiene la
+doceava ingeniería (la azotea): la arena, $48,239.51 y no $49,755.
+
+| Cómo se lee la arena de 7 m³ (`PET-00002`) | Obra | Prototipo | Razón |
+|---|---:|---:|---:|
+| Por clave, como en esta sección | $48,239.51 | $332.05 | ×145 |
+| Por clave, agrupando al leer (P-36) | $48,239.51 | $332.05 | ×145 — **no cambia** |
+| Con el prototipo ya abierto a fondo | $48,239.51 | $332.05 | ×145 — **ya estaba abierto** |
+| Las dos arenas juntas, en m³ | 150.08 m³ | 118.83 m³ | **×1.26** |
+
+**P-36 no mueve ninguna cifra**, porque esta comparación ya sumaba por clave en los
+dos lados: la política decide dónde se suma, no qué se suma, y deja el detalle
+donde estaba (la arena de 7 m³ es un total de 21.44 viajes para compras y 85
+líneas para costos). **La profundidad tampoco era la causa**: ya estaba normalizada
+y el 150× sigue en pie. Lo que quedaba eran dos claves:
+
+| Clave | Descripción | Unidad | PU | Por m³ | En la obra | En el prototipo | La piden |
+|---|---|---|---:|---:|---:|---:|---|
+| `PET-00002` | ARENA 7 M3 | `SERV` | $2,250 | $321.43 | 21.44 viajes · $48,239.51 | 0.15 · $332.05 | `MEZ-03020` |
+| `PET-00015` | ARENA DE RIO 14 M3 | `SERV` | $4,500 | $321.43 | — | 8.41 · $37,862.83 | `MEZ-01010`, `01020`, `01030`, `03060`, `07010` |
+
+> **Son dos camiones de arena, uno de 7 m³ y otro de 14, al mismo precio por metro
+> cúbico.** Las recetas del catálogo piden casi siempre el de 14 y la obra compró
+> siempre el de 7 (§11.14, el mismo mecanismo del mortero). Comparada por clave
+> parece que la obra tiene 150 veces más arena; comparada en metros cúbicos, tiene
+> 1.26 veces la del prototipo, como crece cualquier otro insumo.
+
+**Es lo único de esa forma que hay.** De las 361 claves que están en ambos lados,
+solo dos pasan de 10× con más de $1,000 de por medio: esta arena y `MOA-00214` (un
+destajo de boquilla de pretil: $1,298.15 contra $120.00). Quitada la arena, queda
+una.
+
+**El factorizador sí era la herramienta.** Su propuesta ya decía que con él
+«desaparecen las claves duplicadas por presentación» (`PROPUESTA-CUATRO-MODULOS.md`
+§1): una clave por material y el camión como presentación. Lo que el 20/09 se dio
+por «no lo resuelve el factorizador» era justo su caso. Lo que el caso real
+agrega al diseño de `MODELO.md` §2a, sin una regla nueva:
+
+- **Seis claves del catálogo son un camión** —arena de 7 y de 14, grava de 7, piedra
+  de cerro de 6, arenilla de 14, tezontle de 7— y las seis traen la **unidad `SERV`,
+  el viaje, con los metros cúbicos solo en la descripción**. La pipa (`SER-00003`,
+  «PIPA 10000») es otro viaje, con la capacidad en litros. F-1 dice que la unidad que
+  trae el catálogo es la definida; aquí esa unidad no es la base (el m³), y el caso
+  cae en su cláusula siguiente: *sin unidad detectable, se sugiere y se marca solo si
+  es ambiguo*. Cinco de los seis dicen «N M3» y se sugieren sin duda; el tezontle
+  escribe «7 MTS» y se marca.
+- **Fusionar dos claves de un mismo material no copia cantidades: las convierte por
+  el cociente de los factores.** `MEZ-03020` pide 0.138571 viajes de 7 m³ (0.97 m³);
+  pasada a la clave de 14 m³ sin convertir, pediría 1.94 m³, el doble. La clonación
+  (§16.2) copia receta y precio, no convierte: no sirve para esto.
+  Que las dos claves cuesten lo mismo por m³ es la pista de que son un material, no la
+  prueba; quien lo decide es una persona.
 
 ### Un caso que rompe el patrón, y por eso destaca
 
@@ -2901,6 +3171,11 @@ por `MEZ-07010`, no tienen por qué cambiar.
 > queda explicado por este grupo — no todo. Lo que resta ($142,071) sigue
 > siendo una cola larga sin un patrón tan limpio como este. D-310 (extiende
 > D-308).
+>
+> *D-488 corrige un detalle: de las tres mezclas que se nombran, `MEZ-07010` y
+> `MEZ-01020` piden `PET-00015`, pero `MEZ-03020` pide `PET-00002` —la arena de 7 m³
+> que la obra sí compró—, así que «ninguna receta la referencia» no es cierto. Las
+> cifras del grupo se sostienen: se midieron por clave, no por receta (§11.11).*
 
 Queda la Piedra Galarza 40×40/60×40 (-$134,114/-$95,968) sin revisar —
 mismo patrón sospechado, sin confirmar. D-308.
@@ -3255,6 +3530,3854 @@ apenas 7-17% de eso — y en eléctrica, ninguna fila en los cinco meses. No
 es solo que la herramienta traiga menos detalle que para estructura (ya
 documentado arriba): para esta instalación específica, no registró
 destajo en absoluto.
+
+### Antes de confiar `F/Inicio`/`F/Fin` para un programa: qué son las demás columnas de `grid_AvanceOPEventosOpr`
+
+Dato del usuario, explorar más antes de tomar fecha de inicio/fin como
+dato de programa. El resto de columnas del archivo, sin usar hasta hoy:
+
+**`H/Inicio` = `H/Final` en las 138 filas, y `Operador` es una sola
+persona en las 138.** Confirma que estas fechas/horas son de **captura
+administrativa** —cuándo se tecleó el registro, siempre por la misma
+persona— no de trabajo físico en obra. `Estatus` (137 de 138 en "En
+Especificación") es del mismo tipo: un estado del flujo de captura, no
+de si la obra ya se terminó.
+
+**`Nivel OP` (nivel de construcción, directo del dato) confirma D-377 de
+forma independiente, y encuentra un caso más.** Castillo K1
+(`EST-02110`) trae Planta Baja, Planta Alta **y** Azotea/Roof en esta
+columna —el mismo hallazgo de tres niveles que D-377 dedujo cruzando la
+ingeniería, ahora confirmado por un campo distinto—. Y `ALB-01010`
+(repellado muro 3.00, resuelto en D-378) resulta ser **igual de
+multi-nivel** (Planta Baja, Planta Alta, Azotea/Roof) — no se había
+notado antes; explica de forma más directa por qué se resolvió con el
+mismo patrón que castillo K1.
+
+### `C/Liberada`: no es "ya revisado" — la reducción real está en la tarifa, no en esta bandera
+
+**Dato del usuario, una teoría a confirmar:** que la estimación se
+captura y luego se reduce en la revisión, y que por eso el 34% de las
+filas en `C/Liberada=0` (frente a 66% en `=1`) carga el 66.6% del dinero
+total ($312,697 de $469,735) — parecía apuntar a que esas filas son
+estimación sin corregir todavía.
+
+**Confirmado, pero acotado a un caso, y con un giro:** cruzando contra
+`PRECIO_REAL` (la tarifa realmente pagada) en los diez conceptos que
+tienen ambas fuentes, la reducción real solo aparece limpia en
+`EST-01060` (losa cimentación) — 244 unidades a $230/unidad en
+`grid_AvanceOPEventosOpr` (`C/Promedio`), las mismas 244 pagadas a
+**$161/unidad** en `PRECIO_REAL` (`P.U.`): -30%. En los otros nueve
+(castillos K1-K8, cadenas CE-1/CE-2, columnas CM-1, `EST-02011`), la
+tarifa es **idéntica** entre las dos fuentes, sin excepción.
+
+**Y en esos mismos nueve, sumar `Liberada=0` + `Liberada=1` da el 100.0%
+exacto de `PRECIO_REAL` — filtrar solo por `Liberada=1` los deja entre
+14.9% y 76.7%, muy por debajo.** `C/Liberada` no distingue "ya
+revisado/reducido" de "estimación cruda": las dos banderas usan la
+misma tarifa original, y **las dos hacen falta** para llegar al total
+real. Cuando la reducción existe, se ve en la tarifa completa del
+concepto (`C/Promedio` contra `P.U.`), no en una porción de sus filas.
+
+**Consecuencia práctica: todo lo calculado en D-376 a D-384 con
+`$/Operacion`, sin filtrar por `C/Liberada`, queda validado** — filtrar
+habría introducido el error contrario al que se temía (subcontar, no
+sobrecontar). `EST-00090` (2872% al sumar ambos estados contra
+`PRECIO_REAL`) es un fenómeno distinto, ya conocido: `PRECIO_REAL` solo
+registró 1 de sus 9 operaciones —el mismo hueco de cobertura que
+castillo K1 e instalaciones—, no una reducción de tarifa.
+
+### `SEMILLA-cuadrilla-rendimiento.xlsx` contra ejecución real: castillo K1 cierra exacto
+
+Dato del usuario, verificar el rendimiento teórico (`CATALOGOS.md` §10)
+contra las duraciones reales que este mismo §11.14 ya había reconstruido
+(D-385). Método: `días_teóricos = cantidad_de_la_línea_MO- / rendimiento_
+teórico` (una cuadrilla), contra `días_activos = span_de_calendario −
+huecos_ya_encontrados`.
+
+| Concepto | Días teóricos (1 cuadrilla) | Días reales activos | Cuadrillas implícitas |
+|---|---:|---:|---:|
+| **Castillo K1 (`EST-02110`)** | 28.0 | 28 (84 de calendario − 56 de huecos) | **1.00 — exacto** |
+| Losa PB (`EST-00090`) | 50.7 | 42 (sin huecos) | 1.21 |
+| `ALB-01212` | 14.9 | 14 | 1.06 |
+| Muro tabique (`EST-02010`) | 69.9 | 43 | 1.62 |
+| `ALB-01010` | 40.6 | 14 | **2.90** |
+| `EST-00100` (losa azotea) | 10.0 | 14 | 0.71 |
+| `ALB-01210` | 10.4 | 14 | 0.74 |
+| Castillo K7 (`EST-02170`) | 1.9 | 14 | 0.14 |
+| `IEC-00110` | 83.0 | 7 | 11.85 — no cuadra |
+
+**Castillo K1 cierra exacto: 1.00 cuadrilla.** Los 28.0 días teóricos
+(339.20 M de sus tres niveles ÷ 12.12 M/día) coinciden con los 28 días
+reales activos que quedan al descontar del span de calendario (84 días)
+los dos huecos que D-385 ya había encontrado (56 días). Confirma, con
+el mismo caso, el rendimiento de la semilla y el método de huecos a la
+vez — ninguno de los dos se prueba en aislado.
+
+**`ALB-01010` necesitó ~3 cuadrillas — y D-385 ya explica por qué: es
+multi-nivel.** 40.6 días teóricos para una sola cuadrilla, comprimidos
+en 14 días reales — el número (2.90) encaja con sus tres niveles
+(Planta Baja/Alta/Azotea, confirmados por `Nivel OP` en D-385)
+trabajando en paralelo, una cuadrilla por nivel.
+
+**`IEC-00110` no cuadra —y no es el rendimiento el que falla.** Su
+patrón de facturación (un evento el 3 de junio, los otros cuatro todos
+el 8 de julio) rompe el supuesto de "huecos por semana completa": la
+ventana "activa" de 7 días que da ese método no es trabajo real
+comprimido, es una sola fecha de facturación tardía. Queda marcado, sin
+resolver — mismo tipo de límite que ya reconoce D-385 para este
+concepto.
+
+**La semilla queda guardada en `CATALOGOS.md` §10** —con las 26 claves
+ya cruzadas aquí, mismo criterio que `TESTIGO_MATERIAL` (§12): crece
+fila por fila conforme se usa, no un volcado de las 265 filas
+completas.
+
+### Precedencia técnica encontrada, y violada: instalaciones de muro antes de la cadena de cerramiento
+
+Dato del usuario, regla de campo: eléctrica, hidráulica, sanitaria y
+gas en muro **deben** pasar antes de colar la cadena de cerramiento
+—para que la tubería atraviese el elemento antes de que el concreto ya
+esté colado, no después—. `B-43` ya había resuelto el mecanismo general
+(una actividad que se detiene para colar cadena es una pausa **técnica**,
+se deduce sola en `TRAMO.origen`); esto es la primera vez que se
+contrasta contra un caso real.
+
+**En `ALAMO 18`, la ejecución real no siguió la regla.** Las dos
+cadenas de cerramiento de este prototipo son las únicas de toda su
+ingeniería —no hay una tercera para Planta Alta—:
+
+| Elemento | Inicio real |
+|---|---|
+| Cadena CE-1 (`EST-02310`) | 6 mayo |
+| Cadena CE-2 (`EST-02320`) | 20 mayo |
+| Sanitaria muros PB (`ISA-00110`) | 20 mayo — mismo día que CE-2, 14 días *después* de CE-1 |
+| Hidráulica muros PB (`IHD-00110`) | 3 junio — 28 días *después* de CE-1, 14 *después* de CE-2 |
+| Eléctrica muros PB (`IEC-00110`) | 3 junio — igual que hidráulica |
+| Gas muros (`IGA-00120`) | nunca empezó en los cinco meses de dato |
+
+**Ninguna de las tres instalaciones que sí arrancaron lo hizo antes de
+las cadenas — las tres llegan el mismo día o después.** Con la
+salvedad ya establecida en D-385 (estas fechas son de captura/
+facturación, no de trabajo físico hora por hora), la brecha —14 a 28
+días— es demasiado grande para explicarse solo por retraso de
+captura: el patrón ya conocido es que el material se factura *después*
+de instalarse, nunca antes, así que si la cadena se facturó cerca de su
+colado real y la instalación 2-4 semanas más tarde, lo más simple es
+que también pasó después en la realidad.
+
+**Corregido: la regla no aplica igual a las cuatro instalaciones —
+dato del usuario.** Hidráulica y sanitaria en muro **no necesitan**
+cruzar la cadena de cerramiento salvo en las líneas que suben a Planta
+Alta; el resto de su tubería se queda por debajo de esa altura y puede
+instalarse después sin problema. Revisando el material candidato a
+"la línea que sube" en almacén, por fecha:
+
+| Instalación | Material candidato | Fechas de salida | Contra las cadenas (6/20 mayo) |
+|---|---|---|---|
+| Sanitaria | `HID-00411` (única salida, `ECO-00002`) | 21 abril | **antes de ambas — limpio** |
+| Hidráulica | `HID-00023` (tubo troncal 3/4") | 22 abril (`ECO-00003`) y 2 junio (`IHD-00110`) | la primera antes; la segunda después — pero Planta Alta nunca vuelve a sacar este material, así que la del 2 de junio probablemente no es para la cadena: coincide con la ventana de colado de la losa de entrepiso (`EST-00090`, 13 mayo-24 junio, sin huecos — D-385), no con la cadena. Dato del usuario. |
+
+**Sanitaria queda exonerada — su tubería que sube salió tres semanas
+antes de la primera cadena.** **Hidráulica, con esta lectura, también
+—** su segunda salida de material troncal aterriza dentro de la propia
+ventana de colado de la losa, no después de ella, así que no hay
+evidencia de que haya llegado tarde a *ningún* elemento que deba
+esperarla.
+
+**Lo que queda como deficiencia de calidad real es solo eléctrica**
+(gas nunca arrancó, no se puede evaluar). Cae en la causa 1 de
+`CONOCIMIENTO.md` §13.6 (**error de ejecución** — misma obra, no
+cambia alcance, la paga quien la ejecutó) y en la fila de mano de
+obra/destajo de esa misma tabla (**retrabajo**): colar la cadena antes
+de que pase la instalación eléctrica obliga a picar el concreto ya
+colado para abrir paso al poliducto después. **Corrige D-387.**
+`PENDIENTES-MEJORAS.md` B-43.
+
+### El programa del prototipo: 30 semanas para Diamante, reconstruido de abajo hacia arriba
+
+Dato del usuario, primer caso real para `ACTIVIDAD.modo_duracion=calculada_
+rendimiento` (`MODELO.md` §5c) — un programa por **prototipo**, no por lote:
+duración teórica (rendimiento × cantidad del prototipo) y cuadrillas
+explícitas, no fechas reales de una obra concreta.
+
+**El objetivo, por tamaño de prototipo — corregido (D-419):**
+
+| Grupo | Prototipos | Semanas objetivo |
+|---|---|---:|
+| 1 planta (3) | Zafiro, Rubí, Jade | 28 |
+| 2 plantas (4) | Zafiro Plus, Diamante sin chimenea, Diamante con chimenea, Oro | 30 |
+
+`ALAMO 18` (Diamante) cae en 30 semanas. **Corrige D-389, que registró 20
+para una planta:** son 28 —dato del usuario, "ya lo habíamos
+definido"—, y es lo que el plan manual de Zafiro ya cumple: 9-jun a
+18-dic, 139 días hábiles, 27.8 semanas. El plazo lo fija el número de
+plantas, no los metros cuadrados (más abajo, en el programa de los otros
+seis prototipos).
+
+**Cimentación → Azotea, reconstruido con rendimiento (`CATALOGOS.md` §10)
+y cuadrillas explícitas — sin dejar huecos sin explicar:**
+
+| Etapa | Cuadrillas | Semanas |
+|---|---|---:|
+| Cimentación (losa, `MOC-01010`/`MOC-12010`) | 2 × `MOCU-033` | 2.67 |
+| Planta Baja — muro+castillos+cadena (`MOCU-005`) | 1.8 | 7.41 |
+| — Eléctrica muro PB, antes de cadena | **2 × `MOCU-009`** | 5.93 (cabe antes de que cierre la cadena) |
+| — Losa PB | 1.21 | 5.99 |
+| Planta Alta — muro+castillos+cadena | 1.8 | 2.76 |
+| — Losa PA (proporcional al peso $, 12.1% de losa PB) | 1.21 | 0.72 |
+| Azotea — losa | 1.21 | 1.18 |
+| **Total Cimentación → Azotea** | | **20.74 ≈ 21 semanas** |
+
+**Cierra casi exacto contra el objetivo implícito (30 − 9 de Acabados = 21).**
+El hueco no era un vacío real — era que cimentación, estructura PB/PA y las
+dos losas todavía no tenían su propio rendimiento puesto; al ponerlo, se
+llenan solas.
+
+**El hallazgo que amarra esto con D-387/D-388: eléctrica en muro PB
+necesita 2 cuadrillas, no 1, para terminar antes de que la cadena esté
+lista.** Con 1 sola cuadrilla, eléctrica tarda 83.0 días — muy por encima
+de cuándo la estructura+cadena ya estarían listas para colar (44.6+7.3=
+51.9 días). Con 2 cuadrillas, 41.5 días, cabe. Es, con datos, la causa más
+probable de la deficiencia de calidad real que se encontró en `ALAMO 18`
+(D-387): lo más probable es que ahí solo hubiera una cuadrilla eléctrica
+trabajando ese muro.
+
+**Acabados → Entrega llave en mano: 9 semanas, dato del usuario:**
+
+| Semana (desde inicio de Acabados) | Actividad |
+|---|---|
+| 0 – 2 | Pisos (remate final de `Acabados`, no el monto completo) + Obra exterior, en paralelo |
+| 0 – 1.33 | Barda perimetral — después de Obra exterior, antes de que termine Pisos |
+| 2 – 4 | Cancelería — 2 semanas completas (~1.6 fabricación + 3 días instalación) |
+| 2 – ~2.9 | Asador, estructura/acabados — después de Pisos |
+| 4 – 7 | Carpintería (3 semanas) — arranca al terminar cancelería |
+| 4 – 5/6 | Pérgola Cochera (1 a 2 semanas) — arranca al terminar cancelería, en paralelo con carpintería |
+| 7 – 9 | Cierre (2 semanas): segunda mano de pintura + limpiezas + sellado, en paralelo con muebles + iluminación + herrería |
+
+**Barda y Asador, con rendimiento:**
+
+| Elemento | Días teóricos (1 cuadrilla, secuencial) | Semanas |
+|---|---:|---:|
+| Barda perimetral (cadena desplante → muro sillar → castillo → cadena cerramiento) | 9.34 | 1.33 |
+| Asador, estructura/acabados (muro, castillo, firme, zapata, columna, repellado, forjado, cantera, finas, chaflán) | 6.43 | 0.92 |
+
+**Dos límites del método, marcados, no forzados:** `Pérgola Asador`
+(`CAR-11050`, $35,811.50) no tiene líneas `MO-` propias en el catálogo —a
+diferencia de todo lo demás, no se puede derivar su duración de
+rendimiento; si se parece a Pérgola Cochera (1-2 semanas), Asador completo
+terminaría bien antes de la semana 7, pero es analogía, no cálculo. Y el
+rendimiento de mano de obra no incluye curado de concreto —Asador
+encadena firme, zapata y castillo, cada uno normalmente necesita fraguado
+antes del siguiente paso, que las 0.92 semanas no cuentan.
+
+**Total: 21 (estructura) + 9 (acabados) = 30 semanas — reconcilia con el
+objetivo del prototipo.**
+
+**Verificación de ritmo contra `ALAMO 18` real:** lleva 15.6 semanas
+(13-22 abril a 31 julio) y todavía no registra ni una fila de Acabados en
+`Nivel OP` — dentro del presupuesto de 21 semanas para llegar ahí (le
+quedarían 5.4 semanas de margen), pero más tarde que las cuatro obras de
+comparación revisadas (`Cluster Alamo` Lote 1, `Fresno` Lote 4, `Olmo`
+Lote 20, `Olivo` Lote 1), donde Acabados siempre arranca en paralelo con
+estructura, no después. No es alarmante todavía — es la misma señal
+mixta ya anotada, ahora con presupuesto de semanas explícito para
+medirla.
+
+### `PROGRAMA_ZAFIRO.xlsx` llega: es el plan manual del residente, no la ejecución real — y no coincide con rendimiento
+
+Dato del usuario: de los siete prototipos en el archivo (3,231 filas, un
+capítulo por prototipo, mismo catálogo de presupuesto ya conocido),
+**solo Zafiro 1.0 tiene programa terminado**; los otros seis
+muestran 9-15 días de calendario sin importar el prototipo —plantillas sin
+empezar, no programas reales—. Y el de Zafiro tampoco es la ejecución
+real: **es el plan armado a mano, con la experiencia del residente** —un
+tercer tipo de dato, distinto de los dos que ya usa este cerebro:
+`calculada_rendimiento` (cantidad ÷ rendimiento, D-389) y la ejecución
+real (`grid_AvanceOPEventosOpr`/`PRECIO_REAL`/almacén, D-376 a D-388).
+**El real es el que marque la ejecución a su momento** —dato del
+usuario—, y éste no lo es todavía.
+
+**La brecha de ese plan manual contra rendimiento, medida:** decodificando
+cada concepto de Zafiro a su(s) clave(s) `MO-` (misma ingeniería que ya usa
+este cerebro para Diamante —el catálogo de conceptos se comparte entre
+variantes, D-383, y aquí se confirma que también entre prototipos
+distintos— salvo cimentación, propia de cada huella) y cruzándolas contra
+la semilla (`CATALOGOS.md` §10), salen 50 pares concepto×`MO-`
+comparables. **Cuadrillas implícitas** (días teóricos a 1 cuadrilla ÷ días
+que el plan manual asignó): mediana 0.83 en las 50, sube a 1.25
+excluyendo las cantidades que el teórico ya resuelve en menos de día y
+medio —ahí el piso de "1 día" del programa (nunca baja de un día entero)
+infla la variación sin que signifique nada—. Incluso filtrando ese ruido,
+solo 33% cae entre 0.7 y 1.3 cuadrillas. La misma clave varía fuerte entre
+sus propias apariciones: castillo K-1 (`EST-02110`/`MOE-02020`) sale dos
+veces en Zafiro, 0.35 y 1.50 cuadrillas implícitas. **La causa: hoy la
+duración de cada concepto la decide la experiencia del planeador, uno por
+uno, sin pasar por rendimiento × cuadrillas de forma sistemática** — y
+`Unidades ejecutoras` no ayuda a explicarlo: vale 1.0 en las 317 filas de
+Zafiro, sin excepción, así que el plan nunca registró cuántas cuadrillas
+asumía.
+
+**Dato del usuario, todavía conocimiento, no definición en `MODELO.md` §5c:**
+los días teóricos de `calculada_rendimiento` sí deberían poder
+quedar fraccionarios cuando así es la operación real —no forzar entero—,
+y el redondeo (si hace falta uno) debería ser un parámetro editable, no
+algo implícito en la fórmula. Queda anotado aquí para cuando se defina el
+módulo. `PENDIENTES-MEJORAS.md` B-80.
+
+*(Definido en D-446: la fórmula no redondea, el redondeo es del calendario de la
+obra y no cambia el esfuerzo.)*
+
+### Vínculos: la hoja ya habla el mismo lenguaje que `PRECEDENCIA` — y encuentra un hueco real
+
+Dato del usuario, revisar la columna `Vínculos` de `PROGRAMA_ZAFIRO.xlsx`.
+Formato MS Project: `<fila_predecesora><tipo>[±traslape]`, hasta dos
+predecesoras por coma. **Coincide, sin ajuste, con lo que `PRECEDENCIA`
+(`MODELO.md` §5c) ya tenía cerrado antes de ver este archivo:**
+`tipo_vinculo` (fin_inicio/inicio_inicio/fin_fin) es `FS`/`SS`/`FF`, y
+`traslape_espera` (negativo traslape, positivo espera) es el `±N` de la
+hoja —en horas de 8 por día, no en días: D-424—.
+
+**Un hueco real, no cubierto por el enum de tres valores:** 4 de los 75
+vínculos (en 74 de las 317 filas; D-424 corrige el 78 que decía antes)
+son `SF` —inicio_fin—, que no está en
+`tipo_vinculo`. Minoría (5%) y tipo poco común en la práctica, pero está
+en el dato real: `CAR-01011`, `IEC-01070` (dos veces, una de ellas con
+dos predecesoras `SF` a la vez), `EST-03020`. `PENDIENTES-MEJORAS.md`
+B-81.
+
+*(Cerrado en D-445: `inicio_fin` entra al enum.)*
+
+**Cobertura baja, y el orden de la hoja no es el de ejecución:** solo 74
+de 317 conceptos (23%) traen vínculo explícito; `FS` domina (62/75,
+83%). 19 de los 75 (25%) apuntan a una fila que aparece *después* en la
+hoja —`ALB-01010` cita a `ALB-01012`, un renglón más abajo, como su
+predecesora—: el catálogo lista por código, no por secuencia real;
+`Vínculos` es la única fuente de secuencia cuando existe.
+
+**La cadena de cerramiento, otra vez.** Zafiro (1 planta) solo tiene una
+—`EST-02310`—. Ningún concepto, ni las instalaciones de muro, la cita
+como predecesora. Ni el planeador con experiencia la amarró a mano,
+aunque D-387/D-388 ya mostraron que es una restricción física real en
+`ALAMO 18`. Apoya la decisión ya tomada: `TRAMO.origen=tecnica` se
+deduce sola (`MODELO.md` §5c) precisamente porque no se puede confiar en
+que alguien la capture a mano.
+
+### Cómo leer `PROGRAMA_ZAFIRO.xlsx` — guardado para no depender de que vuelva a llegar
+
+Dato del usuario: Hoja2 (490 filas) no es nada, se descarta. Lo que
+importa vive todo en Hoja1 (3,231 filas × 222 columnas):
+
+- **Columnas A-AC**: la jerarquía de presupuesto ya conocida (`Tipo`:
+  Capítulo/Subcapítulo/Nivel 2/Nivel 3/Concepto) más el programa:
+  `Fecha de inicio`/`Fecha de término`, `Días laborables`/`Días
+  calendario`, `Esfuerzo`, `Unidades ejecutoras`, `% Programado`,
+  `Cantidad programada`, `Vínculos`.
+- **Columnas AD-HN (193 columnas)**: `Cantidad` día por día —una
+  columna por cada día calendario del proyecto completo (9 jun-18 dic
+  2025)—, sin decodificar todavía.
+- **Siete `Capítulo`, uno por prototipo** —mismo orden que el catálogo
+  de presupuesto—. **Solo el primero (Zafiro 1.0) es programa
+  terminado**; los otros seis son plantilla sin empezar, 9-15 días de
+  calendario sin importar el prototipo. Dato del usuario: no asumir
+  ninguno de los seis como dato real.
+- **`Esfuerzo` no es dato nuevo, es derivado**: `Días laborables ×
+  Unidades ejecutoras × 8` (horas/jornada) — confirmado exacto en
+  decenas de filas, nunca falla.
+- **`Días laborables` = `Días calendario` menos sábados y domingos**
+  —semana de 5 días—, confirmado exacto sobre el span completo del
+  proyecto (139 de 193 días).
+- **`Vínculos`**: `<fila_excel_predecesora><FS|SS|FF|SF>[±traslape]`,
+  hasta dos predecesoras por coma. La fila predecesora es el número de
+  fila de Excel en Hoja1, no la columna `Indice`.
+
+Se guarda esta lectura —no el archivo completo— para no tener que
+redescubrirla si vuelve a llegar una versión nueva o un prototipo
+distinto con programa terminado.
+
+### `Esfuerzo` es redundante con `Días laborables` — y expone que nadie guarda cuántas cuadrillas se usaron
+
+Dato del usuario, seguir explorando. Verificado sin excepción en las 415
+filas de Zafiro —cualquier nivel, Concepto o rollup—: **`Esfuerzo` =
+`Días laborables` × 8, siempre.** Explica lo que antes parecía
+inconsistente (el Esfuerzo de un rollup no es la suma del de sus hijos):
+no es que falte sumar bien, es que `Esfuerzo` nunca fue un acumulado de
+trabajo real. Cada fila convierte **su propio** span de calendario a
+horas con una constante fija; no mide cuántas cuadrillas trabajaron ni
+cuánta mano de obra se gastó. El 1,112 del capítulo completo es solo
+139 días laborables del proyecto × 8, nada más.
+
+**No es solo un defecto de este archivo — expone un hueco propio.**
+`ACTIVIDAD.duracion_dias` (`MODELO.md` §5c) guarda el resultado de
+`calculada_rendimiento` (cantidad ÷ rendimiento ÷ cuadrillas), pero
+**el número de cuadrillas usado para llegar ahí no se guarda en
+ningún lado** — se usa una vez, en la fórmula, y se descarta. Las
+cuadrillas de D-389 a D-391 (1.8, 1.21, 2.0...) vivieron solo en texto
+y en cálculo de esta sesión, nunca en un campo.
+
+**Propuesta, no decisión: `TRAMO.cuadrillas`** (NUMERIC, fraccionario
+—mismo espíritu que B-80—), la otra mitad de `calculada_rendimiento`
+que hoy se pierde. Con eso, `esfuerzo_real = Σ(tramo.días ×
+tramo.cuadrillas)` sí sería acumulable de abajo hacia arriba —son
+cuadrillas-día reales, no calendario—, a diferencia de lo que mide este
+archivo. Dos usos concretos, no solo teóricos: le daría a
+`FRENTE_TOPE_CUADRILLA` (`MODELO.md` §5c) el dato que hoy le falta para
+comparar el tope declarado contra lo realmente programado —hoy "se
+declara, no se calcula", a propósito—; y le daría a B-41 (recursos por
+fecha) el mecanismo concreto para mano de obra, en vez de la afirmación
+sin detalle de que "no pide nada nuevo". `PENDIENTES-MEJORAS.md` B-82,
+abierto a propósito para cuando se decida.
+
+### El día-por-día (AD-HN) decodificado: la concurrencia real, y los huecos que sí son `TRAMO`
+
+Dato del usuario, seguir explorando. Cuatro validaciones mecánicas, sin
+una sola excepción: columna AD = 2025-06-09 (día 0) hasta HN = 2025-12-18
+(día 192), una por cada día calendario; `SUMA(AD:HN)` de cada fila
+coincide con su `Cantidad programada` (269/317 exacto, el resto dentro
+de ruido de redondeo); los días no-cero de cada fila caen siempre dentro
+de su propio `Fecha de inicio`/`Fecha de término` (314/314); y cero
+actividad en sábado y domingo, en los 193 días, sin excepción —confirma
+la semana de 5 días hasta el nivel más fino posible.
+
+**La concurrencia real vive aquí, no en `Esfuerzo` (D-392).** Contando
+oficios distintos (prefijo de `Clave`) activos el mismo día: de 1 a 6,
+media 2.25, mediana 2 —pico el 20 de octubre, con estructura, acabados
+y cuatro instalaciones a la vez—. Por semana, la forma es clara: baja en
+cimentación/estructura temprana, sube a 2-3 de media (pico de 6) en las
+semanas 18-27, el mismo traslape fuerte de Acabados/Obras
+Exteriores/Pintura que D-390 ya había visto por otro lado. Refuerza
+B-82 con evidencia, no solo con teoría: hay días reales de hasta 6
+oficios simultáneos que `Esfuerzo`/`Unidades ejecutoras` ocultaban por
+completo.
+
+**Los huecos internos son `TRAMO`, y uno se pudo verificar a fondo.**
+Solo 13 de 317 conceptos tienen un día laborable en cero dentro de su
+propio rango —casi todos con un solo bloque de hueco, dos sesiones de
+trabajo separadas—. `EST-02110` (castillo K-1) trabaja 26-27 jun y
+30 jun-2 jul, se detiene 17 días laborables y retoma 28-29 jul; en ese
+hueco cae exacto `EST-02310` (cadena CE-1, 3-9 jul) —la cadena se cuela
+*dentro* de la pausa del castillo—. El hueco (17 días) excede la ventana
+de colado (5 días): la diferencia es fraguado, el mismo límite que
+D-389 ya había señalado sin poder medirlo. Confirma el mecanismo de B-43
+—técnica se deduce sola— con un segundo caso real, independiente de
+`ALAMO 18`.
+
+Mismo patrón, sin verificar uno por uno con el mismo detalle: `EST-02010`
+(muro tabique, ×2) y `EST-02110` otra vez —estructura, misma historia
+probable—; `EST-21011`/`EST-21031` (losa maciza y nervada, hueco de 6-8
+días) —armado→colado→fraguado→descimbrado, que la semilla ya distingue
+como líneas `MO-` separadas—; `IEC-01210/01220/01260/03010` (centro,
+arbotante, spot, minisplit "LOSA ELEC", hueco de 5 días) —cajas ahogadas
+en la losa, mismo fraguado—; `ALB-01210`/`ALB-01212` (repellado de
+fachada, hueco de 12-13 días) —acabado exterior, sin causa tan clara—.
+
+**Uno no es pausa real, es ruido:** `IEC-02130` ("acometida cable
+muros") son solo 2 días activos de 38 en su rango, 0.5+0.5 de una sola
+unidad total, separados 52 días —una tarea casi trivial repartida a la
+mitad al principio y al final de una ventana que no le pertenece, no un
+patrón físico—.
+
+### El programa hereda las cuatro capas de presupuesto — Base, Diseño, Formado, Real
+
+Dato del usuario, al explorar `PROGRAMA_ZAFIRO.xlsx`: no hay "programa
+de ingeniería" como capa separada —corrige mi primera lectura—. Zafiro
+es **Programa Base**, por prototipo, igual que `PRESUPUESTO.tipo=
+plantilla`; los otros seis capítulos se completan con su información.
+El resto se alinea exacto con B-71:
+
+| Presupuesto | Programa | Dónde vive |
+|---|---|---|
+| Base (`tipo=plantilla`) | Programa Base, por prototipo | Zafiro ya lo tiene |
+| Ingeniería (`tipo=obra`) | Programa de Diseño, por lote | `ACTIVIDAD.origen_captura=manual_con_diseño` + `modo_duracion=capturada` |
+| Formado (calculado) | Programa formado con predicción | `modo_duracion=calculada_rendimiento` |
+| Pagado Real | Programa Real | `fecha_inicio_real`/`fecha_fin_real` |
+
+**¿El programa de diseño de un lote arranca en blanco o se carga desde
+la base?** Dato del usuario: **las dos cosas son válidas** — no es una
+regla obligatoria como `matriz_generada` ("copia y escala, nunca
+genera"). No hace falta campo nuevo: `origen_captura=manual_con_diseño`
+ya cubre ambos casos, porque lo que lo define no es de dónde salió el
+número sino que un humano con criterio lo decidió. Cargar la base,
+cuando existe, es el sistema *proponiendo* un punto de partida —mismo
+principio que todo el resto de este cerebro—, nunca una obligación.
+
+### Tres preguntas quedan cerradas: avance físico real, origen de cantidad, programa contratado
+
+**Avance físico real es un cuarto uso de "declarado menos calculado".**
+Dato del usuario: el sistema propone el % de avance físico —derivado de
+`TRAMO`/fechas reales, mismo cálculo que ya decodificó el día-por-día de
+Zafiro (cantidad ejecutada ÷ cantidad total a la fecha, D-393)—, y quien
+captura **valida o corrige, solo si algo se ve raro**. Mismo mecanismo
+que ya tiene tres usos (`MEMORIA.md`: fusión, extracción, precio alzado)
+— ahora un cuarto. La comparación contra lo pagado (`ESTIMACION_LINEA`)
+reusa `ALERTA`, con la misma forma de dos direcciones que ya tienen
+B-70/B-79: puede pagarse más de lo que se avanzó, o avanzarse más de lo
+que se ha pagado.
+
+**Origen de cantidad (ingeniería real, paramétrico, PU) no pide campo
+nuevo.** Dato del usuario, confirmado: "ingeniería" y "paramétrico" son
+el mismo `calculada_rendimiento` —la procedencia de la cantidad ya vive
+en el `Nodo`/`TRAZO` que la originó (cuantificación directa o
+`ENSAMBLE_PARAMETRO`, B-53), no hace falta duplicarla en `ACTIVIDAD`—.
+"PU" (sin desglose de insumos, como un subcontrato) ya es
+`preestablecida_nivel` (B-48), no un tercer modo. **Dato del usuario,
+nuevo:** cuando una `PROPUESTA(tipo=orden_cambio)` se aprueba, también
+debe propagarse al programa, no solo al presupuesto —las `ACTIVIDAD`
+afectadas se ajustan, no solo las líneas de costo—. Y la intención es
+doble salida, no solo una: **programa de presupuesto** (costo en el
+tiempo) y **programa de insumos** (material en el tiempo, consultable
+individual, general o combinado) — misma explosión de B-41 ("se lee por
+fecha, sin tabla nueva"), ahora con las dos vistas nombradas.
+
+**"Programa contratado" ya existe, disperso — dato del usuario,
+confirmado.** `disparador_fecha=contractual` ya marca que una actividad
+arranca por anticipo o junta de arranque; lo que falta no es tabla
+nueva, es el momento de aprobar el programa de diseño completo de un
+lote como el que se pacta —mismo mecanismo de `PROPUESTA`+roles que ya
+resolvió B-45—, y el control de cambio de siempre para lo que se edite
+después. **Dato del usuario: ojo con las incidencias que adelantan o
+atrasan el programa, marcando ruta crítica — un material puede
+atrasarlo.** Esto ya está cerrado, no es hueco nuevo: la causa 7 de
+§13.6 ("falta de insumos") ya dice que es causa de tiempo, no de costo,
+y que se resuelve como tramo de una actividad existente (P-5) — ese
+tramo, al moverse, ya dispara el recálculo de `es_ruta_critica`
+("recalcula siempre", `MODELO.md` §5c). La cadena ya estaba completa,
+solo faltaba nombrarla de principio a fin.
+
+### A `FRENTE_TOPE_CUADRILLA` le falta `frente_id` en `ACTIVIDAD`, no solo `cuadrillas` en `TRAMO`
+
+Dato del usuario, seguir con cuadrillas/`FRENTE_TOPE_CUADRILLA`. Buscar
+en Zafiro días con ≥2 conceptos *sustanciales* (≥3 días laborables) del
+mismo oficio activos a la vez —la situación que `tope` vigilaría—
+encontró que **el archivo no distingue una tarea repartida en varias
+líneas de catálogo de dos tareas físicas en paralelo: se ven
+idénticas**. Los tres casos grandes resultaron falsos positivos, cada
+uno por una razón distinta: estructura (10 conceptos el 23 de junio) es
+una sola tarea de armado de acero repartida por tamaño de varilla, las
+9 líneas con fechas idénticas; carpintería (9 conceptos, 17 nov-5 dic)
+es un solo subcontrato (`preestablecida_nivel`, B-48) fabricando varias
+piezas en el mismo periodo; obra exterior (7 conceptos, misma semana)
+es una cuadrilla de jardinería recorriendo una lista. **Un caso sí es
+plausible:** `ACA-01010` (finas interiores) y `ACA-20011` (finas en
+fachada) se traslapan —18-30 sep. y 19 sep.-2 oct.— y son zonas físicas
+distintas (dentro/fuera de la casa), el único de los revisados donde la
+explicación no es "es la misma tarea" o "es un solo contrato".
+
+**El hueco real no es solo `TRAMO.cuadrillas` (B-82) — también falta
+`frente_id`.** `FRENTE_TOPE_CUADRILLA` ya tiene `frente_id` y declara su
+tope por frente+oficio, pero ni `ACTIVIDAD` ni `TRAMO` tienen `frente_id`
+propio. Aunque existiera `TRAMO.cuadrillas`, no habría manera de saber
+en qué frente cae cada actividad para comparar contra el tope declarado
+de ese frente —por eso esta búsqueda tuvo que adivinar "frente" desde
+el texto libre de la descripción (RECÁMARA 1/2/3, FACHADA/interior), no
+de un dato estructurado—. Coincide con lo que `CATALOGOS.md` ya decía
+de `Frente`: "no valida, no impide, no calcula" — ahora se ve que le
+falta el enganche, no solo el cálculo. `PENDIENTES-MEJORAS.md` B-82,
+extendido.
+
+### Confirmado con números: muro y losa de cimentación sí necesitan más de una cuadrilla
+
+Dato del usuario: probar con `cantidad necesaria en una semana ÷
+rendimiento de la cuadrilla` que cimentación y muro de tabique
+necesitan más de 1 cuadrilla para el tiempo que el programa les dio.
+**Muro de tabique, con datos propios de Zafiro:** el primer tramo (279
+m², 23 jun-29 jul, 16 días laborables) pide 279÷3.2 semanas = 87.19
+m²/semana contra 10.5×5 = 52.5 m²/semana de 1 cuadrilla —**1.66
+cuadrillas**—; el segundo tramo (62 m², 6 días) cierra en 0.98, casi
+exacto con 1 sola. No es que el muro siempre necesite 2 —es ese primer
+tramo, el más grande y más apretado—. **Losa de cimentación, con los
+números ya validados de Diamante (D-389):** 37.37 días teóricos a 1
+cuadrilla ÷ 18.7 días objetivo = **2.00 cuadrillas exactas** — mismo
+número que D-389 ya usó, ahora reconfirmado con la fórmula pedida en
+vez de solo citado. **Hueco señalado, no resuelto todavía en este
+punto:** `EST-01040` en `PROGRAMA_ZAFIRO.xlsx` está en unidad "act",
+sin los m² propios de Zafiro —se resuelve en el siguiente hallazgo—.
+
+### La ingeniería base de cualquier prototipo ya existe — es la explosión de la matriz de cada concepto, no un archivo aparte
+
+Dato del usuario: se puede crear la ingeniería base de cualquier
+prototipo explotando los insumos de la matriz de cada concepto —y debe
+correr más limpio que con una ingeniería de lote, porque es
+exactamente el mismo mecanismo que el programa cargado (D-394)—.
+**Confirmado, y cierra el hueco de arriba.**
+`ANALISIS_DE_BASICOS_CONCEPTOS.csv` no es del lote —a diferencia de los
+cuatro archivos "INGENIERIA - ALAMO 18"—, es la matriz por prototipo:
+trae `EST-01040` con su propio desglose, y `MOC-01010` (MO losa de
+cimentación) ahí mismo da **172 M2** —coincide exacto con la etiqueta del prototipo,
+"ZAFIRO 1.0 (172 M2)"—. Con el rendimiento de la semilla (6.85 M2/día):
+172÷6.85 = 25.11 días teóricos ÷ 11 días reales que el programa le dio
+= **2.28 cuadrillas** — cierra el mismo patrón que D-389 (Diamante,
+2.00) y D-397 (muro, 1.66), ahora con el 100% de los datos propios de
+Zafiro, sin pedir un archivo de ingeniería de lote que no existe para
+un prototipo. Confirma D-394: la matriz de cada concepto, ya escalada
+al prototipo, **es** la ingeniería base — no hace falta nada aparte
+para tenerla. Generalizable a cualquiera de los siete prototipos del
+catálogo, no solo a Zafiro.
+
+### Aplicado a los siete prototipos: la losa no escala con el m² de la casa
+
+Dato del usuario: aplicar el mismo método a los otros seis. Clave de
+losa por prototipo y su m² en `ANALISIS_DE_BASICOS_CONCEPTOS.csv`:
+Zafiro (`EST-01040`, 172 M2), Rubí (`EST-01030`, 200), Zafiro Plus
+(`EST-01060`, 137), Jade (`EST-01020`, 230), Diamante sin chimenea
+(`EST-01054`, 216), Diamante con chimenea (`EST-01053`, 216), Oro
+(`EST-01013`, 160). **El m² de losa no escala con el m² de la casa**:
+Zafiro Plus (224 m² de casa) tiene menos losa (137) que Zafiro 1.0 (172
+m² de casa, 172 de losa); Oro, la casa más grande (300 m²), tiene de
+las losas más chicas (160) — en los prototipos de 2 plantas la losa
+solo cubre la huella de planta baja, no la suma de ambas. Explotar la
+matriz de cada uno, en vez de estimar por proporción, era necesario.
+
+**Dos cosas distintas, para no mezclar lo medido con lo proyectado.**
+Con rendimiento 6.85 M2/día, días teóricos a 1 cuadrilla: Zafiro 25.11,
+Rubí 29.20, Zafiro Plus 20.00, Jade 33.58, Diamante (las dos) 31.53,
+Oro 23.36. **Medido/confirmado:** solo Zafiro (2.28 cuadrillas contra
+sus 11 días reales, D-398) y Diamante (2.00 contra el objetivo de 18.7
+días, D-389) tienen un target real o ya validado. **Proyectado, no
+confirmado:** los otros cinco no tienen programa real ni objetivo
+propio todavía —solo la plantilla sin empezar, D-390—; dividir entre 2
+cuadrillas (Rubí 14.60 días, Zafiro Plus 10.00, Jade 16.79, Diamante
+15.77, Oro 11.68) es la misma cuadrilla ya repetida dos veces, aplicada
+por consistencia, no un tercer dato medido.
+
+### Comprobado para cada concepto: los seis "act" de Zafiro, uno por uno
+
+Dato del usuario: comprobarlo para cada concepto, no solo losa de
+cimentación. Los conceptos en unidad "act" (lump sum) de Zafiro son
+seis, y el método aplica distinto a cada uno:
+
+| Clave | Concepto | m² (matriz) | Días teóricos 1 cuadrilla | Días reales | Cuadrillas necesarias |
+|---|---|---:|---:|---:|---:|
+| `EST-01040` | Losa cimentación | 172 | 25.11 | 11 | **2.28** |
+| `EST-21011` | Losa maciza 3.00 | 125 | 26.41 (armado+descimbrado) | 9 | **2.93** |
+| `EST-21031` | Losa nervada 4.20 | 40 | 8.45 (armado+descimbrado) | 7 | 1.21 |
+
+**Tres no aplican, por razones distintas, no por descuido:**
+`ACC-00001` (material adicional de consumo) no tiene una sola línea
+`MO-` en la matriz —es consumible, no mano de obra—; `CAN-01002`/
+`CAN-01003` (cancelería, domos) son `preestablecida_nivel` (B-48), se
+contratan terminados, `calculada_rendimiento` no les aplica.
+
+**El patrón se sostiene:** las losas grandes (cimentación 172 m²,
+maciza 125 m²) piden 2 a 3 cuadrillas; la losa chica (nervada, 40 m²) y
+el tramo chico de muro (D-397) cierran cerca de 1. No es que las losas
+siempre necesiten más de 1 cuadrilla — es el tamaño contra el tiempo
+que el programa les dio, igual en los seis casos. `CATALOGOS.md` §10
+—`MOE-02215`/`MOE-02216`/`MOE-02218`, nuevas—.
+
+### `Remanente`: confirmado al 100%, y el usuario distingue tres causas, no una
+
+Dos validaciones exhaustivas, sin excepción: `Remanente` = `Cantidad` −
+`Cantidad programada` en las 317 filas de Concepto; y `Remanente` es
+`NaN` en las 98 filas que no son Concepto (42 Nivel 2, 41 Nivel 3, 14
+Subcapítulo, 1 Capítulo) — nunca aparece en un rollup. **El único caso
+con `Remanente` distinto de cero es `ACA-01080`** — confirma, sin que
+el usuario lo contradijera al presentarlo, que es la actividad sin
+programar a propósito de D-390.
+
+**Dato del usuario: `Remanente` no es una sola causa, son tres.**
+
+1. **De diseño** —la que ya cerró arriba—: nunca se programó, o falta
+   una fracción, desde el inicio. `Cantidad` − `Cantidad programada` >
+   0 antes de que arranque cualquier trabajo. Sin hueco: es justo lo
+   que este campo mide.
+2. **Por posposición en ejecución**: la actividad ya arrancó, se
+   posterga por una causa real (material, clima), y el remanente
+   —dato del usuario— se reprograma. No es hueco nuevo: es
+   `PENDIENTES-MEJORAS.md` B-72 con motivación concreta —antes era
+   una idea sin caso que la sostuviera; ahora hay un campo real, en un
+   archivo real, que mide exactamente lo que B-72 quería detectar.
+3. **Por actividad inconclusa**: dato del usuario, propuesta nueva —
+   termina su ventana sin acabar, sin que haya una causa identificada
+   todavía, y también debe reprogramarse. **No es lo mismo que B-72:**
+   B-72 detecta por corte de salida de almacén (una señal de
+   *material*); esta tercera causa no tiene esa señal —nadie cortó
+   nada, la cuadrilla simplemente no terminó—. La señal que sí
+   existe es la misma `Remanente` > 0, pero leída en el momento en
+   que la actividad llega a su `fecha_fin` (o `fecha_fin_real`), no
+   en el momento en que se abre. Queda como extensión de B-72, no
+   resuelta todavía: hace falta decidir si es el mismo mecanismo con
+   otra señal de entrada, o uno aparte.
+
+### Vínculos múltiples: un solo caso en 317, y revela que los vínculos pueden quedar obsoletos
+
+Dato del usuario, explorar las dos predecesoras. **Solo `IEC-01070`**
+("murete instalaciones accesorios") tiene dos predecesoras entre los
+317 conceptos de Zafiro —`OBE-02030` (zoclo de pórfido) y `OBE-02020`
+(jardinera de pórfido), las dos tipo `SF`, la misma rareza que B-81—.
+
+**Las fechas reales no respetan esa precedencia.** `IEC-01070` corre
+20-21 oct; sus dos "predecesoras" empiezan después de que ya terminó
+—`OBE-02030` el 27 oct, `OBE-02020` el 30 oct—. Bajo cualquier lectura
+de `SF` (la finalización de la sucesora depende del inicio de la
+predecesora) esto es físicamente imposible: la predecesora no puede
+empezar después de que la sucesora ya acabó. No es una relación
+rara-pero-real, es un vínculo que quedó obsoleto —probablemente se fijó
+una vez y alguien movió las fechas a mano después, sin tocarlo—.
+
+**No es un caso aislado — es la mayoría de los `SF` del archivo.** De
+los 4 vínculos `SF` encontrados en D-391, `EST-03020` (zapata, 22-23
+oct) declara como predecesora a `OBE-02020` (30 oct) — misma
+inconsistencia. Solo `CAR-01011`→`EST-00010` (las dos el 14 de julio,
+lag 0) cuadra con sus fechas reales —y es contra un rollup de Nivel 3
+("Losa Zafiro 3.00" completa), no contra un concepto específico—. **3
+de 4 vínculos `SF` reales están obsoletos**, no son relaciones físicas
+genuinas. `PENDIENTES-MEJORAS.md` B-81, con esta evidencia nueva.
+
+*(D-445 matiza esto: «obsoletos» y «físicamente imposible» exageran. Los 3 no se
+cumplen, pero la sucesora solo terminó antes de lo que un vínculo «a tiempo»
+pide; no hay nada físico que se contradiga.)*
+
+**La estructura en sí no tiene hueco.** Dos predecesoras para una
+misma actividad ya se modela sin campo nuevo —dos filas en
+`PRECEDENCIA`, mismo `sucesora_id`, distinto `predecesora_id`—. El
+hueco real es de confianza del dato, no de esquema: un vínculo
+capturado a mano (`origen=decisión`, baja confianza) puede quedar
+obsoleto sin que nada lo marque; uno que se deduce solo
+(`origen=técnica`) se recalcula siempre y no puede envejecer así. Es la
+razón de fondo detrás de que `confianza` ya se derive de `origen` en
+vez de declararse aparte (`MODELO.md` §5c).
+
+### Los vínculos, revisados uno por uno (D-424): solo Zafiro los tiene, y no unen la estructura con el cierre
+
+Dato del usuario, antes de definir las dos plantas: "revisa los vínculos
+y si ya están definidos". **No lo están.** De los siete prototipos, solo
+Zafiro trae la columna `Vínculos` con datos —74 de 317 conceptos, 23%—;
+Rubí, Jade y los otros cuatro tienen 0 celdas. Los programas de Rubí y de
+Jade (D-418 a D-423) copian las fechas de Zafiro pero no escriben ningún
+vínculo: la comprobación de que los de Zafiro se siguen cumpliendo en
+ellos es una lectura, no una definición.
+
+**Contados uno por uno son 75, no 78 (corrige D-391):** 74 celdas, una con
+dos predecesoras (`IEC-01070`); `FS` 62 (83%), `SS` 8, `SF` 4, `FF` 1. Diez
+llevan desfase, en horas de 8 por día (−72, −8, +8, +16, +24 y +40;
+`PRECEDENCIA.traslape_espera` va en días). Todas las sucesoras son
+conceptos; las predecesoras son 52 conceptos, 12 bloques (Nivel 2) y 11
+grupos (Nivel 3). La predecesora se cita por número de fila de Excel, que
+cambia con cualquier fila que se inserte; `PRECEDENCIA` la guarda por id.
+
+**Calidad, contra las fechas del propio Zafiro (74 evaluables):** 52 se
+cumplen y 22 se contradicen —13 obsoletos, con predecesora propia, y 9
+cuya predecesora es el bloque o grupo al que pertenece la propia
+sucesora, que no puede terminar antes de que ella empiece—. De los 52,
+solo 11 están ajustados (la sucesora arranca justo cuando el vínculo lo
+permite) y esos sí mandan la fecha: losa → repellado de plafond (3.00 y
++3.00), impermeabilización → finas de plafond (3.00 y 4.20), cisterna →
+losa de cisterna, las dos pérgolas → chaflán y cuatro acomodos del acero
+y la gualdra a las losas; en los otros 41 hay holgura y la fecha la
+decidió el planeador. Además: 1 vínculo que se cita a sí mismo
+(`EST-01151`), 1 ciclo de dos filas (`ICA-01030` y `BAP-01100`: cada una
+espera a la otra), 14 con el grupo de la propia sucesora como predecesora
+(5 se cumplen) y 4 `SF`, de los que solo 1 se cumple (D-402).
+
+**Dónde no hay vínculos:** cimentación (56 conceptos), Cancelería (2),
+Carpintería (10), Herrería (3) y la estructura de Planta Baja (8); en
+Muebles/Iluminación hay 2%, en Planta Baja 21% y en Pintura 23%. Y
+ninguno de los 16 conceptos que terminan del 15 al 18-dic, el cierre que
+fija las 28 semanas, tiene un solo vínculo. De la losa de 3.00 cuelgan por
+vínculos 6 actividades (hasta el 25-ago) y de la de 4.20, 4 (hasta el
+29-ago); de ahí en adelante nada cuelga de la estructura.
+
+**Lo que esto significa para dos plantas.** Con esta red no se puede
+calcular dónde cae una ampliación de 2 semanas en la estructura: solo esas
+10 actividades se moverían por vínculos, y finas, pisos, pintura,
+carpintería y cierre están por fecha, no por precedencia. La ventana la
+decide el planeador, o se define antes una red mínima entre bloques. Para
+heredar los vínculos sanos a otro prototipo: de los 52 que se cumplen, 38
+tienen ambos extremos con equivalente por `Clave` en Rubí y 37 en Jade;
+los otros 14 o 15 cuelgan de los grupos de losa y de las pérgolas, que no
+se llaman igual en cada prototipo y se mapearían por altura y por rol,
+como el programa (D-425: ya se heredaron, 46 en Rubí y 42 en Jade).
+`PENDIENTES-MEJORAS.md` B-86.
+
+### Los 52 vínculos se heredan, y la red mínima es la ruta crítica de Zafiro (D-425)
+
+Dato del usuario: "hereda los 52 y propón tú la red mínima".
+
+**Herencia: 46 en Rubí y 42 en Jade.** Un vínculo se escribe solo si sus dos
+extremos existen en el prototipo y se cumple con las fechas del propio
+prototipo. Cada extremo se mapea a su equivalente: la partida, por su
+gemelo (misma `Clave`, mismo tramo); los bloques de Nivel 2 y 3, por
+`Clave`; las losas, por altura (Jade tiene una sola); las pérgolas, por ser
+el único concepto de su bloque. La predecesora se cita por la fila de Excel
+del propio prototipo y con el mismo formato que Zafiro (`498FF-72.00000`).
+No pasan 6 en Rubí y 10 en Jade: partidas que el prototipo no tiene o que
+trae distintas —la pintura de dos manos unificada, los marcos de cantera
+interior, la piedra laja en muro, la columna forrada de la pérgola de
+cochera, el acero K7 y el ojo de buey en Jade—, la gualdra —en Zafiro era
+hija del grupo de la losa y en los otros dos queda en la estructura, así que
+su vínculo no se cumple— y, en Jade, dos que cuelgan de la losa de 3.00 y no
+se cumplen porque su losa única no separa las alturas. Tres de los de Rubí y
+dos de los de Jade tienen como predecesora el grupo de su propia sucesora:
+son parte de los 52 y se heredaron tal cual, marcados para el planeador. La
+validación se hizo leyendo solo el libro: formato, predecesora dentro del
+bloque del prototipo, 0 vínculos que no se cumplen, y solo cambiaron 88
+celdas, todas en la columna `Vínculos` de Rubí y Jade.
+
+**La red mínima es una cadena de 28 pasos.** En las fechas de Zafiro cada
+partida de esa cadena arranca el día hábil en que termina la anterior
+—holgura 0 en los 27 relevos, verificado contra el archivo original—, del 9-jun
+(losa de cimentación) al 18-dic (limpieza y sellado final), y sus ventanas
+cubren 138 de los 139 días hábiles del programa: el único sin ningún paso es
+el lunes 6-oct. Es lo que se propone como red a nivel de bloque, 18 vínculos
+entre 17 bloques y partidas, todos con holgura 0 en Zafiro, 16 de 16 en
+Rubí y 15 de 15 en Jade en los que tienen equivalente. Un `FF` con desfase
+equivale a "termina N días hábiles después" y sirve para compactar una
+cadena de partidas en un solo vínculo; la cadena partida concepto por
+concepto es el respaldo. 14 son de origen técnico y 4 de decisión: la
+cancelería arranca al terminar el piso de áreas comunes (`SS` +19 desde el
+arranque de acabados, dos bloques) y la carpintería entra cuando terminan
+las dos cancelerías (dos bloques), ambas de contrato terminado.
+
+| Tramo | Relevos (tipo y desfase, en días hábiles) |
+|---|---|
+| Estructura y losas | cimentación → muro tabique (`FS` −1) → gualdra (`SS` +15) → losa de 3.00 (`FS`) → losa de 4.20 (`SS` +9) |
+| Azotea | losa de 4.20 → pretiles (`FF` +3) y losa de 3.00 → pretiles (`SS` +7); pretiles → albañilería de azotea (`FF` +15) → impermeabilización (`FS`) |
+| Obra gris | impermeabilización → obra gris de PB (`FF` +15) → acabados de PB (`FS` +1) |
+| Cola | acabados → cancelería de PB y de azotea (`SS` +19) → carpintería (`FS`) → pintura de PB (`FF` +5) → limpieza y sellado (`FF` +4); carpintería → cubierta de cocina (`FS`) → equipamientos (`FF`) |
+
+**Lo que se encontró al leerla.** (1) Las instalaciones no están en la
+cadena: las de muros —sanitaria, hidráulica y gas— terminan de 17 a 22 días
+hábiles antes del repellado y las de losa viven dentro de las ventanas de
+armado de las losas. (2) El vínculo de la gualdra en Zafiro va al revés: la
+gualdra se coloca antes de la losa y el `SF` dice lo contrario; la red lo
+corrige (`FS` de la gualdra a la losa). (3) Hay una segunda ruta igual de
+ajustada, de cuadrilla y no de física, entre el 3-oct y el 3-nov: cableado →
+barda → instalaciones del asador y pergolado de cochera → arranque del
+3-nov; no se propone vincularla a la espina. (4) El único relevo con espera
+es obra gris → acabados: un día (el lunes 6-oct), que la red declara
+(`FS` +1) para que 10 días insertados antes lleguen completos al cierre. (5)
+La estructura sí está unida al cierre, pero por las fechas y no por un
+vínculo: la obra gris espera la impermeabilización de la azotea, que espera
+los pretiles, que esperan la losa.
+
+*(D-445 corrige el punto (2) y lo que se dijo arriba de la gualdra en Rubí y Jade:
+con la lectura estándar, el `SF` de la gualdra dice que termina cuando empieza la
+losa, lo mismo que el `FS` de la red, y se cumple con holgura 0 en los dos
+prototipos, así que no iba al revés ni «no se cumplía».)*
+
+**Las 2 semanas de las dos plantas.** Con la red, 10 días hábiles insertados
+en cualquier punto de la cadena corren todo lo que cuelga de ese punto y
+llevan el cierre del 18-dic al 1-ene (149 días hábiles, 29.8 semanas): lo que
+cambia según la ventana es cuántos pasos se corren —16 si fuera en la
+cimentación, 1 si fuera en la limpieza—. Cancelería, carpintería,
+impermeabilización y cubiertas son niveles de duración fija (D-421): no
+admiten los días extra. Propuesta del sistema, sin decidir: la ventana de la
+estructura y losa de la planta alta, entre la losa de 4.20 y los pretiles de
+la azotea (18 al 29-ago en el calendario de Zafiro). Es lo único que una
+planta más agrega antes de la azotea y corre 12 pasos. D-389 calculó esa
+estructura en 3.5 semanas para Diamante (muro, castillos y cadena 2.76 más
+losa 0.72); como el plazo solo crece 2, parte se traslapa con la planta baja
+o se compensa en acabados, y eso lo decide el planeador. Si prefiere repartir
+los 10 días con la obra gris o los pisos, la cadena lo permite.
+
+**Pendiente de validar (B-86).** *(B-86 se resolvió en D-442; lo que queda es del planeador.)* (a) La cadena, en especial los relevos de
+origen recurso o decisión: el orden de los pisos, la cancelería tras el piso
+de áreas comunes, la carpintería tras la cancelería. (b) Dónde se escriben
+los vínculos entre bloques: la propuesta es en la fila del bloque; hoy todos
+los de Zafiro están en partidas (`MODELO.md` §5c). (c) Si se aprueba: 16
+celdas en Zafiro, 14 en Rubí y 13 en Jade, y los cuatro prototipos de dos
+plantas nacen con la red. (d) La ventana. (D-426 resolvió las cuatro, abajo.)
+
+### La red se escribe en las partidas, como Zafiro, y la ventana de la planta alta queda decidida (D-426)
+
+Dato del usuario sobre las cuatro preguntas de D-425: la cadena de 28 pasos
+**es la ruta real**; los vínculos van **por ahora como en Zafiro, en las
+partidas**, y la pregunta de si un bloque puede ser sucesora —"no estoy
+seguro de la pregunta"— se resuelve después; a la tercera, si escribirla,
+respondió "no sé qué responder", así que el sistema la escribió, en un libro
+nuevo que deja intacto el anterior; y la ventana de las 2 semanas es la
+propuesta.
+
+**Cómo se escribe.** En Zafiro la sucesora de un vínculo es siempre una
+partida y la predecesora puede ser partida o bloque (52 de las 75 son
+partidas, 23 son bloques o grupos). Los 18 vínculos entre bloques se vuelven
+30 vínculos de red (P01 a P30) que viven en la partida que arranca o termina
+por ellos: la gualdra cuelga del muro tabique, la cancelería del piso de
+áreas comunes, las 10 partidas de carpintería de las dos cancelerías, la
+segunda mano de pintura de la carpintería (`FF`, que vale igual en los
+prototipos donde las dos manos son una sola partida). Un vínculo se escribe
+solo si se cumple con las fechas del propio programa.
+
+**Resultado.** Zafiro 42 celdas (54 vínculos), Rubí 42 (56) y Jade 34 (43).
+En Zafiro se conservan los vínculos que había y se cumplían y se quitan 5
+que se contradecían y que la red reemplaza en la misma partida —el chaflán,
+las dos finas interiores, el sardinel de regaderas y el mármol travertino—:
+los que no se cumplen bajan de 22 a 17, más el autovínculo; esos 18 quedan
+para el planeador. Con lo heredado en D-425, Rubí queda con 81 celdas y 102
+vínculos y Jade con 70 y 85, ninguno incumplido. No se escribe lo que
+depende de la cubierta de cocina —ni Rubí ni Jade la tienen programada— ni,
+en Jade, el vínculo entre las dos losas.
+
+**La ventana.** Los 10 días hábiles de la planta alta van entre la losa de
+4.20 y los pretiles de la azotea (18 al 29-ago en el calendario de Zafiro):
+todo lo que cuelga de ahí se corre con ella y el cierre pasa del 18-dic al
+1-ene. Con eso los cuatro prototipos de dos plantas ya tienen su regla;
+falta programarlos (`PENDIENTES-MEJORAS.md` B-84).
+
+### Zafiro Plus, la primera versión de las dos plantas: la ventana, la red y lo que se valida (D-427)
+
+Con la ventana y la red decididas (D-426) se programa el primero de los cuatro
+prototipos de dos plantas. **Cierra el 1-ene-2026: 149 días hábiles, 29.8
+semanas, 207 días calendario**, con 388 de sus 389 partidas programadas —la que
+falta es la fila de cierre en blanco, sin cantidad— y la cuadrícula ampliada
+14 columnas (`HO:IB`, 236 en total) con el encabezado `Cantidad` como las demás. *(El calendario de este apartado se corrigió en
+D-428, abajo: el 25-dic y el 1-ene no se trabajan, Plus cierra el lunes 5-ene y la
+cuadrícula llega a `IF`.)*
+
+**Cómo se programó.** Es el programa de Zafiro con 10 días hábiles insertados el
+18-ago: lo anterior queda igual, lo posterior se corre 10 días hábiles, lo que
+cruza el 18-ago queda con un hueco de 10 días y lo ligado por `FF` se alarga.
+Cada partida anota la regla que la programó: 204 por gemelo de `Clave` dentro de
+su bloque equivalente de Zafiro y 10 por la misma `Clave` en otro bloque, 43 de
+cimentación con la ventana de su bloque de Zafiro (D-418), 49 de losas por
+altura —la de 3.00 con la ventana de la de 3.00 de Zafiro, la de 4.20 con la de
+4.20, y el acero y las instalaciones embebidas dentro de su corrida de
+armado—, 44 de la planta alta, 15 por rol explícito, 16 con la ventana de su
+bloque y 7 de nivel de duración fija (cancelería, carpintería y herrería duran
+lo de Zafiro, D-421). Los metros de más no suman días (D-419): 7 partidas piden
+2 o más veces la cantidad por día de su gemela de Zafiro.
+
+**La planta alta cabe en la ventana.** Estructura del 18 al 26-ago (muro tabique
+y castillos los 7 días, la cadena el 25 y 26), colado de la losa de azotea del
+27 al 29-ago, fraguado de 8 días hábiles y segunda corrida el 11 y 12-sep. El
+muro tabique de PA son 197 m² en 7 días, 1.6 veces la cantidad por día del de
+Zafiro; la cadena, 1.6; los castillos, entre 0.2 y 0.7. Las instalaciones en
+muros de PA arrancan en su hueco de la ventana con los días de su gemela de PB.
+
+**Dos correcciones de secuencia sobre la primera versión.** Los pretiles de la
+azotea quedaban en julio, antes de que existiera la losa que los carga, y el
+plafón de PA se repellaba el mismo día que se colaba su losa. Ahora los pretiles
+van sobre la losa de azotea, del 1 al 3-sep, y los 6 días de Zafiro bajan a 3 con
+más cuadrilla (1.2 y 1.6 veces la cantidad por día); el plafón de PA se repella
+tras descimbrar (15 al 19-sep) y el muro +3.00 de PA después (22 y 23-sep). Si
+los pretiles esperaran el descimbrado, la cadena se correría 10 días hábiles y
+el cierre pasaría al 15-ene: no cabría en 30 semanas.
+
+**La red, con piso.** Se hereda con las reglas de Rubí y Jade y una más: cada
+sucesora se enlaza con la predecesora **de su piso** —PB con PB, PA con PA,
+azotea con azotea— y, si la predecesora solo existe en un piso, con esa. Quedan
+110 celdas con 132 vínculos, todos con holgura mayor o igual a 0 con las fechas
+de Plus: 47 de los 52 sanos de D-425, 26 de los 30 de la red de D-426 (P05 y P06
+no aplican, porque los pretiles de Plus cuelgan de la losa de azotea) y cuatro
+eslabones propios de las dos plantas, PX01 a PX04: la estructura de PA arranca
+el día hábil siguiente de terminar la losa de 4.20, la cadena termina con el
+muro, la losa de azotea se cuela el día siguiente de la cadena y los pretiles
+arrancan 3 días hábiles después de colarla. No se escriben los que dependen de
+partidas que Plus no tiene —cubierta de cocina, tanque estacionario en losa,
+marcos de cantera interior, piedra laja en muro, lijado y sellado de muro
+interior, limpieza de piedra laja— ni el orden entre las dos manos de pintura,
+que en Plus es una sola partida.
+
+**La ruta crítica de Plus son 31 pasos**, del 9-jun al 1-ene, todos los relevos
+con holgura 0: la cadena de Zafiro con tres pasos de planta alta en medio
+—muro, cadena y losa de azotea— y los pretiles colgando de la losa de azotea. La
+ventana de 10 días llega entera al cierre.
+
+**Cómo se verificó.** Validación independiente leyendo solo los libros: forma
+(236 columnas, autofiltro hasta `IB`), solo cambia el bloque de Plus, reglas de
+la cuadrícula (lunes a viernes, ceros explícitos, cantidad entre días), cierre
+con 149 días hábiles, 208 gemelos con el patrón de Zafiro más los 10 días, la
+cimentación con la ventana de su bloque, las losas por altura iguales a las de
+Zafiro y los resúmenes consistentes; de la red, formato, predecesora dentro del
+bloque, cumplimiento con las fechas y que solo cambie la columna `Vínculos`.
+
+**Pendiente de validar (B-84).** *(B-84 se resolvió en D-449; lo que queda es del planeador.)* Once supuestos, en la hoja «A validar» del libro
+de revisión: la ventana, la cuadrilla de la estructura de PA, el colado y
+descimbrado de la losa de azotea (8 días de fraguado), los pretiles antes del
+descimbrado, el plafón de PA, las instalaciones de PA, los acabados de PA con
+las ventanas de PB, el ojo de buey en la estructura de PB, lo que Plus no
+tiene, el calendario (se trabaja el 25-dic y el 1-ene) y la red. Faltan
+Diamante sin chimenea, Diamante con chimenea y Oro.
+
+### Los feriados: el 25-dic y el 1-ene no se trabajan, y el calendario será una opción del sistema (D-428)
+
+Dato del usuario: se continúa con los dos Diamante; **el 25 de diciembre y el 1
+de enero no se trabajan**, pero el sistema debe dejar como opción agregar o
+quitar días no laborables y también los fines de semana, "solo como opción, no
+para este ejercicio" (`MODELO.md` §5c). Responde la pregunta de feriados que
+D-419 había dejado abierta para los programas de 30 semanas.
+
+**El calendario del ejercicio.** Lunes a viernes sin el 25-dic y el 1-ene. El
+16-sep y el 17-nov se siguen trabajando, como en Zafiro, que es el confiable.
+Zafiro, Rubí y Jade cierran el 18-dic, antes de los dos feriados, y no cambian.
+
+**Qué cambia.** El trabajo no cambia —149 días hábiles, con la ventana de 10 días—,
+cambia el calendario: el cierre de los programas de dos plantas pasa del jueves
+1-ene al **lunes 5-ene-2026**, 30 semanas y un día hábil; la cuadrícula crece
+hasta el 5-ene (columna `IF`, 240 en total, 18 columnas más que Zafiro); y el
+25-dic y el 1-ene llevan un `0` explícito dentro de los tramos que los cruzan, que
+es la misma regla de los fines de semana (34 ceros en Plus y 29 en cada Diamante). Todo lo que
+Plus tenía programado desde el 25-dic se corre; antes de esa fecha el programa es
+idéntico al de D-427 (probado: los 388 conceptos conservan su patrón de días
+hábiles). La ruta crítica de Plus sigue siendo de 31 pasos y termina el 5-ene.
+
+**Si el plazo se mide en semanas de calendario.** Cerrar el viernes 2-ene, el
+último día de la semana 30, exigiría una ventana de 9 días en vez de 10: se
+acorta un día la estructura de la planta alta. Queda como opción del planeador y
+como pregunta de modelo, no como decisión (`PENDIENTES-MEJORAS.md` B-87).
+
+*(Resuelto en D-447: el plazo se cuenta en días hábiles por defecto, con la cuenta
+de semanas de calendario a la vista; los dos tipos de plazo y la regla de la cantidad
+por día están abajo.)*
+
+### Diamante sin y con chimenea programados con el mismo método de las dos plantas (D-429, D-430)
+
+Los dos Diamante usan el motor de Plus —el programa de Zafiro con 10 días hábiles
+insertados el 18-ago, la planta alta emparejada por rol— con el calendario de
+D-428. **Los dos cierran el lunes 5-ene-2026, 149 días hábiles**: Diamante sin
+chimenea con 377 de 378 partidas programadas y Diamante con chimenea con 380 de
+381 (la que falta es la fila de cierre en blanco, sin cantidad), y la
+cimentación con la ventana de su bloque de Zafiro, 49 de 49 y 48 de 48.
+
+**Lo que cambia respecto de Plus: una sola altura.** La planta baja de Diamante
+es toda de 4.20 y no hay losa de 3.00. Las cuatro losas (208 m²: dos macizas de
+11 y 12 cm y dos nervadas) toman las ventanas de las dos losas de Zafiro unidas,
+del 15-jul al 15-ago (16 días hábiles), que da 13.0 m² por día, el ritmo de la
+losa maciza de 3.00 de Zafiro (13.9); con solo la ventana de 4.20 (7 días) serían
+29.7 m² por día. La gualdra va el 14-jul, el acero de arranque y las
+instalaciones embebidas en las losas siguen la corrida de 4.20, y el vínculo que
+separa las dos losas (P04) no aplica. Es lo mismo que se hizo con la losa única
+de Jade (D-423).
+
+**Emparejamientos por rol propios de Diamante.** Lo que Zafiro no tiene toma la
+ventana de lo que hace el mismo trabajo: el castillo de sección extra con el de
+la sección más cercana, las columnas con el castillo K-1, la cadena CE-2 con la
+CE-1, los paneles solares de 12 m con los de 4 m, el muro, el castillo y el
+acero del asador con el forjado y la zapata del asador, y su repellado y fina
+con el forrado de cantera. Están explicados uno por uno en la hoja «Por rol
+(propuestas)» de cada libro de revisión.
+
+**Con y sin chimenea.** Difieren en pocos conceptos: la losa de cimentación, el
+acero K3 (7 piezas contra 5), un ramal sanitario, una losa nervada de 84 m² en
+vez de la de 83 m², la columna C-1 que solo tiene la de sin chimenea, un muro, un
+castillo K-7 y un repellado de la chimenea en la estructura de planta baja, las
+galarzas de 40x40 y 60x40 y el relleno de azotea (195 contra 110). Con
+chimenea el castillo de sección extra es un K-7 de 15x21, no un K-8 de 15x40.
+
+**La red.** Se hereda con las mismas reglas que en Plus —cada sucesora con la
+predecesora de su piso—: 106 celdas y 130 vínculos en Diamante sin chimenea y 107
+y 131 en Diamante con chimenea, todos con holgura mayor o igual a 0 con las fechas
+del propio programa. La ruta crítica son 30 pasos del 9-jun al 5-ene, uno menos que
+Plus porque no hay una segunda losa. No se escriben los vínculos que dependen de
+partidas que Diamante no tiene (cubierta de cocina, boquilla en fachada, ojo de
+buey, marcos de cantera interior, piedra laja, lijado y sellado de muro) ni los
+pretiles (P05 y P06) ni P04.
+
+**Piden más cuadrilla.** 19 partidas en Diamante sin chimenea y 18 en Diamante con
+chimenea piden 2 o más veces la cantidad por día de su gemela de Zafiro: los
+extremos son boquilla fina en fachada (9.8 veces), repellado de muro +3.00 (6.2),
+acero K1 de 1.50 (6) y castillos K-3 y K-8 (5.3). Son los candidatos a que el
+planeador los ajuste, como la losa de 4.20 de Rubí (D-422).
+
+**Validado leyendo solo los libros**, con las mismas pruebas de Plus más que
+ninguna partida cae en un día sin trabajo —sábado, domingo, 25-dic o 1-ene— y que
+ninguna otra celda del libro cambió. Libro de revisión de cada prototipo, con las
+reglas, los 12 supuestos para validar, la red y la ruta crítica. Oro, abajo (D-431).
+
+### Oro programado: los siete prototipos ya tienen programa (D-431)
+
+Oro es el último de los cuatro prototipos de dos plantas y se programa con el
+mismo motor y el calendario de D-428. **Cierra el lunes 5-ene-2026, 149 días
+hábiles, con las 402 partidas programadas** —Oro no trae la fila de cierre en
+blanco, así que no queda nada sin programar—, la cimentación con la ventana de
+sus bloques de Zafiro (51 de 51) y 232 gemelos de `Clave` con el patrón de
+Zafiro más los 10 días de la ventana.
+
+**Las losas de planta baja, por su orden.** El grupo de losas de Oro trae dos
+—`LOSA NERVADA ENTREPISO` y `LOSA NERVADA AZOTEA` de planta baja— y no dice la
+altura de ninguna, pero sí tiene instalaciones embebidas de 3.00 y de 4.20, así
+que existen las dos alturas. Con la regla del planeador, primero la de 3.00 y
+luego la de 4.20, la primera losa toma la ventana de la de 3.00 de Zafiro (15-jul
+al 4-ago) y la segunda la de 4.20 (28-jul al 15-ago); el acero de arranque, el
+escalón forjado y la cadena intermedia siguen a la primera y la gualdra va el
+14-jul. Si las dos fueran de 4.20 tomarían las ventanas unidas, como Diamante.
+
+**Lo que Oro trae distinto.** El muro tabique de planta alta son 246 m² en 7
+días, 2.0 veces la cantidad por día del de planta baja de Zafiro (la cadena CE-1,
+2.1; los castillos, entre 0.2 y 0.9). Las 2 piezas de ojo de buey vienen dentro
+de la estructura de planta alta y no son estructura: caen el 1-sep, corridas con
+la ventana. El tanque estacionario de gas de la losa de azotea va los dos primeros
+días del colado, como la eléctrica. El plafón +3.00 de planta alta, que Plus y
+Diamante no tienen, se repella tras descimbrar la losa de azotea, igual que el de
+3.00 (15-sep). El bloque de instalaciones del asador (`ECO-00044`) existe en Zafiro
+y se empareja directo. Los emparejamientos por rol propios son cuatro: vertedero
+y regadera en corte sanitario con el vertedero de Zafiro, el apagador de losa con
+el centro de losa (la misma clave en Zafiro es del asador y caería en noviembre)
+y la salida de gas del estudio con la de la estancia, como en Jade.
+
+**Un solo motor para los cuatro.** Las instalaciones embebidas en las losas se
+reconocen por la descripción de su grupo («losa entrepiso 3.00» o «4.20») y no por
+la clave, porque Oro numera distinto las de hidráulica; con eso Plus y los dos
+Diamante dan exactamente el mismo programa que antes. Las losas se configuran por
+prototipo: por altura en Plus, por su orden en Oro, una sola ventana en Diamante.
+
+**La red.** 109 celdas y 133 vínculos, todos con holgura mayor o igual a 0; la
+ruta crítica son 31 pasos del 9-jun al 5-ene, los mismos de Plus. Como Oro tiene
+dos losas, el vínculo que las separa (P04) sí aplica, y los vínculos de Zafiro que
+cuelgan del grupo de la losa de 3.00 o de la de 4.20 usan la losa de su altura
+cuando el grupo, que junta las dos, no los cumple.
+
+**Piden más cuadrilla.** 15 partidas piden 2 o más veces la cantidad por día de su
+gemela de Zafiro; los extremos son la limpieza y el entintado del durmiente (5.4
+veces), el castillo K-3 (5) y las finas y el repellado de fachada +3.00 (4.1).
+Candidatos a que el planeador los ajuste, como en Diamante.
+
+**Con Oro quedan programados los siete prototipos** (`RESUMEN_7_PROTOTIPOS.xlsx`):
+
+| Prototipo | Plantas | Cierre | Días hábiles | Partidas | Celdas con vínculos | Vínculos |
+|---|---|---|---|---|---|---|
+| Zafiro | 1 | 18-dic | 139 | 314 de 315 | 102 | 124 |
+| Rubí | 1 | 18-dic | 139 | 294 de 294 | 81 | 102 |
+| Jade | 1 | 18-dic | 139 | 288 de 288 | 70 | 85 |
+| Zafiro Plus | 2 | 5-ene | 149 | 388 de 388 | 110 | 132 |
+| Diamante sin chimenea | 2 | 5-ene | 149 | 377 de 377 | 106 | 130 |
+| Diamante con chimenea | 2 | 5-ene | 149 | 380 de 380 | 107 | 131 |
+| Oro | 2 | 5-ene | 149 | 402 de 402 | 109 | 133 |
+
+Cuentan las partidas con cantidad (Jade programa además `MATERIAL PARA PRUEBAS`,
+que no trae cantidad, y por eso D-423 habla de 289). Los vínculos de Zafiro
+incluyen los 18 que quedaron sin cumplirse para el planeador (D-426); en los
+otros seis no hay ninguno. Validado leyendo solo los
+libros, con las mismas pruebas de Plus y los Diamante. Queda lo que sigue
+abierto en `PENDIENTES-MEJORAS.md` B-84 y B-87: el método mixto, el horizonte de la
+cuadrícula y el plazo medido en semanas de calendario (B-87 se cierra en D-447).
+
+### El redondeo del día a día se corrige: el último día absorbe el residuo (D-433)
+
+Dato del usuario, con un ejemplo concreto: `EST-10010` de Zafiro, 37 pza en 11
+días hábiles, `round(37/11, 2) = 3.36` repetido los 11 días suma **36.96, no
+37** —0.04 pza de residuo que el reparto uniforme pierde—. Es el mismo "ruido
+de redondeo" que §11.14 ya había visto en Zafiro (`SUMA(AD:HN)` exacta en 269
+de 317 filas, D-390-ish): ahí se dejó como ruido porque Zafiro es el programa
+original, intacto. En los seis prototipos que el sistema escribe, no hay razón
+para dejarlo: el **último día activo de cada partida absorbe el residuo** —en
+el ejemplo, diez días de 3.36 y el último de **3.40**— para que la suma cierre
+exacto contra `Cantidad programada`.
+
+**Se corrigió en los seis prototipos derivados, no en Zafiro.** Zafiro es el
+original y es el que se tomó como confiable desde D-414: sus 415 filas quedan
+exactamente como estaban, residuo de redondeo incluido. Rubí, Jade, Zafiro
+Plus, Diamante sin y con chimenea y Oro sí se corrigen, usando los planes ya
+validados de cada uno (fila, cantidad, fechas) —nada se reconstruye—: el
+prefijo (todos los días salvo el último) ya era el valor uniforme en el 100%
+de las partidas revisadas, así que la corrección es una sola celda por
+partida, la del último día.
+
+| Prototipo | Partidas revisadas | Último día corregido |
+|---|---|---|
+| Rubí | 294 | 68 |
+| Jade | 289 | 59 |
+| Zafiro Plus | 388 | 78 |
+| Diamante sin chimenea | 377 | 86 |
+| Diamante con chimenea | 380 | 85 |
+| Oro | 402 | 90 |
+
+466 celdas en total (D-433). Validación independiente leyendo solo los dos libros
+(antes y después): fuera de los seis bloques —Zafiro incluido— ninguna celda
+cambia; dentro, solo la cuadrícula, nunca más de una celda por partida; la
+suma de los días activos de cada partida cierra exacto contra su `Cantidad
+programada` en las 2,130 partidas de los seis prototipos. La regla queda en
+`escribir_dos_plantas.py`, así que cualquier reconstrucción futura —un ajuste
+del planeador, por ejemplo— ya nace sin el residuo.
+
+### Pretiles después de la losa completa, y las cuatro losas de azotea de Plus escalonadas (D-434)
+
+Dato del usuario, tres instrucciones sobre Zafiro Plus y Oro. **(1)** Zafiro
+Plus no puede terminar el muro de pretiles antes que la losa de azotea: los
+pretiles tienen que terminar *después* de que la losa completa esté lista,
+no antes ni durante su curado. **(2)** Las cuatro losas de azotea de Zafiro
+Plus (`MZ-01` a `MZ-04`) van escalonadas: `MZ-01` es el ancla (sin cambio),
+`MZ-02` y `MZ-03` arrancan 7 días hábiles después de `MZ-01`, y `MZ-04` 7
+días hábiles después de esas dos (14 desde el ancla). **(3)** En Oro, que
+tiene losa plana e inclinada, solo la inclinada se mueve: 7 días hábiles
+*antes* que la plana, que se queda de ancla.
+
+**La lectura de "antes que la losa de azotea".** El dato tal como llegó es
+gramaticalmente ambiguo (「no puedes terminar primero... que... tiene que
+terminar hasta después」 admite más de una lectura). Se resolvió a favor de
+la única lectura compatible con la física de la obra: los pretiles se
+cuelan sobre la losa, así que no pueden ni empezar hasta que esté colada;
+"terminar después" solo puede referirse a la losa **completa** —todos sus
+paneles, no solo el primero—, porque un pretil que arrancara apenas colado
+un panel estaría parado sobre losa fresca sin terminar. Zafiro ya tenía los
+pretiles después del descimbrado (D-426); D-434 los mueve más tarde todavía,
+al día hábil siguiente de que el último panel de losa de azotea quede listo.
+
+| Prototipo | Pretiles antes (D-426) | Pretiles ahora (D-434) | Losa de azotea completa |
+|---|---|---|---|
+| Zafiro Plus | 01-sep → 03-sep | 03-oct → 07-oct | 02-oct |
+| Diamante sin chimenea | 01-sep → 03-sep | 15-sep → 17-sep | 12-sep |
+| Diamante con chimenea | 01-sep → 03-sep | 15-sep → 17-sep | 12-sep |
+| Oro | 01-sep → 03-sep | 15-sep → 17-sep | 12-sep |
+
+Zafiro Plus se mueve más que los otros tres porque sus cuatro paneles ahora
+están escalonados 14 días hábiles de punta a punta (regla 2): la losa no
+queda "completa" hasta que termina el último panel (`MZ-04`), y los pretiles
+esperan a ese cierre, no al de `MZ-01`. Los tres prototipos de una sola losa
+—o losa única para Diamante, dos alturas fijas para Oro— no tienen ese
+escalonamiento y por eso su losa completa (y sus pretiles) se mueven menos.
+
+**El escalonamiento de Plus y la inclinada de Oro, en fechas.** Antes de
+D-434, los cuatro paneles (o la plana y la inclinada de Oro) compartían la
+misma ventana —colado el 27 al 29-ago, descimbrado el 11 al 12-sep, sin
+distinguir un panel de otro—:
+
+| Prototipo | Panel | Antes (D-426/431) | Ahora (D-434): colado | Ahora: descimbrado |
+|---|---|---|---|---|
+| Zafiro Plus | MZ-01 (ancla) | 27-ago→29-ago / 11-sep→12-sep | 27-ago→29-ago | 11-sep→12-sep |
+| Zafiro Plus | MZ-02, MZ-03 | 27-ago→29-ago / 11-sep→12-sep | 05-sep, 08-sep→09-sep | 22-sep→23-sep |
+| Zafiro Plus | MZ-04 | 27-ago→29-ago / 11-sep→12-sep | 16-sep→18-sep | 01-oct→02-oct |
+| Oro | plana (ancla) | 27-ago→29-ago / 11-sep→12-sep | 27-ago→29-ago | 11-sep→12-sep |
+| Oro | inclinada | 27-ago→29-ago / 11-sep→12-sep | 18-ago→20-ago | 02-sep→03-sep |
+
+Implementado en `dos_plantas.py`, el motor compartido por los cuatro
+prototipos de dos plantas: ramas por `Clave` dentro de la misma función
+`asignar()`, en vez de un motor nuevo, para que el resto del programa —que
+no cambia— siga saliendo por el mismo camino ya validado. Diferencia
+quirúrgica confirmada contra el libro anterior: cambian exactamente 5
+conceptos en Plus (los 4 paneles de losa más el bloque de pretiles) y 2 en
+cada Diamante y 3 en Oro (pretiles, más la inclinada y, en Oro, un vínculo
+que dependía de ella).
+
+**Consecuencia real, no error: la red escrita se encoge.** El motor de este
+cerebro no resuelve fechas por CPM a partir de los vínculos escritos —asigna
+casi todo por "gemelo por Clave" (copia la posición relativa de Zafiro,
+desplazada) y los vínculos son una anotación posterior de lo que se cumple,
+no un insumo de cálculo (ver D-427 y la validación de este mismo apartado).
+Por eso mover los pretiles más tarde no empuja el resto del programa, pero
+sí rompe vínculos que antes se cumplían, con `heredar_dos_plantas.py`
+registrando el déficit exacto en cada caso: `P07` (repellado de muro de
+azotea, que seguía la fecha vieja de los pretiles) deja de cumplirse en
+los cuatro prototipos; `P08` (repellado de fachada +3.00) deja de cumplirse
+en Plus y Oro, y en los dos Diamante se queda sin gemelo directo por la
+misma causa; Plus pierde además `V07` (déficit de 14 días), y Oro además
+`PX03` (un emparejamiento propio que colgaba de la inclinada en su posición
+vieja, déficit de 7). Ninguno de estos se reescribe solo —quedan en la hoja
+«Red sin escribir» de cada libro de revisión, para que el planeador
+decida—, así que la red final sigue sin ningún vínculo con holgura negativa
+(`validar_red_dos_plantas.py`: OK), pero
+la ruta crítica se acorta de 31/30 pasos a **22 pasos** en los cuatro
+prototipos, y deja de arrancar en la cimentación: ahora empieza en el
+repellado de fachada +3.00 (04-ago) y nunca vuelve a pasar por estructura ni
+por la losa. Esto es correcto —ya no hay una cadena de holgura 0 que llegue
+desde la estructura, porque el cierre del programa (5-ene) ya no depende de
+ella—, pero es una pérdida de información real que el planeador tiene que
+resolver a mano. Vínculos totales después de D-434
+(`RESUMEN_7_PROTOTIPOS.xlsx`): Zafiro Plus 107 celdas / 129 vínculos,
+Diamante sin chimenea 104 / 128, Diamante con chimenea 105 / 129, Oro 106 /
+130 —todos con 0 vínculos que no se cumplen en la red escrita—.
+
+Validado con la misma batería que D-426/427/428: `validar_dos_plantas.py`
+(0 violaciones en los cuatro, incluida la fórmula de residuo de D-433) y
+`validar_red_dos_plantas.py` (red consistente, ruta crítica reconstruida).
+
+### P07/P08/V07/PX03 se reconectan sin romper las 30 semanas: castillo, plafón, cadena de acabados y losas de Plus (D-435, D-436)
+
+El usuario pidió revisar si había alguna duda sobre el programa después de
+D-434. Sí había una, y resultó más grande de lo esperado: P07, P08 (§11.14
+arriba), `V07` (el plafón de planta alta de Plus) y `PX03` (la inclinada de
+Oro) no eran solo anotaciones rotas —dos de los tres eran conflictos reales
+de secuencia física—.
+
+**D-435, tres correcciones, todas con dato del usuario.** **(1)** La
+inclinada de Oro, adelantada 7 días (D-434), arrancaba el 18-ago —antes de
+que su propia estructura (la cadena CE-1 de planta alta) terminara el
+26-ago—: literalmente se colaría sobre estructura sin terminar. El usuario
+confirmó el tope físico: la inclinada no puede empezar antes del día
+siguiente a que la cadena termine (27-ago), que es exactamente cuándo ya
+arranca la losa maciza —cero margen—, así que el adelanto queda en 0 y las
+dos losas de Oro coinciden. **(2)** El plafón de planta alta de Zafiro Plus
+(bajo la losa de azotea, repellado tras descimbrar) tenía el mismo problema
+que los pretiles, en un concepto que D-434 no tocó: seguía anclado al
+12-sep, cuando la losa completa de Plus ya cierra el 02-oct. Se corrigió
+igual que los pretiles —arranca el día siguiente a que la losa esté
+completa—. **(3)** `ALB-01010` (repellado muro 3.00, P07) y `ALB-01212`
+(repellado fachada +3.00, P08) seguían la fecha vieja del castillo de
+pretiles; ahora se corren con él, en su nueva posición.
+
+**El hallazgo: reconectar P07/P08 reabre el inicio de la ruta crítica de 22
+pasos de D-434, con holgura 0 de punta a punta.** El castillo corregido
+empuja `ALB-01212` más tarde, y de ahí cuelgan `ACA-01051` (boquilla
+exterior) y `ALB-03014`/`ALB-03020` (relleno, chaflán) —el arranque exacto
+de la cadena que ya se documentó en D-434 llega hasta el cierre—. Sin
+margen, arrastrarla entera movería el cierre a **06-feb-2026** en Zafiro
+Plus (+24 días hábiles) y a **19-ene-2026** en Diamante sin/con chimenea y
+Oro (+10), rompiendo las 30 semanas fijas desde D-419.
+
+**Se exploró si cimentación o la estructura de planta baja tenían margen
+real antes de tocar nada más —no lo hay, de forma limpia.** La cantidad por
+partida de Oro y Plus contra Zafiro va de 0.02× a 23× en cimentación y de
+0.43× a 5× en estructura PB: hay partidas más ligeras, pero también mucho
+más pesadas que Zafiro (el castillo K-3 de Oro ya pide 5 cuadrillas por
+una), compartiendo una sola ventana por bloque (D-418/419). Acortar esa
+ventana compartida solo empeora a la partida más pesada, nunca libera
+margen. Tampoco hay un hueco ocioso entre el fin de la estructura de PB y
+el 18-ago: Zafiro trae trabajo real corriendo ahí (un segundo tramo de
+castillo y muro hasta el 20-ago, instalación eléctrica hasta el 20-ago,
+repellados activos a través del 18-ago) —el margen, si existe, hay que
+construirlo, no estaba escondido—.
+
+**D-436: la palanca que sí funciona es la misma que ya se usó para los
+pretiles —más cuadrilla, menos días— aplicada a la cadena de acabados.**
+Boquilla exterior, relleno, chaflán, finas +3.00, finas 3.00 y boquilla
+fina interior se comprimen a la mitad (3→2, 3→2, 2→1, 4→2, 9→5, 3→2); la
+impermeabilización (nivel de duración fija) y finas de plafond 4.20 solo se
+recorren detrás, sin comprimirse. Eso recupera exactamente 10 días
+hábiles —ni uno de más— en los cuatro prototipos.
+
+| Prototipo | Déficit (D-434/435) | Compresión de la cadena | Residual |
+|---|---|---|---|
+| Diamante sin chimenea | 10 | −10 | 0 — cierra 05-ene-2026 exacto |
+| Diamante con chimenea | 10 | −10 | 0 — cierra 05-ene-2026 exacto |
+| Oro | 10 | −10 | 0 — cierra 05-ene-2026 exacto |
+| Zafiro Plus | 24 | −10 | 14 |
+
+**Zafiro Plus necesitaba más, y el usuario aportó dos datos nuevos para
+cerrarlo.** Dato 1: los 7 días hábiles entre `MZ-01` y `MZ-02`/`MZ-03` (y
+otros 7 hasta `MZ-04`, D-434) no eran una necesidad real —"realmente las
+losas van escalonadas, no es que realmente se necesita 7 días"—; el usuario
+los bajó a 5, que recorta el escalonamiento total de 14 a 10 días hábiles y
+recupera 4 más del déficit. Dato 2: revisar si la losa de cimentación podía
+bajar 4 días. Zafiro Plus no tiene un concepto propio de "losa de
+cimentación" en su catálogo, pero el acero de los castillos de cimentación
+que sí llega al día 11 de la ventana (`EST-10010/11`, `EST-10020/21`,
+`EST-10070/71` —K1, K2, K7—) se comprime de 11 a 7 días con más cuadrilla
+(la misma partida que en Zafiro necesitaba 1 pieza pasa a necesitar hasta 23
+en Plus: tender más acero en paralelo es de lo más escalable que hay en
+obra). El vínculo ya escrito (P01, "el muro de planta baja arranca el día
+siguiente de la losa de cimentación") dice que si cimentación cierra antes,
+todo el resto del programa de Plus puede arrancar antes: se recorrieron los
+4 días hábiles completos, el mismo mecanismo que ya inserta los 10 días el
+18-ago (D-426), aquí restando al principio en vez de sumando después.
+
+**El resultado, calculado por el motor, no a mano, sobrepasó el déficit.**
+Las tres palancas juntas (cadena −10, escalonamiento −4, cimentación −4+
+arrastre) no se compensan por simple suma debido a cómo caen los fines de
+semana entremedio: Zafiro Plus termina cerrando el **29-dic-2025, 145 días
+hábiles (29.0 semanas)** —4 días hábiles *antes* del 05-ene-2026 original,
+no después—. La ruta crítica que antes llegaba hasta el cierre
+(estufa `EQU-02010`, 26-dic→29-dic) ya no pasa por acabados de PB: la
+compresión le quitó holgura 0 a todo ese tramo.
+
+**Quedan tres vínculos menores pendientes, el mismo patrón de siempre.**
+`V09` (finas plafond 3.00 tras el bloque de impermeabilización completo),
+`P02` (la gualdra tras el muro, solo en Plus) y `P16` (vertedero tras la
+boquilla fina interior, que lleva un día de espera además del FS) no
+alcanzan a cumplirse —entre 2 y 17 días de déficit, ninguno en la ruta
+crítica final—. `heredar_dos_plantas.py` no los escribe; quedan en «Red sin
+escribir» para el planeador, igual que los 17 de Zafiro o los 22 de D-424:
+no es un defecto nuevo, es la misma convención de todo el proyecto.
+
+Validado con la misma batería de siempre, extendida donde D-436 lo exige:
+`validar_dos_plantas.py` (0 violaciones en los cuatro, incluida una
+verificación dedicada de que el acero de cimentación de Plus cierra en 7
+días y de que P07/P08 siguen al castillo en su nueva fecha) y
+`validar_red_dos_plantas.py` (red escrita sin holgura negativa; ruta
+crítica de 13 pasos en los tres de 10 días, de 1 paso en Plus).
+
+### Dos bugs propios, un hueco real en cimentación, y Plus cierra a las 30 semanas, no antes (D-437)
+
+El usuario pidió revisar los tres vínculos que quedaron pendientes de
+D-436 (`V09`, `P02`, `P16`). Dos resultaron ser bugs del propio trabajo de
+D-436, no hallazgos nuevos del programa; el tercero destapó un hueco real
+en la compresión de cimentación; y al cerrarlo todo, Plus terminó cerrando
+*antes* de las 30 semanas —4 días hábiles antes—, algo que D-436 presentó
+como resultado pero que el usuario corrigió: Plus tiene que cerrar a las
+30 semanas, igual que los otros tres, ni antes ni después.
+
+**`P02` (la gualdra tras el muro de planta baja): bug de límite.** Solo
+fallaba en Plus. La corrección de D-436 que recorre "todo lo que no es
+cimentación" 4 días decidía qué es cimentación por fecha (`bd ≤ 10`), y el
+muro de planta baja (`EST-02010`) arranca *exactamente* el día 11 (23-jun,
+bd 10) —coincidencia de fecha con cimentación, no porque sea cimentación—.
+Con `≤` en vez de `<`, el muro se quedó sin recorrer mientras la gualdra
+(su sucesora, 15 días después) sí se recorría, rompiendo la relación entre
+las dos por los mismos 4 días. Corregido decidiendo por el campo real
+(`fuente == 'cimentación (bloque de Zafiro)'`), no por coincidencia de fecha.
+
+**`V09` (finas de plafond 3.00 tras la impermeabilización): bug de
+alcance.** La corrección de D-436 movió "la partida `ACA-04010`" al lugar
+correcto (tras el chaflán, D-434), pero esa Clave solo tiene una partida
+real por prototipo —la del bloque `ECO-00050`, la misma que pide `P12`—,
+no dos. El bug no era mover la partida equivocada: era no haber corrido
+también a `ACA-01030` (finas de plafond 3.00), que en Zafiro arranca el
+mismo día que `ACA-01040` (finas de plafond 4.20, sí corregida), las dos
+en paralelo tras la impermeabilización. Corregido corriendo las dos juntas.
+
+**`P01` (la estructura de planta baja tras la losa de cimentación): un
+hueco real, no un bug de alcance.** Al revisar `P02` apareció `P01` roto
+con el mismo patrón, déficit 4. La causa: Zafiro Plus **sí tiene** su
+propia losa de cimentación —`EST-01060`, con otra Clave, no `EST-01040`
+como se dijo por error en D-436—, y D-436 solo había comprimido el acero
+de los castillos, no la losa ni la plomería (`IHD-`), eléctrico (`IEC-`) y
+gas (`IGAS-`) de cimentación, que corren en paralelo con ella, no después.
+El bloque completo seguía cerrando en 11 días por esas partidas, aunque el
+acero ya cerrara en 7. Corregido comprimiendo también la losa (misma
+lógica: más cuadrilla, de 11 a 7 días) y corriendo plomería/eléctrico/gas
+los mismos 4 días hábiles junto con ella, para que el bloque completo de
+cimentación cierre en 7 días, no solo una parte.
+
+**`P16` (vertedero tras boquilla fina interior): se acercó, no se cerró —
+y ahí aparece el límite real.** Comprimir 2 días más la cadena (finas 3.00
+de 5 a 3 días, con más cuadrilla) cerró el déficit completo en Diamante
+sin/con chimenea y Oro (de 2 a 0) sin tocar nada más. En Plus bajó de 12 a
+10, no a 0: cerrarlo del todo necesitaba correr vertedero y todo lo que
+sigue (mármoles, pisos, cancelería, pintura, limpieza) más tarde,
+devolviendo parte de los días que D-436 había ganado. El usuario preguntó
+si esos mismos días podían salir de cimentación en vez de devolverse —se
+revisó y no hay margen: el castillo K1-4.00, la partida más pesada, ya
+necesita **36 cuadrillas** de la de Zafiro solo para caber en los 7 días
+actuales; comprimir más (a 5 días, como finas 3.00) pediría más de 50 —ya
+no es "más cuadrilla razonable".
+
+**Decisión final, dato del usuario: Plus cierra a las 30 semanas.** No 4
+días antes (lo que D-436 reportó) ni más tarde por cerrar `P16` del todo.
+Los 4 días que cimentación comprimida le ganaba al programa se quedan
+hasta donde llega la cadena corregida a mano (de los pretiles a boquilla
+fina interior); de vertedero en adelante no se recorre nada, para que esa
+cola cierre en la misma fecha que Diamante y Oro —no antes—. `P16` queda
+con déficit 10 en «Red sin escribir», el único vínculo pendiente en los
+cuatro prototipos (los otros tres no tienen ninguno).
+
+| Prototipo | Cierre final | Días hábiles | Vínculos sin cumplirse |
+|---|---|---|---|
+| Zafiro Plus | 05-ene-2026 | 149 (30 semanas) | 1 (`P16`, déficit 10) |
+| Diamante sin chimenea | 05-ene-2026 | 149 (30 semanas) | 0 |
+| Diamante con chimenea | 05-ene-2026 | 149 (30 semanas) | 0 |
+| Oro | 05-ene-2026 | 149 (30 semanas) | 0 |
+
+Validado con la misma batería: `validar_dos_plantas.py` (0 violaciones en
+los cuatro; cimentación completa —losa, acero, plomería, eléctrico y
+gas— verificada contra el nuevo recorte de 7 días) y
+`validar_red_dos_plantas.py` (red sin holgura negativa en los cuatro).
+
+### Método mixto (B-84, 3): cuántas cuadrillas implica cada prototipo derivado (D-438)
+
+Dato del usuario: retomar el método mixto que B-84 dejó pendiente desde
+D-419 — con esa regla los m² de más no suben los días, suben la
+cantidad por día, y eso es más cuadrillas, no más tiempo; faltaba
+responder cuántas.
+
+**El cálculo.** `Unidades ejecutoras implícitas` = `Rendimiento
+Requerido` ÷ `Rendimiento Teórico` (§6.2), con `Rendimiento Requerido`
+= `Cantidad` ÷ `Días laborables` del propio prototipo y `Rendimiento
+Teórico` el de la semilla (`CATALOGOS.md` §10). No hay cruce nuevo que
+inventar: es el mismo cruce clave↔`MO-` de 49 pares que D-406 ya
+validó contra Zafiro (castillo K1 cierra en 1.50 en el tramo 1, el
+mismo número que D-419 ya citaba) — 3 claves compuestas de dos
+operaciones con rendimiento distinto (`OBE-01020`, `OBE-02011`,
+`ACA-07060`) se excluyen sin promediarlas, mismo criterio de "no
+inventar". Se aplica tal cual a los seis prototipos derivados, con su
+propia cantidad y sus propios días, leídos de
+`PROGRAMA_ZAFIRO_con_los_7_prototipos.xlsx`.
+
+**Alcance real, antes de los números: 15%, no más.** De los 2,135
+conceptos de los seis derivados, solo 339 (15.2%-17.3% según el
+prototipo) tienen una línea `MO-` propia en la semilla — el mismo
+límite que ya fijaban D-404/D-405 (solo existe donde el destajo tiene
+mano de obra propia en la matriz), ahora contado prototipo por
+prototipo. El resto —cancelería, carpintería, herrería
+(`preestablecida_nivel`), subcontratos, y casi todas las
+instalaciones— sigue sin un solo dato para responder esta pregunta; no
+es un hueco nuevo, es la cobertura real de uno ya conocido.
+
+**La mediana no confirma la apuesta de B-84, la cola sí.** B-84 (3)
+apostaba a que "instalaciones y los prototipos de dos plantas son los
+candidatos más probables a necesitarlo primero". En la mediana no se
+cumple: los cuatro de dos plantas (0.62-0.99) no piden más cuadrillas
+que Zafiro (0.92) ni que Rubí/Jade (1.03-1.05). Pero los 15
+multiplicadores más altos de toda la tabla —de 3.40× a 6.77×— son los
+cuatro de dos plantas sin una sola excepción; ni Rubí, ni Jade, ni
+Zafiro entran ahí, y sus propios máximos se quedan en 2.16-2.97×. No
+hay más cuadrillas en promedio, pero cuando un concepto de dos plantas
+se dispara, se dispara mucho más fuerte que cualquiera de Rubí, Jade o
+Zafiro.
+
+**El hallazgo más grande no es la cadena comprimida — es "+3.00" en
+los dos Diamante.** `ALB-01012` (repellado muro +3.00) y `ALB-01112`
+(repellado plafond +3.00) llegan a 6.77× y 6.49× — los dos
+multiplicadores más altos de toda la tabla, y ninguno tocado por las
+compresiones de D-434 a D-437. La causa es física, no un error: los
+dos Diamante son de una sola altura, construidos enteros al módulo de
+4.20 m (D-429, D-430), así que casi toda su pared cae en el destajo
+"+3.00" que en Zafiro es solo un remate chico (33-36 m² en 2 días);
+Diamante hereda la misma ventana de 2 días de Zafiro (D-419: los días
+no cambian con el m²) con 186-203 m² — seis veces la cantidad en el
+mismo tiempo. Es la regla de D-419 llevada a su caso más extremo: aquí
+"se absorbe con más gente" significaría casi 7 cuadrillas de albañil
+repellando lo mismo a la vez, algo que el método solo puede señalar,
+no validar — queda para el planeador, mismo criterio que los "tramos
+con mucha más cantidad" ya señalados en B-84 (8). No es solo acabados:
+`EST-02310` (cadena intermedia CE-1, obra gruesa) entra al mismo podio
+en Oro (4.52×) y Zafiro Plus (3.47×) — la misma regla de D-419, aplicada
+esta vez a una partida de estructura.
+
+**La cadena comprimida de D-436/D-437, cuantificada por primera vez.**
+De las 9 claves que D-436/D-437 comprimieron "a la mitad" (misma
+lógica que los pretiles), 7 tienen rendimiento teórico en la semilla;
+2 no (`ALB-03014` relleno, `ACA-04010` impermeabilización — fuera de
+alcance, no hay con qué calcular, mismo límite de siempre). De las 7,
+tres llegan a multiplicadores grandes: `ACA-01010` (finas interiores
+3.00) a 4.0× en la instancia de planta baja de los dos Diamante y de
+Oro (1.3× en Zafiro; Zafiro Plus se queda en 2.6×, también por encima
+de Zafiro pero lejos del extremo), `ACA-01040` (finas plafond 4.20) a
+3.5× en los dos Diamante y `ACA-01020` (finas interiores +3.00) a
+2.95× en los mismos dos Diamante. Las otras cuatro (`ACA-01051`,
+`ALB-03020`, `ACA-01030`, `ACA-01060`) se quedan entre 0.05× y 2.5×,
+dentro de lo que ya se veía en Zafiro. Ninguno de estos números cambia
+una fecha ya decidida —D-437 ya cerró que Plus cierra a las 30
+semanas—: es el costo en personal de una decisión que ya se tomó, no
+una corrección sobre ella.
+
+**Lo que esto no resuelve.** *(Dicho antes de D-439, que cierra B-83.)* Instalaciones (B-83) sigue sin un cruce
+clave↔`MO-` propio —la semilla solo tiene 7 destajos de
+electricidad/sanitario, genéricos, nunca emparejados contra una
+`Clave` de catálogo—, así que la mitad de la hipótesis de B-84 (3)
+queda exactamente donde estaba: abierta, no cerrada ni descartada.
+Tampoco se escribe ningún valor en la columna `Unidades ejecutoras` de
+los libros de programa —sigue en 1.0 (D-403)—: el sistema propone, el
+planeador decide si una fecha se corrige con esta evidencia, mismo
+principio que B-85.
+
+Libro de reporte: `METODO_MIXTO_CUADRILLAS.xlsx` (hojas Resumen, Cadena
+D-436-437, Top 20, Detalle completo —339 pares—, Referencia Zafiro,
+Cobertura). `CONOCIMIENTO.md` §6.2, `CATALOGOS.md` §10,
+`PENDIENTES-MEJORAS.md` B-83, B-84.
+
+### B-83 se cierra: el teórico heredado de instalaciones no se puede confirmar con dato de campo, se adopta el Calculado — y el hueco de instalaciones en el método mixto se cierra de paso (D-439)
+
+Dato del usuario: cerrar B-83. El cruce de D-438 había dejado
+instalaciones fuera —"la semilla solo tiene destajos genéricos, nunca
+emparejados contra una `Clave` de catálogo"—, apoyado en la semilla
+*curada* de `CATALOGOS.md` §10 (69 de 265 filas, "las que ya se usaron",
+D-386). Ese supuesto era el límite equivocado: existen dos fuentes
+completas, sin tocar hasta hoy.
+
+**La semilla completa (265 filas, no 69) tiene 123 destajos de
+instalación —eléctrica, gas, hidráulica, sanitaria—, no un puñado.**
+`SEMILLA-cuadrilla-rendimiento.xlsx` original (`CATALOGOS.md` §10) solo
+había cargado al cerebro las filas "ya cruzadas contra ejecución real";
+las otras 196 —migradas igual, nunca con caso real que las citara—
+seguían completas en el archivo, sin leerse. 123 de ellas son `MOE-01`
+(eléctrica, 38), `MOG-` (gas, 17), `MOH-` (hidráulica, 23) y `MOS-`
+(sanitaria, 45) — cada una con su `Cuadrilla` y `Rendimiento teórico` de
+catálogo, igual que las de obra gruesa.
+
+**`ANALISIS_DE_BASICOS_CONCEPTOS.csv` ya tenía el cruce clave↔destajo
+determinístico, para las cuatro instalaciones, sin necesidad de
+emparejar por descripción como D-406.** Sus filas `Tipo=Contrato` son
+`Clave Padre` (el concepto, `IEC-`/`IHD-`/`ISN-`/`IGAS-`) → `Clave Hijo`
+(el destajo, `MOE-`/`MOH-`/`MOS-`/`MOG-`) uno a uno —exactamente la
+misma estructura que D-438 ya usó para obra gruesa, solo que ahí se
+armó a mano (49 pares) por no saber que este archivo ya la daba
+completa—. 167 conceptos de instalación cruzan así; 166 de 167 tienen
+además su rendimiento teórico en la semilla completa (falta solo
+`IEC-01070`, que liga a `MOP-00302`, fuera de las cuatro instalaciones).
+Solo 1 concepto (de 167) liga a más de un destajo a la vez y se excluye,
+mismo criterio de D-438.
+
+**El costo real de cada cuadrilla de instalación también estaba
+cargado, sin usar para esto.** Las filas `Origen=ManoDeObra` del mismo
+CSV (D-406) dan `MOCU-009` (eléctrica) $1,452.00/jornada, `MOCU-010`
+(hidráulica/sanitaria) $1,303.63, `MOCU-021`/`024`/`025` (gas y
+minisplit) $1,452.00 — con esto, `Rendimiento Calculado` (§6.2: costo de
+la cuadrilla ÷ precio del destajo) se puede calcular para los 123
+destajos, no solo citarse en genérico ("0.03 a 4.9 en eléctrico") como
+hasta D-406/D-408.
+
+**La dispersión que B-83 reportaba con un puñado de casos se confirma, a
+escala, y es peor de lo que parecía.** Con los 123 destajos completos
+—no los 7-10 que alcanzaba a cruzar la semilla curada—, la razón
+Calculado÷Teórico:
+
+| Instalación | Destajos | Mediana | Media | Mínimo | Máximo |
+|---|---:|---:|---:|---:|---:|
+| Eléctrica | 38 | 8.47× | 9.57× | 0.83× | 29.04× |
+| Gas | 17 | 3.84× | 3.41× | 0.83× | 5.81× |
+| Hidráulica | 23 | 1.74× | 4.27× | 0.83× | 10.43× |
+| Sanitaria | 45 | 1.86× | 3.82× | 0.26× | 10.86× |
+
+Solo 2 de 123 (1.6%) caen en una banda razonable (0.9×-1.3×, la que
+describiría un factor limpio como el 1.085 de albañil/pintor, §6.2). No
+hay un solo factor que corrija las cuatro instalaciones —ni una por
+separado—: eléctrica es la peor (mediana 8.47×) pero ninguna familia se
+acerca a 1.0×. **Confirma B-83 con un sustento 12× más grande que el
+que tenía (de ~10 casos genéricos a 123 destajos reales), no un hallazgo
+distinto.**
+
+**Por qué no es el precio el que está mal, ni la cuadrilla: es el
+teórico migrado.** Un ejemplo de los extremos —`MOS-06010` (línea
+principal sanitaria), teórico 0.06/día— aplicado a una partida real
+(`ISN-02001`/`02003`, 1 pieza en 2 días de catálogo) pide 8.33
+cuadrillas por el teórico y solo 0.77 por el Calculado: el teórico dice
+que ni una cuadrilla entera le alcanzaría en una jornada completa para
+una sola conexión, algo que no es físicamente creíble para esta partida;
+el Calculado, apoyado en lo que el destajo realmente cuesta, da un
+número que sí cabe en el programa. El patrón se repite en los diez
+multiplicadores más altos del método mixto aplicado a instalaciones
+(abajo): todos entre 7.2× y 9.8× por el teórico, todos por debajo de
+0.85× por el Calculado.
+
+**No hay dato de campo que arbitre, y no es por falta de buscar —ya se
+intentó, dos veces, y las dos fallaron por razones distintas a la del
+rendimiento.** `PRECIO_REAL` no tiene ninguna fila de destajo eléctrico
+en los cinco meses de `ALAMO 18` (D-384); el único intento de bajar
+`grid_AvanceOPEventosOpr` al nivel de una sola línea `MO-` para
+reconstruir días reales (`IEC-00110`, D-386) dio un número imposible
+(11.85 cuadrillas) no por un teórico equivocado sino porque su
+facturación —un evento en junio, cuatro el mismo día de julio— rompe el
+supuesto de huecos por semana completa que el método necesita. Hidráulica,
+sanitaria y gas sí tienen algo de pagado real agregado por concepto
+(D-384: 55.8%-97.4% de la ingeniería), pero no al nivel de una línea
+`MO-` individual —la granularidad que el método de D-386 exige—, y no se
+intentó reconstruir de nuevo con la misma técnica: el caso ya probado
+(`IEC-00110`) muestra que el obstáculo es el patrón de facturación, no
+la instalación, así que repetirlo en las otras tres no tendría por qué
+salir distinto.
+
+**Decisión de cierre, dato del usuario: se adopta `Rendimiento
+Calculado` como referencia para instalaciones, sin dejar de anotar su
+límite.** Es la misma salida que §6.2 ya apuntaba desde antes de esta
+sesión ("ahí el teórico heredado no es confiable y conviene tomar el
+calculado") — ahora con 123 destajos y el contraste del método mixto
+detrás, no una frase suelta. El límite se queda anotado, no se oculta:
+Calculado es el rendimiento al que el precio ya negociado iguala el
+costo real de la cuadrilla hoy —una cifra económica, no una medida de
+campo de cuánto rinde la cuadrilla—; sigue sin ser lo que B-83 pedía
+("evidencia de campo"), solo la mejor disponible cuando el teórico ya
+está descartado y no hay real que lo sustituya. Si aparece dato de campo
+real para instalaciones —otro lote, otra fuente— se compara contra los
+dos, igual que castillo K1 lo hizo contra obra gruesa (D-386).
+
+**Con esto, el hueco de instalaciones del método mixto (D-438) se cierra
+de paso, no aparte.** Aplicado el cruce completo a los siete prototipos:
+997 de 1,108 filas de instalación del programa (90.0%) ya tienen
+cuadrillas implícitas calculables —contra 0 en D-438—, por los dos
+rendimientos:
+
+| Prototipo | Filas de instalación | Con rendimiento | Cobertura | Mediana (Teórico) | Mediana (Calculado) | Máximo (Teórico) | Máximo (Calculado) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Zafiro | 140 | 130 | 92.9% | 0.20 | 0.07 | 7.21 | 1.38 |
+| Rubí | 128 | 116 | 90.6% | 0.20 | 0.10 | 8.49 | 1.38 |
+| Zafiro Plus | 182 | 163 | 89.6% | 0.30 | 0.08 | 7.67 | 0.88 |
+| Jade | 128 | 115 | 89.8% | 0.24 | 0.10 | 9.78 | 1.72 |
+| Diamante sin chimenea | 165 | 147 | 89.1% | 0.24 | 0.07 | 8.33 | 1.45 |
+| Diamante con chimenea | 165 | 147 | 89.1% | 0.24 | 0.07 | 8.33 | 1.45 |
+| Oro | 200 | 179 | 89.5% | 0.20 | 0.09 | 8.33 | 1.03 |
+
+**Instalaciones no pide más cuadrillas que obra gruesa — pide muchas
+menos, por los dos rendimientos, en los siete prototipos por igual.**
+Mediana entre 0.20 y 0.30 cuadrillas por el teórico, 0.07-0.10 por el
+Calculado: consistente con D-412 (los huecos de calendario más grandes
+del programa son de instalaciones) — es trabajo repartido en visitas
+cortas, no una partida que se comprima a un solo frente. Pero el
+teórico sí dispara extremos irreales (7.2×-9.8×, una partida pidiendo
+casi diez cuadrillas) que el Calculado nunca repite (máximo 0.88×-1.72×
+en los siete) — la misma razón, con datos de programa real en vez de
+solo del catálogo, por la que se adopta Calculado arriba.
+
+Libro de reporte: `B83_INSTALACIONES_RENDIMIENTO.xlsx` (Dispersión por
+familia, Cobertura, Método mixto -resumen y detalle-, Top 20, los 123
+destajos Calculado-vs-Teórico, el cruce completo de 167 conceptos).
+`CONOCIMIENTO.md` §6.2, `CATALOGOS.md` §8, §10, `PENDIENTES-MEJORAS.md`
+B-83, B-84.
+
+### B-82 se cierra a la mitad: `TRAMO.cuadrillas` ya tiene dato real y `esfuerzo_real` se calcula por primera vez; `frente_id` se intenta de nuevo, con más evidencia, y sigue sin resolverse (D-440)
+
+*(Los picos de concurrencia de este apartado se corrigen en D-448, abajo: el cruce
+duplicaba 472 filas y los de dos plantas estaban inflados entre 33% y 44%. El
+`esfuerzo_real` no cambia.)*
+
+Dato del usuario: cerrar B-82. Dos huecos distintos, de D-392/D-396, con
+destino distinto hoy.
+
+**`TRAMO.cuadrillas` deja de ser propuesta: D-438 y D-439 ya la
+calculaban, sin saber que alimentaban esto.** La «otra mitad» de
+`calculada_rendimiento` que D-392 decía perdida —el número de cuadrillas
+usado para llegar a una duración— es exactamente `cuadrillas_implícitas`
+(obra gruesa/acabados, D-438, 339 pares) y `cuadrillas_calculado`
+(instalaciones, D-439, 997 filas): 1,382 filas de los siete prototipos
+ya tienen el dato que B-82 pedía, calculado, no inventado. Se formaliza
+en `MODELO.md` §5c como `TRAMO.cuadrillas` (NUMERIC, fraccionario): el
+sistema la propone con este método, el planeador la confirma o la
+corrige, mismo principio de siempre.
+
+**`esfuerzo_real` existe por primera vez, y corrige `Esfuerzo` en
+direcciones opuestas según la familia.** `esfuerzo_real =
+Σ(tramo.días × cuadrillas × 8)`, contra el `Esfuerzo` = días × 8 de
+D-392 (que no pesa por cuadrilla):
+
+| Familia | Filas | Esfuerzo (naive) | Esfuerzo real | Razón |
+|---|---:|---:|---:|---:|
+| Obra gruesa / acabados | 385 | 11,096 h | 13,697 h | **1.23×** |
+| Instalaciones | 997 | 25,776 h | 2,868 h | **0.11×** |
+
+**Obra gruesa pide más esfuerzo del que `Esfuerzo` registra —consistente
+con D-397/D-398/D-419 (muro y losa ya necesitaban más de una
+cuadrilla)—; instalaciones pide una fracción, no por error: trabaja en
+visitas cortas dentro de una ventana larga (D-412), así que contar cada
+día de calendario completo a 8 horas, cuadrilla completa, infla el real
+casi 9 veces.** Por prototipo, la razón combinada va de 0.36× (Zafiro
+Plus) a 0.51× (Diamante sin chimenea) — dominada por el peso de
+instalaciones en filas (72% del total), no por un patrón de dos plantas.
+
+**`frente_id` se vuelve a intentar, con lo que D-396 no tenía: cuadrillas
+reales, no supuestas en 1, y los siete prototipos, no solo Zafiro.**
+Mismo método que `FRENTE_TOPE_CUADRILLA` necesitaría: por oficio
+(prefijo de `Clave`) y día, suma de `cuadrillas` de los conceptos cuyo
+rango de fechas lo cubre. Los picos son grandes —hasta 22.3 cuadrillas
+de `ACA-` el mismo día en Oro, con 11 conceptos activos a la vez— pero
+revisados concepto por concepto, **confirman D-396 a mayor escala, no lo
+contradicen:**
+
+- **Estructura (`EST-`):** el pico de 17.4 en Diamante con chimenea (3-jul)
+  son muro tabique, cuatro tipos de castillo, dos columnas y dos cadenas
+  —la misma pared, por tipo de elemento, no cinco cuadrillas en paralelo—.
+  Mismo patrón que D-396 ya había visto en el armado de acero por calibre.
+- **Carpintería (`CAR-`):** el pico de 12.0 en Rubí (18-nov) son doce
+  muebles distintos (cocina, alacena, clósets, puertas) del mismo
+  subcontrato —un solo `preestablecida_nivel` fabricando piezas, no doce
+  frentes—. Mismo patrón que D-396 ya había visto en carpintería.
+- **Acabados (`ACA-`/`ALB-`):** aquí sí hay una señal real —"FACHADA" en
+  la descripción separa un frente exterior de uno interior, el mismo par
+  que D-396 encontró una vez (`ACA-01010`/`ACA-20011`)—, pero **separarlos
+  no alcanza:** el pico de "interior" se queda en 16.6-20.8 de los
+  19.4-22.3 originales (reducción de 0%-20% según el prototipo, 0% en dos
+  de los siete) — la gran mayoría de lo que queda adentro de "interior"
+  sigue sin frente propio (no hay recámara, baño o zona en la
+  descripción de estos conceptos, solo la altura del muro).
+
+**Conclusión, con más evidencia que D-396, no una distinta: `frente_id`
+sigue sin poder deducirse del dato que existe.** Ni `TRAMO.cuadrillas`
+real ni el texto de la descripción alcanzan — falta el dato estructurado
+mismo (`CATALOGOS.md`: `Frente` "no valida, no impide, no calcula", y
+ahora tampoco se puede inferir). Dos causas distintas detrás de los
+picos grandes, que `frente_id` no resolvería igual: catálogo partido por
+tipo de elemento o por pieza de un subcontrato (estructura, carpintería
+— no es un problema de frente, es de granularidad de catálogo) contra
+acabados, donde sí podría haber paralelismo real sin dato para
+confirmarlo. `PENDIENTES-MEJORAS.md` B-82 queda abierto solo en esta
+mitad.
+
+Libro de reporte: `ESFUERZO_REAL_Y_CONCURRENCIA_B82.xlsx` (esfuerzo real
+por prototipo y familia, picos de concurrencia por oficio, el detalle de
+acabados con y sin frente de fachada). `MODELO.md` §5c,
+`PENDIENTES-MEJORAS.md` B-82.
+
+### B-85 se cierra: la herencia de una duración tiene referencia explícita y el que edita pasa a ser la referencia de su alcance — con los 6 derivados ya clasificados (D-441)
+
+Dato del usuario: retomar B-85. La regla ya estaba dada (D-421, D-422) —el
+planeador cambia cualquier duración y decide a quién alcanza— y lo que
+faltaba era el mecanismo y tres preguntas: si la referencia es siempre
+Zafiro, si bastan las cuatro opciones de alcance, y si lo que el planeador
+hizo en Rubí se hereda. Los seis programas derivados ya existen, así que
+se contestó con datos, no con teoría: cada una de sus 2,130 duraciones se
+comparó contra su gemela de Zafiro.
+
+**Cómo se clasificó.** Gemela por `Clave` cuando es única, o por posición
+cuando Zafiro la repite igual número de veces que el prototipo. `heredada`
+si los días laborables coinciden, `propia` si no, `sin referencia` si no hay
+gemela clara. Resultado (`HERENCIA_DE_DURACIONES_B85.xlsx`):
+
+| Origen | Duraciones | % |
+|---|---:|---:|
+| `heredada` | 1,520 | 71.4% |
+| `propia` | 132 | 6.2% |
+| `sin referencia` | 478 | 22.4% |
+
+Rubí no tiene ninguna `propia` y Jade una; los cuatro de dos plantas
+concentran las otras 131 (Plus 43, Diamante 33 y 32, Oro 23). Los seis
+niveles de duración fija revisados (cancelería, carpintería, herrería e
+impermeabilización: 121 duraciones) no tienen ninguna `propia`: 46 son
+heredadas y 75 sin referencia (piezas con nombre de prototipo, como
+«COCINA RUBÍ»); cubiertas y pérgolas no se revisaron por separado. Un caso se reclasificó a
+mano: `ACA-01080` (poyos de cocina) figura con 11 días en los seis, pero
+Zafiro nunca la programó (0 días) — es la regla de D-420, no una duración
+que el planeador cambiara.
+
+**Pregunta 1 — ¿la referencia es siempre Zafiro? No.** Dos razones en el
+dato. (a) La losa de 4.20 de Jade hereda el ajuste que el planeador hizo
+en Rubí (D-423): su referencia es Rubí. (b) 478 duraciones (22.4%) no
+tienen gemela por `Clave` — las losas (`EST-30012` en Rubí, `EST-30010` en
+Jade, cada una con su clave propia por altura), la carpintería con nombre
+de prototipo, la planta alta — y se emparejan por rol, altura o nivel. La
+referencia tiene que ser una llave explícita a una actividad, no algo que
+se deduzca por `Clave`.
+
+**Pregunta 2 — ¿bastan «todos», «1 planta», «2 plantas» y «los que el
+planeador señale»? Sí, y la cuarta se usa de verdad.** Las 132 duraciones
+`propias` son 34 `Clave` distintas, por el conjunto de prototipos que
+comparten el cambio:
+
+| Alcance real | Claves | Ejemplos |
+|---|---:|---|
+| 2 plantas (los 4) | 14 | la cadena de acabados comprimida (D-436, D-437): boquilla exterior 3→2, finas interiores 9→3, relleno 3→2, chaflán 2→1 |
+| Solo este | 12 | el acero de cimentación de Plus (K-6.00, D-436, D-437): 11→7; la mayoría del resto son partidas sueltas de Plus, Oro, Diamante con y Jade |
+| Subconjunto señalado | 8 | Diamante con + sin + Plus (6): instalación eléctrica de losa (4→2) y de muros y cableado (2→3, 4 y 5); Diamante con + sin (1): gas del asador; Oro + Plus (1): gas de recámara |
+| 1 planta (Rubí + Jade) | 0 | — |
+| Todos los derivados | 0 | — |
+
+Ocho de 34 (24%) no son ni un grupo por plantas ni uno solo: sin «señalados»
+no se podrían expresar. «1 planta» y «todos» no aparecen todavía entre las
+`propias` porque Rubí y Jade casi no se apartaron de Zafiro (D-419: toman
+sus fechas y días tal cual).
+
+**Pregunta 3 — lo de Rubí.** La losa de 4.20 de Rubí (7→9 días, D-422) ya
+la lleva Jade (D-423), que queda marcada «para validar»: de hecho es el
+alcance «1 planta», pero sin tocar Zafiro, que es el original. La
+validación sigue siendo del planeador.
+
+**El mecanismo (`MODELO.md` §5c).** Dos campos en `ACTIVIDAD`:
+`duracion_origen` (`heredada` · `propia`) y `duracion_referencia_id` (FK a
+otra `ACTIVIDAD`, nullable). Al editar, el sistema pregunta solo a quién
+alcanza. El programa que edita queda `propia`, conserva su referencia para
+mostrar la diferencia y poder volver a heredar; en cada programa del
+alcance, la gemela `heredada` toma el valor nuevo y **su referencia pasa a
+ser la actividad editada** —así se cuenta lo de Jade—; la `propia` no se
+pisa y dispara `ALERTA(tipo=duracion_propia_en_herencia)`, sin umbral. Para
+los alcances por plantas hace falta `PRESUPUESTO.plantas` (nuevo), el
+mismo dato que ya decide el plazo de 28 o 30 semanas (D-419). Sin tabla
+nueva, sin ciclos: la cadena se corta en la primera `propia`.
+
+**Se conecta con el método mixto.** Cuando una duración se hereda pero la
+cantidad cambia, lo que absorbe la diferencia son las cuadrillas
+(`TRAMO.cuadrillas`, D-440). De las 287 duraciones `heredadas` con
+cuadrillas calculables (obra gruesa/acabados, D-438), 38 (13%) piden dos o
+más: Diamante 11 y 11, Oro 6, Jade 5, Rubí 4, Plus 1 — encabezadas por el
+repellado +3.00 de los dos Diamante (6.77× y 6.49×). Son las candidatas
+naturales a que el planeador las vuelva `propias`: la lista queda en la
+hoja «Heredadas con 2+ cuadrillas». No se cambia ninguna duración en los
+libros: es una lista de revisión, no una corrección.
+
+**Lo que esto no resuelve.** Las 478 `sin referencia` siguen sin
+emparejar: hace falta que el planeador (o una regla de rol/altura, como las
+de D-420/D-421) las ligue a su actividad de referencia; hasta entonces son
+`propia` con referencia nula. Tampoco se carga el campo en los libros de
+programa: el formato de `PROGRAMA_ZAFIRO.xlsx` no tiene columna para él.
+
+Libro de reporte: `HERENCIA_DE_DURACIONES_B85.xlsx` (resumen por
+prototipo, alcance de las 34 `Clave` propias, las 38 heredadas que piden
+2+ cuadrillas, las 478 por emparejar y el detalle de las 2,130).
+`MODELO.md` §5, §5a, §5c, `PENDIENTES-MEJORAS.md` B-85.
+
+### B-86 se cierra: un bloque puede ser predecesora, los 18 vínculos rotos de Zafiro ya tienen propuesta, y lo que queda es del planeador (D-442)
+
+*(Dos cosas de este apartado se corrigen en D-443, abajo: la regla de los
+bloques que contienen a su propia sucesora —no se rechazan, se leen sin
+ella— y el conteo de los vínculos de Zafiro que no se cumplen, 18 → 16.)*
+
+Dato del usuario: retomar B-86. De sus ocho puntos, la mitad ya estaba
+hecha (heredar los 52, la red mínima, las dos plantas, las correcciones de
+D-435 a D-437); quedaban la pregunta de modelo sobre los bloques (D-425), el
+formato del desfase y de la predecesora (3), el ojo de buey de Rubí (4), los
+vínculos que no se cumplen, la segunda ruta de cuadrilla y `P16`. Con los
+siete programas ya escritos, se leyeron los 832 vínculos del libro de los
+siete prototipos:
+
+| Prototipo | Vínculos | Celdas | No se cumplen |
+|---|---:|---:|---:|
+| Zafiro | 124 | 102 | **18** |
+| Rubí | 102 | 81 | 0 |
+| Jade | 85 | 70 | 0 |
+| Zafiro Plus | 130 | 108 | 0 |
+| Diamante sin chimenea | 129 | 105 | 0 |
+| Diamante con chimenea | 130 | 106 | 0 |
+| Oro | 132 | 108 | 0 |
+
+**Los seis derivados no tienen ningún vínculo incumplido porque solo se
+escribe el que se cumple (D-425); los 18 son los de Zafiro, el plan hecho a
+mano.** Las 832 sucesoras son partidas, ninguna es un bloque.
+
+**La pregunta de modelo se decide: un bloque puede ser predecesora, con
+`ACTIVIDAD` resumen en Nivel 2 y 3 (lectura (a) de D-425).** 263 de los 832
+vínculos (32%) tienen un bloque como predecesora —201 de Nivel 2 y 62 de
+Nivel 3—. En 219 la ventana del bloque la fija una sola partida, pero en 44
+la fijan entre 2 y 12 que empatan el mismo día (carpintería de planta baja,
+hasta 12; estructura de cimentación, hasta 10). La lectura (b), vínculos solo
+entre partidas, convertiría los 263 en 468 (+78%) y los dejaría atados al
+contenido de cada prototipo: en 18 de los 35 casos comparables entre
+prototipos las partidas que fijan la ventana son otras (la que cierra la
+cancelería de planta baja es `CAN-01008` en un Diamante, `CAN-01004` en Jade,
+`CAN-01001` en Oro; la carpintería lleva el nombre del prototipo), mientras
+que «cuando termine toda esta etapa» dice lo mismo en los siete. Las
+reglas están en `MODELO.md` §5c: el bloque solo es predecesora, solo existe
+si algún vínculo lo cita, sus fechas son el mínimo y el máximo de sus
+partidas, y se rechazan al cargar los vínculos que el CPM no puede calcular
+(una actividad como su propia predecesora, una predecesora que es el bloque
+de su propia sucesora, y los ciclos).
+
+**(3) El desfase y la predecesora ya estaban bien en el modelo; faltaba
+escribir la regla de importación.** Los 832 desfases son múltiplos de 8
+horas —de −9 a +15 días enteros, ninguno fraccionario—, así que la
+conversión es horas ÷ 8 sin pérdida (y `traslape_espera` ya es NUMERIC, por
+si algún día llega medio día). La predecesora viene como número de fila del
+libro, que cambia si se inserta una fila; el libro trae además `Oid` en las
+3,231 filas, sin nulos ni repetidos, así que el cargador resuelve fila →
+`Oid` → `Nodo` → `ACTIVIDAD` y guarda la llave, nunca el número de fila.
+`PRECEDENCIA.predecesora_id` ya era una FK: no cambia el esquema.
+
+**(4) El ojo de buey de Rubí no afecta ningún vínculo.** `ACA-07050` es obra
+gris en Zafiro y va dentro de la estructura de planta baja en Rubí (18-ago) y
+Zafiro Plus (26-ago), y de planta alta en Oro (1-sep): en esos tres, la
+ventana del bloque termina en la fecha del ojo de buey y no cuando termina la
+estructura. Ninguno de los 832 vínculos cita esos bloques como predecesora.
+Se queda la regla —un vínculo cuya intención es un hecho físico concreto cita
+la partida, no el bloque—, para que no llegue a tenerlo.
+
+**Los 18 vínculos de Zafiro, con la propuesta del sistema para cada uno.**
+Zafiro es el original y no se toca; lo que sigue es una lista para el
+planeador, no una corrección:
+
+| Propuesta | Vínculos | Confianza | Qué es |
+|---|---:|---|---|
+| Reasignar a hermanas | 8 | media | 7 tienen como predecesora el grupo de su propia sucesora (no puede esperar a terminar lo que ella misma contiene) y 1 un bloque que termina después de que la sucesora ya empezó; se propone la última partida del bloque que sí termina antes |
+| Invertir | 7 | baja | las fechas de Zafiro respaldan el orden contrario, pero solo las fechas — es plan manual (D-390) |
+| Descartar | 3 | alta (2), media (1) | un autovínculo (`EST-01151`), el ciclo `ICA-01030`/`BAP-01100` (queda el que sí se cumple) y `ALB-01010` tras `ALB-01012`, que se traslapan y solo cumplen FF |
+
+Las 8 reasignaciones incluyen algunas que se leen bien (el piso del asador
+tras el firme, la primera mano de pintura tras el lijado y sellado) y otras
+dudosas (la boquilla interior tras el repellado de fachada): el sistema elige
+la última partida que termina antes, no la que tiene sentido físico — por eso
+la confianza es media, no alta. **Siete de los 18 tienen como causa común que
+la predecesora es un bloque que contiene a su sucesora, y un validador al
+cargar los habría rechazado:** la regla nueva de `MODELO.md` los detecta sola.
+Para los demás, `ALERTA` gana `vinculo_incumplido`, sin umbral —el plan hecho
+a mano no pasa por ningún CPM (D-409), así que no es error de nadie—.
+
+**Evidencia nueva para B-81 (`SF`), sin cerrarla.** De los 7 «invertir», 3 son
+vínculos `SF` de Zafiro (`IEC-01070` dos veces, `EST-03020`), y los 3 se
+cumplen con el orden contrario con holgura de 3 a 6 días: parece que en el
+plan de origen «SF» se escribió con el sentido invertido. El único `SF` que sí
+se cumple con el sentido normal (`CAR-01011`) es el que heredaron los cuatro
+prototipos de dos plantas (4 de los 8 `SF` del libro, todos con holgura 0).
+
+**Lo que queda es del planeador, y ya no es un hueco de diseño:** los 18 de
+Zafiro, con propuesta; `P16` (vertedero tras la boquilla fina interior, déficit
+de 10 días en Plus), por decisión del usuario en D-437; y la segunda ruta de
+cuadrilla (cableado, barda, asador y pergolado, 3-nov), que es
+`origen=recurso`: por `PRECEDENCIA.origen` se captura a mano, no hay de dónde
+deducirla.
+
+Libro de reporte: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (los 18 con su propuesta,
+confianza y motivo; los pendientes; los bloques como predecesora por prototipo;
+la red por prototipo). `MODELO.md` §5a, §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### Corrige D-442: un bloque que contiene a su sucesora se lee sin ella, y los rotos de Zafiro son 16, no 18 — y los 8 `SF` del libro se cumplen todos al revés (D-443)
+
+*(Las cifras de `SF` de este apartado se corrigen en D-445, abajo: la holgura de
+`SF` se medía sin el «+ 1». Leídos normal se cumplen 5 de los 8, no 0; los rotos
+de Zafiro son 15, no 16; y de los 39 vínculos con el bloque de su sucesora se
+cumplen 35, no 30.)*
+
+Al empezar los pendientes de B-86 se simuló qué pasa con la red de Zafiro si
+se aplican las propuestas de D-442, y la simulación encontró un error mío en
+D-442: la regla nueva rechazaba «una predecesora que es el bloque de su propia
+sucesora». **39 de los 832 vínculos (4.7%) tienen esa forma, y 32 se cumplen
+tal como están escritos** —Rubí 3, Jade 2, Zafiro Plus 8, cada Diamante 6,
+Oro 2, Zafiro 5—. Son relaciones naturales de obra, como «el acero del K1
+termina 9 días antes de que acabe la losa que lo contiene» (`EST-10013` FF−9
+contra `LOSA ZAFIRO 3.00`): rechazarlas habría tirado el 4.7% de la red que el
+usuario validó.
+
+**La lectura correcta: el bloque sin la sucesora —«después de lo demás del
+grupo»—.** La ventana del bloque se calcula con sus otras partidas, de modo
+que no hay ciclo (el bloque ya no espera a lo que contiene) y el vínculo
+conserva su sentido. Se rechazan solo el autovínculo y los ciclos reales. Con
+esa lectura, de los 39: 30 se cumplen y 9 no —los 4 de Zafiro que ya estaban
+rotos y los 5 vínculos `SF` de la gualdra (Zafiro y los cuatro de dos plantas),
+que quedan en −1 leídos normal (abajo)—.
+
+**Efecto sobre los 18 de Zafiro (D-442): 3 dejan de estar rotos y 1 pasa a
+estarlo.** Se cumplen con holgura 0 `ACA-01050` (boquilla interior tras las
+albañilerías de PB), `ACA-01072` (boquilla fina exterior tras la obra gris de
+azotea) y `ACA-01071` (boquilla fina en fachada tras los acabados de fachada):
+quien programó escribió «después de lo demás del grupo», y D-442 los leyó como
+«después de sí mismo». `CAR-01011` (`SF`, la gualdra) pasa de 0 a −1 leído
+normal. **Los incumplidos de Zafiro son 16:**
+
+| Propuesta | Vínculos | Qué es |
+|---|---:|---|
+| Reasignar a hermanas | 5 | 4 con el grupo de su propia sucesora (aun sin ella, sus demás partidas terminan después: `OBE-01012`, `BAP-01010`, `ACA-30011`, `ACA-30020`) y 1 con un bloque que termina después (`ACA-02510`, piso del asador → firme) |
+| Invertir | 4 | las fechas respaldan el orden contrario (baja confianza) |
+| Descartar | 3 | autovínculo, ciclo, uno obsoleto (sin cambio) |
+| Leer `SF` al revés | 4 | ver abajo (B-81) |
+
+**Evidencia fuerte para B-81 (`SF`): 0 de los 8 `SF` del libro se cumplen
+leídos normal, 8 de 8 se cumplen leídos al revés.** «Al revés» es un FS de la
+sucesora a la predecesora (la predecesora empieza después de que la sucesora
+termina). Holguras leídas al revés: 0 en los cinco que la lectura normal daba
+por buenos o por −1 (`CAR-01011` y los cuatro heredados), +1 y +6 en los tres
+que parecían rotos. El plan de origen parece escribir `SF` con el sentido
+invertido. No se cambia nada en B-81 todavía: es una decisión del usuario
+(abajo).
+
+Libro corregido: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (hojas «16 de Zafiro -
+propuesta», «Cambios vs D-442», «39 con bloque que contiene»).
+`MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### Los pendientes de B-86: Zafiro queda de origen y solo se anota, `P16` sigue pendiente, la segunda ruta queda en borrador (D-444)
+
+*(D-445, abajo, corrige las cifras de `SF` de este apartado y cierra B-81:
+`inicio_fin` entra al enum. En la tabla de lecturas, Zafiro es 18 y 15, y los
+otros seis, 0 y 0.)*
+
+Dato del usuario, sobre los cuatro pendientes que dejaban D-442 y D-443,
+después de ver que aplicar todas las propuestas dejaba a Zafiro en 0 vínculos
+incumplidos:
+
+| Pendiente | Decisión del usuario |
+|---|---|
+| Descartes (3) y reasignaciones (5) en Zafiro | **No tocar Zafiro.** |
+| Inversiones (4) | **Ninguna.** Con lo anterior, tampoco se descartan: los vínculos se quedan como están |
+| `SF` (B-81) | **«Zafiro queda desde origen, solo anotar todo lo encontrado».** No se convierte `SF` al revés ni se agrega al enum; B-81 sigue abierto con la evidencia anotada *(se resolvió en D-445)* |
+| `P16` y la segunda ruta | `P16` sigue pendiente (D-437); la segunda ruta se arma como borrador, sin escribirla |
+
+**Zafiro es el original y no se corrige: la lista de D-442/D-443 pasa de
+«pendiente de aplicar» a «registro de lo que se encontró».** Los vínculos de
+Zafiro se quedan como el residente los hizo, y lo mismo los 4 `SF` que
+heredaron los prototipos de dos plantas. El número de «no se cumplen» depende
+de cómo se lea, y las tres lecturas quedan en el libro (hoja «Red por
+prototipo»):
+
+| Prototipo | Ventana completa del bloque (D-442) | Sin la sucesora (D-443) | Sin la sucesora y `SF` al revés |
+|---|---:|---:|---:|
+| Zafiro | 18 | 16 | 12 |
+| Zafiro Plus, Diamante sin, Diamante con, Oro | 0 cada uno | 1 cada uno | 0 cada uno |
+| Rubí, Jade | 0 | 0 | 0 |
+
+**La segunda ruta de cuadrilla, en borrador.** Tres eslabones `recurso`, todos
+con holgura 0 en Zafiro, que no están en la espina de 28 pasos: (R1) la barda
+(`ECO-00046`) arranca el día hábil siguiente al cableado (`ECO-00028`); (R2)
+las instalaciones del asador (`ECO-00044`) arrancan el día siguiente a la
+barda; (R3) el pergolado de cochera (`ECO-00053`) también. No es una ruta que
+todos los prototipos compartan: R1 se cumple en 4 de 7 (Zafiro, Jade y los dos
+Diamante; en Rubí, Zafiro Plus y Oro el bloque de cableado incluye partidas de
+diciembre y su ventana llega al 12 o 29-dic, holgura −45), R2 se cumple en los
+2 prototipos que tienen asador (Zafiro y Oro) y R3 en los 7. Después de las
+instalaciones del asador (31-oct) arrancan el 3-nov siete partidas —zoclo
+Brunei, tapa de registro, cancelería, domos, coladera de jardín, pintura de
+fachada 1.ª mano, columna forrada— y después del pergolado (12-nov), el chaflán
+y la pintura de plafón 1.ª mano: el sistema no puede saber cuáles dependen de
+la cuadrilla y cuáles de otra cosa (varias ya cuelgan de la red), así que no
+las propone; quedan listadas en la hoja «Segunda ruta - lo que sigue». Por
+`PRECEDENCIA.origen` un vínculo de recurso se captura a mano, y no se escribe
+ninguno.
+
+**Estado: B-86 queda cerrado en diseño y en datos; no queda nada por aplicar.**
+`P16` y la segunda ruta se quedan como están por decisión, y B-81 abierto.
+
+Libro: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (8 hojas: las 16 con su propuesta, los
+cambios contra D-442, los pendientes con la decisión de cada uno, los 39 con
+bloque que contiene, los bloques como predecesora, la red por prototipo en
+las tres lecturas y la segunda ruta). `MODELO.md` §5c,
+`PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### B-81 se cierra: `inicio_fin` entra al enum, y la holgura de `SF` no sumaba 1 — se corrigen D-443 y D-444 (D-445)
+
+Dato del usuario: «B-81». La pregunta llevaba abierta desde D-391 —¿`PRECEDENCIA.tipo_vinculo`
+cubre `inicio_fin`?— y D-442, D-443 y D-444 le habían ido sumando una evidencia
+que parecía inclinarla hacia «el plan de origen escribe `SF` al revés». Al ir a
+cerrarla se revisó cómo se mide la holgura de un `SF` y apareció un error propio.
+
+**El error: la holgura de `SF` no sumaba 1.** Un plan de días hábiles completos
+abre cada tramo al empezar su primer día y lo cierra al terminar el último: el
+inicio del día hábil `d` es el instante `n(d)` y su fin es `n(d)+1`. Con eso, las
+cuatro holguras (`MODELO.md` §5c):
+
+| Tipo | Holgura en instantes | Con días hábiles entre fechas |
+|---|---|---|
+| `fin_inicio` (FS) | abre(s) − (cierra(p) + desfase) | bc(fin_p, ini_s) − 1 − desfase |
+| `inicio_inicio` (SS) | abre(s) − (abre(p) + desfase) | bc(ini_p, ini_s) − desfase |
+| `fin_fin` (FF) | cierra(s) − (cierra(p) + desfase) | bc(fin_p, fin_s) − desfase |
+| `inicio_fin` (SF) | cierra(s) − (abre(p) + desfase) | bc(ini_p, fin_s) **+ 1** − desfase |
+
+La función que medía los vínculos desde D-424, y con ella la lectura de D-442 y
+D-443, tenía la cuarta sin el «+ 1»: comparaba el cierre de un día con la apertura
+de otro como si fueran el mismo instante. Reimplementada por instantes y sin
+mirar la anterior, la nueva coincide con la vieja en las 824 holguras de `FS`
+(680), `SS` (91) y `FF` (53), y da exactamente 1 más en los 8 `SF`: el error era
+solo de `SF`.
+
+**Qué cambia:**
+
+| Decían D-443 y D-444 | Es |
+|---|---|
+| 0 de los 8 `SF` se cumplen leídos normal | **5 de 8**, los cinco con holgura 0: la gualdra termina el día hábil anterior al que empieza el resto de su losa. Los 3 que no se cumplen son de Zafiro: −5, −6 y −6 |
+| 8 de 8 se cumplen leídos al revés: «el plan de origen parece escribir `SF` con el sentido invertido» | Al revés también se cumplen 8 de 8, pero en 5 las dos lecturas dan la misma holgura 0; solo en 3 (`IEC-01070` dos veces, `EST-03020`) se separan. Con tres casos no se distingue un `SF` escrito al revés de un vínculo que las fechas ya no siguen: la inferencia era más débil de lo que se dijo |
+| Zafiro: 16 vínculos que no se cumplen (12 con `SF` al revés) | **15**: 10 `FS`, 2 `SS` y 3 `SF`. Con la ventana completa del bloque (D-442) siguen siendo 18 |
+| Plus, Diamante sin, Diamante con y Oro: 1 cada uno | **0 cada uno**: el «1» era la gualdra. Rubí y Jade, 0 |
+| `CAR-01011` «pasa a estar roto» (de 0 a −1) | Se cumple: holgura 0 sin la sucesora y +1 con ella |
+| De los 39 vínculos cuyo bloque contiene a la sucesora, 30 se cumplen y 9 no | **35 y 4** (los 4 de Zafiro que ya estaban rotos); «32 se cumplen tal como están escritos» no cambia |
+
+**Qué es un `SF` en el libro.** Es la definición de MS Project: la sucesora no
+puede terminar antes de que empiece la predecesora, más el desfase; su uso
+típico es «a tiempo», que la sucesora termine justo cuando la otra arranca. Los
+8 del libro son de dos clases. **Cinco gualdras** —la de Zafiro y las de los
+cuatro prototipos de dos plantas, que la heredaron— con su losa: la gualdra se
+coloca la víspera de que empiece el resto de la losa (en Zafiro termina el lunes
+14-jul y el martes 15 arranca el grupo), holgura 0, y es también lo que dice el
+`FS` de la gualdra a la losa maciza (`EST-21011`) que Zafiro ya trae. **Tres de
+Zafiro** (`IEC-01070` tras el zoclo y la jardinera de pórfido, `EST-03020` tras
+la jardinera) en que la sucesora terminó de 3 a 6 días hábiles antes de que la
+predecesora empezara: el vínculo «a tiempo» no se siguió. Nada físico se
+contradice —un murete o una zapata no se deshacen por terminarse antes—; es el
+mismo tipo de incumplimiento que los otros 12 de Zafiro, aunque 3 de 4 es una
+proporción alta. Un `SF` «a tiempo» se incumple en cuanto la sucesora se
+adelanta, así que no sorprende, pero tampoco descarta que estén escritos al
+revés.
+
+**Decisión (cierra B-81), con la regla de D-444 —Zafiro queda de origen, solo se
+anota—:**
+
+1. `PRECEDENCIA.tipo_vinculo` gana `inicio_fin`: cuatro valores, uno por cada
+   tipo del formato fuente (`FS`, `SS`, `FF`, `SF`). El cargador no convierte
+   ni descarta nada: es la regla de D-444 llevada al modelo, porque importar
+   Zafiro tal cual exige poder decir `inicio_fin`.
+2. Definición y holgura, las de arriba (`MODELO.md` §5c). Para el CPM, un
+   `inicio_fin` le pone un piso al término de la sucesora (como `fin_fin`) y no
+   a su inicio.
+3. Una holgura negativa en un `SF` es una sucesora que terminó antes de lo que
+   el vínculo pide; `ALERTA(tipo=vinculo_incumplido)` la avisa como a cualquier
+   otra y no se trata como imposible.
+4. Los 3 `SF` de Zafiro que no se cumplen se anotan: no se invierten ni se
+   convierten. Si algún día se quiere probar la hipótesis del sentido invertido,
+   los 3 casos que la separan están en la hoja «SF - los 8 vínculos».
+5. Los 4 `SF` de los prototipos de dos plantas se quedan: se cumplen con
+   holgura 0.
+
+**Lo que esto corrige de otras decisiones** (sin reescribirlas; cada una lleva su
+aviso):
+
+- **D-402:** «3 de 4 `SF` están obsoletos, físicamente imposible» → no se
+  cumplen, pero no es imposible (arriba).
+- **D-425 (2):** «el `SF` de la gualdra va al revés» → con la lectura estándar
+  dice lo mismo que el `FS`. Y la razón por la que no se heredó a Rubí y Jade
+  («su vínculo no se cumple») era este mismo error: se cumple con holgura 0 en
+  los dos. **Faltan dos vínculos:** `498SF` en la gualdra de Rubí (`CAR-01012`) y
+  `1401SF` en la de Jade (`CAR-01014`), junto al `SS` +15 que ya tienen; no pasan
+  5 en Rubí y 9 en Jade, no 6 y 10. No se escriben mientras el usuario no lo
+  diga *(lo dijo en D-460: se heredan)*: los libros de Rubí y Jade están validados y un `SF` no mueve ninguna
+  fecha (el motor asigna por gemelo de `Clave`, no por CPM, D-427). Rubí pasaría
+  de 102 a 103 vínculos y Jade de 85 a 86, en las mismas celdas.
+- **D-424:** «4 `SF`, de los que solo 1 se cumple» sigue siendo cierto en Zafiro.
+- **D-442 y D-443:** las cifras de `SF` (arriba).
+
+**Estado:** B-81 cerrado. B-86 sigue cerrado, con 15 rotos en Zafiro y no 16. Lo
+único por decidir es si se escriben los dos `SF` de Rubí y Jade.
+
+Libro: `VINCULOS_ROTOS_Y_BLOQUES_B86.xlsx` (12 hojas: las correcciones, los 8
+`SF`, las fórmulas, los dos vínculos de Rubí y Jade y, con las cifras corregidas,
+lo que traía el de D-444). `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-81, B-86.
+
+### B-80 se cierra: los días teóricos quedan fraccionarios, el redondeo es un parámetro del calendario y no cambia el esfuerzo (D-446)
+
+Dato del usuario: seguir con el que sigue, B-80. El dato original (D-390) decía
+que los días teóricos de `calculada_rendimiento` pueden quedar fraccionarios
+cuando así es la operación, y que el redondeo, si hace falta uno, es un
+parámetro editable y no algo implícito en la fórmula; faltaba bajarlo a
+`MODELO.md` §5c. Se midió con los 1,382 pares concepto × `MO-` de los siete
+prototipos: 385 de obra gruesa y acabados con el `Rendimiento Teórico` (D-438) y
+997 de instalaciones con el `Rendimiento Calculado` (D-439), la referencia
+interina de esa familia.
+
+**Los días teóricos son fraccionarios de verdad, y casi siempre de menos de un
+día.** A una cuadrilla:
+
+| Días teóricos | Instalaciones (997) | Obra gruesa y acabados (385) |
+|---|---:|---:|
+| menos de 0.25 | 70.2% | 2.9% |
+| 0.25 a 0.5 | 12.4% | 12.7% |
+| 0.5 a 1 | 7.9% | 16.6% |
+| 1 a 2 | 7.0% | 19.5% |
+| 2 a 5 | 2.4% | 21.6% |
+| 5 o más | 0% | 26.7% |
+
+La mediana es 0.17 día en instalaciones —hora y media de una jornada de 8— y
+1.82 en obra gruesa y acabados; 74% de los 1,382 pares dura menos de un día, y
+solo 20% y 11% caen en un entero (a ±0.05). Forzarlos a días enteros, con un
+mínimo de uno, triplica los días de instalaciones (3.1×) y suma 11% a obra
+gruesa; si esos días se cobraran como cuadrilla completa, el esfuerzo se
+inflaría lo mismo —es lo que D-440 ya había visto con las ventanas del plan,
+9×—.
+
+**El plan de Zafiro no sigue una regla de redondeo: sigue las cuadrillas.** En
+sus 46 partidas de obra gruesa y acabados con rendimiento, a una cuadrilla,
+ninguna regla reproduce los días del plan: coinciden en 33% con `arriba` y con
+`cercano` y en 46% con `abajo`, y a ±1 día en 65-67%. La causa se ve en las
+cuadrillas efectivas: las partidas de menos de medio día llevan 0.36 de
+cuadrilla (el plan les da 1 día, algunas hasta 3) y las de 10 días teóricos o
+más llevan 1.7 (el plan las comprime). En las 130 de instalaciones la mediana
+del plan es 2 días contra 0.14 teóricos, unas 14 veces: ventanas de visita, no
+redondeo (D-412). El planeador no redondea, ajusta cuadrillas, y eso es lo que
+D-440 ya formalizó en `TRAMO.cuadrillas`.
+
+**Por qué `cercano` por defecto.** Los datos del plan no distinguen una regla de
+otra, así que se decide por lo que cada una le hace a una cadena. En las 355
+actividades de un día o más a una cuadrilla, el sesgo medio contra el exacto es
+de +0.52 día con `arriba`, +0.03 con `cercano` y −0.45 con `abajo`. En una cadena
+de 28 pasos como la ruta crítica de Zafiro, calculada y redondeada paso por
+paso, son +14.6, +0.8 y −12.6 días hábiles: con `arriba`, casi tres semanas de
+un plazo de 28; con `abajo`, otro tanto en sentido contrario. Las 1,027 de menos
+de un día quedan en 1 con cualquiera de los tres (mínimo de un paso). `arriba`
+puede ser lo que el planeador quiera —no promete terminar antes de lo que la
+cuadrilla puede—, pero como valor por defecto le agrega holgura a cada paso.
+
+**Los siete programas no cambian.** 2,443 partidas programadas, todas de días
+enteros, ninguna de menos de 1 (337 con exactamente 1) y ninguna de más de 16.
+Las 1,382 con rendimiento ya traen cuadrillas efectivas (D-438, D-439), así que
+`cantidad ÷ (rendimiento × cuadrillas)` devuelve sus días tal cual y el paso 1
+no mueve ninguna; las otras 1,061 no tienen rendimiento emparejado (D-438,
+D-439) y no hay qué calcular. El redondeo solo actúa cuando la duración se calcula de nuevo —un
+prototipo nuevo, o una cantidad o unas cuadrillas editadas—. Recalcular por
+proporción las 825 duraciones de los derivados que heredaron los días de Zafiro
+cambiaría entre 42% y 44% con cualquier sentido, porque la cantidad es otra en
+442 de ellas (D-419): la herencia (D-441) sigue siendo el camino de los
+derivados y `calculada_rendimiento` el de lo nuevo.
+
+**Decisión (cierra B-80):**
+
+1. La fórmula no redondea: `duracion_dias` es NUMERIC y los días teóricos se
+   calculan y se muestran siempre, sin redondear.
+2. El redondeo es del calendario de la obra: `CALENDARIO_OBRA.paso_dias` (por
+   defecto 1, el día hábil completo; también 0.5, 0.125 o nulo) y
+   `CALENDARIO_OBRA.sentido_redondeo` (por defecto `cercano`; también `arriba` y
+   `abajo`). Ninguna actividad lleva el suyo: una duración concreta se captura.
+3. Nunca menos de un paso, y en `arriba` y `abajo` un excedente menor a 0.01 día
+   no mueve la duración (4 de los 1,382: 183.83 ÷ 26.25 = 7.003 días se programan
+   en 7, no en 8).
+4. El redondeo mueve las cuadrillas, no el esfuerzo: `TRAMO.cuadrillas` guarda las
+   efectivas, `cantidad ÷ (rendimiento × días programados)`, y `días × cuadrillas
+   × 8` sigue siendo `cantidad ÷ rendimiento × 8`.
+5. Con `cercano` o `abajo` las efectivas pueden pasar de las pedidas
+   (`ACA-01040` de Zafiro: 36 m² ÷ 26.25 = 1.37 días, que `cercano` programa en
+   1: 1.37 cuadrillas). El sistema las muestra junto a las pedidas y las compara
+   con el tope declarado de `FRENTE_TOPE_CUADRILLA`; decide el planeador.
+6. Con paso 1 bastan las fechas; con un paso menor el tramo necesitaría hora de
+   inicio y de fin, que no se define hasta que un programa lo pida.
+
+**Lo que no cierra.** Con paso 1, las instalaciones —90% de las cuales dura menos
+de un día— siguen programadas en ventanas de un día o más. Un programa de
+instalaciones por horas pediría el paso menor y la hora del tramo; queda dicho,
+sin definir.
+
+Libro: `REDONDEO_DE_DIAS_B80.xlsx` (13 hojas: la decisión, la distribución de los
+días teóricos, las reglas contra el plan de Zafiro, el efecto y el sesgo por regla,
+la herencia contra el recálculo, ejemplos, la tolerancia, los siete programas y
+los 1,382 pares). `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-80.
+
+### B-87 se cierra: el plazo se cuenta en días hábiles con la otra cuenta a la vista, los feriados se sugieren y no se aplican, y la cantidad por día se deriva del calendario (D-447)
+
+Dato del usuario: seguir con el siguiente, B-87. D-428 dejó el calendario como
+opción del sistema y tres preguntas sin responder: si el plazo de 28 o de 30
+semanas se mide en días hábiles o en semanas de calendario, si el sistema trae
+una plantilla de feriados para quitar y poner, y qué pasa con la cantidad por
+día de un programa cuando se agrega el sábado.
+
+**El plazo de los siete programas, en las dos cuentas.** Los siete cierran un día
+hábil antes del último que permite el plazo contado en días hábiles; en semanas de
+calendario, los de dos plantas se pasan un día hábil:
+
+| Programas | Plazo | Cierre | Días hábiles | Límite N × 5 | Contra la semana N de calendario |
+|---|---:|---|---:|---:|---|
+| Zafiro, Rubí, Jade | 28 semanas | jueves 18-dic | 139 | 140 (sobra 1) | el último día hábil es el viernes 19-dic: sobra 1 día hábil |
+| Zafiro Plus, Diamante sin, Diamante con, Oro | 30 semanas | lunes 5-ene | 149 | 150 (sobra 1) | el último día hábil es el viernes 2-ene: se pasa 1 día hábil |
+
+Los dos feriados explican la diferencia: sin ellos los de dos plantas cerrarían el
+jueves 1-ene, con un día de sobra en las dos cuentas. Cerrar el 2-ene exigiría la
+ventana de la planta alta en 9 días y no en 10 (D-426), opción del planeador que no
+se cambia:
+
+| Ventana de la planta alta | Días hábiles | Cierre | Contra N × 5 | Contra la semana 30 de calendario |
+|---|---:|---|---:|---:|
+| 9 días | 148 | viernes 2-ene | +2 | 0 |
+| 10 días (la del ejercicio) | 149 | lunes 5-ene | +1 | −1 |
+| 11 días | 150 | martes 6-ene | 0 | −2 |
+
+**Por qué días hábiles por defecto.** Es la cuenta que el usuario ya usó: D-419 dio
+139 días hábiles como 27.8 semanas, y D-437 aceptó 149 días hábiles y el cierre del
+5-ene como «las 30 semanas, ni antes ni después»; D-428 había dicho que los
+feriados mueven la fecha y no el trabajo. Y es la única cuenta que no reacciona a
+cada feriado: si además se dejaran de trabajar el 16-sep y el 17-nov, el trabajo no
+cambia —139 y 149 días— pero todos los cierres se corren 2 días hábiles, los de una
+planta al lunes 22-dic y los de dos al miércoles 7-ene; contra N × 5 siguen
+cabiendo con 1 día de sobra, y contra la semana de calendario pasan a 1 y a 3 días
+hábiles tarde. Un contrato en días naturales necesita `semanas_calendario`, por eso
+es una opción y las dos cuentas se muestran siempre.
+
+**Los feriados: se sugieren, no se aplican.** En la ventana de los siete programas
+caen cuatro feriados oficiales, y dos se trabajan en todos:
+
+| Feriado oficial | Partidas con cantidad ese día | Calendario del ejercicio |
+|---|---|---|
+| martes 16-sep | de 1 a 5 en cada programa (Zafiro 3) | se trabaja |
+| lunes 17-nov | de 7 a 12 en cada programa (Zafiro 9) | se trabaja |
+| jueves 25-dic | ninguna | no se trabaja |
+| jueves 1-ene | ninguna | no se trabaja |
+
+Aplicar una plantilla por su cuenta contradiría a Zafiro, que es el confiable
+(D-428). La plantilla existe como semilla editable (`FERIADO_PLANTILLA`: nombre,
+regla, origen ley o costumbre), el sistema la ofrece al armar el calendario y el
+planeador acepta los feriados que quiera, uno por uno; un calendario nuevo sale
+de lunes a viernes sin ninguno. Qué feriados trae es dato de carga, no de este
+cerebro.
+
+**El sábado y la cantidad por día.** La cantidad por día no se guarda: se deriva
+de la cantidad del tramo y de los días hábiles del calendario vigente (uniforme, y
+el último día absorbe el residuo, D-433). Lo que pasa al agregar el sábado
+depende de lo que se capturó. Con duraciones fijas (los seis derivados, que
+heredan los días de Zafiro) se conservan los días hábiles, se mueven las fechas y
+la cantidad por día no cambia: Rubí y Jade cerrarían el lunes 17-nov en lugar del
+jueves 18-dic (31 días naturales antes) y los cuatro de dos plantas el viernes
+28-nov en lugar del lunes 5-ene (38 antes). Con fechas fijas (Zafiro, cargado con fechas,
+`modo_duracion=derivada_fechas`) se conservan las fechas, los días hábiles cambian
+y la cantidad por día se redistribuye:
+
+| Zafiro con fechas fijas (301 partidas sin pausas) | Valor |
+|---|---:|
+| Partidas con al menos un sábado en su rango | 72 (24%) |
+| Días hábiles de lunes a viernes → con sábado | 1,079 → 1,173 |
+| Baja de la cantidad por día, ponderada por días | 8.0% |
+| Entre las afectadas: baja mediana / máxima | 15.4% / 33.3% |
+| Programa completo (9-jun a 18-dic), días hábiles | 139 → 166 |
+
+Las 14 partidas cuyo conteo de días no cubre todo su rango (pausas, D-393) quedan
+fuera: sus días son solo los activos y el sábado de una pausa no es trabajo.
+
+**Decisión (cierra B-87):**
+
+1. `PRESUPUESTO.plazo_semanas` (NUMERIC, nullable): el sistema lo propone desde
+   `plantas` (una 28, dos 30, D-419) y el planeador lo edita.
+2. `CALENDARIO_OBRA.plazo_medido_en`: `dias_habiles` (por defecto; límite =
+   `plazo_semanas` × días laborables por semana) o `semanas_calendario` (límite =
+   el último día hábil en o antes del domingo de la semana N). El programa muestra
+   siempre las dos cuentas.
+3. `ALERTA(tipo=plazo_excedido)` cuando el cierre pasa del límite según
+   `plazo_medido_en`, sin umbral. No hay alerta por cerrar antes: «ni antes ni
+   después» (D-437) es regla de diseño de este ejercicio.
+4. `FERIADO_PLANTILLA`: sugerencia editable, nunca aplicada; un calendario nuevo
+   sale de lunes a viernes sin feriados.
+5. La cantidad por día se deriva del calendario vigente; al cambiar el calendario,
+   una duración conserva los días y mueve las fechas, y las fechas conservan las
+   fechas y redistribuyen la cantidad.
+6. En el ejercicio no cambia nada: el calendario sigue siendo lunes a viernes sin
+   el 25-dic ni el 1-ene, y los siete programas se quedan como están.
+
+**Lo que no cierra.** Qué feriados trae la plantilla y para qué país es dato de
+carga; la ventana de 9 días sigue siendo opción del planeador; y cómo se
+reprograma un plan de fechas fijas cuando el calendario cambia a mitad de obra
+—cuáles actividades se mueven y cuáles se quedan— no se define hasta que un
+programa lo pida.
+
+Libro: `PLAZO_Y_CALENDARIO_B87.xlsx` (8 hojas: la decisión, el plazo de los siete
+programas, los escenarios de calendario, los feriados en la ventana, la ventana de
+la planta alta y el sábado con fechas fijas). `MODELO.md` §5c,
+`PENDIENTES-MEJORAS.md` B-87.
+
+### Corrige D-440: los picos de concurrencia estaban inflados por un cruce que duplicaba filas, y «frente» se usa en el cerebro con tres sentidos (D-448)
+
+Dato del usuario: seguir con lo que sigue. Lo que seguía era la segunda mitad de
+B-82 (`frente_id`). Al volver a medir la concurrencia para retomarla apareció un
+error propio en D-440.
+
+**El error.** D-440 cruzó las partidas programadas con sus cuadrillas efectivas
+por (prototipo, `Clave`, `Días laborables`). Cuando dos filas de cuadrillas
+comparten esa llave —la misma `Clave` con otra cantidad y los mismos días, 431 de
+las 1,382—, cada partida se copiaba una vez por cada una: las 2,446 partidas con
+fechas se volvieron 2,918, 472 de más (106 en Diamante con chimenea, 98 en Diamante sin,
+126 en Zafiro Plus, 126 en Oro, 6 en Zafiro, 6 en Rubí y 4 en Jade). Las copias
+contaban doble en la carga de cada día y llevaban cuadrillas que no eran suyas.
+
+**Qué cambia.** Con el cruce por prototipo, `Clave`, días y cantidad, una fila por
+partida, los picos de los cuatro prototipos de dos plantas bajan entre 33% y 44%:
+
+| Prototipo | Pico máximo en D-440 | Corregido |
+|---|---:|---:|
+| Oro | 22.33 (`ACA-`) | 12.43 (`ACA-`) |
+| Diamante con chimenea | 20.38 (`ALB-`) | 13.27 (`EST-`) |
+| Diamante sin chimenea | 19.35 (`ACA-`) | 12.95 (`EST-`) |
+| Zafiro Plus | 16.60 (`ACA-`) | 10.80 (`ACA-`) |
+| Jade | 12.64 (`EST-`) | 12.64 |
+| Rubí | 12.00 (`CAR-`) | 12.00 |
+| Zafiro | 10.66 (`EST-`) | 10.66 |
+
+**Lo que no cambia.** El `esfuerzo_real` de D-440 (1.23× en obra gruesa y acabados,
+0.11× en instalaciones) se calcula directo sobre los 1,382 pares y no pasa por ese
+cruce; tampoco D-438 ni D-439. Y las lecturas de D-440 se sostienen: los picos
+grandes son catálogo partido —el acero por calibre en estructura, las doce piezas de
+un mismo subcontrato en carpintería— y separar «fachada» por el texto de la
+descripción casi no los baja (0% en cuatro prototipos y 12-13% en tres; D-440 decía
+0%-20%).
+
+**Lo que sí cambia de la lectura.** Con las cifras corregidas, los cuatro programas
+de dos plantas piden cuadrillas simultáneas por oficio del mismo orden que el propio
+Zafiro, el confiable: de 10.8 a 13.3 contra 10.7 (y Rubí 12.0, Jade 12.6), no el
+doble. La «cola» de D-440 era del error. Y la medida es gruesa: 1,063 de las 2,445 partidas (43%) no
+tienen rendimiento emparejado y cuentan como 1.0 cuadrilla cada una, así que el
+pico cuenta líneas de catálogo, no cuadrillas; el nivel correcto para comparar es la
+ventana de trabajo (D-449).
+
+**«Frente» tiene tres sentidos en el cerebro, y D-396 y D-440 buscaron solo uno.**
+
+| Lectura | Qué es | De dónde sale | Qué implica para `frente_id` |
+|---|---|---|---|
+| A. Agrupación de conceptos por organización del trabajo | Instalaciones · Estructura · Acabados, transversal a niveles y etapas; las cuadrillas se referencian a frentes; informativo | `GLOSARIO-DOMINIO.md` «Frente» («Hoy vive en: Catálogo de conceptos-frentes»), `CATALOGOS.md` | Es un atributo del concepto: si el catálogo trae el frente de cada concepto, `frente_id` se deduce y no se captura |
+| B. Etapa donde conviven oficios | Cimentación, planta baja…; el tope es por oficio dentro del frente; el cierre al 90% de avance | `PROPUESTA-CUATRO-MODULOS.md` P-6 y «Cierre de frente» (D-261, D-270) | La etapa ya está en el árbol (Nivel 2); agrupar por etapa y oficio baja el pico máximo de 0% a 27% (0% en tres de los siete), porque los picos son catálogo partido dentro de una misma etapa |
+| C. Zona física | Recámara, fachada, azotea; lo que D-396 y D-440 buscaron en el texto | `CONOCIMIENTO.md` D-396, D-440 | No hay dato estructurado ni se deduce del texto |
+
+D-396 y D-440 concluyeron que falta «el dato estructurado mismo». Eso es cierto de
+la lectura C; de la A, el glosario dice que existe un catálogo de conceptos-frentes
+y no se ha visto.
+
+**Qué se necesita para cerrar B-82.** Una definición del usuario: qué es un frente.
+Si es la A, el catálogo de conceptos-frentes (no está en este entorno) da el frente
+de cada concepto y `ACTIVIDAD.frente_id` se deduce de `concepto_id`; el tope de
+cuadrillas (`FRENTE_TOPE_CUADRILLA`) pasaría a medirse por frente y oficio. Si es la
+B, no hace falta `frente_id`: la etapa del árbol cumple. Si es la C, se captura. No se
+agrega ningún campo mientras tanto.
+
+*Respondido por D-450: el usuario definió el frente como el nivel constructivo, con los
+gremios como sub-frentes y sin zona física; la A pasa a sub-frente, la B a frente, la C
+se descarta, y B-82 cierra sin `frente_id`.*
+
+Libro: `CONCURRENCIA_CORREGIDA_B82.xlsx` (8 hojas: qué estaba mal, las filas
+duplicadas, los picos por oficio corregidos contra D-440, el máximo por prototipo,
+acabados con y sin fachada, por etapa y oficio, las etapas con más cuadrillas y las
+tres lecturas de «frente»). `MODELO.md` §2, §5c, `PENDIENTES-MEJORAS.md` B-82.
+
+### B-84 se cierra: el horizonte de la cuadrícula sigue al programa más largo, y heredar los días no hereda el ritmo —la alerta va por ventana de trabajo, no por línea de catálogo— (D-449)
+
+Dato del usuario: seguir con lo que sigue. B-84 conservaba dos puntos abiertos: el
+horizonte de la cuadrícula (4) y los tramos con mucha más cantidad que Zafiro (8);
+el (5), los emparejamientos por rol, es del planeador.
+
+**(4) El horizonte no se fija: sigue al programa más largo.** La cuadrícula día por
+día no se guarda (D-447), es una vista; va del primer día del programa más temprano
+que muestra al último del más tardío. En el libro de los siete son 211 columnas
+(9-jun a 5-ene): los cuatro de dos plantas llegan al 5-ene y los tres de una dejan
+18 vacías después del 18-dic. Con el sábado trabajado (D-447) el más largo cerraría
+el 28-nov y serían 173.
+
+**(8) Heredar los días no hereda el ritmo.** D-419 fijó que los m² de más no agregan
+días sino gente, y D-422 contó los tramos con el doble o más de cantidad que su
+gemela de Zafiro (10 de 208 en Rubí, 17 de 197 en Jade) para que el planeador los
+revisara. Con la referencia explícita de D-441, 1,502 líneas de los seis derivados
+tienen gemela y los mismos días que Zafiro, y 140 tienen el doble o más de su
+cantidad. **Pero por línea la razón engaña:** una línea comparte los días de las
+demás de su oficio (D-396). El acero K1-6.00 pasa de 6 a 61 piezas en los dos
+Diamante (10×) y, a las cuadrillas de Zafiro, pediría 112 días, cuando el acero de la
+cimentación es una sola tarea de 11 días; el acero del K3 de 6.00 m pediría 77.
+
+**Por ventana sale una lista que se puede revisar.** Una ventana es el conjunto de
+actividades del mismo oficio con las mismas fechas de inicio y término; sus
+cuadrillas son la suma de las de sus líneas con rendimiento (D-438, D-439). Se
+comparan 355 ventanas de los seis derivados (890 líneas con rendimiento en los dos
+lados y los mismos días que Zafiro) contra la ventana de su gemela. Zafiro tiene 76
+ventanas con rendimiento: mediana de 0.61 cuadrillas, p90 de 1.67 y máximo de 3.4. **17
+ventanas piden al menos el doble de cuadrillas y al menos una más** (Rubí 2, Jade 2,
+Zafiro Plus 0, Diamante sin chimenea 5, Diamante con chimenea 5, Oro 3), y 7 pasan
+de lo más que Zafiro llegó a usar en una ventana:
+
+| Prototipo | Ventana | Cuadrillas en Zafiro → hoy | Días a las cuadrillas de Zafiro |
+|---|---|---|---|
+| Los dos Diamante | repellado de muro +3.00 (`ALB-01012`), 20-21 ago | 2.2 → 7.5 | 7, en vez de 2 |
+| Los dos Diamante | repellado de plafond +3.00 (`ALB-01112`), 18-19 ago | 1.3 → 6.5 | 10, en vez de 2 |
+| Los dos Diamante | finas de plafond 4.20 (`ACA-01040`), 15-16 sep | 0.7 → 3.5 | 10, en vez de 2 |
+| Oro | repellado de muro +3.00 (`ALB-01012`), 20-21 ago | 2.2 → 4.6 | 4, en vez de 2 |
+| Rubí | castillo K-3 (`EST-02130`), 1-jul | 0.4 → 2.7 | 7, en vez de 1 |
+| Oro | repellado de muros de fachada +3.00 (`ALB-01212`), 4-29 ago | 0.6 → 2.5 | 33, en vez de 8 |
+
+Las primeras cuatro filas (siete ventanas) son las que pasan de lo probado; las
+otras dos muestran por qué hay dos propuestas y no una: en `ALB-01212` conservar los
+8 días con 2.5 cuadrillas está dentro de lo que Zafiro llegó a usar, y alargarlo a 33
+no tiene sentido. Las 17 están en el libro con sus propuestas.
+
+**Lo que la alerta no ve.** Solo cuenta lo que tiene rendimiento emparejado (57% de las
+partidas); 53 líneas sin él tienen el doble o más de su gemela —las finas de fachada
+de Oro, ×4.1, entre ellas— y van en una hoja aparte para que las mire el planeador.
+La ventana es una aproximación (mismo oficio, mismas fechas) y sus cuadrillas son una
+cota inferior.
+
+**Decisión (cierra B-84):**
+
+1. El horizonte de la cuadrícula es el del programa más largo que se muestra; no se
+   fija.
+2. `ALERTA(tipo=ritmo_sobre_referencia)`: en una ventana de actividades que heredan
+   sus días, las cuadrillas efectivas son al menos `razon` veces las de la ventana
+   de su referencia y al menos `cuadrillas_mas` más; por defecto 2 y 1, editables en
+   `ALERTA.parametro_usado`.
+3. El sistema propone dos salidas —conservar los días con las cuadrillas que pide, o
+   alargar a los días que tendría con las de la referencia, acomodados al paso del
+   calendario (D-446)— y el planeador decide.
+4. Ninguno de los siete programas cambia: las 17 ventanas, las 53 líneas y los
+   emparejamientos por rol de Rubí y Jade (28 y 18, en especial los poyos de cocina)
+   quedan para el planeador.
+
+Libro: `RITMO_HEREDADO_B84.xlsx` (10 hojas: la decisión, el horizonte, las 17
+ventanas, línea contra ventana, las líneas que engañan, las 53 sin rendimiento, las
+ventanas de Zafiro, la cuenta por umbral y las 355 comparables). `MODELO.md` §5a,
+§5c, `PENDIENTES-MEJORAS.md` B-84.
+
+### B-82 se cierra: «frente» es el nivel constructivo de la obra y sus sub-frentes son los gremios que trabajan dentro de él —el árbol ya lo trae, no hace falta `frente_id`— (D-450)
+
+Dato del usuario: la definición que pedía D-448. En sus palabras, resumidas: el frente de
+una obra es amplio; el frente principal es una etapa que corresponde a un nivel
+constructivo, y los gremios son parte de él —la etapa de estructura en el nivel de
+cimentación abarca los gremios de Estructura y de Instalaciones—. **No es una zona
+física** como recámara, sala o fachada: son las actividades programadas para ejecutar
+una obra. Un residente con «n» obras tiene uno o varios frentes y varios sub-frentes.
+Caso 1: arranca Álamo 08, el frente es Cimentación (dos semanas) y los sub-frentes son
+Estructura e Instalaciones. Caso 2: más adelante hay varios frentes a la vez, y en la
+semana 23 pueden juntarse seis sub-frentes o más. Lo que se busca: controlar de forma
+sencilla a partir de la ejecución, y que se pueda comparar con el costo de construcción
+—«como ensamble y subensamble, pero sin perder el detalle»—.
+
+**La definición ya está en el árbol del presupuesto.**
+
+| Concepto | Dónde vive | Zafiro, Cimentación |
+|---|---|---|
+| Frente | Subcapítulo (Nivel 1): catálogo de niveles (`Nivel ERP`, 15 claves `NIV-xxxxx`) | 9 a 23 de junio, 11 días hábiles (dos semanas), 9.6% del costo de la obra |
+| Sub-frente | El gremio dentro del frente: las etapas (Nivel 2, `ECO-xxxxx`) del frente agrupadas por gremio | Estructura (1 etapa) e Instalaciones (4: sanitarias, hidráulicas, eléctricas, gas) |
+| Detalle | La etapa y, debajo, sus partidas: no se pierde nada al subir | 5 etapas y 56 partidas (9 de Estructura, 47 de Instalaciones) |
+| Zona física | No es frente | — |
+
+Contra los siete programas, los dos casos del usuario salen del dato sin tocarlo:
+**semana 2 de Zafiro** —1 frente (Cimentación), 2 sub-frentes, Estructura con 65% del
+valor de la semana e Instalaciones con 35%— es el Caso 1; **semana 23** —7 frentes, 9
+sub-frentes, 6 gremios distintos— es el Caso 2. El pico de Zafiro es la semana 22 (7
+frentes, 10 sub-frentes, 14 etapas; Rubí y Jade igual o uno más) y el de los programas de
+dos plantas las semanas 23 y 24 (hasta 8 frentes, 12 sub-frentes, 17 etapas). Contar etapas
+infla (14 a 17) y contar sub-frentes (10 a 12) es lo que el usuario llama sub-frentes; pero
+contar cuántos hay engaña, porque pesan distinto: en la semana 22 de Zafiro 3 de los 10 sub-frentes cargan
+el 72% del valor y 5 el 86% (semana 23: 4 de 9 cargan el 94%), y los pesados son
+paquetes contratados —cancelería, pérgola de cochera, pintura—. El valor programado
+(cuadrícula × precio) cuadra con el costo del capítulo entre 0.0% y 0.3% en los siete
+prototipos, así que el costo y la ejecución se pueden comparar en el mismo nodo.
+
+**Qué cierra.** La segunda mitad de B-82, sin campo nuevo:
+
+- De las tres lecturas de D-448, la A (gremio) pasa a ser el **sub-frente**, la B
+  (nivel constructivo) es el **frente**, y la C (zona física) queda descartada por el
+  usuario. El «Catálogo de conceptos-frentes» que el glosario daba como hogar del
+  frente no hace falta: el frente y el sub-frente se leen subiendo por el árbol desde la
+  partida.
+- **`ACTIVIDAD` no gana `frente_id`.** Cada actividad ya cuelga de un concepto con su
+  etapa y su nivel por ancestros; guardarlo sería una copia que se desactualiza.
+- `FRENTE` queda como el catálogo de niveles (el mismo hueco anotado en
+  `MODELO.md` §4: el catálogo `NIVEL`/`ETAPA` formal); `FRENTE_TOPE_CUADRILLA` y
+  `CIERRE_FRENTE` siguen apuntando a un frente, y el tope se mide por frente y oficio
+  como decía P-6 —por ventana de trabajo, D-449—.
+- El **sub-frente no es una tabla**: es el agrupamiento de las etapas de un frente por
+  gremio, una vista.
+
+*D-451 corrige dos frases de arriba: el «Catálogo de conceptos-frentes» no se da por
+innecesario ni por inexistente (solo se comprobó que no está en este entorno), y que `FRENTE`
+sea el catálogo de niveles queda en revisión con el usuario (B-89).*
+
+**Qué deja sin decidir** (B-88, el sistema propone y el usuario decide):
+
+1. **El gremio de cada etapa.** Hay 52 claves de etapa (55 con variantes de nombre) y
+   la propuesta las reparte así: Instalaciones 19, Albañilería 8, Estructura 7, Acabados 7,
+   Cancelería 4, Carpintería 3, Muebles y equipamiento 3, mixtas 2, Herrería 1, Obra
+   exterior 1. 40 no ofrecen duda y 15 piden mirar con el prefijo de sus partidas en la
+   mano: «Obra gris» tiene prefijo de acabados pero es muro y aplanado (se propone
+   Albañilería); las etapas del asador y de la pérgola de cochera mezclan estructura y
+   acabados; el cableado cuelga del frente Acabados siendo eléctrico. Falta decidir dónde
+   vive el gremio: el catálogo de etapas es el lugar natural.
+2. **El Nivel 1 mezcla dos cosas:** 6 niveles constructivos (Cimentación, Planta baja,
+   Planta alta, Azotea, Acabados, Obras exteriores) y 8 paquetes que se contratan
+   terminados (Cancelería, Carpintería, Muebles / Iluminación, Herrería, Asador, Barda,
+   Pintura, Pergolado cochera), más Consumibles. En el programa pesan mucho en las
+   semanas de más trabajo; falta decidir si una marca `paquete` los distingue.
+3. **Cómo se controla,** que el usuario pidió mejorar: un árbol de control con una
+   cifra ponderada por costo en cada nodo y semana; captura abajo (partida o tramo) y
+   lectura arriba (sub-frente y frente se calculan, no se capturan); una cola de
+   atención semanal ordenada por atraso, ruta crítica, cierre cercano, desviación de
+   costo e incidencias; la carga del residente en todas sus obras. Nada de esto se
+   construye hasta que el usuario lo elija.
+
+*D-455 corrige el punto 2 de arriba: los «8 paquetes» eran un conteo por nombre; solo tres frentes se ejecutan de golpe en el dato y la marca `paquete` no hace falta.*
+
+Libro: `FRENTES_Y_SUBFRENTES.xlsx` (10 hojas: lo que se entendió, los dos casos, las 55
+etapas con su gremio propuesto, el árbol de Zafiro, los activos por semana de los siete,
+el valor programado semana a semana, la conciliación con el costo y la propuesta).
+`MODELO.md` §2 y §5c, `GLOSARIO-DOMINIO.md` «Frente», `PENDIENTES-MEJORAS.md` B-82 y B-88.
+
+### Sub-frente confirmado, y el «Catálogo de conceptos-frentes» queda en revisión (D-451)
+
+Dato del usuario, respondiendo a D-450: **sí, el sub-frente es la etapa agrupada por
+gremio**, y **lo del catálogo de conceptos-frentes se va a revisar**.
+
+**Lo confirmado.** La definición de D-450 queda firme en sus tres niveles: frente =
+nivel constructivo (Subcapítulo, Nivel 1); sub-frente = las etapas (Nivel 2) del frente
+agrupadas por gremio; detalle = la etapa y, debajo, sus partidas. De B-88 sigue abierto
+el mapa de qué gremio es cada etapa y la marca de los frentes que son paquete *(B-88 se resolvió en D-455)*.
+
+**Lo que D-450 dio por resuelto de más.** Dijo que el «Catálogo de conceptos-frentes» «no
+hace falta» y el glosario que «no hay» tal catálogo. Lo único que se comprobó es que **no
+está en este entorno**; no se sabe qué trae. Lo que sí hay escrito:
+
+| Dónde | Qué dice |
+|---|---|
+| `GLOSARIO-DOMINIO.md` «Frente» | «Hoy vive en: Catálogo de conceptos-frentes»; el ejemplo es Instalaciones · Estructura · Acabados, o sea gremios |
+| `CATALOGOS.md` «Las cuadrillas se referencian a frentes» | Relación muchos a muchos cuadrilla–frente, informativa; sirve para filtrar 39 cuadrillas por frente en vez de recorrer 97 |
+
+En ese catálogo «frente» se usa en el sentido que D-450 llama **sub-frente**. Por eso lo
+que D-450 sí dejó firme no depende de él: `ACTIVIDAD` no necesita `frente_id`, porque el
+frente y el sub-frente se leen del árbol (de la partida a su etapa y a su nivel) con o
+sin ese catálogo.
+
+**Qué se pone a revisión (B-89)**, sin decidir nada hasta ver el catálogo:
+
+1. Si el catálogo es la **fuente del gremio de cada concepto** y, por tanto, de cada
+   etapa. Es una hipótesis del sistema: entonces el mapa por nombre y prefijo de B-88
+   pasaría a ser la verificación y no la fuente.
+2. Cómo se llama ahora que «frente» cambió de significado: el nombre y las relaciones
+   que hoy lo usan para el gremio (cuadrilla–frente, `FRENTE_TOPE_CUADRILLA` por oficio).
+3. Si la entidad `FRENTE` de `MODELO.md` es el catálogo de niveles (como asumió D-450) o
+   ese catálogo.
+
+`GLOSARIO-DOMINIO.md` «Frente», `CATALOGOS.md`, `MODELO.md` §2, `PENDIENTES-MEJORAS.md` B-88 y B-89.
+
+*Respondido por D-452: el catálogo de conceptos-frentes no existe (dato del usuario) y B-89 se cierra.*
+
+### Frentes por obra, sub-frentes como etapas, división por contratista; el catálogo de conceptos-frentes no existe (D-452)
+
+Dato del usuario, respondiendo a D-451: **no tiene catálogo de conceptos-frentes**; los
+frentes son por obra, que son los niveles; los sub-frentes son las etapas de construcción;
+los contratistas ejecutan los sub-frentes y, si hay dos contratistas en un sub-frente, **el
+sub-frente se divide para tenerlo por contratista**. Pidió ver si con eso queda más claro
+o abre aclaraciones.
+
+**Qué cierra.**
+
+- **B-89.** No hay catálogo que revisar: la línea del glosario «Hoy vive en: Catálogo de
+  conceptos-frentes» no tenía respaldo. D-448 anotó que no se había visto, D-450 lo dio por
+  innecesario y D-451 lo dejó en revisión; ahora es dato. Tampoco hay una fuente externa del gremio de cada etapa: el
+  mapa de B-88 sigue siendo propuesta del sistema.
+- **El frente es por obra:** (obra, nivel). En el modelo es el nodo de Nivel 1 del
+  presupuesto de esa obra (`PRESUPUESTO.tipo=obra`); el catálogo de 15 niveles es la
+  plantilla, no el frente. Por eso un cierre de frente (`CIERRE_FRENTE`, al 90% de avance)
+  es siempre de un frente de una obra.
+- **El sub-frente es la etapa** (Nivel 2) del frente. Esto matiza D-450 y D-451, que lo
+  llamaron «la etapa agrupada por gremio»: el nodo es la etapa y la agrupación por gremio
+  es una forma de leer (en Cimentación, 5 etapas son 2 grupos). Cuál de las dos se cuenta
+  y se controla queda como pregunta (B-88).
+- **La división por contratista** es regla del usuario: un sub-frente con dos
+  contratistas se parte en uno por contratista.
+
+**Lo que dice el dato.** Las 2,890 operaciones de avance de mano de obra de marzo a julio
+de 2026 con lote (`avance-TODAS-obras-5meses.csv`) traen obra (cluster y lote, p. ej.
+Alamo 18), nivel, etapa o partida y contratista: 34 obras, 13 niveles, 146 frentes, 21
+contratistas. La etapa se identifica en el 69% de las operaciones (el resto son partidas
+que no están en los siete prototipos o caen en más de una etapa).
+
+| Qué | Resultado |
+|---|---|
+| Cimentación como frente | 19 obras, mediana de 9 días entre la primera y la última operación: las «dos semanas» |
+| Contratistas por sub-frente (etapa) | 287 de 292 con uno (98.3%); 5 con dos |
+| Contratistas por sub-frente (grupo de gremio) | 257 de 266 con uno; 9 con dos (3.4%) |
+| Una partida con dos contratistas | 1 de 1,036 (obra × nivel × partida): **la división es por partida, no por cantidad** |
+| Instalaciones | las ejecuta un solo contratista en los 56 casos (frente × grupo); los dos contratistas de instalaciones (894 operaciones) no hacen otra cosa |
+| Un contratista en un frente | ejecuta 1 etapa en 78 casos, 2 en 24, 3 en 37 y 4 en 15: el grupo es lo que ejecuta una persona |
+| Los 9 con dos | 4 paralelos reales (13% a 32% del monto al segundo), 3 incidentales (1% a 4%, una operación), 2 secuenciales (no coinciden en el tiempo) |
+| Una semana, una obra | promedio 2.1 frentes, máximo 7; hasta 8 sub-frentes por grupo y 12 etapas |
+| Un residente (suposición: el operador que más registra la obra, 95%) | promedio 3.0 obras, 6.3 frentes y 8.1 sub-frentes por semana; máximo 7 obras, 23 frentes y 31 sub-frentes |
+
+Coincide con la descripción del usuario —uno o varios frentes y varios sub-frentes por
+residente— y muestra que contar no basta: con 31 sub-frentes en una semana la atención
+se reparte por peso (B-88).
+
+**Qué abre.** Tres aclaraciones, sin decidir:
+
+1. **La unidad que se cuenta y controla:** la etapa (5 en Cimentación) o el grupo de etapas
+   del mismo gremio (2). Propuesta del sistema: la etapa es el nodo y el gremio agrupa.
+   Cambia los conteos (semana 23 de Zafiro: 13 etapas o 9 sub-frentes por grupo). B-88.
+2. **Dónde vive el contratista:** el modelo lo liga al precio pactado, las deducciones,
+   los préstamos y los tickets de garantía, pero no a una actividad ni a un sub-frente.
+   Propuesta: asignarlo por partida, y que la división del sub-frente salga sola de las
+   partidas de cada contratista. Falta saber si el plan lo asigna antes de ejecutar o lo
+   revela el primer avance. B-90.
+3. **Cuándo un segundo contratista divide:** todo segundo, o solo el que pesa. Propuesta:
+   un umbral editable del 10% del monto, que deja fuera los 3 incidentales. B-90.
+
+Libro: `FRENTES_POR_OBRA_Y_CONTRATISTA.xlsx` (14 hojas: lo que quedó claro, las preguntas
+nuevas, cómo se midió, frentes por nivel y por obra, contratistas por sub-frente, los
+sub-frentes divididos, etapas por contratista, contratista por gremio, la carga por obra
+y por operador, y la cobertura de etapas). `GLOSARIO-DOMINIO.md` «Frente»,
+`MODELO.md` §2 y §5c, `PENDIENTES-MEJORAS.md` B-88, B-89 y B-90.
+
+*Corregido por D-453: la división sí llega a la cantidad, y no hay umbral del 10%.*
+
+### El contratista se asigna de lo general a lo particular hasta el concepto y la cantidad, las etapas de instalaciones se quedan separadas (D-453)
+
+Dato del usuario, respondiendo a las tres aclaraciones de D-452:
+
+1. **Las etapas de instalaciones se separan** en cimentación y en los demás niveles. La
+   única fusión, más adelante, es Hidráulicas y Sanitarias en **Hidrosanitarias**.
+2. **El contratista se asigna por obra y por tipo de trabajo, de ahí por etapa de
+   construcción**, salvo que una actividad o un concepto se asigne a otro contratista: de
+   lo general a lo particular. Se puede **reasignar en cualquier momento** por abandono de
+   obra o por logística. Pregunta si así se deduce el frente y se puede dividir en cualquier
+   momento.
+3. **Debe poder dividirse en lo particular por concepto y por cantidad.**
+
+**Qué cierra.**
+
+- **La pregunta 1 de D-452:** el sub-frente es la etapa, sin agrupar por gremio. Cimentación
+  son 5 sub-frentes (4 cuando se fusionen Hidráulicas y Sanitarias). El mapa etapa → gremio de
+  B-88 ya no hace falta para definir sub-frentes.
+- **Sí se deduce.** El frente (obra, nivel) y el sub-frente (etapa) salen del árbol. El
+  contratista de una partida sale de la asignación más particular que esté vigente. Y la
+  división de un sub-frente es el reparto de sus partidas por contratista, que se calcula a
+  cualquier fecha siempre que cada reasignación guarde su vigencia: no se captura ni se
+  guarda.
+- **Corrige D-452:** dije que «la división es por partida, no por cantidad» porque una
+  partida con dos contratistas era 1 de 1,036. Ese caso es justo una división por cantidad
+  (ACA-20020 en la azotea de Alamo 19: de 185.74 m² requeridos, 19.10 m² los hizo un contratista
+  en abril y 44.00 m² otro en julio), y 612 de las 1,036 partidas se ejecutan en varios avances,
+  que es donde una reasignación por abandono parte la cantidad. Por eso la asignación llega
+  hasta concepto **y cantidad**.
+- **Retira el umbral del 10% de D-452.** Con la asignación, la división la decide quien
+  asigna, no el peso. Lo que antes era «segundo contratista incidental» pasa a ser un aviso: el
+  avance registra al contratista real y el sistema lo compara con el asignado.
+
+**Lo que dice el dato** (2,890 avances reales de 34 obras). La asignación por obra y tipo de
+trabajo, con el tipo de trabajo como la Familia del concepto (el oficio), explica casi todo:
+
+| Nivel de la asignación | Cuántas pide | Operaciones que explica |
+|---|---|---|
+| Obra × tipo de trabajo | 215 (6.3 por obra) | 98.4% de las 2,890; 205 de 215 grupos con un solo contratista |
+| + Etapa | 6 de 292 etapas con otro contratista principal | de 98.6% a 99.8% en las 1,996 con etapa identificada |
+| + Concepto y cantidad | 24 de 1,036 partidas con ejecutor distinto del de su obra × tipo | el resto; entre las que tienen etapa quedan 3 partidas (0.2% del monto) |
+
+Es lo que se *ejecutó*, no lo que se asignó: en los datos no hay asignaciones, y muestran que
+una asignación por obra × tipo habría acertado el 98.4%. Tampoco hay un relevo por abandono
+(en los 10 pares de contratistas del mismo tipo y obra, 6 trabajan en paralelo y 4 son un
+segundo contratista con el 5% o menos del monto): esa parte del diseño viene de la regla del
+usuario, no del dato.
+
+**Cómo queda** (la regla es del usuario; los campos son propuesta del sistema, `MODELO.md`
+§4a): una `ASIGNACION_CONTRATISTA` con obra, alcance (obra × tipo · etapa · concepto), la
+Familia o el nodo, la cantidad (solo en el concepto; vacía es toda), el contratista, su
+vigencia y el motivo (inicial, abandono, logística, otro). Al reasignar se cierra la vigente y
+se abre otra; lo avanzado hasta esa fecha se queda con quien lo hizo. El sistema propone al
+contratista que tenga la especialidad del tipo de trabajo (el catálogo de contratistas
+trae 29) y el humano decide.
+
+**Hidráulicas + Sanitarias = Hidrosanitarias (B-91), anotado sin fecha.** En las 17
+combinaciones obra × nivel del dato donde hay las dos, las ejecuta el mismo contratista, así que
+la fusión no crea divisiones, y no cambia los picos de etapas activas de los siete programas.
+Se haría con claves de etapa nuevas por nivel y una equivalencia para leer las obras
+anteriores, sin reescribir las claves (`clave` nunca se reescribe). Hay un **choque de nombre**:
+`ECO-00039` «HIDRO-SANITARIOS» ya existe en Muebles / Iluminación y es de muebles sanitarios.
+
+Libro: `ASIGNACION_DE_CONTRATISTA_D453.xlsx` (8 hojas: la respuesta, la cascada, los pares con
+dos contratistas, el concepto dividido por cantidad, las hidrosanitarias y la propuesta de campos
+y reglas). `MODELO.md` §4a, `PENDIENTES-MEJORAS.md` B-88, B-90 y B-91.
+
+*Confirmado por D-454: el usuario aceptó los campos de `ASIGNACION_CONTRATISTA`.*
+
+### Los campos de la asignación quedan firmes, el frente no necesita marca de paquete y el tablero se calcula con lo que ya se captura (D-454, D-455)
+
+Dato del usuario: **confirma los campos** de `ASIGNACION_CONTRATISTA` (D-453) y pide seguir con
+lo que sigue, que es B-88.
+
+**D-454: los campos pasan de propuesta a firmes** (`MODELO.md` §4a). Cierra B-90.
+
+**D-455: B-88 se cierra.** Se probó el control completo sobre `ALAMO 18` (138 operaciones de
+avance de mano de obra del 22-abr al 29-jul-2026, cuatro niveles con avance, dos contratistas) contra
+su ingeniería y el presupuesto base, explotados a destajo.
+
+1. **Sin marca de paquete.** Contratar un frente terminado ya tiene su mecanismo:
+   `modo_duracion=preestablecida_nivel` con `disparador_fecha=contractual` (B-48, D-353). Los
+   avances reales de las 34 obras dicen que solo Cancelería, Carpintería y Muebles / Iluminación se
+   ejecutan de golpe (una o dos operaciones por frente, de $20,000 a $65,000 cada una); Asador, Pintura,
+   Barda y Pergolado cochera se ejecutan en detalle (2 a 5 operaciones por frente, de $1,300 a
+   $2,500 cada una) y Herrería no tiene operaciones. **Esto corrige D-450**, que contó 8 «paquetes» por el
+   nombre. Muebles / Iluminación tiene un solo frente en el dato y no basta para cambiar D-353, que dice
+   que se programa como el resto.
+2. **El control no pide captura nueva.** La operación de avance ya trae obra, nivel, destajo,
+   cantidad y contratista; el frente, el sub-frente, su avance y su contratista salen de ahí hacia
+   arriba y no se guardan.
+3. **Una cifra por nodo, comparable con el costo.** Por frente y por sub-frente: presupuesto base,
+   ingeniería del lote, ejecutado valuado (cantidad avanzada × precio pactado), ejecutado (%) y
+   pendiente, primera y última operación, días sin avance, contratista(s) y lo ejecutado por encima
+   de la ingeniería. El porcentaje pesa por costo sin hacer nada más: es ejecutado ÷ ingeniería.
+   Si un destajo cae en dos etapas del mismo nivel, lo ejecutado se reparte en proporción a su costo
+   (14 de 263 pares nivel × destajo).
+4. **La cola de atención son tres alertas** (`MODELO.md` §5a): un frente listo para solicitar su
+   cierre, un sub-frente iniciado y detenido, y un sub-frente ejecutado por encima de su ingeniería.
+
+| `ALAMO 18`, corte 29-jul-2026 | Resultado |
+|---|---|
+| Mano de obra de ingeniería | $1,031,773; ejecutado $466,385 (**45.2%**) |
+| Cimentación / Planta baja / Planta alta / Azotea | 92.1% / 55.7% / 57.1% / 16.4%; los otros seis frentes sin arrancar |
+| Sub-frentes | 38; 22 con avance; ninguno dividido (un contratista cada uno) |
+| Cola de atención | 8 filas: Cimentación lista para cierre y siete sub-frentes de instalaciones detenidos (18% de los 38) |
+| Lo que el 90% deja pasar | Cimentación llega al 92% con tres instalaciones pendientes y detenidas 91, 97 y 98 días (eléctricas en 28%, hidráulicas en 80% y sanitarias en 92%); el cierre pregunta, no impide |
+| Sobre la ingeniería | $2,838 (0.3%), en tres instalaciones de Cimentación |
+| Sin línea en la ingeniería | $512.50, dos destajos de Cimentación |
+
+**Lo que no hace.** Marcar atraso contra programa: el programa de `ALAMO 18` no está en los datos.
+Con un programa, la fecha de término del sub-frente da una cuarta alerta sin campo nuevo. «Detenido»
+es un aviso, no un diagnóstico: el avance puede no haberse capturado.
+
+**Parámetros que se proponen** (editables, en `ALERTA.parametro_usado`): 21 días sin avance para marcar
+detenido; el porcentaje del cierre es el de `solicitar_cierre_frente`, 90% (D-261).
+
+Libro: `TABLERO_DE_FRENTES_ALAMO18_B88.xlsx` (7 hojas: la respuesta, los frentes, los sub-frentes,
+la cola de atención, qué frente es paquete o detalle, las 280 líneas y cómo se calcula).
+`MODELO.md` §4a, §5a y §5c, `PENDIENTES-MEJORAS.md` B-88 y B-90.
+
+*D-456 resuelve los tres límites de arriba: el atraso contra programa (`subfrente_atrasado`), el «detenido» con diagnóstico y los parámetros.*
+
+### El atraso contra programa, el «detenido» con diagnóstico y los parámetros calibrados (D-456)
+
+Dato del usuario: «vamos con esto», sobre los tres límites que D-455 dejó dichos: no hay atraso
+contra programa, «detenido» es un aviso y no un diagnóstico, y dos parámetros editables (21 días y 90%).
+
+**1. Atraso contra programa.** `ALAMO 18` no tiene `ACTIVIDAD` cargada. Se usó el programa de su
+prototipo (Diamante con chimenea, §11.11) corrido al arranque real, el 22-abr-2026, en días hábiles de
+lunes a viernes y sin feriados (D-447): es lo que haría el CPM de la obra con las duraciones
+heredadas (D-441). Al corte del 29-jul-2026:
+
+| Frente | Planeado | Ejecutado | Valor rezagado |
+|---|---|---|---|
+| Planta baja | 87.3% | 55.7% | $155,139 |
+| Cimentación | 100% | 92.1% | $6,950 |
+| Planta alta | 56.5% | 57.1% | — |
+| Azotea | 3.1% | 16.4% | — (adelantada) |
+| **Obra** | **59.8%** | **45.2%** | **$162,089** (14.6 puntos) |
+
+La alerta nueva `subfrente_atrasado` avisa en tres casos: el término planeado pasó y el sub-frente no
+llega al 90%, debía haber arrancado y no arrancó, o va en curso 20 puntos o más por debajo de lo
+planeado. En `ALAMO 18` son 10 sub-frentes. Ordenada por valor rezagado, la cola cambia de lugar el
+problema: los tres primeros no son instalaciones detenidas sino la obra negra de Planta baja —Albañilerías
+($67,208), Obra gris, que debía arrancar el 15-jul ($39,955), y Estructura ($30,762)—, que suman $137,925
+(Albañilerías y Estructura siguen avanzando; Obra gris no ha arrancado); las instalaciones detenidas pesan
+de $150 a $12,730 cada una.
+
+**2. «Detenido» con diagnóstico.** El sistema no puede saber si un sub-frente está detenido o terminado
+sin capturar, pero sí reunir lo que lo distingue y preguntar. Tres pistas, con su alcance:
+
+| Pista | Qué dice en `ALAMO 18` | Alcance |
+|---|---|---|
+| Material surtido después de la última operación | Cimentación: ninguno | Sirve donde el material sale por partida. Las instalaciones lo reciben todo al abrir la orden de la etapa, así que «sin material posterior» no dice nada |
+| Avance del frente siguiente | Planta baja va al 56% | Cimentación no suele quedar a medias con el nivel de arriba al 56%: apunta a terminado sin capturar |
+| Contratista en otras obras | 8 a 15 obras | **No distingue nada:** los contratistas de más volumen promedian 2 a 4 obras por semana (este, 3.5) |
+
+El residente responde en la nota de resolución de la alerta con una de cuatro causas —terminado sin
+capturar, detenido de verdad, esperando un predecesor, contratista reasignado (D-453)— y, si es la
+primera, el sistema propone corregir el avance. **Sin campo nuevo:** el vocabulario vive en
+`nota_resolucion` hasta que haga falta contarlo. Hay además un patrón por contratista: siete de los diez
+sub-frentes atrasados son instalaciones del mismo contratista, y en las otras obras las 26 pausas
+registradas de instalaciones llegan a 14 días como máximo; aquí van 91 a 98. El sistema lo muestra
+agrupado y la causa la decide el residente.
+
+**3. Parámetros.**
+
+| Parámetro | Valor | Cómo se decidió |
+|---|---|---|
+| `dias_sin_avance` | 21 | **Se queda.** Es el percentil 90 de las pausas normales entre dos avances del mismo sub-frente (511 pausas de 292 sub-frentes de 34 obras; mediana 7, percentil 75 en 13, percentil 95 en 28). De los casos con 21 días sin avance (pausas pasadas más sub-frentes abiertos), el 37% terminó con avance; con 28, el 31%; con 35, el 20% |
+| `porcentaje_cierre` | 90% | **Se queda.** Es regla del usuario (D-261) y no hay registros de cierre con que calibrarla. Avisaría 39 de los 132 frentes con avance de las 34 obras; con 95%, 23 |
+| `porcentaje_terminado` | 90% | **Nuevo.** Un sub-frente con 90% o más no se avisa como atrasado: evita avisar por residuos (Cimentación sanitarias en 92%, $988) |
+| `puntos_rezago` | 20 | **Nuevo, sin calibrar:** solo hay una obra con programa; sale de leer los 8 casos de `ALAMO 18` (B-92) |
+
+Viven en `ALERTA.parametro_usado`. El libro trae las pausas por gremio (pocas en instalaciones, 26) y la
+sensibilidad del 90%.
+
+**Dos precisiones.** El archivo de almacén del lote 18 trae 358 filas de `ALAMO 18` y 28 de otros
+clusters (D-365); se usaron las 358. Y el atraso es contra el programa de la plantilla corrido al
+arranque: si el planeador lo edita o lo reancla, la alerta se mueve con él.
+
+Libro: `ATRASO_Y_DETENIDOS_ALAMO18_D456.xlsx` (11 hojas: la respuesta, la cola de atención, planeado contra
+real por frente, el programa anclado, el diagnóstico de detenidos, la calibración, las pausas normales y por
+gremio, la sensibilidad del 90%, los parámetros y cómo se calcula). `MODELO.md` §5a y §5c,
+`PENDIENTES-MEJORAS.md` B-88 y B-92.
+
+*Corregido por D-457: no hay `puntos_rezago` ni `porcentaje_terminado`; el retraso real se avisa desde un día hábil y la alerta es una por obra.*
+
+### Si el retraso es real se avisa, el retraso es de la obra y se audita por contratista y por residente (D-457)
+
+Dato del usuario, respondiendo a la pregunta de D-456 (¿20 puntos de rezago?): **«si el retraso es real
+se avisa; el retraso es por obra, pero es auditable por contratista y por residente»**.
+
+**1. Sin umbral.** Se retiran `puntos_rezago` (20) y `porcentaje_terminado` (90) de D-456. El retraso se mide
+en días hábiles detrás del programa, por **tiempo ganado**: hoy menos el último día en que el plan estaba en el
+avance ejecutado. Es **real desde un paso del calendario** (`CALENDARIO_OBRA.paso_dias`, un día hábil, D-446): no
+hay otra perilla. Un sub-frente al 99.9% o más cuenta como terminado, que es la precisión de la medida y no una
+política. Quedan `dias_sin_avance` (21) y el 90% de `solicitar_cierre_frente` (D-261), que no son retraso.
+
+**2. El retraso es de la obra.** La alerta es **una por obra** (`obra_atrasada`, `objeto_id` = la raíz del
+presupuesto de la obra); los sub-frentes atrasados de D-456 son su evidencia, no alertas aparte. El retraso es
+neto —lo adelantado compensa a lo atrasado— y la evidencia trae las dos partes. `ALAMO 18` al 29-jul-2026:
+**13 días hábiles detrás**, 59.8% planeado contra 45.2% ejecutado, **$150,164** netos ($174,697 detrás del
+programa y $24,533 adelante, en Azotea y Planta alta). Si una obra va en tiempo pero un sub-frente atrasa
+compensado por otro adelantado, solo aparece en la evidencia y no dispara: es la consecuencia de que el retraso
+sea de la obra.
+
+**3. Auditable por contratista.** El valor se reparte **exacto**, línea de destajo por línea: retraso de la línea =
+(planeado de su etapa − ejecutado) × su costo, y la suma de las líneas es el retraso de la obra. Cada línea cae
+con el contratista de `ASIGNACION_CONTRATISTA` vigente (D-453); en los datos, que no la traen, se usó el que
+ejecutó la línea, si no el que más ejecutó su etapa, si no el que ejecutó el mismo gremio, si no «sin contratista
+asignado». Es una lectura que se agrupa y no un campo, como la de `DESVIACION` por contratista (§5g).
+
+| Contratista | Detrás | Adelante | Retraso neto | Parte |
+|---|---|---|---|---|
+| Luis Fernando Aguilera Mallagan | $148,227 | $24,437 | **$123,790** | 82% |
+| Rigoberto Orduña | $26,470 | $96 | **$26,374** | 18% |
+| Sin contratista asignado | — | — | $0 (71 líneas, $160,959 de ingeniería sin arrancar) | — |
+| **Obra** | $174,697 | $24,533 | **$150,164** | 100% |
+
+**4. Auditable en el tiempo.** Recalculado cada miércoles (el avance se registra por semana), el retraso de
+`ALAMO 18` aparece el 20-may (3 días) y llega a 13 el 22-jul. El de Rigoberto Orduña aparece pronto (unos $26,000
+desde el 20-may) y no se corrige: las instalaciones nunca alcanzan al programa. El de Luis Fernando Aguilera
+aparece el 10-jun y crece en julio con la obra negra de Planta baja ($137,923 el 22-jul). Auditar en el tiempo
+exige que la asignación guarde su vigencia: sin ella, una reasignación por abandono le cargaría su historia al
+contratista nuevo.
+
+**5. Por residente.** Se agrupa por la obra que tiene asignada (`RESIDENTE_OBRA`). Aquí el residente es el
+operador que más registra la obra (suposición, D-452): Isai Olvera Arteaga, con 4 obras de las que solo
+`ALAMO 18` tiene programa. **`RESIDENTE_OBRA` no tiene vigencia**: igual que la asignación del contratista,
+necesita `vigente_desde` y `vigente_hasta` para que un cambio de residente no le cargue la historia al nuevo
+(B-93, propuesta).
+
+**Qué no resuelve.** Auditar las 34 obras pide el programa de cada una, que sale de su prototipo corrido a su
+arranque; en el sistema el prototipo de cada obra se sabe por la clonación de su presupuesto, pero en estos
+datos solo se identificó el de `ALAMO 18`. Y la cifra en días crece cerca del final de un sub-frente chico
+(Cimentación: 62 días por el 8% de $87,518), así que las listas se ordenan por valor.
+
+Libro: `AUDITORIA_DEL_RETRASO_ALAMO18_D457.xlsx` (9 hojas: la respuesta, la obra y sus frentes, por contratista,
+contratista por sub-frente, por residente, la serie semanal, la cola de atención, las 280 líneas al corte y
+cómo se calcula). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-92 y B-93.
+
+*Corregido por D-458: los sub-frentes atrasados también avisan por sí solos; el retraso bruto y el adelanto se cuentan por sub-frente por contratista ($165,426 y $15,262).*
+
+### El retraso también avisa por sub-frente, y al cambiar de residente el retraso anterior se congela y la mejora es del nuevo (D-458)
+
+Dato del usuario, respondiendo a las dos preguntas de D-457: **«también sub-frente»**, y **«si cambia de residente
+debe notar su propio retraso: el atraso anterior se congela y, si hay mejora, se atribuye al nuevo residente»**.
+
+**1. Por obra y también por sub-frente.** `obra_atrasada` (neto, una por obra) y `subfrente_atrasado` (un
+sub-frente al menos un día hábil detrás de su programa y sin terminar) disparan los dos. D-457 había dicho que los
+sub-frentes eran solo evidencia: se corrige. En `ALAMO 18` son la obra (13 días, $150,164) y 13 sub-frentes.
+
+**2. Relevo de residente.** La unidad de cuenta es el **sub-frente por contratista** (la división de D-453; con un
+solo contratista es el sub-frente). Al cambiar de residente en la fecha T:
+
+| Pieza | Regla |
+|---|---|
+| Residente anterior | Conserva, **congelado**, el retraso que había en T |
+| Residente nuevo | Ve **su propio retraso** aparte de lo heredado: retraso(hoy) − retraso(T), por sub-frente por contratista |
+| Mejora | Si un sub-frente heredado se recupera, la mejora se acredita al nuevo, sin pasar de lo que heredó |
+| Un sub-frente que no estaba atrasado y se atrasa | Es propio del nuevo |
+| Cuentas | Anterior + propio del nuevo = retraso de hoy, en cada sub-frente, frente y obra; con relevos sucesivos sigue cuadrando |
+
+Se cuenta el **retraso** (lo que va detrás) y no el adelanto. Si el adelanto contara, el nuevo residente pagaría la
+erosión del adelanto del anterior: en un relevo el 1-jul, Estructura de Planta alta pasaría de $47,803 adelantada a
+$11 atrasada sin que nadie hubiera hecho nada mal, porque el plan la alcanzó. En $ se suma entre sub-frentes; en días
+(tiempo ganado) se resta dentro de cada nivel y acompaña, sin sumarse entre niveles: cerca del final de un
+sub-frente chico los días suben sin que el valor cambie (Cimentación, +20 días con $0).
+
+**3. Lo que se guarda.** El congelado no se recalcula: con un programa editado después, otro cálculo daría otra
+cifra. Se guarda un corte inmutable por relevo (`CORTE_RETRASO`, `MODELO.md` §5c), que es el cierre del anterior y la
+herencia del nuevo. `RESIDENTE_OBRA` gana `vigente_desde` y `vigente_hasta`, que quedan firmes (cierra B-93); el
+corte y su enlace son propuesta.
+
+**4. Ejemplos con `ALAMO 18`** (no hubo relevo; son hipotéticos para ver la regla con datos reales):
+
+| Relevo | Anterior (congelado) | Nuevo, propio | Lo que explica |
+|---|---|---|---|
+| 1-jul-2026 | $82,981 (6 días) | **+$82,445** (+7 días): empeora $86,195, mejora $3,750 | Albañilerías de Planta baja +$42,561 y Obra gris +$39,955 (debía arrancar el 15-jul); Albañilerías de Planta alta −$2,330 |
+| 22-jul-2026 | $167,741 (13 días) | **−$2,315** (0 días): mejora $3,430, empeora $1,115 | Albañilerías de Planta baja −$3,254; Losas de Planta alta +$1,115 |
+
+**5. Cifras de D-457 que se afinan.** Contando por sub-frente por contratista el retraso es **$165,426 detrás y
+$15,262 adelante** (D-457 daba $174,697 y $24,533 contando por línea de destajo). El neto, $150,164, y el reparto
+neto por contratista (Luis Fernando Aguilera $123,790 y Rigoberto Orduña $26,374) no cambian.
+
+**Extensión propuesta, sin confirmar.** La misma regla para un cambio de contratista por abandono o logística
+(D-453): congelar el retraso del anterior y acreditarle la mejora al nuevo. Sin ella, el contratista que releva
+cargaría con el retraso de quien se fue.
+
+Libro: `RELEVO_DE_RESIDENTE_ALAMO18_D458.xlsx` (7 hojas: la respuesta, la regla, los dos ejemplos con sus días y las
+cifras de la obra por contratista). `MODELO.md` §5a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-93 y B-94.
+
+*Confirmado por D-459: los campos del corte quedan firmes y la regla aplica igual al contratista.*
+
+*D-460 diseña la fusión de Hidrosanitarias (B-91), resuelve el «detenido» de instalaciones (B-92) y suelta los `SF` de gualdra de Rubí y Jade.*
+
+### Los campos del corte quedan firmes, y la regla del relevo aplica igual al contratista (D-459)
+
+Dato del usuario, respondiendo a D-458: **«sí, confirmo los campos, y aplica igual a contratista»**.
+
+**1. Campos firmes.** `CORTE_RETRASO` (obra, fecha, motivo, días y detalle por sub-frente y contratista) y
+`RESIDENTE_OBRA.corte_inicio_id` pasan de propuesta a firmes (`MODELO.md` §5c, §5b). Cierra B-94.
+
+**2. Igual al contratista.** Al reasignar un contratista por abandono o logística (D-453):
+
+- Se guarda un corte (`CORTE_RETRASO`, motivo `cambio_contratista`) y la nueva `ASIGNACION_CONTRATISTA` lo enlaza
+  en `corte_inicio_id` (campo nuevo, firme por consecuencia de lo que el usuario pidió).
+- El **contratista nuevo recibe el alcance** de la asignación que sustituye (obra y tipo de trabajo, etapa,
+  concepto o parte de la cantidad). Hereda el retraso de ese alcance en la fecha del cambio, que no es suyo.
+- El anterior conserva el retraso **congelado**. El nuevo ve su retraso **propio** = retraso(hoy) − retraso(corte), y
+  toda mejora se le acredita a él. Se cuenta el retraso y no el adelanto (D-458).
+- Lo ya ejecutado se queda con quien lo hizo (D-453).
+
+**3. Un periodo, un residente y un contratista.** Entre dos cortes, lo que cambia el retraso de un sub-frente es de
+quien estaba al frente de la obra y de ese sub-frente en ese periodo. La suma de los periodos es el retraso de hoy,
+sumada por residente o por contratista, y las dos sumas coinciden. Si el residente y el contratista cambian el mismo
+día, comparten un solo corte: el segundo evento apunta al que ya existe.
+
+**4. Ejemplo hipotético con `ALAMO 18`:** relevo de residente el 1-jul y cambio del contratista de instalaciones el
+22-jul.
+
+| Periodo | Residente | Luis Fernando Aguilera | Rigoberto Orduña | Contratista nuevo | Total |
+|---|---|---|---|---|---|
+| 22-abr a 1-jul | A | $57,478 | $25,503 | — | $82,981 |
+| 1-jul a 22-jul | B | $83,889 | $871 | — | $84,760 |
+| 22-jul a 29-jul | B | −$2,315 | congelado | $0 | −$2,315 |
+| **Total** | | **$139,052** | **$26,374** | **$0** | **$165,426** |
+
+Por residente: A deja $82,981 y B suma $82,445. Por contratista: Rigoberto Orduña se va con $26,374 congelados y el
+nuevo empieza en $0 propio, porque en la primera semana las instalaciones no se mueven. Las dos sumas dan $165,426, el
+retraso de hoy.
+
+**Caso borde, propuesta.** Si la reasignación es de una parte de la cantidad de un concepto, el retraso de la línea
+en la fecha del cambio se reparte en proporción a la cantidad pendiente que pasa. No está confirmado.
+
+Libro: `PERIODOS_RESIDENTE_Y_CONTRATISTA_ALAMO18_D459.xlsx` (5 hojas: la respuesta, la regla, el cuadro de periodos,
+el cambio de contratista y las cuentas). `MODELO.md` §4a, §5b y §5c, `PENDIENTES-MEJORAS.md` B-94.
+
+### Los tres abiertos quedan anotados: Hidrosanitarias como fusión, el «detenido» de instalaciones y los pendientes de B-86 (D-460)
+
+Dato del usuario: **«vamos con esos tres abiertos; ya no necesitamos tablas de Excel, necesitamos que esté anotado
+en el cerebro»**. Los tres son B-91, B-92 y los pendientes anteriores (los `SF` de la gualdra de Rubí y Jade, y
+`P16`). Desde aquí el trabajo se registra en el cerebro y no en libros.
+
+**1. Hidráulicas + Sanitarias = Hidrosanitarias (B-91, diseñado).** Es una fusión, y su regla ya existe (§7,
+«Reglas de la fusión»); se aplica tal cual:
+
+- **Nombre y claves.** «INSTALACIONES HIDROSANITARIAS» más el nivel (CIM, PB, PA), con claves ECO nuevas: el mismo
+  patrón de las demás etapas de instalaciones, y no choca con `ECO-00039` «HIDRO-SANITARIOS» (muebles de baño, en
+  Muebles / Iluminación). Las claves actuales no se reescriben.
+- **Convive con las originales.** Sanitarias e Hidráulicas siguen existiendo: las obras y programas que las tienen no
+  cambian. La fusionada se usa en las versiones nuevas de la plantilla, y **solo en presupuestos en diseño**; en lo
+  contratado va por control de cambio. El nodo nace con `procedencia=fusion` y la `PROPUESTA(tipo=fusion)`
+  aprobada que lo crea es su vínculo con las originales; para comparar una obra con la etapa fusionada contra una con
+  las separadas se suman las dos originales.
+- **Efecto en los siete programas: ninguna partida cambia de fecha.** La ventana del bloque es la unión de las dos:
+  Cimentación pasa a 16 a 18-jun (3 días hábiles) en seis de los siete y a 11 a 17-jun en Plus; la de Planta alta es
+  la de Sanitarias en todos y la de Planta baja es la mayor de las dos. El pico de etapas activas no cambia (14 a 17) y
+  Cimentación pasa de 5 a 4 sub-frentes.
+- **Contratista.** En las 17 combinaciones obra × nivel del dato donde hay las dos etapas, las ejecuta el mismo
+  contratista; si fueran dos, el sub-frente se divide por contratista (D-453).
+- **Cuándo.** Cuando el usuario cree la versión nueva de la plantilla. No se ha tocado ningún programa ni presupuesto.
+
+**2. El «detenido» en instalaciones (B-92, resuelto).** D-456 dejó sin pista a las instalaciones, porque reciben
+todo el material al abrir la orden de la etapa. Con las 34 obras (73 sub-frentes de instalaciones de Cimentación,
+Planta baja y Planta alta, 32 de ellos parciales):
+
+| Dato | Resultado |
+|---|---|
+| Pausas de instalaciones | 26; la más larga, 14 días; **ninguna pasa de 21 días** |
+| Parciales y quietos 21 días o más | 19, en 11 obras (15 de Cimentación y 4 de Planta baja) |
+| Nivel siguiente de esos 19 | Siempre avanzado: 61% como mínimo, mediana 86% |
+| Dónde se quedaron | Entre 36% y 99%; mediana 84%; percentil 10 en 50% |
+
+Una instalación que lleva 21 días quieta no vuelve a avanzar: el edificio sigue y ella queda donde estaba. La
+lectura propia de `subfrente_detenido` en una etapa de instalaciones:
+
+1. **Probable terminado sin capturar:** el nivel siguiente va al 50% o más y la etapa lleva 50% o más. Se propone
+   cerrarla en su avance capturado o completarla; lo decide el residente (nota de resolución, D-456).
+2. **Pendiente real:** el nivel siguiente no llega al 50%. Es un prerrequisito sin hacer.
+3. **Atípico, se pregunta:** el nivel siguiente va al 50% o más pero la etapa lleva menos de 50%; en los datos
+   ocurre en 2 de 19 casos.
+
+Parámetros en `ALERTA.parametro_usado`: `siguiente_frente_pct` 50 y `captura_tipica_pct` 50. En `ALAMO 18`:
+Cimentación sanitarias (92%) e hidráulicas (80%) y Planta baja sanitarias (87%) e hidráulicas (52%) son probables
+terminados sin capturar; Cimentación eléctricas (28%), Planta baja eléctricas (48%) y gas (19%) son atípicas, las
+tres por debajo de lo más bajo que se haya visto (36%). La lectura es más firme en Cimentación (15 de los 19) que
+en Planta baja (4), donde las instalaciones de muros pueden esperar al repello. El avance se midió por las líneas con
+operaciones y la etapa se identificó en el 69% de las operaciones: se recalibra con más obras.
+
+**3. Los pendientes de B-86.**
+
+- **`SF` de la gualdra de Rubí y Jade.** El usuario suelta la espera de D-445: Rubí hereda `498SF`
+  (`CAR-01012`) y Jade `1401SF` (`CAR-01014`), junto al `SS` +15 que ya tienen. Se cumplen con holgura 0 y no mueven
+  ninguna fecha: Rubí pasa de 102 a 103 vínculos y Jade de 85 a 86. El libro de programas no se regenera; lo que manda
+  es lo anotado aquí.
+- **`P16`** (vertedero tras la boquilla fina interior, déficit de 10 días hábiles en Plus, Diamante sin, Diamante con
+  y Oro): queda como **incumplido conocido** de los cuatro prototipos de dos plantas, con `vinculo_incumplido`
+  activa. Es lo que dejó la decisión de D-437 de cerrar en 30 semanas. Cerrarlo pide mover el plazo diez días
+  hábiles (30 a 32 semanas) o relajar el vínculo; cualquiera de las dos lo decide el planeador por obra.
+  *(D-461 corrige: `P16` es solo de Plus y está sin escribir; en Diamante sin chimenea, Diamante con chimenea y Oro está escrito y se cumple.)*
+- **Sin cambio:** la segunda ruta de cuadrilla sigue en borrador (D-444), y las listas del planeador (17 ventanas, 53
+  líneas sin rendimiento, emparejamientos por rol, 15 incumplidos de Zafiro) siguen siendo suyas.
+
+`MODELO.md` §5a y §5c, `CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-86, B-91 y B-92.
+
+### El motor del CPM existe, y el programa ya no depende de ningún libro de Excel (D-461)
+
+Dato del usuario: «vamos con el que sigue y contempla que todo lo anterior de programa CPM sí esté anotado en el cerebro».
+El motor que D-409 y §15 daban por pendiente está escrito (`backend/core/motor_cpm.py`) y lo que vivía solo en los
+libros de Excel de los siete prototipos pasó a `1-mundo/programas/`. El contrato, la red con sus identificadores,
+las listas del planeador y las cifras de referencia están en `PROGRAMA-CPM.md`; aquí queda lo que cambia lo dicho
+antes en este archivo:
+
+- **Se prueba con datos reales.** Los siete programas, pasados a CSV, reproducen cada cifra publicada de esta
+  sección: 832 vínculos (680 `FS`, 91 `SS`, 53 `FF`, 8 `SF`), los 15 de Zafiro (18 con el bloque completo), los 39
+  cuyo bloque contiene a su sucesora (35 cumplidos), el cierre en 139 y 149 días hábiles y la herencia de
+  duraciones 1,520 / 132 / 478.
+- **Un bloque como predecesora se calcula por punto fijo, no por orden topológico.** Con aristas desde todos sus
+  descendientes, la gualdra y la losa de su propio grupo parecen un ciclo en los seis programas limpios; no lo son.
+- **Zafiro: 124 vínculos y 75 no se contradicen.** Son dos libros: el original (75, D-424) y el de los siete, al que
+  D-426 le sumó la red mínima y le quitó los 5 que esa red reemplaza (75 − 5 + 54).
+- **Con la red que hay, el CPM puro no reproduce el cierre de los de dos plantas.** Rubí y Jade calculan 139 días
+  hábiles, igual que su plan; Diamante sin chimenea, Diamante con chimenea y Oro, 139 contra 149 (la ventana de la
+  planta alta no está en ningún vínculo); Plus, 81, porque le falta `P16`. Con `P16` escrito calcularía 135.
+- **`P16` es solo de Plus.** D-460 lo dio como incumplido de los cuatro de dos plantas; en los otros tres está
+  escrito y se cumple.
+
+`PROGRAMA-CPM.md`, `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-13 y B-95.
+
+### El programa se carga, la cadena de relevos se calcula y el Gantt es un dato (D-462)
+
+Dato del usuario: «vamos con el que sigue». Las reglas de carga que D-442 y D-443 dejaron escritas son código
+(`backend/core/programa.py`); el detalle, las tablas y las pruebas están en `PROGRAMA-CPM.md` §4.5, §8. Lo que
+cambia lo dicho antes en este archivo:
+
+- **De los 124 vínculos de Zafiro, 6 no se pueden cargar** y los otros 9 de sus 15 incumplidos cargan y avisan.
+  Los seis son el autovínculo `EST-01151`, el ciclo de `BAP-01100` y `ICA-01030` (D-424: se queda el `SS`, que se
+  cumple), y cuatro de partidas hermanas que esperan cada una al resto de su grupo, ciclos que D-443 no
+  distinguía porque leer el bloque sin la sucesora solo evita el autovínculo. Los otros seis programas cargan
+  todos sus vínculos.
+- **La cadena de relevos de D-425 se calcula**, y reproduce fila por fila las cinco que se tenían. Rubí tiene una
+  de 28 pasos y Jade una de 27, que D-425 solo daba por cumplidas dentro de la red mínima.
+- **El Gantt de D-432 ya es un dato**: 388 partidas y 90 resúmenes de Nivel 2 y 3 (D-432 contó también la fila
+  de cierre en blanco, 479), 130 flechas y las marcas del calendario. Lo que decide la pantalla sigue siendo de
+  B-95.
+
+`PROGRAMA-CPM.md`, `MODELO.md` §5c, `PENDIENTES-MEJORAS.md` B-95.
+
+### El programa se reprograma por empuje mínimo y el Gantt se edita (D-463)
+
+Dato del usuario sobre las tres preguntas de B-95: «tú decide lo mejor», «lo que sea mejor, simple de operar pero
+sin perder detalle» y «lo más autónomo posible pero editable». El detalle, las reglas y las pruebas están en
+`PROGRAMA-CPM.md` §4.6, §8; lo que cambia lo dicho antes en este archivo:
+
+- **Editar no es recalcular el programa entero.** Con la red mínima, el CPM más temprano colapsa (Plus, 81 días
+  hábiles contra 149) y no sirve como modo de trabajo; el planeador edita sobre el plan que tiene y el sistema
+  corre solo lo que la edición obliga. Sin ediciones, los seis programas limpios quedan idénticos.
+- **`P16` cuesta lo que D-437 midió.** Agregarlo a Plus corre el cierre del 5 al 19-ene-2026, 10 días hábiles:
+  el déficit de D-437 y los «30 a 32 semanas» que D-460 decía que costaría cerrarlo, ahora calculados por el
+  motor y no leídos a mano.
+- **Zafiro, si la red mandara:** con sus 118 vínculos cargados se moverían 47 partidas y cerraría el 7-ene-2026.
+  Solo informa; Zafiro sigue de origen (D-444).
+- **El rojo del Gantt es la cadena de relevos** que el usuario validó en D-426, y la ruta crítica de la red queda
+  como diagnóstico.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-95.
+
+### Las ediciones del programa se guardan como bitácora y el vínculo editado lleva su origen (D-464)
+
+Dato del usuario: «vamos con lo que queda abierto». Lo que quedaba era guardar lo que el planeador edita y el
+origen del vínculo que D-463 dejó como propuesta. El detalle, el contrato y las pruebas están en
+`PROGRAMA-CPM.md` §4.7 y la entidad en `MODELO.md` §5c; lo que cambia lo dicho antes en este archivo:
+
+- **No se guardan fechas, se guarda lo que se editó.** El programa base no cambia y el vigente es la base más
+  las ediciones aplicadas: deshacer una es repetir la cuenta sin ella, y la historia de cómo se llegó a las
+  fechas de hoy no se pierde.
+- **Es la primera pieza de la persistencia que ESTADO daba por pendiente**, y está verificada contra un
+  Postgres de verdad (16, embebido) con el mismo contrato que el adaptador en memoria. La bitácora no se borra
+  ni se reescribe; sin autor o sin origen en un vínculo editado, la edición no entra.
+- **El origen de lo importado queda vacío.** El libro no dice por qué existe cada uno de sus 832 vínculos y no
+  se inventa; solo lo que alguien edita lleva origen, y sin declarar es `decision`.
+
+`PROGRAMA-CPM.md`, `MODELO.md` §5c.
+
+### El programa tiene API y la pantalla trabaja contra lo guardado (D-465)
+
+Dato del usuario: «ok, lo que sigue». Lo que D-464 dejó abierto era la superficie FastAPI (D-54) y que la
+pantalla del Gantt dejara de simular. El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo dicho
+antes en este archivo:
+
+- **La pantalla ya no solo simula.** Servida por la API muestra lo guardado y, encima, lo que se decide, que queda
+  por guardar hasta que se guarda; cada edición entra a la bitácora con quién la hizo, con qué rol, cuándo y el
+  impacto que se vio, y se puede deshacer. Sin servidor sigue siendo la simulación de D-463.
+- **Quien guarda dice la versión que vio.** Una pantalla vieja no aplica sobre lo que no vio: recibe un conflicto,
+  trae lo de hoy y revalida lo que tenía pendiente.
+- **Sin decidir quién es quien llama.** Hasta que haya autenticación (B-96), el rol y el nombre viajan en dos
+  cabeceras que sirven para trabajar y probar y no se despliegan.
+- **El cliente de la pantalla se genera del spec** (D-55) y una prueba avisa si queda viejo.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
+
+### Los programas se listan y se suben por la API (D-466)
+
+Dato del usuario: «vamos con el que sigue abierto». El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo
+dicho antes en este archivo:
+
+- **Subir un programa ya no es cosa del repositorio.** Un archivo en el formato de los siete prototipos se carga entero
+  o no se carga, y el reporte dice qué vínculos no entraron y por qué, sin corregirlos: los decide el planeador.
+- **Pide la misma función que editar la estructura** (Control de obra), porque subir un programa es lo más estructural
+  que hay; y el programa dice quién lo subió.
+- **El texto del programa es de otro.** Desde que cualquiera con permiso puede subir uno, lo que trae —su nombre, sus
+  claves, sus descripciones— se muestra siempre como texto y nunca como HTML.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
+
+### La versión nueva de un programa: lo decidido pasa, y lo que no, se dice (D-467)
+
+Dato del usuario: «vamos con el que sigue abierto». El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo
+dicho antes en este archivo:
+
+- **Revisar un programa no borra lo ya decidido.** La versión nueva es otro programa; las ediciones aplicadas pasan a
+  ella con su autor, su rol y su fecha, siempre que sigan teniendo sentido.
+- **Si el archivo nuevo ya cambió una partida, gana el archivo.** La duración o el arranque que el planeador puso en
+  la revisión no se pisan con una edición vieja; se avisa y él decide.
+- **Nada pasa a medias.** El programa nuevo y sus ediciones se guardan juntos o no se guarda nada, y la cadena de
+  versiones es una sola.
+
+`PROGRAMA-CPM.md`.
+
+### La autenticación, los permisos desde su tabla y las pantallas sin datos (D-469)
+
+Dato del usuario: «vamos con el que sigue abierto». Es B-96, tomado con la recomendación que ya estaba escrita y como
+propuesta sin confirmar. El detalle está en `PROGRAMA-CPM.md` §4.8 y §8; lo que cambia lo dicho antes en este archivo:
+
+- **Quién puede qué es, por fin, la tabla que `MODELO.md` §5b decía.** El código lo tenía como una constante; ahora el
+  servicio lee `ROL_FUNCION` en cada acción, y lo que corrija `gestionar_rol_funcion` vale en la siguiente.
+- **La API no tiene contraseñas.** Verifica los tokens que entrega un proveedor de identidad y se queda con el correo;
+  quién es y qué puede hacer se resuelve con las tablas de aquí. El proveedor dice quién es; no decide qué puede hacer.
+- **Un token se acepta solo con el algoritmo que el servidor configuró**, nunca con el que el token diga, y siempre
+  vence: así no pasan ni `none` ni el `HS256` firmado con una llave pública.
+- **Los datos no salen sin saber quién los pide.** Por eso las pantallas llegan vacías y los piden con el token.
+
+`PROGRAMA-CPM.md`, `PENDIENTES-MEJORAS.md` B-96.
+
+### Supabase Auth es el proveedor y el modelo de autenticación queda firme (D-470)
+
+Dato del usuario, respondiendo las dos preguntas con que quedó D-469: «1 supabase. 2 confirmar, para pendientes que
+arrastra. No es necesario en este momento, vamos con otros pendientes». **Cambia lo que la sección anterior (D-469) llama
+«propuesta sin confirmar»:** el modelo —token firmado que la API verifica, correo como llave de `USUARIO`, personas dadas
+de alta a propósito, permisos desde `ROL_FUNCION`— es el que el usuario quiere, y el proveedor es Supabase Auth (el
+hosting ya era Supabase: D-03, B-21).
+
+- **No cambia el código.** Supabase entra por la configuración que D-469 dejó abierta: su JWKS (o el secreto compartido,
+  si el proyecto no firma con llaves asimétricas), la audiencia, el emisor y la dirección de entrada. La receta está en
+  `PROGRAMA-CPM.md` §4.8.
+- **De Supabase solo se toma el `email`.** Su reclamo `role` vale `authenticated` para todos; los roles de este sistema
+  salen de `USUARIO_ROL` y nunca de lo que diga el proveedor.
+- **Un requisito que es del proyecto de Supabase:** la API se fía del correo que el token trae, así que el proyecto debe
+  exigir confirmar el correo (y, de preferencia, no dejar registrarse a cualquiera). Si no, quien se registre con el
+  correo de otro —uno que sí esté dado de alta— recibiría un token válido.
+- **Lo que no se pudo verificar:** no se abre el sitio de Supabase desde donde se trabaja y no hay un proyecto. Lo que
+  Supabase documenta (por búsqueda) es la dirección del JWKS y que solo trae llaves si el proyecto firma con las
+  asimétricas; `aud`, `iss`, `email` y la duración del acceso salen de fuentes de terceros y se confirman con el primer
+  token real, donde la API dice por qué rechaza uno.
+- **Lo pospuesto no se descarta:** alta de personas desde la API, alcance de datos por obra y clave foránea al usuario
+  son B-98; cómo inicia sesión la gente y la renovación del token son B-97.
+
+`PROGRAMA-CPM.md` §4.8, §9, `PENDIENTES-MEJORAS.md` B-96, B-97, B-98.
+
+### El programa con versión nueva se cierra a ediciones, y las partidas se reconocen solo por `oid` (D-471)
+
+Dato del usuario: «vamos con otros pendientes». Eran las dos decisiones menores que D-467 había dejado abiertas, y no
+dependían de ningún dato nuevo; el detalle y las pruebas están en `PROGRAMA-CPM.md` §4.8, §8 y §9.
+
+- **Un programa con versión nueva se ve pero no se edita.** Lo que se decidiera ahí no pasaría a la nueva y se
+  perdería en silencio. La API contesta 409 `reemplazado` con el número de la nueva, y el puerto lo comprueba con la
+  fila bloqueada, antes que la versión. No se pierde ninguna salida: si la versión nueva salió mala, se sube otra encima.
+- **Las partidas se reconocen por `oid` y no por clave ni por fila.** La clave se repite dentro de un mismo programa
+  (Zafiro: 317 conceptos, 297 claves distintas) y la fila se corre; casar por cualquiera de las dos sería adivinar, y un
+  acierto falso mueve en silencio otra partida que la decidida. Lo que no se encuentra se dice y se decide a mano.
+- **Lo que se agregó es el aviso del caso probable:** cuántas partidas comparte el archivo nuevo con el anterior. Los
+  siete programas reales no comparten ni un `oid` entre sí, así que un archivo de otro programa subido como versión da
+  cero y la pantalla pregunta si es el archivo correcto, sin impedirlo.
+
+`PROGRAMA-CPM.md`.
+
+### Los archivos de OPUS que sí había, leídos con el cargador y contrastados con el motor (D-472)
+
+Dato del usuario: «Catálogos crudos de opus ya los tienes los convertiste a csv». Había tres CSV y las once ingenierías de
+ALAMO 18 en la carpeta de archivos subidos de la sesión; pasan a `1-mundo/opus/`. Los demás catálogos no están en ninguna
+parte de la máquina (`CATALOGOS.md`, «Qué archivos de OPUS están en el repo»). El detalle y las pruebas, en `MEMORIA.md` D-472:
+
+- **El cargador de §2.4 y §2.5 existe** (`backend/core/importacion_opus.py`): mapeo por alias con informe, árbol por posición,
+  placeholders descartados solo si se verifica, números estrictos, matrices, huella y diagnóstico de §2.9. No escribe nada.
+- **Los archivos reproducen lo que el cerebro decía de ellos:** las 3,231 filas, los 121 placeholders, la tabla de tipos de
+  §2.4, y `Indice` como lugar entre hermanos.
+- **El motor de cálculo da el precio de OPUS al centavo** en los 467 conceptos con matriz, los 89 compuestos y las 39
+  cuadrillas. Es la primera vez que B-02 se prueba con algo más que un caso trabajado.
+- **`ANALISIS_DE_BASICOS_COMPUESTOS` no aporta nada que `_CONCEPTOS` no traiga**, y `Origen` ahí es la clase del padre.
+- **P-09 sigue sin resolverse y P-11 ya se puede ejecutar:** los cuatro conceptos sin matriz no están en ningún archivo que
+  haya; las 79 claves `AUX-` son las reales y están completas. *(P-11 se ejecutó en D-478.)*
+
+`CATALOGOS.md`, `PENDIENTES-MEJORAS.md` B-02, B-06, P-09 y P-11.
+
+### El catálogo, las matrices y los presupuestos de OPUS, persistidos (D-473)
+
+Dato del usuario: «vamos con persistir presupuesto y APU». El detalle, las decisiones y las pruebas están en `MEMORIA.md` D-473 y
+`MODELO.md` §4 (la subsección de D-473). Lo que cambia lo dicho antes en este archivo:
+
+- **La secuencia de §2.9 está completa para lo que traen los tres archivos:** se lee, se compara, se muestra el diagnóstico, y se aplica
+  todo junto. Lo que se detiene (unidad distinta, PU movido más de 5 % sin confirmar, lo que depende de algo detenido, el precio de
+  un trabajo) queda dicho en la carga con su motivo; el resto entra.
+- **Versionar es de la receta y el precio es otra historia** (§2.2 y `MODELO.md` §4a): una cantidad cambiada es una versión nueva, sola;
+  un precio movido es una fila de historia que cierra la anterior y no versiona nada. El PU de una versión se congela.
+- **La huella de una matriz ya no lleva la unidad** *(corrige §2.7, que la definía como `f(unidad, insumos, cantidades)`)*: se compara
+  antes y aparte, y saber una unidad que no se sabía no cambia la receta.
+- **Un presupuesto que ya existe no se toca.** Reconciliar sus cantidades cuando llega distinto es lo siguiente que hay que diseñar.
+- **Cada capítulo del archivo es un presupuesto**, con su árbol desde 1.
+
+`PENDIENTES-MEJORAS.md` B-03 a B-06.
+
+### El programa cuelga del presupuesto (D-474)
+
+Dato del usuario: «vamos con colgar el programa del presupuesto y lo que no está también». El detalle, las reglas y las pruebas están
+en `MEMORIA.md` D-474, `MODELO.md` §4 (la subsección de D-474) y `PROGRAMA-CPM.md` §4.7. Lo que cambia o se aprende:
+
+- **Los siete programas cuelgan de sus siete presupuestos: 3,110 enlaces, exactamente las 3,110 filas que se quedaron al cargarlos.**
+  Seis cuadran de los dos lados sin excepción. Un bloque se casa por su ruta natural (`clave#n`), una partida por su bloque y su
+  clave, la n-ésima vez que se nombra; los programas traen 120 marcadores vacíos de OPUS (§2.5) que no se enlazan.
+- **El cruce encontró dos cosas que el planeador y Costos deciden:** el programa de Zafiro tiene `ACA-02034` «CUBIERTA DE COCINA» (8 días,
+  vinculada a la fila 262), que **no está en ningún archivo de OPUS que haya** —el plan manual le puso un total de $1—, y dice 4 en
+  `OBE-04010` donde el presupuesto dice 1 (el programa trae $34,863.48, cuatro veces el precio). El sistema no corrige ninguna de las
+  dos: las dice.
+- **Un programa no se cuelga de un presupuesto que no es el suyo:** la ruta lleva la clave del capítulo, así que Rubí contra Zafiro
+  casa cero filas; si casan menos de la mitad de los conceptos hace falta que alguien lo confirme.
+
+`PENDIENTES-MEJORAS.md` B-03 y B-05.
+
+### Contratar un subárbol fija sus PU y lo congela (D-475)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-475 y `MODELO.md` §4 (la subsección de D-475). Lo que cambia lo dicho antes
+en este archivo:
+
+- **El estado de §1.4 ya tiene dónde vivir:** es del bloque, su subárbol se contrata completo y los de abajo lo heredan. Lo contratado
+  está congelado en la base; «solo admite adiciones al final» se cumple porque agregar es lo único que la base deja.
+- **Contratar es el segundo disparador de versión de §2.2** (el primero es que cambie la receta): fija el PU de cada concepto a ese
+  momento, con una versión nueva de la misma receta si los precios se movieron. Con el acero un 2 % más caro, contratar la cimentación
+  de Zafiro cuesta $40.97 más y no mueve ni un centavo a los otros seis presupuestos.
+- **«Algo contratado: no entra en vigor, va a control de cambio» (§2.2) ya se cumple en la carga:** la versión nueva de un concepto
+  que fija un renglón contratado se detiene y ninguna confirmación la deja pasar.
+- **Sigue sin definirse** cómo se deshace una contratación (sería un control de cambio, §13.4) y no existe todavía la orden de cambio
+  que agrega sobre lo contratado.
+
+`PENDIENTES-MEJORAS.md` B-05.
+
+### Un presupuesto que ya existe se reconcilia (D-476)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-476 y `MODELO.md` §4 (la subsección de D-476). Lo que cambia lo dicho antes en
+este archivo:
+
+- **«Un presupuesto que ya existe no se toca» (D-473) ya no es cierto:** llega otra vez y se reconcilia por la ruta natural de §2.3 —no por
+  posición—. En diseño «renumera libre» (§1.4): las cantidades distintas y los renglones nuevos entran, con su historia; lo contratado
+  «solo admite adiciones al final» y por control de cambio, así que la carga no le toca nada.
+- **Una baja es la decisión más cara y la que más se confirma:** el archivo que ya no trae un renglón no basta para quitarlo. Se dice, con
+  el id con que se confirma, y el renglón sigue hasta que alguien lo confirme; un bloque que se va se lleva lo que cuelga de él con una sola
+  confirmación. Y no se borra: queda dado de baja con su carga.
+- **El programa y el presupuesto cambian cada uno por su lado sin perderse:** reconciliar no mueve un enlace; si un renglón que el programa
+  cita se da de baja, el enlace queda donde estaba y el programa lo dice.
+
+`PENDIENTES-MEJORAS.md` B-05 y B-06.
+
+### La alerta por diferencia de texto, en la carga (D-477)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-477. Lo que cambia o se aprende:
+
+- **§2.7.1 ya no es solo una regla escrita:** al recargar, la descripción de cada nodo del catálogo se normaliza y se compara con la
+  guardada. Cosmético no alerta; un número o una palabra que cambian alertan como **alta**; el orden o un calificativo, como informativa.
+- **Cruzar texto y huella ya se cumple:** un texto que cambió de forma alta junto con la matriz es **otro concepto**: se detiene y se
+  propone la clave siguiente libre, y quien decide puede confirmar que es el mismo.
+- **En los datos que hay no hay una sola diferencia de texto** —cada clave trae una sola descripción en los dos archivos de OPUS—: la regla
+  se probó contra todas las descripciones reales y con filas reales editadas, no contra un caso que haya ocurrido.
+- **Falta el diccionario de sinónimos** que §2.7.1 menciona: no existe en el repositorio, y sin él fabricación y elaboración son palabras
+  distintas.
+
+`PENDIENTES-MEJORAS.md` B-06.
+
+### P-11 se ejecuta: las 79 claves `AUX-` pasan a `PRE-` por clonar y sustituir (D-478)
+
+El detalle, las reglas y las pruebas están en `MEMORIA.md` D-478. Lo que cambia o se aprende:
+
+- **El diseño de §8.4 y §16.2 se cumplió tal como estaba escrito:** no se renombra, nace `PRE-00120` con la receta y el precio de `AUX-00001`;
+  lo que lo citaba pasa a citarlo con una versión nueva (el mismo PU, así que no se mueve un centavo) y la clave vieja **sigue entrando**: un
+  archivo de OPUS que la traiga se lee como el clon, y la carga lo avisa.
+- **Los compuestos de material son materiales, no auxiliares (§10.4):** D-472 los había guardado como `auxiliar`; se corrigió en la carga y en la base.
+- **Con los datos reales:** las 79 juntas son 177 versiones nuevas y 217 renglones fijados; los siete presupuestos suman lo mismo al centavo; recargar
+  los tres archivos de siempre no cambia nada. Hay diez pares donde un `AUX-` cita a otro (nervaduras de nervaduras): el orden no importa.
+- **Lo contratado se respeta como en la corrección de unidad (§2.8):** libre en diseño, se detiene donde hay contrato; el original no se toca y se dice
+  cuál lo frena.
+- **El viaje de vuelta es una bandera, no un exportador:** `exporta_clave_vieja` dice que la clave vieja sigue saliendo; todavía no hay quien exporte (B-08).
+- **El mismo mecanismo sirve para los demás prefijos** (el material hidráulico con prefijo sanitario de `IDEAS.md` §6; `HD-00411` y `MOS-2079` de P-33):
+  `python3 -m api.clonar --corregir-prefijo VIEJO --por NUEVO --desde N`. Qué claves son no está en ningún archivo que haya.
+
+`PENDIENTES-MEJORAS.md` P-11, `IDEAS.md` §6.
+
+### `Unidades ejecutoras`: el hueco es de comportamiento, no de esquema
+
+Dato del usuario, explorar `Unidades ejecutoras`. Confirmado en las
+3,231 filas, los siete prototipos completos, no solo Zafiro:
+`Unidades ejecutoras` = 1.0 en las 2,452 filas de Concepto, sin una
+sola excepción; `NaN` en las 779 que no son Concepto —misma división
+limpia por `Tipo` que `Remanente`—. No es un comportamiento de Zafiro,
+es el default del archivo entero.
+
+**Esto cambia cómo se lee el hueco de B-82.** El campo se llama
+"Unidades ejecutoras", en plural, acepta cualquier número —el ERP sí
+puede representar más de una cuadrilla—. El hueco no es que falte el
+campo: es que nadie, en ninguna de las 2,452 filas de los siete
+prototipos, lo tocó nunca. No hay nada que le diga a quien captura
+"esta cantidad, contra este tiempo y este rendimiento, necesita más de
+1" — exactamente el cálculo que D-397 a D-400 tuvieron que hacer a
+mano, concepto por concepto. El hueco es de comportamiento —falta la
+mitad de "el sistema propone"—, no de esquema. `PENDIENTES-MEJORAS.md`
+B-82, extendido.
+
+### `Rendimiento calculado` no necesitaba fórmula nueva — ya la tenía, en §6.2
+
+**Corrige lo que esta misma sección decía unas líneas arriba.** La
+fórmula que se propuso aquí (`Rendimiento teórico` × `Unidades
+ejecutoras`) nunca hacía falta: `Rendimiento calculado` ya estaba
+definido, desde antes de esta sesión, en §6.2 —`Costo de la cuadrilla`
+÷ `Precio del destajo`—, sin pasar por `Unidades ejecutoras` en
+absoluto. Esa sección distingue cuatro rendimientos (Calculado,
+Teórico, Real, Requerido); lo que aquí se escribió no coincidía con
+ninguno de los cuatro.
+
+**Lo que de verdad hacía falta nombrar era otra fórmula, para otro
+campo:** la duración de `modo_duracion=calculada_rendimiento`
+(`MODELO.md` §5c) es `Cantidad` ÷ (`Rendimiento teórico` ×
+`Unidades ejecutoras`) — ahí sí entra `Unidades ejecutoras`, y no
+pasa por `Rendimiento calculado`. Y lo que `PROGRAMA_ZAFIRO.xlsx`
+aporta (cantidad entre duración capturada a mano) ya tenía nombre en
+§6.2 sin un caso real que lo probara: es `Rendimiento Requerido`.
+
+**Los dos límites de alcance siguen de pie, dato del usuario —solo
+cambian de fórmula—:** solo existe cuando el destajo tiene su propia
+línea de mano de obra en la matriz —los conceptos
+`preestablecida_nivel` (Cancelería, Domos, B-48, D-400) no tienen nada
+que escalar—; y el mismo mecanismo aplica igual a maquinaria, no solo
+a cuadrillas de personas.
+
+**Con números reales, no solo con la fórmula corregida.** Castillo K1
+conecta, por primera vez, el lado del destajo (§6.2) con el lado del
+programa que D-397 a D-400 ya habían trabajado a mano aquí mismo: el
+caso real cierra los tres rendimientos entre 11.17 y 12.12; los dos
+tramos de diseño de Zafiro se disparan en direcciones opuestas (18.13
+y 4.20) — confirma por el lado del dinero lo que ya se sabía por el
+lado del tiempo. Tabla completa en §6.2. `CATALOGOS.md` §10,
+`PENDIENTES-MEJORAS.md` B-82.
+
+### `Holgura`: confirma un hueco ya conocido, no abre uno nuevo
+
+Dato del usuario, seguir explorando `PROGRAMA_ZAFIRO.xlsx`, ahora
+`Holgura`. Igual que `Rendimiento` y `Programa según rendimiento`:
+siempre 0, en las 3,231 filas de los siete prototipos, sin excepción.
+No es un hallazgo nuevo — es exactamente lo que §15 ya tenía anotado:
+`ACTIVIDAD.holgura` existe en el modelo como campo **calculado**
+(`MODELO.md` §5c, P-20), pero "el motor que calcula fechas tempranas/
+tardías y ruta crítica sigue sin escribirse" —exclusión de alcance
+deliberada, código sobre el schema, no el schema—. `PROGRAMA_ZAFIRO.
+xlsx` es un plan capturado a mano, nunca pasó por ningún motor de CPM,
+así que la columna se queda en su default — mismo patrón que `Esfuerzo`
+(D-392): la plantilla la trae, pero solo la llena un cálculo que hoy
+nadie corre sobre este archivo. §15, `MODELO.md` §5c.
+
+### `% Programado` es `Remanente` visto al revés, no una columna nueva
+
+Dato del usuario, seguir explorando, ahora `% Programado`. Confirmado
+en los 317 Concepto de Zafiro: `% Programado` = `Cantidad programada`
+÷ `Cantidad`, exacto en 315 de 317 —las otras 2 son `Cantidad`=0, sin
+nada que programar, no son casos reales—. 314 de 317 están al 100%; el
+único en 0% es `ACA-01080` — el mismo y único caso real que D-401 ya
+había encontrado con `Remanente`, no uno nuevo. Si `Remanente =
+Cantidad − Cantidad programada`, entonces `% Programado = 1 −
+(Remanente ÷ Cantidad)` — la misma resta, como cobertura en vez de
+cantidad sobrante. Mismo patrón que `Esfuerzo` (D-392) y `Holgura`
+(D-409): la plantilla trae una columna que parece nueva, pero es una
+vista derivada de un dato que ya existe.
+
+### `Programa según rendimiento`: la causa común de cuatro columnas "sin usar"
+
+Dato del usuario, cerrar la exploración columna por columna con la
+que faltaba. `Programa según rendimiento` = "No" en las 3,231 filas de
+los siete prototipos, sin excepción — pero a diferencia de las demás,
+esta no es solo otra columna trivial: **es el interruptor mismo de
+`modo_duracion=calculada_rendimiento`** (`MODELO.md` §5c). "No"
+significa que la duración se escribió a mano (`capturada`), nunca se
+calculó como cantidad÷rendimiento÷cuadrillas — y esa es la causa raíz
+de cuatro hallazgos que esta misma exploración fue encontrando uno por
+uno, sin verlos todavía como una sola cosa: `Rendimiento` en 0 (nunca
+se activó el modo que lo usaría), `Unidades ejecutoras` siempre en 1
+(D-403, sin ese modo no hay para qué tocarlo), `Esfuerzo` trivial
+(D-392, no hay cuadrillas reales que acumular) y `Holgura` en 0
+(D-409, el motor de CPM tampoco corrió). Si alguna fila dijera "Sí"
+aquí, sería la señal de que esa actividad sí pasó por el cálculo —y
+ahí las otras cuatro empezarían a tener contenido real—. `MODELO.md`
+§5c.
+
+### `Fecha de inicio`/`Fecha de término`/`Días`: confirma D-393 con otro método, y encuentra que instalaciones también se dispersa en calendario
+
+Dato del usuario, cerrar la exploración columna por columna con las
+fechas. `Días calendario` = (`Fecha de término` − `Fecha de inicio` +
+1), exacto en 315 de 317 —las 2 excepciones son `ACA-01080` y la fila
+vacía de cierre, ya conocidas—. `Días calendario` − `Días laborables`
+(los días no laborables dentro del propio tramo): 231 de 317 (73%) en
+0, un grupo en 2-4 que parece fin de semana simple, y una cola larga
+hasta 50.
+
+**La cola larga confirma D-393, no la contradice.** Castillo K1 y muro
+tabique —las dos actividades que D-393 ya marcó con el parón de 17
+días esperando la cadena CE-1— tienen los huecos más grandes de toda
+la obra gruesa: castillo K1 sus dos tramos en 18 y 27; muro tabique
+los suyos en 17 y 21. Mismo caso, confirmado ahora por fecha-menos-
+fecha en vez del día-por-día de la cuadrícula AD-HN.
+
+**Nuevo: instalación eléctrica se dispersa también en calendario, no
+solo en rendimiento.** Cuatro destajos `IEC-` (arbotante, spot, centro,
+minisplit) comparten el mismo tramo de 11 días con solo 4 laborables
+cada uno. El caso más extremo del archivo entero es `IEC-02130`
+(ranura para voz y datos): 52 días calendario, 2 laborables — un
+tramo 25 veces más largo que lo que de verdad trabaja. Mismo patrón
+que la razón de rendimiento dispersa de instalaciones (D-408): el
+planeador no las captura con la misma disciplina que a la obra gruesa.
+**Idea sin resolver, dato del usuario:** el rendimiento teórico de
+instalaciones necesita revisarse — no es solo que el dato disperse al
+compararlo, puede que el dato mismo esté desactualizado.
+`PENDIENTES-MEJORAS.md` B-83.
+
+### Completar los otros seis prototipos: el programa de Zafiro se copia, no se escala — el plazo lo fija el número de plantas
+
+Dato del usuario: Zafiro es el único prototipo con programa completo;
+en los otros seis, solo cimentación tiene fechas —confirmado,
+exactamente 1 de 14-15 Subcapítulo por prototipo tiene `Días
+calendario` > 0, y siempre es cimentación—. Todo lo demás (Planta
+Baja, Azotea, Acabados…) es el stub de 0 días. **Y esas fechas de
+cimentación no sirven — dato del usuario, D-418: "ya están editados de
+origen, pero están mal, solo la Zafiro es confiable".** En Rubí, las
+instalaciones caían el 9 y 10-jun, los dos primeros días, cuando en
+Zafiro van en la segunda semana, y la estructura cerraba el 19-jun
+contra el 23-jun de Zafiro. El método no hereda nada de eso: lo rehace
+desde Zafiro. Dato del usuario: empezar con un piloto de un solo
+prototipo antes de replicar a los otros cinco; las dos plantas, "paso a
+paso", después.
+
+**Por qué Rubí primero.** Zafiro es de una sola planta; cuatro de los
+seis prototipos restantes (Zafiro Plus, los dos Diamante, sin y con
+chimenea, y Oro) tienen Planta Alta — dato del usuario: adaptar a dos
+plantas es lo interesante, pero "paso a paso". De los dos de una planta que
+quedan (Rubí 207m², Jade 230m²), Rubí es el más cercano en tamaño a
+Zafiro (172m²).
+
+**La regla de fondo, dato del usuario (D-419): el plazo lo fija el
+número de plantas, no los metros cuadrados.** Una planta cierra en 28
+semanas, dos plantas en 30 (la tabla de más arriba, corregida: decía
+20). Zafiro cumple las 28 con 172 m² —9-jun a 18-dic, 139 días hábiles,
+27.8 semanas—; Rubí tiene 207, y lo razonable parecería que tardara
+más, "pero esto no aplica": los metros de más no agregan días. Se
+absorben con más gente al mismo tiempo, y eso solo se ve en un lugar:
+la cantidad por día de la cuadrícula. **Corrige D-414 y D-418:** el
+primer método escalaba los días de cada tramo por la razón de
+cantidades (Rubí cerraba el 1-ene-2026, 149 días hábiles contra 139) y
+la cimentación por la razón de las losas (200 contra 172 m², 13 días en
+vez de 11). Las dos cosas quedan fuera.
+
+**Segunda regla del mismo dato, ampliada (D-420, D-421): cancelería,
+carpintería, herrería, cubiertas, pérgolas e impermeabilización duran lo
+mismo que en Zafiro, en todos los prototipos** —los seis niveles que
+D-353 manda por la ruta de contratación terminada—. Es
+`modo_duracion=preestablecida_nivel` (`MODELO.md` §5c, B-48, D-353) con
+sus valores a la vista por primera vez: Cancelería 10 días hábiles (3 a
+14-nov, 2 semanas), Carpintería 15 (17-nov a 5-dic, 3 semanas), Herrería
+5 (24 a 28-nov, 1 semana), Pérgola Asador 4 (7 a 12-nov), Pérgola
+Cochera 5 (5 a 11-nov), Cubiertas partida por partida —sencilla 5, doble
+2, de cocina 8— e Impermeabilización 2 (11 a 12-sep) —las mismas 2 y 3
+semanas que D-389 ya había anotado para Cancelería y Carpintería del
+Diamante—. Una pérgola de 14.50 m² dura lo que una de 14.80, y una de 34
+m² lo que una de 29.92.
+
+**Y una regla sobre las reglas, dato del usuario (D-421): nada de lo
+anterior es un candado.** Las duraciones fijas valen como punto de
+partida para todos los prototipos —eso es lo que fija este ejercicio—,
+pero en cualquier programa el planeador puede cambiar cualquier
+duración, y **decide si el cambio se hereda a los demás prototipos o
+solo vale en ese programa** —dato del usuario, D-422: el alcance se elige
+entre todos los prototipos, los de 1 planta, los de 2 plantas, o los
+prototipos que el planeador señale—. Es el principio del resto del cerebro: el
+sistema propone el valor, el humano decide el alcance —y ya estaba dicho
+para el programa de un lote, que cargar la base es proponer un punto de
+partida, nunca una obligación (más arriba, "El programa hereda las
+cuatro capas de presupuesto")—. Lo que no existe todavía es el
+mecanismo: `ACTIVIDAD` guarda la duración pero no de dónde viene ni a
+quién alcanza un cambio. Propuesta, sin decidir:
+`PENDIENTES-MEJORAS.md` B-85.
+
+**El método, versión de D-420:**
+
+```
+0. Se descarta todo lo que el prototipo trae programado: su
+   cimentación está mal (D-418)
+1. Cimentación: los cinco bloques de Zafiro (Nivel 2), cada uno con
+   UNA ventana que comparten todos sus conceptos —estructura 9 a
+   23-jun (11 días hábiles), sanitarias 16-17, hidráulicas 17-18,
+   eléctricas 18-19, gas 20-jun—. Cada concepto del prototipo toma
+   la ventana de su bloque, sin escalar
+2. Cada concepto con la misma Clave que uno de Zafiro, TRAMO A TRAMO
+   —no por Clave sola: varios conceptos (castillo K1, muro tabique)
+   tienen 2-3 tramos con la misma Clave, y cruzarlos sin respetar su
+   posición relativa multiplica mal (3×3=9 en vez de 3; se corrige
+   con groupby('Clave').cumcount())—, copia las fechas y los días de
+   ese tramo, idénticos: misma forma (corre N días, se detiene M,
+   retoma K)
+3. Cantidad por día = Cantidad del prototipo ÷ Días laborables de
+   Zafiro, a 2 decimales, en cada día activo; un `0` explícito en
+   TODO día sin trabajo entre el primer y el último día activo
+   (fines de semana y parón); fuera del tramo, vacío (D-416)
+4. Sin gemelo en un nivel de tiempo fijo —Cancelería, Carpintería,
+   Herrería y las dos pérgolas—: la ventana que Zafiro le da a ese
+   nivel (la más frecuente; para la pérgola, la de su bloque)
+5. Sin gemelo en un bloque que Zafiro programa como UNA ventana
+   (cableado eléctrico, iluminación, jardinería): esa ventana
+6. Sin gemelo en ninguna de las anteriores —el nombre del prototipo
+   está en la partida (`LOSA MACIZA RUBÍ 3.00`)—: copia las fechas de
+   la partida de Zafiro que hace el mismo trabajo, una por una (tabla
+   de abajo); si el prototipo junta dos manos de pintura en una
+   partida, la unión de las dos manos de Zafiro
+7. Término = último día activo; Días calendario = término − inicio
+   + 1; Esfuerzo = Días laborables × 8 (D-392); las filas de
+   resumen se recalculan de sus hijos (abajo)
+```
+
+**Resultado en Rubí: 295 filas de concepto, 294 con programa y una
+vacía.** 57 de cimentación (paso 1), 208 con gemelo por Clave (paso 2),
+11 de nivel de tiempo fijo —2 de cancelería, 7 de carpintería y las dos
+pérgolas—, 4 de bloque de una ventana —tres eléctricos y la lavanda— y
+14 por rol (paso 6). **Ninguna partida con cantidad queda sin programar
+(dato del usuario: "no deben quedar algo sin programar en la Rubí"); la
+única fila sin programa es la vacía de cierre, sin clave, descripción
+ni cantidad, igual que en Zafiro. El programa cierra el 18-dic, el
+mismo día que Zafiro** (139 días laborables, 27.8 semanas, las 28), y
+el Capítulo queda al 100% programado. Los 208 gemelos tienen fechas,
+días y ceros idénticos a los de su tramo en Zafiro (208 de 208), y 11
+de los 14 por rol, idénticos a los de su partida de origen; los otros 3
+son ajustes con dato del usuario (las dos losas de 4.20 y el muro de 21
+cm, abajo). Contra
+Zafiro, 59 de los 208 tramos llevan más de 5% de cantidad extra
+(mediana 1.00, media 1.13): ahí sube la cantidad por día, que es más
+cuadrillas y no más tiempo —castillo K1, tramo 1: 18.13 m/día en
+Zafiro, 23.4 en Rubí; contra el rendimiento teórico de 12.12, 1.50
+cuadrillas implícitas y 1.93—.
+
+**Los 30 sin programar de la primera versión no eran "mayoría
+instalaciones" — corrige D-414 y D-415 (D-418).** Eran 28 sin gemelo por
+Clave en Zafiro, `ACA-01080` y la fila vacía de cierre; por familia, 10
+de carpintería, 6 de estructura (las cuatro losas, más un muro y una
+cadena), 5 de acabados, 5 de instalaciones, 2 de cancelería, 1 de obras
+exteriores y la fila vacía: $615,148, el 30.1% del costo de Rubí, de los
+cuales las cinco instalaciones sumaban $1,204. La causa era la `Clave`,
+no el oficio: el concepto específico de Rubí lleva el nombre del
+prototipo (`COCINA RUBÍ`, `LOSA MACIZA RUBÍ 3.00`) y Zafiro tiene su
+gemelo por rol bajo otra clave (`COCINA ZAFIRO`, `LOSA MACIZA ZAFIRO
+3.00`). Los pasos 4 y 5 resuelven 15 de esos 28; **los otros 13 y
+`ACA-01080` se programan por rol en D-420.** Dato del usuario: "los
+emparejamientos no los entendí" —una lista de claves por aprobar no
+decía nada—, así que se aplicó el criterio más simple, copiar las fechas
+de la partida de Zafiro que hace el mismo trabajo, y cada caso queda
+escrito en palabras:
+
+| Partida de Rubí | Copia las fechas de | Fechas |
+|---|---|---|
+| Losa maciza 3.00 (`EST-30012`) | losa maciza 3.00 de Zafiro (`EST-21011`) | 15-jul a 4-ago, 9 días |
+| Losa nervada 3.00 (`EST-30040`) | la misma losa de 3.00: Zafiro no tiene una nervada de 3.00 | 15-jul a 4-ago, 9 días |
+| Losa maciza 4.20 (`EST-30013`) | la misma losa de 4.20: Zafiro no tiene una maciza de 4.20 | 28-jul a 15-ago, 9 días (ajuste del planeador, abajo) |
+| Losa nervada 4.20 (`EST-30041`) | losa nervada 4.20 de Zafiro (`EST-21031`) | 28-jul a 15-ago, 9 días (ajuste del planeador, abajo) |
+| Pintura de muro, 2 manos (`ACA-03025`) | 1ª y 2ª mano de muro (`ACA-30011`, `ACA-30012`) | 11 a 13-nov y 8 a 10-dic, 6 días |
+| Pintura de plafond, 2 manos (`ACA-03026`) | 1ª y 2ª mano de plafond (`ACA-30021`, `ACA-30022`) | 13 a 14-nov y 11 a 12-dic, 4 días |
+| Pintura de fachada, 2 manos (`ACA-03047`) | 1ª y 2ª mano de fachada (`ACA-30031`, `ACA-30032`) | 4 a 7-nov y 2 a 5-dic, 8 días |
+| Pintura de azotea, 2 manos (`ACA-03047`) | 1ª y 2ª mano de azotea (`ACA-30031`, `ACA-30032`) | 3 a 4-nov y 1 a 2-dic, 4 días |
+| Muro de 21 cm (`EST-02020`) | no tiene gemelo: oculta la respiración de la lavandería, va después de instalarla (abajo) | 7-jul, 1 día |
+| Cadena `CE-2` (`EST-02320`) | cadena `CE-1` (`EST-02310`) | 3 a 9-jul, 5 días |
+| Gualdra (`CAR-01012`) | gualdra (`CAR-01011`) | 14-jul, 1 día |
+| Ventilación sanitaria de 3.00 m (`ISN-10011`) | ventilación sanitaria de 1.00 m (`ISN-10010`) | 3 a 4-jul, 2 días |
+| Caja de válvulas de Rubí (`IGAS-02131`) | caja de válvulas de Zafiro (`IGAS-02130`) | 25 a 27-jun, 3 días |
+| Poyos de cocina (`ACA-01080`) | repellado de muro (`ALB-01010`) — propuesta: Zafiro nunca lo programó | 11 a 25-ago, 11 días |
+
+**Las losas van por altura, no por tipo — dato del usuario, D-421, que
+corrige a D-420.** Primero las de 3.00 m, porque sobre ellas se levanta
+el muro de tabique que enrasa la losa de 4.20; después las de 4.20.
+Zafiro es consistente con eso —losa de 3.00 el 15-jul, muro de tabique
+del nivel de azotea el 24-jul, losa de 4.20 el 28-jul— y Rubí copia esa
+secuencia: sus dos losas de 3.00 (93 y 24 m², 117 en total) en los 9
+días de la de Zafiro (125 m²), y sus dos de 4.20 (46 y 40 m², 86 en
+total) en la ventana de la de Zafiro (40 m²). D-420 las agrupaba por
+tipo, maciza o nervada, y dejaba la nervada de 3.00 en la ventana de
+4.20 y la maciza de 4.20 en la de 3.00: al revés de la secuencia física.
+Las pinturas de "2 manos" juntan en una sola partida lo que Zafiro tiene
+en dos, con las semanas de parón de por medio —los ceros de la cuadrícula
+las miden, como el castillo K1—. Los demás siguen a Zafiro; `ACA-01080`,
+el último de la tabla, es la única propuesta sin dato detrás.
+
+**Primer ajuste del planeador (D-422): la losa de 4.20 de Rubí sube a 9
+días, y nada más se mueve.** Las de 4.20 de Rubí cargan 86 m² contra los
+40 de Zafiro, más del doble; la regla de fondo lo absorbería con más
+cuadrillas en los mismos 7 días, y el usuario, haciendo de planeador,
+decide otra cosa: "para este ejercicio debería subir a 9 días y buscar
+cómo acomodar las demás actividades para no aumentar la duración de 28
+semanas". Se acomoda sin mover ninguna otra actividad. La losa de 4.20 de
+Zafiro tiene dos tramos de trabajo —5 días de armado (28-jul a 1-ago) y 2
+de descimbrado (14 y 15-ago)— con 8 días hábiles de espera en medio, que
+se lee como el fraguado; las dos jornadas nuevas se toman del principio
+de esa espera (4 y 5-ago, más armado), que queda en 6 días hábiles, los
+mismos 6 que tiene la losa de 3.00. El inicio (28-jul) y el fin (15-ago) no cambian, así
+que lo que cuelga de ella —el repellado de plafond +3.00 arranca el
+18-ago— se cumple igual y el programa sigue cerrando el 18-dic, 139 días
+hábiles. Comprobado contra los vínculos de precedencia de Zafiro (75;
+58 con ambos extremos programados y equivalentes en Rubí; 38 se cumplen
+en Zafiro y esos mismos 38 en Rubí, ninguno se rompe; los otros 20 ya no
+se cumplían en Zafiro, B-81). Lo deja el sistema resuelto y el planeador
+valida o ajusta: es el primer caso de B-85, y a la vista quedan otros
+tramos con el doble o más de cantidad que Zafiro que siguen con los días
+de Zafiro —castillo K-3 ×7, sellado de marco de cantera ×5.8, acero de
+K7 y BAP ×4, y el repellado y las finas de plafond de 4.20 ×2.2—.
+
+*(D-449 revisa esos casos por ventana de trabajo y no por línea: 17 ventanas, no
+todas las líneas de arriba.)*
+
+**El muro de 21 cm no es un muro de tabique más (dato del usuario,
+D-422; corrige D-420).** "Los muros de tabique son 14 cm; el de 21 solo
+es para ocultar la respiración de la lavandería y no está en todos los
+prototipos." D-420 lo había copiado de la ventana del muro de 14 cm
+—16 días con parón para 6.30 m²—, que lo pone a trabajar antes de que la
+respiración exista. Como oculta la tubería, va después de instalarla: 1
+día, el 7-jul, el siguiente a la instalación sanitaria en muros (3 y
+4-jul). Una partida que no está en todos los prototipos es justo la que
+no se hereda a ciegas.
+
+**Las filas de resumen se recalculan de sus hijos, no se copian
+(D-418).** Las 77 filas de Capítulo, Subcapítulo, Nivel 2 y Nivel 3 de
+Rubí con hijos programados traían, a lo más, las fechas de la
+cimentación vieja. La regla sale de Zafiro y se comprobó ahí primero,
+en sus 82 filas de resumen con hijos programados: inicio = el primer
+inicio de sus conceptos, término = el último término, `Días calendario`
+= término − inicio + 1 (82 de 82), `Días laborables` = los días hábiles
+de ese rango (81 de 82; la excepción es una fila con un solo hijo que
+tiene un parón, y ahí el resumen copia los días del hijo), `Esfuerzo` =
+`Días laborables` × 8, y `% Programado` = el promedio de los `% Programado`
+de sus conceptos ponderado por `Total` (82 de 82, a 4 decimales). Con
+esa regla el Capítulo de Rubí queda del 9-jun al 18-dic, 139 días
+laborables, 100% programado. Quedan 16 filas de Nivel 3 sin hijos,
+vacías, las mismas 16 que tiene Zafiro.
+
+**Reglas de la cuadrícula AD:HN que salen de Zafiro, comprobadas en
+sus 314 conceptos programados:** solo conceptos llevan valores (los
+resúmenes van vacíos); solo lunes a viernes, sin excluir feriados
+(16-sep y 17-nov tienen actividad); los días con valor son
+exactamente `Días laborables` (314 de 314); cada uno vale `Cantidad`
+÷ `Días laborables` a 2 decimales (312 de 314); el primer y el último
+día con valor son `Fecha de inicio` y `Fecha de término` (313 de
+314). **Y la séptima, que la primera versión de este piloto se saltó
+(D-416): los ceros.** Entre el primer y el último día activo, todo
+día sin trabajo lleva un `0` explícito —410 ceros contra ninguna celda
+vacía ahí dentro— y fuera del tramo las celdas van vacías (59,035
+contra un solo cero suelto). El número de ceros de cada fila es
+exactamente `Días calendario − Días laborables` (313 de 314): los
+ceros no son relleno, **miden cuánto dura cada parón** y marcan los
+días sin trabajo. La cimentación de Rubí que venía en el archivo —con
+las fechas equivocadas, D-418, pero con la convención de ceros bien
+puesta— la sigue igual (57 de 57; 9 sábados y 9 domingos). Los ceros de
+fin de semana caen en sábado y domingo (132 y 132 en Zafiro, contra 146
+ceros en días hábiles que son parón), igual que D-393 ya había
+encontrado: cero actividad en sábado y domingo. **Dato del usuario,
+confirmado (D-417):** los días sin trabajo son sábado y domingo — un
+"viernes y sábado" dicho antes fue un desliz, no una regla distinta.
+Rubí cumple las siete: 0 violaciones en sus 294 conceptos programados,
+con 540 ceros explícitos (158 sábados, 158 domingos, 224 de parón en 19
+tramos —las cuatro losas y las cuatro pinturas lo heredan de su partida
+de origen—; Zafiro tiene parón en 13 de 315).
+
+**Jade, el segundo prototipo de una planta (D-423): las mismas reglas, y
+nada queda sin programar.** 290 filas de concepto, 289 con programa y la
+vacía de cierre: 59 de cimentación (la que traía el archivo ya tenía la
+estructura en 11 días, pero con las instalaciones el 9 y 10-jun, como
+Rubí), 197 con gemelo por Clave, 8 de nivel de tiempo fijo —2 de
+cancelería, 3 de carpintería, 1 de herrería y las dos pérgolas—, 7 de
+bloque de una ventana —tres de cableado eléctrico y cuatro de
+iluminación— y 18 por rol. El programa cierra el 18-dic, el mismo día
+que Zafiro (139 días laborables, las 28 semanas) y el Capítulo queda al
+100% programado. Los 197 gemelos tienen fechas, días y ceros idénticos a
+los de Zafiro (197 de 197) y los 17 por rol con partida de origen,
+idénticos a ella (17 de 17). De los 75 vínculos de precedencia de Zafiro,
+57 tienen ambos extremos programados y equivalentes en Jade: 37 se
+cumplen en Zafiro y esos mismos 37 en Jade, ninguno se rompe. La
+cuadrícula cumple las siete reglas en los 289 conceptos, con 500 ceros
+explícitos (146 sábados, 146 domingos, 208 de parón en 16 tramos). Una
+fila con cantidad 0 —`PRB-01001`, material para pruebas, $0— lleva un
+cero en cada día de su tramo, como `CAR-02100` de Zafiro.
+
+**La losa de Jade cubre las dos alturas en un solo concepto.**
+`EST-30010`, "losa maciza Jade (230 m²)", sustituye a las dos losas de
+Zafiro: bajo ella hay 113 m² de plafond a 3.00 y 85 a 4.20 —los mismos 85
+que las losas de 4.20 de Rubí, más del doble de los 36 de Zafiro—. Por
+altura, toma la unión de las dos ventanas de Zafiro (15-jul a 15-ago), y
+a la parte de 4.20 se le aplica el ajuste que el planeador ya hizo en
+Rubí: 2 jornadas más de armado tomadas de la espera, que queda en 6 días
+hábiles (8 en Zafiro). Son 16 jornadas con el inicio y el fin de siempre,
+así que nada más se mueve. Mismo criterio sin preguntar de nuevo: queda
+para que el planeador valide o ajuste.
+
+Las 18 partidas de Jade por rol, una por una:
+
+| Partida de Jade | Copia las fechas de | Fechas |
+|---|---|---|
+| Losa maciza de 230 m² (`EST-30010`) | las losas de 3.00 y de 4.20 de Zafiro (`EST-21011`, `EST-21031`), con +2 jornadas en la de 4.20 | 15-jul a 15-ago, 16 días |
+| Pintura de muro, 2 manos (`ACA-03025`) | 1ª y 2ª mano de muro (`ACA-30011`, `ACA-30012`) | 11 a 13-nov y 8 a 10-dic, 6 días |
+| Pintura de plafond, 2 manos (`ACA-03026`) | 1ª y 2ª mano de plafond (`ACA-30021`, `ACA-30022`) | 13 a 14-nov y 11 a 12-dic, 4 días |
+| Pintura de fachada, 2 manos (`ACA-03047`) | 1ª y 2ª mano de fachada (`ACA-30031`, `ACA-30032`) | 4 a 7-nov y 2 a 5-dic, 8 días |
+| Pintura de azotea, 2 manos (`ACA-03047`) | 1ª y 2ª mano de azotea (`ACA-30031`, `ACA-30032`) | 3 a 4-nov y 1 a 2-dic, 4 días |
+| Limpieza, entintado y sellado de durmiente (`ACA-08060`) | la de gualdra (`ACA-08061`) | 9 a 10-dic, 2 días |
+| Castillo K-5 de 15x45 (`EST-02150`) | castillo K-3 de 15x30 (`EST-02130`), la sección más cercana — propuesta | 1-jul, 1 día |
+| Cadena `CE-2` (`EST-02320`) | cadena `CE-1` (`EST-02310`) | 3 a 9-jul, 5 días |
+| Gualdra 6x12x6 (`CAR-01014`) | gualdra 6x12x8 (`CAR-01011`) | 14-jul, 1 día |
+| Vigas de cantera 10x20x6 (`ICA-03010`) | muro de sillar (`EST-02080`) — propuesta | 2 a 8-jul, 5 días |
+| Regadera en corte sanitario (`ISN-02050`) | vertedero en corte sanitario (`ISN-02010`) | 3 a 4-jul, 2 días |
+| Paneles solares en losa, 12 m (`IEC-01100`) | los de 4 m (`IEC-01110`) | 21 a 22-jul, 2 días |
+| Salida de gas del estudio (`IGAS-02090`) | la de la estancia (`IGAS-02070`) | 25 a 27-jun, 3 días |
+| Caja de válvulas de Jade (`IGAS-02132`) | la de Zafiro (`IGAS-02130`) | 25 a 27-jun, 3 días |
+| Poyos de cocina (`ACA-01080`) | repellado de muro (`ALB-01010`) — propuesta: Zafiro nunca lo programó | 11 a 25-ago, 11 días |
+| Fachaleta de cantera (`ACA-10010`) | marcos de cantera interior (`ACA-07012`) — propuesta | 27 a 29-ago, 3 días |
+| Tejas sobre losa (`ACA-06010`) | las dos ventanas del bloque de acabados de fachada (`ACA-01052`, `ACA-01071`) — propuesta | 7 y 10-nov, 2 días |
+| Vigas de 60 cm de fachada (`ICA-01060`) | las mismas del bloque de acabados de fachada — propuesta | 7 y 10-nov, 2 días |
+
+Seis de ellas no tienen un gemelo claro —el castillo K-5, los dos juegos
+de vigas de cantera, la fachaleta, las tejas y los poyos de cocina—:
+suman $34,462, el 1.6% del costo de Jade, y son lo primero que el
+planeador debería mirar. Los 197 gemelos de Jade llevan más de 5% de
+cantidad extra en 77 tramos (mediana 1.00, media 1.24) y 17 con el doble
+o más —el repellado y las finas de plafond de 4.20, ×2.4 como en Rubí;
+el acero de K1, ×5; el sellado de marco de cantera, ×4.1…— que siguen con
+los días de Zafiro.
+
+**La cuadrícula no cambia de tamaño con una planta; con dos, sí.** Las
+193 columnas de Zafiro (9-jun a 18-dic) son exactamente las 28
+semanas, así que Rubí cabe en `AD:HN` sin columnas nuevas. Un prototipo
+de dos plantas cierra en 30 semanas —10 días hábiles más, 14 columnas
+(`HO:IB`)— y es donde el horizonte dejará de alcanzar.
+
+**Lo que este método no resuelve, a propósito, dato del usuario:** no
+toca `Vínculos` —se necesitaría remapear cada referencia de
+precedencia a las filas de Rubí, más riesgo de error que valor en un
+piloto—; no resuelve las dos plantas, donde Zafiro no tiene Planta Alta
+que copiar y las 28 semanas pasan a 30; y no pasa por rendimiento ×
+cuadrillas —el método "mixto" que sí lo haría queda para después de
+validar este—. Esto último pesa más ahora: como la cantidad extra se
+absorbe con cuadrillas, el ritmo por día ya no se hereda de Zafiro sino
+que sube con la cantidad, y cuántas cuadrillas implica cada prototipo
+es justo lo que ese método respondería. Y los 14 emparejados por rol
+son una lectura del sistema, no un dato: el usuario corrige las que no
+le parezcan. `PENDIENTES-MEJORAS.md` B-84.
+
 
 ## 11.15 Salidas de almacén: cómo leer el archivo
 
@@ -4616,6 +8739,15 @@ cliente.**
 > (`PROPUESTA-CUATRO-MODULOS.md` §4), un registro aparte que puede o no generar
 > también una desviación o un control de cambio: no son el mismo renglón.
 
+**Caso real de causa 1 (error de ejecución), encontrado leyendo el programa de
+`ALAMO 18`:** la cadena de cerramiento se coló antes de que pasara la
+instalación eléctrica de muro, no después como pide la regla de campo —
+obliga a picar concreto ya colado para abrir paso al poliducto, exactamente
+el retrabajo de la fila de mano de obra/destajo, arriba. Hidráulica y
+sanitaria, revisadas con la misma fecha, quedan exoneradas (D-388, corrige
+D-387): su tubería que sube a Planta Alta salió a tiempo. `CONOCIMIENTO.md`
+§11.14, `PENDIENTES-MEJORAS.md` B-43.
+
 ### Las dos omisiones son opuestas
 
 Se parecen y se pagan al revés:
@@ -4878,6 +9010,8 @@ equivalencias, orden de cambio.
 | `estado` | `pendiente` · `aprobada` · `rechazada` |
 | `resuelve` | Quién decidió y cuándo |
 
+> *Los nombres de arriba son conceptuales. En la tabla construida (`MODELO.md` §5, «La bandeja construida», D-485) `propone` es `valor_propuesto` y `resuelve` son `resuelto_por`, `resuelto_con_rol` y `resuelta_en`.*
+
 ## 14.2 La evidencia no es opcional
 
 > Una propuesta sin evidencia es una orden disfrazada.
@@ -4917,6 +9051,15 @@ Sin él, solo puede consultar; con él, puede sugerir sin poder romper nada.
 Y hace verificable su aprendizaje: **el corpus del agente son las propuestas
 aprobadas**, con su evidencia y su historia de rechazos.
 
+## 14.6 Ya está en código (D-485)
+
+La bandeja dejó de ser solo una regla: `backend/core/propuestas.py`, la migración `0010` y `backend/api/bandeja.py`. Lo que §14.2
+y §14.3 dicen, el sistema lo hace cumplir: una propuesta con la evidencia en blanco no entra; una rechazada no se borra, lleva la
+nota de quien la rechazó y no vuelve a entrar con las mismas palabras. Y se agregó lo que §14.4 daba por supuesto: **aprobar es
+hacer** —el sistema ejecuta lo propuesto con la identidad de quien aprueba, que necesita la función de esa acción además de la de
+resolver la bandeja— y **quien propone no aprueba lo suyo**. La alerta que reaparece se cuenta en vez de repetirse. La forma
+exacta, en `MODELO.md` §5 y `MODELO.md` §5a; cómo se conecta con las personas y el agente, en `WORKFLOWS.md` §3.1.
+
 ---
 
 # 15. La ruta crítica ya está en el modelo — el tiempo de entrega seguía sin schema
@@ -4940,6 +9083,7 @@ qué— ya cerró con P-20:
 > El motor que calcula fechas tempranas/tardías y ruta crítica sigue sin
 > escribirse — es código sobre este schema, no schema en sí, mismo
 > criterio que excluye el resto de `MODELO.md` §6.
+> *(D-461: ya está escrito, `backend/core/motor_cpm.py`; ver `PROGRAMA-CPM.md`.)*
 
 Queda la conexión que seguía a medias: **el tiempo de entrega del material**
 da la fecha de pedido a partir del inicio de la actividad — ahora que el
@@ -5039,6 +9183,8 @@ sale    hacia otro sistema              →  vuelve la clave vieja
 
 La clave vieja deja de salir **cuando el usuario lo autoriza** — individual o total,
 según haya actualizado o no cada sistema externo.
+
+*D-478: «entra» ya se cumple —la carga lee la clave vieja como el clon y lo avisa—; «sale» es solo la bandera `exporta_clave_vieja` hasta que haya exportador (B-08).*
 
 ## 16.3 La homologación es bidireccional; la normalización no
 

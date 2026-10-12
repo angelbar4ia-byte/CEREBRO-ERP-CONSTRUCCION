@@ -1,0 +1,612 @@
+<title>__TITULO__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /*__TOKENS__*/
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.45;
+         padding-inline: 16px; padding-block: 20px 28px; }
+  .pagina { max-width: 1480px; margin-inline: auto; display: grid; gap: 14px; }
+  .atras { font-size: .84rem; color: var(--acento); text-decoration: none; }
+  .atras:hover { text-decoration: underline; }
+  header h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -.01em; margin: 0 0 4px; text-wrap: balance; }
+  header .nota { margin: 0; color: var(--muted); max-width: 78ch; }
+  code { font-family: var(--mono); font-size: .88em; }
+  .tarjetas { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .tarjeta { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; min-width: 0; }
+  .tarjeta .k { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .tarjeta .v { font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .tarjeta .d { font-size: .82rem; color: var(--muted); }
+  .tarjeta.cambia .v { color: var(--aviso); }
+  .pastilla { display: inline-block; font-family: var(--mono); font-size: .78rem; padding: 1px 7px; border-radius: 10px; background: var(--acento-fondo); color: var(--acento); margin-left: 6px; }
+  .pastilla.mas { background: color-mix(in srgb, var(--aviso) 16%, transparent); color: var(--aviso); }
+  .ediciones { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; min-height: 28px; }
+  .ediciones .chip { display: inline-flex; gap: 6px; align-items: center; background: var(--acento-fondo); border: 1px solid var(--line); border-radius: 14px; padding: 2px 4px 2px 10px; font-size: .82rem; }
+  .ediciones .chip button { all: unset; cursor: pointer; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; color: var(--muted); }
+  .ediciones .chip button:hover { background: var(--line); }
+  .aviso { background: color-mix(in srgb, var(--aviso) 14%, var(--panel)); border: 1px solid var(--aviso); border-radius: 6px; padding: 6px 10px; font-size: .86rem; }
+  .controles { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 8px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+  .controles label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+  .controles .grupo { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .controles .titulo { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  button.b, select, input[type=number], input[type=date], input[type=text] { font: inherit; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; }
+  button.b { cursor: pointer; }
+  button.b:hover:not(:disabled) { border-color: var(--acento); }
+  button.b:disabled { opacity: .45; cursor: default; }
+  button.b.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  .ediciones .titulo-lista { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .ediciones .chip.nuevo { background: color-mix(in srgb, var(--aviso) 12%, var(--panel)); border-color: var(--aviso); }
+  .bitacora { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; }
+  .bitacora summary { cursor: pointer; font-weight: 500; }
+  .bitacora ol { list-style: none; margin: 8px 0 4px; padding: 0; display: grid; gap: 6px; max-height: 260px; overflow: auto; }
+  .bitacora li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; padding: 4px 0; border-top: 1px solid var(--grid); font-size: .86rem; }
+  .bitacora li .sec { font-family: var(--mono); color: var(--muted); }
+  .bitacora li .quien-cuando { grid-column: 2; font-size: .78rem; color: var(--muted); }
+  .bitacora li.revertida .que { text-decoration: line-through; color: var(--muted); }
+  .bitacora li .acciones { grid-row: 1 / span 2; grid-column: 3; align-self: center; }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .82rem; }
+  .leyenda button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 4px; }
+  .leyenda button[aria-pressed="false"] { opacity: .35; }
+  .leyenda i { width: 12px; height: 8px; border-radius: 2px; display: inline-block; }
+  .zona { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) 330px; align-items: start; }
+  @media (max-width: 1000px) { .zona { grid-template-columns: minmax(0, 1fr); } }
+  .marco { position: relative; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); overflow: auto; height: min(74vh, 800px); }
+  .interior { display: grid; grid-template-columns: 340px max-content; min-width: max-content; }
+  .etiquetas { position: sticky; left: 0; z-index: 3; background: var(--panel); border-right: 1px solid var(--line); }
+  .esquina { position: sticky; top: 0; z-index: 4; height: 46px; background: var(--panel); border-bottom: 1px solid var(--line);
+             padding: 0 10px 6px; display: flex; align-items: flex-end; color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+  .fila-eti { height: 15px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; font-size: 11.5px; padding-right: 8px; cursor: pointer; }
+  .fila-eti:hover { background: var(--acento-fondo); }
+  .fila-eti.sel { background: var(--sel); }
+  .fila-eti .caret { width: 12px; flex: none; color: var(--muted); font-size: 9px; text-align: center; }
+  .fila-eti .clave { font-family: var(--mono); font-size: 10.5px; color: var(--muted); flex: none; }
+  .fila-eti .desc { overflow: hidden; text-overflow: ellipsis; }
+  .fila-eti.resumen { font-weight: 600; }
+  .fila-eti.critica .desc { color: var(--critica); }
+  .fila-eti.movida .desc::after { content: " ↦"; color: var(--aviso); }
+  .lienzo { position: relative; }
+  .cabecera { position: sticky; top: 0; z-index: 2; background: var(--panel); border-bottom: 1px solid var(--line); height: 46px; }
+  svg text { font-family: var(--sans); }
+  svg [data-l] { cursor: pointer; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 10px; min-width: 0; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; }
+  @media (max-width: 1000px) { .panel { position: static; max-height: none; } }
+  .panel h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+  .panel h3 { margin: 0; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+  .panel .mono { font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+  .panel .campo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .panel input[type=number] { width: 70px; }
+  .panel .vinculo { display: grid; gap: 4px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 5px; font-size: .82rem; }
+  .panel .vinculo .quien { overflow: hidden; text-overflow: ellipsis; }
+  .panel .vinculo.roto { border-color: var(--aviso); }
+  .panel .nota { color: var(--muted); font-size: .8rem; margin: 0; }
+  .tip { position: fixed; z-index: 20; pointer-events: none; background: var(--panel); color: var(--fg); border: 1px solid var(--line);
+         border-radius: 6px; box-shadow: var(--sombra); padding: 8px 10px; font-size: 12px; max-width: 320px; }
+  .tip b { font-weight: 600; }
+  .tip .mono { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  @media (max-width: 640px) { .interior { grid-template-columns: 220px max-content; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="pagina">
+  <header>
+    <a class="atras" id="atras" href="/" hidden>← Programas</a>
+    <h1 id="titulo">__TITULO__</h1>
+    <p class="nota" id="nota-pagina">El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Es una simulación en pantalla: nada se guarda. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.</p>
+  </header>
+
+  <div class="aviso" id="version-aviso" hidden></div>
+
+  <div class="tarjetas" aria-live="polite">
+    <div class="tarjeta" id="t-cierre"></div>
+    <div class="tarjeta" id="t-movidas"></div>
+    <div class="tarjeta" id="t-ruta"></div>
+  </div>
+  <div class="ediciones" id="ediciones"></div>
+  <div class="aviso" id="aviso" role="status" hidden></div>
+
+  <div class="controles" role="group" aria-label="Controles del Gantt">
+    <span class="grupo" id="g-quien" hidden><span class="titulo">Quién edita</span>
+      <span id="sesion"></span>
+      <span class="mono" id="q-version"></span>
+    </span>
+    <span class="grupo"><span class="titulo">Ver</span>
+      <button class="b" id="b-frentes">Frentes</button>
+      <button class="b" id="b-etapas">Etapas</button>
+      <button class="b" id="b-todo">Todo el detalle</button>
+    </span>
+    <span class="grupo"><span class="titulo">Vínculos</span>
+      <label><input type="radio" name="flechas" value="auto" checked> Los que importan</label>
+      <label><input type="radio" name="flechas" value="todas"> Todos</label>
+      <label><input type="radio" name="flechas" value="ninguna"> Ninguno</label>
+    </span>
+    <span class="grupo"><span class="titulo">En rojo</span>
+      <label><input type="radio" name="rojo" value="relevos" checked> Cadena de relevos</label>
+      <label><input type="radio" name="rojo" value="red" id="r-red"> Ruta crítica de la red</label>
+    </span>
+    <span class="grupo"><label for="zoom"><span class="titulo">Escala</span></label>
+      <input type="range" id="zoom" min="3" max="14" step="1" value="6" aria-label="Píxeles por día">
+      <label><input type="checkbox" id="c-marcas" checked> Fines de semana</label>
+    </span>
+  </div>
+
+  <details class="bitacora" id="bitacora" hidden></details>
+
+  <div class="leyenda" id="leyenda" aria-label="Frentes"></div>
+
+  <div class="zona">
+    <div class="marco" id="marco" tabindex="0" aria-label="Gantt, se desplaza en los dos sentidos">
+      <div class="interior">
+        <div class="etiquetas"><div class="esquina">Clave · partida</div><div id="etiquetas"></div></div>
+        <div class="lienzo"><div class="cabecera" id="cabecera"></div><div id="cuerpo"></div></div>
+      </div>
+    </div>
+    <aside class="panel" id="panel" aria-label="Edición"></aside>
+  </div>
+</div>
+
+<div class="tip" id="tip" hidden></div>
+
+<script>
+/*__MOTOR__*/
+</script>
+<script>
+/*__CLIENTE__*/
+</script>
+<script>
+/*__SESION__*/
+</script>
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+// Con configuración, la pantalla trabaja contra la API y pide el programa: la página no lleva ningún dato suyo, porque
+// el navegador no puede mandar un token al abrirla y los datos no pueden salir sin saber quién los pide (B-96).
+// Sin ella es la simulación de siempre, con el programa dentro de la página.
+const CFG = __CONFIG__;
+async function cargarVivo() {
+  const p = await Sesion.llamar("ver_programa", { programa_id: CFG.programa });
+  const g = p.vista;
+  g.nombre = p.nombre;
+  g.api = { programa: p.id, version: p.version, guardadas: p.guardadas, version_de: p.version_de, reemplazado_por: p.reemplazado_por, traspaso: p.traspaso };
+  return g;
+}
+let G;
+try {
+  if (CFG) { Sesion.iniciar(CFG); G = await cargarVivo(); } else G = __DATOS__;
+} catch (err) {
+  const caja = document.querySelector(".pagina");
+  if (Sesion.esFaltaDeSesion(err)) Sesion.pantallaDeEntrada(caja);
+  else caja.innerHTML = `<h1>No pude abrir el programa</h1><p class="nota">${esc(err && err.mensaje || err)}</p><p><a href="/">← Programas</a></p>`;
+  return;
+}
+if (CFG) { document.title = "Gantt " + G.nombre; $("titulo").textContent = "Gantt " + G.nombre; }
+// El programa lo sube quien tiene permiso y lo ven todos: lo que se muestra de él nunca se toma por HTML. Las claves y
+// las descripciones se escapan una vez aquí; las llaves —que también son claves de búsqueda— al ponerlas en un atributo.
+G.filas.forEach(f => { f.clave = esc(f.clave); f.descripcion = esc(f.descripcion); });
+Object.keys(G.frentes).forEach(k => { G.frentes[k] = esc(G.frentes[k]); });
+const R = G.red, dias = R.dias;
+const FILA = 15, MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const COLORES = ["var(--f1)","var(--f2)","var(--f3)","var(--f4)","var(--f5)","var(--f6)"];
+const MOTIVOS = {
+  repetido: "Ese vínculo ya existe.", cierra_un_ciclo: "Ese vínculo cierra un ciclo: cada partida esperaría a la otra.",
+  autovinculo: "Una partida no puede esperarse a sí misma.", sucesora_no_es_partida: "El vínculo siempre llega a una partida, no a un bloque.",
+  predecesora_sin_partidas: "Ese bloque no tiene partidas.", duracion_invalida: "La duración debe ser mayor que cero.",
+  vinculo_inexistente: "Ese vínculo ya no existe.", actividad_desconocida: "No encuentro esa actividad."
+};
+// por qué una edición de la versión anterior no pasó a esta
+const NO_PASO = {
+  la_version_nueva_ya_la_cambio: "El archivo nuevo ya cambió esa partida: ganó el archivo.", actividad_desconocida: "Esa partida ya no está en el programa.",
+  repetido: "Ese vínculo ya estaba en el archivo nuevo.", vinculo_inexistente: "Ese vínculo ya no existía en el archivo nuevo.",
+  cierra_un_ciclo: "Con el archivo nuevo cerraría un ciclo.", autovinculo: "Una partida no puede esperarse a sí misma.",
+  sucesora_no_es_partida: "Lo que espera ya no es una partida.", predecesora_sin_partidas: "El bloque que citaba ya no tiene partidas.",
+  duracion_invalida: "La duración no es válida."
+};
+const fecha = s => new Date(s + "T00:00:00");
+const desde = fecha(G.desde);
+const dia = s => Math.round((fecha(s) - desde) / 864e5);
+const OFF = dias.map(dia);
+const fmt = s => { const d = fecha(s); return d.getDate() + "-" + MES[d.getMonth()]; };
+const fmtL = s => fmt(s) + "-" + fecha(s).getFullYear();
+const frentes = Object.keys(G.frentes);
+const colorDe = f => { const i = frentes.indexOf(f); return i >= 0 && i < COLORES.length ? COLORES[i] : "var(--fx)"; };
+const porLlave = Object.fromEntries(G.filas.map(f => [f.llave, f]));
+const orden = {}; R.partidas.forEach((p, i) => orden[p.k] = i);
+const baseWin = {}; R.partidas.forEach(p => baseWin[p.k] = [p.ini, p.fin]);
+const baseCierre = Math.max(...R.partidas.map(p => p.fin));
+const hijosDe = k => R.bloques[k] || [];
+
+// Con `G.api` la pantalla trabaja contra el servidor: `saved` es lo ya guardado (la bitácora aplicada), `edits` lo que
+// está por guardar. Sin `G.api` es la simulación de siempre y `saved` queda vacío.
+const API = G.api || null;
+// qué función de `ROL_FUNCION` pide cada edición (`PERMISO_DE` en programa.py); quién la tiene lo dice la API (`Sesion.puede`)
+const FUNCION_DE = { dur: "editar_estructura_programa", add: "editar_estructura_programa", del: "editar_estructura_programa", chg: "editar_estructura_programa", ini: "editar_fechas_programa" };
+const QUE_ES = { editar_estructura_programa: "editar la estructura (duración y vínculos)", editar_fechas_programa: "editar las fechas" };
+const ORIGENES = { decision: "por decisión", recurso: "por recurso", tecnica: "técnico" };
+const CONFIANZA = { tecnica: "alta", recurso: "media", decision: "baja" };
+let guardadas = API ? API.guardadas : [], version = API ? API.version : 0, ocupado = false;
+// un programa con versión nueva se ve y se consulta, pero no se edita (D-471): lo que se decidiera aquí no pasaría a la nueva
+const cerrado = () => !!(API && API.reemplazado_por);
+const AVISO_CERRADO = () => `Este programa ya tiene una versión más nueva (la ${API.reemplazado_por}): ahí se edita; éste queda como estaba.`;
+
+const frac = x => { const m = String(x).split("/"); return m.length === 2 ? +m[0] / +m[1] : +x; };
+function deServidor(d) { // la edición como la guarda la bitácora → la de este motor
+  if (d.edicion === "cambiar_duracion") return { t: "dur", k: d.llave, dias: frac(d.dias) };
+  if (d.edicion === "fijar_inicio") return { t: "ini", k: d.llave, fecha: d.fecha };
+  const v = { de: d.predecesora, a: d.sucesora, tipo: d.tipo };
+  if (d.edicion === "agregar_vinculo") return Object.assign({ t: "add", desfase: frac(d.desfase) }, v, d.origen ? { origen: d.origen } : {});
+  if (d.edicion === "quitar_vinculo") return Object.assign({ t: "del" }, v);
+  return Object.assign({ t: "chg", tipoActual: d.tipo_actual, desfase: frac(d.desfase) }, v, d.origen ? { origen: d.origen } : {});
+}
+function aServidor(e) { // y de vuelta; los días y las esperas cruzan como texto
+  if (e.t === "dur") return { edicion: "cambiar_duracion", llave: e.k, dias: String(e.dias) };
+  if (e.t === "ini") return { edicion: "fijar_inicio", llave: e.k, fecha: e.fecha };
+  const v = { predecesora: e.de, sucesora: e.a, tipo: e.tipo };
+  if (e.t === "add") return Object.assign({ edicion: "agregar_vinculo", desfase: String(e.desfase || 0) }, v, e.origen ? { origen: e.origen } : {});
+  if (e.t === "del") return Object.assign({ edicion: "quitar_vinculo" }, v);
+  return Object.assign({ edicion: "cambiar_vinculo", tipo_actual: e.tipoActual, desfase: String(e.desfase || 0) }, v);
+}
+let saved = [];
+const rehacerGuardadas = () => { saved = guardadas.filter(g => g.estado === "aplicada").map(g => deServidor(g.edicion)); };
+rehacerGuardadas();
+let edits = [], vig, cur, CMP, sel = null, pick = null;
+const todas = () => saved.concat(edits);
+function recalcular() { // lo guardado y, encima, lo que está por guardar
+  vig = Motor.reprogramar(R, saved); cur = Motor.reprogramar(R, todas());
+  if (API && edits.length) { // contra qué se compara: contra lo guardado si hay algo por decidir, y si no, contra el plan
+    const movidas = {}; let n = 0;
+    for (const p of R.partidas) { const a = cur.win[p.k], b = vig.win[p.k], di = a[0] - b[0], df = a[1] - b[1]; if (di || df) { movidas[p.k] = [di, df]; n++; } }
+    CMP = { win: vig.win, fin: vig.finDespues, movidas, nMovidas: n, rutaAntes: vig.rutaDespues, rutaCambia: cur.rutaDespues.length !== vig.rutaDespues.length || cur.rutaDespues.some(x => !vig.rutaDespues.includes(x)), contraGuardado: true };
+  } else CMP = { win: baseWin, fin: baseCierre, movidas: cur.movidas, nMovidas: cur.nMovidas, rutaAntes: cur.rutaAntes, rutaCambia: cur.rutaCambia, contraGuardado: false };
+}
+let px = 6, soloFrente = null, rojo = "relevos", flechas = "auto", aviso = null;
+let expandidos = new Set(G.filas.filter(f => f.resumen && f.nivel <= 1).map(f => f.llave));
+
+const ventanaFila = (f, win) => {
+  if (!f.resumen) return win[f.llave];
+  const hs = hijosDe(f.llave); if (!hs.length) return null;
+  return [Math.min(...hs.map(h => win[h][0])), Math.max(...hs.map(h => win[h][1]))];
+};
+const esVisible = () => { // las filas que se ven según lo que está plegado y el frente elegido
+  const vis = new Set();
+  for (const f of G.filas) {
+    if (soloFrente !== null && f.nivel >= 1 && f.frente !== soloFrente) continue;
+    if (f.padre === null || (vis.has(f.padre) && expandidos.has(f.padre))) vis.add(f.llave);
+  }
+  return vis;
+};
+const rojoSet = () => rojo === "relevos" ? new Set(cur.rutaDespues) : (todas().length ? new Set() : new Set(G.ruta_critica_red));
+
+function textoEdicion(e, conOrigen = true) {
+  const c = k => porLlave[k] ? porLlave[k].clave : esc(k);
+  const lag = d => d ? (d > 0 ? "+" : "") + d : "";
+  if (e.t === "dur") return `${c(e.k)} dura ${e.dias} d`;
+  if (e.t === "ini") return `${c(e.k)} no arranca antes del ${fmt(e.fecha)}`;
+  if (e.t === "add") return `${c(e.de)} → ${c(e.a)} ${e.tipo}${lag(e.desfase)}${conOrigen && e.origen ? " · " + ORIGENES[e.origen] : ""}`;
+  if (e.t === "del") return `quitar ${c(e.de)} → ${c(e.a)}`;
+  return `${c(e.de)} → ${c(e.a)}: ${e.tipoActual} pasa a ${e.tipo}${lag(e.desfase)}`;
+}
+
+function reconstruir(lista) { // vuelve a validar una a una, sobre lo guardado: lo que ya no aplica se descarta
+  const ok = [];
+  for (const e of lista) { const p = Motor.reprogramar(R, saved.concat(ok, [e])); if (p.rechazadas.length === 0) ok.push(e); }
+  return ok;
+}
+function aplicar(e) {
+  if (cerrado()) { aviso = AVISO_CERRADO(); todo(); return; }
+  if (API && !Sesion.puede(FUNCION_DE[e.t])) { aviso = `Con ${Sesion.describir()} no puedes ${QUE_ES[FUNCION_DE[e.t]]}.`; todo(); return; }
+  const ant = e.t === "dur" || e.t === "ini" ? edits.filter(x => !(x.t === e.t && x.k === e.k)) : edits;
+  const prueba = Motor.reprogramar(R, saved.concat(ant, [e]));
+  if (prueba.rechazadas.length) { aviso = MOTIVOS[prueba.rechazadas[prueba.rechazadas.length - 1]] || "No se puede aplicar."; }
+  else { aviso = null; edits = ant.concat([e]); }
+  recalcular(); todo();
+}
+function quitarEdicion(i) { edits = reconstruir(edits.filter((_, j) => j !== i)); aviso = null; recalcular(); todo(); }
+
+// ------------------------------------------------------------------ hablar con el servidor
+const llamar = (op, args) => Sesion.llamar(op, Object.assign({ programa_id: API.programa }, args));
+const textoError = err => {
+  if (!(err instanceof ClientePrograma.ErrorApi)) return "Algo falló: " + err;
+  if (Sesion.esFaltaDeSesion(err)) return "Tu sesión no es válida: vuelve a entrar.";
+  const d = err.detalle || {};
+  if (err.codigo === "no_aplicable") return "El servidor no pudo aplicarla: " + (d.rechazadas || []).map(m => MOTIVOS[m] || m).join(" ");
+  if (err.codigo === "reemplazado") { API.reemplazado_por = d.reemplazado_por; avisoDeVersion(); return `Mientras mirabas se subió una versión más nueva (la ${d.reemplazado_por}): ahí se edita; éste queda como estaba.`; }
+  if (err.codigo === "dependen") return `No se puede deshacer: las ediciones ${(d.dependientes || []).join(", ")} dependen de ella. Deshaz primero esas.`;
+  return err.mensaje;
+};
+async function recargar() { // trae lo que hay hoy; lo por guardar se vuelve a validar encima
+  const p = await llamar("ver_programa", {});
+  guardadas = p.guardadas; version = p.version; rehacerGuardadas();
+  const antes = edits.length; edits = reconstruir(edits);
+  return antes - edits.length;
+}
+async function guardar() {
+  if (!API || !edits.length || ocupado) return;
+  const falta = Sesion.falta(); if (falta) { aviso = falta; todo(); return; }
+  ocupado = true; aviso = null; todo();
+  try {
+    while (edits.length) {
+      const r = await llamar("aplicar_edicion", { cuerpo: { edicion: aServidor(edits[0]), esperaba: version } }); // la versión que vio quien decide
+      guardadas = guardadas.concat([r.guardada]); version = r.version; edits = edits.slice(1); rehacerGuardadas();
+    }
+  } catch (err) {
+    aviso = textoError(err);
+    if (err.codigo === "conflicto") {
+      try { const quitadas = await recargar(); aviso += " Ya traje lo de hoy" + (quitadas ? ` y quité ${quitadas} edición(es) que ya no aplicaban` : "") + "; revisa el impacto y guarda de nuevo."; } catch (e2) { aviso += " " + textoError(e2); }
+    }
+  }
+  ocupado = false; recalcular(); todo();
+}
+async function deshacer(id) {
+  if (!API || ocupado) return;
+  if (cerrado()) { aviso = AVISO_CERRADO(); todo(); return; }
+  const falta = Sesion.falta(); if (falta) { aviso = falta; todo(); return; }
+  ocupado = true; aviso = null; todo();
+  try {
+    const r = await llamar("deshacer_edicion", { edicion_id: id });
+    guardadas = r.guardadas; version = r.version; rehacerGuardadas();
+    const antes = edits.length; edits = reconstruir(edits);
+    if (edits.length < antes) aviso = `Quité ${antes - edits.length} edición(es) por guardar que dependían de lo que deshiciste.`;
+  } catch (err) {
+    aviso = textoError(err);
+    if (err.codigo === "conflicto") { try { await recargar(); aviso += " Ya traje lo de hoy."; } catch (e2) { aviso += " " + textoError(e2); } }
+  }
+  ocupado = false; recalcular(); todo();
+}
+
+function tarjetas() {
+  const d = CMP.contraGuardado ? cur.finDespues - CMP.fin : cur.diasDeCambio, hay = todas().length > 0;
+  const cual = CMP.contraGuardado ? "lo guardado" : "el plan";
+  $("t-cierre").className = "tarjeta" + (d ? " cambia" : "");
+  $("t-cierre").innerHTML = `<div class="k">Cierre</div><div class="v">${fmtL(dias[cur.finDespues])}${d ? `<span class="pastilla mas">${d > 0 ? "+" : ""}${d} d hábiles</span>` : ""}</div><div class="d">${d ? `antes ${fmtL(dias[CMP.fin])}` + (CMP.contraGuardado ? " (lo guardado)" : "") : `${cual}, sin cambios`}${CMP.contraGuardado && baseCierre !== vig.finDespues ? ` · plan ${fmtL(dias[baseCierre])}` : ""}</div>`;
+  $("t-movidas").className = "tarjeta" + (CMP.nMovidas ? " cambia" : "");
+  $("t-movidas").innerHTML = `<div class="k">Partidas que se mueven</div><div class="v">${CMP.nMovidas}<span class="pastilla">de ${R.partidas.length}</span></div><div class="d">${CMP.nMovidas ? `marcadas con ↦ en el árbol${CMP.contraGuardado ? "; contra lo guardado" : ""}` : "ninguna"}</div>`;
+  $("t-ruta").className = "tarjeta" + (CMP.rutaCambia ? " cambia" : "");
+  $("t-ruta").innerHTML = `<div class="k">Cadena de relevos</div><div class="v">${cur.rutaDespues.length} pasos${CMP.rutaCambia ? `<span class="pastilla mas">cambia</span>` : ""}</div><div class="d">${CMP.rutaCambia ? `eran ${CMP.rutaAntes.length}; cambian de partidas` : (hay ? "la misma ruta: correr fechas no es noticia" : "la que lee el planeador")}</div>`;
+  const chips = edits.map((e, i) => `<span class="chip ${API ? "nuevo" : ""}">${textoEdicion(e)}<button data-q="${i}" aria-label="Quitar esta edición" ${ocupado ? "disabled" : ""}>×</button></span>`).join("");
+  if (!API) $("ediciones").innerHTML = edits.length ? chips + `<button class="b" id="b-reset">Deshacer todo</button>` : `<span style="color:var(--muted)">Sin ediciones: es el programa tal como está.</span>`;
+  else $("ediciones").innerHTML = edits.length
+    ? `<span class="titulo-lista">Por guardar</span>${chips}<button class="b primario" id="b-guardar" ${ocupado ? "disabled" : ""}>${ocupado ? "Guardando…" : `Guardar ${edits.length === 1 ? "la edición" : edits.length + " ediciones"}`}</button><button class="b" id="b-reset" ${ocupado ? "disabled" : ""}>Descartar</button>`
+    : `<span style="color:var(--muted)">${saved.length ? `${saved.length} edición(es) guardada(s); nada por guardar.` : "Sin ediciones: es el programa tal como se importó."}</span>`;
+  const av = $("aviso"); av.hidden = !aviso; av.textContent = aviso || "";
+  $("r-red").disabled = hay;
+  if (hay && rojo === "red") { rojo = "relevos"; document.querySelector('input[name="rojo"][value="relevos"]').checked = true; }
+}
+
+function bitacora() {
+  const b = $("bitacora"); if (!API) { b.hidden = true; return; }
+  b.hidden = false;
+  const abierta = b.open; // al redibujar, no se cierra sola
+  const fmtHora = s => { try { return new Date(s).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" }); } catch (_) { return s; } };
+  const fila = g => {
+    const e = deServidor(g.edicion), i = g.impacto || {}, ok = g.estado === "aplicada";
+    const imp = i.fin_despues ? `cierre ${i.dias_de_cambio > 0 ? "+" : ""}${i.dias_de_cambio} d, ${i.partidas_movidas} partida(s) movida(s)${i.ruta_cambia ? ", cambió la cadena" : ""}` : "";
+    const origen = g.edicion.origen ? ` · ${esc(ORIGENES[g.edicion.origen] || g.edicion.origen)} (confianza ${esc(CONFIANZA[g.edicion.origen] || "?")})` : "";
+    const puede = Sesion.puede(FUNCION_DE[e.t]);
+    return `<li class="${ok ? "" : "revertida"}"><span class="sec">#${g.secuencia}</span><span class="que">${textoEdicion(e, false)}${origen}</span>` +
+      `<span class="acciones">${ok ? `<button class="b" data-d="${g.id}" ${ocupado || !puede || cerrado() ? "disabled" : ""} title="${cerrado() ? "Este programa ya tiene una versión más nueva: ya no se edita" : puede ? "Deshacer esta edición" : "Tus roles no pueden " + QUE_ES[FUNCION_DE[e.t]]}">Deshacer</button>` : `<span class="mono">revertida</span>`}</span>` +
+      `<span class="quien-cuando">${esc(g.usuario)} (${esc(Sesion.nombreDeRol(g.rol))}) · ${esc(fmtHora(g.creada_en))}${g.heredada_de ? " · pasó de la versión anterior" : ""}${imp ? " · " + imp : ""}${ok ? "" : ` · revertida por ${esc(g.revertida_por)}`}</span></li>`;
+  };
+  b.innerHTML = `<summary>Lo guardado · ${saved.length} aplicada(s)${guardadas.length > saved.length ? `, ${guardadas.length - saved.length} revertida(s)` : ""} · versión ${version}</summary>` +
+    (guardadas.length ? `<ol>${guardadas.slice().reverse().map(fila).join("")}</ol>` : `<p class="nota" style="margin:8px 0 4px">Todavía no se ha guardado ninguna edición.</p>`);
+  b.open = abierta;
+}
+
+function leyenda() {
+  $("leyenda").innerHTML = frentes.map(f =>
+    `<button data-f="${esc(f)}" aria-pressed="${soloFrente === null || soloFrente === f}"><i style="background:${colorDe(f)}"></i>${G.frentes[f].toLowerCase()}</button>`).join("") +
+    `<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:8px;border-radius:2px;display:inline-block;background:var(--critica)"></i>cadena en rojo</span>`;
+}
+
+function dibujar() {
+  const vis = esVisible();
+  const filas = G.filas.filter(f => vis.has(f.llave));
+  const y = {}; filas.forEach((f, i) => y[f.llave] = i * FILA);
+  const visDe = k => { let x = k; while (x && !vis.has(x)) x = porLlave[x] ? porLlave[x].padre : null; return x; };
+  const maxIdx = Math.max(baseCierre, cur.finDespues, vig.finDespues);
+  const total = OFF[maxIdx] + 6;
+  const W = total * px, H = filas.length * FILA;
+  const x0 = i => OFF[i] * px, x1 = i => (OFF[i] + 1) * px;
+  const roja = rojoSet();
+  const selSet = sel === null ? new Set() : (porLlave[sel].resumen ? new Set(hijosDe(sel)) : new Set([sel]));
+  const win = cur.win;
+
+  $("etiquetas").innerHTML = filas.map(f => {
+    const tiene = f.resumen && hijosDe(f.llave).length;
+    const abierto = expandidos.has(f.llave);
+    const movida = f.resumen ? hijosDe(f.llave).some(h => CMP.movidas[h]) : !!CMP.movidas[f.llave];
+    return `<div class="fila-eti ${f.resumen ? "resumen" : ""} ${roja.has(f.llave) ? "critica" : ""} ${sel === f.llave ? "sel" : ""} ${movida ? "movida" : ""}" style="padding-left:${4 + f.nivel * 9}px" data-l="${esc(f.llave)}">` +
+      `<span class="caret" ${tiene ? `data-c="${esc(f.llave)}"` : ""}>${tiene ? (abierto ? "▼" : "▶") : ""}</span><span class="clave">${f.clave}</span><span class="desc">${f.descripcion.toLowerCase()}</span></div>`;
+  }).join("");
+
+  let cab = `<svg width="${W}" height="46" role="img" aria-label="Escala de tiempo">`;
+  let d = new Date(desde), mesPrev = -1;
+  for (let i = 0; i < total; i++, d.setDate(d.getDate() + 1)) {
+    if (d.getMonth() !== mesPrev) { mesPrev = d.getMonth(); cab += `<line x1="${i * px}" x2="${i * px}" y1="0" y2="46" stroke="var(--line)"/><text x="${i * px + 4}" y="14" font-size="11" font-weight="600" fill="var(--fg)">${MES[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</text>`; }
+    if (d.getDay() === 1) cab += `<line x1="${i * px}" x2="${i * px}" y1="30" y2="46" stroke="var(--line)"/>` + (px >= 8 ? `<text x="${i * px + 3}" y="42" font-size="9.5" fill="var(--muted)" font-family="var(--mono)">${d.getDate()}</text>` : "");
+  }
+  const vt = G.marcas.ventana;
+  if (vt) { const a = dia(vt.inicio) * px, b = (dia(vt.fin) + 1) * px; cab += `<rect x="${a}" y="18" width="${b - a}" height="8" fill="var(--acento)" opacity=".85" rx="2"/><text x="${b + 4}" y="26" font-size="9.5" fill="var(--acento)">ventana de la planta alta</text>`; }
+  $("cabecera").innerHTML = cab + `</svg>`; $("cabecera").style.width = W + "px";
+
+  let s = `<svg width="${W}" height="${H}" id="svg" role="img" aria-label="Barras del programa"><defs>
+    <marker id="fl" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0.5 L5.5,3 L0,5.5z" fill="var(--flecha)"/></marker>
+    <marker id="fr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0.5 L5.5,3 L0,5.5z" fill="var(--critica)"/></marker>
+    <marker id="fa" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0.5 L5.5,3 L0,5.5z" fill="var(--acento)"/></marker>
+    <marker id="fw" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0.5 L5.5,3 L0,5.5z" fill="var(--aviso)"/></marker></defs>`;
+  if ($("c-marcas").checked) G.marcas.no_laborables.forEach(m => { s += `<rect x="${dia(m.fecha) * px}" y="0" width="${px}" height="${H}" fill="var(--fin-semana)"/>`; });
+  if (vt) { const a = dia(vt.inicio) * px, b = (dia(vt.fin) + 1) * px; s += `<rect x="${a}" y="0" width="${b - a}" height="${H}" fill="var(--ventana)"/>`; }
+  d = new Date(desde);
+  for (let i = 0; i < total; i++, d.setDate(d.getDate() + 1)) if (d.getDay() === 1) s += `<line x1="${i * px}" x2="${i * px}" y1="0" y2="${H}" stroke="var(--grid)"/>`;
+  if (sel !== null && y[sel] !== undefined) s += `<rect x="0" y="${y[sel]}" width="${W}" height="${FILA}" fill="var(--sel)" opacity=".7"/>`;
+
+  filas.forEach(f => {
+    const yy = y[f.llave], w = ventanaFila(f, win), b0 = ventanaFila(f, CMP.win);
+    if (!w) return;
+    const a = x0(w[0]), b = x1(w[1]);
+    if (b0 && (b0[0] !== w[0] || b0[1] !== w[1])) s += `<rect x="${x0(b0[0])}" y="${yy + 4}" width="${Math.max(x1(b0[1]) - x0(b0[0]), 2)}" height="7" rx="2" fill="none" stroke="var(--muted)" stroke-dasharray="2 2" opacity=".8"/>`;
+    if (f.resumen) {
+      const plegada = !expandidos.has(f.llave) && hijosDe(f.llave).length;
+      if (plegada) s += `<rect data-l="${esc(f.llave)}" x="${a}" y="${yy + 3}" width="${Math.max(b - a, 2)}" height="9" rx="2" fill="${colorDe(f.frente)}" opacity=".55"/>`;
+      s += `<g data-l="${esc(f.llave)}"><rect x="${a}" y="${yy + 5}" width="${b - a}" height="3.5" fill="var(--resumen)" opacity=".75"/><path d="M${a},${yy + 4} v7 l3,-3 z M${b},${yy + 4} v7 l-3,-3 z" fill="var(--resumen)" opacity=".75"/></g>`;
+    } else s += `<rect data-l="${esc(f.llave)}" x="${a}" y="${yy + 3}" width="${Math.max(b - a, 2)}" height="9" rx="2" fill="${roja.has(f.llave) ? "var(--critica)" : colorDe(f.frente)}"/>`;
+  });
+
+  if (flechas !== "ninguna") {
+    const vistas = new Set();
+    cur.vinculos.forEach((v, i) => {
+      if (!win[v.a]) return;
+      const ref = Motor.referencia(R, win, v, roja, orden);
+      if (ref === v.a) return;
+      const p = R.bloques[v.de] ? Motor.ventanaDeBloque(R, win, v.de, v.a) : win[v.de];
+      const hol = p ? Motor.holgura(v.tipo, v.desfase, p[0], p[1] + 1, win[v.a][0], win[v.a][1] + 1) : null;
+      const roto = hol !== null && hol < 0;
+      const enCadena = roja.has(ref) && roja.has(v.a) && hol === 0;
+      const toca = selSet.has(ref) || selSet.has(v.a) || (R.bloques[v.de] && sel !== null && v.de === sel);
+      if (flechas === "auto" && !(enCadena || toca || roto)) return;
+      const A = visDe(ref), B = visDe(v.a);
+      if (!A || !B || A === B || y[A] === undefined || y[B] === undefined) return;
+      const clave = A + "|" + B + "|" + v.tipo;
+      if (vistas.has(clave)) return; vistas.add(clave);
+      const wa = ventanaFila(porLlave[A], win), wb = ventanaFila(porLlave[B], win);
+      const ini = v.tipo === "SS" || v.tipo === "SF", finS = v.tipo === "FF" || v.tipo === "SF";
+      const xa = ini ? x0(wa[0]) : x1(wa[1]), xb = finS ? x1(wb[1]) : x0(wb[0]);
+      const ya = y[A] + 7.5, yb = y[B] + 7.5, d1 = ini ? -1 : 1, xv = xa + 5 * d1, entra = finS ? xb + 5 : xb - 5;
+      let ruta;
+      if (finS ? xv >= entra : xv <= entra) ruta = `M${xa},${ya} H${xv} V${yb} H${xb}`;
+      else { const ym = (ya + yb) / 2 + (yb >= ya ? 4 : -4); ruta = `M${xa},${ya} H${xv} V${ym} H${entra} V${yb} H${xb}`; }
+      const col = roto ? "aviso" : toca ? "acento" : enCadena ? "critica" : "flecha";
+      const mk = roto ? "fw" : toca ? "fa" : enCadena ? "fr" : "fl";
+      s += `<path d="${ruta}" fill="none" stroke="var(--${col})" stroke-width="${toca || enCadena ? 1.4 : .8}" ${roto ? 'stroke-dasharray="3 2"' : ""} opacity="${toca || enCadena || roto ? 1 : .7}" marker-end="url(#${mk})" data-v="${i}"/>`;
+    });
+  }
+  $("cuerpo").innerHTML = s + `</svg>`;
+}
+
+function panel() { // el panel de siempre; si el programa ya tiene versión nueva, solo se mira
+  panelDeEdicion();
+  if (!cerrado()) return;
+  const p = $("panel");
+  p.querySelectorAll("input, select, button").forEach(x => x.disabled = true);
+  p.insertAdjacentHTML("beforeend", `<p class="nota" data-cerrado>${esc(AVISO_CERRADO())} <a href="/programas/${esc(API.reemplazado_por)}/gantt">Abrirla</a></p>`);
+}
+function panelDeEdicion() {
+  const p = $("panel");
+  if (sel === null) { p.innerHTML = `<h2>Edición</h2><p class="nota">Toca una barra o una fila para ver sus vínculos y cambiarla. Con el triángulo pliegas o despliegas un bloque; sus flechas se suman al bloque plegado, sin perder ninguna.</p><p class="nota">Estructura (duración y vínculos) es de Control de obra; las fechas son del Residente. ${API ? "Lo que apliques queda por guardar hasta que presiones Guardar." : "Aquí se simula y no se guarda."}</p>`; return; }
+  const f = porLlave[sel], w = ventanaFila(f, cur.win), b0 = ventanaFila(f, CMP.win);
+  const info = `<h2>${f.descripcion.toLowerCase()}</h2><div class="mono">${f.clave} · fila ${f.fila}${G.frentes[f.frente] ? " · " + G.frentes[f.frente].toLowerCase() : ""}</div><div>${fmt(dias[w[0]])} → ${fmt(dias[w[1]])}${b0 && (b0[0] !== w[0] || b0[1] !== w[1]) ? ` <span class="pastilla mas">antes ${fmt(dias[b0[0]])} → ${fmt(dias[b0[1]])}</span>` : ""}</div>`;
+  if (f.resumen) {
+    const n = hijosDe(f.llave).length, mov = hijosDe(f.llave).filter(h => CMP.movidas[h]).length;
+    p.innerHTML = info + `<p class="nota">Resumen de ${n} partidas${mov ? `, ${mov} se mueven` : ""}. Despliégalo para editar una de ellas, o únelo como predecesora de una partida: sale de la que fija la fecha.</p>` + (pick ? `<button class="b primario" id="p-pick">Es la predecesora de ${porLlave[pick.a].clave}</button><button class="b" id="p-nopick">Cancelar</button>` : "");
+    return;
+  }
+  const dur = w[1] - w[0] + 1;
+  const vinc = (lista, entrantes) => lista.length ? lista.map(({ v, i }) => {
+    const otro = entrantes ? v.de : v.a, o = porLlave[otro];
+    const wp = R.bloques[v.de] ? Motor.ventanaDeBloque(R, cur.win, v.de, v.a) : cur.win[v.de];
+    const hol = wp ? Motor.holgura(v.tipo, v.desfase, wp[0], wp[1] + 1, cur.win[v.a][0], cur.win[v.a][1] + 1) : null;
+    return `<div class="vinculo ${hol !== null && hol < 0 ? "roto" : ""}"><div class="quien" title="${o ? o.descripcion : ""}"><span class="mono">${o ? o.clave : esc(otro)}</span> ${o ? o.descripcion.toLowerCase() : ""}</div>
+      <div class="campo"><select data-vt="${i}" aria-label="Tipo">${Motor.TIPOS.map(t => `<option ${t === v.tipo ? "selected" : ""}>${t}</option>`).join("")}</select>
+      <input type="number" step="1" value="${v.desfase}" data-vl="${i}" aria-label="Espera (+) o traslape (−), en días"> <span class="mono">d</span>
+      <button class="b" data-vq="${i}">Quitar</button><span class="mono">${hol === null ? "" : "holgura " + hol}</span></div></div>`;
+  }).join("") : `<p class="nota">Ninguno.</p>`;
+  const entran = [], salen = [];
+  cur.vinculos.forEach((v, i) => { if (v.a === sel) entran.push({ v, i }); if (v.de === sel) salen.push({ v, i }); });
+  p.innerHTML = info +
+    `<h3>Duración y arranque</h3><div class="campo"><input type="number" min="1" step="1" id="e-dur" value="${dur}" aria-label="Duración en días hábiles"> <span class="mono">días hábiles</span> <button class="b" id="e-dur-ok">Aplicar</button></div>
+     <div class="campo"><input type="date" id="e-ini" value="${dias[w[0]]}" aria-label="No arranca antes de"> <button class="b" id="e-ini-ok">Fijar arranque</button></div>
+     <h3>Espera a</h3>${vinc(entran, true)}
+     <h3>Le siguen</h3>${vinc(salen, false)}
+     <h3>Agregar una predecesora</h3><div class="campo"><select id="a-tipo" aria-label="Tipo">${Motor.TIPOS.map(t => `<option>${t}</option>`).join("")}</select><input type="number" id="a-lag" step="1" value="0" aria-label="Espera en días"> <span class="mono">d</span>
+     <button class="b ${pick ? "primario" : ""}" id="a-pick">${pick ? "Toca la predecesora…" : "Elegir en el Gantt"}</button></div>
+     ${API ? `<div class="campo"><label for="a-origen" class="mono">¿Por qué este orden?</label><select id="a-origen" aria-label="Por qué existe este orden">${Object.entries(ORIGENES).map(([k, t]) => `<option value="${k}" ${k === "decision" ? "selected" : ""}>${t} · confianza ${CONFIANZA[k]}</option>`).join("")}</select></div><p class="nota">Si no lo dices, queda «por decisión»: lo menos firme, lo primero que se revisa.</p>` : ""}`;
+}
+
+function identidad() { // la sesión de quien edita: solo con servidor
+  $("g-quien").hidden = !API; if (!API) return;
+  $("q-version").textContent = "versión " + version;
+}
+function todo() { identidad(); tarjetas(); bitacora(); leyenda(); dibujar(); panel(); }
+
+// ------------------------------------------------------------------ eventos
+const filaDe = e => e.target.closest("[data-l]");
+$("marco").addEventListener("click", e => {
+  const c = e.target.closest("[data-c]");
+  if (c) { const k = c.dataset.c; expandidos.has(k) ? expandidos.delete(k) : expandidos.add(k); dibujar(); return; }
+  const l = filaDe(e); if (!l) return;
+  const k = l.dataset.l;
+  if (pick && k !== pick.a) {
+    const e1 = { t: "add", de: k, a: pick.a, tipo: pick.tipo, desfase: pick.desfase };
+    if (pick.origen) e1.origen = pick.origen;
+    pick = null; aplicar(e1); return;
+  }
+  sel = k; tarjetas(); dibujar(); panel();
+});
+$("panel").addEventListener("click", e => {
+  const id = e.target.id, d = e.target.dataset;
+  if (id === "e-dur-ok") aplicar({ t: "dur", k: sel, dias: +$("e-dur").value });
+  else if (id === "e-ini-ok") aplicar({ t: "ini", k: sel, fecha: $("e-ini").value });
+  else if (id === "a-pick") { pick = pick ? null : { a: sel, tipo: $("a-tipo").value, desfase: +$("a-lag").value || 0, origen: API ? $("a-origen").value : undefined }; panel(); }
+  else if (id === "p-nopick") { pick = null; panel(); }
+  else if (d.vq !== undefined) { const v = cur.vinculos[+d.vq]; aplicar({ t: "del", de: v.de, a: v.a, tipo: v.tipo }); }
+});
+$("panel").addEventListener("change", e => {
+  const d = e.target.dataset;
+  if (d.vt !== undefined || d.vl !== undefined) {
+    const i = +(d.vt !== undefined ? d.vt : d.vl), v = cur.vinculos[i];
+    const caja = e.target.closest(".vinculo");
+    aplicar({ t: "chg", de: v.de, a: v.a, tipoActual: v.tipo, tipo: caja.querySelector("select").value, desfase: +caja.querySelector("input").value || 0 });
+  }
+});
+$("ediciones").addEventListener("click", e => {
+  if (e.target.dataset.q !== undefined) quitarEdicion(+e.target.dataset.q);
+  else if (e.target.id === "b-reset") { edits = []; aviso = null; recalcular(); todo(); }
+  else if (e.target.id === "b-guardar") guardar();
+});
+$("bitacora").addEventListener("click", e => { const b = e.target.closest("button[data-d]"); if (b) { e.preventDefault(); deshacer(+b.dataset.d); } });
+$("leyenda").addEventListener("click", e => { const b = e.target.closest("button[data-f]"); if (b) { soloFrente = soloFrente === b.dataset.f ? null : b.dataset.f; leyenda(); dibujar(); } });
+$("b-frentes").onclick = () => { expandidos = new Set(G.filas.filter(f => f.nivel === 0).map(f => f.llave)); dibujar(); };
+$("b-etapas").onclick = () => { expandidos = new Set(G.filas.filter(f => f.resumen && f.nivel <= 1).map(f => f.llave)); dibujar(); };
+$("b-todo").onclick = () => { expandidos = new Set(G.filas.filter(f => f.resumen).map(f => f.llave)); dibujar(); };
+document.querySelectorAll('input[name="flechas"]').forEach(r => r.onchange = () => { flechas = r.value; dibujar(); });
+document.querySelectorAll('input[name="rojo"]').forEach(r => r.onchange = () => { rojo = r.value; dibujar(); });
+$("c-marcas").onchange = dibujar;
+$("zoom").oninput = e => { px = +e.target.value; dibujar(); };
+
+const tip = $("tip");
+function mostrar(html, e) { tip.innerHTML = html; tip.hidden = false; const r = tip.getBoundingClientRect(); tip.style.left = Math.min(e.clientX + 14, innerWidth - r.width - 8) + "px"; tip.style.top = Math.min(e.clientY + 14, innerHeight - r.height - 8) + "px"; }
+$("marco").addEventListener("mousemove", e => {
+  const l = filaDe(e), v = e.target.closest("[data-v]");
+  if (v) { const x = cur.vinculos[+v.dataset.v];
+    mostrar(`<b>${x.tipo}${x.desfase ? (x.desfase > 0 ? "+" : "") + x.desfase : ""}</b><div class="mono">${porLlave[x.de] ? porLlave[x.de].clave : esc(x.de)} → ${porLlave[x.a].clave}</div><div>${porLlave[x.de] ? porLlave[x.de].descripcion.toLowerCase() : ""}<br>→ ${porLlave[x.a].descripcion.toLowerCase()}</div>`, e); }
+  else if (l) { const f = porLlave[l.dataset.l], w = ventanaFila(f, cur.win);
+    mostrar(`<b>${f.descripcion.toLowerCase()}</b><div class="mono">${f.clave} · fila ${f.fila}</div><div>${fmt(dias[w[0]])} → ${fmt(dias[w[1]])}</div>`, e); }
+  else tip.hidden = true;
+});
+$("marco").addEventListener("mouseleave", () => tip.hidden = true);
+function avisoDeVersion() { // de dónde viene este programa y a dónde fue: lo dice quien lo subió, no se deduce
+  const partes = [];
+  if (API.reemplazado_por) partes.push(`<p style="margin:0">Hay una <b>versión más nueva</b> de este programa, y éste ya no se edita: se ve como quedó. <a href="/programas/${esc(API.reemplazado_por)}/gantt">Abrirla</a></p>`);
+  const t = API.traspaso;
+  if (API.version_de && t) {
+    const no = t.no_pasaron || [];
+    partes.push(`<p style="margin:0">Versión nueva de «${esc(t.de_nombre)}» (<a href="/programas/${esc(API.version_de)}/gantt">verla</a>): <b>${esc(t.pasaron)}</b> ${t.pasaron === 1 ? "edición pasó" : "ediciones pasaron"}${no.length ? ` y <b>${no.length}</b> no` : ""}.</p>` +
+      (typeof t.partidas_en_comun === "number"
+        ? `<p style="margin:0">${t.partidas_en_comun === 0 ? `<b>No comparte ninguna de las ${esc(t.partidas_anterior)} partidas</b> de la versión anterior —cada partida se reconoce por su <span class="mono">oid</span>—: ¿es el archivo correcto?` : `Comparte ${esc(t.partidas_en_comun)} de las ${esc(t.partidas_anterior)} partidas de la versión anterior.`}</p>` : "") +
+      (no.length ? `<details><summary>Las que no pasaron</summary><ul style="margin:6px 0 0;padding-left:18px">` +
+        no.map(n => `<li>#${esc(n.secuencia)} ${esc(n.texto)} — ${esc(n.usuario)} (${esc(Sesion.nombreDeRol(n.rol))}): ${esc(NO_PASO[n.motivo] || n.motivo)}</li>`).join("") + `</ul></details>` : ""));
+  }
+  const caja = $("version-aviso"); caja.hidden = !partes.length; caja.innerHTML = partes.join("");
+}
+if (API) {
+  Sesion.montar($("sesion"));
+  Sesion.alCambiar(() => { aviso = null; tarjetas(); bitacora(); panel(); }); // cuando se sabe qué puede hacer quien edita, se redibuja lo que depende de eso
+  avisoDeVersion();
+  $("atras").hidden = false;
+  $("nota-pagina").innerHTML = 'El sistema dibuja el programa y lo mantiene; tú lo editas. Toca una partida: ves sus vínculos, cambias su duración, su arranque o sus uniones, y el programa se reprograma por el empuje mínimo mostrando el impacto antes de que decidas. Lo que decides queda <b>por guardar</b> hasta que lo guardes; entonces entra a la bitácora con tu nombre, tu rol y el impacto que viste, y se puede deshacer. Las reglas están en <code>PROGRAMA-CPM.md</code> §8.';
+}
+recalcular(); todo();
+})();
+</script>

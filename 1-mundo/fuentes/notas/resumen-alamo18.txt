@@ -1,0 +1,56 @@
+[Nota de lectura que se escribió al recibir estas tablas (sesión de 2026-09-18 a 2026-09-27); D-479 la conserva tal cual. Habla de las tablas de la carpeta hermana, no de los CSV recortados que mencionan: esos no se guardan, se regeneran del original.]
+
+# resumen-alamo18 — de dónde sale y qué se recortó
+
+Fuente: `PRECIO_REAL_ALAMO_18.xlsx` (subido dos veces — versión chica 27 KB
+descartada, esta es la versión completa 89 KB). Es el **"resumen del lote"**
+que el usuario dijo que agrega desde su propio ERP — no es la "estimación"
+(esa es lo realmente pagado, archivo distinto, todavía no sube).
+
+9 hojas, cada una su CSV. Semanas 17 a 33 de 2026 (mediados de abril a
+mediados de agosto) — la etiqueta de período que traía la versión chica
+("23/07/2026 al 26/08/2026") no aplica a esta versión y quedó en blanco en
+la hoja `Resumen`.
+
+## Totales (hoja `Resumen`)
+MO Pagada $545,235.03 · Materiales $858,918.88 · Subcontratos $0 · **Total
+$1,404,153.91** — cuadra al centavo contra la suma de `mano-de-obra.csv` y
+`materiales.csv`.
+
+## Hallazgo 1 — `materiales.csv` duplica registros de `almacen-abril.csv`
+
+76 de sus 377 filas (todas las de abril) tienen el **mismo `# Reg`** que filas
+de `almacen-abril.csv`, con la misma `Cantidad` (signo invertido: aquí ya
+viene negativa como salida, allá viene positiva con un campo `Motivo` que
+dice el sentido). Confirmado por Lote=18 en `almacen-abril.csv`.
+
+**No son dos fuentes independientes — es el mismo libro de movimientos de
+almacén, ya filtrado por este ERP a Lote 18 y extendido a mayo-agosto.**
+`almacen-abril.csv` cubre todos los lotes solo en abril; este `materiales.csv`
+cubre solo Lote 18 pero de abril a agosto.
+
+**Consecuencia:** para el costo real de materiales de ALAMO 18, usar
+`materiales.csv` / `consolidado-materiales.csv` de aquí — no sumarlo con
+`almacen-abril.csv`, eso duplicaría las 76 filas de abril.
+`almacen-abril.csv` sigue sirviendo para los otros lotes y para el detalle
+de columnas que aquí no vienen (contratista, ubicación, etc. sí vienen; pero
+`# OP`, proveedor, etc. no se repitieron aquí).
+
+## Hallazgo 2 — dos canales de captura en Mano de Obra, se suman como si no se solaparan
+
+`mano-de-obra.csv` trae una columna `ID` con dos valores: `ERP` (357,832.66)
+y `Manual` (187,402.365) — ver `resumen-mo-id-y-mat-motivo.csv`. El mismo
+`Clave` puede aparecer bajo los dos IDs con cantidades distintas — ej.
+`EST-02010` (muro 14cm tabique): 371.65 m² vía ERP + 343.00 m² vía Manual,
+sumados sin más en `consolidado-mo.csv`. **No verificado si son porciones
+de obra realmente distintas (crew distinto, alcance distinto) o el mismo
+trabajo capturado dos veces por dos canales** — el resumen del ERP los trata
+como aditivos. Igual que con los anillos: hipótesis, no conclusión.
+
+## Columnas que sí tienen dato aquí (a diferencia de `almacen-abril`)
+`mano-de-obra.csv` trae `Contratista`, `Residente`, `Ubicación`, `%` — esta
+última siempre vacía en las filas vistas (no se usó en este lote).
+
+## Hoja vacía
+`subcontratos.csv` — 0 filas. ALAMO 18 no tiene subcontratos registrados a
+la fecha de este export.

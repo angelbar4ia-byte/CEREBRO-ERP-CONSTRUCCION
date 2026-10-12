@@ -5,8 +5,8 @@
 capa:       II — Operación
 pregunta:   ¿cómo se agrega un módulo, incluso uno que aún no está definido?
 tiempo:     se hace así
-corte:      2026-09-21
-verificado: Derivado de los 25 módulos de PENDIENTES §F y de las costuras de `erp-construccion.md` §9
+corte:      2026-10-12
+verificado: Derivado de los módulos de PENDIENTES §F (25 cuando se escribió) y de las costuras de `erp-construccion.md` §9 · releído el 2026-10-12 contra los skills y agentes que hay, D-54 y la API construida; el estado del MCP y de los agentes internos se contrastó con el código y con `gravity-obra.md`
 ```
 
 > **La lista de módulos vive en `PENDIENTES-MEJORAS.md` §F.** Aquí está el
@@ -132,6 +132,10 @@ herramienta es una llamada al servicio que ya existe, más una buena descripció
 > **Lo que sí se decide hoy, porque es caro después: la capa de servicio va separada de
 > la API.** Si la lógica vive dentro de los endpoints, el día del MCP hay que sacarla de
 > ahí. Mismo principio que los montos como `string`.
+>
+> *Al 2026-10-12: la API existe (`backend/api/`, D-482 y D-485), los servicios viven aparte
+> en `backend/core/` y no hay MCP ni agente que lo pida —el de Consulta, B-31, queda fuera
+> del foco desde D-487—.*
 
 ## 4.3 Lo que MCP cambia para bien
 
@@ -296,9 +300,9 @@ serlo en cuanto algo empieza a depender de él.
 
 # 9. Cada módulo trae su skill, derivado
 
-**Hoy hay un solo skill porque hay un solo sistema.** Cuando los módulos existan,
-cada uno gana el suyo — y se **compila** desde el conocimiento, nunca se escribe a
-mano.
+**Un módulo gana su skill cuando sus reglas están decididas y escritas**, y se
+**compila** desde el conocimiento, nunca se escribe a mano. Hoy hay un skill base y
+cinco satélites.
 
 | Skill | Compilado de | Estado |
 |---|---|---|
@@ -306,15 +310,21 @@ mano.
 | `erp-importacion` | `CONOCIMIENTO.md` §2 · `CATALOGOS.md` §11 · `CONOCIMIENTO.md` §4.2 | ✅ |
 | `erp-rediseno` | `CONOCIMIENTO.md` §6.4 · `CONOCIMIENTO.md` §8 · `CONOCIMIENTO.md` §9 · `CONOCIMIENTO.md` §12 | ✅ |
 | `erp-parametrico` | `CONOCIMIENTO.md` §5 | ✅ |
+| `erp-cuantificador` | `CONOCIMIENTO.md` §17 | ✅ |
+| `erp-programa` | `PROGRAMA-CPM.md` §3 a §8 · `MODELO.md` §5c · `MODELO.md` §5a | ✅ D-486 |
 | `erp-diccionario` | — | ⛔ **Bloqueado: su diseño no está en el conocimiento** |
+
+*D-480: cuatro de los skills se recompilaron el 2026-10-11 (`erp-importacion` con lo que D-472 a D-479 construyeron; `erp-rediseno` con la clonación; `erp-parametrico`, que repetía una explicación que `CONOCIMIENTO.md` §5.7 ya había retirado; y el base). `erp-cuantificador` se verificó y quedó igual. Un skill puede quedar viejo sin que nadie lo note: cuando cambia la sección de la que sale, hay que recompilarlo. D-486: `programa` pasó a tener su skill —`erp-programa`—, compilado de `PROGRAMA-CPM.md` y `MODELO.md` §5c, y la tabla recupera la fila de `erp-cuantificador`, que existía y no estaba.*
 
 **Lo que califica para skill propio:** reglas verificadas que los demás módulos no
 necesitan leer. El motor, el APU, el catálogo y el presupuesto **no califican** — son
-núcleo, y sacarlos del base los vuelve opcionales. `programa`, `exportacion`,
-estimaciones y almacén **todavía no**: sus reglas están sin decidir, y escribirles
-skill hoy sería inventar hechos.
+núcleo, y sacarlos del base los vuelve opcionales. `exportacion`, estimaciones
+y almacén **todavía no tienen skill**. Cuando esto se escribió se decía que sus reglas
+estaban sin decidir; para estimaciones y almacén ya no es cierto (P-18 y P-19 resueltos,
+`PENDIENTES-MEJORAS.md` B-15 y B-16), y `exportacion` está resuelta solo en parte (B-08):
+lo que falta es decidir si se compilan, no qué dicen. *(`programa` ya calificó: sus reglas se decidieron y se escribieron entre D-441 y D-471, y las usan el motor, el cargador, la API y la pantalla; D-486.)*
 
-**El costo de partir de más:** un skill se dispara por su descripción. Con cuatro
+**El costo de partir de más:** un skill se dispara por su descripción. Con cinco
 satélites bien separados no hay solape; con doce, se carga el equivocado y el skill
 pasa de prevenir errores a causarlos.
 
@@ -322,8 +332,9 @@ pasa de prevenir errores a causarlos.
 > a mano, dos skills terminan afirmando cosas distintas del `%MO`, dos agentes las
 > leen, y nadie sabe cuál mintió.
 
-Sería la séptima aparición de *si algo se puede derivar del uso, deja de ser entrada:
-es un subproducto* — siempre completo, sin huérfanos, y no se desactualiza.
+Es otra aparición de *si algo se puede derivar del uso, deja de ser entrada: es un
+subproducto* —la séptima fue el cliente de API generado, D-55— siempre completo, sin
+huérfanos, y no se desactualiza.
 
 **Cuándo partir el skill:** cuando un módulo tenga reglas que los demás no necesitan
 leer. Antes de eso, partirlo sólo multiplica los lugares donde el mismo hecho puede
@@ -335,8 +346,8 @@ divergir.
 
 | Familia | Dónde vive | Qué hace | Estado |
 |---|---|---|---|
-| **De desarrollo** | Fuera del producto, en la sesión | Diseñan, construyen, migran, auditan | ✅ Tres escritos · uno propuesto |
-| **Interno** | **Dentro del ERP**, con el Agent SDK | Consulta, detecta, propone | ⏸️ Fase 2 |
+| **De desarrollo** | Fuera del producto, en la sesión | Diseñan, construyen, migran, auditan | ✅ Cuatro escritos y el orquestador, `gravity` |
+| **Interno** | **Dentro del ERP**, con el Agent SDK | Consulta, detecta, propone | ⏸️ Fase 2 · diseñado en `gravity-obra.md`, fuera del foco desde D-487 |
 
 ## Los de desarrollo
 

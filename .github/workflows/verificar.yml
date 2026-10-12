@@ -1,13 +1,33 @@
 name: Verificar el cerebro
 
+# Qué dispara esto (D-483):
+#   pull_request     cada commit de un PR, sobre el resultado de mezclarlo con main (lo que de verdad se va a mezclar)
+#   push a main      lo que quedó después de mezclar
+#   schedule         los lunes: backend/requirements.txt no fija versiones, y una versión nueva de una dependencia puede romper
+#                    algo sin que nadie haya tocado el repo; así se sabe antes de la siguiente entrega y no en medio de ella
+#   workflow_dispatch  a mano, desde la pestaña Actions
+# Un push a una rama con PR abierto ya no corre dos veces (antes: una por `push` y otra por `pull_request`).
 on:
-  push:
   pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 12 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+# Un commit nuevo en un PR cancela la corrida que ya no sirve; en main y en la corrida semanal no se cancela nada.
+concurrency:
+  group: verificar-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  verificar:
+  cerebro:
+    name: cerebro
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -15,3 +35,56 @@ jobs:
           python-version: "3.12"
       - name: Comprobar coherencia
         run: python3 2-operacion/verificar-cerebro.py .
+      # las tres partes de `pruebas` son las carpetas core, infra y api; una carpeta de pruebas nueva tiene que entrar en alguna
+      - name: Comprobar que ninguna prueba se queda fuera de las partes
+        run: |
+          fuera=$(find backend -name 'test*.py' -not -path 'backend/core/tests/*' -not -path 'backend/infra/tests/*' -not -path 'backend/api/tests/*')
+          if [ -n "$fuera" ]; then
+            echo "Pruebas que ninguna parte corre (agrega su carpeta a la matriz de 'pruebas'):"
+            echo "$fuera"
+            exit 1
+          fi
+
+  # Las pruebas del backend, en tres partes que corren a la vez. Cada parte es una carpeta de pruebas: `discover` la recorre entera, así que una
+  # prueba nueva en esa carpeta entra sola y ninguna se queda fuera. Tiempos medidos en GitHub (D-483): core 1.6 min, api 2.4 min e infra
+  # 7.5 min (cada prueba contra Postgres carga los archivos de OPUS); juntas, 12 minutos seguidos antes. infra es hoy el cuello de botella.
+  pruebas:
+    name: pruebas (${{ matrix.parte }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        parte: [core, infra, api]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar lo que las pruebas del backend necesitan
+        run: pip install -r backend/requirements.txt
+      # solo las pruebas de la pantalla abren un navegador
+      - name: Instalar el navegador de las pruebas de la pantalla
+        if: matrix.parte == 'api'
+        run: playwright install --with-deps chromium
+      - name: Probar ${{ matrix.parte }} contra los programas y los archivos de OPUS reales
+        run: cd backend && python3 -m unittest discover -s ${{ matrix.parte }}/tests -t .
+      - name: Comprobar que el cliente de la pantalla es el que da el spec de la API
+        if: matrix.parte == 'api'
+        run: cd backend && python3 -m api.generar_cliente --verificar
+
+  # El nombre `verificar` es el de siempre: lo que se pida como comprobación obligatoria sigue valiendo, y es la suma de lo de arriba.
+  verificar:
+    name: verificar
+    needs: [cerebro, pruebas]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Todo en verde
+        env:
+          CEREBRO: ${{ needs.cerebro.result }}
+          PRUEBAS: ${{ needs.pruebas.result }}
+        run: |
+          echo "cerebro: $CEREBRO · pruebas: $PRUEBAS"
+          test "$CEREBRO" = "success" && test "$PRUEBAS" = "success"

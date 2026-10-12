@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
-corte:      2026-09-26
-verificado: 79 términos · 25 ambigüedades
+corte:      2026-10-12
+verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -173,6 +173,30 @@ Agrupación de conceptos por organización del trabajo en obra, transversal a ni
 - **Ejemplo:** Instalaciones · Estructura · Acabados
 - **Hoy vive en:** `Catálogo de conceptos-frentes`
 
+*Corregido por D-450, dato del usuario: **frente** es el nivel constructivo de la obra
+(Cimentación, Planta baja, Azotea…): las actividades programadas para ejecutar la obra en
+ese nivel, con costo y fechas propios. Los **gremios** (Estructura, Instalaciones,
+Albañilería…) son sus **sub-frentes**: lo que trabaja dentro de él. No es una zona
+física (recámara, sala, fachada). Se lee del árbol del presupuesto —frente = Subcapítulo
+(Nivel 1), sub-frente = las etapas (Nivel 2) del frente agrupadas por gremio—; no hay
+«catálogo de conceptos-frentes».*
+
+*D-451, dato del usuario: **sub-frente = la etapa agrupada por gremio**, confirmado. Lo del
+«Catálogo de conceptos-frentes» **no queda resuelto**: la frase anterior («no hay…») iba
+de más. Solo se comprobó que ese catálogo no está en este entorno; no se sabe qué trae y
+el usuario lo revisará (B-89). Hasta entonces ni se da por inexistente ni por innecesario,
+y el «Hoy vive en» de arriba sigue siendo la pista original.*
+
+*D-452, dato del usuario: **no existe el «Catálogo de conceptos-frentes»**; el «Hoy vive en» de
+arriba no tenía respaldo. El **frente es por obra** —(obra, nivel), el nodo de Nivel 1 de su
+presupuesto— y el **sub-frente es la etapa** (Nivel 2) del frente; agruparlas por gremio es
+una forma de leer. Un sub-frente con dos contratistas se divide en uno por contratista.*
+
+*D-453, dato del usuario: el sub-frente es la etapa **sin agrupar por gremio** (las etapas de
+instalaciones se quedan separadas; solo Hidráulicas y Sanitarias se fusionarán después en
+Hidrosanitarias). El contratista se asigna por obra y tipo de trabajo, de ahí por etapa, salvo
+que un concepto se asigne a otro, y se puede dividir hasta la cantidad.*
+
 ### Especialidad
 
 Oficio que domina un contratista. Uno puede tener varias.
@@ -223,7 +247,7 @@ Agrupador por prototipo: condensa varios conceptos con sus cantidades en un solo
 - **También:** Agrupador; Nivel 3
 - **No confundir con:** Auxiliar (categoría de insumo); Concepto
 - **Se usa con:** Concepto; Prototipo; Presupuesto
-- **Ejemplo:** EST-01010 Losa cimentación Oro = $132,364.24, la suma exacta de sus 8 conceptos
+- **Ejemplo:** EST-01010 Losa cimentación Oro = $138,599.24, la suma exacta de sus 8 conceptos *(decía $132,364.24: ninguna fuente del repo lo da, y las tres que traen la fila dicen $138,599.24)*
 - **Hoy vive en:** `Filas `Nivel 3` del presupuesto`
 
 ### Descripción
@@ -253,7 +277,7 @@ Lo que el concepto incluye además del trabajo principal: limpieza, acarreos, he
 - **También:** Incluye; Cláusula de alcance
 - **No confundir con:** Descripción (el alcance es parte de ella)
 - **Se usa con:** Concepto; Descripción
-- **Ejemplo:** «Incluye: limpieza, material, mano de obra…» en 408 de 470
+- **Ejemplo:** «Incluye: limpieza, material, mano de obra…» en 408 de 470 *(el CSV del presupuesto da 408 de 471 claves de concepto)*
 - **Hoy vive en:** `Cola de la `Descripción``
 
 ### Unidad
@@ -828,6 +852,8 @@ Varios destajos se vuelven uno. El precio se propone ponderado por cantidad.
 - **Ejemplo:** Salida hidráulica + sanitaria = hidro-sanitaria
 - **Hoy vive en:** `— pendiente`
 
+*D-460: también se fusionan etapas —Hidráulicas y Sanitarias en «Instalaciones hidrosanitarias» por nivel—, con la misma regla: convive con las originales (`CATALOGOS.md`).*
+
 ### División
 
 Un concepto con varios destajos se vuelve varios conceptos.
@@ -1123,6 +1149,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Subcapítulo | Nivel de construcción |
 | Subcontrato | **Subcontrato** |
 | Subfamilia | **Subfamilia** |
+| Sub-frente | Frente |
 | Suministro | Material |
 | Tarea | Actividad |
 | Tarjeta | APU |

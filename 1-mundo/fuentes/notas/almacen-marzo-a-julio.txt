@@ -1,0 +1,78 @@
+[Nota de lectura que se escribió al recibir estas tablas (sesión de 2026-09-18 a 2026-09-27); D-479 la conserva tal cual. Habla de las tablas de la carpeta hermana, no de los CSV recortados que mencionan: esos no se guardan, se regeneran del original.]
+
+# almacen-marzo-a-julio — cinco meses reales consecutivos, sin traslape
+
+Fuente: `03_MARZO_...xlsx` a `07_JULIO_MOVIMIENTOS_DE_ALMACEN.xlsx`, mismo
+formato SAP Business One que abril, misma hoja única `Consulta`, mismas 46
+columnas (julio trae una 47ª, `Orden Compra`, nueva — ver abajo).
+
+23,075 filas totales · 5 meses · **sin traslape de fechas**: marzo
+(03-02 a 03-31), abril (04-01 a 04-30), mayo (05-01 a 05-29), junio
+(06-01 a 06-30), julio (07-01 a 07-31) — verificado uno por uno, no es el
+patrón de doble exportación de D-322/B-64.
+
+## Lote=18 (ALAMO 18): 386 filas, no 77
+
+| Mes | Implosión | Salida producción | Total |
+|---|---:|---:|---:|
+| Marzo | 0 | 11 | 11 |
+| Abril | 67 | 10 | 77 |
+| Mayo | 65 | 5 | 70 |
+| Junio | 133 | 17 | 150 |
+| Julio | 68 | 10 | 78 |
+| **Total** | **333** | **53** | **386** |
+
+Marzo no tiene Implosión — solo surtido, consistente con obra en etapa
+temprana. `Lote` viene como `float` (18.0), no string — cuidado al
+filtrar.
+
+## 47 `# OP` distintos, 103 `# Parte` distintos (antes: 2 OP, un mes)
+
+Parseado de `Referencia` (formato `OP:nnnnn, No.Parte:XXX-nnnnn,
+Parte-DESCRIPCIÓN`), confirma columna `# OP` — coinciden 100%.
+
+**Concepto con más continuidad: `EST-02010` (Muro Tabique 14 cm), 4 meses
+seguidos (abril-julio), 39 filas, 2 materiales (tabique, cemento).**
+Detalle cantidad por mes:
+
+| Mes | Tabique (PZ) | Cemento (sacos) |
+|---|---:|---:|
+| Abril | 6,000 | 60 |
+| Mayo | 18,000 | 98 |
+| Junio | 6,545 | 55 |
+| Julio | 0 | 25 |
+
+Julio con tabique=0 y cemento=25 es la confirmación más limpia hasta hoy
+de la regla ya escrita en `CONOCIMIENTO.md` §11.17: tabique se abastece
+por lote (no comparable semana a semana ni mes a mes), cemento es la
+señal diaria confiable.
+
+Otros conceptos con 2-3 meses seguidos: `EST-02110`/`EST-02310` (3 meses,
+mayo-julio), `EST-02120`/`EST-02130`/`EST-02170`/`EST-02180`/`EST-00090`/
+`ALB-01010`/`ISA-00110`/`IEC-00140`/`IEC-00110`/`EST-07010` (2 meses).
+
+## Lo que esto NO permite todavía
+
+No hay archivo de avance/estimación pagada (`grid_AvanceOPEventosOpr`)
+para marzo/mayo/junio/julio — solo existe para abril. Sin eso, no se
+puede repetir el cálculo de "% de lo pagado sin respaldo de cemento"
+(§11.17) para los meses nuevos, solo confirmar el patrón de abasto
+tabique-vs-cemento con las cantidades de almacén solas.
+
+## CIMBRA — existe en catálogo, nunca se mueve para Lote=18
+
+`MAD-00002 CIMBRA 4 MTS`, `MAD-00003 CIMBRAPLAY 12 MM`, `MAD-00046
+CIMBRAPLAY 15 MM` — Clase Maderas, Grupo Materiales Construccion. Se
+mueven en los 5 meses (30-ish filas totales, otros lotes) pero **cero
+veces para Lote=18** en 386 movimientos reales. El presupuesto de este
+lote menciona "cimbra"/"descimbra"/"cimbrado" en 167 renglones de
+`CATALOGO_DE_PRESUPUESTO.csv` — losas, castillos, cadenas, zapatas, todo
+"Incluye: ...cimbra, descimbra...". Dato del usuario, confirmado: no se
+está registrando su consumo para esta obra.
+
+## Nueva columna en julio: `Orden Compra`
+
+937 de 4,335 filas la traen, con formato `PC-nnnnnn`. No aparece en
+marzo/abril/mayo/junio. Primera evidencia real de una orden de compra
+ligada a un movimiento — relevante para `PRESENTACION_COMPRA` (D-348) si
+en el futuro se necesita rastrear el lote de compra específico.

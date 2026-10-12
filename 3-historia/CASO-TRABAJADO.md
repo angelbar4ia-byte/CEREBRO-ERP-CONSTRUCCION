@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿cómo se ve todo junto?
 tiempo:     fue así
-corte:      2026-09-10
-verificado: Un caso de punta a punta · 12 reglas
+corte:      2026-10-12
+verificado: Un caso de punta a punta · 12 reglas · cifras releídas contra los tres CSV de `1-mundo/opus/` el 2026-10-12 (la jerarquía, la matriz de `EST-01053`, la zapata, los 89 compuestos) · las referencias de «Las reglas que este caso demuestra» corregidas: ocho apuntaban a una sección existente que no habla de eso · sin reproducir: las 11 filas y los $34,946 del filtro por `Ingenieria ERP`
 ```
 
 > **Un solo caso, de punta a punta.** Todas las reglas del modelo aparecen aquí,
@@ -32,7 +32,7 @@ zapata que resulta ser el ejemplo perfecto de las reglas más difíciles.
 Nivel 0  Capítulo      CAS-00007  DIAMANTE CON CHIMENEA (239 m²)     $2,829,925.98
 Nivel 1  Subcapítulo   NIV-00001  CIMENTACIÓN                          $259,315.61
 Nivel 2  Nivel 2       ECO-00001  ESTRUCTURA CIM                       $214,257.37
-Nivel 3  Nivel 3       EST-01080  LOSA CIMENTACIÓN DIAMANTE            $214,257.37
+Nivel 3  Nivel 3       EST-01080  LOSA CIMENTACIÓN DIAMANTE SIN CHIMENEA  $214,257.37
 Nivel 4  Concepto      EST-01053  LOSA CIMENTACIÓN DIAMANTE C/CH       $185,864.48
 Nivel 4  Concepto      EST-10011  K1 - 6.00 ACERO         61 pza         $8,589.41
 ```
@@ -45,6 +45,9 @@ Nivel 4  Concepto      EST-10011  K1 - 6.00 ACERO         61 pza         $8,589.
   también. **El tipo no lo determina la profundidad.**
 - El capítulo se llama Diamante, pero **capítulo no significa prototipo**: aquí se
   usa así.
+- **El nombre del `Nivel 3` dice «sin chimenea» dentro del capítulo «con chimenea».** El
+  CSV lo trae así: el `Nivel 3` que agrupa a `EST-01053` se llama «… SIN CHIMENEA». Otra
+  etiqueta que no dice lo que el contenido, como en `METODO.md` §2.5.
 
 > **Cómo se sabe quién cuelga de quién:** por **orden de fila más profundidad**, no
 > por el código. Extraer este prototipo filtrando por `Ingenieria ERP` deja fuera 11
@@ -71,14 +74,14 @@ Nivel 4  Concepto      EST-10011  K1 - 6.00 ACERO         61 pza         $8,589.
 **El concepto mezcla categorías.** Material, Contrato y Flete conviven. La regla de
 homogeneidad no existe.
 
-**Hay cantidades negativas.** `−0.656` de varilla, `−0.196` de varilla 3/8. Son
-ajustes: descuentan acero que ya está contado dentro de un auxiliar. **El modelo
+**Hay cantidades negativas.** `−0.656` de varilla, `−0.196` de varilla 3/8 y `−0.240` de anillo
+15x25. Son ajustes: descuentan acero que ya está contado dentro de un auxiliar. **El modelo
 debe permitirlas.**
 
 **Un material puede ser en realidad un flete.** `MAD-00004 Tablas` tiene `Tipo =
 Flete` — es el caso de un insumo apartado en esa categoría.
 
-**Y cinco de sus líneas son compuestos**, marcados `AUX-` y `ZA1-`. Se abren.
+**Y siete de sus líneas son compuestos** —cinco `AUX-`, una `ZA1-` y una `ZA2-`—. Se abren.
 
 ---
 
@@ -216,12 +219,12 @@ Para no dar por cubierto lo que sigue abierto:
 | 1 | La jerarquía va **por orden y profundidad**, no por el código | `CATALOGOS.md` |
 | 2 | **El tipo no lo determina la profundidad** | `CATALOGOS.md` |
 | 3 | El auxiliar **es la suma de sus hijos**, no un dato propio | `CATALOGOS.md` |
-| 4 | El concepto **mezcla categorías** | `CONOCIMIENTO.md` §1 |
-| 5 | Las **cantidades negativas** son válidas | `CONOCIMIENTO.md` §1 |
-| 6 | El compuesto **suma exacto** a su costo de catálogo | `CONOCIMIENTO.md` §2 |
-| 7 | El compuesto **reporta a su categoría, entero** | `CONOCIMIENTO.md` §2 |
-| 8 | `Tipo` es el ADN; `Origen` es el monto | `CONOCIMIENTO.md` §2 |
+| 4 | El concepto **mezcla categorías** | `CONOCIMIENTO.md` §10.4 |
+| 5 | Las **cantidades negativas** son válidas | `CATALOGOS.md` §8 · `CONOCIMIENTO.md` §11.10 |
+| 6 | El compuesto **suma exacto** a su costo de catálogo | `CATALOGOS.md` §7 |
+| 7 | El compuesto **reporta a su categoría, entero** | `CONOCIMIENTO.md` §10.4 |
+| 8 | `Tipo` es el ADN; `Origen` es el monto | `CONOCIMIENTO.md` §10.4 · `CATALOGOS.md` §7 |
 | 9 | **Dos lecturas** que suman lo mismo y dicen cosas distintas | `CONOCIMIENTO.md` §10.5 |
-| 10 | **Tres rendimientos**, dos se capturan | `CONOCIMIENTO.md` §4 |
-| 11 | El precio **vive en un solo lugar** | `CONOCIMIENTO.md` §5 |
-| 12 | Lo contratado **no se reescribe** | `CONOCIMIENTO.md` §5 |
+| 10 | **Tres rendimientos**, dos se capturan | `CONOCIMIENTO.md` §6.2 |
+| 11 | El precio **vive en un solo lugar** | `CONOCIMIENTO.md` §13.1 |
+| 12 | Lo contratado **no se reescribe** | `CONOCIMIENTO.md` §1.4 |

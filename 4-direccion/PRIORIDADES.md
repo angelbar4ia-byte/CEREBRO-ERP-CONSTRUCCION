@@ -5,8 +5,9 @@
 capa:       IV — Dirección
 pregunta:   ¿en qué se gasta el hiperenfoque?
 tiempo:     esto primero
-corte:      2026-09-12
+corte:      2026-10-12
 derivado:   ESTADO.md · PENDIENTES-MEJORAS.md · PROPUESTA-CUATRO-MODULOS.md
+verificado: §1 a §4 y §6 son criterio y no caducan; §5 se relee el 2026-10-12 y se marca como foto del 2026-09-12
 ```
 
 > **El criterio, no la lista.** La cola de pendientes vive en
@@ -86,10 +87,11 @@ Tres disparadores, y sólo tres:
 
 ---
 
-# 5. La cola vigente
+# 5. La cola, como estaba el 2026-09-12
 
-Tomada de `ESTADO.md`, con su casilla. **No se duplica aquí: si difieren, manda
-`ESTADO.md`.**
+Tomada de `ESTADO.md` ese día, con su casilla, para mostrar el criterio aplicado. **Ya no es
+el orden de hoy** —entre otras cosas, desde D-487 el cerebro no construye la app, y las filas 2 y 4
+quedaron fuera del foco—: manda `ESTADO.md`.
 
 | # | Qué | Costo | Desbloqueo | Nota |
 |---|---|---|---|---|
