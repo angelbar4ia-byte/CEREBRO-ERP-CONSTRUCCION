@@ -46,8 +46,8 @@ jobs:
           fi
 
   # Las pruebas del backend, en tres partes que corren a la vez. Cada parte es una carpeta de pruebas: `discover` la recorre entera, así que una
-  # prueba nueva en esa carpeta entra sola y ninguna se queda fuera. Tiempos medidos (D-483): core ≈ 2 min, infra ≈ 6 min (cada prueba contra
-  # Postgres carga los archivos de OPUS), api ≈ 3 min; juntas, 12 minutos seguidos antes.
+  # prueba nueva en esa carpeta entra sola y ninguna se queda fuera. Tiempos medidos en GitHub (D-483): core 1.6 min, api 2.4 min e infra
+  # 7.5 min (cada prueba contra Postgres carga los archivos de OPUS); juntas, 12 minutos seguidos antes. infra es hoy el cuello de botella.
   pruebas:
     name: pruebas (${{ matrix.parte }})
     runs-on: ubuntu-latest

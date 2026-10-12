@@ -41,8 +41,9 @@ fechas de corte, referencias que resuelven, secciones que existen, conteos decla
 contra reales, cifras de control en su fuente, tablas bien formadas y párrafos
 duplicados entre archivos.
 
-**Corre solo en cada push** (`.github/workflows/verificar.yml`). Sale con código 1 si
-hay fallas.
+**Corre solo** en cada pull request, en cada push a `main` y los lunes (`.github/workflows/verificar.yml`); también a mano desde la
+pestaña Actions. Sale con código 1 si hay fallas. Las pruebas del backend corren en tres partes a la vez (core · infra · api) y un
+trabajo final, `verificar`, las suma.
 
 > Lo que el verificador **no** ve: dos archivos que dicen lo mismo con palabras
 > distintas, y una referencia que resuelve a la sección equivocada. Eso sigue siendo

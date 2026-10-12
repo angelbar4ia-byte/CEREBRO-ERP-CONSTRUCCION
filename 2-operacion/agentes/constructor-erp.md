@@ -55,7 +55,7 @@ se revisa antes, sin escribir nada, y el sistema propone. En la API cada acción
 4. **Probá la prueba.** Rompé a propósito el código que defiende y comprobá que algo falla; si nada falla, la prueba no prueba. Así se ha hecho
    desde D-471.
 5. **Un cambio, un commit lógico.** No mezcles refactor con funcionalidad.
-6. **Antes de cerrar:** `cd backend && python3 -m unittest discover` y `python3 2-operacion/verificar-cerebro.py .` — lo mismo que corre el CI, sin saltarse ninguna prueba.
+6. **Antes de cerrar:** `cd backend && python3 -m unittest discover` y `python3 2-operacion/verificar-cerebro.py .` — lo mismo que corre el CI (en tres partes a la vez: core · infra · api), sin saltarse ninguna prueba.
 
 ## Lo que siempre verificás
 
