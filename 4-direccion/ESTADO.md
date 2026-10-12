@@ -27,6 +27,8 @@ antes de escribirse.
 
 **Para:** crear un ERP nuevo, reestructurar los existentes, y darles un idioma común.
 
+**Lo que es y lo que no:** esto es el cerebro —conocimiento, reglas y decisiones—, no la aplicación. La aplicación no se está construyendo (D-487).
+
 ---
 
 ## Cómo retomar
@@ -96,10 +98,10 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 
 | Bloque | Estado |
 |---|---|
-| **Conocimiento** | 15 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
+| **Conocimiento** | 17 partes de reglas · `CATALOGOS.md` con los 8 de OPUS · `IDEAS.md` con lo no diseñado |
 | **Cadena de costo** | Los 467 conceptos, 89 compuestos y 39 cuadrillas **cuadran al centavo** |
 | **Modelo de datos** | `MODELO.md` aprobado, con 15 hallazgos resueltos |
-| **Roles y permisos** | Cierra P-21 — `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` (`MODELO.md` §5b) · muchos-a-muchos, sin tope por monto · Cierra B-73 — 28 funciones atómicas (12 nuevas: incidencia, cierre de frente, edición de programa, precio nuevo con aprobación doble), D-329 · 🆕 Cierra B-75 — `validar_estimacion` a Control de obra, `gestionar_rol_funcion` nueva para reasignar sin tocar esquema, lista completa de 33 funciones (21 asignadas, 12 a propósito sin asignar), D-330 |
+| **Roles y permisos** | Cierra P-21 — `ROL`, `FUNCION_ATOMICA`, `ROL_FUNCION` (`MODELO.md` §5b) · muchos-a-muchos, sin tope por monto · Cierra B-73 — 28 funciones atómicas (12 nuevas: incidencia, cierre de frente, edición de programa, precio nuevo con aprobación doble), D-329 · 🆕 Cierra B-75 — `validar_estimacion` a Control de obra, `gestionar_rol_funcion` nueva para reasignar sin tocar esquema, lista completa de 33 funciones (21 asignadas, 12 a propósito sin asignar), D-330 · 🆕 hoy son 37 funciones y 27 asignadas: D-473, D-475 y D-478 agregan tres, D-485 asigna dos más (`MODELO.md` §5b) |
 | **Histórico de precios** | Cierra P-07/P-08 — `PRECIO_HISTORICO`, `VERSION_CONCEPTO.pu`, `TABULADOR_CONTRATISTA` (`MODELO.md` §4a) · marcador de prototipo (P-40) cierra con `PRESUPUESTO.tipo` · 🆕 `fuente` gana `almacen`/`estimacion`, pendiente desde que P-18/P-19 cerraron · 🆕 **Confirmado con dato real (D-362): la deriva de precio es pequeña y real** (tabique +3.6%/5 meses), pero `C/Ultimo`/`C/Promedio` traen ruido de captura (filas rotas que su propio `Efecto Costo` no respalda, cancelaciones con precio negativo) — si se alimenta `PRECIO_HISTORICO` desde este crudo, hay que validar contra `Efecto Costo`, no leer el precio directo · 🆕 **Cierra P-39 (D-366): `CONTRATISTA` nuevo** — el nombre viaja al 100% en el crudo de almacén, 39 reales con volumen recurrente entre lotes; desbloquea `TABULADOR_CONTRATISTA`, `DEDUCCION` y `PRESTAMO` de un golpe |
 | **Almacén** | Cierra P-19/B-16 — tabla `MOVIMIENTO_ALMACEN`; el archivo real ya separaba surtido (`salida_produccion`) de consumido (`implosion`) sin campo nuevo, corte matricial es vista sobre `COMPOSICION`, no tabla (`MODELO.md` §5e, D-333). Devoluciones sin espécimen real todavía, queda abierto. 🆕 **Auditoría (D-337): le faltaba `presupuesto_id`** — sin él, siete de ocho motivos no tenían cómo decir de qué obra son. Se agrega, resuelto de `Lote` al importar. 🆕 **Hallazgo (D-367): postventa es un proceso real y separado, nunca modelado** — 213 filas reales en cinco meses (10 de gasto de oficina excluidas), $104,901.95 en reparaciones de garantía sobre casas ya entregadas. 🆕 **Cierra P-41 (D-370): modelo completo, dato del usuario** — `PRESUPUESTO.fecha_entrega`, `TICKET_GARANTIA` (causa en ocho valores reales) y `MOVIMIENTO_ALMACEN.ticket_garantia_id` nuevos; costo de garantía es consulta aparte, no sexta columna de B-71 (`MODELO.md` §3b) |
 | **Comparación y reportes de obra** | Cierra B-71 — de las cinco columnas (Base, Ingeniería, Pagado Real, Formado, Control de Cambio), cuatro reusan tabla ya cerrada y la quinta (`PROPUESTA(tipo=orden_cambio)`) solo necesitaba la forma de su JSON (`MODELO.md` §5f, D-334). Subcontratos siguen bloqueados en dato (`subcontratos.csv` vacío, D-321), no en diseño. 🆕 **Auditoría (D-337): Pagado Real de material corregido** — era `motivo=recepcion` (sin `Lote`, no atribuible a obra), ahora `salida_produccion`/`implosion`. 🆕 **Cierra B-78: sin umbral por %, dato del usuario** — `ALERTA(tipo=subcontrato_fuera_de_base)` dispara en cualquier divergencia Real-vs-Base; el lado bajo puede ser ahorro o reducción de alcance (como la cochera, D-321), simétrico al lado alto — mismo `orden_cambio`, `delta_monto` con signo (`MODELO.md` §5a, D-354). 🆕 **Segunda corrección a Pagado Real (D-363): el andamio tampoco es material directo, dato del usuario** — `HET-00034` se excluye, su costo pasa a la capa de indirectos (`CONOCIMIENTO.md` §5), primer dato real que la ejerce; acotado a esta clave, no a toda `categoria=herramienta`/`equipo` (`MODELO.md` §5f) |
@@ -108,7 +110,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326. 🆕 **P-22 se parte en dos rutas** — por analogía cierra (`PROPUESTA(tipo=matriz_generada)`, copia y escala, nunca genera; corpus es `PROPUESTA` misma, `MODELO.md` §5, D-352); por fórmula sigue siendo B-18, bloqueado en constantes físicas |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada · 🆕 Avanza P-14/B-09 — Cabeceras/Materiales/Operaciones confirmados contra el propio dialecto OPUS y el join entre ellos validado sin huérfanos; `Flete`, archivo-vs-API y los 4 catálogos de salida siguen abiertos (`CONOCIMIENTO.md` §4.3, D-331/D-332) |
-| **Memoria** | 486 decisiones · 12 descartes · 30 correcciones · 13 hallazgos de construcción · 🆕 recuento completo desde D-01, el número venía sobrestimado (D-338) |
+| **Memoria** | 487 decisiones · 12 descartes · 30 correcciones · 🆕 recuento completo desde D-01, el número venía sobrestimado (D-338) |
 | **Desviación, Consulta y renovación de invariantes** | 🆕 `DESVIACION` cierra tercera aparición del mismo hueco — patrones son `GROUP BY`, no tabla (`MODELO.md` §5g, D-343). `CONSULTA_LOG` le da bandeja propia a Consulta, persistente sin retención (§5h, D-344, B-33). Renovación semestral de invariantes es una `ALERTA` más, lee el `corte:` que ya existe, sin campo nuevo — Control de obra la resuelve (§5a, D-345, B-54). 🆕 **Corrección (D-347): `causa` tenía el vocabulario equivocado** — las nueve causas de §13.6 deciden si la fila es `DESVIACION` siquiera, no la describen; el vocabulario real es «causas por categoría», del mismo §13.6 |
 | **Cuatro decisiones de política del usuario** | 🆕 P-34 (`NODO.marca_revisado`, checklist no validación) · P-35 (sustitución = `PROPUESTA(tipo=version)` + `GRUPO_FUNCIONAL`, ya lo tenía el caso mortero/cemento) · P-36 (consolidar solo al leer, no al cargar — depende de compras/obra vs. costos/control) · P-27 (`PROPUESTA(tipo=patron_carga)`, confirma la forma una vez, no por archivo) — D-339 a D-342. 🆕 **Cierra P-26**: las cinco estructuras de ingeniería (`CONOCIMIENTO.md` §11.8) ya caían bajo `patron_carga` — la firma solo necesitaba el patrón de llenado de la columna de agrupador, no solo conteo de columnas (D-351) |
 | **Skill** | Base + 5 satélites compilados: importación, rediseño, paramétrico, cuantificador, 🆕 programa (D-486) |
@@ -122,7 +124,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Capas** | 🆕 Cuatro: Mundo · Operación · Historia · Dirección |
 | **Escalabilidad** | 🆕 Contrato de módulo · ERP nuevo y ERP existente |
 | **Coherencia** | 🆕 `verificar-cerebro.py` — el cerebro se comprueba solo |
-| **Motor de cálculo** | `backend/core/` — sin Django, puerto + adaptador en memoria. 11 pruebas contra `CASO-TRABAJADO.md`, D-178 a D-182. **Falta la persistencia** (Django/Postgres) |
+| **Motor de cálculo** | `backend/core/` — sin Django (FastAPI y psycopg, D-182), puerto con adaptador en memoria y otro de Postgres, y los dos pasan el mismo contrato. Da el precio de OPUS al centavo en los 467 conceptos, 89 compuestos y 39 cuadrillas (D-472). La persistencia ya existe (D-464 a D-485; 886 pruebas) |
 | **La alerta** | Tabla `ALERTA` (`MODELO.md` §5a) — peldaño de abajo de `PROPUESTA`. Cierra B-32, P-29, P-30 |
 | **Cuantificación** | Tablas `TRAZO`/`ENLACE_CUANTIFICACION` y geometría cerrados (PostGIS D-218, GeoJSON D-219/D-220, WKT D-221) — cierra B-19. 🆕 Gobierno cierra (B-45, roles reusados, D-236) · 5 de 7 reglas de dominio en `medida×factor`, taludes vía `formula_personalizada` (`CONOCIMIENTO.md` §17) · `NOTA_PLANO` nueva (D-237) · skill `erp-cuantificador` compilado. Quedan ejes/niveles (bloqueado por `FRENTE`) y la aspiración de un agente que trace solo |
 | **Caso trabajado** | Un ejemplo de punta a punta con 12 reglas |
@@ -137,17 +139,36 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 
 ---
 
+### El foco (D-487)
+
+> Dato del usuario (2026-10-12): *«Todo lo que está hecho está bien, ahora continuemos pero no estamos construyendo la app».*
+
+- **Lo hecho se da por bueno**, hasta D-486. Incluye lo que D-484 y D-485 dejaban como propuesta sin confirmar: las tres
+  reglas de `WORKFLOWS.md` (aprobar pide la función de la acción y se hace con la identidad de quien aprueba; el agente lee,
+  simula y propone; las operaciones se clasifican por efecto y función) y las dos funciones de la bandeja (`aprobar_propuesta`
+  a Control de obra, `resolver_alerta` a Supervisor y Control de obra). Cambiarlas sigue siendo una fila de `ROL_FUNCION`. Lo
+  que **no** estaba hecho sigue abierto: quién captura el avance (`registrar_avance`) y qué hereda el Superintendente (B-101).
+- **Se sigue con el cerebro**: conocimiento, reglas, decisiones y la comprobación de todo eso contra los datos reales que ya
+  están en el repositorio.
+- **La app no se construye.** No se agregan módulos, rutas, pantallas, migraciones ni tipos de propuesta. El código que existe
+  se queda como está, y el verificador y el CI siguen siendo la prueba de que el cerebro y lo ya escrito cuadran.
+- **Sale del foco, sin borrarse**: B-97 (crear el proyecto de Supabase, que es desplegar), B-99 (pantallas), B-63 (el servidor
+  MCP), B-20 (el agente interno) y, de la bandeja, aprobar los otros tipos, los detectores de alertas y la credencial del
+  agente. Se retoman si el foco cambia.
+
+---
+
 ## Lo que sigue, en orden
 
-### La cola vigente — 2026-10-11 (D-468; ajustada en D-470 a D-486)
+### La cola vigente — 2026-10-11 (D-468; ajustada en D-470 a D-487)
 
 Rehecha con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, con los dos frenos: ¿está decidido? y ¿qué cuesta deshacerlo?). La columna «quién» es la que importa: separa lo que se puede hacer hoy de lo que espera una decisión o un dato que no está en este repo.
 
 | # | Qué | Quién lo mueve | Por qué va en este lugar |
 |---|---|---|---|
-| 1 | **Revisar y mergear el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** —los commits de D-385 a D-486, abierto el 2026-10-10— | El usuario | Casilla «ahora»: nada del CPM, el programa ni la API está en `main`, y cuesta un clic |
+| 1 | **Revisar y mergear el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** —los commits de D-385 a D-487, abierto el 2026-10-10— | El usuario | Casilla «ahora»: nada del CPM, el programa ni la API está en `main`, y cuesta un clic |
 | 2 | **Los catálogos de OPUS que no están** —`MATERIALES`, `TRABAJOS`, `MANO_DE_OBRA`, `FLETES`, `CONCEPTOS` y los de la generación anterior— | Nadie: **ya no se piden** | Decisión del usuario (2026-10-11, D-479): lo que compartió está a salvo en el repo (`1-mundo/opus/` y `1-mundo/fuentes/`, con su manifiesto de huellas), con los CSV de OPUS alcanza para presupuesto y APU, y lo demás son temas menores. Estos cinco se leyeron en sesiones anteriores y su archivo no está en ninguna parte; siguen frenando P-09, P-32, M-14, B-07 y el cierre de P-14, pero **no se pregunta por ellos**: si entran, entran con `python3 -m api.guardar_subidas` |
-| 3 | **B-97 · Crear el proyecto de Supabase y entregarle su llave a la API** | El usuario | B-96 quedó confirmado (D-470): proveedor Supabase Auth, modelo firme. Lo que falta es configurar, no construir: crear el proyecto con la confirmación de correo activa, darle a `servir` el JWKS o el secreto (`PROGRAMA-CPM.md` §4.8) y decidir cómo inicia sesión la gente (con Google basta una dirección). Frena todo despliegue: sin esto la API no se puede publicar. Lo que B-96 arrastraba (alta desde la API, alcance por obra, clave foránea) lo pospuso el usuario: B-98 |
+| 3 | **B-97 · Crear el proyecto de Supabase y entregarle su llave a la API** — ⏸️ **fuera del foco desde D-487**: es desplegar la app | El usuario | B-96 quedó confirmado (D-470): proveedor Supabase Auth, modelo firme. Lo que falta es configurar, no construir: crear el proyecto con la confirmación de correo activa, darle a `servir` el JWKS o el secreto (`PROGRAMA-CPM.md` §4.8) y decidir cómo inicia sesión la gente (con Google basta una dirección). Frena todo despliegue: sin esto la API no se puede publicar. Lo que B-96 arrastraba (alta desde la API, alcance por obra, clave foránea) lo pospuso el usuario: B-98 |
 | 4 | **B-101 · Confirmar o cambiar lo que D-485 propuso —`aprobar_propuesta` a Control de obra; `resolver_alerta` a Supervisor y Control de obra—, y decidir quién captura el avance y qué hereda el Superintendente** | El usuario | Cuesta una decisión y nada de código; deshacerla es una fila de `ROL_FUNCION`. La bandeja ya está construida (B-102, D-485) y funciona con lo propuesto; lo que falta decidir es `registrar_avance`, que frena la captura de avance y, con ella, las alertas de frente y de atraso. La recomendación está en `WORKFLOWS.md` §7 |
 | 5 | **P16 en Zafiro Plus**: llevar el plazo a 32 semanas o relajar el vínculo | El planeador, por obra | Decisión de obra, no de sistema |
 | 6 | **Las listas del planeador**: los 12 supuestos de cada programa, los 15 vínculos de Zafiro, **dos que salieron de colgar el programa del presupuesto (D-474): `ACA-02034` de Zafiro, que está en el programa y en ningún presupuesto, y `OBE-04010`, cuya cantidad dice 4 en el programa y 1 en el presupuesto**, las 59 partidas que piden más cuadrilla, las 17 ventanas, las 53 líneas sin rendimiento, los emparejamientos de Rubí y Jade; y la segunda ruta de cuadrilla | El planeador | `PROGRAMA-CPM.md` §7 y §9 |
@@ -184,7 +205,7 @@ al usuario si hace falta, este archivo no lo guarda).
 
 ## Lo único que bloquea
 
-**Nada para seguir construyendo lo ya aprobado.** `MODELO.md` está aprobado, y con
+**Nada para seguir con el cerebro.** `MODELO.md` está aprobado, y con
 él los módulos con reglas escritas y verificadas siguen creciendo: motor de
 cálculo, catálogo, APU, presupuesto, importación, semilla, diccionario,
 rediseño, paramétrico/ensamble, propuestas, alerta, cuantificación, histórico

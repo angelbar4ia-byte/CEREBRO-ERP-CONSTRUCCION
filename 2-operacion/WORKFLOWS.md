@@ -230,6 +230,8 @@ la simulación como evidencia y su `base`. Control de obra la aprueba; corre `co
 
 # 7. Lo que falta decidir o construir
 
+> **Desde D-487 la app no se construye.** Los huecos de construcción (3 a 5, y del 6 la credencial) quedan descritos y no se trabajan; los de decisión (1, 2 y 7) siguen siendo del cerebro.
+
 | # | Hueco | Quién lo mueve | Por qué importa |
 |---|---|---|---|
 | 1 | **`registrar_avance` sigue sin dueño** (quién captura el avance que alimenta las alertas de frente y de atraso). Recomendación, siguiendo lo que ya hay: Residente y Supervisor, que ejecutan y dan seguimiento. *D-485 asignó, como propuestas, las otras dos del lazo: `aprobar_propuesta` a Control de obra, que ya gobierna entre obras, y `resolver_alerta` a Supervisor y Control de obra* | **El usuario** | Confirmar o cambiar las dos asignadas, y decidir la tercera. Corregirlas no toca esquema (`gestionar_rol_funcion`) |

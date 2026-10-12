@@ -296,9 +296,9 @@ serlo en cuanto algo empieza a depender de él.
 
 # 9. Cada módulo trae su skill, derivado
 
-**Hoy hay un solo skill porque hay un solo sistema.** Cuando los módulos existan,
-cada uno gana el suyo — y se **compila** desde el conocimiento, nunca se escribe a
-mano.
+**Un módulo gana su skill cuando sus reglas están decididas y escritas**, y se
+**compila** desde el conocimiento, nunca se escribe a mano. Hoy hay un skill base y
+cinco satélites.
 
 | Skill | Compilado de | Estado |
 |---|---|---|

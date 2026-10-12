@@ -43,7 +43,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 8 | Factorizador | ⚠️ **No resuelve el problema que parecía suyo — la política de consolidar ya cerró (P-36, 26/09), la comparación no se ha vuelto a correr con ella** |
 | 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse *(D-461: ya existe, `backend/core/motor_cpm.py`)*, y esta obra no tiene actividades cargadas para correrlo |
 | 10 | Recursos por fecha | 🔶 **Diseñado desde el 26/09** (`MODELO.md` §5f, misma explosión leída por fecha) — depende de 9, que tampoco tiene datos que leer todavía |
-| 11 | Contratación y congelamiento | ⛔ Sin probar |
+| 11 | Contratación y congelamiento | ⛔ Sin probar con esta obra *(D-475: contratar un bloque y congelar sus PU se probó con los siete presupuestos de plantilla; con una obra en ejecución sigue sin probarse)* |
 | 12 | Salidas y desviación | ✅ **Pasa — cinco meses de almacén y cuatro de avance, el triángulo material-avance cuadra en acumulado al 99.8%** (`MOVIMIENTO_ALMACEN` §5e, comparación de cinco columnas §5f, `DESVIACION` §5g). El 27/09 pasó de uno a cinco meses de almacén; el 28/09 cerró el avance —y con él, un falso positivo propio: el 68.5% sin respaldo que parecía un hallazgo real era la ventana de datos incompleta (D-375) |
 
 ---

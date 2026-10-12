@@ -242,13 +242,13 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `ESTADO.md` | IV | ✅ Punto de entrada · punto de corte |
 | `METODO.md` | II | ✅ Razonamiento e identidad |
 | `RAZONAMIENTO.md` | II | 🆕 Cómo responder preguntas operativas con el cerebro ya construido |
-| `MODELO.md` | I | ✅ Aprobado, 6 hallazgos |
-| `CONOCIMIENTO.md` | I | ✅ 15 partes · las reglas del sistema |
+| `MODELO.md` | I | ✅ Aprobado, 15 hallazgos resueltos |
+| `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 486 decisiones · 12 descartes · 30 correcciones |
+| `MEMORIA.md` | III | ✅ 487 decisiones · 12 descartes · 30 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
-| `erp-construccion.md` | II | ✅ Regenerado desde el conocimiento |
+| `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 886 pruebas · los siete programas reproducen las cifras publicadas |
 | `GLOSARIO-DOMINIO.md` | I | **79 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
@@ -269,7 +269,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `agentes/gravity.md` | II | 🆕 Orquestador externo · entrega plan de ruta, no ejecuta |
 | `agentes/gravity-obra.md` | II | 🆕 Orquestador interno · Ollama local, Groq red · diseñado, no construido |
 | `agentes/auditor-erp.md` | II | 🆕 Corre las invariantes — **de los datos y del cerebro** |
-| `verificar-cerebro.py` | II | 🆕 7 comprobaciones mecánicas de coherencia |
+| `verificar-cerebro.py` | II | 🆕 9 comprobaciones mecánicas de coherencia |
 | `IDEAS.md` | IV | 🆕 8 ideas sin diseñar · dividido de CONOCIMIENTO |
 | `PROPUESTA-CUATRO-MODULOS.md` | IV | ✅ **22 decisiones cerradas** · pendiente diseño formal |
 | `agentes/` | II | Gravity, arquitecto, constructor, migrador, auditor |

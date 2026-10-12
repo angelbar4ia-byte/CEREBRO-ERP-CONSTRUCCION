@@ -3308,6 +3308,9 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 | 10 | La alerta no tenía dónde vivir, y se perdía al cerrar la sesión que la detectaba | Tabla `ALERTA`, peldaño de abajo de `PROPUESTA`, con `veces_vista` para saber si reaparece | ✅ |
 | 11 | `NODO.modo_cantidad = medida` no tenía mecanismo que lo alimentara | Tablas `TRAZO` y `ENLACE_CUANTIFICACION` — el trazo es evidencia, el enlace tipa qué mide y con qué factor | ✅ |
 | 12 | `modo_cantidad` no tenía sus casos escritos, y faltaba uno (ingeniería cargada) | Ciclo de vida completo con evidencia; quinto valor `cargada`, verificable contra `medida` | ✅ |
+| 13 | La receta fija no basta cuando el múltiplo depende de esta obra | `COMPOSICION.formula_personalizada` y `NODO.variables`, evaluadas en el motor y nunca en SQL (§1a, D-215) | ✅ |
+| 14 | Quién puede qué no tenía dónde vivir | `ROL`, `FUNCION_ATOMICA` y `ROL_FUNCION`, de muchos a muchos y sin tope por monto (§5b, D-225) | ✅ |
+| 15 | El precio de un insumo y la receta de un concepto cambian por razones distintas | `PRECIO_HISTORICO` independiente de `VERSION_CONCEPTO`; la versión congela su `pu` (§4a, D-226) | ✅ |
 
 **Los seis primeros hallazgos fueron revisados y aprobados el 2026-09-10**, con dos
 ajustes sobre la propuesta original:
@@ -3322,6 +3325,10 @@ Los hallazgos 1, 4, 5 y 6 quedan tal como se propusieron.
 **Los hallazgos 7 a 12 se agregaron el 2026-09-15**, resolviendo P-02, P-03, P-04,
 P-25, P-29, P-30 y B-19 en una sesión de trabajo con el usuario — no en la revisión
 original del 09-10. Los seis aprobados en la misma conversación que los originó.
+
+**Los hallazgos 13 a 15 se agregaron entre el 2026-09-15 y el 09-18** (D-215, D-225 y
+D-226) y esta tabla no los traía: el encabezado decía 15, el índice 6 y los pendientes
+13. Los tres viven donde se resolvieron, no en un apartado propio (D-487).
 
 > **Este modelo puede pasar a la siguiente fase**: tipos de columna concretos,
 > índices, y el motor de cálculo como funciones sobre este schema. Eso no se hace

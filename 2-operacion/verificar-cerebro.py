@@ -153,6 +153,27 @@ def check_conteos(textos):
                 if m and int(m.group(1)) != reales:
                     falla(arch, f"línea {n}: declara {m.group(1)} decisiones; en MEMORIA hay {reales}")
 
+    # lo que se declara en más de un archivo y tiene una fuente que se puede contar (D-487: el índice decía 6 hallazgos, los
+    # pendientes 13 y el encabezado 15, y la tabla de MODELO traía 12; CONOCIMIENTO tenía 17 partes y dos archivos decían 15)
+    def declaraciones(patron, real, fuente, que):
+        for arch, t in textos.items():
+            for n, linea in enumerate(t.split("\n"), 1):
+                if not (linea.startswith("verificado:") or linea.startswith("|")):
+                    continue
+                m = re.search(patron, linea)
+                if m and int(m.group(1)) != real:
+                    falla(arch, f"línea {n}: declara {m.group(1)} {que}; {fuente} trae {real}")
+
+    mod = textos.get("MODELO.md", "")
+    if "# Resumen de hallazgos" in mod:
+        filas = [int(x) for x in re.findall(r"^\| (\d+) \|", mod.split("# Resumen de hallazgos", 1)[1], re.M)]
+        if filas:
+            declaraciones(r"(\d+)\s+hallazgos\s+resueltos", max(filas), "la tabla de hallazgos de MODELO.md", "hallazgos resueltos")
+    con = textos.get("CONOCIMIENTO.md", "")
+    partes = len(re.findall(r"^# \d+\. ", con, re.M))
+    if partes:
+        declaraciones(r"(\d+)\s+partes", partes, "CONOCIMIENTO.md", "partes")
+
     glo = textos.get("GLOSARIO-DOMINIO.md", "")
     if glo:
         # los términos son encabezados de tercer nivel sin numerar
