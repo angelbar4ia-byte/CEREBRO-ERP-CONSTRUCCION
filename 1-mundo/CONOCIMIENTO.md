@@ -2282,7 +2282,7 @@ igual es lo que hace que el método parezca peor de lo que es.
 | Clase | Cuántos | Qué hace el sistema |
 |---|---|---|
 | **Resuelto** | 32 | Se aplica solo. Detectar no necesita permiso |
-| **Ambiguo** — varios candidatos | 4 | **Propuesta con todos los candidatos y su evidencia.** No se elige el más probable |
+| **Ambiguo** — varios candidatos | 4 | **Propuesta con todos los candidatos y su evidencia.** No se elige el más probable *(D-489: los cuatro eran una suma que cierra contra el presupuesto, ver abajo)* |
 | **Clave inexistente** | 1 · `MOS-2079` | **Propuesta con las dos lecturas** —errata o trabajo nuevo— **y se reporta sin tocar** |
 | **Destajo de compuesto** | 1 · `MOC-12010` | **No es residuo.** La reversión debe buscar también dentro de compuestos |
 
@@ -2301,7 +2301,8 @@ no en la del concepto. Buscando candidatos sólo entre conceptos nunca iba a ten
 candidatos, no uno.
 
 Y no está entre las 7 claves perdidas al migrar, así que lo más probable es que sea de
-las 19 nuevas del todo. Pero hay una tercera lectura que obliga a no tocarla:
+las 19 nuevas del todo *(D-489 corrige esta conjetura: es el destajo que le falta a la
+ingeniería, abajo)*. Pero hay una tercera lectura que obliga a no tocarla:
 
 > **Puede ser un cambio que nadie autorizó** — la *ausencia de causa* de §11.7. Si el
 > sistema la corrige o la da de alta solo, borra la evidencia de que alguien cambió
@@ -2355,6 +2356,79 @@ que salió al comparar la estructura contra el prototipo (§11.5).
 
 **Cada paso alimenta al siguiente.** Y con eso la ingeniería sí se puede cargar como
 presupuesto: **los conceptos son recuperables aunque el archivo no los traiga.**
+
+### Vuelta a correr con los datos del repo (D-489): el residuo del 16 % era una suma, no una elección
+
+Se volvió a sacar de los archivos del repo (`backend/core/tests/test_reversion_alamo18.py`
+la deja comprobable en el CI): los 38 destajos de la ingeniería de la cimentación
+contra las matrices y el Diamante con chimenea. **Salen exactos el 32, el 4 y los 2 de
+arriba**, con una condición que antes no estaba escrita: los candidatos de un destajo
+son los conceptos **de su misma etapa** (`ECO-`), y su cantidad es la de esa etapa en el
+presupuesto, no la de la clave en todo el capítulo. `ISN-01111` está también en Planta
+Baja, con 2; sumada a lo de la cimentación daba 11 en vez de 9 y la obra parecía haber
+construido menos de lo presupuestado.
+
+**La ingeniería trae los insumos de la etapa sumados.** Un destajo con varios
+conceptos candidatos no es «cuál de ellos»: es lo que hicieron todos juntos. Los cuatro
+«ambiguos» cierran exacto contra el presupuesto del prototipo:
+
+| Destajo | En la ingeniería | Conceptos de la etapa (cantidad en el presupuesto) | Suma |
+|---|---:|---|---:|
+| `MOS-01030` bajadas sanitarias | 10 | `ISN-01111` (9) + `ISN-01112` (1) | **10** |
+| `MOH-01030` salida de llave y refrigerador | 4 | `IHD-01070` (3) + `IHD-01080` (1) | **4** |
+| `MOH-01020` salida de hidroneumático y boiler | 2 | `IHD-01090` (1) + `IHD-01100` (1) | **2** |
+| `MOE-01101` salida de zumbador y timbre | 2 | `IEC-01020` (1) + `IEC-01030` (1) | **2** |
+
+> **El reparto de las bajadas sanitarias no depende del presupuesto: lo confirman
+> cuatro materiales.** Con 9 y 1, la matriz espera 10 codos de 3×90 (`SAN-00009`: 9 de
+> la bajada más 1 de `ISN-02001`), 1 tee (`SAN-00017`), 1 reducción (`SAN-00015`) y 7.000
+> de tubo de 3" (`SAN-00020`); la ingeniería compró 10, 1, 1 y 6.99985. Con 10 y 0 no
+> coincide ninguno. Es un material que solo usa un candidato: el tipo de insumo que
+> parte una suma, a diferencia de los materiales compartidos de §11.13, donde cualquier
+> ruido parece limpio.
+
+**La regla, entonces:** un destajo con varios candidatos en su etapa es una **suma**. Se
+prueba contra el presupuesto del prototipo: si cierra, cada candidato lleva su cantidad;
+si no, la suma real se sabe y el reparto no, y se busca un insumo que solo use uno de
+los candidatos; si tampoco lo hay, **propuesta con la suma y los candidatos**, y nunca se
+elige el más probable. Sigue sin ser proximidad de claves: es aritmética sobre lo que la
+ingeniería trae sumado.
+
+**`MOC-12010` encaja sin forzar nada.** `ZA1-000001` lo cita `EST-01053` (6 por unidad) y
+`EST-01054`, que es de otro nivel: en la cimentación hay un solo concepto, con cantidad
+1, y 1 × 6 son las 6 zapatas que la ingeniería trae. La losa dice 1.13 y las zapatas
+1.00, porque las zapatas se cuentan y no se miden; dos destajos de un mismo concepto en
+desacuerdo se resuelven por el de mayor costo (§11.13), y el de la losa cuesta $56,120
+contra $2,760.
+
+**`MOS-2079` es el destajo que sobra frente al único que falta.** El presupuesto de la
+cimentación pide un destajo que la ingeniería no trae: `MOS-02020` «MO SALIDA SAN
+LAVADERO» (`ISN-01020`, una pieza, $312.50). Y la ingeniería trae uno que no es de
+ningún concepto: `MOS-2079`, con el mismo texto, una pieza y $312.50. No es
+proximidad —`2079` y `02020` no se parecen—: es **exclusión más tres coincidencias**,
+texto, cantidad y precio, entre el único que sobra y el único que falta. Una clave nueva
+del todo no coincidiría en las tres con la que el prototipo echa de menos. La lectura de
+errata pasa de conjetura a la más probable. **No se aplica**: sigue siendo propuesta con
+las dos lecturas y reporte sin tocar, porque la tercera —un cambio que nadie autorizó— no
+se descarta con esto; lo nuevo es que la propuesta ya lleva su evidencia y quien decide
+solo confirma.
+
+| | Destajos |
+|---|---:|
+| Un candidato | 32 |
+| De compuesto (`MOC-12010`) | 1 |
+| Varios, suma que cierra con el presupuesto | 4 |
+| **Resuelto por evidencia** | **37 de 38 · 97 %** |
+| Clave inexistente, propuesta con evidencia (`MOS-2079`) | 1 |
+
+**A escala, en las once ingenierías:** hay 15 destajos con varios candidatos en su etapa;
+10 cierran exacto con el presupuesto y 5 no. Los cinco son lo que la obra hizo de más o
+de menos con la suma conocida y el reparto no: tres de las losas de Planta Baja, la
+nervada (`MOE-02211` armado y `MOE-02212` descimbrado, 182.40 contra 147) y la maciza
+(`MOE-02214`, 56.80 contra 63) —el caso «dos hijos, una sola ancla» de §11.14—, y dos
+de cableado eléctrico del archivo de Planta Alta (`MOE-01112` de contacto, 56 contra 59;
+`MOE-01122` de apagador, 24 contra 31). Esos cinco son el residuo verdadero del método,
+y ya se trataban como lote o como propuesta.
 
 
 ## 11.10 Sin cantidades negativas en la ingeniería del lote

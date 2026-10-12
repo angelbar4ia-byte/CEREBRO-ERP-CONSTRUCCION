@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿el flujo completo aguanta sobre una obra real?
 tiempo:     fue así
 corte:      2026-10-12
-verificado: 12 etapas recorridas · 4 pasan · 2 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
+verificado: 12 etapas recorridas · 5 pasan · 1 con matices · 4 diseñadas sin caso real que las ejercite · 2 sin poder probarse
 ```
 
 > **Escenario de prueba** en el sentido de B-42: un caso real recorrido de punta a
@@ -38,7 +38,7 @@ punta —lo ejecutado— es justamente la que falta, y eso mismo es un resultado
 | 3 | Cuantificación de volúmenes | ⛔ No existe |
 | 4 | Paramétrico | 🔶 **Diseñado desde el 26/09** (`NODO`(rol=ensamble)+`COMPOSICION`+`ENSAMBLE_PARAMETRO`, `MODELO.md` §1c) — sin correr todavía contra la cimentación de dos plantas de este lote |
 | 5 | Carga de la ingeniería del lote | ✅ Pasa |
-| 6 | Reversión por destajo | ⚠️ **Pasa al 84% — falta qué hacer con el 16%** |
+| 6 | Reversión por destajo | ✅ **Pasa — vuelta a correr el 12/10 (D-489): 37 de 38 destajos de la cimentación se resuelven por evidencia; el 38.º, `MOS-2079`, queda como propuesta que ya trae la suya. Los «ambiguos» eran sumas que cierran con el presupuesto** |
 | 7 | Comparación contra prototipo | ✅ Pasa, y encuentra un hecho real |
 | 8 | Factorizador | ⚠️ **Vuelta a correr el 12/10 (D-488): sí es del factorizador, pero no por lo que se creyó — no era profundidad ni consolidar (P-36 no mueve ninguna cifra), era el camión: dos claves de arena, de 7 y de 14 m³. Falta una fila poblada que lo ejerza** |
 | 9 | Programa y ruta crítica | 🔶 **Modelo de datos completo desde el 26/09** (`ACTIVIDAD`/`PRECEDENCIA`/`CALENDARIO_OBRA`/`TRAMO`, `MODELO.md` §5c) — el motor de cálculo del CPM sigue sin escribirse *(D-461: ya existe, `backend/core/motor_cpm.py`)*, y esta obra no tiene actividades cargadas para correrlo |
@@ -150,7 +150,11 @@ ingeniería — cancelería, carpintería, muebles, herrería y consumibles.
 
 ---
 
-## 6 · Reversión por destajo — ⚠️
+## 6 · Reversión por destajo — ✅ (era ⚠️ hasta el 12/10)
+
+> **Lo que sigue hasta «Escalado a diez niveles» es la lectura del 18/09**, cuando el residuo no tenía
+> regla. La regla se escribió después (B-46, `CONOCIMIENTO.md` §11.9) y se comprobó con los datos
+> del repo el 12/10: «Vuelta a correr», al final de esta etapa.
 
 Sobre la cimentación: **32 de 38 destajos · 84%**, filtrando por el prototipo
 correcto. Sin filtrar, 42%.
@@ -242,6 +246,30 @@ ninguna ingeniería cargada. Contados en dinero, no en etapas, son
 > así que no hay PU independiente contra qué cruzarlos. Queda con su costo
 > original ($658.28), con la duda abierta y sin forma de cerrarla con los
 > datos de hoy.
+
+### Vuelta a correr con los datos del repo — 2026-10-12 (D-489)
+
+Con las matrices, el Diamante con chimenea y la ingeniería de la cimentación, tal como
+están en el repo. **Salen exactos los 32, los 4 y los 2 de arriba**, y el residuo cambia
+de naturaleza:
+
+| Lo que el 18/09 era «residuo» | Lo que es con los datos |
+|---|---|
+| 4 ambiguos — «no definido» | **Cuatro sumas, y las cuatro cierran exacto con el presupuesto del prototipo** (10 = 9 + 1, 4 = 3 + 1, 2 = 1 + 1 y 2 = 1 + 1). La ingeniería trae los insumos de la etapa sumados: un destajo con dos conceptos es lo que hicieron los dos. El reparto de las bajadas sanitarias lo confirman además cuatro materiales |
+| `MOC-12010` — sin candidato | Vive en el compuesto de la zapata y cae en `EST-01053`: 1 × 6 zapatas = 6 |
+| `MOS-2079` — formato roto | **El único destajo que sobra frente al único que falta**: el presupuesto pide `MOS-02020` «MO SALIDA SAN LAVADERO» y la ingeniería trae `MOS-2079` con el mismo texto, una pieza y $312.50. Propuesta con las dos lecturas y sin tocar, pero ya con su evidencia |
+
+**37 de 38 se resuelven por evidencia (97 %); el que falta es una confirmación, no una
+laguna.** A escala, en las once ingenierías, hay 15 destajos con varios candidatos: 10
+cierran exacto y 5 no —la losa nervada y la maciza de Planta Baja y dos de cableado de
+Planta Alta—, que son lo que la obra hizo de más o de menos con la suma conocida y el
+reparto no. Ese es el residuo verdadero del método. La explicación completa y el detalle
+están en `CONOCIMIENTO.md` §11.9.
+
+> **Una trampa que apareció al volver a correrla:** la cantidad del presupuesto se toma de
+> la etapa, no de la clave en todo el capítulo. `ISN-01111` está también en Planta Baja y
+> sumada daba 11 donde la cimentación pide 9: con ella, la obra parecía haber construido
+> menos de lo presupuestado en cuatro destajos que en realidad cierran.
 
 ---
 
@@ -612,7 +640,7 @@ Es P-38, y esta prueba lo confirma como el dato que más falta.
 
 # Resultado de la prueba
 
-**Cuatro etapas pasan, dos tienen matices, cuatro quedaron diseñadas sin caso real
+**Cinco etapas pasan, una tiene matices, cuatro quedaron diseñadas sin caso real
 que las ejercite, dos no se pueden probar.** El flujo aguanta completo desde la
 carga hasta la comparación entre planes, y donde empieza la ejecución ya hay
 modelo de datos completo y probado con cinco meses reales — el cuello de botella
@@ -647,6 +675,7 @@ caso real corriendo encima.
 | 12 | **Confirmar el testigo correcto puede cambiar el sentido del hallazgo sin cambiar el número.** `ALB-01012` comparaba contra mortero, que la obra nunca usa; con cemento (dato del usuario, la matriz genérica) el +2.8% contra diseño completo se sostuvo — pero adelantado a todas las fuentes de avance a la vez es el caso real de `consumo_material_sin_respaldo_avance`, con un riesgo de fondo que no se ve hasta el cierre de obra | D-379 |
 | 13 | **El mismo patrón se repite fuera de estructura — B-70 no era un caso aislado de repellado.** Extendido a instalaciones con un método nuevo (alcance ponderado en $, para conceptos que agrupan varias sub-actividades bajo una clave), eléctrica/hidráulica/gas confirman; sanitaria repite, por tercera vez, avance facturado sin material que lo respalde — ahora en un dominio distinto al que lo motivó | D-381, D-382 |
 | 14 | **Una desproporción de 150× no era de profundidad ni de consolidar: eran dos claves de camión de un mismo material, con la unidad `SERV` y los metros cúbicos en el texto** — leída en m³, la obra tiene 1.26 veces la arena del prototipo | D-488, B-25 |
+| 15 | **El «residuo ambiguo» de la reversión no era una elección entre candidatos sino una suma**: la ingeniería trae los insumos de la etapa sumados, y los cuatro destajos con dos conceptos cierran exacto con el presupuesto; la clave que no existe era el único destajo que sobra frente al único que falta | D-489, B-46 |
 
 ## Lo que la prueba validó
 
