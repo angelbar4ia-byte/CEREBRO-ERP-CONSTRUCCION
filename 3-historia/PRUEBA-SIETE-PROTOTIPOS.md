@@ -5,8 +5,8 @@
 capa:       III — Historia
 pregunta:   ¿el camino paramétrico aguanta sobre el catálogo real?
 tiempo:     fue así
-corte:      2026-09-26
-verificado: 6 etapas · 2 pasan · 1 con matices · 2 diseñadas sin caso real que las ejerciten · 1 sin poder probarse
+corte:      2026-10-12
+verificado: 6 etapas · 2 pasan · 1 con matices · 2 diseñadas sin caso real que las ejerciten · 1 sin poder probarse · cifras de las etapas 1 a 4 vueltas a sacar de `CATALOGO_DE_PRESUPUESTO.csv` el 2026-10-12
 ```
 
 > **Tercera prueba (B-42).** Las otras dos siguen **una obra**. Ésta sigue **el
@@ -101,6 +101,13 @@ dispersión, es otra población.
 > plantas, y qué es sigue sin saberse (**B-52**; D-312: es el desplante). Y uno de método: **una partición que
 > mejora el número no queda probada por mejorarlo.** El 32% que quedaba en el otro
 > subgrupo era la señal de que faltaba explicación, y se leyó como ruido.
+
+> **Releído el 2026-10-12 contra `1-mundo/opus/CATALOGO_DE_PRESUPUESTO.csv`.** Salen igual: los $16,460,623.50, el rango
+> de $8,717 a $11,841 por m² (35.8%, $537,328 sobre 172 m²), los $/m² de cada subcapítulo y de la cimentación por
+> prototipo, el 1.71× y el CV de 6.0% contra el desplante. Con dos matices en cómo se calculó la dispersión: el
+> 2.8% del grupo A da 2.7% con desviación poblacional y 3.1% con muestral, y el 2% y el 32% de la cohorte por plantas
+> son muestrales (poblacional: 1.6% y 27.7%) mientras que el 6.7% del grupo B es poblacional. La conclusión no cambia,
+> pero una cifra de dispersión debe decir cuál de las dos es.
 
 > **Actualización 2026-09-26 — B-52 ya contestó qué es.** Medido contra el
 > desplante declarado en la propia losa de cimentación de cada prototipo (no el

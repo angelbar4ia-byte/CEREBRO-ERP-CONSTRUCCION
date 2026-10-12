@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
-corte:      2026-09-26
-verificado: 79 términos · 25 ambigüedades
+corte:      2026-10-12
+verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -247,7 +247,7 @@ Agrupador por prototipo: condensa varios conceptos con sus cantidades en un solo
 - **También:** Agrupador; Nivel 3
 - **No confundir con:** Auxiliar (categoría de insumo); Concepto
 - **Se usa con:** Concepto; Prototipo; Presupuesto
-- **Ejemplo:** EST-01010 Losa cimentación Oro = $132,364.24, la suma exacta de sus 8 conceptos
+- **Ejemplo:** EST-01010 Losa cimentación Oro = $138,599.24, la suma exacta de sus 8 conceptos *(decía $132,364.24: ninguna fuente del repo lo da, y las tres que traen la fila dicen $138,599.24)*
 - **Hoy vive en:** `Filas `Nivel 3` del presupuesto`
 
 ### Descripción
@@ -277,7 +277,7 @@ Lo que el concepto incluye además del trabajo principal: limpieza, acarreos, he
 - **También:** Incluye; Cláusula de alcance
 - **No confundir con:** Descripción (el alcance es parte de ella)
 - **Se usa con:** Concepto; Descripción
-- **Ejemplo:** «Incluye: limpieza, material, mano de obra…» en 408 de 470
+- **Ejemplo:** «Incluye: limpieza, material, mano de obra…» en 408 de 470 *(el CSV del presupuesto da 408 de 471 claves de concepto)*
 - **Hoy vive en:** `Cola de la `Descripción``
 
 ### Unidad

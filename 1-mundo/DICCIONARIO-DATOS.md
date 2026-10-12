@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿qué renglones hay que corregir?
 tiempo:     es así
-corte:      2026-09-26
-verificado: Reconstruido contra los catálogos vigentes
+corte:      2026-10-12
+verificado: Reconstruido contra los catálogos vigentes (2026-09-10) · §1 releída contra `CATALOGO_DE_PRESUPUESTO.csv` el 2026-10-12: 9 de sus 10 grupos salen idénticos · §2 a §6 sin releer: el método que dio sus conteos no está escrito
 ```
 
 > **Los datos concretos a corregir.** Qué homologar, qué es equivalente, qué está
@@ -54,6 +54,12 @@ verificado: Reconstruido contra los catálogos vigentes
 
 **10 grupos, 20 conceptos.** Misma descripción, claves distintas.
 
+> *Releído el 2026-10-12 contra `1-mundo/opus/CATALOGO_DE_PRESUPUESTO.csv`:* **9 de los 10 son idénticos** (mismo
+> texto completo, tras quitar acentos y signos). El décimo, `IEC-01010` ≡ `IEC-01011`, **no lo es**: el texto largo dice
+> «desarrollo de 5.00 m» en uno y «4.00 m» en el otro, y la línea cortada a 70 caracteres de abajo lo escondía.
+> Es una variante dimensional (§3), no un duplicado; los PU distintos de la fila ya lo anticipaban. Aparece también en las
+> familias de dos miembros de §2.
+
 > Van a **tabla de equivalencia**. No se fusionan.
 
 | Claves | Núcleo | Unidad | PU |
@@ -62,7 +68,7 @@ verificado: Reconstruido contra los catálogos vigentes
 | `ALB-01110` ≡ `ALB-01112` | Repellado en plafond a una altura de 3.00 mts, con mezcla mortero-aren | M2 | 169.88 · 174.88 |
 | `CAN-01001` ≡ `CAN-01011` | Canceleria oro | SERV | 43,022.75 · 39,489.53 |
 | `CAR-01030` ≡ `ICA-01030` | Colocación de durmiente 20x20 cm en vanos de fachada, | PZ | 1,080.00 · 1,080.00 |
-| `IEC-01010` ≡ `IEC-01011` | Salida eléctrica para contacto, ahogado en piso o en losa a base de po | SAL | 71.33 · 67.20 |
+| ⚠️ `IEC-01010` ≡ `IEC-01011` | Salida eléctrica para contacto, ahogado en piso o en losa a base de po (**5.00 m contra 4.00 m**) | SAL | 71.33 · 67.20 |
 | `IGAS-02131` ≡ `IGAS-02132` | Caja de valvulas GAS PRO, valvulas de paso y codos 3/8" modelo RUBI | SAL | 0.00 · 0.00 |
 | `IHD-02202` ≡ `IHD-02203` | Linea alimentacion cisterna-hidroneumatico de CPVC de 1" desarrollo 12 | SAL | 531.39 · 267.39 |
 | `ISN-02001` ≡ `ISN-02005` | Linea principal sanitaria de pvc de 6" desarrollo 24.00 mts | SAL | 5,419.73 · 3,640.26 |

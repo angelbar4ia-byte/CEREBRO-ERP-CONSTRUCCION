@@ -87,13 +87,13 @@ Medido con `python3 2-operacion/red-del-cerebro.py .` el 2026-10-12.
 
 | Qué vigila | Instrumento | Su límite |
 |---|---|---|
-| ¿Está vigente? | `corte` y `verificado` en cada archivo | El corte se mueve al verificar, no al editar: el 2026-10-12 —antes de mover el de los archivos por donde pasa toda decisión— 20 de 36 habían cambiado después del suyo, y el verificador lo dice en una nota |
+| ¿Está vigente? | `corte` y `verificado` en cada archivo; `red-del-cerebro.py --vigencia` dice a quién releer | El corte se mueve al verificar, no al editar: el 2026-10-12 —antes de mover el de los archivos por donde pasa toda decisión— 20 de 36 habían cambiado después del suyo. Después de releer 13 contra su fuente (D-492) quedan 5, y los tres más grandes solo se releyeron en parte: lo dice su `verificado`, no su fecha. Que un archivo cite a otro que se movió no prueba que esté viejo: casi todos citan `CONOCIMIENTO` y `MODELO` |
 | ¿Se contradice? | El verificador (nueve comprobaciones) y el auditor | No ve dos archivos que dicen lo mismo con palabras distintas |
 | ¿Dónde se equivocó? | `MEMORIA.md` §3 y las filas «Corrige» | Solo lo que alguien registró |
 | ¿Qué está diseñado y qué probado? | Los símbolos de las pruebas de flujo: ✅ pasa · ⚠️ matices · 🔶 diseñado · ⛔ no se puede | Un símbolo no dice qué tan fuerte es la prueba |
 | ¿Qué no se midió? | «Lo que esto no resuelve» y «lo que no se midió» | Depende de que quien escribe lo anote |
 | ¿Qué se sabe que no se sabe? | `PENDIENTES-MEJORAS.md` | |
-| ¿Quién lo revisa de afuera? | Proponer y esperar (`METODO.md` §3.2) | El mecanismo que más errores atrapó: `METODO.md` §4 |
+| ¿Quién lo revisa de afuera? | Proponer y esperar (`METODO.md` §3.2) | De las trece filas de `MEMORIA.md` §3, cinco las señaló quien revisaba y siete salieron de contrastar contra los datos: hacen falta los dos (`METODO.md` §4) |
 
 ---
 
@@ -103,10 +103,11 @@ Sobre los títulos de las filas «Corrige» de `MEMORIA.md` (clasificación prop
 
 | Familia | Ejemplos | Qué la atrapa |
 |---|---|---|
-| **La muestra era parcial**: un archivo incompleto, un mes, una sola fuente, una llave que no era única, una clave sumada en todo el capítulo | D-305, D-358, D-365, D-375, D-377 | Correr con toda la muestra (`METODO.md` §5.3: sospechar del alcance antes que del dato) |
+| **La muestra era parcial**: un archivo incompleto, un mes, una sola fuente, una llave que no era única, una clave sumada en todo el capítulo | D-305, D-358, D-365, D-375, D-377 | Correr con toda la muestra (`METODO.md` §5, punto 3: sospechar del alcance antes que del dato) |
 | **Se generalizó desde un caso**, o se validó con algo que el dato no prometía | D-314, D-324, D-388, D-419 a D-422, D-488 | Una segunda fuente independiente (`METODO.md` §1.4) |
 | **Error propio de cálculo o de lectura**: un cruce que duplicaba filas, un conteo, una holgura sin el «+ 1», días naturales por hábiles | D-309, D-415, D-416, D-443, D-445, D-448 | Contrastar contra un total conocido (`METODO.md` §1.1) |
-| **No se leyó lo ya escrito** | D-347, D-405, D-490 | Buscar antes de proponer (`METODO.md` §5.1) |
+| **No se leyó lo ya escrito** | D-347, D-405, D-490 | Buscar antes de proponer (`METODO.md` §5, punto 1) |
+| **La cifra viajó sin su fuente**: «seis de ocho», «22 casos», $132,364.24, «cinco compuestos»; una referencia que resuelve y apunta a otra cosa | D-492 | Volver a sacarla del dato (`METODO.md` §1.1) y leer el título del destino junto a la frase (`METODO.md` §3.7) |
 
 **Las correcciones vienen en cadenas**: D-376 → D-377 → D-378 → D-379; D-414 → D-415 → D-416;
 D-419 → D-420 → D-421 y D-422; D-442 → D-443 → D-445. Cada eslabón corrige al anterior con más
@@ -124,6 +125,7 @@ Está dicho en su lugar y aquí solo se señala, para que no se tome por complet
 - **Las tablas de OPUS que no están** (materiales, trabajos, mano de obra, fletes, conceptos), y la
   doceava ingeniería de `ALAMO 18`, la azotea (`MEMORIA.md` D-472, D-488).
 - **Los cuatro archivos retirados** y lo que pudieron contener (`MEMORIA.md` D-490).
+- **Lo que no se pudo volver a sacar** (D-492): las cifras de cimentación de `RAZONAMIENTO.md`, las 11 filas del filtro por `Ingenieria ERP`, el 1.085 y los conteos de `DICCIONARIO-DATOS.md` §3. Están en el `verificado` de su archivo.
 - **Lo que ningún instrumento de arriba puede ver**: un tercer hecho perdido que nadie sabe que
   existió, y dos archivos que se contradicen sin repetir una sola cifra.
 

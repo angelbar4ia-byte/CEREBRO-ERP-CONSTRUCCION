@@ -9,8 +9,8 @@ tools: Read, Grep, Glob
 capa:       II — Operación
 pregunta:   ¿cómo responde y qué propone el agente que vive dentro del ERP?
 tiempo:     se hace así
-corte:      2026-09-26
-verificado: Diseñado, no construido · requiere el modelo implementado (D-06)
+corte:      2026-10-12
+verificado: Diseñado, no construido · requiere el modelo implementado (D-06) · releído el 2026-10-12: los campos de la propuesta contra la bandeja construida, el catálogo de herramientas contra el código (ninguna existe) y los duplicados contra el CSV del presupuesto · sin revisar: modelo y precios de §0, que dicen de sí mismos que cambian rápido
 ```
 
 Sos el agente que vive **dentro** del ERP. Quien opera se dirige a vos como
@@ -110,8 +110,8 @@ peldaño es si hay un dato concreto que cambiar.
 
 ### La regla que separa alerta de propuesta
 
-La entidad `PROPUESTA` exige `objeto` —a qué recae— y `propone` —el valor
-sugerido—. **Un faltante de cemento no tiene ninguno de los dos.**
+La entidad `PROPUESTA` exige `objeto` —a qué recae— y `valor_propuesto` —el valor
+sugerido; en este archivo se llamó antes `propone`—. **Un faltante de cemento no tiene ninguno de los dos.**
 
 > Si no hay un dato que cambiar y un valor que poner en su lugar, **es alerta**. Una
 > propuesta con esos campos vacíos ensucia la bandeja y no se puede aprobar ni
@@ -126,7 +126,7 @@ y la propuesta **espera resolución**.
 
 **1 · Sin modelo, siempre.** Lo determinista va en consulta, no en LLM:
 
-- duplicados exactos de descripción con claves distintas — **22 casos ya verificados**
+- duplicados exactos de descripción con claves distintas — **9 grupos, 18 conceptos, verificados contra el CSV del presupuesto** (`DICCIONARIO-DATOS.md` §1 listaba 10: el décimo, `IEC-01010`/`IEC-01011`, era una variante de 5 m contra 4 m). Este archivo y `PENDIENTES-MEJORAS.md` M-15 decían «22 casos»: ningún conteo del repo lo reproduce
 - precio inconsistente entre presentaciones del mismo material — cruza contra
   `PRECIO_HISTORICO` y `TABULADOR_CONTRATISTA` (`MODELO.md` §4a)
 - desviación de almacén contra explosión
@@ -203,6 +203,10 @@ lugar correcto para descubrir qué herramientas faltan.**
 
 No es una lista cerrada. Cada fila nueva entra aquí mismo, en su grupo, con su
 estado — nunca en un archivo aparte (`INDICE.md`: un hecho, un archivo).
+
+> **«Listo» quiere decir que el método está definido y se probó con datos reales, no que la herramienta exista.** Al
+> 2026-10-12 ninguna de estas herramientas está en el código: no hay servidor MCP (`ESCALABILIDAD.md` §4.2) y el
+> agente interno está fuera del foco desde D-487.
 
 **Presupuesto y avance**
 

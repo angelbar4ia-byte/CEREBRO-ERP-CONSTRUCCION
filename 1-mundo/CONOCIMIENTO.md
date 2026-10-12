@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo funciona el sistema?
 tiempo:     es así
 corte:      2026-09-26
-verificado: 17 partes · cada regla comprobada antes de escribirse
+verificado: 17 partes · cada regla comprobada antes de escribirse · releído el 2026-10-12 contra los CSV y el código, sin mover el corte: la parte 2 entera, el conteo de la parte 8, los bloques en blanco y las negativas de la 11, y los campos de la bandeja de la 14; lo demás no se releyó
 ```
 
 > **Las reglas del sistema.** Los catálogos de origen están en `CATALOGOS.md`; las
@@ -121,7 +121,7 @@ partes: cimentación entra a contrato mientras acabados sigue en diseño.
 Consecuencias:
 
 - El **rediseño sigue corriendo** en las ramas no congeladas.
-- Las tres capas (§11) aplican por subárbol.
+- Las tres capas (§12) aplican por subárbol.
 - Una regla de rediseño que toque un nodo congelado **queda «no aplicada»** y se
   reporta — el mecanismo de §12.2 ya lo cubre.
 
@@ -450,11 +450,13 @@ huella**, ya no es una descripción distinta.
 Defensa que no depende de comparar campo por campo:
 
 ```
-huella = f(unidad, insumos, cantidades)
+huella = f(insumos, cantidades)
 ```
 
 Se calcula al cargar y se compara con la anterior. **Si cambió, cambió** — aunque
 el texto sea idéntico y aunque el PU dé la misma cifra por coincidencia.
+
+> *Corregido en D-473: esta sección definía la huella como `f(unidad, insumos, cantidades)`. La unidad se compara aparte y antes (§2.7): cambiarla detiene el concepto, y saber una unidad que no se sabía no cambia la receta. Es lo que hace `huella` en `backend/core/importacion_opus.py`.*
 
 > **La descripción queda fuera de la huella a propósito.** Si entrara, cada
 > corrección de acento generaría versión y el versionado perdería sentido.
@@ -603,7 +605,7 @@ frontend/    ← web en Vercel · móvil en Google Studio
 | `apu` | Matrices, explosión, versionado (§2.2) |
 | `presupuesto` | Árbol, WBS, cantidades, estados |
 | `parametrico` | Ensambles: plantilla e instancia (§5) |
-| `rediseno` | Las cuatro operaciones y las tres capas (§8, §11) |
+| `rediseno` | Las seis operaciones y las tres capas (§8, §12) |
 | `programa` | Actividades, asignaciones, avance |
 | `contratos` | Contratación, estimaciones, control de cambio |
 | `diccionario` | Términos, equivalencias, homologación |
@@ -1476,7 +1478,7 @@ calculado*. Tres situaciones, un solo mecanismo.
 
 # 8. Operaciones de rediseño
 
-Cuatro operaciones de la misma familia. Todas reagrupan lo mismo con distinta forma.
+Seis operaciones de la misma familia. Las cuatro primeras reagrupan lo mismo con distinta forma; la clonación (§8.4) y el borrado (§8.5) se agregaron después. *(Esta sección decía «cuatro» y su tabla traía cinco filas; releída el 2026-10-12, `erp-rediseno.md` ya contaba seis.)*
 
 | Operación | Qué hace | Inversa |
 |---|---|---|
@@ -1485,6 +1487,7 @@ Cuatro operaciones de la misma familia. Todas reagrupan lo mismo con distinta fo
 | **Extracción** | Materiales sin destajo → concepto propio | — |
 | **Composición** | Varios conceptos → un concepto nuevo (§9) | Explosión |
 | **Clonación** | Un insumo → otro igual con clave nueva (§8.4) | — |
+| **Borrado** | Quita una clave que nada usa (§8.5) | — |
 
 ## 8.1 Las cuatro reglas comunes
 
@@ -2228,7 +2231,8 @@ niveles enteros sin ingeniería:
 ### La fila en blanco es el separador de bloque
 
 Verificado en los cuatro archivos grandes: **después de una fila vacía siempre viene
-un agrupador.** 155 casos, sin una sola excepción.
+un agrupador.** 155 bloques de filas vacías, sin una sola excepción: 151 con un agrupador
+detrás y 4 que cierran el archivo (releído contra los CSV el 2026-10-12).
 
 > **Es dato estructural, no adorno.** En `CEMENTO_EXTRA` dos filas en blanco separan
 > el cemento de fachada de un grupo distinto —pegapiso, rodapié y marco de cantera—
@@ -2433,7 +2437,7 @@ y ya se trataban como lote o como propuesta.
 
 ## 11.10 Sin cantidades negativas en la ingeniería del lote
 
-Se buscaron cantidades negativas en las 12 ingenierías de `ALAMO 18`. **Ninguna.**
+Se buscaron cantidades negativas en las 12 ingenierías de `ALAMO 18`. **Ninguna.** *(Releído el 2026-10-12 en las once que están en el repo: ninguna también. La doceava, la azotea, no se guardó —`MEMORIA.md` D-472—, así que esa no se pudo volver a mirar.)*
 
 > Contrasta con la matriz de conceptos, donde sí existen —58 líneas en 23
 > conceptos— para descontar material ya contado dentro de un compuesto (§8).
@@ -9005,6 +9009,8 @@ equivalencias, orden de cambio.
 | `origen` | Quién la hizo: persona o **agente** |
 | `estado` | `pendiente` · `aprobada` · `rechazada` |
 | `resuelve` | Quién decidió y cuándo |
+
+> *Los nombres de arriba son conceptuales. En la tabla construida (`MODELO.md` §5, «La bandeja construida», D-485) `propone` es `valor_propuesto` y `resuelve` son `resuelto_por`, `resuelto_con_rol` y `resuelta_en`.*
 
 ## 14.2 La evidencia no es opcional
 

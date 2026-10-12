@@ -9,6 +9,8 @@ pueda volver a sacar. Dos clases de conexión, como en un cerebro de verdad:
   funcional     dos archivos que cambian en los mismos commits: lo que se activa junto, aunque nadie lo haya escrito
 
 Uso:  python3 2-operacion/red-del-cerebro.py [ruta-al-cerebro]
+Con --vigencia (necesita la historia completa de git) añade, por archivo, cuánto se ha movido desde su `corte` él y los archivos en
+los que se apoya.
 La parte funcional necesita la historia completa de git (en un clon superficial no hay nada que medir y se omite).
 """
 import collections
@@ -18,7 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-RAIZ = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent)
+RAIZ = Path(next((a for a in sys.argv[1:] if not a.startswith("--")), Path(__file__).resolve().parent.parent))
 CAPAS = {"1": "I", "2": "II", "3": "III", "4": "IV"}
 
 
@@ -119,6 +121,38 @@ def mostrar_funcion(archivos):
     print("  cambian juntos y ninguno nombra al otro:  " + ("; ".join(f"{a} ↔ {b} ({w})" for a, b, w in ocultas) or "ninguno"))
 
 
+def mostrar_vigencia(archivos):
+    """Por archivo: su corte, cuándo cambió por última vez, y qué archivos que nombra cambiaron después de su corte (sus fuentes)."""
+    import datetime
+    if subprocess.run(["git", "-C", str(RAIZ), "rev-parse", "--is-shallow-repository"], capture_output=True, text=True).stdout.strip() != "false":
+        print("\nVIGENCIA · sin historia completa de git: se omite")
+        return
+
+    def ultimo(p):
+        sucio = subprocess.run(["git", "-C", str(RAIZ), "status", "--porcelain", "--", str(p)], capture_output=True, text=True).stdout.strip()
+        if sucio:
+            return datetime.date.today()
+        d = subprocess.run(["git", "-C", str(RAIZ), "log", "-1", "--format=%ad", "--date=short", "--", str(p)], capture_output=True, text=True).stdout.strip()
+        return datetime.date.fromisoformat(d) if d else None
+
+    nombre, aristas = estructural(archivos)
+    corte, cambio = {}, {}
+    for p in archivos:
+        m = re.search(r"^corte:\s+(\d{4}-\d{2}-\d{2})", p.read_text(encoding="utf-8"), re.M)
+        if m:
+            corte[p.name] = datetime.date.fromisoformat(m.group(1))
+        cambio[p.name] = ultimo(p)
+    print("\nVIGENCIA · por archivo: días que se ha movido desde su corte, y sus fuentes (los que más nombra) que se movieron después")
+    filas = []
+    for n, c in corte.items():
+        propio = (cambio[n] - c).days if cambio[n] else 0
+        fuentes = sorted(((w, b) for (a, b), w in aristas.items() if a == n and b in cambio and cambio[b] and cambio[b] > c), reverse=True)
+        filas.append((propio, len(fuentes), n, c, fuentes[:3]))
+    for propio, nf, n, c, fuentes in sorted(filas, reverse=True):
+        if propio > 0 or nf:
+            print(f"  {n:30} corte {c} · él +{propio:3} d · {nf:2} fuentes movidas  " + ", ".join(f"{b}×{w}" for w, b in fuentes))
+
+
 def mostrar_capacidad(archivos):
     print("\nCAPACIDAD · la fila de tabla más larga de lo que se lee primero")
     for p in archivos:
@@ -132,3 +166,5 @@ if __name__ == "__main__":
     mostrar_estructura(todos)
     mostrar_funcion(todos)
     mostrar_capacidad(todos)
+    if "--vigencia" in sys.argv:
+        mostrar_vigencia(todos)

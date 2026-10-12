@@ -5,8 +5,9 @@
 capa:       III — Historia
 pregunta:   ¿cómo lo aprobado cambia lo que el sistema cree?
 tiempo:     se aprendió así
-corte:      2026-09-12
+corte:      2026-10-12
 derivado:   `CONOCIMIENTO.md` §14 · `MEMORIA.md` · `MODELO.md` §5
+verificado: §7 releído contra `0010_bandeja_de_propuestas.sql` y `propuestas.py` el 2026-10-12; §1 a §6 son diseño, sin código que contrastar
 ```
 
 > **El lazo que faltaba.** Se menciona tres veces en el conocimiento —*«el corpus
@@ -124,8 +125,12 @@ Miden si el aprendizaje funciona. Van a `INVARIANTES.md` cuando haya datos:
 
 # 7. Estado
 
-**Diseñado, no construido.** Requiere la tabla `PROPUESTA` implementada, que
-requiere `MODELO.md` en implementación.
+**Diseñado; la mitad de abajo ya está construida y la de arriba no.** Cuando esto se escribió faltaba la tabla
+`PROPUESTA`. Desde D-485 existe (`database/migraciones/0010_bandeja_de_propuestas.sql` y
+`backend/core/propuestas.py`), y ya hace dos cosas que este archivo pide: **conserva lo rechazado con su nota** y
+**no deja volver a proponer lo rechazado** si la evidencia es la misma (`RechazadaAntes`). Lo que no existe es el
+paso 4 —indexar el caso resuelto— ni la búsqueda por parecido de §4: la bandeja guarda los casos, nadie los consulta
+todavía. Y con D-487 no se construye.
 
 Lo que sí aplica desde hoy, sin código: **cuando se resuelve algo en sesión, el
 paso 4 se escribe.** Es lo que hacía falta para que la referencia rota dejara de

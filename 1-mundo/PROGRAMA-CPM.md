@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿cómo se calcula el programa y qué cifras lo prueban?
 tiempo:     es así
-corte:      2026-10-10
-verificado: 901 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas
+corte:      2026-10-12
+verificado: 901 pruebas · los siete programas reales (832 vínculos) reproducen las cifras publicadas · las filas de los trece CSV de §2 releídas contra los archivos el 2026-10-12
 ```
 
 > **Este archivo es el mapa y la prueba del programa y del CPM.** Las reglas siguen donde ya

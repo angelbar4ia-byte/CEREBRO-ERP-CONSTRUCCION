@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿qué forma tienen los datos?
 tiempo:     es así
 corte:      2026-09-26
-verificado: Aprobado · 15 hallazgos resueltos
+verificado: Aprobado · 15 hallazgos resueltos · releído el 2026-10-12 contra el SQL y el código, sin mover el corte: los bloques «Cómo quedó en la base», la bandeja construida, la huella de la parte 4 y la lista de alertas de 5a; lo demás es diseño y no se releyó
 ```
 
 > **Primera versión.** Nace de `CONOCIMIENTO.md`, verificado contra 8 catálogos de
@@ -208,7 +208,7 @@ CUAD-001: $1,880 → $188).
 
 Las capas de sobrecosto (indirectos, utilidad): la base **sí es acumulativa** en la
 convención mexicana — cada capa se calcula sobre lo que dejaron las anteriores
-(`CONOCIMIENTO.md` §5).
+(`erp-construccion.md` §6; antes decía `CONOCIMIENTO.md` §5, que es el paramétrico).
 
 > Si `COMPOSICION` y la futura tabla de capas comparten un solo campo genérico
 > `porcentaje_sobre`, alguien va a copiar la lógica de una a la otra y romper el
@@ -933,7 +933,7 @@ pasó suelto.
 ```
 VERSION_CONCEPTO
   id, concepto_id (nodo), version, vigente_desde
-  huella          hash de (unidad, insumos, cantidades) — NO incluye descripción   firme
+  huella          hash de (insumos, cantidades) — NO incluye descripción ni unidad   firme (la unidad se compara aparte, D-473)
 
 EQUIVALENCIA
   id, concepto_a_id, concepto_b_id, tipo (duplicado_exacto|casi_identico|variante_dimensional)
@@ -982,7 +982,7 @@ la fila vigente, nunca fuente de verdad — mismo principio que
 ```
 VERSION_CONCEPTO
   id, concepto_id (nodo), version, vigente_desde
-  huella          hash de (unidad, insumos, cantidades) — NO incluye descripción   firme
+  huella          hash de (insumos, cantidades) — NO incluye descripción ni unidad   firme (la unidad se compara aparte, D-473)
   pu              NUMERIC — el PU resuelto al crear esta versión, usando
                    PRECIO_HISTORICO de cada insumo a esa fecha. Se congela,
                    nunca se recalcula                                        firme — nuevo
@@ -3308,7 +3308,7 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 | No incluido | Por qué |
 |---|---|
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
-| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`CONOCIMIENTO.md` §5) |
+| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`erp-construccion.md` §6) |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
 | Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). *Resuelto en parte (D-461): el motor existe en `backend/core/motor_cpm.py`, probado contra los siete programas reales; la visualización del Gantt cierra en D-463 (`PROGRAMA-CPM.md` §8). D-462: el cargador con las reglas de D-442 y D-443 está en `backend/core/programa.py`; D-463: la reprogramación por empuje mínimo, también; D-464: la bitácora de ediciones y su persistencia.* `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos; antes hay que decidir qué es un frente (D-448)*Resuelto (D-450): el frente es el nivel constructivo y se lee subiendo por el árbol desde la partida, así que `ACTIVIDAD` no necesita `frente_id`; el tope se compara por frente y oficio, por ventana de trabajo (D-449).* |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |

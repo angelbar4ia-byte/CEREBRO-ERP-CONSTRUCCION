@@ -5,8 +5,8 @@
 capa:       II — Operación
 pregunta:   ¿cómo se piensa aquí?
 tiempo:     se hace así
-corte:      2026-09-11
-verificado: 6 reglas · cada una con su error en MEMORIA
+corte:      2026-10-12
+verificado: 6 reglas, cada una con su error en MEMORIA · cifras de §2 vueltas a sacar de los CSV del repo el 2026-10-12 (79 `AUX-`, 58 negativas, 52 etapas, 155 bloques) · sin fuente en el repo: el 1.085, los $1.9M y $2.83M, los 11 y 8 de §1.1 y §2.2, y la losa 1.12 contra 1.130
 ```
 
 > **Cómo se piensa aquí.** Los otros archivos dicen qué es verdad; este dice **cómo
@@ -22,8 +22,8 @@ verificado: 6 reglas · cada una con su error en MEMORIA
 ## Qué es este cerebro
 
 Un modelo de ERP de construcción **verificado contra datos reales**, no diseñado en
-abstracto. Ocho catálogos de OPUS 2025, doce ingenierías de obra, y cada regla
-comprobada aritméticamente antes de escribirse.
+abstracto. Ocho catálogos de OPUS 2025, doce ingenierías de obra (once están en el repo; la
+azotea no se subió), y cada regla comprobada aritméticamente antes de escribirse.
 
 **Para qué sirve:** crear un ERP nuevo, reestructurar los existentes, y darles a
 todos un idioma común para que hablen entre sí.
@@ -141,7 +141,7 @@ Lo mismo con `Tipo` —cuatro significados—, `Nivel` —tres—, `Cantidad` �
 | Insumos colgando de la etapa sin concepto | Intencional: costo no atribuible a una partida |
 | Cantidades negativas | Ajustes que descuentan material ya contado |
 | El mismo insumo dos veces en una matriz | Dos usos distintos — amarre de varilla y de estribos |
-| Filas en blanco | **Separador de bloque** — 155 casos sin excepción |
+| Filas en blanco | **Separador de bloque** — 155 bloques en los cuatro archivos grandes: 151 seguidos de un agrupador y 4 al final del archivo |
 | `EQU` clasificado como material | Equipamiento *es* material |
 
 > **Antes de "limpiar" algo raro, preguntar.** Cuatro de estas cinco se habrían
@@ -196,7 +196,8 @@ Con algo contratado→  no se toca: se agrega encima
 ## 3.2 Propone, no aplica
 
 Aparece nueve veces en el modelo. Por eso **la propuesta es una entidad**, no un
-campo en cada mecanismo — si no, serían nueve bandejas distintas.
+campo en cada mecanismo — si no, serían nueve bandejas distintas. (Después se sumó
+un décimo tipo, `precio_nuevo`, sin tocar la base: el tipo es abierto.)
 
 **Tres reglas que la sostienen:**
 
@@ -278,6 +279,11 @@ comparten casi nada, o la referencia está mal o la frase no dice lo que cree de
 > **Tres de las 16 estaban mal desde antes de dividir.** Las capas de sobrecosto se
 > citaban como conocimiento y nunca vivieron ahí. Un error de referencia sobrevive
 > años si nadie comprueba el tema.
+>
+> *El 2026-10-12 aparecieron 15 más, y dos eran otra vez las capas de sobrecosto. Una
+> comparación de vocabulario entre la frase y el destino señaló 3; las otras se vieron
+> leyendo el título del destino junto a la frase. El detector es débil: sirve para
+> priorizar, no para dar por buena una referencia (`MEMORIA.md` D-492).*
 
 ## 3.8 Una reescritura masiva se audita contra el original
 
@@ -304,9 +310,12 @@ Están completos en `MEMORIA.md` §3. Los que más enseñan:
 | Zafiro Plus tiene 4 subcapítulos | Tiene 15 | Error de lectura de una propia salida |
 | La primera carga marcará deriva masiva | **Cero deriva** | Predicción sin verificar |
 
-> **Seis de ocho las detectó el usuario, no el sistema.** Por eso el patrón de
-> proponer y esperar aprobación no es cortesía: es el mecanismo que atrapa estos
-> errores.
+> **De las trece filas de `MEMORIA.md` §3, cinco las señaló el usuario, siete salieron de
+> contrastar contra los datos —un total declarado, una prueba de ida y vuelta, derivar
+> en vez de leer— y una fue lectura propia.** Los dos mecanismos hacen falta: el de
+> proponer y esperar aprobación no es cortesía, y el de calcular contra un total
+> conocido (§1.1) atrapa lo que el usuario no ve. (Hasta el 2026-10-12 este párrafo
+> decía «seis de ocho»: no se podía volver a sacar de ninguna parte.)
 >
 > Las familias en que se agrupan los errores posteriores, y qué atrapa cada una:
 > `METACOGNICION.md` §5.

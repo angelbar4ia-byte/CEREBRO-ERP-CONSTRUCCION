@@ -564,7 +564,7 @@ de un factor de rendimiento (ligaría con el factorizador, D-86 a D-92).
 
 > **No es más que una idea todavía.** Necesita el mismo tratamiento que las otras
 > seis: evidencia de casos reales, y que el arquitecto la revise antes de agregarla
-> a `CONOCIMIENTO.md` §12.
+> a `CONOCIMIENTO.md` §8.
 
 ## 8 Idea: el agente interno sugiere tramos, aprendiendo de la salida de almacén
 

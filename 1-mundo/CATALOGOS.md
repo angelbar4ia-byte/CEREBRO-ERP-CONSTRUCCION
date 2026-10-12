@@ -5,8 +5,8 @@
 capa:       I — Mundo
 pregunta:   ¿qué trae cada catálogo de OPUS y qué trampas tiene?
 tiempo:     es así
-corte:      2026-09-21
-verificado: 8 catálogos de OPUS 2025 · aritmética comprobada
+corte:      2026-10-12
+verificado: §1, §7, §8, §9 y la semilla de §10 vueltos a sacar de los CSV del repo el 2026-10-12 · §2 a §6 sin fuente en el repo, como se comprobaron el 2026-09-21
 ```
 
 > **Lo que entrega OPUS 2025.** Punto de partida, no alcance final. Las reglas del
@@ -969,6 +969,8 @@ una** — lo dice la columna `Origen`:
 
 **Cero diferencias.** No hay PU congelado ni desfasado: OPUS recalcula (§1).
 
+*Por qué la tabla de arriba cuenta 468 padres de concepto y 467 con explosión: `ACA-01070` trae matriz y no aparece en ninguna fila del presupuesto. Es una matriz prestada, de las que `CONOCIMIENTO.md` §11.14 describe, y no un concepto más (vuelto a contar contra los CSV el 2026-10-12).*
+
 Los **4 conceptos sin explosión** son los de precio cero: `IGAS-02131`,
 `IGAS-02132`, `ISN-02061` y `ACC-00003`. Pendientes de costear (`CONOCIMIENTO.md` §4.1).
 
@@ -1022,7 +1024,7 @@ dentro de los datos de OPUS 2025**. No hay que pedirlos ni mantenerlos aparte.
 
 | Vocabulario viejo | Se reemplaza con | Resultado |
 |---|---|---|
-| `Catalogo_de_unidades` (16) | Las unidades en uso en los catálogos vigentes | **17 en uso**, todas en el catálogo salvo `(%)mo` |
+| `Catalogo_de_unidades` (16) | Las unidades en uso en los catálogos vigentes | **17 en uso**, todas en el catálogo salvo `(%)mo` *(en los archivos del repo se cuentan 19 formas en minúsculas; `pz`/`pza` y `ser`/`serv` son la misma unidad escrita de dos maneras)* |
 | `CATALOGO_DE_NIVELES` (15) | Las filas `Subcapítulo` del presupuesto, con su `Nivel ERP` | **15** — coinciden |
 | `CATALOGO_DE_ETAPAS` (50) | Las filas `Nivel 2` del presupuesto | **52** — aparecen las tres que faltaban |
 | `CATALOGO_DE_FAMILIAS` (35) | Los campos `Familia` y `Subfamilia` de los cuatro catálogos de insumo | **50** familias y **243** subfamilias, por categoría |
