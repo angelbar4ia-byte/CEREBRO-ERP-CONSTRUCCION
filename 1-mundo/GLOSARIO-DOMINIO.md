@@ -795,7 +795,7 @@ Lo acordado con un contratista concreto. No toca el catálogo.
 
 ### Descuento
 
-Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Antes de pagar no hay descuento: hay renegociación. **Hay una segunda familia, de calidad y cumplimiento** (trabajo mal hecho, no terminado, abandonado, que afectó otros trabajos, o que pagó otro contratista), que no tiene que ver con el precio (D-509).
+Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Antes de pagar no hay descuento: hay renegociación. **Hay una segunda familia, de calidad y cumplimiento** (trabajo mal hecho, no terminado, abandonado, que afectó otros trabajos, o que pagó otro contratista), que no tiene que ver con el precio (D-509). **Puede ir a una OT o directo al contratista** (D-519): si el trabajo de una OT ya pagada lo repara otro, el descuento va solo al contratista que lo hizo mal y no baja esa OT.
 
 - **También:** Deducción
 - **No confundir con:** Renegociación
