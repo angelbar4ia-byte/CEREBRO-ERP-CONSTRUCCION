@@ -5,9 +5,10 @@ preparar-para-github.py — deja la carpeta de una app lista para subirse a GitH
 No sube nada y no toca la carpeta original: la lee, la revisa y arma una copia limpia. Quien empuja es la persona.
 
 Qué hace:
-  1. Recorre la carpeta sin entrar a lo que nunca va a git (node_modules, venv, __pycache__…).
-  2. Aparta lo que no debe subirse: archivos de claves (.env, .pem…), bases de datos y hojas con datos reales, carpetas de
-     subidas y respaldos, archivos de más de 20 MB.
+  1. Recorre la carpeta sin entrar a lo que nunca va a git (node_modules, venv, site-packages, __pycache__…).
+  2. Aparta lo que no debe subirse: archivos de claves (.env, .pem…), bases de datos y hojas con datos reales, el directorio de
+     datos de PostgreSQL, MySQL o MongoDB si la carpeta lo trae adentro, carpetas de subidas y respaldos, archivos de más de
+     20 MB y las carpetas que tú pidas con --excluir (por ejemplo, un PostgreSQL instalado dentro de la app).
   3. Busca claves dentro del texto: llaves de servicio de Supabase, contraseñas en URLs de base de datos, tokens de GitHub,
      de AWS y de otros servicios, y asignaciones sospechosas. Nunca muestra el valor completo: solo sus primeras letras.
   4. Arma `<salida>/<nombre>/` con lo que sí puede subirse, más un `.gitignore`, un `.env.example` con los NOMBRES de las
@@ -17,7 +18,10 @@ Qué hace:
 Uso:
   python3 preparar-para-github.py CARPETA --nombre extraordinarios                   # revisa y arma la copia limpia
   python3 preparar-para-github.py CARPETA --nombre extraordinarios --a ../Multi-erp  # y la deja dentro del clon
+  python3 preparar-para-github.py CARPETA --nombre auditoria --excluir postgresql    # sin una carpeta ajena que viene dentro
   python3 preparar-para-github.py --autoprueba                                       # se prueba a sí mismo con secretos falsos
+
+Además de lo que imprime, deja el informe completo en `<salida>/<nombre>-informe.txt` (con los valores siempre tapados).
 
 Un archivo con una clave de verdad (nivel CRÍTICO) NO se copia: se mueve la clave a una variable de entorno y se vuelve a
 correr. Las hojas de datos y las bases se piden aparte con --incluir-datos, por si alguna es semilla del sistema.
@@ -30,12 +34,13 @@ import re
 import shutil
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 CARPETAS_QUE_NUNCA_VAN = {"node_modules", ".venv", "venv", "env", "__pycache__", ".git", "dist", "build", ".next", ".pytest_cache",
-                          ".idea", ".vscode", ".mypy_cache", ".expo", ".gradle", "coverage"}
+                          ".idea", ".vscode", ".mypy_cache", ".expo", ".gradle", "coverage", "site-packages", "dist-packages"}
 CARPETAS_DE_DATOS = {"uploads", "exports", "backups", "backup", "logs", "instance", "tmp", "temp"}
-EXTENSIONES_DE_DATOS = {".db", ".sqlite", ".sqlite3", ".mdb", ".accdb", ".bak", ".dump", ".xlsx", ".xls", ".xlsm", ".csv", ".tsv"}
+EXTENSIONES_DE_DATOS = {".db", ".sqlite", ".sqlite3", ".mdb", ".accdb", ".bak", ".backup", ".dump", ".xlsx", ".xls", ".xlsm", ".csv", ".tsv"}
 EXTENSIONES_DE_CLAVES = {".pem", ".key", ".pfx", ".p12", ".jks"}
 EXTENSIONES_DE_TEXTO = {".py", ".js", ".jsx", ".ts", ".tsx", ".json", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".env", ".html", ".htm",
                         ".sh", ".ps1", ".bat", ".cmd", ".sql", ".md", ".txt", ".conf", ".properties", ".php", ".rb", ".go", ".java", ".cs"}
@@ -43,6 +48,9 @@ LIMITE_GRANDE = 20 * 1024 * 1024
 LIMITE_DE_LECTURA = 3 * 1024 * 1024
 PLACEHOLDERS = ("password", "contraseña", "contrasena", "xxx", "****", "tu_", "tu-", "your", "changeme", "cambia", "ejemplo", "example",
                 "<", ">", "${", "{{", "%s", "$", "secret_aqui", "aqui", "dummy", "ficticio", "placeholder", "test", "demo", "...")
+
+NOMBRES_QUE_NO_SON_CLAVES = re.compile(r"(?i)(type|placement|url|uri|endpoint|field|file|path|name|method|hint|source|header|expires?|algorithm|prefix|scope|style)$")
+VALORES_QUE_NO_SON_CLAVES = re.compile(r"^(https?://|urn:|#[0-9a-fA-F]{3,8}$)")
 
 CRITICO, AVISO, INFO = "CRÍTICO", "AVISO", "INFO"
 
@@ -96,7 +104,7 @@ def hallazgos_de_texto(texto):
         if re.search(r"os\.environ|getenv|process\.env|import\.meta\.env", linea):
             continue
         for m in re.finditer(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)\s*[:=]\s*['\"]([^'\"\s]{6,})['\"]", linea):
-            if not es_placeholder(m.group(2)):
+            if not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)) and not VALORES_QUE_NO_SON_CLAVES.match(m.group(2)):
                 salida.append((n, AVISO, "asignación de «" + m.group(1) + "» con un valor escrito en el código", ocultar(m.group(2))))
     return salida
 
@@ -118,54 +126,78 @@ def es_archivo_de_claves(ruta):
     return bool(re.match(r"(id_rsa|id_ed25519|\.npmrc|\.pypirc|\.netrc)", nombre) or re.search(r"(credential|service[-_]?account)", nombre) and nombre.endswith(".json"))
 
 
-def archivos_de(carpeta):
-    """Los archivos de la carpeta, sin entrar a node_modules, venv, .git ni las demás carpetas que nunca van (entrar es lo que tardaba)."""
-    for raiz, subcarpetas, archivos in os.walk(carpeta):
-        subcarpetas[:] = sorted(d for d in subcarpetas if d not in CARPETAS_QUE_NUNCA_VAN)
-        for nombre in sorted(archivos):
-            yield Path(raiz) / nombre
+def base_de_datos_en(archivos, subcarpetas):
+    """Si esta carpeta es el directorio de datos de un gestor de bases (las tablas de verdad), dice cuál."""
+    if "PG_VERSION" in archivos and {"base", "global"} & set(subcarpetas):
+        return "directorio de datos de PostgreSQL (las tablas de verdad)"
+    if "ibdata1" in archivos:
+        return "directorio de datos de MySQL o MariaDB (las tablas de verdad)"
+    if "WiredTiger" in archivos:
+        return "directorio de datos de MongoDB (las tablas de verdad)"
+    return None
 
 
-def revisar(carpeta):
-    """Recorre la carpeta y devuelve un informe: qué entra, qué se aparta y por qué, y qué claves aparecen."""
+def revisar(carpeta, excluir=()):
+    """Recorre la carpeta y devuelve un informe: qué entra, qué se aparta y por qué, y qué claves aparecen.
+    No entra a node_modules, venv, .git ni demás carpetas que nunca van (entrar es lo que tardaba), ni al directorio de datos
+    de una base, ni a lo que se pida con `excluir`."""
+    pedidas = {e.strip("/\\").replace("\\", "/").lower() for e in excluir}
     entra, aparta, hallazgos, variables, total = [], [], {}, set(), 0
-    for ruta in archivos_de(carpeta):
-        rel = ruta.relative_to(carpeta)
-        partes = rel.parts
-        if not ruta.is_file():
+    for raiz, subcarpetas, nombres in os.walk(carpeta):
+        raiz = Path(raiz)
+        base = base_de_datos_en(nombres, subcarpetas)
+        if base:
+            aparta.append((raiz.relative_to(carpeta), base))
+            subcarpetas[:] = []
             continue
-        total += 1
-        if total % 2000 == 0:
-            print(f"  … {total} archivos revisados", flush=True)
-        if es_archivo_de_claves(ruta):
-            aparta.append((rel, "archivo de claves"))
-            continue
-        if any(p.lower() in CARPETAS_DE_DATOS for p in partes[:-1]):
-            aparta.append((rel, "carpeta de subidas, respaldos o salidas"))
-            continue
-        if ruta.suffix.lower() in EXTENSIONES_DE_DATOS:
-            aparta.append((rel, "datos (base o hoja)"))
-            continue
-        try:
-            tamano = ruta.stat().st_size
-        except OSError:
-            aparta.append((rel, "no se pudo leer (¿la tiene abierta otro programa?)"))
-            continue
-        if tamano > LIMITE_GRANDE:
-            aparta.append((rel, "pesa más de 20 MB"))
-            continue
-        if ruta.suffix.lower() in EXTENSIONES_DE_TEXTO or ruta.name.lower().startswith(".env") or ruta.suffix == "":
+        quedan = []
+        for d in sorted(subcarpetas):
+            rel_d = (raiz / d).relative_to(carpeta)
+            if d in CARPETAS_QUE_NUNCA_VAN:
+                continue
+            if d.lower() in pedidas or rel_d.as_posix().lower() in pedidas:
+                aparta.append((rel_d, "carpeta que pediste dejar fuera con --excluir"))
+                continue
+            quedan.append(d)
+        subcarpetas[:] = quedan
+        for nombre in sorted(nombres):
+            ruta = raiz / nombre
+            rel = ruta.relative_to(carpeta)
+            partes = rel.parts
+            if not ruta.is_file():
+                continue
+            total += 1
+            if total % 2000 == 0:
+                print(f"  … {total} archivos revisados", flush=True)
+            if es_archivo_de_claves(ruta):
+                aparta.append((rel, "archivo de claves"))
+                continue
+            if any(p.lower() in CARPETAS_DE_DATOS for p in partes[:-1]):
+                aparta.append((rel, "carpeta de subidas, respaldos o salidas"))
+                continue
+            if ruta.suffix.lower() in EXTENSIONES_DE_DATOS:
+                aparta.append((rel, "datos (base o hoja)"))
+                continue
             try:
-                if tamano <= LIMITE_DE_LECTURA:
-                    texto = ruta.read_text(encoding="utf-8", errors="ignore")
-                    if "\x00" not in texto[:8000]:
-                        variables |= nombres_de_variables(texto)
-                        encontrados = hallazgos_de_texto(texto)
-                        if encontrados:
-                            hallazgos[rel] = encontrados
+                tamano = ruta.stat().st_size
             except OSError:
-                pass
-        entra.append(rel)
+                aparta.append((rel, "no se pudo leer (¿la tiene abierta otro programa?)"))
+                continue
+            if tamano > LIMITE_GRANDE:
+                aparta.append((rel, "pesa más de 20 MB"))
+                continue
+            if ruta.suffix.lower() in EXTENSIONES_DE_TEXTO or ruta.name.lower().startswith(".env") or ruta.suffix == "":
+                try:
+                    if tamano <= LIMITE_DE_LECTURA:
+                        texto = ruta.read_text(encoding="utf-8", errors="ignore")
+                        if "\x00" not in texto[:8000]:
+                            variables |= nombres_de_variables(texto)
+                            encontrados = hallazgos_de_texto(texto)
+                            if encontrados:
+                                hallazgos[rel] = encontrados
+                except OSError:
+                    pass
+            entra.append(rel)
     return {"entra": entra, "aparta": aparta, "hallazgos": hallazgos, "variables": variables, "total": total}
 
 
@@ -206,6 +238,8 @@ def bloque_gitignore():
 *.sqlite
 *.sqlite3
 *.bak
+*.backup
+pgdata/
 uploads/
 exports/
 backups/
@@ -213,6 +247,7 @@ logs/
 instance/
 # Entornos y empaques
 node_modules/
+site-packages/
 .venv/
 venv/
 __pycache__/
@@ -246,23 +281,45 @@ def armar_copia(carpeta, informe, salida, nombre, incluir_datos):
     return destino, copiados
 
 
-def imprimir(informe, carpeta):
-    print(f"\nRevisé {informe['total']} archivos de {carpeta}\n")
-    print(f"  Entran a git:  {len(informe['entra'])}")
-    print(f"  Se apartan:    {len(informe['aparta'])}")
+def carpeta_alta(rel):
+    return rel.parts[0] if len(rel.parts) > 1 else "(raíz)"
+
+
+def imprimir(informe, carpeta, maximo=25, p=print):
+    """El informe en pantalla (con `maximo` líneas por nivel) o completo (maximo=None) para el archivo."""
+    p(f"\nRevisé {informe['total']} archivos de {carpeta}\n")
+    p(f"  Entran a git:  {len(informe['entra'])}")
+    donde = Counter(carpeta_alta(r) for r in informe["entra"])
+    if donde:
+        p("     por carpeta: " + " · ".join(f"{k} {v}" for k, v in donde.most_common(8)) + (" …" if len(donde) > 8 else ""))
+    p(f"  Se apartan:    {len(informe['aparta'])}")
     por_motivo = {}
     for rel, motivo in informe["aparta"]:
         por_motivo.setdefault(motivo, []).append(rel)
     for motivo, lista in sorted(por_motivo.items(), key=lambda kv: -len(kv[1])):
-        print(f"     – {len(lista):4}  {motivo}: " + ", ".join(r.as_posix() for r in lista[:3]) + (" …" if len(lista) > 3 else ""))
+        vista = lista if maximo is None else lista[:3]
+        p(f"     – {len(lista):4}  {motivo}: " + ", ".join(r.as_posix() for r in vista) + (" …" if len(vista) < len(lista) else ""))
+    por_carpeta = Counter(carpeta_alta(r) for r in informe["hallazgos"])
+    rango = {CRITICO: 0, AVISO: 1, INFO: 2}
+    filas = [(rel, n, nivel, que, vista) for rel, hs in informe["hallazgos"].items() for n, nivel, que, vista in hs]
+    filas.sort(key=lambda f: (rango[f[2]], por_carpeta[carpeta_alta(f[0])], f[0].as_posix(), f[1]))  # primero lo de las carpetas con pocos hallazgos
     criticos = con_critico(informe)
-    print(f"\n  Claves encontradas en {len(informe['hallazgos'])} archivos ({len(criticos)} con nivel CRÍTICO, que NO se copian):")
-    for rel, hs in informe["hallazgos"].items():
-        for n, nivel, que, vista in hs:
-            print(f"     [{nivel}] {rel.as_posix()}:{n}  {que}  → {vista}")
-    if not informe["hallazgos"]:
-        print("     ninguna")
-    print(f"\n  Variables de entorno que el código lee: {', '.join(sorted(informe['variables'])) or 'ninguna'}")
+    por_nivel = Counter(f[2] for f in filas)
+    p(f"\n  Claves: {len(informe['hallazgos'])} archivos con algo, {len(criticos)} de ellos con nivel CRÍTICO (esos NO se copian).")
+    p(f"     líneas: {por_nivel[CRITICO]} críticas · {por_nivel[AVISO]} avisos · {por_nivel[INFO]} informativas")
+    if por_carpeta:
+        p("     archivos con hallazgos por carpeta: " + " · ".join(f"{k} {v}" for k, v in por_carpeta.most_common(6)))
+    for nivel in (CRITICO, AVISO) + ((INFO,) if maximo is None else ()):
+        del_nivel = [f for f in filas if f[2] == nivel]
+        for rel, n, _, que, vista in (del_nivel if maximo is None else del_nivel[:maximo]):
+            p(f"     [{nivel}] {rel.as_posix()}:{n}  {que}  → {vista}")
+        if maximo is not None and len(del_nivel) > maximo:
+            p(f"     … y {len(del_nivel) - maximo} {nivel} más, en el informe completo")
+    if not filas:
+        p("     ninguna")
+    nombres = sorted(informe["variables"])
+    corte = len(nombres) if maximo is None else 30
+    p(f"\n  Variables de entorno que el código lee ({len(nombres)}): " + (", ".join(nombres[:corte]) or "ninguna") + (f" … y {len(nombres) - corte} más" if len(nombres) > corte else ""))
 
 
 def autoprueba():
@@ -287,9 +344,19 @@ def autoprueba():
         (app / ".env.example").write_text("SUPABASE_URL=\n", encoding="utf-8")
         (app / "datos.db").write_bytes(b"SQLite format 3\x00" + b"\x00" * 100)
         (app / "grande.bin").write_bytes(b"\x00" * (LIMITE_GRANDE + 1))
-        informe = revisar(app)
+        (app / "pgdata" / "base" / "1").mkdir(parents=True)  # el directorio de datos de un PostgreSQL metido en la app
+        (app / "pgdata" / "global").mkdir()
+        (app / "pgdata" / "PG_VERSION").write_text("16\n", encoding="utf-8")
+        (app / "pgdata" / "base" / "1" / "1259").write_bytes(b"\x00" * 64)
+        (app / "pgdata" / "global" / "pg_control").write_bytes(b"\x00" * 64)
+        (app / "lib" / "site-packages" / "x").mkdir(parents=True)  # código ajeno instalado: no es de la app y trae ejemplos de claves
+        (app / "lib" / "site-packages" / "x" / "m.py").write_text("DB = 'postgresql://u:clave12345@db.ejemplo.com/x'\n", encoding="utf-8")
+        (app / "vendor").mkdir()  # lo que el usuario pide dejar fuera con --excluir
+        (app / "vendor" / "v.py").write_text("print('ajeno')\n", encoding="utf-8")
+        (app / "tipos.py").write_text("TOKEN_TYPE = 'bearer-largo'\nAPI_KEY_URL = 'https://x.example/k'\n", encoding="utf-8")
+        informe = revisar(app, excluir=["Vendor"])
         apartados = {r.as_posix() for r, _ in informe["aparta"]}
-        esperado_apartado = {".env", "datos.db", "uploads/estimacion.xlsx", "uploads/recibo.png", "grande.bin"}
+        esperado_apartado = {".env", "datos.db", "uploads/estimacion.xlsx", "uploads/recibo.png", "grande.bin", "pgdata", "vendor"}
         errores = []
         if apartados != esperado_apartado:
             errores.append(f"apartados {sorted(apartados)} ≠ {sorted(esperado_apartado)}")
@@ -302,15 +369,22 @@ def autoprueba():
                 errores.append(f"no detectó {esperado}")
         if "dev.py" in crit or "dev.py" not in {r.as_posix() for r in informe["hallazgos"]}:
             errores.append("dev.py (dirección local y llave de ejemplo) debía dar solo AVISO o INFO")
+        if "tipos.py" in {r.as_posix() for r in informe["hallazgos"]}:
+            errores.append("marcó TOKEN_TYPE y API_KEY_URL, que no son claves")
         if "limpio.py" in informe["hallazgos"]:
             errores.append("marcó un archivo limpio (password='password' es un marcador)")
         if informe["variables"] != {"TOKEN_X", "VITE_URL", "CLAVE_API"}:
             errores.append(f"variables {sorted(informe['variables'])}")
         destino, copiados = armar_copia(app, informe, raiz / "salida", "prueba", False)
         dentro = {p.relative_to(destino).as_posix() for p in destino.rglob("*") if p.is_file()}
-        for prohibido in ("app.py", "config.js", ".env", "datos.db", "uploads/estimacion.xlsx", "uploads/recibo.png", "grande.bin", "node_modules/x/i.js"):
+        for prohibido in ("app.py", "config.js", ".env", "datos.db", "uploads/estimacion.xlsx", "uploads/recibo.png", "grande.bin", "node_modules/x/i.js",
+                           "pgdata/PG_VERSION", "pgdata/base/1/1259", "pgdata/global/pg_control", "vendor/v.py", "lib/site-packages/x/m.py"):
             if prohibido in dentro:
                 errores.append(f"copió {prohibido}")
+        lineas = []
+        imprimir(informe, app, maximo=None, p=lineas.append)
+        if not any("PostgreSQL" in l and "pgdata" in l for l in lineas):
+            errores.append("el informe completo no nombra el directorio de datos de PostgreSQL")
         for requerido in ("limpio.py", "dev.py", ".gitignore", ".env.example", "FICHA.md", "README.md"):
             if requerido not in dentro:
                 errores.append(f"faltó {requerido}")
@@ -325,6 +399,8 @@ def main():
     ap.add_argument("--nombre", help="cómo se llamará la carpeta dentro del repo (extraordinarios, auditoria…)")
     ap.add_argument("--salida", type=Path, default=Path("para-github"), help="dónde armar la copia limpia (por omisión ./para-github)")
     ap.add_argument("--a", type=Path, help="el clon de Multi-erp: la copia limpia se deja en <clon>/apps/<nombre>")
+    ap.add_argument("--excluir", action="append", default=[], metavar="CARPETA",
+                    help="deja fuera una carpeta entera por su nombre o ruta relativa (se puede repetir); p. ej. --excluir postgresql")
     ap.add_argument("--incluir-datos", action="store_true", help="incluye bases y hojas (solo si son semillas del sistema y no datos reales)")
     ap.add_argument("--autoprueba", action="store_true", help="se prueba a sí mismo con claves falsas y sale")
     a = ap.parse_args()
@@ -335,10 +411,15 @@ def main():
     if not a.carpeta.is_dir():
         raise SystemExit(f"{a.carpeta} no es una carpeta")
     print(f"Revisando {a.carpeta} … (si la carpeta es grande puede tardar; irá avisando)", flush=True)
-    informe = revisar(a.carpeta)
+    informe = revisar(a.carpeta, a.excluir)
     imprimir(informe, a.carpeta)
     destino, copiados = armar_copia(a.carpeta, informe, a.salida, a.nombre, a.incluir_datos)
+    completo = []
+    imprimir(informe, a.carpeta, maximo=None, p=completo.append)
+    archivo_informe = a.salida / f"{a.nombre}-informe.txt"
+    archivo_informe.write_text("\n".join(completo) + "\n", encoding="utf-8")
     print(f"\nCopia limpia: {destino}  ({copiados} archivos + .gitignore, .env.example, FICHA.md)")
+    print(f"Informe completo (valores tapados): {archivo_informe}")
     criticos = con_critico(informe)
     if criticos:
         print("\nOJO: hay archivos con claves que NO se copiaron. Mueve cada clave a una variable de entorno (.env) y vuelve a correr.")
