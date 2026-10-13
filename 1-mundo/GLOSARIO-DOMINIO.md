@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 87 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 79 términos · 25 ambigüedades · 2026-09-21
+> 87 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -50,7 +50,9 @@ verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos con
 
 **Tiempo y ejecución** — Rendimiento calculado · Rendimiento teórico · Rendimiento real · Gantt · Actividad · Asignación · Avance · Estimación
 
-**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Desviación · Ejecutado sin respaldo
+**El lugar** — Proyecto · Cluster · Lote · Urbanización · Nivel de casa
+
+**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Highlight · Orden de trabajo (OT) · Extraordinario · Desviación · Ejecutado sin respaldo
 
 **Operaciones** — Fusión · División · Extracción · Composición · Procedencia
 
@@ -72,7 +74,7 @@ Identificador único de un registro. Es su identidad ante el negocio: nunca se r
 
 ### id interno
 
-Identificador que genera la base de datos en el INSERT. Nunca se muestra y nunca cambia, ni al mover ni al renumerar.
+Identificador que genera la base de datos en el INSERT. Nunca se muestra y nunca cambia, ni al mover ni al renumerar. En la estimación el usuario lo llama *oid* y sí viaja en el archivo que sale a revisión, para reconocer sus renglones cuando vuelve (D-516).
 
 - **También:** Identidad interna
 - **No confundir con:** Clave; WBS
@@ -180,6 +182,8 @@ Albañilería…) son sus **sub-frentes**: lo que trabaja dentro de él. No es u
 física (recámara, sala, fachada). Se lee del árbol del presupuesto —frente = Subcapítulo
 (Nivel 1), sub-frente = las etapas (Nivel 2) del frente agrupadas por gremio—; no hay
 «catálogo de conceptos-frentes».*
+
+*D-513: ObraCtrl llama «frente» a lo que aquí es un sub-frente (Estructura, Albañilería, Hidrosanitaria, Eléctrica…) y, otras veces, a un nivel (Preliminares, Cimentación, Acabados). Entre los dos manda esta definición.*
 
 *D-451, dato del usuario: **sub-frente = la etapa agrupada por gremio**, confirmado. Lo del
 «Catálogo de conceptos-frentes» **no queda resuelto**: la frase anterior («no hay…») iba
@@ -408,11 +412,11 @@ Clase de trabajo: se paga por unidad producida, no por jornada.
 
 ### Subcontrato
 
-Clase de trabajo: se contrata completo a un tercero. Su precio incluye material y utilidad, no solo mano de obra.
+Clase de trabajo: se contrata completo a un tercero. Su precio incluye material y utilidad, no solo mano de obra. Al asignarse a un contratista se formaliza con una Orden de trabajo (OT), un contrato informal (D-511).
 
 - **También:** Contrato a terceros
 - **No confundir con:** Destajo; Contratista
-- **Se usa con:** Trabajo; Contratista; Alzado
+- **Se usa con:** Trabajo; Contratista; Alzado; Orden de trabajo (OT)
 - **Ejemplo:** Cuatro de los seis valen $1.00: son precio alzado
 - **Hoy vive en:** ``Tipo` = Subcontrato`
 
@@ -447,13 +451,13 @@ Unidad que indica un porcentaje sobre la suma de los jornales de esa cuadrilla. 
 
 ### Contratista
 
-Persona o empresa que ejecuta trabajos, con su tabulador de precios propio.
+Persona o empresa que ejecuta trabajos, con su tabulador de precios propio. Se categoriza por **tipo** (destajo, subcontrato o los dos) y por **oficio** (la `Familia` del trabajo), y puede llevar una **retención** de 5 % por defecto, editable por contratista. No lleva clave, solo el id. (D-512 a D-521.)
 
 - **También:** Ejecutor; Proveedor de mano de obra
 - **No confundir con:** Subcontrato (ese es el trabajo, no quién lo hace)
 - **Se usa con:** Subcontrato; Especialidad; Precio pactado
 - **Ejemplo:** FRE-00005 Eduardo Andrade
-- **Hoy vive en:** ``CATALOGO_DE_CONTRATISTAS``
+- **Hoy vive en:** ``CATALOGO_DE_CONTRATISTAS``; en el modelo, `CONTRATISTA` con su tipo y sus oficios (`MODELO.md` §4a, firme desde D-521)
 
 
 ## El cálculo
@@ -553,7 +557,7 @@ Margen del constructor, aplicado como capa. La base sobre la que se calcula camb
 
 ### Prototipo
 
-Modelo de vivienda que se repite. Cada uno con su presupuesto completo.
+Modelo de vivienda que se repite. Cada uno con su presupuesto completo. Los m² son del prototipo; una casa es un prototipo con o sin modificaciones y con o sin m² adicionales (D-512).
 
 - **También:** Modelo; Tipo de casa
 - **No confundir con:** Frente; Nivel
@@ -573,10 +577,10 @@ El nivel más alto del presupuesto. En esta empresa se usa para el prototipo, pe
 
 ### Nivel de construcción
 
-División física de la obra por altura o zona. Primer nivel bajo el capítulo.
+División del presupuesto bajo el capítulo: mezcla pisos, zonas y oficios (Cimentación, Planta baja, Azotea, Acabados, Cancelería…). El usuario la llama *nivel de presupuesto* y en el cerebro es el frente (D-450). No es el nivel de casa (D-512).
 
-- **También:** Subcapítulo; Planta; Zona
-- **No confundir con:** Nivel 2 / Nivel 3, que son profundidad
+- **También:** Subcapítulo; Zona; Nivel de presupuesto
+- **No confundir con:** Nivel 2 / Nivel 3, que son profundidad; Nivel de casa
 - **Se usa con:** Etapa de construcción; Prototipo
 - **Ejemplo:** NIV-00001 Cimentación
 - **Hoy vive en:** ``Nivel ERP` + filas `Subcapítulo``
@@ -758,7 +762,7 @@ Porcentaje o volumen ejecutado. Alimenta el Gantt y la estimación.
 
 ### Estimación
 
-Documento que cobra el avance ejecutado en un periodo.
+Documento que cobra el avance ejecutado en un periodo. Es **un solo documento que avanza:** el residente la crea en Excel, Control de obra la recolecta y la envía al validador de topes (hoy Compras), vuelve a los residentes y supervisores para ajustar y justificar, el validador la ajusta, y Control de obra comparte la final para el pago y la marca pagada (D-522).
 
 - **También:** Valuación; Corte; Generador
 - **No confundir con:** Presupuesto (eso es lo planeado)
@@ -791,7 +795,7 @@ Lo acordado con un contratista concreto. No toca el catálogo.
 
 ### Descuento
 
-Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Antes de pagar no hay descuento: hay renegociación.
+Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Antes de pagar no hay descuento: hay renegociación. **Hay una segunda familia, de calidad y cumplimiento** (trabajo mal hecho, no terminado, abandonado, que afectó otros trabajos, o que pagó otro contratista), que no tiene que ver con el precio (D-509). **Puede ir a una OT o directo al contratista** (D-519): si el trabajo de una OT ya pagada lo repara otro, el descuento va solo al contratista que lo hizo mal y no baja esa OT.
 
 - **También:** Deducción
 - **No confundir con:** Renegociación
@@ -813,13 +817,43 @@ construir más (efecto cantidad) o por usar distinto rendimiento (efecto receta)
 
 ### Orden de cambio
 
-Documento que referencia un nodo congelado y propone un delta. No edita: agrega.
+Documento que referencia un nodo congelado y propone un delta. No edita: agrega. Puede nacer de un extra interno de la obra (D-515).
 
 - **También:** Control de cambio
 - **No confundir con:** Desviación
 - **Se usa con:** Contrato; Causa; Autorización
 - **Ejemplo:** Con causa, impacto y si se autorizó antes o después de ejecutar
 - **Hoy vive en:** `PROPUESTA(tipo=orden_cambio)` — `MODELO.md` §5f, D-334
+
+### Highlight
+
+Estimado que se le entrega al cliente cuando pide modificar el alcance o rediseñar los subcontratos de su presupuesto. Se hace antes de ejecutar y se folia; al aprobarse se vuelve control de cambio.
+
+- **También:** —
+- **No confundir con:** Adicional al presupuesto (ese ya está en ejecución); Cotización del contratista (esa es la que sigue)
+- **Se usa con:** Orden de cambio; Orden de trabajo (OT); Cotizador
+- **Ejemplo:** El cliente rediseña el pergolado de la cochera: se le cotiza el cambio (highlight) y, con la cotización del contratista, nace la OT
+- **Hoy vive en:** `MODELO.md` §5b (Cotizador), D-280; la app de extraordinarios no lo registra
+
+### Orden de trabajo (OT)
+
+El contrato informal con un contratista para ejecutar un subcontrato. Se contrata **después de la venta al cliente**, a partir de un presupuesto o de un control de cambio, y cubre la vida del subcontrato desde ahí: pagos, descuentos, reasignaciones, cambios de alcance y cancelación. (D-511.)
+
+- **También:** OT. En D-509 y D-510 se le llamó «extraordinario por subcontrato»; el usuario aclaró que el nombre correcto es **subcontrato** (D-511)
+- **No confundir con:** Orden de cambio (esa es con el cliente, esta con el contratista); Subcontrato (la clase de trabajo en el presupuesto, que la OT contrata); Extraordinario
+- **Se usa con:** Subcontrato; Contratista; Asignación; Highlight; Cotización
+- **Ejemplo:** *(sin ejemplo con cifra: no se han visto los datos de la app)*
+- **Hoy vive en:** la tabla `ots` de la app de extraordinarios, con un campo de tipo de contrato que mezcla origen, forma de pago y estado (`LENGUAJE.md`); no está en el modelo del cerebro
+
+### Extraordinario
+
+Lo que queda **fuera del presupuesto**: no estaba en lo contratado con el cliente. Es la palabra del oficio para lo que entra después del contrato, con número nuevo al final y sin renumerar nada (`CONOCIMIENTO.md` §1.4). El usuario dice que es el calificativo más cercano, pero que lo que maneja su app se llama **subcontrato** (D-511).
+
+- **También:** Fuera del presupuesto
+- **No confundir con:** Subcontrato (aquel puede ser base o extraordinario); Adicional al presupuesto (el cerebro no ha decidido si son sinónimos)
+- **Se usa con:** Orden de cambio; Highlight; Orden de trabajo (OT)
+- **Ejemplo:** El cliente agrega un cambio de acabados que no estaba en lo vendido
+- **Hoy vive en:** `CONOCIMIENTO.md` §1.4 (conceptos extraordinarios); el nombre de la app de extraordinarios
 
 ### Desviación
 
@@ -840,6 +874,61 @@ Obra registrada sin presupuesto aprobado. Es una deuda medible, con antigüedad.
 - **Ejemplo:** Dos destinos: orden de cambio, o pérdida
 - **Hoy vive en:** `— pendiente`
 
+
+## El lugar
+
+### Proyecto
+
+El desarrollo completo: agrupa clústeres y una urbanización. Hoy hay dos: Magnolia y «Antigua», un proyecto viejo al que le quedan una o muy pocas obras por cerrar. (D-512 y D-516.)
+
+- **También:** Desarrollo
+- **No confundir con:** Lote (una casa); Prototipo; Presupuesto
+- **Se usa con:** Cluster; Urbanización; Lote
+- **Ejemplo:** Magnolia; «Antigua»
+- **Hoy vive en:** `proyectos` del concentrador (2), `proyecto` en auditoría y en ObraCtrl; el modelo del cerebro aún no lo tiene (`MODELO.md` §3c, firme desde D-521)
+
+### Cluster
+
+Agrupación de lotes dentro del proyecto. Magnolia tiene siete. Su nombre forma parte de la clave de la casa. En «Antigua» esa agrupación se llama **manzana** y la clave es manzana y lote («10-04»). (D-512 y D-520.)
+
+- **También:** Clúster
+- **No confundir con:** Proyecto; Frente
+- **Se usa con:** Proyecto; Lote; Control de cambio
+- **Ejemplo:** Acacia, Alamo, Fresno, Maple, Olivo, Olmo y Tabachín (los siete que aparecen en el avance del ERP, lectura mía); en «Antigua», la manzana 10
+- **Hoy vive en:** dentro del texto del lote («FRESNO 12»); `cluster` en auditoría y en ObraCtrl; la sigla (`ALM`) en la clave de un control de cambio, que sirve para formarla y para reconocer a qué obra corresponde
+
+### Lote
+
+La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster y número de lote. Es un prototipo con o sin modificaciones, con o sin m² adicionales. (D-512.)
+
+- **También:** Obra; Casa
+- **No confundir con:** Prototipo (el modelo que se repite); Urbanización
+- **Se usa con:** Cluster; Prototipo; Presupuesto
+- **Ejemplo:** FRESNO 12; ALAMO 18; 10-04 (manzana 10, lote 4, en «Antigua»)
+- **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, firme desde D-521)
+- **Estatus:** pendiente (en planeación o próxima a construir), iniciada, en proceso, por entregar (desde el 90 % de avance, hasta que el cliente la recibe) y entregada, como en ObraCtrl (D-514)
+
+### Urbanización
+
+La obra única del proyecto, que sirve a todos los clústeres y a las amenidades. Hay una sola por proyecto y sus ramas son los clústeres y las amenidades. (D-512.)
+
+- **También:** URBA, que es como se llama su hoja en las estimaciones
+- **No confundir con:** Lote (la obra de una casa)
+- **Se usa con:** Proyecto; Cluster
+- **Ejemplo:** La urbanización de Magnolia
+- **Hoy vive en:** la hoja URBA de las estimaciones; en el modelo, un `PRESUPUESTO` de tipo obra con `proyecto_id` (`MODELO.md` §3c, firme desde D-521)
+
+### Nivel de casa
+
+Cada piso de la vivienda: planta baja, planta alta y la azotea, que es roof garden cuando el cliente lo pide. No es el nivel del presupuesto. El roof garden no cuenta como planta. (D-512 y D-514.)
+
+- **También:** Planta; Piso; Roof garden (que el catálogo escribe «Azotea» o «Azotea/Roof»)
+- **No confundir con:** Nivel de construcción (el del presupuesto, que es el frente); Nivel 2 y Nivel 3 (profundidad)
+- **Se usa con:** Prototipo; Nivel de construcción
+- **Ejemplo:** Castillo K1 (`EST-02110`) se ejecuta en planta baja, planta alta y azotea/roof
+- **Hoy vive en:** `Nivel OP` del avance (las órdenes de producción); `PRESUPUESTO.plantas` cuenta planta baja y planta alta
+
+---
 
 ## Operaciones
 
@@ -975,6 +1064,17 @@ es decisión, no vocabulario.**
 
 Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 
+| Casa | Lote |
+| Clúster | Cluster |
+| Cluster | **Cluster** |
+| Desarrollo | Proyecto |
+| Lote | **Lote** |
+| Nivel de casa | **Nivel de casa** |
+| Nivel de presupuesto | Nivel de construcción |
+| Obra | Lote |
+| Piso | Nivel de casa |
+| Proyecto | **Proyecto** |
+| Roof garden | Nivel de casa |
 | Se dice | Término canónico |
 |---|---|
 | %MO | **%MO** |
@@ -1070,6 +1170,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Explosión | **Explosión** |
 | Explosión de insumos | Explosión |
 | Explosión de insumos | APU |
+| Extraordinario | **Extraordinario** |
 | Extracción | **Extracción** |
 | Familia | **Familia** |
 | Fase | Etapa de construcción |
@@ -1086,6 +1187,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Grupo | Familia |
 | id interno | **id interno** |
 | Identidad interna | id interno |
+| Highlight | **Highlight** |
 | Importe | **Importe** |
 | Incluye | Alcance |
 | Indirectos | Costo indirecto |
@@ -1110,15 +1212,17 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Nivel de construcción | **Nivel de construcción** |
 | Nombre corto | Descripción corta |
 | Oficio | Especialidad |
+| OT | Orden de trabajo (OT) |
 | Orden | Índice |
 | Orden de cambio | **Orden de cambio** |
+| Orden de trabajo (OT) | **Orden de trabajo (OT)** |
 | Origen | Procedencia |
 | P.U. | PU |
 | Paramétrico | Ensamble |
 | Parcial | Importe |
 | Partida | Concepto |
 | Parámetro | Divisor |
-| Planta | Nivel de construcción |
+| Planta | Nivel de casa |
 | Plantilla | **Plantilla** |
 | Porcentaje sobre mano de obra | %MO |
 | Precio a destajo | Destajo |
@@ -1166,6 +1270,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | UM | Unidad |
 | Unidad | **Unidad** |
 | Unidad de medida | Unidad |
+| Urbanización | **Urbanización** |
 | Utilidad | **Utilidad** |
 | Valuación | Estimación |
 | Variación | Desviación |

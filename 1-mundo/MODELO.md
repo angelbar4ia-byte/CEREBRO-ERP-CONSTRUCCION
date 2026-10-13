@@ -928,6 +928,52 @@ pasó suelto.
 
 ---
 
+## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512 y D-520; firme desde D-521)
+
+Dato del usuario (D-512): el proyecto es **Magnolia**, con siete clústeres y *n* lotes en cada uno; **cada lote o casa es una obra** y se identifica por clúster y lote. La **urbanización es una sola** para todo el proyecto, y sus ramas son los clústeres y las amenidades. Hasta aquí el modelo no tenía proyecto ni cluster: el cluster era parte del nombre de la obra («ALAMO 18»), aunque la clave de un control de cambio ya los usaba por separado (`CC-ALM-18001`, §5f). **D-520:** en «Antigua» las casas no se identifican por cluster sino por **manzana y lote** («10-04» es manzana 10, lote 4), la sigla del cluster sirve para armar las claves y reconocer más rápido a qué obra pertenece un control de cambio, y el cliente se maneja como idea. **Los campos de este bloque los confirmó el usuario en D-521** y pasan de propuesta a firmes, como pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454).
+
+```
+PROYECTO
+  id
+  nombre             texto — «Magnolia» y «Antigua» (un proyecto viejo al
+                      que le quedan una o muy pocas obras por cerrar)       firme — D-521
+  agrupacion         enum: cluster · manzana — cómo llama el proyecto a lo
+                      que agrupa sus lotes; Magnolia, cluster; Antigua, manzana   firme — D-521
+
+CLUSTER
+  id
+  proyecto_id        FK PROYECTO                                          firme — D-521
+  nombre             texto — siete en Magnolia; en Antigua, el número de
+                      la manzana («10»)                                    firme — D-521
+  codigo             texto, nullable — la sigla que sirve para formar las
+                      claves y reconocer a qué obra corresponde un control
+                      de cambio (`ALM` en `CC-ALM-18001`)                   firme — D-521
+
+PRESUPUESTO — campos que gana (todos nullable)
+  cluster_id         FK CLUSTER — solo en la obra de una casa; en Antigua
+                      apunta a su manzana                                  firme — D-521
+  lote               texto — dentro del cluster o de la manzana, y se
+                      conserva como se escribe («04»); con él, la clave de
+                      la casa («FRESNO 12», «10-04»)                       firme — D-521
+  proyecto_id        FK PROYECTO — solo en la urbanización                 firme — D-521
+  prototipo_id       FK PRESUPUESTO (tipo=plantilla) — de qué prototipo
+                      es la casa                                           firme — D-521
+  m2                 NUMERIC — solo en la plantilla: los m² del prototipo  firme — D-521
+  m2_adicionales     NUMERIC — solo en la casa: lo que suma al prototipo   firme — D-521
+  estatus            enum: pendiente · iniciada · en_proceso · por_entregar ·
+                      entregada — solo en tipo=obra                         firme — D-521
+```
+
+- **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote («FRESNO 12») o manzana y lote («10-04»), única dentro del proyecto. **La sigla del cluster** (`CLUSTER.codigo`) no es la clave de la casa: forma la clave de lo que cuelga de ella, como un control de cambio, y dice de un vistazo a qué obra corresponde (D-520); no se dijo si «Antigua» usa una sigla.
+- **La urbanización también es un `PRESUPUESTO(tipo=obra)`, uno por proyecto,** con `proyecto_id` y sin cluster ni lote. Sus ramas —los clústeres y las amenidades— son nodos de su árbol, no tablas.
+- **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
+- **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
+- **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
+- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y **el cliente (D-520, idea):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_GARANTIA` y las OT de postventa y mantenimiento (§5i)—.
+- **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b), y **al entregarse la obra pasa a postventa** (§3b, D-516). «Antigua», que D-513 leyó como un estatus, es el nombre del segundo proyecto.
+
+---
+
 # 4. Identidad y versionado
 
 ```
@@ -1127,12 +1173,28 @@ hueco:
 
 ```
 CONTRATISTA
-  id
+  id               el identificador del sistema; no hay clave corta         firme — D-521
   nombre           texto — tal como aparece en el crudo de almacén         firme — nuevo
+  activo           boolean — se retira, no se borra, igual que USUARIO     firme — D-521
+  rfc              texto, nullable                                         firme — D-521
+  contacto, telefono, correo   texto, nullable — el correo será el del
+                    inicio de sesión cuando entren al sistema (B-121)      firme — D-521
+  calificacion     NUMERIC, nullable — el método se define después (B-117)  firme — D-521
+  retencion_pct    NUMERIC, nullable — nulo no lleva retención; por defecto
+                    5, el mismo para todos y editable por contratista;
+                    se aplica sobre el total de la OT (§5i)                firme — D-521
+
+CONTRATISTA_TIPO
+  contratista_id   FK CONTRATISTA
+  clase_trabajo_id FK CLASE_TRABAJO — destajo o subcontrato; uno o los dos   firme — D-521
+
+CONTRATISTA_ESPECIALIDAD
+  contratista_id   FK CONTRATISTA
+  familia_id       FK Familia — el oficio; puede tener varios                firme — D-521
 ```
 
-Mínima a propósito: el crudo no trae oficio, contacto ni identificador
-fiscal — solo el nombre. Dos advertencias de captura, no de diseño:
+Sin identificador fiscal, oficio ni contacto en el crudo —solo el nombre—, la tabla nació
+mínima; los campos de arriba los dio el usuario (D-512 a D-521). Dos advertencias de captura, no de diseño:
 **"Bodega" y "Cuadrilla Postventa" no son contratistas** (son etiquetas
 de operación interna, mismo tipo de ruido que `Grupo` en
 `CONOCIMIENTO.md` §11.20) y se excluyen al cargar; **"Abelardo
@@ -1140,6 +1202,8 @@ Sanabria"/"Avelardo Sanabria"
 son la misma persona**, una sola letra de diferencia — homologa con el
 mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
 `NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
+
+*Cómo llegó a ser firme (D-512 a D-521).* El usuario pidió categorizar a los contratistas **por tipo y por oficio** (D-512), dijo que no hay clave, solo el id; que el `rfc` es opcional; que van el contacto y la `calificacion`, cuyo método se define después (D-514); y que el correo es el del inicio de sesión (D-516). **En D-521 confirmó el bloque y contestó tres cosas:** un contratista puede ser destajo y subcontrato a la vez, por eso el tipo es una tabla de relación (`CONTRATISTA_TIPO`) y no un campo; el oficio es la `Familia` del trabajo; y la retención de 5 % es igual para todos pero **editable por contratista.** Por eso `retencion_pct` es un campo del contratista: el 5 es el valor por defecto (parámetro de B-114) y nulo significa que no la lleva. El `tipo` se pensó como FK a `CLASE_TRABAJO` (§2) y la `clave` como nullable; ambas quedan fuera.
 
 ### Lo que esto ya resuelve, de paso
 
@@ -2616,6 +2680,40 @@ existe:**
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
 
+### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515; firme desde D-522)
+
+Dos respuestas del usuario (D-515) sobre lo que ObraCtrl hace distinto, que el usuario confirmó en D-522 y son firmes.
+
+**El cierre: dos candados.** Se solicita **por frente** (`CIERRE_FRENTE`, firme, arriba) y, **si se requiere, por una o varias actividades;** el segundo candado cierra **todo el lote**. Las manos son las de siempre (D-269): el residente solicita, el supervisor aprueba, control valida. Lo que se suma, ahora como tablas (D-522):
+
+```
+CIERRE_ACTIVIDADES                  el cierre de una o varias actividades
+  id, presupuesto_id FK PRESUPUESTO
+  solicitado_por, solicitado_en     FK USUARIO — Residente                   firme — D-522
+  aprobado_por, aprobado_en         FK USUARIO — Supervisor                  firme — D-522
+  validado_por, validado_en         FK USUARIO — Control de obra             firme — D-522
+
+CIERRE_ACTIVIDADES_LINEA
+  cierre_id FK CIERRE_ACTIVIDADES, actividad_id FK ACTIVIDAD                  firme — D-522
+
+ENTREGA_OBRA                        el cierre del lote; una por obra
+  id, presupuesto_id FK PRESUPUESTO, único
+  entrega_por, entrega_en           FK USUARIO — Residente                   firme — D-522
+  visto_bueno_por, visto_bueno_en   FK USUARIO — Supervisor                  firme — D-522
+  calidad_por, calidad_en           FK USUARIO — Control de obra             firme — D-522
+  firma_por, firma_en               FK USUARIO — equipo de gestión de
+                                     proyectos                              firme — D-522
+  superintendente_por, superintendente_en   nullable — puede o no estar      firme — D-522
+
+INCIDENCIA gana orden_cambio_id     FK PROPUESTA(tipo=orden_cambio), nullable   firme — D-522
+```
+
+- **El cierre de actividades:** una solicitud puede llevar varias. ObraCtrl lo hace por actividad, con lista de verificación, adjuntos, cantidad y monto (`solicitud_cierre`).
+- **El cierre del lote:** la entrega de la obra, que la deja en `entregada` y la pasa a postventa (§3c y §3b). Confirmado en D-516: participan **el residente (entrega), el supervisor (visto bueno), control de obra (calidad y expediente) y el equipo de gestión de proyectos (firma);** el superintendente puede estar o no. La obra queda entregada cuando participan los cuatro, **en cualquier orden** (D-522): entonces `PRESUPUESTO.estatus` pasa a `entregada`, se fija `fecha_entrega` y entra a postventa. *Idea del usuario (D-522), sin modelar:* con el tiempo la entrega puede escalar a un **acta de entrega y recepción.**
+- **Qué quiere decir «candado» (D-516):** cerrar un frente, una actividad o el lote **cierra al residente** —ya no registra avance ahí—, y para los demás roles sigue abierto hasta la entrega de la casa. Hoy el cierre de frente «pregunta, no impide» (§5c, arriba); esto lo vuelve una regla por rol: las funciones de captura del residente no aplican sobre lo cerrado (B-119). Al entregarse, la obra no queda solo congelada: **pasa a postventa.**
+
+**Una incidencia puede llegar al cliente.** Un «extra» de ObraCtrl —más cantidad que la tolerancia, trabajo fuera de catálogo, sustitución o alta de catálogo— se parece a una `INCIDENCIA` que cambia la actividad (`crece_actividad`, `crea_actividad`), y el usuario dice que **puede** pasar a una orden de cambio con el cliente (`PROPUESTA(tipo=orden_cambio)`, §5f). `CONOCIMIENTO.md` §13.6 ya decía que una incidencia puede o no generar un control de cambio; lo que faltaba es la liga: `INCIDENCIA.orden_cambio_id`, FK `PROPUESTA`, nullable, nula mientras el extra es interno.
+
 ### El tablero del frente se calcula, no se guarda (D-455, cierra B-88)
 
 El frente (obra, nivel) y el sub-frente (etapa) son el nodo de Nivel 1 y el de Nivel 2; su
@@ -2694,15 +2792,23 @@ es su forma de tabla.
 
 ```
 ESTIMACION
-  id, presupuesto_id FK PRESUPUESTO
+  id                 el «oid»: lo genera el sistema y no se teclea          firme — D-522
+  presupuesto_id FK PRESUPUESTO
   periodo_inicio, periodo_fin      semanal (`CONOCIMIENTO.md` §13.8)       firme
   fuente             enum: erp_externo · manual (D-284)                   firme
-  estado             enum: capturada · devuelta · validada · pagada       firme
+  estado             enum: capturada · enviada · devuelta · validada ·
+                      pagada                                              firme — D-522
+  enviada_por, enviada_en   FK USUARIO, nullable — Control de obra, que
+                      recolecta las estimaciones y las envía                firme — D-522
   validado_por        FK USUARIO — bajo validar_estimacion, D-299
   validado_en
+  pagada_por, pagada_en     FK USUARIO, nullable — Control de obra            firme — D-522
 
 ESTIMACION_LINEA
-  id, estimacion_id FK ESTIMACION
+  id                 el «oid» del renglón: viaja en el archivo que sale a
+                      revisión                                            firme — D-522
+  estimacion_id FK ESTIMACION
+  folio              texto, único — `[E-]SSAA-NNN`, armado por regla         firme — D-522
   concepto_id         FK Nodo — nullable si es fuera de catálogo
   actividad_id         FK ACTIVIDAD (§5c) — nullable
   incidencia_id         FK INCIDENCIA (§5c) — nullable, si esta línea nace
@@ -2712,6 +2818,14 @@ ESTIMACION_LINEA
   excede_tope           caché — compara contra el contratado vigente
                         (D-285) al validar. NUNCA fuente de verdad, mismo
                         principio que `ESTADO_CARGA.porcentaje_cargado` (§3)
+  justificacion, justificada_por   texto y FK USUARIO, nullable — solo en un
+                        renglón fuera de catálogo; la da el Supervisor        propuesta — D-522
+
+ESTIMACION_LINEA_HISTORIA   (solo se agrega, nunca se edita)
+  id, linea_id FK ESTIMACION_LINEA
+  cambio              enum: modificado · eliminado · agregado                firme — D-522
+  antes, despues      el renglón como estaba y como quedó
+  aceptado_por, aceptado_en   FK USUARIO — quien aceptó el cambio            firme — D-522
 
 DEDUCCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
@@ -2736,6 +2850,33 @@ PRESTAMO
 vigente (D-285), se lee de donde ya vive (`VERSION_CONCEPTO`/`ACTIVIDAD`),
 nunca se copia. Guardarlo aparte lo desincroniza en cuanto el contratado
 cambie.
+
+*D-512 (firme desde D-522): `ESTIMACION_LINEA` gana `folio` (texto, único), que se arma con una regla y no se teclea: `[E-]SSAA-NNN` —semana en dos dígitos, año en dos y un consecutivo de tres que no se corta—, con el prefijo `E-` solo si `ESTIMACION.fuente = erp_externo`. Es por renglón y no por documento, y si el campo de semana que llega ya trae esa forma, se toma como folio. Así lo define la «Fuente de la Verdad» de auditoría en su apartado 3.2, y el usuario confirmó que sigue vigente. Los parámetros que esa fuente da por vigentes (IVA, umbral, similitud) no tienen tabla todavía: B-114.*
+
+*D-514 (firme desde D-522): el usuario confirmó el folio por renglón y pidió algo más: **la estimación necesita su propio identificador generado por el sistema** (su «oid»), porque los folios son de renglón y no la identifican. Es el `id` de `ESTIMACION`, que no se teclea ni se reutiliza. El `estado` gana `enviada` entre `capturada` y `validada` —la envía quien la captura, y si excede el tope vuelve como `devuelta`—, y **Control de obra la marca `pagada`**, una función nueva (`marcar_estimacion_pagada`, por asignar) que no está en la lista de §5b todavía; una estimación pagada ya no se toca. `estado` sigue siendo firme en sus otros valores; este es un añadido (B-118).*
+
+*D-516 (firme desde D-522) — la estimación sale y vuelve: su oid, tomado del presupuesto.* El usuario señaló que el presupuesto sí trae un oid, y que de ahí sale la idea: una estimación se **descarga y se manda a revisión fuera del sistema,** y allá se pueden **eliminar, cambiar, agregar y modificar renglones.** Sin una identidad que viaje en el archivo no hay forma de saber qué es qué cuando regresa. Se propone:
+- **La estimación y cada renglón llevan un oid** que genera este sistema y **sale en una columna del archivo;** el folio no sirve para esto, porque viene del ERP o se arma por regla y también se puede teclear mal o cambiar afuera. La diferencia con el `OID` de OPUS (§1): aquel es de un sistema ajeno y no se adopta como identidad; este lo genera el cerebro, así que sí puede serlo (`ESTIMACION.id` y `ESTIMACION_LINEA.id`).
+- **Al volver, se casa por oid y se propone, no se aplica** (la bandeja, §5): mismo oid y mismos valores, nada; mismo oid con valores distintos, un renglón **modificado** (con lo de antes y lo de ahora); un oid que el sistema tiene y el archivo ya no trae, un renglón **eliminado afuera** —pide confirmación y no borra, como una baja de presupuesto (D-476)—; un renglón sin oid, o con uno que el sistema no conoce o repetido, un renglón **agregado.**
+- **Hasta dónde se puede:** una estimación `validada` o `pagada` ya no se edita desde un archivo; lo que regrese distinto genera una alerta, no un cambio. Cada cambio aceptado deja una fila de historia que solo se agrega (como `RENGLON_HISTORIA`, §4a), y ese rastro es lo que B-109 pedía para comparar la versión previa con la revisada.
+
+*D-519 (propuesta) — una deducción puede ir al contratista sin tocar ninguna OT.* El usuario dijo que un descuento «puede ir directamente a una OT o al contratista» y puso el caso: Floviesa reparó una pérgola que había hecho Javier Galvan, con una OT ya pagada. Se hace primero la OT de la reparación, con un descuento a Javier Galvan que **hace referencia a la OT inicial;** no se descuenta a esa OT, porque aparecería como falta por pagar, así que el descuento es **solo al contratista** y la empresa no paga por el arreglo. Hoy `DEDUCCION` cuelga siempre de una línea de estimación, y eso no alcanza. Se propone:
+- `estimacion_linea_id` pasa a **nullable:** `sobrepago` y `rehacer_trabajo` (D-289) siguen colgando de una línea; los tipos nuevos (B-110) no tienen por qué.
+- `contratista_responsable_id` **es a quien se le cobra** y es siempre obligatorio.
+- `orden_trabajo_id`, FK nullable: la OT **sobre cuyo pago cae** el descuento. Nulo cuando va directo al contratista.
+- `ot_origen_id`, FK nullable: la OT **donde se hizo el trabajo** que originó el descuento; **solo referencia,** no cambia el saldo de esa OT. En el caso de arriba, la pérgola de Javier Galvan.
+- `ot_base_id`, FK nullable: cuando el monto es **el valor de otra OT** (D-510), esa OT. En el caso de arriba, la reparación de Floviesa.
+- *Lectura mía:* el descuento directo queda como **saldo del contratista** y se cobra de sus pagos siguientes, al modo del préstamo (D-290); y `absorbe_empresa` ya cubre que el contratista no siga activo. **Sin decidir:** si un descuento aplicado a una OT cuenta como liquidación en su saldo; el usuario pidió que la OT pagada no aparezca como falta por pagar, y eso solo está resuelto para el descuento directo (B-110).
+
+**El recorrido real de una estimación (D-522).** Al confirmar el bloque, el usuario contó cómo viaja hoy, y eso corrigió una lectura mía: **quien la envía no es el residente sino Control de obra.** El recorrido:
+1. **El residente crea su estimación en Excel.**
+2. **Control de obra las recolecta y las pasa al extractor** (el concentrador de estimaciones).
+3. **Control de obra las envía al validador de topes,** que hoy ejerce **Compras** —`enviada`—.
+4. **Vuelven a los residentes** para que revisen los ajustes de lo que no pasa por topes —`devuelta`—; se **solicita verificar la cuantificación** *(lectura mía: a los residentes, que son quienes cuantifican)* y **los supervisores dan la justificación de lo fuera de catálogo.**
+5. **El validador ajusta, y esa es la estimación que se paga** —`validada`—. *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por él, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
+6. **Control de obra comparte la estimación final para el pago** y la marca `pagada`.
+
+**Dos cosas quedan sin decidir.** (a) **El validador:** D-330 asignó `validar_estimacion` a Control de obra y dejó a Compras fuera de `ROL`; el recorrido dice que el validador de topes es de Compras. Mientras el usuario no decida, la tabla de funciones (§5b) sigue como está. *Propuesta del sistema:* agregar `compras` como fila de `ROL`, junto con `finanzas` y `proyectos` (B-115), y asignarle `validar_estimacion`; Control de obra conservaría recolectar, enviar, compartir y marcar `pagada`. `ROL_FUNCION` es de muchos a muchos, así que no cambia el esquema. (b) **La justificación del fuera de catálogo** es un campo mío (`justificacion` y `justificada_por`, arriba, propuesta).
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`
@@ -3300,6 +3441,71 @@ señal de mejora no se pierda.** Distinto de `ALERTA`/`PROPUESTA`, que sí
 resuelven y cierran: aquí no hay «resuelto», el valor está en acumular
 para ver qué se pregunta seguido y qué herramienta falta, no en cerrar
 cada fila. `PENDIENTES-MEJORAS.md` B-33.
+
+---
+
+## 5i. La orden de trabajo (OT) — el subcontrato contratado (D-518; firme desde D-519)
+
+El usuario describió la OT a lo largo de D-508 a D-518 y contestó lo que faltaba para escribirla. **Los campos de este bloque los confirmó el usuario en D-519** y pasan de propuesta a firmes, como pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454); lo que sigue abierto se dice abajo. La OT es **el contrato informal con el contratista** para ejecutar un subcontrato; empieza al contratar, y la venta al cliente (un presupuesto o un control de cambio) viene antes. Lo que el cerebro ya tenía no se repite: quién la ejecuta (`ASIGNACION_CONTRATISTA`, §4a) y contratar con el precio fijo (`ESTADO_CONGELAMIENTO`, §4a, D-475).
+
+```
+ORDEN_TRABAJO
+  id                   el «oid»: lo genera el sistema                          firme — D-519
+  numero               INTEGER, único — el consecutivo de la app de hoy: se
+                        sugiere el siguiente y se puede escribir otro que no
+                        exista; se conserva al migrar                           firme
+  presupuesto_id       FK PRESUPUESTO — la obra: una casa o la urbanización (§3c)   firme
+  nodo_id              FK Nodo, nullable — el subcontrato del presupuesto que
+                        contrata; nulo si no tiene partida base                 firme
+  asignacion_id        FK ASIGNACION_CONTRATISTA — quién la ejecuta; reasignar
+                        cierra una y abre otra                                  firme
+  origen               enum: presupuesto · adicional_al_cliente ·
+                        presupuesto_mas_adicional · postventa · mantenimiento ·
+                        otro                                                   firme — D-519
+  cobro                enum, nullable: cliente · garantia ·
+                        necesario_para_entrega — solo en postventa y
+                        mantenimiento                                          firme — D-519
+  forma_de_pago        enum: parcialidades · pago_unico                        firme — D-519
+  orden_cambio_id      FK PROPUESTA(tipo=orden_cambio), nullable — la venta al
+                        cliente de la que viene                                 firme — D-519
+  estado               enum: cotizada · concluida · cancelada                  firme
+  fecha, observaciones
+
+COTIZACION_OT
+  id, orden_trabajo_id FK ORDEN_TRABAJO
+  version              INTEGER — ampliar o disminuir el alcance agrega una
+                        nueva; la anterior no se edita (D-510)                  firme
+  vigente              boolean — la última                                     firme
+  iva_pct              NUMERIC — por defecto el de la configuración (16 %, B-114)   firme
+  hecha_por            FK USUARIO — Proyectos                                  firme
+  auditada_por, auditada_en   FK USUARIO, nullable — Control de obra, después   firme — D-519
+  notas
+
+PARTIDA_COTIZACION
+  id, cotizacion_id FK COTIZACION_OT
+  descripcion, unidad, cantidad, precio_unitario   libres, sin clave de catálogo   firme
+
+PAGO_OT
+  id                   el oid
+  orden_trabajo_id     FK ORDEN_TRABAJO
+  semana, anio
+  medio                enum: estimacion · efectivo · transferencia              firme — D-519
+  tipo                 enum: anticipo · avance · finiquito · garantia · pago_unico   firme
+  monto                NUMERIC
+  estimacion_linea_id  FK ESTIMACION_LINEA, nullable — solo si medio=estimacion
+  confirmado, confirmado_por   boolean, FK USUARIO — Control de obra; un anticipo
+                        planeado en la asignación nace sin confirmar y con monto 0
+```
+
+- **La cotización.** Solo cuentan las partidas con descripción, cantidad mayor a cero y precio unitario mayor a cero. Subtotal = suma de cantidad por precio; IVA = subtotal por `iva_pct`; el monto de la OT es el total de la cotización vigente. **Proyectos cotiza y genera la OT; Control de obra va después** y la confirma o la modifica si algo no está dentro del presupuesto (D-519: antes era lectura mía y el usuario la confirmó; no es una autorización previa). *Lectura mía:* si Control la modifica, es una versión nueva de la cotización con su propia autora y no una edición de la anterior. **Las partidas siguen libres por ahora (D-519):** el usuario va a hacer un **cotizador,** y el presupuesto ya trae algo adelantado en carpintería y herrería que hay que complementar con, por ejemplo, el costo de las puertas y de los muebles (B-123). No se agrega ningún campo hasta diseñarlo.
+- **Los pagos.** El **medio** es la estimación semanal (que hacen los residentes), el **efectivo** («a cuenta», dicho por el usuario) o la transferencia, **bancaria** (D-519), aunque por ahora **no se ven transferencias SPEI ni bancos:** el medio es solo una etiqueta, sin cuenta, banco ni clave de rastreo. El **saldo** es el total vigente menos los pagos confirmados, y se calcula. El monto de una OT de **tipo presupuesto** es el precio de venta del prototipo (D-518).
+- **La retención.** Se calcula sobre el **total de la OT** y se **retiene al finiquitar,** no de cada pago: `CONTRATISTA.retencion_pct` (§4a) por el total vigente, solo si el contratista la lleva (5 por defecto, editable por contratista, D-521). **«Garantía» es la retención:** el pago de tipo `garantia` es su devolución, y el finiquito puede llevar la retención, la garantía o las dos. Se libera al entregarse la vivienda, o antes si el Supervisor lo autoriza, y Control de obra valida si hace falta. `RETENCION` (§5d) ganaría la OT de la que sale y el pago con que se devuelve.
+- **Los descuentos** ya no son un tipo de pago: son `DEDUCCION` (§5d) con los siete tipos nuevos (B-110). Por eso `PAGO_OT.tipo` no trae `descuento`, que la app de hoy sí tiene. **Un descuento puede ir a una OT o directo al contratista** (D-519), y en el segundo caso **no toca el saldo de ninguna OT.** El caso del usuario: Floviesa reparó una pérgola que había hecho Javier Galvan, con una OT ya pagada. Primero se hace la OT de la reparación y lleva un descuento a Javier Galvan que **hace referencia** a la OT inicial; no se descuenta de esa OT porque, si se hiciera, aparecería como falta por pagar, así que **el descuento es solo al contratista** y la empresa no paga por ese arreglo. Cómo queda en `DEDUCCION`, abajo en §5d (propuesta).
+- **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
+- **Concluir.** Los residentes estiman hasta el pago de la garantía, si la hay; la OT se concluye cuando **se pagó todo,** garantía incluida (D-518). *Lectura mía:* el sistema lo propone y Proyectos lo confirma, como hoy hace el usuario de cotización.
+- **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **Cómo se registra ese traspaso queda por diseñar** (se parece al préstamo que se salda con avance de obra, D-290; B-124). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
+- **Quién (funciones propuestas, que no entran todavía a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
+- **Fuera de aquí:** el contratista como usuario (B-121), el traspaso del anticipo (B-124), el cotizador (B-123) y la estructura de los descuentos (B-110).
 
 ---
 
