@@ -503,6 +503,32 @@ Las tres hojas de la estimación del concentrador (obra, instalaciones y urbaniz
 
 **Siguen abiertas** (no bloquean nada): el porcentaje y la lista exacta de los contratistas con retención (la lista es de memoria); si el 5 % varía por contratista; y si «extraordinario» es sinónimo de *adicional* o abarca también la postventa y el mantenimiento.
 
+### La OT en el cerebro: un primer borrador, para contestar (D-517)
+
+Con lo que el usuario ha dicho de la OT (D-508 a D-516) ya se ve qué del cerebro la cubre y qué falta. **Es un borrador para contestar,** no un diseño: nada de esto entra a `MODELO.md` hasta que el usuario lo confirme. Una OT es el contrato informal con el contratista para ejecutar un subcontrato; empieza al contratar, y la venta al cliente (un presupuesto o un control de cambio) viene antes (D-511).
+
+| Pieza | Hoy en la app de extraordinarios | Dónde cae en el cerebro | Estado |
+|---|---|---|---|
+| Quién la ejecuta | Asignación con historial; la hace Finanzas | `ASIGNACION_CONTRATISTA`, con alcance de concepto y cadena de reemplazos (D-453) | Ya está |
+| Contratar y fijar el precio | Al cotizar nace la OT | `ESTADO_CONGELAMIENTO` en `contratado` (D-475) | Ya está |
+| Número de la OT | Consecutivo único; se sugiere el siguiente y se puede escribir otro que no exista | Un número único | Por proponer |
+| Cotización del contratista | Partidas libres y un IVA que se teclea; al ampliar o disminuir el alcance se sobrescribe | Una cotización **con versión,** que se agrega y no se edita, con partidas libres (los «conceptos extraordinarios» de `CONOCIMIENTO.md` §1.4) | Por proponer |
+| Origen, quién absorbe el costo, forma de pago y estado | Un solo campo «tipo de contrato» con ocho valores | Cuatro campos: `origen`, `cobro`, `forma_de_pago` y `estado` (D-510) | Por proponer |
+| La venta al cliente de la que viene | No la guarda | Una liga a la orden de cambio (`PROPUESTA(orden_cambio)`), que viene del highlight o del adicional | Por proponer |
+| Pagos | Renglones por clase y tipo, que confirma Control de obra | Una tabla de pagos de la OT | Por proponer |
+| Retención de 5 % | Informativa | `CONTRATISTA.retencion_pct` y `RETENCION` (D-290 y B-112) | Por proponer |
+| Descuentos | Un número sin tipo | `DEDUCCION` con los siete tipos nuevos (B-110) | Por proponer |
+| Saldo | Monto menos pagos confirmados | Se calcula, no se guarda | — |
+| Reasignar | Cambia el nombre del contratista | Cambio de contratista (mueve el anticipo y avisa) o de obra (D-510) | Por proponer |
+| Cancelar | No hay ruta | Un estado `cancelada` | Por proponer |
+
+**Cinco preguntas, las que hacen falta para escribirlo:**
+1. Las tres clases de pago de la app son estimación, a cuenta (fuera de estimación) y transferencia: ¿qué diferencia hay entre «a cuenta» y «transferencia»?
+2. La retención de 5 %: ¿se descuenta de cada pago, o se calcula sobre el total de la OT y se retiene al finiquitar? Y el tipo de pago «garantía», ¿es la devolución de lo retenido?
+3. En una OT de tipo presupuesto, ¿el monto es el precio de venta del prototipo o lo que se le paga al contratista, que puede ser distinto? (El cerebro compara el real de un subcontrato contra su base, D-313.)
+4. Al ampliar o disminuir el alcance, ¿lo aprueba alguien o lo hace Proyectos directo, y cambia entonces la venta al cliente?
+5. ¿Quién concluye una OT y cuándo: Proyectos al terminar el trabajo, o cuando ya se pagó todo?
+
 ### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
 
 Ya estaba en GitHub (`ERP-ESTIMACI-N`, privado). Todo sale de su README, de la estructura de su base y de la lista de sus rutas; **no se ha leído su lógica de extracción**, y no se leyó el contenido de sus datos.
@@ -736,7 +762,7 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 |---|---|---|
 | El oid de la estimación | «El presupuesto sí tiene un oid; de ahí toma la idea para la estimación, porque cuando se descarga y se manda a revisión fuera del sistema se pueden eliminar, cambiar, agregar y modificar renglones» | La estimación **y cada renglón** llevan un oid que **genera este sistema y viaja en el archivo que sale;** al volver, se reconcilia por él. Es la misma idea con que el cerebro ya usa el `OID` de OPUS, con una diferencia: aquel es de un sistema ajeno y no se adopta como identidad (`MODELO.md` §1); este lo genera el cerebro y por eso sí puede serlo. Las reglas están en `MODELO.md` §5d |
 | «Antigua» | «No sé a qué te refieras, ¿al proyecto?» | Sí: «Antigua» es el segundo proyecto, no un estatus. Se corrigió D-513 |
-| El correo | «Sí, solo que el correo es para el login» | Contacto, teléfono y correo siguen opcionales en el contratista, **pero el correo es el del inicio de sesión:** en `USUARIO` es obligatorio y único (D-469 y D-470). Si el contratista entrara algún día al sistema, sería con ese correo *(por confirmar)* |
+| El correo | «Sí, solo que el correo es para el login» | Contacto, teléfono y correo siguen opcionales en el contratista, **pero el correo es el del inicio de sesión:** en `USUARIO` es obligatorio y único (D-469 y D-470). Si el contratista entra algún día al sistema —y el usuario dice que sí, más adelante (D-517)—, será con ese correo |
 | La entrega de obra | «Sí, aunque el superintendente puede o no estar; es más como el equipo de gestión de proyectos» | El candado del lote es la entrega de obra de ObraCtrl, con cuatro participantes: **el residente entrega, el supervisor da el visto bueno, control revisa calidad y expediente, y el equipo de gestión de proyectos firma;** el superintendente puede estar o no. *Lectura mía:* ese equipo es el área de Proyectos de R10 |
 | El candado | «Más bien tendría que pasar a postventa; lo puedes cerrar al residente, pero para los demás se puede mantener abierto hasta la entrega de la casa» | Cerrar un frente, una actividad o el lote **cierra al residente** (ya no registra avance ahí); supervisor, control y gestión de proyectos siguen pudiendo hasta la entrega. **Al entregar, la obra pasa a postventa** (`MODELO.md` §3b) y no queda solo «congelada» como en ObraCtrl |
 
@@ -746,14 +772,14 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 |---|---|---|
 | Entrega de obra con cuatro participantes | **Entra** (ya contestado arriba) | Es el segundo candado y lo que pasa la obra a postventa |
 | Expediente técnico (planos, contratos, actas, evidencias, bitácora y otros, por obra) | **Entra,** chico | La entrega pide a control revisar «calidad y expediente»; el cerebro ya tiene planos y notas sobre ellos, pero no el expediente |
-| Revisión física de control (fotos, comentario y calidad de 1 a 5) | **Entra,** chica | De ahí puede salir la incidencia de calidad de un cierre (`CIERRE_FRENTE.incidencia_calidad_id`) y, después, la postventa |
-| Bloqueo de periodo (una estimación validada cierra esa semana de la obra) | **Entra como regla** | Generaliza «una pagada ya no se toca»; falta saber para quién cierra (abajo) |
+| Revisión física de control (fotos, comentario y calidad de **5 a 10,** D-517) | **Entra,** chica | De ahí puede salir la incidencia de calidad de un cierre (`CIERRE_FRENTE.incidencia_calidad_id`) y, después, la postventa |
+| Bloqueo de periodo (una estimación validada cierra esa semana de la obra) | **Entra como regla** | Generaliza «una pagada ya no se toca»; **cierra la semana para todos** (D-517) |
 | Tolerancia de extra de 20 % por obra y por actividad | **Entra como parámetro** | Es el mismo 20 % que el cerebro usa de ejemplo de umbral; cabe en la tabla de parámetros (B-114) |
 | Evaluaciones de obra, residente y contratista (auto, control y final, con criterios ponderados) | **Después** | Es el punto de partida del método de calificar a los contratistas, que el usuario dejó para más adelante (B-117) |
 | Cuadrillas con versión e integrantes | **Ya está** | Las cuadrillas son nodos con su matriz (D-473) |
 | Avisos y notificaciones, captura sin conexión, varias organizaciones, idempotencia, respaldos | **Fuera del cerebro** | Son de la aplicación, no del dominio. Varias organizaciones se retoma si algún día se vende a otras constructoras |
 
-**Tres preguntas que quedan,** chicas: si hoy hacen la revisión física y con qué escala de calidad; si una estimación validada cierra la semana de esa obra para todos o solo para el residente; y si los contratistas entrarán al sistema (el correo).
+**Las tres preguntas chicas, contestadas en D-517:** la calidad de la revisión física va **de 5 a 10** (ObraCtrl usa de 1 a 5 y tendría que cambiar); una estimación validada cierra la semana de esa obra **para todos;** y los contratistas **hoy no entran al sistema,** pero sí más adelante, para el cotizador, el programa de ejecución y, probablemente, su estado de cuenta (B-121).
 
 **Lo que el usuario contestó sobre ObraCtrl (D-514).**
 
