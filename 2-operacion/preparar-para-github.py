@@ -19,6 +19,7 @@ Uso:
   python3 preparar-para-github.py CARPETA --nombre extraordinarios                   # revisa y arma la copia limpia
   python3 preparar-para-github.py CARPETA --nombre extraordinarios --a ../Multi-erp  # y la deja dentro del clon
   python3 preparar-para-github.py CARPETA --nombre auditoria --excluir postgresql    # sin una carpeta ajena que viene dentro
+  python3 preparar-para-github.py CARPETA --nombre auditoria --quitar-contrasenas   # la COPIA sale sin las contraseñas escritas en el código
   python3 preparar-para-github.py --autoprueba                                       # se prueba a sí mismo con secretos falsos
 
 Además de lo que imprime, deja el informe completo en `<salida>/<nombre>-informe.txt` (con los valores siempre tapados).
@@ -53,6 +54,7 @@ NOMBRES_QUE_NO_SON_CLAVES = re.compile(r"(?i)(type|placement|url|uri|endpoint|fi
 VALORES_QUE_NO_SON_CLAVES = re.compile(r"^(https?://|urn:|#[0-9a-fA-F]{3,8}$)")
 
 CRITICO, AVISO, INFO = "CRÍTICO", "AVISO", "INFO"
+MARCA_DE_CLAVE = "CAMBIA_ESTA_CLAVE"
 
 
 def es_placeholder(valor):
@@ -74,7 +76,8 @@ def decodificar_jwt(token):
 
 
 def hallazgos_de_texto(texto):
-    """[(línea, nivel, qué, vista)] de las claves que parecen de verdad. La vista nunca trae el valor completo."""
+    """[(línea, nivel, qué, vista, quitable)] de las claves que parecen de verdad. La vista nunca trae el valor completo;
+    `quitable` es (tipo, valor) para las contraseñas escritas en el código que --quitar-contrasenas puede sacar de la copia, o None."""
     salida = []
     for n, linea in enumerate(texto.split("\n"), 1):
         if len(linea) > 4000:  # una línea enorme es un archivo empacado, no código escrito a mano
@@ -82,30 +85,30 @@ def hallazgos_de_texto(texto):
         for m in re.finditer(r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}", linea):
             rol = decodificar_jwt(m.group(0)).get("role")
             if rol == "service_role":
-                salida.append((n, CRITICO, "llave de servicio de Supabase (salta toda la seguridad por fila)", ocultar(m.group(0))))
+                salida.append((n, CRITICO, "llave de servicio de Supabase (salta toda la seguridad por fila)", ocultar(m.group(0)), None))
             elif rol == "anon":
-                salida.append((n, INFO, "llave anon de Supabase (pública por diseño; la protege RLS)", ocultar(m.group(0))))
+                salida.append((n, INFO, "llave anon de Supabase (pública por diseño; la protege RLS)", ocultar(m.group(0)), None))
             else:
-                salida.append((n, AVISO, "token firmado (JWT) con rol " + str(rol), ocultar(m.group(0))))
+                salida.append((n, AVISO, "token firmado (JWT) con rol " + str(rol), ocultar(m.group(0)), None))
         for m in re.finditer(r"[a-zA-Z][a-zA-Z0-9+.-]*://[^\s:/@'\"]+:([^\s@'\"/]{4,})@[^\s'\"]+", linea):
             if not es_placeholder(m.group(1)):
                 if re.search(r"@(localhost|127\.0\.0\.1|0\.0\.0\.0|host\.docker\.internal)\b", m.group(0)):
-                    salida.append((n, AVISO, "dirección local con contraseña de desarrollo (revisa que no sea la de producción)", ocultar(m.group(1))))
+                    salida.append((n, AVISO, "dirección local con contraseña de desarrollo (revisa que no sea la de producción)", ocultar(m.group(1)), ("url", m.group(1))))
                 else:
-                    salida.append((n, CRITICO, "dirección de servicio con contraseña adentro", ocultar(m.group(1))))
+                    salida.append((n, CRITICO, "dirección de servicio con contraseña adentro", ocultar(m.group(1)), None))
         if re.search(r"-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----", linea):
-            salida.append((n, CRITICO, "llave privada", "-----BEGIN…"))
+            salida.append((n, CRITICO, "llave privada", "-----BEGIN…", None))
         for m in re.finditer(r"\b(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|xox[abprs]-[A-Za-z0-9-]{10,}|"
                              r"sk-ant-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{32,}|AIza[0-9A-Za-z_-]{35})\b", linea):
             if "EXAMPLE" in m.group(0).upper():
-                salida.append((n, INFO, "llave de ejemplo de la documentación del servicio", ocultar(m.group(0))))
+                salida.append((n, INFO, "llave de ejemplo de la documentación del servicio", ocultar(m.group(0)), None))
             else:
-                salida.append((n, CRITICO, "token de un servicio (AWS, GitHub, Slack, Anthropic, OpenAI o Google)", ocultar(m.group(0))))
+                salida.append((n, CRITICO, "token de un servicio (AWS, GitHub, Slack, Anthropic, OpenAI o Google)", ocultar(m.group(0)), None))
         if re.search(r"os\.environ|getenv|process\.env|import\.meta\.env", linea):
             continue
         for m in re.finditer(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)\s*[:=]\s*['\"]([^'\"\s]{6,})['\"]", linea):
             if not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)) and not VALORES_QUE_NO_SON_CLAVES.match(m.group(2)):
-                salida.append((n, AVISO, "asignación de «" + m.group(1) + "» con un valor escrito en el código", ocultar(m.group(2))))
+                salida.append((n, AVISO, "asignación de «" + m.group(1) + "» con un valor escrito en el código", ocultar(m.group(2)), ("asignacion", m.group(2))))
     return salida
 
 
@@ -258,7 +261,31 @@ build/
 """
 
 
-def armar_copia(carpeta, informe, salida, nombre, incluir_datos):
+def quitar_en_linea(linea, tipo, valor):
+    """Cambia SOLO la contraseña por la marca, sin tocar el resto de la línea (el usuario, la dirección, las comillas)."""
+    v = re.escape(valor)
+    if tipo == "url":
+        return re.sub(r"(://[^\s:/@'\"]+:)" + v + r"(@)", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
+    return re.sub(r"(['\"])" + v + r"(['\"])", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
+
+
+def quitar_contrasenas(archivo, quitables):
+    """Reescribe `archivo` (que es la COPIA) sin las contraseñas de `quitables` [(línea, tipo, valor)]. Respeta los fines de
+    línea y los bytes que no son UTF-8. Devuelve cuántas líneas cambió."""
+    texto = archivo.read_bytes().decode("utf-8", errors="surrogateescape")
+    lineas = texto.split("\n")
+    cambiadas = 0
+    for n, tipo, valor in quitables:
+        if 0 < n <= len(lineas):
+            nueva = quitar_en_linea(lineas[n - 1], tipo, valor)
+            if nueva != lineas[n - 1]:
+                lineas[n - 1] = nueva
+                cambiadas += 1
+    archivo.write_bytes("\n".join(lineas).encode("utf-8", errors="surrogateescape"))
+    return cambiadas
+
+
+def armar_copia(carpeta, informe, salida, nombre, incluir_datos, quitar=False):
     destino = salida / nombre
     if destino.exists():
         raise SystemExit(f"{destino} ya existe: bórrala o elige otra --salida.")
@@ -272,6 +299,15 @@ def armar_copia(carpeta, informe, salida, nombre, incluir_datos):
         fin.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(origen, fin)
         copiados += 1
+        quitables = [(n, q[0], q[1]) for n, _, _, _, q in informe["hallazgos"].get(rel, []) if q]
+        if quitar and quitables:
+            quitar_contrasenas(fin, quitables)
+            informe.setdefault("sin_quitar", [])
+            texto_final = fin.read_text(encoding="utf-8", errors="ignore")
+            if any(h[4] for h in hallazgos_de_texto(texto_final)):
+                informe["sin_quitar"].append(rel)  # sigue habiendo una contraseña: se avisa, no se calla
+            else:
+                informe.setdefault("sin_contrasena", []).append(rel)
     previo = (destino / ".gitignore").read_text(encoding="utf-8") if (destino / ".gitignore").exists() else ""
     (destino / ".gitignore").write_text(previo.rstrip("\n") + ("\n\n" if previo else "") + bloque_gitignore(), encoding="utf-8")
     (destino / ".env.example").write_text("".join(f"{v}=\n" for v in sorted(informe["variables"])), encoding="utf-8")
@@ -301,7 +337,7 @@ def imprimir(informe, carpeta, maximo=25, p=print):
         p(f"     – {len(lista):4}  {motivo}: " + ", ".join(r.as_posix() for r in vista) + (" …" if len(vista) < len(lista) else ""))
     por_carpeta = Counter(carpeta_alta(r) for r in informe["hallazgos"])
     rango = {CRITICO: 0, AVISO: 1, INFO: 2}
-    filas = [(rel, n, nivel, que, vista) for rel, hs in informe["hallazgos"].items() for n, nivel, que, vista in hs]
+    filas = [(rel, n, nivel, que, vista) for rel, hs in informe["hallazgos"].items() for n, nivel, que, vista, _ in hs]
     filas.sort(key=lambda f: (rango[f[2]], por_carpeta[carpeta_alta(f[0])], f[0].as_posix(), f[1]))  # primero lo de las carpetas con pocos hallazgos
     criticos = con_critico(informe)
     por_nivel = Counter(f[2] for f in filas)
@@ -324,6 +360,7 @@ def imprimir(informe, carpeta, maximo=25, p=print):
 
 def autoprueba():
     """Crea una app falsa con claves sembradas y comprueba que se detectan, se apartan y no se copian."""
+    global quitar_contrasenas
     def jwt(rol):
         cab = base64.urlsafe_b64encode(b'{"alg":"HS256","typ":"JWT"}').decode().rstrip("=")
         carga = base64.urlsafe_b64encode(json.dumps({"iss": "supabase", "role": rol, "ref": "abcdefgh"}).encode()).decode().rstrip("=")
@@ -353,6 +390,8 @@ def autoprueba():
         (app / "lib" / "site-packages" / "x" / "m.py").write_text("DB = 'postgresql://u:clave12345@db.ejemplo.com/x'\n", encoding="utf-8")
         (app / "vendor").mkdir()  # lo que el usuario pide dejar fuera con --excluir
         (app / "vendor" / "v.py").write_text("print('ajeno')\n", encoding="utf-8")
+        (app / "cfg.py").write_text("SECRET_KEY = 'otra-clave-larga-999'\nNOMBRE = 'postgres'\n", encoding="utf-8")
+        (app / "win.bat").write_bytes(b"@echo off\r\nset URL=postgresql://obra_usr:obra_dev1@localhost:5432/obra\r\nrem acci\xf3n en latin-1\r\n")
         (app / "tipos.py").write_text("TOKEN_TYPE = 'bearer-largo'\nAPI_KEY_URL = 'https://x.example/k'\n", encoding="utf-8")
         informe = revisar(app, excluir=["Vendor"])
         apartados = {r.as_posix() for r, _ in informe["aparta"]}
@@ -381,6 +420,34 @@ def autoprueba():
                            "pgdata/PG_VERSION", "pgdata/base/1/1259", "pgdata/global/pg_control", "vendor/v.py", "lib/site-packages/x/m.py"):
             if prohibido in dentro:
                 errores.append(f"copió {prohibido}")
+        sin, _ = armar_copia(app, informe, raiz / "salida_sin", "prueba", False, quitar=True)
+        orig_dev = (app / "dev.py").read_text(encoding="utf-8")
+        copia_dev = (sin / "dev.py").read_text(encoding="utf-8")
+        if "postgres:postgres@" in copia_dev or MARCA_DE_CLAVE not in copia_dev:
+            errores.append("--quitar-contrasenas no sacó la contraseña de la copia de dev.py")
+        if "postgresql://postgres:" + MARCA_DE_CLAVE + "@localhost:5432/x" not in copia_dev:
+            errores.append("--quitar-contrasenas tocó más que la contraseña (usuario, esquema o dirección)")
+        if "postgres:postgres@" not in orig_dev:
+            errores.append("¡--quitar-contrasenas cambió el ORIGINAL!")
+        copia_cfg = (sin / "cfg.py").read_text(encoding="utf-8")
+        if "otra-clave-larga-999" in copia_cfg or "SECRET_KEY = '" + MARCA_DE_CLAVE + "'" not in copia_cfg or "NOMBRE = 'postgres'" not in copia_cfg:
+            errores.append("--quitar-contrasenas falló con una asignación (o tocó una línea que no era la hallada)")
+        copia_bat = (sin / "win.bat").read_bytes()
+        if b"obra_dev1" in copia_bat or b"\r\n" not in copia_bat or b"acci\xf3n" not in copia_bat:
+            errores.append("--quitar-contrasenas rompió los fines de línea o los bytes no UTF-8 de win.bat")
+        if informe.get("sin_quitar"):
+            errores.append("quedó una contraseña sin quitar: " + str(informe["sin_quitar"]))
+        real = quitar_contrasenas  # si quitar no logra quitar, tiene que avisar y no callar
+        quitar_contrasenas = lambda *args: 0
+        try:
+            otro = dict(informe)
+            otro.pop("sin_quitar", None)
+            otro.pop("sin_contrasena", None)
+            armar_copia(app, otro, raiz / "salida_x", "prueba", False, quitar=True)
+        finally:
+            quitar_contrasenas = real
+        if not otro.get("sin_quitar"):
+            errores.append("no avisó que quedaba una contraseña en la copia")
         lineas = []
         imprimir(informe, app, maximo=None, p=lineas.append)
         if not any("PostgreSQL" in l and "pgdata" in l for l in lineas):
@@ -401,6 +468,8 @@ def main():
     ap.add_argument("--a", type=Path, help="el clon de Multi-erp: la copia limpia se deja en <clon>/apps/<nombre>")
     ap.add_argument("--excluir", action="append", default=[], metavar="CARPETA",
                     help="deja fuera una carpeta entera por su nombre o ruta relativa (se puede repetir); p. ej. --excluir postgresql")
+    ap.add_argument("--quitar-contrasenas", action="store_true",
+                    help="en la COPIA (nunca en tu app) cambia las contraseñas escritas en el código por " + MARCA_DE_CLAVE)
     ap.add_argument("--incluir-datos", action="store_true", help="incluye bases y hojas (solo si son semillas del sistema y no datos reales)")
     ap.add_argument("--autoprueba", action="store_true", help="se prueba a sí mismo con claves falsas y sale")
     a = ap.parse_args()
@@ -413,13 +482,19 @@ def main():
     print(f"Revisando {a.carpeta} … (si la carpeta es grande puede tardar; irá avisando)", flush=True)
     informe = revisar(a.carpeta, a.excluir)
     imprimir(informe, a.carpeta)
-    destino, copiados = armar_copia(a.carpeta, informe, a.salida, a.nombre, a.incluir_datos)
+    destino, copiados = armar_copia(a.carpeta, informe, a.salida, a.nombre, a.incluir_datos, a.quitar_contrasenas)
     completo = []
     imprimir(informe, a.carpeta, maximo=None, p=completo.append)
     archivo_informe = a.salida / f"{a.nombre}-informe.txt"
     archivo_informe.write_text("\n".join(completo) + "\n", encoding="utf-8")
     print(f"\nCopia limpia: {destino}  ({copiados} archivos + .gitignore, .env.example, FICHA.md)")
     print(f"Informe completo (valores tapados): {archivo_informe}")
+    if a.quitar_contrasenas:
+        quitados = informe.get("sin_contrasena", [])
+        print(f"\nContraseñas quitadas de la copia (cambiadas por {MARCA_DE_CLAVE}): {len(quitados)} archivos."
+              + (" Tu app original no se tocó." if quitados else " No había ninguna que quitar."))
+        for rel in informe.get("sin_quitar", []):
+            print(f"  OJO: en {rel.as_posix()} sigue habiendo una contraseña; quítala a mano antes de subir.")
     criticos = con_critico(informe)
     if criticos:
         print("\nOJO: hay archivos con claves que NO se copiaron. Mueve cada clave a una variable de entorno (.env) y vuelve a correr.")
@@ -432,7 +507,7 @@ def main():
         print(f"\nLista dentro del clon: {fin}\nAhora, desde {a.a}:\n  git add apps/{a.nombre}\n  git commit -m \"Agrega {a.nombre}\"\n  git push")
     else:
         print(f"\nSiguiente: clona Multi-erp, copia {destino} a apps/{a.nombre}/ dentro del clon, y haz git add, commit y push.")
-    return 2 if criticos else 0
+    return 2 if (criticos or informe.get("sin_quitar")) else 0
 
 
 if __name__ == "__main__":
