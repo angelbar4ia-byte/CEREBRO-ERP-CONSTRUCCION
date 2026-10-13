@@ -620,7 +620,7 @@ Proyecto: Magnolia
    └─ Lote = una casa = una obra ......... se identifica por clúster y lote («FRESNO 12»)
 ```
 
-Cada casa es un prototipo, con o sin modificaciones y con o sin m² adicionales. En el modelo: `MODELO.md` §3c. El concentrador trae **dos** proyectos (D-506) y el usuario habla de uno, Magnolia: falta saber cuál es el otro.
+Cada casa es un prototipo, con o sin modificaciones y con o sin m² adicionales. En el modelo: `MODELO.md` §3c. El concentrador trae **dos** proyectos (D-506): Magnolia y **«Antigua»,** un proyecto viejo al que le quedan una o muy pocas obras por cerrar (D-516; D-513 había leído mal «Antigua» como un estatus de obra).
 
 **2. Los niveles (R3).** El usuario avisó que «nivel» se dice de dos cosas distintas: el nivel del presupuesto y el nivel de la casa. Con el que el cerebro ya distinguía, son tres:
 
@@ -667,11 +667,11 @@ La «Fuente» dice también que las estimaciones **no generan IVA, ni llevan ret
 
 **9. Dirección (R11).** El cerebro es el correcto, y el usuario dice que «en algún momento» se evaluará **adaptar las apps al cerebro**. Es un tercer camino junto a los dos de D-506 (unir las apps o crear una nueva en segundo plano); la decisión sigue siendo suya (B-107) y D-487 sigue en pie.
 
-**Quedan abiertos, sin bloquear nada:** si el cliente es un dato de la obra; cuál es el segundo proyecto del concentrador; si «tipo» de contratista es destajo o subcontrato; si los tres contratistas con retención son todos subcontratistas; y qué significa el prefijo `MOO` (una sola clave).
+**Quedan abiertos, sin bloquear nada:** si el cliente es un dato de la obra; si «tipo» de contratista es destajo o subcontrato; si los tres contratistas con retención son todos subcontratistas; y qué significa el prefijo `MOO` (una sola clave).
 
 ### ObraCtrl campo por campo contra el cerebro (D-513)
 
-Primero, el estatus de una obra. En D-513 se leyó que el usuario quería cinco —por arrancar, en construcción, por entregar, entregada y antigua—; **en D-514 aclaró que el de ObraCtrl está bien,** con «casi lista» llamada «por entregar» (ver abajo).
+Primero, el estatus de una obra. En D-513 se leyó que el usuario quería cinco —por arrancar, en construcción, por entregar, entregada y antigua—; **en D-514 aclaró que el de ObraCtrl está bien,** con «casi lista» llamada «por entregar» (ver abajo). Y **en D-516 se vio que «Antigua» no era un estatus:** es el nombre del segundo proyecto, al que le quedan una o muy pocas obras por cerrar.
 
 Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTROL-AVANCE` (69 tablas, último cambio el 3 de septiembre de 2026, commit `8dfb1b4`), su semilla canónica y su especificación. **No se corrió la app ni se vieron sus datos,** que viven en Supabase. En todo lo que se contradice manda el cerebro, como pidió el usuario (D-507); lo que ObraCtrl tiene de más queda como pregunta.
 
@@ -710,7 +710,7 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 | S8 | Frente | Ocho canónicos —Preliminares, Cimentación, Estructura, Albañilería, Hidrosanitaria, Eléctrica, Acabados, Herrería y carpintería—; cada etapa pertenece a un frente (mezcla niveles y gremios) | Frente = nivel constructivo; los gremios son sus sub-frentes (D-450) | El cerebro: lo que ObraCtrl llama «frente» es aquí un sub-frente (gremio) o un nivel, según el caso | — |
 | S9 | Estimación | Cabecera con `semana`, `anio`, `tipo_semana`, `modo` (destajo, concepto o subcontrato), estatus `borrador · enviada · validada` y el `folio` en la cabecera | Periodo, `fuente` y estado `capturada · devuelta · validada · pagada`: un documento que avanza (D-508) | ✅ **Decidido (D-514):** pasa por «enviada»; **Control de obra la marca «pagada»;** el folio va **en cada renglón** y el sistema crea además un identificador propio (oid) para la estimación | — |
 | S10 | Control de cambio | De actividades: `extra_catalogo`, `fuera_catalogo`, `sustitucion` y `alta_catalogo`; estatus `solicitado · autorizado · rechazado`; la orden de cambio se captura al autorizar | Orden de cambio con el cliente (delta de monto y plazo, causa) más la incidencia que cambia la actividad | ✅ **Decidido (D-515):** son dos capas unidas: un extra **puede** pasar a una orden de cambio con el cliente; la liga es opcional | — |
-| S11 | Cierre | `solicitud_cierre` por **actividad** | `CIERRE_FRENTE` por frente, al 90 % (D-261) | ✅ **Decidido (D-515):** un doble candado. Se solicita **por frente** y, si se requiere, **por una o varias actividades;** y el segundo candado cierra **todo el lote** | — |
+| S11 | Cierre | `solicitud_cierre` por **actividad** | `CIERRE_FRENTE` por frente, al 90 % (D-261) | ✅ **Decidido (D-515 y D-516):** un doble candado. Se solicita **por frente** y, si se requiere, **por una o varias actividades;** y el segundo candado cierra **todo el lote.** Cerrar lo cierra **al residente;** para los demás sigue abierto hasta la entrega, y al entregar la obra **pasa a postventa** | — |
 | S12 | Incidencia | Tipos `falta_material · error_ejecucion · cambio_cliente · proyecto_indef · retrabajo · detalle`; impacto `detalle · retraso · detiene`; seis estatus | Motivo (las nueve causas), efecto sobre la actividad y seis estados con tres manos (D-268 y D-269) | El cerebro | — |
 | S13 | Costo de un insumo | Cuatro costos guardados: base, base actualizado, promedio de almacén y último | `PRECIO_HISTORICO`: una serie con fechas | El cerebro, que conserva la historia | — |
 | S14 | Parámetros | Tabla `configuracion` con ámbito y vigencia | Sin tabla (B-114) | **Se toma la forma de ObraCtrl** | — |
@@ -719,7 +719,7 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 
 **Lo que el cerebro tiene y ObraCtrl no:** vigencias de residente y de asignación de contratista con cadena de reemplazos; retraso auditado por corte; alertas con su parámetro; historia de precios; congelamiento de lo contratado; estado «pagada» de la estimación; deducción, retención y préstamo; postventa y su ticket de garantía; presentaciones de compra; la fecha de entrega al cliente; y los roles de costos y cotizador. En el esquema de ObraCtrl no hay nada de eso.
 
-**Contestadas:** S1, S3, S5, S7 y S9 en D-514, y S10 y S11 en D-515. **Quedan por contestar:** de lo que ObraCtrl tiene de más, **cuáles de esas piezas usan hoy y deben entrar al cerebro** —sobre todo la entrega de obra con cuatro firmas, las evaluaciones y la revisión física—, y si «candado» quiere decir que lo cerrado ya no admite cambios (ver abajo).
+**Contestadas:** S1, S3, S5, S7 y S9 en D-514, S10 y S11 en D-515 y la duda del candado en D-516. **De lo que ObraCtrl tiene de más,** el usuario pidió seguir (D-516) y la partición propuesta está abajo.
 
 **Lo que el usuario contestó sobre ObraCtrl (D-515).**
 
@@ -728,13 +728,38 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 | Un extra y el cliente | «Sí, un extra puede pasar a un control de cambio con el cliente» | Las dos capas de S10 se unen con una liga **opcional:** nula mientras el extra es interno. En el cerebro un extra es una incidencia que cambia la actividad (`crece_actividad`, `crea_actividad`), y `CONOCIMIENTO.md` §13.6 ya decía que una incidencia «puede o no» generar un control de cambio. Lo que faltaba era la liga (`MODELO.md` §5c, propuesta) |
 | El cierre | «Vamos a ponerlo por frente, y si se requiere alguna actividad también; o sea, un doble candado: por un lado una actividad o varias, y segundo todo el lote» | Dos candados. **Primero** el frente y, si hace falta, una o varias actividades; **segundo** el lote entero. Las manos no cambian: el residente solicita, el supervisor aprueba y control valida (D-269). El candado del lote parece ser la **entrega de obra** de ObraCtrl (cuatro firmas; la obra queda entregada y congelada) *(lectura mía)*; el de las actividades es su `solicitud_cierre`, pero una solicitud puede llevar varias |
 
-*Una duda de palabra:* en español «doble candado» puede ser dos controles (dos niveles de revisión) o dos bloqueos (lo cerrado ya no se toca). El cerebro hoy dice que el cierre de frente «pregunta, no impide» (`MODELO.md` §5c); ObraCtrl sí congela la obra entregada y cierra la semana de una estimación validada. Se deja como **dos niveles de control** y se pregunta si además lo cerrado debe quedar bloqueado.
+*Una duda de palabra, resuelta en D-516:* «doble candado» podía ser dos controles o dos bloqueos. El usuario contestó que **lo cerrado se cierra al residente, y para los demás sigue abierto hasta la entrega de la casa, cuando pasa a postventa.**
+
+**Lo que el usuario contestó (D-516).**
+
+| Tema | Respuesta del usuario | Qué queda |
+|---|---|---|
+| El oid de la estimación | «El presupuesto sí tiene un oid; de ahí toma la idea para la estimación, porque cuando se descarga y se manda a revisión fuera del sistema se pueden eliminar, cambiar, agregar y modificar renglones» | La estimación **y cada renglón** llevan un oid que **genera este sistema y viaja en el archivo que sale;** al volver, se reconcilia por él. Es la misma idea con que el cerebro ya usa el `OID` de OPUS, con una diferencia: aquel es de un sistema ajeno y no se adopta como identidad (`MODELO.md` §1); este lo genera el cerebro y por eso sí puede serlo. Las reglas están en `MODELO.md` §5d |
+| «Antigua» | «No sé a qué te refieras, ¿al proyecto?» | Sí: «Antigua» es el segundo proyecto, no un estatus. Se corrigió D-513 |
+| El correo | «Sí, solo que el correo es para el login» | Contacto, teléfono y correo siguen opcionales en el contratista, **pero el correo es el del inicio de sesión:** en `USUARIO` es obligatorio y único (D-469 y D-470). Si el contratista entrara algún día al sistema, sería con ese correo *(por confirmar)* |
+| La entrega de obra | «Sí, aunque el superintendente puede o no estar; es más como el equipo de gestión de proyectos» | El candado del lote es la entrega de obra de ObraCtrl, con cuatro participantes: **el residente entrega, el supervisor da el visto bueno, control revisa calidad y expediente, y el equipo de gestión de proyectos firma;** el superintendente puede estar o no. *Lectura mía:* ese equipo es el área de Proyectos de R10 |
+| El candado | «Más bien tendría que pasar a postventa; lo puedes cerrar al residente, pero para los demás se puede mantener abierto hasta la entrega de la casa» | Cerrar un frente, una actividad o el lote **cierra al residente** (ya no registra avance ahí); supervisor, control y gestión de proyectos siguen pudiendo hasta la entrega. **Al entregar, la obra pasa a postventa** (`MODELO.md` §3b) y no queda solo «congelada» como en ObraCtrl |
+
+**Las piezas que ObraCtrl tiene de más: qué entra al cerebro (propuesta, D-516).** El criterio: el cerebro guarda el **dominio** de la obra, no la **plomería** de una aplicación (D-487).
+
+| Pieza de ObraCtrl | Propuesta | Por qué |
+|---|---|---|
+| Entrega de obra con cuatro participantes | **Entra** (ya contestado arriba) | Es el segundo candado y lo que pasa la obra a postventa |
+| Expediente técnico (planos, contratos, actas, evidencias, bitácora y otros, por obra) | **Entra,** chico | La entrega pide a control revisar «calidad y expediente»; el cerebro ya tiene planos y notas sobre ellos, pero no el expediente |
+| Revisión física de control (fotos, comentario y calidad de 1 a 5) | **Entra,** chica | De ahí puede salir la incidencia de calidad de un cierre (`CIERRE_FRENTE.incidencia_calidad_id`) y, después, la postventa |
+| Bloqueo de periodo (una estimación validada cierra esa semana de la obra) | **Entra como regla** | Generaliza «una pagada ya no se toca»; falta saber para quién cierra (abajo) |
+| Tolerancia de extra de 20 % por obra y por actividad | **Entra como parámetro** | Es el mismo 20 % que el cerebro usa de ejemplo de umbral; cabe en la tabla de parámetros (B-114) |
+| Evaluaciones de obra, residente y contratista (auto, control y final, con criterios ponderados) | **Después** | Es el punto de partida del método de calificar a los contratistas, que el usuario dejó para más adelante (B-117) |
+| Cuadrillas con versión e integrantes | **Ya está** | Las cuadrillas son nodos con su matriz (D-473) |
+| Avisos y notificaciones, captura sin conexión, varias organizaciones, idempotencia, respaldos | **Fuera del cerebro** | Son de la aplicación, no del dominio. Varias organizaciones se retoma si algún día se vende a otras constructoras |
+
+**Tres preguntas que quedan,** chicas: si hoy hacen la revisión física y con qué escala de calidad; si una estimación validada cierra la semana de esa obra para todos o solo para el residente; y si los contratistas entrarán al sistema (el correo).
 
 **Lo que el usuario contestó sobre ObraCtrl (D-514).**
 
 | Tema | Respuesta del usuario | Qué queda |
 |---|---|---|
-| Estatus de la obra | «Está bien así, como ObraCtrl»; «casi lista» es lo mismo que «por entregar» y prefiere ese nombre | `pendiente · iniciada · en_proceso · por_entregar · entregada`. En ObraCtrl el estatus **se deriva del avance:** desde 90 % es `casi_lista` (ahora por entregar) y con más de 0 % es `en_proceso`; `iniciada` se marca al arrancar la obra y `entregada` al entregarla, y **una obra entregada queda congelada;** tampoco se entrega una que nunca arrancó. El 90 % es el mismo del cierre de frente (D-261). La definición del usuario («terminada, pero el cliente no la ha recibido») y la regla de ObraCtrl (desde el 90 %) quedan juntas: por entregar va del 90 % hasta la entrega. `antigua` **no se agrega** *(lectura mía: si hace falta, se deduce de la fecha de inicio)* |
+| Estatus de la obra | «Está bien así, como ObraCtrl»; «casi lista» es lo mismo que «por entregar» y prefiere ese nombre | `pendiente · iniciada · en_proceso · por_entregar · entregada`. En ObraCtrl el estatus **se deriva del avance:** desde 90 % es `casi_lista` (ahora por entregar) y con más de 0 % es `en_proceso`; `iniciada` se marca al arrancar la obra y `entregada` al entregarla, y **una obra entregada queda congelada;** tampoco se entrega una que nunca arrancó. El 90 % es el mismo del cierre de frente (D-261). La definición del usuario («terminada, pero el cliente no la ha recibido») y la regla de ObraCtrl (desde el 90 %) quedan juntas: por entregar va del 90 % hasta la entrega. «Antigua» **no es un estatus:** es el segundo proyecto (D-516) |
 | Roof garden | «Actualmente el presupuesto solo combina en la Diamante planta alta y roof garden; algunos títulos dicen Azotea/Roof, porque la azotea puede pasar a roof garden si el cliente lo pide» | El roof garden **no es un nivel aparte ni cuenta en `plantas`:** es la azotea que el cliente convierte. Los datos lo confirman: el presupuesto solo trae conceptos de roof en los dos Diamante, y el título «Azotea/Roof» en Rubí. Convertirla es un cambio sobre esa casa |
 | Supervisor | «No es por cluster, ve las obras de sus residentes» | Se queda `SUPERVISION`; `supervisor_cluster` de ObraCtrl sobra |
 | Contratista | «No ponemos clave al contratista; solo el id. RFC opcional, no obligatorio. Contacto y calificación sí; después veremos el método de calificar» | Sin clave; `rfc` opcional; contacto, teléfono y correo opcionales *(lectura mía: ObraCtrl los trae separados)*; `calificacion` sin método todavía (B-117). La clave obligatoria de ObraCtrl sobra |

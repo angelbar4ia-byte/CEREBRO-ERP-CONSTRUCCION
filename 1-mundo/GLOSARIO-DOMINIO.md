@@ -74,7 +74,7 @@ Identificador único de un registro. Es su identidad ante el negocio: nunca se r
 
 ### id interno
 
-Identificador que genera la base de datos en el INSERT. Nunca se muestra y nunca cambia, ni al mover ni al renumerar.
+Identificador que genera la base de datos en el INSERT. Nunca se muestra y nunca cambia, ni al mover ni al renumerar. En la estimación el usuario lo llama *oid* y sí viaja en el archivo que sale a revisión, para reconocer sus renglones cuando vuelve (D-516).
 
 - **También:** Identidad interna
 - **No confundir con:** Clave; WBS
@@ -879,12 +879,12 @@ Obra registrada sin presupuesto aprobado. Es una deuda medible, con antigüedad.
 
 ### Proyecto
 
-El desarrollo completo: agrupa clústeres y una urbanización. Hoy hay uno, Magnolia. (D-512.)
+El desarrollo completo: agrupa clústeres y una urbanización. Hoy hay dos: Magnolia y «Antigua», un proyecto viejo al que le quedan una o muy pocas obras por cerrar. (D-512 y D-516.)
 
 - **También:** Desarrollo
 - **No confundir con:** Lote (una casa); Prototipo; Presupuesto
 - **Se usa con:** Cluster; Urbanización; Lote
-- **Ejemplo:** Magnolia
+- **Ejemplo:** Magnolia; «Antigua»
 - **Hoy vive en:** `proyectos` del concentrador (2), `proyecto` en auditoría y en ObraCtrl; el modelo del cerebro aún no lo tiene (`MODELO.md` §3c, propuesta)
 
 ### Cluster

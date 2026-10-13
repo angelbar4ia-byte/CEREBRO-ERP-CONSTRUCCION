@@ -935,7 +935,8 @@ Dato del usuario (D-512): el proyecto es **Magnolia**, con siete clústeres y *n
 ```
 PROYECTO
   id
-  nombre             texto — «Magnolia»                                    propuesta — D-512
+  nombre             texto — «Magnolia» y «Antigua» (un proyecto viejo al
+                      que le quedan una o muy pocas obras por cerrar)       propuesta — D-512 y D-516
 
 CLUSTER
   id
@@ -963,7 +964,7 @@ PRESUPUESTO — campos que gana (todos nullable)
 - **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
 - **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
 - **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y el cliente, que no se dijo si es un dato de la obra.
-- **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b) y una obra entregada queda congelada. `antigua`, que se había leído en D-513, no se agrega.
+- **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b), y **al entregarse la obra pasa a postventa** (§3b, D-516). «Antigua», que D-513 leyó como un estatus, es el nombre del segundo proyecto.
 
 ---
 
@@ -1180,7 +1181,7 @@ son la misma persona**, una sola letra de diferencia — homologa con el
 mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
 `NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
 
-*D-512 (propuesta): el usuario pidió categorizar a los contratistas **por tipo y por oficio**. `CONTRATISTA` gana `activo` (boolean — se retira, no se borra, igual que `USUARIO`), `tipo` (FK `CLASE_TRABAJO`, la tabla abierta de §2: destajo o subcontrato; si un contratista trabaja de las dos maneras habrá que permitir más de uno) y `clave` (texto, nullable: la de OPUS si llega ese catálogo; no se inventa una). **D-514:** el usuario confirmó que no hay clave, solo el id; que el `rfc` es opcional; y que van el contacto (`contacto`, `telefono` y `correo`, opcionales) y la `calificacion` (NUMERIC, nullable), cuyo método de calificar se define después (B-117). Los oficios van en `CONTRATISTA_ESPECIALIDAD` (`contratista_id`, `familia_id` —la `Familia` del trabajo, que es el oficio—): una persona puede tener varios. La retención por garantías (B-112) es `retencion_pct`, NUMERIC nullable: nulo no la lleva y 5 es lo normal.*
+*D-512 (propuesta): el usuario pidió categorizar a los contratistas **por tipo y por oficio**. `CONTRATISTA` gana `activo` (boolean — se retira, no se borra, igual que `USUARIO`), `tipo` (FK `CLASE_TRABAJO`, la tabla abierta de §2: destajo o subcontrato; si un contratista trabaja de las dos maneras habrá que permitir más de uno) y `clave` (texto, nullable: la de OPUS si llega ese catálogo; no se inventa una). **D-514:** el usuario confirmó que no hay clave, solo el id; que el `rfc` es opcional; y que van el contacto (`contacto`, `telefono` y `correo`, opcionales) y la `calificacion` (NUMERIC, nullable), cuyo método de calificar se define después (B-117). **El correo es el del inicio de sesión** (D-516): en `USUARIO` es obligatorio y único; en el contratista es un dato de contacto, y si algún día entra al sistema, lo hará con él. Los oficios van en `CONTRATISTA_ESPECIALIDAD` (`contratista_id`, `familia_id` —la `Familia` del trabajo, que es el oficio—): una persona puede tener varios. La retención por garantías (B-112) es `retencion_pct`, NUMERIC nullable: nulo no la lleva y 5 es lo normal.*
 
 ### Lo que esto ya resuelve, de paso
 
@@ -2663,8 +2664,8 @@ Dos respuestas del usuario (D-515) sobre lo que ObraCtrl hace distinto, que aqu�
 
 **El cierre: dos candados.** Se solicita **por frente** (`CIERRE_FRENTE`, firme, arriba) y, **si se requiere, por una o varias actividades;** el segundo candado cierra **todo el lote**. Las manos son las de siempre (D-269): el residente solicita, el supervisor aprueba, control valida. Lo que se suma, sin escribirlo todavía como tabla:
 - **El cierre de actividades:** una solicitud puede llevar varias. ObraCtrl lo hace por actividad, con lista de verificación, adjuntos, cantidad y monto (`solicitud_cierre`).
-- **El cierre del lote:** la entrega de la obra, que la deja en `entregada` y congelada (§3c). En ObraCtrl participan cuatro —el residente entrega, el supervisor da el visto bueno, control revisa calidad y expediente y el superintendente firma— y la obra queda entregada cuando están todos. *Lectura mía:* ese es el segundo candado; falta que el usuario confirme que es el flujo que usa.
-- **Candado no es todavía bloqueo:** hoy el cierre de frente «pregunta, no impide» (§5c, arriba). Si el usuario quiere que lo cerrado ya no admita avance ni cambios, es una regla nueva (B-119).
+- **El cierre del lote:** la entrega de la obra, que la deja en `entregada` y la pasa a postventa (§3c y §3b). Confirmado en D-516: participan **el residente (entrega), el supervisor (visto bueno), control de obra (calidad y expediente) y el equipo de gestión de proyectos (firma);** el superintendente puede estar o no. La obra queda entregada cuando participan todos.
+- **Qué quiere decir «candado» (D-516):** cerrar un frente, una actividad o el lote **cierra al residente** —ya no registra avance ahí—, y para los demás roles sigue abierto hasta la entrega de la casa. Hoy el cierre de frente «pregunta, no impide» (§5c, arriba); esto lo vuelve una regla por rol: las funciones de captura del residente no aplican sobre lo cerrado (B-119). Al entregarse, la obra no queda solo congelada: **pasa a postventa.**
 
 **Una incidencia puede llegar al cliente.** Un «extra» de ObraCtrl —más cantidad que la tolerancia, trabajo fuera de catálogo, sustitución o alta de catálogo— se parece a una `INCIDENCIA` que cambia la actividad (`crece_actividad`, `crea_actividad`), y el usuario dice que **puede** pasar a una orden de cambio con el cliente (`PROPUESTA(tipo=orden_cambio)`, §5f). `CONOCIMIENTO.md` §13.6 ya decía que una incidencia puede o no generar un control de cambio; lo que faltaba es la liga: `INCIDENCIA.orden_cambio_id`, FK `PROPUESTA`, nullable, nula mientras el extra es interno.
 
@@ -2792,6 +2793,11 @@ cambie.
 *D-512 (propuesta): `ESTIMACION_LINEA` gana `folio` (texto, único), que se arma con una regla y no se teclea: `[E-]SSAA-NNN` —semana en dos dígitos, año en dos y un consecutivo de tres que no se corta—, con el prefijo `E-` solo si `ESTIMACION.fuente = erp_externo`. Es por renglón y no por documento, y si el campo de semana que llega ya trae esa forma, se toma como folio. Así lo define la «Fuente de la Verdad» de auditoría en su apartado 3.2, y el usuario confirmó que sigue vigente. Los parámetros que esa fuente da por vigentes (IVA, umbral, similitud) no tienen tabla todavía: B-114.*
 
 *D-514 (propuesta): el usuario confirmó el folio por renglón y pidió algo más: **la estimación necesita su propio identificador generado por el sistema** (su «oid»), porque los folios son de renglón y no la identifican. Es el `id` de `ESTIMACION`, que no se teclea ni se reutiliza. El `estado` gana `enviada` entre `capturada` y `validada` —la envía quien la captura, y si excede el tope vuelve como `devuelta`—, y **Control de obra la marca `pagada`**, una función nueva (`marcar_estimacion_pagada`, por asignar) que no está en la lista de §5b todavía; una estimación pagada ya no se toca. `estado` sigue siendo firme en sus otros valores; este es un añadido (B-118).*
+
+*D-516 (propuesta) — la estimación sale y vuelve: su oid, tomado del presupuesto.* El usuario señaló que el presupuesto sí trae un oid, y que de ahí sale la idea: una estimación se **descarga y se manda a revisión fuera del sistema,** y allá se pueden **eliminar, cambiar, agregar y modificar renglones.** Sin una identidad que viaje en el archivo no hay forma de saber qué es qué cuando regresa. Se propone:
+- **La estimación y cada renglón llevan un oid** que genera este sistema y **sale en una columna del archivo;** el folio no sirve para esto, porque viene del ERP o se arma por regla y también se puede teclear mal o cambiar afuera. La diferencia con el `OID` de OPUS (§1): aquel es de un sistema ajeno y no se adopta como identidad; este lo genera el cerebro, así que sí puede serlo (`ESTIMACION.id` y `ESTIMACION_LINEA.id`).
+- **Al volver, se casa por oid y se propone, no se aplica** (la bandeja, §5): mismo oid y mismos valores, nada; mismo oid con valores distintos, un renglón **modificado** (con lo de antes y lo de ahora); un oid que el sistema tiene y el archivo ya no trae, un renglón **eliminado afuera** —pide confirmación y no borra, como una baja de presupuesto (D-476)—; un renglón sin oid, o con uno que el sistema no conoce o repetido, un renglón **agregado.**
+- **Hasta dónde se puede:** una estimación `validada` o `pagada` ya no se edita desde un archivo; lo que regrese distinto genera una alerta, no un cambio. Cada cambio aceptado deja una fila de historia que solo se agrega (como `RENGLON_HISTORIA`, §4a), y ese rastro es lo que B-109 pedía para comparar la versión previa con la revisada.
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`
