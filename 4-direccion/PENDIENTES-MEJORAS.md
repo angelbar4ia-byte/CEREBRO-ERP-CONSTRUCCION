@@ -323,6 +323,7 @@ puede escribir de lo que primero hay que definir.
 
 ---
 | 🔶 B-104 | **Cómo se ordenan los repos de los ERPs del usuario** | Decidido en D-496 (el usuario delegó la estructura): polirepo con el cerebro como centro. `CONTROL-AVANCE` (ObraCtrl) y `ERP-ESTIMACI-N` no se mueven; los dos sistemas de la laptop viven en `Multi-erp`, uno por carpeta (`apps/extraordinarios`, `apps/auditoria`), y no en repos nuevos como proponía D-495. Esqueleto de `Multi-erp` subido (commit `019f579`) con `herramientas/preparar-para-github.py` y `docs/COMO-AGREGAR-UNA-APP.md` | 🔶 **Falta del usuario:** traer la carpeta de cada app; archivar `obractrl-deploy`, `MAGNOLIA-AVANCES` y `MAGNOLIA-AVANCE-DE-OBRA`; pasar `AVANCE-EJEMPLO` (público) a privado; quitar `.claude/worktrees` de `CONTROL-AVANCE`; y decir qué proyecto de Render y de Vercel es la API y cuál el panel |
+| ⏸️ B-105 | **Leer los dos documentos de la carpeta de auditoría y reconciliar los tres cánones** | La carpeta `obra-control` trae «FUENTE_DE_LA_VERDAD_Sistema_Control_Obra» y «MODULO_AUDITORIA_ESTIMACION» (D-500). Cuando suban a `Multi-erp`, leerlos, compararlos con la parte 10 de la especificación de ObraCtrl y con `LENGUAJE.md`, y proponer qué se queda como canon (D-495 dejó esto antes de conectar nada) | ⏸️ **Espera a que la app suba a `Multi-erp`** |
 
 ### Lo que se puede empezar hoy
 

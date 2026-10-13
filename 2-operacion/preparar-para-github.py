@@ -285,6 +285,38 @@ def quitar_contrasenas(archivo, quitables):
     return cambiadas
 
 
+def se_puede_cambiar_en_todo(valor):
+    """Un valor largo y con números o símbolos casi nunca es una palabra común; uno corto y de letras sí (postgres, admin)."""
+    return len(valor) >= 8 and bool(re.search(r"[0-9]|[^A-Za-z0-9]", valor))
+
+
+def barrer_valores(destino, valores):
+    """Busca en TODA la copia las contraseñas que se quitaron de una línea concreta: casi siempre están también en otra forma
+    (`CREATE USER … PASSWORD '…'`, `set PGPASSWORD=…`) que ninguna regla reconoce. Las largas se cambian por la marca; las cortas y
+    de letras, que serían palabras comunes, solo se avisan. Devuelve ({archivo: veces cambiadas}, {archivo: veces vistas})."""
+    cambiados, avisados = {}, {}
+    for archivo in sorted(destino.rglob("*")):
+        if not archivo.is_file() or archivo.stat().st_size > LIMITE_DE_LECTURA:
+            continue
+        datos = archivo.read_bytes()
+        if b"\x00" in datos[:8000]:
+            continue
+        rel, nuevo = archivo.relative_to(destino), datos
+        for valor in valores:
+            aguja = valor.encode("utf-8")
+            veces = nuevo.count(aguja)
+            if not veces:
+                continue
+            if se_puede_cambiar_en_todo(valor):
+                nuevo = nuevo.replace(aguja, MARCA_DE_CLAVE.encode("utf-8"))
+                cambiados[rel] = cambiados.get(rel, 0) + veces
+            else:
+                avisados[rel] = avisados.get(rel, 0) + veces
+        if nuevo != datos:
+            archivo.write_bytes(nuevo)
+    return cambiados, avisados
+
+
 def armar_copia(carpeta, informe, salida, nombre, incluir_datos, quitar=False):
     destino = salida / nombre
     if destino.exists():
@@ -308,9 +340,13 @@ def armar_copia(carpeta, informe, salida, nombre, incluir_datos, quitar=False):
                 informe["sin_quitar"].append(rel)  # sigue habiendo una contraseña: se avisa, no se calla
             else:
                 informe.setdefault("sin_contrasena", []).append(rel)
+    if quitar:
+        valores = {q[1] for hs in informe["hallazgos"].values() for _, _, _, _, q in hs if q}
+        informe["barrido"] = barrer_valores(destino, valores) if valores else ({}, {})
     previo = (destino / ".gitignore").read_text(encoding="utf-8") if (destino / ".gitignore").exists() else ""
     (destino / ".gitignore").write_text(previo.rstrip("\n") + ("\n\n" if previo else "") + bloque_gitignore(), encoding="utf-8")
-    (destino / ".env.example").write_text("".join(f"{v}=\n" for v in sorted(informe["variables"])), encoding="utf-8")
+    if not (destino / ".env.example").exists():  # el que ya traía la app (con sus comentarios) vale más que una lista de nombres
+        (destino / ".env.example").write_text("".join(f"{v}=\n" for v in sorted(informe["variables"])), encoding="utf-8")
     (destino / "FICHA.md").write_text(plantilla_de_ficha(nombre, informe["variables"]), encoding="utf-8")
     if not (destino / "README.md").exists():
         (destino / "README.md").write_text(f"# {nombre}\n\nVer `FICHA.md`.\n", encoding="utf-8")
@@ -392,6 +428,9 @@ def autoprueba():
         (app / "vendor" / "v.py").write_text("print('ajeno')\n", encoding="utf-8")
         (app / "cfg.py").write_text("SECRET_KEY = 'otra-clave-larga-999'\nNOMBRE = 'postgres'\n", encoding="utf-8")
         (app / "win.bat").write_bytes(b"@echo off\r\nset URL=postgresql://obra_usr:obra_dev1@localhost:5432/obra\r\nrem acci\xf3n en latin-1\r\n")
+        (app / "inst.bat").write_text('psql -c "CREATE USER obra_usr WITH PASSWORD \'obra_dev1\'"\n', encoding="utf-8")  # la misma contraseña, en una forma que ninguna regla reconoce
+        (app / "notas.txt").write_text("usuario postgres en la base postgres\n", encoding="utf-8")  # palabra común: se avisa, no se cambia
+        (app / ".env.example").write_text("SUPABASE_URL=\n# comentario del autor\n", encoding="utf-8")
         (app / "tipos.py").write_text("TOKEN_TYPE = 'bearer-largo'\nAPI_KEY_URL = 'https://x.example/k'\n", encoding="utf-8")
         informe = revisar(app, excluir=["Vendor"])
         apartados = {r.as_posix() for r, _ in informe["aparta"]}
@@ -437,6 +476,15 @@ def autoprueba():
             errores.append("--quitar-contrasenas rompió los fines de línea o los bytes no UTF-8 de win.bat")
         if informe.get("sin_quitar"):
             errores.append("quedó una contraseña sin quitar: " + str(informe["sin_quitar"]))
+        inst = (sin / "inst.bat").read_bytes()
+        if b"obra_dev1" in inst or MARCA_DE_CLAVE.encode() not in inst:
+            errores.append("el barrido no cambió la misma contraseña escrita en otra forma (inst.bat)")
+        if b"usuario postgres en la base postgres" not in (sin / "notas.txt").read_bytes():
+            errores.append("el barrido cambió una palabra común y corta (postgres)")
+        if "notas.txt" not in {r.as_posix() for r in informe["barrido"][1]}:
+            errores.append("el barrido no avisó de la palabra corta que dejó sin cambiar")
+        if b"comentario del autor" not in (sin / ".env.example").read_bytes():
+            errores.append("pisó el .env.example que ya traía la app")
         real = quitar_contrasenas  # si quitar no logra quitar, tiene que avisar y no callar
         quitar_contrasenas = lambda *args: 0
         try:
@@ -493,6 +541,13 @@ def main():
         quitados = informe.get("sin_contrasena", [])
         print(f"\nContraseñas quitadas de la copia (cambiadas por {MARCA_DE_CLAVE}): {len(quitados)} archivos."
               + (" Tu app original no se tocó." if quitados else " No había ninguna que quitar."))
+        cambiados, avisados = informe.get("barrido", ({}, {}))
+        if cambiados:
+            print(f"Barrido del resto de la copia: la misma contraseña estaba también, en otra forma, en {len(cambiados)} archivos más "
+                  f"(cambiada): {', '.join(r.as_posix() for r in list(cambiados)[:8])}" + (" …" if len(cambiados) > 8 else ""))
+        if avisados:
+            print(f"  Aparece también, sin cambiarse por ser una palabra corta y común, en: "
+                  f"{', '.join(r.as_posix() + ' (' + str(v) + ')' for r, v in list(avisados.items())[:8])}. Revisa si es la contraseña o solo la palabra.")
         for rel in informe.get("sin_quitar", []):
             print(f"  OJO: en {rel.as_posix()} sigue habiendo una contraseña; quítala a mano antes de subir.")
     criticos = con_critico(informe)
