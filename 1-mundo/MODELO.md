@@ -2657,6 +2657,17 @@ existe:**
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
 
+### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515, propuesta)
+
+Dos respuestas del usuario (D-515) sobre lo que ObraCtrl hace distinto, que aquí son propuesta.
+
+**El cierre: dos candados.** Se solicita **por frente** (`CIERRE_FRENTE`, firme, arriba) y, **si se requiere, por una o varias actividades;** el segundo candado cierra **todo el lote**. Las manos son las de siempre (D-269): el residente solicita, el supervisor aprueba, control valida. Lo que se suma, sin escribirlo todavía como tabla:
+- **El cierre de actividades:** una solicitud puede llevar varias. ObraCtrl lo hace por actividad, con lista de verificación, adjuntos, cantidad y monto (`solicitud_cierre`).
+- **El cierre del lote:** la entrega de la obra, que la deja en `entregada` y congelada (§3c). En ObraCtrl participan cuatro —el residente entrega, el supervisor da el visto bueno, control revisa calidad y expediente y el superintendente firma— y la obra queda entregada cuando están todos. *Lectura mía:* ese es el segundo candado; falta que el usuario confirme que es el flujo que usa.
+- **Candado no es todavía bloqueo:** hoy el cierre de frente «pregunta, no impide» (§5c, arriba). Si el usuario quiere que lo cerrado ya no admita avance ni cambios, es una regla nueva (B-119).
+
+**Una incidencia puede llegar al cliente.** Un «extra» de ObraCtrl —más cantidad que la tolerancia, trabajo fuera de catálogo, sustitución o alta de catálogo— se parece a una `INCIDENCIA` que cambia la actividad (`crece_actividad`, `crea_actividad`), y el usuario dice que **puede** pasar a una orden de cambio con el cliente (`PROPUESTA(tipo=orden_cambio)`, §5f). `CONOCIMIENTO.md` §13.6 ya decía que una incidencia puede o no generar un control de cambio; lo que faltaba es la liga: `INCIDENCIA.orden_cambio_id`, FK `PROPUESTA`, nullable, nula mientras el extra es interno.
+
 ### El tablero del frente se calcula, no se guarda (D-455, cierra B-88)
 
 El frente (obra, nivel) y el sub-frente (etapa) son el nodo de Nivel 1 y el de Nivel 2; su

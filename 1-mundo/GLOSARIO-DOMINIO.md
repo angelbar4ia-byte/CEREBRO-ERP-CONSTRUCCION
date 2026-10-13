@@ -817,7 +817,7 @@ construir más (efecto cantidad) o por usar distinto rendimiento (efecto receta)
 
 ### Orden de cambio
 
-Documento que referencia un nodo congelado y propone un delta. No edita: agrega.
+Documento que referencia un nodo congelado y propone un delta. No edita: agrega. Puede nacer de un extra interno de la obra (D-515).
 
 - **También:** Control de cambio
 - **No confundir con:** Desviación
