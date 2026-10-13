@@ -844,6 +844,50 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 
 ---
 
+### ObraCtrl y el avance de obra: ¿rediseño o piloto? (D-523)
+
+El usuario pidió ver el avance de obra para planear si hace falta rediseñar y para poner la app en operación. Esto es lo que se encontró; **no se construyó ni se conectó nada** (D-487 sigue en pie) y ObraCtrl no se tocó.
+
+**Qué hace hoy el avance en ObraCtrl.** El residente captura la cantidad ejecutada de cada actividad (web, o móvil sin conexión); `cant_ejecutada` se deriva de la suma de lo capturado y el avance es esa cantidad entre la base; no se puede ejecutar más de lo programado, ni programar más de 120 % de la base (se pasa por control de cambio); desde 90 % la actividad queda «casi lista». Cerrar una actividad es residente solicita, supervisor autoriza y control valida; el cierre dispara el recálculo de la ruta crítica. Es la parte más completa de la app: la hoja de ruta de ObraCtrl da por cerradas sus 16 fases y dice que **lo que falta ya no es código sino ponerla frente a una obra real.**
+
+**Qué se verificó (en esta sesión, con una copia aparte).**
+
+| Capa | Resultado |
+|---|---|
+| Backend | **1,451 pruebas pasan:** 1,069 de dominio y 382 de integración contra un Postgres 16 con las 50 migraciones aplicadas |
+| Base de datos | Las 50 migraciones aplican limpias, y las pruebas de aislamiento por rol (RLS) pasan |
+| Web | **825 pruebas pasan** y la web compila |
+| No se verificó | El móvil, las pruebas de navegador, la reversa de las migraciones, y **lo que está desplegado hoy:** el panel de Vercel no se pudo abrir desde la sesión y no se sabe qué hay en Render, Supabase, Redis y R2 |
+
+**Qué avance real existe hoy.** Las exportaciones `grid_AvanceOPEventosOpr` del ERP externo (marzo a julio de 2026, ya en `1-mundo/fuentes/avance`) traen **2,920 eventos de operación** en 41 combinaciones de ubicación y lote, con 24 contratistas, 216 operaciones de destajo y 22 semanas con eventos. El avance es un **porcentaje por operación:** 1,137 eventos en 100 % y 1,783 por debajo, ninguno arriba. Los **siete clústeres** aparecen por nombre —Acacia, Alamo, Fresno, Maple, Olivo, Olmo y Tabachín— y también la planta tratadora, la vía Magnolia y la casa club (ubicaciones que no son casas). El estatus del ERP no sirve para nada (2,889 de 2,920 dicen «En Especificación»). Es decir: **el avance físico existe, pero solo como la salida de otro sistema;** ObraCtrl sería la forma de capturarlo directo en campo, que es lo que `CONOCIMIENTO.md` §13.7 pide: un avance físico independiente del pagado.
+
+**¿Se necesita rediseño? Para operar el avance, no.** Lo que difiere del cerebro se reparte así:
+
+| # | Brecha | Evidencia | Clase |
+|---|---|---|---|
+| G1 | El estatus `casi_lista` debe llamarse `por_entregar` (D-514) | Valor del enum de estatus de obra | **Ajuste menor:** renombrar el valor |
+| G2 | La clave del contratista es obligatoria y única (D-514 dijo que no hay clave) | Columna `clave` no nula | **Ajuste menor:** al cargar, una clave provisional; después quitar la restricción |
+| G3 | Toda obra exige cluster, así que la urbanización y las amenidades no caben (D-512) | `cluster_id` no nulo en la obra | **Antes de capturar esas obras;** no estorba a las casas |
+| G4 | `supervisor_cluster` sobra (D-514) | La tabla sigue, pero ObraCtrl ya dejó de usarla para el alcance (migración 0042: el alcance sigue a la gente) y la conserva como dato territorial | **Ya resuelto en el código;** solo queda quitar la tabla cuando convenga |
+| G5 | La estimación de ObraCtrl se genera del avance validado (`borrador`, `enviada`, `validada`), y el recorrido real es otro: Excel del residente, extractor, validador de topes de Compras, ajustes, pago (D-522) | Reglas de negocio y flujo de estimación de su especificación | **Rediseño diferido:** en el piloto el módulo de estimación se deja sin usar y la estimación sigue como hoy (R9) |
+| G6 | Las órdenes de trabajo y los extraordinarios no están en ObraCtrl (su control de cambio es interno) | — | Fuera: extraordinarios se queda (R9) |
+| G7 | El cerebro propone el % de avance desde el programa y el residente solo corrige lo raro; ObraCtrl pide la cantidad capturada | `CONOCIMIENTO.md` §13.7 y D-393 | **Mejora posterior,** con evidencia del piloto |
+| G8 | Calidad de la revisión física de 1 a 5 (D-517 dijo de 5 a 10), roles con otros nombres, Antigua con manzanas | — | No bloquean; se ajustan cuando se usen |
+
+**El plan, por etapas.**
+
+| Etapa | Qué | Quién |
+|---|---|---|
+| 0 · Inventario | Saber qué hay desplegado hoy y con qué datos (panel, API, base, cola, evidencias), y dejar a punto lo que pide la hoja de ruta de ObraCtrl: sellar la base de producción, los orígenes permitidos (CORS), el modo de producción, la llave de servicio, etiquetas de versión y un respaldo probado | El usuario |
+| 1 · Decisiones | Obra piloto, residentes, si tienen señal en campo, y si el piloto corre en paralelo al avance del ERP | El usuario |
+| 2 · Datos de la obra piloto | Cargar en orden: unidades y familias, catálogo de conceptos con sus matrices, materiales, mano de obra y subcontratos, prototipo con su árbol, programa base, contratistas, la obra, usuarios y asignaciones. **El cerebro ya tiene casi todo en CSV** (los tres catálogos de OPUS, los siete programas de prototipos, la ingeniería de ALAMO 18, el almacén y el avance real); falta darle el formato de carga de ObraCtrl | El cerebro, **si el usuario levanta D-487 solo para preparar archivos de carga** |
+| 3 · Piloto | Cuatro semanas con una obra en proceso o por arrancar: el residente captura el avance físico cada semana desde la web, control valida los cierres, **la estimación sigue en Excel**, y cada semana se compara el avance físico con el pagado (la alerta de dos sentidos de `CONOCIMIENTO.md` §13.7) | Residente y control |
+| 4 · Decisión | Con lo que dejó el piloto: seguir, y qué de G1 a G8 rediseñar primero | El usuario |
+
+**Una observación sobre la obra piloto.** ALAMO 18 es la obra mejor documentada del cerebro (ingeniería, precio real, cinco meses de almacén y de avance), pero probablemente ya esté avanzada. Sirve mejor para **repetir su historia por ObraCtrl** y comprobar la carga y la ruta crítica; el piloto en vivo conviene en una obra que esté en proceso o por arrancar.
+
+**Lo que se necesita del usuario** (B-126): qué hay desplegado hoy; cuál obra y qué residentes; si hay señal en campo (si no, el móvil sin conexión deja de ser opcional, y no está publicado); si corre en paralelo al avance del ERP; y si se levanta D-487 para preparar los archivos de carga.
+
 ## Versión del canon
 
 El canon va a cambiar. Cada ERP quedará hablando la versión con que se conectó.

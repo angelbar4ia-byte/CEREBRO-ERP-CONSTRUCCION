@@ -894,7 +894,7 @@ Agrupación de lotes dentro del proyecto. Magnolia tiene siete. Su nombre forma 
 - **También:** Clúster
 - **No confundir con:** Proyecto; Frente
 - **Se usa con:** Proyecto; Lote; Control de cambio
-- **Ejemplo:** Alamo, Fresno, Olmo; en «Antigua», la manzana 10
+- **Ejemplo:** Acacia, Alamo, Fresno, Maple, Olivo, Olmo y Tabachín (los siete que aparecen en el avance del ERP, lectura mía); en «Antigua», la manzana 10
 - **Hoy vive en:** dentro del texto del lote («FRESNO 12»); `cluster` en auditoría y en ObraCtrl; la sigla (`ALM`) en la clave de un control de cambio, que sirve para formarla y para reconocer a qué obra corresponde
 
 ### Lote
