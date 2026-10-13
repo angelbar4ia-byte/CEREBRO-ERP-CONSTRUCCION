@@ -44,12 +44,13 @@ git log --oneline -5                ← el último commit tiene que coincidir co
                                        lo que este archivo describe como hecho
 ```
 
-Y el estado del Pull Request — hay uno abierto:
-**https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/1**
-Si sigue abierto, el trabajo de esta rama todavía no se mergeó a `main`. Seguí
-trabajando sobre la misma rama salvo que el usuario diga lo contrario.
+Y el estado del Pull Request — **hoy no hay ninguno abierto** (verificado con la API de
+GitHub el 2026-10-12): el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)
+se mergeó a `main` ese día (commit `e10ea08`) con todo hasta D-493. Lo que viene después
+(D-494 en adelante) vive en esta rama hasta que el usuario pida otro PR; no se abre uno por
+cuenta propia. Seguí trabajando sobre la misma rama salvo que el usuario diga lo contrario.
 
-> *D-468 (2026-10-10): **ya no hay ningún PR abierto.** El #1 se cerró y el #2 se mergeó a `main` hasta D-384. Los 73 commits que siguen —de D-385 a D-467: el CPM, el programa, la API y las pantallas, 58 archivos— viven solo en esta rama. Pedir el PR es del usuario. El CI de GitHub corre las 251 pruebas completas, sin saltarse ninguna, y está en verde en cada uno de esos commits. **Ese mismo día el usuario lo pidió y se abrió el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** con los 74 commits, de D-385 a D-468; mientras esté abierto, el trabajo sigue en esta rama.*
+> *D-468 (2026-10-10): **ya no hay ningún PR abierto.** El #1 se cerró y el #2 se mergeó a `main` hasta D-384. Los 73 commits que siguen —de D-385 a D-467: el CPM, el programa, la API y las pantallas, 58 archivos— viven solo en esta rama. Pedir el PR es del usuario. El CI de GitHub corre las 251 pruebas completas, sin saltarse ninguna, y está en verde en cada uno de esos commits. **Ese mismo día el usuario lo pidió y se abrió el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** con los 74 commits, de D-385 a D-468; mientras esté abierto, el trabajo sigue en esta rama. **D-496: ese PR se mergeó el 2026-10-12.***
 
 **Después, leer en este orden — el cerebro está en carpetas por capa**
 (`1-mundo`, `2-operacion`, `3-historia`, `4-direccion`; ver `INDICE.md`):
@@ -110,7 +111,7 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 | **Ensamble / Paramétrico** | 🆕 Cierra B-53 — `NODO`(rol=ensamble)+`COMPOSICION` reusados sin campo nuevo, `ENSAMBLE_PARAMETRO` nuevo para tasa/cohorte/dispersión (`MODELO.md` §1c, D-325). `CONSTANTE_FISICA` (B-18) con dos filas reales; el motor de cálculo del constructor sigue sin diseñar, D-326. 🆕 **P-22 se parte en dos rutas** — por analogía cierra (`PROPUESTA(tipo=matriz_generada)`, copia y escala, nunca genera; corpus es `PROPUESTA` misma, `MODELO.md` §5, D-352); por fórmula sigue siendo B-18, bloqueado en constantes físicas |
 | **Método** | `METODO.md` — cómo se razona, con los errores que lo enseñaron |
 | **Lenguaje** | Canon 1.0, tres dialectos, prueba de ida y vuelta ejecutada · 🆕 Avanza P-14/B-09 — Cabeceras/Materiales/Operaciones confirmados contra el propio dialecto OPUS y el join entre ellos validado sin huérfanos; `Flete`, archivo-vs-API y los 4 catálogos de salida siguen abiertos (`CONOCIMIENTO.md` §4.3, D-331/D-332) |
-| **Memoria** | 493 decisiones · 12 descartes · 35 correcciones · 🆕 recuento completo desde D-01, el número venía sobrestimado (D-338) |
+| **Memoria** | 497 decisiones · 12 descartes · 35 correcciones · 🆕 recuento completo desde D-01, el número venía sobrestimado (D-338) |
 | **Desviación, Consulta y renovación de invariantes** | 🆕 `DESVIACION` cierra tercera aparición del mismo hueco — patrones son `GROUP BY`, no tabla (`MODELO.md` §5g, D-343). `CONSULTA_LOG` le da bandeja propia a Consulta, persistente sin retención (§5h, D-344, B-33). Renovación semestral de invariantes es una `ALERTA` más, lee el `corte:` que ya existe, sin campo nuevo — Control de obra la resuelve (§5a, D-345, B-54). 🆕 **Corrección (D-347): `causa` tenía el vocabulario equivocado** — las nueve causas de §13.6 deciden si la fila es `DESVIACION` siquiera, no la describen; el vocabulario real es «causas por categoría», del mismo §13.6 |
 | **Cuatro decisiones de política del usuario** | 🆕 P-34 (`NODO.marca_revisado`, checklist no validación) · P-35 (sustitución = `PROPUESTA(tipo=version)` + `GRUPO_FUNCIONAL`, ya lo tenía el caso mortero/cemento) · P-36 (consolidar solo al leer, no al cargar — depende de compras/obra vs. costos/control) · P-27 (`PROPUESTA(tipo=patron_carga)`, confirma la forma una vez, no por archivo) — D-339 a D-342. 🆕 **Cierra P-26**: las cinco estructuras de ingeniería (`CONOCIMIENTO.md` §11.8) ya caían bajo `patron_carga` — la firma solo necesitaba el patrón de llenado de la columna de agrupador, no solo conteo de columnas (D-351) |
 | **Skill** | Base + 5 satélites compilados: importación, rediseño, paramétrico, cuantificador, 🆕 programa (D-486) |
@@ -157,18 +158,21 @@ Tiene que decir *"Todo cuadra"* en los dos momentos.
 - **Sale del foco, sin borrarse**: B-97 (crear el proyecto de Supabase, que es desplegar), B-99 (pantallas), B-63 (el servidor
   MCP), B-20 (el agente interno) y, de la bandeja, aprobar los otros tipos, los detectores de alertas y la credencial del
   agente. Se retoman si el foco cambia.
+- **El objetivo detrás del foco** *(dato del usuario, 2026-10-12, D-494)*: que el cerebro **actúe sobre los demás ERPs del usuario**. Para eso
+  hacen falta un conector por ERP y un agente que lo use, y los dos están fuera del foco. **D-487 sigue en pie** hasta que el usuario lo
+  levante para esa parte. Mientras, lo que toca es cerebro: el inventario de los ERPs y una ficha por cada uno (`LENGUAJE.md`, «Antes de la ficha»).
 
 ---
 
 ## Lo que sigue, en orden
 
-### La cola vigente — 2026-10-11 (D-468; ajustada en D-470 a D-493)
+### La cola vigente — 2026-10-11 (D-468; ajustada en D-470 a D-497)
 
 Rehecha con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, con los dos frenos: ¿está decidido? y ¿qué cuesta deshacerlo?). La columna «quién» es la que importa: separa lo que se puede hacer hoy de lo que espera una decisión o un dato que no está en este repo.
 
 | # | Qué | Quién lo mueve | Por qué va en este lugar |
 |---|---|---|---|
-| 1 | **Revisar y mergear el [PR #3](https://github.com/angelbar4ia-byte/CEREBRO-ERP-CONSTRUCCION/pull/3)** —los commits de D-385 a D-493, abierto el 2026-10-10— | El usuario | Casilla «ahora»: nada del CPM, el programa ni la API está en `main`, y cuesta un clic |
+| 1 | **Traer `extraordinarios` y `auditoria` a `Multi-erp`** (D-496) —el esqueleto ya está subido; falta la carpeta de cada app, por clonar y correr `preparar-para-github.py` o por zip en la conversación— | El usuario pone la carpeta; Claude revisa y sube | Hoy esas dos apps solo existen en la laptop, sin respaldo ni historia; es el primer paso del objetivo de D-494 y no cuesta nada deshacer |
 | 2 | **Los catálogos de OPUS que no están** —`MATERIALES`, `TRABAJOS`, `MANO_DE_OBRA`, `FLETES`, `CONCEPTOS` y los de la generación anterior— | Nadie: **ya no se piden** | Decisión del usuario (2026-10-11, D-479): lo que compartió está a salvo en el repo (`1-mundo/opus/` y `1-mundo/fuentes/`, con su manifiesto de huellas), con los CSV de OPUS alcanza para presupuesto y APU, y lo demás son temas menores. Estos cinco se leyeron en sesiones anteriores y su archivo no está en ninguna parte; siguen frenando P-09, P-32, M-14, B-07 y el cierre de P-14, pero **no se pregunta por ellos**: si entran, entran con `python3 -m api.guardar_subidas` |
 | 3 | **B-97 · Crear el proyecto de Supabase y entregarle su llave a la API** — ⏸️ **fuera del foco desde D-487**: es desplegar la app | El usuario | B-96 quedó confirmado (D-470): proveedor Supabase Auth, modelo firme. Lo que falta es configurar, no construir: crear el proyecto con la confirmación de correo activa, darle a `servir` el JWKS o el secreto (`PROGRAMA-CPM.md` §4.8) y decidir cómo inicia sesión la gente (con Google basta una dirección). Frena todo despliegue: sin esto la API no se puede publicar. Lo que B-96 arrastraba (alta desde la API, alcance por obra, clave foránea) lo pospuso el usuario: B-98 |
 | 4 | **B-101 · Confirmar o cambiar lo que D-485 propuso —`aprobar_propuesta` a Control de obra; `resolver_alerta` a Supervisor y Control de obra—, y decidir quién captura el avance y qué hereda el Superintendente** | El usuario | Cuesta una decisión y nada de código; deshacerla es una fila de `ROL_FUNCION`. La bandeja ya está construida (B-102, D-485) y funciona con lo propuesto; lo que falta decidir es `registrar_avance`, que frena la captura de avance y, con ella, las alertas de frente y de atraso. La recomendación está en `WORKFLOWS.md` §7 |

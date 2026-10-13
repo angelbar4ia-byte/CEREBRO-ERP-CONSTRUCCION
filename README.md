@@ -53,6 +53,8 @@ trabajo final, `verificar`, las suma.
 junto, qué se lee primero— y `2-operacion/METACOGNICION.md` explica qué hacer con lo que mide. Con `--integracion` dice cuánto cuesta
 partir la red y qué párrafos se repiten entre archivos; con `--reentrada`, si un archivo compilado oyó el último cambio de la sección de la que sale.
 
+`python3 2-operacion/preparar-para-github.py CARPETA --nombre X` no mira el cerebro sino una app ajena: aparta las claves y los datos reales y deja la carpeta lista para subir a GitHub (D-496).
+
 ## Los agentes
 
 `gravity` orquesta y entrega plan de ruta · `arquitecto` diseña · `constructor`
