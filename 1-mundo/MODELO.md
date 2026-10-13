@@ -928,40 +928,40 @@ pasó suelto.
 
 ---
 
-## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512 y D-520, propuesta)
+## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512 y D-520; firme desde D-521)
 
-Dato del usuario (D-512): el proyecto es **Magnolia**, con siete clústeres y *n* lotes en cada uno; **cada lote o casa es una obra** y se identifica por clúster y lote. La **urbanización es una sola** para todo el proyecto, y sus ramas son los clústeres y las amenidades. Hasta aquí el modelo no tenía proyecto ni cluster: el cluster era parte del nombre de la obra («ALAMO 18»), aunque la clave de un control de cambio ya los usaba por separado (`CC-ALM-18001`, §5f). **D-520:** en «Antigua» las casas no se identifican por cluster sino por **manzana y lote** («10-04» es manzana 10, lote 4), la sigla del cluster sirve para armar las claves y reconocer más rápido a qué obra pertenece un control de cambio, y el cliente se maneja como idea. Los campos son **propuesta del sistema**, a la espera de que el usuario los confirme, igual que pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454).
+Dato del usuario (D-512): el proyecto es **Magnolia**, con siete clústeres y *n* lotes en cada uno; **cada lote o casa es una obra** y se identifica por clúster y lote. La **urbanización es una sola** para todo el proyecto, y sus ramas son los clústeres y las amenidades. Hasta aquí el modelo no tenía proyecto ni cluster: el cluster era parte del nombre de la obra («ALAMO 18»), aunque la clave de un control de cambio ya los usaba por separado (`CC-ALM-18001`, §5f). **D-520:** en «Antigua» las casas no se identifican por cluster sino por **manzana y lote** («10-04» es manzana 10, lote 4), la sigla del cluster sirve para armar las claves y reconocer más rápido a qué obra pertenece un control de cambio, y el cliente se maneja como idea. **Los campos de este bloque los confirmó el usuario en D-521** y pasan de propuesta a firmes, como pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454).
 
 ```
 PROYECTO
   id
   nombre             texto — «Magnolia» y «Antigua» (un proyecto viejo al
-                      que le quedan una o muy pocas obras por cerrar)       propuesta — D-512 y D-516
+                      que le quedan una o muy pocas obras por cerrar)       firme — D-521
   agrupacion         enum: cluster · manzana — cómo llama el proyecto a lo
-                      que agrupa sus lotes; Magnolia, cluster; Antigua, manzana   propuesta — D-520
+                      que agrupa sus lotes; Magnolia, cluster; Antigua, manzana   firme — D-521
 
 CLUSTER
   id
-  proyecto_id        FK PROYECTO                                          propuesta — D-512
+  proyecto_id        FK PROYECTO                                          firme — D-521
   nombre             texto — siete en Magnolia; en Antigua, el número de
-                      la manzana («10»)                                    propuesta — D-512 y D-520
+                      la manzana («10»)                                    firme — D-521
   codigo             texto, nullable — la sigla que sirve para formar las
                       claves y reconocer a qué obra corresponde un control
-                      de cambio (`ALM` en `CC-ALM-18001`)                   propuesta — D-512 y D-520
+                      de cambio (`ALM` en `CC-ALM-18001`)                   firme — D-521
 
 PRESUPUESTO — campos que gana (todos nullable)
   cluster_id         FK CLUSTER — solo en la obra de una casa; en Antigua
-                      apunta a su manzana                                  propuesta — D-512 y D-520
+                      apunta a su manzana                                  firme — D-521
   lote               texto — dentro del cluster o de la manzana, y se
                       conserva como se escribe («04»); con él, la clave de
-                      la casa («FRESNO 12», «10-04»)                       propuesta — D-512 y D-520
-  proyecto_id        FK PROYECTO — solo en la urbanización                 propuesta — D-512
+                      la casa («FRESNO 12», «10-04»)                       firme — D-521
+  proyecto_id        FK PROYECTO — solo en la urbanización                 firme — D-521
   prototipo_id       FK PRESUPUESTO (tipo=plantilla) — de qué prototipo
-                      es la casa                                           propuesta — D-512
-  m2                 NUMERIC — solo en la plantilla: los m² del prototipo  propuesta — D-512
-  m2_adicionales     NUMERIC — solo en la casa: lo que suma al prototipo   propuesta — D-512
+                      es la casa                                           firme — D-521
+  m2                 NUMERIC — solo en la plantilla: los m² del prototipo  firme — D-521
+  m2_adicionales     NUMERIC — solo en la casa: lo que suma al prototipo   firme — D-521
   estatus            enum: pendiente · iniciada · en_proceso · por_entregar ·
-                      entregada — solo en tipo=obra                         propuesta — D-514
+                      entregada — solo en tipo=obra                         firme — D-521
 ```
 
 - **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote («FRESNO 12») o manzana y lote («10-04»), única dentro del proyecto. **La sigla del cluster** (`CLUSTER.codigo`) no es la clave de la casa: forma la clave de lo que cuelga de ella, como un control de cambio, y dice de un vistazo a qué obra corresponde (D-520); no se dijo si «Antigua» usa una sigla.
@@ -1173,12 +1173,28 @@ hueco:
 
 ```
 CONTRATISTA
-  id
+  id               el identificador del sistema; no hay clave corta         firme — D-521
   nombre           texto — tal como aparece en el crudo de almacén         firme — nuevo
+  activo           boolean — se retira, no se borra, igual que USUARIO     firme — D-521
+  rfc              texto, nullable                                         firme — D-521
+  contacto, telefono, correo   texto, nullable — el correo será el del
+                    inicio de sesión cuando entren al sistema (B-121)      firme — D-521
+  calificacion     NUMERIC, nullable — el método se define después (B-117)  firme — D-521
+  retencion_pct    NUMERIC, nullable — nulo no lleva retención; por defecto
+                    5, el mismo para todos y editable por contratista;
+                    se aplica sobre el total de la OT (§5i)                firme — D-521
+
+CONTRATISTA_TIPO
+  contratista_id   FK CONTRATISTA
+  clase_trabajo_id FK CLASE_TRABAJO — destajo o subcontrato; uno o los dos   firme — D-521
+
+CONTRATISTA_ESPECIALIDAD
+  contratista_id   FK CONTRATISTA
+  familia_id       FK Familia — el oficio; puede tener varios                firme — D-521
 ```
 
-Mínima a propósito: el crudo no trae oficio, contacto ni identificador
-fiscal — solo el nombre. Dos advertencias de captura, no de diseño:
+Sin identificador fiscal, oficio ni contacto en el crudo —solo el nombre—, la tabla nació
+mínima; los campos de arriba los dio el usuario (D-512 a D-521). Dos advertencias de captura, no de diseño:
 **"Bodega" y "Cuadrilla Postventa" no son contratistas** (son etiquetas
 de operación interna, mismo tipo de ruido que `Grupo` en
 `CONOCIMIENTO.md` §11.20) y se excluyen al cargar; **"Abelardo
@@ -1187,7 +1203,7 @@ son la misma persona**, una sola letra de diferencia — homologa con el
 mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
 `NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
 
-*D-512 (propuesta): el usuario pidió categorizar a los contratistas **por tipo y por oficio**. `CONTRATISTA` gana `activo` (boolean — se retira, no se borra, igual que `USUARIO`), `tipo` (FK `CLASE_TRABAJO`, la tabla abierta de §2: destajo o subcontrato; si un contratista trabaja de las dos maneras habrá que permitir más de uno) y `clave` (texto, nullable: la de OPUS si llega ese catálogo; no se inventa una). **D-514:** el usuario confirmó que no hay clave, solo el id; que el `rfc` es opcional; y que van el contacto (`contacto`, `telefono` y `correo`, opcionales) y la `calificacion` (NUMERIC, nullable), cuyo método de calificar se define después (B-117). **El correo es el del inicio de sesión** (D-516): en `USUARIO` es obligatorio y único; en el contratista es un dato de contacto, y cuando entre al sistema —más adelante, D-517— lo hará con él. Los oficios van en `CONTRATISTA_ESPECIALIDAD` (`contratista_id`, `familia_id` —la `Familia` del trabajo, que es el oficio—): una persona puede tener varios. La retención por garantías (B-112) es `retencion_pct`, NUMERIC nullable: nulo no la lleva y 5 es lo normal.*
+*Cómo llegó a ser firme (D-512 a D-521).* El usuario pidió categorizar a los contratistas **por tipo y por oficio** (D-512), dijo que no hay clave, solo el id; que el `rfc` es opcional; que van el contacto y la `calificacion`, cuyo método se define después (D-514); y que el correo es el del inicio de sesión (D-516). **En D-521 confirmó el bloque y contestó tres cosas:** un contratista puede ser destajo y subcontrato a la vez, por eso el tipo es una tabla de relación (`CONTRATISTA_TIPO`) y no un campo; el oficio es la `Familia` del trabajo; y la retención de 5 % es igual para todos pero **editable por contratista.** Por eso `retencion_pct` es un campo del contratista: el 5 es el valor por defecto (parámetro de B-114) y nulo significa que no la lleva. El `tipo` se pensó como FK a `CLASE_TRABAJO` (§2) y la `clave` como nullable; ambas quedan fuera.
 
 ### Lo que esto ya resuelve, de paso
 
@@ -3434,7 +3450,7 @@ PAGO_OT
 
 - **La cotización.** Solo cuentan las partidas con descripción, cantidad mayor a cero y precio unitario mayor a cero. Subtotal = suma de cantidad por precio; IVA = subtotal por `iva_pct`; el monto de la OT es el total de la cotización vigente. **Proyectos cotiza y genera la OT; Control de obra va después** y la confirma o la modifica si algo no está dentro del presupuesto (D-519: antes era lectura mía y el usuario la confirmó; no es una autorización previa). *Lectura mía:* si Control la modifica, es una versión nueva de la cotización con su propia autora y no una edición de la anterior. **Las partidas siguen libres por ahora (D-519):** el usuario va a hacer un **cotizador,** y el presupuesto ya trae algo adelantado en carpintería y herrería que hay que complementar con, por ejemplo, el costo de las puertas y de los muebles (B-123). No se agrega ningún campo hasta diseñarlo.
 - **Los pagos.** El **medio** es la estimación semanal (que hacen los residentes), el **efectivo** («a cuenta», dicho por el usuario) o la transferencia, **bancaria** (D-519), aunque por ahora **no se ven transferencias SPEI ni bancos:** el medio es solo una etiqueta, sin cuenta, banco ni clave de rastreo. El **saldo** es el total vigente menos los pagos confirmados, y se calcula. El monto de una OT de **tipo presupuesto** es el precio de venta del prototipo (D-518).
-- **La retención.** Se calcula sobre el **total de la OT** y se **retiene al finiquitar,** no de cada pago: `CONTRATISTA.retencion_pct` (§4a) por el total vigente, solo si el contratista la lleva. **«Garantía» es la retención:** el pago de tipo `garantia` es su devolución, y el finiquito puede llevar la retención, la garantía o las dos. Se libera al entregarse la vivienda, o antes si el Supervisor lo autoriza, y Control de obra valida si hace falta. `RETENCION` (§5d) ganaría la OT de la que sale y el pago con que se devuelve.
+- **La retención.** Se calcula sobre el **total de la OT** y se **retiene al finiquitar,** no de cada pago: `CONTRATISTA.retencion_pct` (§4a) por el total vigente, solo si el contratista la lleva (5 por defecto, editable por contratista, D-521). **«Garantía» es la retención:** el pago de tipo `garantia` es su devolución, y el finiquito puede llevar la retención, la garantía o las dos. Se libera al entregarse la vivienda, o antes si el Supervisor lo autoriza, y Control de obra valida si hace falta. `RETENCION` (§5d) ganaría la OT de la que sale y el pago con que se devuelve.
 - **Los descuentos** ya no son un tipo de pago: son `DEDUCCION` (§5d) con los siete tipos nuevos (B-110). Por eso `PAGO_OT.tipo` no trae `descuento`, que la app de hoy sí tiene. **Un descuento puede ir a una OT o directo al contratista** (D-519), y en el segundo caso **no toca el saldo de ninguna OT.** El caso del usuario: Floviesa reparó una pérgola que había hecho Javier Galvan, con una OT ya pagada. Primero se hace la OT de la reparación y lleva un descuento a Javier Galvan que **hace referencia** a la OT inicial; no se descuenta de esa OT porque, si se hiciera, aparecería como falta por pagar, así que **el descuento es solo al contratista** y la empresa no paga por ese arreglo. Cómo queda en `DEDUCCION`, abajo en §5d (propuesta).
 - **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
 - **Concluir.** Los residentes estiman hasta el pago de la garantía, si la hay; la OT se concluye cuando **se pagó todo,** garantía incluida (D-518). *Lectura mía:* el sistema lo propone y Proyectos lo confirma, como hoy hace el usuario de cotización.

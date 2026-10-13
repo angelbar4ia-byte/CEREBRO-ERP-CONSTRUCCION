@@ -451,13 +451,13 @@ Unidad que indica un porcentaje sobre la suma de los jornales de esa cuadrilla. 
 
 ### Contratista
 
-Persona o empresa que ejecuta trabajos, con su tabulador de precios propio.
+Persona o empresa que ejecuta trabajos, con su tabulador de precios propio. Se categoriza por **tipo** (destajo, subcontrato o los dos) y por **oficio** (la `Familia` del trabajo), y puede llevar una **retención** de 5 % por defecto, editable por contratista. No lleva clave, solo el id. (D-512 a D-521.)
 
 - **También:** Ejecutor; Proveedor de mano de obra
 - **No confundir con:** Subcontrato (ese es el trabajo, no quién lo hace)
 - **Se usa con:** Subcontrato; Especialidad; Precio pactado
 - **Ejemplo:** FRE-00005 Eduardo Andrade
-- **Hoy vive en:** ``CATALOGO_DE_CONTRATISTAS``
+- **Hoy vive en:** ``CATALOGO_DE_CONTRATISTAS``; en el modelo, `CONTRATISTA` con su tipo y sus oficios (`MODELO.md` §4a, firme desde D-521)
 
 
 ## El cálculo
@@ -885,7 +885,7 @@ El desarrollo completo: agrupa clústeres y una urbanización. Hoy hay dos: Magn
 - **No confundir con:** Lote (una casa); Prototipo; Presupuesto
 - **Se usa con:** Cluster; Urbanización; Lote
 - **Ejemplo:** Magnolia; «Antigua»
-- **Hoy vive en:** `proyectos` del concentrador (2), `proyecto` en auditoría y en ObraCtrl; el modelo del cerebro aún no lo tiene (`MODELO.md` §3c, propuesta)
+- **Hoy vive en:** `proyectos` del concentrador (2), `proyecto` en auditoría y en ObraCtrl; el modelo del cerebro aún no lo tiene (`MODELO.md` §3c, firme desde D-521)
 
 ### Cluster
 
@@ -905,7 +905,7 @@ La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster
 - **No confundir con:** Prototipo (el modelo que se repite); Urbanización
 - **Se usa con:** Cluster; Prototipo; Presupuesto
 - **Ejemplo:** FRESNO 12; ALAMO 18; 10-04 (manzana 10, lote 4, en «Antigua»)
-- **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, propuesta)
+- **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, firme desde D-521)
 - **Estatus:** pendiente (en planeación o próxima a construir), iniciada, en proceso, por entregar (desde el 90 % de avance, hasta que el cliente la recibe) y entregada, como en ObraCtrl (D-514)
 
 ### Urbanización
@@ -916,7 +916,7 @@ La obra única del proyecto, que sirve a todos los clústeres y a las amenidades
 - **No confundir con:** Lote (la obra de una casa)
 - **Se usa con:** Proyecto; Cluster
 - **Ejemplo:** La urbanización de Magnolia
-- **Hoy vive en:** la hoja URBA de las estimaciones; en el modelo, un `PRESUPUESTO` de tipo obra con `proyecto_id` (`MODELO.md` §3c, propuesta)
+- **Hoy vive en:** la hoja URBA de las estimaciones; en el modelo, un `PRESUPUESTO` de tipo obra con `proyecto_id` (`MODELO.md` §3c, firme desde D-521)
 
 ### Nivel de casa
 
