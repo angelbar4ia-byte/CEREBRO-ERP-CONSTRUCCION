@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 81 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 82 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 81 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 81 términos · 25 ambigüedades · 2026-09-21
+> 82 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -50,7 +50,7 @@ verificado: 81 términos · 25 ambigüedades · ejemplos con cifra releídos con
 
 **Tiempo y ejecución** — Rendimiento calculado · Rendimiento teórico · Rendimiento real · Gantt · Actividad · Asignación · Avance · Estimación
 
-**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Highlight · Extraordinario por subcontrato · Desviación · Ejecutado sin respaldo
+**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Highlight · Orden de trabajo (OT) · Extraordinario · Desviación · Ejecutado sin respaldo
 
 **Operaciones** — Fusión · División · Extracción · Composición · Procedencia
 
@@ -408,11 +408,11 @@ Clase de trabajo: se paga por unidad producida, no por jornada.
 
 ### Subcontrato
 
-Clase de trabajo: se contrata completo a un tercero. Su precio incluye material y utilidad, no solo mano de obra.
+Clase de trabajo: se contrata completo a un tercero. Su precio incluye material y utilidad, no solo mano de obra. Al asignarse a un contratista se formaliza con una Orden de trabajo (OT), un contrato informal (D-511).
 
 - **También:** Contrato a terceros
 - **No confundir con:** Destajo; Contratista
-- **Se usa con:** Trabajo; Contratista; Alzado
+- **Se usa con:** Trabajo; Contratista; Alzado; Orden de trabajo (OT)
 - **Ejemplo:** Cuatro de los seis valen $1.00: son precio alzado
 - **Hoy vive en:** ``Tipo` = Subcontrato`
 
@@ -827,19 +827,29 @@ Estimado que se le entrega al cliente cuando pide modificar el alcance o redise�
 
 - **También:** —
 - **No confundir con:** Adicional al presupuesto (ese ya está en ejecución); Cotización del contratista (esa es la que sigue)
-- **Se usa con:** Orden de cambio; Extraordinario por subcontrato; Cotizador
+- **Se usa con:** Orden de cambio; Orden de trabajo (OT); Cotizador
 - **Ejemplo:** El cliente rediseña el pergolado de la cochera: se le cotiza el cambio (highlight) y, con la cotización del contratista, nace la OT
 - **Hoy vive en:** `MODELO.md` §5b (Cotizador), D-280; la app de extraordinarios no lo registra
 
-### Extraordinario por subcontrato
+### Orden de trabajo (OT)
 
-La orden de trabajo (OT) que se le da a un contratista de subcontrato. Cubre la vida entera de ese subcontrato: el subcontrato base del presupuesto, los cambios que pide el cliente (que nacen de un highlight ya cotizado), la postventa, el mantenimiento y la cancelación. *(Lectura por confirmar, D-510.)*
+El contrato informal con un contratista para ejecutar un subcontrato. Se contrata **después de la venta al cliente**, a partir de un presupuesto o de un control de cambio, y cubre la vida del subcontrato desde ahí: pagos, descuentos, reasignaciones, cambios de alcance y cancelación. (D-511.)
 
-- **También:** OT (orden de trabajo), en la app de extraordinarios, que es como se le llama hoy; el usuario dice que hay que renombrarla así (D-509)
-- **No confundir con:** Adicional (no siempre lo es); Orden de cambio (esa es con el cliente, esta con el contratista)
-- **Se usa con:** Highlight; Contratista; Asignación; Cotización
+- **También:** OT. En D-509 y D-510 se le llamó «extraordinario por subcontrato»; el usuario aclaró que el nombre correcto es **subcontrato** (D-511)
+- **No confundir con:** Orden de cambio (esa es con el cliente, esta con el contratista); Subcontrato (la clase de trabajo en el presupuesto, que la OT contrata); Extraordinario
+- **Se usa con:** Subcontrato; Contratista; Asignación; Highlight; Cotización
 - **Ejemplo:** *(sin ejemplo con cifra: no se han visto los datos de la app)*
 - **Hoy vive en:** la tabla `ots` de la app de extraordinarios, con un campo de tipo de contrato que mezcla origen, forma de pago y estado (`LENGUAJE.md`); no está en el modelo del cerebro
+
+### Extraordinario
+
+Lo que queda **fuera del presupuesto**: no estaba en lo contratado con el cliente. Es la palabra del oficio para lo que entra después del contrato, con número nuevo al final y sin renumerar nada (`CONOCIMIENTO.md` §1.4). El usuario dice que es el calificativo más cercano, pero que lo que maneja su app se llama **subcontrato** (D-511).
+
+- **También:** Fuera del presupuesto
+- **No confundir con:** Subcontrato (aquel puede ser base o extraordinario); Adicional al presupuesto (el cerebro no ha decidido si son sinónimos)
+- **Se usa con:** Orden de cambio; Highlight; Orden de trabajo (OT)
+- **Ejemplo:** El cliente agrega un cambio de acabados que no estaba en lo vendido
+- **Hoy vive en:** `CONOCIMIENTO.md` §1.4 (conceptos extraordinarios); el nombre de la app de extraordinarios
 
 ### Desviación
 
@@ -1090,7 +1100,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Explosión | **Explosión** |
 | Explosión de insumos | Explosión |
 | Explosión de insumos | APU |
-| Extraordinario por subcontrato | **Extraordinario por subcontrato** |
+| Extraordinario | **Extraordinario** |
 | Extracción | **Extracción** |
 | Familia | **Familia** |
 | Fase | Etapa de construcción |
@@ -1132,9 +1142,10 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Nivel de construcción | **Nivel de construcción** |
 | Nombre corto | Descripción corta |
 | Oficio | Especialidad |
-| OT (orden de trabajo) | Extraordinario por subcontrato |
+| OT | Orden de trabajo (OT) |
 | Orden | Índice |
 | Orden de cambio | **Orden de cambio** |
+| Orden de trabajo (OT) | **Orden de trabajo (OT)** |
 | Origen | Procedencia |
 | P.U. | PU |
 | Paramétrico | Ensamble |

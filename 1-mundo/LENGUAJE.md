@@ -343,7 +343,7 @@ Subida a `Multi-erp` (carpeta `apps/auditoria`, 220 archivos, sin claves ni dato
 
 ### La ficha de extraordinarios, con lo que ya se sabe (D-504)
 
-Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni datos). Las siete preguntas salen de su README y de lo que midió la herramienta; **su código se leyó después y está en la sección siguiente (D-508)**.
+Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni datos). *El usuario dice que lo que maneja se llama **subcontrato** y que «extraordinario» solo describe lo que queda fuera del presupuesto (D-511); el nombre de la app y de su carpeta se conserva hasta que él pida cambiarlo.* Las siete preguntas salen de su README y de lo que midió la herramienta; **su código se leyó después y está en la sección siguiente (D-508)**.
 
 | # | Pregunta | Respuesta | De dónde sale |
 |---|---|---|---|
@@ -361,7 +361,7 @@ Toca el mismo dominio que el módulo «Control de OT (subcontratos)» de la «Fu
 
 El usuario decidió que la app **se queda funcionando como está** y que el cerebro **anota cómo trabaja hoy para aprenderlo** (D-508). Esto sale de leer su código en `Multi-erp/apps/extraordinarios`: las rutas del servidor, el esquema (seis migraciones) y la lógica de la pantalla de pagos. **No se ejecutó la app ni se vieron sus datos**: describe lo que el código hace, no lo que la base contiene. Y el código no es una especificación: lo que parece un descuido se anota como observación, no como regla.
 
-**El recorrido de un trabajo extraordinario.**
+**El recorrido de una OT (orden de trabajo).**
 
 | Paso | Quién (rol) | Qué hace el código | Qué queda guardado |
 |---|---|---|---|
@@ -398,7 +398,7 @@ El usuario decidió que la app **se queda funcionando como está** y que el cere
 | Tema | Extraordinarios hoy | El cerebro hoy | Lectura |
 |---|---|---|---|
 | Asignar contratista a lote y trabajo | `asignaciones` y su historial; el contratista es texto. **Reasignar es lo común** (D-509) | `ASIGNACION_CONTRATISTA`: alcance, vigencias, motivo y cadena de reemplazos (`reemplaza_id`) | El cerebro la cubre; falta el anticipo planeado que cuelga de ella |
-| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | La OT no existe. Sí existen el **highlight** y el **adicional** (D-280, `MODELO.md` §5b), foliados y vueltos control de cambio al aprobarse (`CONOCIMIENTO.md` §13.4) | La OT es el **extraordinario por subcontrato** (D-509). Cuando el trabajo es un cambio del cliente, nace de la cotización del contratista tras un highlight cotizado al cliente; cuando es el subcontrato base, no (D-510). La app no guarda el highlight del que viene |
+| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | La OT no existe. Sí existen el **highlight** y el **adicional** (D-280, `MODELO.md` §5b), foliados y vueltos control de cambio al aprobarse (`CONOCIMIENTO.md` §13.4) | La OT es **el contrato informal con el contratista** para ejecutar un subcontrato (D-511). Se contrata después de la venta: de un presupuesto o de un control de cambio. Cuando es un cambio del cliente, nace de la cotización del contratista tras un highlight cotizado al cliente; cuando es el subcontrato base, no. La app no guarda de dónde viene |
 | Descuentos y retenciones | `garantia` (5 %) y `descuento` guardados sin restarse | `DEDUCCION` (sobrepago, rehacer trabajo), `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` | El cerebro **ya tiene** el mecanismo. La garantía de 5 % **sí es una retención** que se devuelve y no aplica a todos (D-509); faltan quiénes la llevan y cuándo se devuelve. Los descuentos de calidad y cumplimiento (siete tipos, D-509) no caben aún en `DEDUCCION` |
 | Anticipo, finiquito, pago único | Tipos de pago por OT | No existen | Dominio que el cerebro no modela |
 | Estimación o fuera de ella | `clase` del pago: estimación, a cuenta, transferencia | `ESTIMACION.fuente` (ERP externo o manual) es otra cosa | No son el mismo eje |
@@ -410,7 +410,7 @@ El usuario decidió que la app **se queda funcionando como está** y que el cere
 |---|---|---|
 | ¿La garantía de 5 % es una retención que se devuelve? | «Sí, no aplica para todos los contratistas» | Es una retención, pero **qué contratistas la llevan no está en la app**: la pantalla la calcula siempre al 5 % de la OT. En el cerebro `RETENCION` aplica solo a subcontratos (D-290); queda por confirmar si «los que la llevan» son ellos, y cuándo se devuelve |
 | ¿Cómo se captura un descuento? | «No está definido» en la app, pero **hay siete tipos** (lista siguiente) | Hoy el descuento es un número sin tipo ni responsable. Los tipos que el usuario nombró son lo que le falta |
-| ¿Una OT es siempre un adicional al contrato original? | «No siempre; de hecho se tiene que renombrar **extraordinario por subcontrato**». Los subcontratos están en el presupuesto; el cliente puede modificar su alcance o rediseñarlos, y a eso se le llama **highlight**, ya definido y cotizado al cliente; con la cotización del contratista se crea la OT | Ver la cadena abajo. El glosario ya trae los dos términos (D-509) |
+| ¿Una OT es siempre un adicional al contrato original? | «No siempre; de hecho se tiene que renombrar **extraordinario por subcontrato**» *(D-511: el usuario aclaró que el nombre correcto es «subcontrato»; «extraordinario» sería «fuera del presupuesto»)*. Los subcontratos están en el presupuesto; el cliente puede modificar su alcance o rediseñarlos, y a eso se le llama **highlight**, ya definido y cotizado al cliente; con la cotización del contratista se crea la OT | Ver la cadena abajo. El glosario ya trae *Highlight* y *Orden de trabajo (OT)* (D-509 y D-511) |
 | ¿Hay OT canceladas? | «Sí se pueden cancelar, pero es más común reasignar» | El camino común (reasignar) ya está cubierto por `ASIGNACION_CONTRATISTA`; para cancelar hay que decidir cómo se registra (¿estado de la OT?) |
 
 **Los tipos de descuento, con las palabras del usuario.** Son siete frases separadas por comas; no se sabe si «mal trabajo» es el paraguas de las demás.
@@ -432,7 +432,7 @@ Hoy el cerebro solo tiene dos tipos de `DEDUCCION`: `sobrepago` (se pagó de má
 1. El cliente pide modificar el alcance o rediseñar un subcontrato que está en el presupuesto.
 2. Se le entrega un **highlight** cotizado (se folia; al aprobarse es control de cambio, D-280 y `CONOCIMIENTO.md` §13.4).
 3. El contratista cotiza ese cambio.
-4. Con esa cotización nace la **OT**, que en el canon se llama **extraordinario por subcontrato**.
+4. Con esa cotización nace la **OT**: el contrato informal con el contratista (D-511).
 
 Lo que la app hace hoy es solo los pasos 3 y 4, con una asignación de por medio. Los pasos 1 y 2 viven en otra parte, y **la OT no guarda el highlight del que viene**. La app no sabe de qué cambio viene cada OT. *(Una primera lectura mía de por qué su tipo de contrato incluye `PRESUPUESTO` quedó superada en D-510: ese tipo es el subcontrato base del presupuesto, no un cambio.)*
 
@@ -465,7 +465,7 @@ Lo que la app hace hoy es solo los pasos 3 y 4, con una asignación de por medio
 
 Las cuatro cosas que mezcla esa lista: **de dónde viene el trabajo** (base, adicional, modificado, postventa, mantenimiento), **cómo se paga** (pago único), **en qué estado está** (cancelado) y **un comodín**. Y dos de los orígenes se subdividen por **quién absorbe el costo**: el cliente, la garantía o «lo necesario para la entrega». Lo que propongo —sin decidirlo— es separarlos en campos distintos: `origen`, `forma_de_pago`, `estado` y `cobro` (al cliente, garantía o necesario para la entrega). Eso es lo que `MODELO.md` ya hace en otras partes (el «quién paga» de las nueve causas, `CONOCIMIENTO.md` §13.6).
 
-**Una lectura mía que el usuario debe confirmar:** como `PRESUPUESTO` es el subcontrato base, **la OT no es solo un trabajo extra: cubre la vida entera de un subcontrato**, desde su precio de venta en el prototipo hasta sus cambios, su postventa y su cancelación. El nombre «extraordinario por subcontrato» sería entonces «fuera del destajo ordinario», no «fuera del presupuesto». Si es así, la definición de *Extraordinario por subcontrato* en el glosario se amplía (se hizo en D-510).
+**Confirmado en D-511:** la OT cubre la vida del subcontrato **desde que se contrata, no desde la venta**. La venta al cliente es un presupuesto o un control de cambio; de ahí se contrata la OT, que «funciona como un contrato informal para el contratista». Y el nombre: lo que yo había llamado «extraordinario por subcontrato» **debe llamarse simplemente subcontrato**; si algo es «extraordinario», es lo que queda **fuera del presupuesto**, que es lo más parecido que el usuario encuentra a la palabra.
 
 **Cómo se calcula el monto de un descuento, según el motivo** (lo dicho por el usuario, sin completar):
 
@@ -488,7 +488,20 @@ Las tres hojas de la estimación del concentrador (obra, instalaciones y urbaniz
 
 **Ampliar o disminuir el alcance.** El usuario dice que ambos se pueden hacer. En la app, editar una cotización **sobrescribe** las partidas y recalcula el monto: no queda la versión anterior. El cerebro hace lo contrario (la orden de cambio «no edita, agrega», `CONOCIMIENTO.md` §13.4, con un delta firmado). Hay además un caso hacia abajo: **descuentos al cliente**, cuando no quiso algo y hay que bajar el presupuesto (una cocina; en equipamiento, una estufa y una campana, aunque eso lo lleva **otra área, no subcontratos**). Eso es una orden de cambio con delta negativo y el cerebro ya tiene la forma de guardarla.
 
-**Siguen abiertas** (no bloquean nada): cuándo se devuelve la retención y a cuánto asciende; si la lectura de que la OT cubre toda la vida del subcontrato es correcta; y si «otra u otras OT» son las del mismo contratista.
+**Lo que el usuario aclaró después (D-511).**
+
+| Tema | Respuesta del usuario | Qué implica |
+|---|---|---|
+| El nombre | «Extraordinario» **debe ser «subcontrato»**; si algo es extraordinario, es «más bien un fuera del presupuesto, lo más similar» | El nombre de lo que maneja la app es **subcontrato**. «Extraordinario» queda como calificativo: lo que está fuera del presupuesto. El nombre de la app (y su carpeta `apps/extraordinarios`) es del usuario; no se renombra sin que lo pida |
+| Dónde empieza la OT | «Sí, pero no desde la venta»: la venta es un presupuesto o un control de cambio; de ahí se contrata la OT, un contrato informal para el contratista | Hay **dos lados**: el del cliente (presupuesto, highlight, control de cambio) y el del contratista (OT). La OT es el segundo |
+| Reasignar | «Sí, correcto»: las otras OT pendientes por pagar son las del mismo contratista que sale | Se confirma la lectura de D-510 |
+| Retención por garantías | **5 % normalmente**, «posterior a la entrega de la vivienda o cuando el supervisor autoriza»; **Control solo valida, de ser necesario** | Ver abajo |
+
+**La retención por garantías, completa.** Es un atributo del contratista (D-510); el porcentaje es **5 % normalmente** (hay excepciones); se libera **al entregarse la vivienda o antes, cuando el Supervisor lo autoriza**, y Control de obra **solo valida si hace falta**. En el cerebro: la fecha de entrega ya existe (`PRESUPUESTO.fecha_entrega`, `MODELO.md` §3b); `RETENCION` hoy cuelga de una línea de estimación y no dice cuándo se libera; y las dos manos —el Supervisor autoriza, Control valida— son el patrón de siempre (D-269), con una diferencia: **aquí la validación es opcional**, y el modelo no tiene validaciones condicionales. La retención parece respaldar la garantía de postventa (`TICKET_GARANTIA`), pero eso no se dijo.
+
+**Lo que el cerebro ya tiene de una OT** *(lectura mía)*: contratar un subcontrato del presupuesto **ya existe** —`ESTADO_CONGELAMIENTO` en `contratado` fija el precio (D-475) y `ASIGNACION_CONTRATISTA` dice quién lo ejecuta (D-453)—. Lo que no tiene es el **folio de la OT**, la **cotización del contratista** con partidas fuera de catálogo (los «conceptos extraordinarios» con número nuevo de `CONOCIMIENTO.md` §1.4), los **pagos por clase y tipo**, los **descuentos** y la **retención con su liberación**. Es decir, la OT quizá no sea una entidad nueva sino la contratación que el cerebro ya modela más lo que le cuelga.
+
+**Siguen abiertas** (no bloquean nada): el porcentaje y la lista exacta de los contratistas con retención (la lista es de memoria); si el 5 % varía por contratista; y si «extraordinario» es sinónimo de *adicional* o abarca también la postventa y el mantenimiento.
 
 ### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
 
