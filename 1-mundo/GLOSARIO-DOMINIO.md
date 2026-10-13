@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 81 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 79 términos · 25 ambigüedades · 2026-09-21
+> 81 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -50,7 +50,7 @@ verificado: 79 términos · 25 ambigüedades · ejemplos con cifra releídos con
 
 **Tiempo y ejecución** — Rendimiento calculado · Rendimiento teórico · Rendimiento real · Gantt · Actividad · Asignación · Avance · Estimación
 
-**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Desviación · Ejecutado sin respaldo
+**Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Highlight · Extraordinario por subcontrato · Desviación · Ejecutado sin respaldo
 
 **Operaciones** — Fusión · División · Extracción · Composición · Procedencia
 
@@ -791,7 +791,7 @@ Lo acordado con un contratista concreto. No toca el catálogo.
 
 ### Descuento
 
-Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Antes de pagar no hay descuento: hay renegociación.
+Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Antes de pagar no hay descuento: hay renegociación. **Hay una segunda familia, de calidad y cumplimiento** (trabajo mal hecho, no terminado, abandonado, que afectó otros trabajos, o que pagó otro contratista), que no tiene que ver con el precio (D-509).
 
 - **También:** Deducción
 - **No confundir con:** Renegociación
@@ -820,6 +820,26 @@ Documento que referencia un nodo congelado y propone un delta. No edita: agrega.
 - **Se usa con:** Contrato; Causa; Autorización
 - **Ejemplo:** Con causa, impacto y si se autorizó antes o después de ejecutar
 - **Hoy vive en:** `PROPUESTA(tipo=orden_cambio)` — `MODELO.md` §5f, D-334
+
+### Highlight
+
+Estimado que se le entrega al cliente cuando pide modificar el alcance o rediseñar los subcontratos de su presupuesto. Se hace antes de ejecutar y se folia; al aprobarse se vuelve control de cambio.
+
+- **También:** —
+- **No confundir con:** Adicional al presupuesto (ese ya está en ejecución); Cotización del contratista (esa es la que sigue)
+- **Se usa con:** Orden de cambio; Extraordinario por subcontrato; Cotizador
+- **Ejemplo:** El cliente rediseña el pergolado de la cochera: se le cotiza el cambio (highlight) y, con la cotización del contratista, nace la OT
+- **Hoy vive en:** `MODELO.md` §5b (Cotizador), D-280; la app de extraordinarios no lo registra
+
+### Extraordinario por subcontrato
+
+Trabajo que se le encarga a un contratista por un cambio sobre un subcontrato del presupuesto. Se formaliza con una orden de trabajo (OT) a partir de la cotización del contratista, una vez definido y cotizado el highlight al cliente.
+
+- **También:** OT (orden de trabajo), en la app de extraordinarios, que es como se le llama hoy; el usuario dice que hay que renombrarla así (D-509)
+- **No confundir con:** Adicional (no siempre lo es); Orden de cambio (esa es con el cliente, esta con el contratista)
+- **Se usa con:** Highlight; Contratista; Asignación; Cotización
+- **Ejemplo:** *(sin ejemplo con cifra: no se han visto los datos de la app)*
+- **Hoy vive en:** la tabla `ots` de la app de extraordinarios; no está en el modelo del cerebro
 
 ### Desviación
 
@@ -1070,6 +1090,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Explosión | **Explosión** |
 | Explosión de insumos | Explosión |
 | Explosión de insumos | APU |
+| Extraordinario por subcontrato | **Extraordinario por subcontrato** |
 | Extracción | **Extracción** |
 | Familia | **Familia** |
 | Fase | Etapa de construcción |
@@ -1086,6 +1107,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Grupo | Familia |
 | id interno | **id interno** |
 | Identidad interna | id interno |
+| Highlight | **Highlight** |
 | Importe | **Importe** |
 | Incluye | Alcance |
 | Indirectos | Costo indirecto |
@@ -1110,6 +1132,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Nivel de construcción | **Nivel de construcción** |
 | Nombre corto | Descripción corta |
 | Oficio | Especialidad |
+| OT (orden de trabajo) | Extraordinario por subcontrato |
 | Orden | Índice |
 | Orden de cambio | **Orden de cambio** |
 | Origen | Procedencia |

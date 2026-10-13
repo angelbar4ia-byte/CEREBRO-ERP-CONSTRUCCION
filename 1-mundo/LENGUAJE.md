@@ -369,7 +369,7 @@ El usuario decidió que la app **se queda funcionando como está** y que el cere
 | 2. Reasignar o editar | `ASIGNACION` | Cambiar el contratista deja una fila de historial (anterior, nuevo, quién, cuándo); editar una asignación que ya tiene OT mueve también la OT; cancelar una pendiente la borra | `asignaciones_historial` |
 | 3. Cotizar | `COTIZACION` | Desde una asignación pendiente, o **directa** sin asignación previa (entonces crea la asignación ya cotizada). Captura partidas (descripción, unidad, cantidad, precio unitario); solo cuentan las que tienen descripción, cantidad mayor a cero y precio mayor a cero, y sin ninguna válida no se genera (se valida en el servidor, no solo en pantalla). Subtotal = suma de cantidad × precio; IVA = subtotal × el porcentaje que mande la pantalla (el servidor no fija 16 %: si no llega nada, es 0); total = subtotal + IVA | `cotizaciones` (partidas como JSON) y **la OT** |
 | 4. Numerar la OT | — | Consecutivo global y único (`ot_numero`). La pantalla sugiere el siguiente sin consumirlo y el usuario puede escribir otro que no exista; la secuencia se adelanta para no chocar después. Tipo de contrato por defecto `PRESUPUESTO`; el monto de la OT es el total cotizado | `ots` |
-| 5. Concluir | `COTIZACION` | La OT pasa a `CONCLUIDA`, en un solo sentido (no vi ruta para reabrirla). El estatus `CANCELADA` existe en el esquema, pero **no vi ruta que lo ponga** | `ots.estatus` |
+| 5. Concluir | `COTIZACION` | La OT pasa a `CONCLUIDA`, en un solo sentido (no vi ruta para reabrirla). El estatus `CANCELADA` existe en el esquema, pero **no vi ruta que lo ponga**; el usuario dice que sí se cancelan, aunque lo común es reasignar (D-509), y la lista de tipos de contrato trae `CANCELADO` (¿es así como se hace hoy?) | `ots.estatus` |
 | 6. Pagar | `ADMIN` («pagos») | Registra renglones de pago por OT (tabla siguiente). Un anticipo planeado en el paso 1 aparece como **borrador sin confirmar**, con monto 0, hasta que el administrador lo captura y lo confirma | `pagos` |
 | 7. Ver | todos | Resumen por lote o por contratista (contratado, pagado, por pagar y porcentaje); la OT en PDF con su resumen de pagos; la lista «Estimación» (pagos de clase estimación por semana, con casillas, subtotales por tipo y por contratista, y salida a Excel); y un enlace público de solo lectura con token | — |
 
@@ -381,9 +381,9 @@ El usuario decidió que la app **se queda funcionando como está** y que el cere
 | `tipo` | `ANTICIPO · AVANCE · FINIQUITO · GARANTIA · PAGO UNICO · DESCUENTO` |
 | `ppto` | La base del cálculo; se llena con el monto de la OT |
 | `pct` y `monto` | Se escribe uno y el otro se deriva: monto = ppto × pct / 100, o pct = monto / ppto × 100 |
-| `garantia` | **5 % del presupuesto**, fijo en la pantalla; se guarda con cada renglón y es informativo: **no se resta del monto** |
+| `garantia` | **5 % del presupuesto**, fijo en la pantalla; se guarda con cada renglón y es informativo: **no se resta del monto**. El usuario confirmó que es una retención que se devuelve y que **no aplica a todos los contratistas** (D-509); la pantalla la calcula siempre y no distingue |
 | `anticipo`, `avance`, `finiquito`, `pago_unico` | El mismo `monto`, repetido en la columna que corresponde al tipo (las otras quedan vacías); sirven para el Excel de salida |
-| `descuento` | Un número capturado aparte; **no se resta del monto ni entra en el saldo**; solo sale en el Excel |
+| `descuento` | Un número capturado aparte; **no se resta del monto ni entra en el saldo**; solo sale en el Excel. No guarda de qué tipo es: los tipos que el usuario nombró están en la sección siguiente (D-509) |
 | `por_pagar` | Del renglón: ppto − monto. No es el saldo acumulado de la OT |
 | `confirmado` | Falso en los borradores; guardar o editar un pago lo confirma; confirmar exige monto mayor a cero |
 
@@ -397,14 +397,48 @@ El usuario decidió que la app **se queda funcionando como está** y que el cere
 
 | Tema | Extraordinarios hoy | El cerebro hoy | Lectura |
 |---|---|---|---|
-| Asignar contratista a lote y trabajo | `asignaciones` y su historial; el contratista es texto | `ASIGNACION_CONTRATISTA`: alcance, vigencias, motivo y cadena de reemplazos | El cerebro la cubre; falta el anticipo planeado que cuelga de ella |
-| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | No existen. Lo más cercano: `ESTIMACION_LINEA.concepto_id`, que puede ir vacío si es fuera de catálogo | Una OT se parece a un trabajo adicional de monto fijo; **no hay que asumirlo**, es una pregunta para el usuario |
-| Descuentos y retenciones | `garantia` (5 %) y `descuento` guardados sin restarse | `DEDUCCION` (sobrepago, rehacer trabajo), `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` | El cerebro **ya tiene** el mecanismo; falta saber si la garantía de 5 % es la misma retención |
+| Asignar contratista a lote y trabajo | `asignaciones` y su historial; el contratista es texto. **Reasignar es lo común** (D-509) | `ASIGNACION_CONTRATISTA`: alcance, vigencias, motivo y cadena de reemplazos (`reemplaza_id`) | El cerebro la cubre; falta el anticipo planeado que cuelga de ella |
+| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | La OT no existe. Sí existen el **highlight** y el **adicional** (D-280, `MODELO.md` §5b), foliados y vueltos control de cambio al aprobarse (`CONOCIMIENTO.md` §13.4) | La OT es el **extraordinario por subcontrato** (D-509): nace de la cotización del contratista cuando un highlight ya se definió y se cotizó al cliente. La app no guarda el highlight del que viene |
+| Descuentos y retenciones | `garantia` (5 %) y `descuento` guardados sin restarse | `DEDUCCION` (sobrepago, rehacer trabajo), `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` | El cerebro **ya tiene** el mecanismo. La garantía de 5 % **sí es una retención** que se devuelve y no aplica a todos (D-509); faltan quiénes la llevan y cuándo se devuelve. Los descuentos de calidad y cumplimiento (siete tipos, D-509) no caben aún en `DEDUCCION` |
 | Anticipo, finiquito, pago único | Tipos de pago por OT | No existen | Dominio que el cerebro no modela |
 | Estimación o fuera de ella | `clase` del pago: estimación, a cuenta, transferencia | `ESTIMACION.fuente` (ERP externo o manual) es otra cosa | No son el mismo eje |
 | Ver lo pagado | Resumen por lote o contratista; enlace público | Reporte «Real contra Base» (D-313) | Parecido en espíritu, otro nivel de detalle |
 
-**Para el usuario, cuando se toque este dominio** (no bloquea nada): ¿la garantía de 5 % es una retención que se devuelve? ¿el descuento se captura como número positivo y se resta a mano? ¿una OT es siempre un trabajo adicional fuera del contrato original? ¿hay OT canceladas y cómo se registran hoy?
+**Lo que el usuario contestó sobre extraordinarios (D-509).** Las cuatro preguntas de D-508, con lo que implica cada respuesta.
+
+| Pregunta | Respuesta del usuario | Qué implica |
+|---|---|---|
+| ¿La garantía de 5 % es una retención que se devuelve? | «Sí, no aplica para todos los contratistas» | Es una retención, pero **qué contratistas la llevan no está en la app**: la pantalla la calcula siempre al 5 % de la OT. En el cerebro `RETENCION` aplica solo a subcontratos (D-290); queda por confirmar si «los que la llevan» son ellos, y cuándo se devuelve |
+| ¿Cómo se captura un descuento? | «No está definido» en la app, pero **hay siete tipos** (lista siguiente) | Hoy el descuento es un número sin tipo ni responsable. Los tipos que el usuario nombró son lo que le falta |
+| ¿Una OT es siempre un adicional al contrato original? | «No siempre; de hecho se tiene que renombrar **extraordinario por subcontrato**». Los subcontratos están en el presupuesto; el cliente puede modificar su alcance o rediseñarlos, y a eso se le llama **highlight**, ya definido y cotizado al cliente; con la cotización del contratista se crea la OT | Ver la cadena abajo. El glosario ya trae los dos términos (D-509) |
+| ¿Hay OT canceladas? | «Sí se pueden cancelar, pero es más común reasignar» | El camino común (reasignar) ya está cubierto por `ASIGNACION_CONTRATISTA`; para cancelar hay que decidir cómo se registra (¿estado de la OT?) |
+
+**Los tipos de descuento, con las palabras del usuario.** Son siete frases separadas por comas; no se sabe si «mal trabajo» es el paraguas de las demás.
+
+| # | Tipo | En el cerebro |
+|---|---|---|
+| 1 | Mal trabajo | No está como tipo. ¿Es lo mismo que el 4? |
+| 2 | Mal trabajo: **otro contratista realiza la reparación de la misma actividad** | Es `rehacer_trabajo` (D-289): se descuenta al responsable si sigue activo; si ya no, la empresa absorbe |
+| 3 | La misma actividad quedó **no terminada** | No está |
+| 4 | La misma actividad, **de mala calidad** | No está |
+| 5 | **Afectación a otros trabajos** | No está |
+| 6 | **Abandono de trabajo** | No está |
+| 7 | **Pagado a otro contratista** | No está. ¿Es el monto de lo que costó repararlo o terminarlo? |
+
+Hoy el cerebro solo tiene dos tipos de `DEDUCCION`: `sobrepago` (se pagó de más por precio) y `rehacer_trabajo`. Los siete de arriba pertenecen a otra familia, **la de calidad y cumplimiento**, y la lista cabe como valores nuevos de `tipo`; **es una propuesta, no cambia `MODELO.md` hasta que el usuario confirme la lista y su estructura** (B-110).
+
+**La cadena que el usuario describió, puesta en los términos del cerebro:**
+
+1. El cliente pide modificar el alcance o rediseñar un subcontrato que está en el presupuesto.
+2. Se le entrega un **highlight** cotizado (se folia; al aprobarse es control de cambio, D-280 y `CONOCIMIENTO.md` §13.4).
+3. El contratista cotiza ese cambio.
+4. Con esa cotización nace la **OT**, que en el canon se llama **extraordinario por subcontrato**.
+
+Lo que la app hace hoy es solo los pasos 3 y 4, con una asignación de por medio. Los pasos 1 y 2 viven en otra parte, y **la OT no guarda el highlight del que viene**. Eso explica por qué su tipo de contrato admite `ADICIONAL AL CLIENTE`, `PPTO + ADICIONAL`, `POSTVENTA` o `MANTENIMIENTO`, pero también `PRESUPUESTO` (que es el valor por defecto): la app no sabe de qué cambio viene cada OT.
+
+**Una observación del código sobre reasignar** (no se vieron datos): al reasignar, la app cambia el contratista de la asignación y de la OT, pero los pagos ya hechos conservan el nombre del contratista anterior y el saldo se calcula por número de OT. Resultado: **el resumen por contratista le atribuye al nuevo todo lo pagado en la OT, incluido lo que cobró el anterior.** Es relevante porque reasignar es lo común, y porque «pagado a otro contratista» es uno de los tipos de descuento.
+
+**Siguen abiertas, para cuando se toque este dominio** (no bloquean nada): ¿«mal trabajo» es el paraguas de los demás tipos, o son siete distintos?; ¿quién decide el monto del descuento y cómo se calcula?; ¿qué contratistas llevan retención y cuándo se les devuelve?; ¿qué significa cada tipo de contrato de la OT y cuáles son «extraordinario por subcontrato»?; ¿qué se hace con lo ya pagado cuando se reasigna?
 
 ### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
 
