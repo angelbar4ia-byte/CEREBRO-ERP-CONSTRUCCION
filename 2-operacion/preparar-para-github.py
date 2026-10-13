@@ -270,6 +270,7 @@ def bloque_gitignore():
 *.bak
 *.backup
 pgdata/
+.pgdata/
 uploads/
 exports/
 backups/
@@ -550,6 +551,9 @@ def autoprueba():
         imprimir(informe, app, maximo=None, p=lineas.append)
         if not any("PostgreSQL" in l and "pgdata" in l for l in lineas):
             errores.append("el informe completo no nombra el directorio de datos de PostgreSQL")
+        for vigilada in ("pgdata/", ".pgdata/", ".env"):
+            if vigilada not in (destino / ".gitignore").read_text(encoding="utf-8").split("\n"):
+                errores.append("el .gitignore de la copia no vigila " + vigilada)
         for requerido in ("limpio.py", "dev.py", ".gitignore", ".env.example", "FICHA.md", "README.md"):
             if requerido not in dentro:
                 errores.append(f"faltó {requerido}")
