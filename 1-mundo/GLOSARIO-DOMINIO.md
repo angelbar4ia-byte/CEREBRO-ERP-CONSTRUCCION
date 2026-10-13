@@ -833,13 +833,13 @@ Estimado que se le entrega al cliente cuando pide modificar el alcance o redise�
 
 ### Extraordinario por subcontrato
 
-Trabajo que se le encarga a un contratista por un cambio sobre un subcontrato del presupuesto. Se formaliza con una orden de trabajo (OT) a partir de la cotización del contratista, una vez definido y cotizado el highlight al cliente.
+La orden de trabajo (OT) que se le da a un contratista de subcontrato. Cubre la vida entera de ese subcontrato: el subcontrato base del presupuesto, los cambios que pide el cliente (que nacen de un highlight ya cotizado), la postventa, el mantenimiento y la cancelación. *(Lectura por confirmar, D-510.)*
 
 - **También:** OT (orden de trabajo), en la app de extraordinarios, que es como se le llama hoy; el usuario dice que hay que renombrarla así (D-509)
 - **No confundir con:** Adicional (no siempre lo es); Orden de cambio (esa es con el cliente, esta con el contratista)
 - **Se usa con:** Highlight; Contratista; Asignación; Cotización
 - **Ejemplo:** *(sin ejemplo con cifra: no se han visto los datos de la app)*
-- **Hoy vive en:** la tabla `ots` de la app de extraordinarios; no está en el modelo del cerebro
+- **Hoy vive en:** la tabla `ots` de la app de extraordinarios, con un campo de tipo de contrato que mezcla origen, forma de pago y estado (`LENGUAJE.md`); no está en el modelo del cerebro
 
 ### Desviación
 

@@ -398,7 +398,7 @@ El usuario decidió que la app **se queda funcionando como está** y que el cere
 | Tema | Extraordinarios hoy | El cerebro hoy | Lectura |
 |---|---|---|---|
 | Asignar contratista a lote y trabajo | `asignaciones` y su historial; el contratista es texto. **Reasignar es lo común** (D-509) | `ASIGNACION_CONTRATISTA`: alcance, vigencias, motivo y cadena de reemplazos (`reemplaza_id`) | El cerebro la cubre; falta el anticipo planeado que cuelga de ella |
-| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | La OT no existe. Sí existen el **highlight** y el **adicional** (D-280, `MODELO.md` §5b), foliados y vueltos control de cambio al aprobarse (`CONOCIMIENTO.md` §13.4) | La OT es el **extraordinario por subcontrato** (D-509): nace de la cotización del contratista cuando un highlight ya se definió y se cotizó al cliente. La app no guarda el highlight del que viene |
+| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | La OT no existe. Sí existen el **highlight** y el **adicional** (D-280, `MODELO.md` §5b), foliados y vueltos control de cambio al aprobarse (`CONOCIMIENTO.md` §13.4) | La OT es el **extraordinario por subcontrato** (D-509). Cuando el trabajo es un cambio del cliente, nace de la cotización del contratista tras un highlight cotizado al cliente; cuando es el subcontrato base, no (D-510). La app no guarda el highlight del que viene |
 | Descuentos y retenciones | `garantia` (5 %) y `descuento` guardados sin restarse | `DEDUCCION` (sobrepago, rehacer trabajo), `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` | El cerebro **ya tiene** el mecanismo. La garantía de 5 % **sí es una retención** que se devuelve y no aplica a todos (D-509); faltan quiénes la llevan y cuándo se devuelve. Los descuentos de calidad y cumplimiento (siete tipos, D-509) no caben aún en `DEDUCCION` |
 | Anticipo, finiquito, pago único | Tipos de pago por OT | No existen | Dominio que el cerebro no modela |
 | Estimación o fuera de ella | `clase` del pago: estimación, a cuenta, transferencia | `ESTIMACION.fuente` (ERP externo o manual) es otra cosa | No son el mismo eje |
@@ -434,11 +434,61 @@ Hoy el cerebro solo tiene dos tipos de `DEDUCCION`: `sobrepago` (se pagó de má
 3. El contratista cotiza ese cambio.
 4. Con esa cotización nace la **OT**, que en el canon se llama **extraordinario por subcontrato**.
 
-Lo que la app hace hoy es solo los pasos 3 y 4, con una asignación de por medio. Los pasos 1 y 2 viven en otra parte, y **la OT no guarda el highlight del que viene**. Eso explica por qué su tipo de contrato admite `ADICIONAL AL CLIENTE`, `PPTO + ADICIONAL`, `POSTVENTA` o `MANTENIMIENTO`, pero también `PRESUPUESTO` (que es el valor por defecto): la app no sabe de qué cambio viene cada OT.
+Lo que la app hace hoy es solo los pasos 3 y 4, con una asignación de por medio. Los pasos 1 y 2 viven en otra parte, y **la OT no guarda el highlight del que viene**. La app no sabe de qué cambio viene cada OT. *(Una primera lectura mía de por qué su tipo de contrato incluye `PRESUPUESTO` quedó superada en D-510: ese tipo es el subcontrato base del presupuesto, no un cambio.)*
 
 **Una observación del código sobre reasignar** (no se vieron datos): al reasignar, la app cambia el contratista de la asignación y de la OT, pero los pagos ya hechos conservan el nombre del contratista anterior y el saldo se calcula por número de OT. Resultado: **el resumen por contratista le atribuye al nuevo todo lo pagado en la OT, incluido lo que cobró el anterior.** Es relevante porque reasignar es lo común, y porque «pagado a otro contratista» es uno de los tipos de descuento.
 
-**Siguen abiertas, para cuando se toque este dominio** (no bloquean nada): ¿«mal trabajo» es el paraguas de los demás tipos, o son siete distintos?; ¿quién decide el monto del descuento y cómo se calcula?; ¿qué contratistas llevan retención y cuándo se les devuelve?; ¿qué significa cada tipo de contrato de la OT y cuáles son «extraordinario por subcontrato»?; ¿qué se hace con lo ya pagado cuando se reasigna?
+**Lo que el usuario contestó después (D-510).** Las cinco preguntas que quedaron abiertas en D-509.
+
+| Pregunta | Respuesta del usuario | Qué implica |
+|---|---|---|
+| ¿«Mal trabajo» es el paraguas de los demás descuentos? | «Son distintos, pero muy similares» | Siete tipos separados; ninguno contiene a otro. Eso responde también si el 1 y el 4 de la lista son lo mismo: no |
+| ¿Quién decide el monto y cómo se calcula? | «Depende de cada motivo»: la calidad puede ser un porcentaje; las afectaciones, el valor de otra OT o un concepto estimado de obra, instalaciones o urbanización, «por mencionar algunos» | El monto **no tiene una sola fórmula: la base de cálculo depende del motivo**. Ver la tabla de abajo |
+| ¿Qué contratistas llevan retención? | «Es por contratista actualmente»; recuerda a Gerardo Sierra, Melpro y Floviesa | La retención es **un atributo del contratista**, no del tipo de trabajo. La lista es de memoria, no necesariamente completa. Cuándo se devuelve no se contestó |
+| ¿Qué significa cada tipo de contrato? | Ver la tabla de tipos de contrato | Ocho valores que mezclan **cuatro cosas distintas**; ver abajo |
+| ¿Qué pasa con lo ya pagado cuando se reasigna? | Hay **dos clases de reasignación**; ver abajo | La app solo hace una de las dos |
+
+*Para el diccionario de equivalencias:* en los cinco meses de almacén del repo, «Gerardo Sierra» aparece como contratista en 25 movimientos y «Productos Forestales Floviesa» en 1; Melpro no aparece en esa columna.
+
+**Los ocho tipos de contrato de la OT, con las palabras del usuario.**
+
+| Tipo | Qué es, según el usuario | Qué es en el cerebro (lectura mía) |
+|---|---|---|
+| `PRESUPUESTO` | Lo que el presupuesto base tiene como venta; cada prototipo tiene su precio de subcontrato de venta | **El subcontrato base.** Es el nodo de subcontrato de la plantilla del prototipo (D-313 lo compara contra su propia base). **No es un cambio**: es el caso normal |
+| `ADICIONAL AL CLIENTE` | Cuando el cliente agrega algo: proyecto de obra nueva, cambio de accesorios, cambio de acabados | Cambio pedido por el cliente: highlight o adicional, y control de cambio al aprobarse (causa 5, `CONOCIMIENTO.md` §13.6) |
+| `PPTO + ADICIONAL` | Se contrató y después se modificó (una cocina contratada en base y luego modificada) | Subcontrato base con una orden de cambio encima |
+| `PAGO UNICO` | «Realmente es un método de pago»: no necesariamente requiere pagos posteriores ni cobro al cliente | **No es un tipo de contrato sino una forma de pago**; vive en otro eje |
+| `POSTVENTA` | Trabajo posterior a la entrega de la vivienda; hay dos tipos: **costo al cliente** o **garantía** | La garantía es el `TICKET_GARANTIA` que el cerebro ya tiene (`MODELO.md` §3b). «Costo al cliente» no tiene dónde caer |
+| `MANTENIMIENTO` | Trabajo por temporada; dos tipos: **costo al cliente** o **necesario para la entrega** | No está modelado. Sus dos tipos dicen quién absorbe el costo |
+| `CANCELADO` | El cliente ya no quiso alguno de los anteriores, o ya no era necesario; **aplica a todos los anteriores** | **Es un estado, no un tipo**: cualquiera de los otros puede terminar así |
+| `OTRO` | Un comodín, algún motivo que no estén viendo | Se queda como comodín abierto |
+
+Las cuatro cosas que mezcla esa lista: **de dónde viene el trabajo** (base, adicional, modificado, postventa, mantenimiento), **cómo se paga** (pago único), **en qué estado está** (cancelado) y **un comodín**. Y dos de los orígenes se subdividen por **quién absorbe el costo**: el cliente, la garantía o «lo necesario para la entrega». Lo que propongo —sin decidirlo— es separarlos en campos distintos: `origen`, `forma_de_pago`, `estado` y `cobro` (al cliente, garantía o necesario para la entrega). Eso es lo que `MODELO.md` ya hace en otras partes (el «quién paga» de las nueve causas, `CONOCIMIENTO.md` §13.6).
+
+**Una lectura mía que el usuario debe confirmar:** como `PRESUPUESTO` es el subcontrato base, **la OT no es solo un trabajo extra: cubre la vida entera de un subcontrato**, desde su precio de venta en el prototipo hasta sus cambios, su postventa y su cancelación. El nombre «extraordinario por subcontrato» sería entonces «fuera del destajo ordinario», no «fuera del presupuesto». Si es así, la definición de *Extraordinario por subcontrato* en el glosario se amplía (se hizo en D-510).
+
+**Cómo se calcula el monto de un descuento, según el motivo** (lo dicho por el usuario, sin completar):
+
+| Motivo | Base del monto |
+|---|---|
+| Calidad (mala calidad) | Un porcentaje |
+| Afectación a otros trabajos | El valor de otra OT, o un concepto estimado de obra, instalaciones o urbanización |
+| Los demás | No se dijo; «por mencionar algunos» deja la lista abierta |
+
+Las tres hojas de la estimación del concentrador (obra, instalaciones y urbanización) ya existen, así que un «concepto estimado de obra, instalaciones o urbanización» es una línea de esas estimaciones. Esto hace que **un descuento tenga una base de cálculo que se elige** (porcentaje, valor de otra OT, línea de estimación), además de su tipo. `DEDUCCION` hoy cuelga de una línea de estimación; estos cuelgan del pago de una OT, que el modelo no tiene. **Por eso `MODELO.md` espera a que la OT se modele** (B-111).
+
+**Las dos clases de reasignación.**
+
+| Clase | Qué pasa, según el usuario | En el cerebro | En la app de hoy |
+|---|---|---|---|
+| **Cambio de contratista** | Si ya se entregó un pago o anticipo, «que se pueda mover o cambiar como avance de otra u otras OT pendientes por pagar». Solo se pide una **alerta**: que el contratista esté enterado y que **no tenga avanzado el trabajo** | `ASIGNACION_CONTRATISTA` con `reemplaza_id` y motivo (abandono o logística). Lo avanzado se queda con quien lo hizo (D-453); el aviso de «quien avanza distinto del asignado» ya existe. **Mover un anticipo a otra OT se parece a `PRESTAMO`** (se salda con avance de obra, D-290), pero el cerebro no lo ha dicho así | Solo cambia el nombre en la asignación y en la OT; **no mueve pagos ni avisa** |
+| **Cambio de obra** | «Solo cambia el recurso de una obra a otra» | Se cierra la asignación en una obra y se abre en otra (`presupuesto_id`) | Se logra editando el lote de la asignación, que mueve el de la OT |
+
+*Lectura mía que falta confirmar:* «otra u otras OT pendientes por pagar» son las **otras OT del mismo contratista** que sale. También es posible que el descuento «pagado a otro contratista» sea esta misma situación vista desde el otro lado.
+
+**Ampliar o disminuir el alcance.** El usuario dice que ambos se pueden hacer. En la app, editar una cotización **sobrescribe** las partidas y recalcula el monto: no queda la versión anterior. El cerebro hace lo contrario (la orden de cambio «no edita, agrega», `CONOCIMIENTO.md` §13.4, con un delta firmado). Hay además un caso hacia abajo: **descuentos al cliente**, cuando no quiso algo y hay que bajar el presupuesto (una cocina; en equipamiento, una estufa y una campana, aunque eso lo lleva **otra área, no subcontratos**). Eso es una orden de cambio con delta negativo y el cerebro ya tiene la forma de guardarla.
+
+**Siguen abiertas** (no bloquean nada): cuándo se devuelve la retención y a cuánto asciende; si la lectura de que la OT cubre toda la vida del subcontrato es correcta; y si «otra u otras OT» son las del mismo contratista.
 
 ### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
 
