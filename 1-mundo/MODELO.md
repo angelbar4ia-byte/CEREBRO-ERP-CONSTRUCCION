@@ -928,27 +928,33 @@ pasó suelto.
 
 ---
 
-## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512, propuesta)
+## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512 y D-520, propuesta)
 
-Dato del usuario (D-512): el proyecto es **Magnolia**, con siete clústeres y *n* lotes en cada uno; **cada lote o casa es una obra** y se identifica por clúster y lote. La **urbanización es una sola** para todo el proyecto, y sus ramas son los clústeres y las amenidades. Hasta aquí el modelo no tenía proyecto ni cluster: el cluster era parte del nombre de la obra («ALAMO 18»), aunque la clave de un control de cambio ya los usaba por separado (`CC-ALM-18001`, §5f). Los campos son **propuesta del sistema**, a la espera de que el usuario los confirme, igual que pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454).
+Dato del usuario (D-512): el proyecto es **Magnolia**, con siete clústeres y *n* lotes en cada uno; **cada lote o casa es una obra** y se identifica por clúster y lote. La **urbanización es una sola** para todo el proyecto, y sus ramas son los clústeres y las amenidades. Hasta aquí el modelo no tenía proyecto ni cluster: el cluster era parte del nombre de la obra («ALAMO 18»), aunque la clave de un control de cambio ya los usaba por separado (`CC-ALM-18001`, §5f). **D-520:** en «Antigua» las casas no se identifican por cluster sino por **manzana y lote** («10-04» es manzana 10, lote 4), la sigla del cluster sirve para armar las claves y reconocer más rápido a qué obra pertenece un control de cambio, y el cliente se maneja como idea. Los campos son **propuesta del sistema**, a la espera de que el usuario los confirme, igual que pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454).
 
 ```
 PROYECTO
   id
   nombre             texto — «Magnolia» y «Antigua» (un proyecto viejo al
                       que le quedan una o muy pocas obras por cerrar)       propuesta — D-512 y D-516
+  agrupacion         enum: cluster · manzana — cómo llama el proyecto a lo
+                      que agrupa sus lotes; Magnolia, cluster; Antigua, manzana   propuesta — D-520
 
 CLUSTER
   id
   proyecto_id        FK PROYECTO                                          propuesta — D-512
-  nombre             texto — siete en Magnolia                            propuesta — D-512
-  codigo             texto, nullable — la sigla que ya lleva la clave de
-                      un control de cambio (`ALM` en `CC-ALM-18001`)        propuesta — D-512
+  nombre             texto — siete en Magnolia; en Antigua, el número de
+                      la manzana («10»)                                    propuesta — D-512 y D-520
+  codigo             texto, nullable — la sigla que sirve para formar las
+                      claves y reconocer a qué obra corresponde un control
+                      de cambio (`ALM` en `CC-ALM-18001`)                   propuesta — D-512 y D-520
 
 PRESUPUESTO — campos que gana (todos nullable)
-  cluster_id         FK CLUSTER — solo en la obra de una casa              propuesta — D-512
-  lote               texto — dentro del cluster; con él, la clave de la
-                      casa («FRESNO 12»)                                   propuesta — D-512
+  cluster_id         FK CLUSTER — solo en la obra de una casa; en Antigua
+                      apunta a su manzana                                  propuesta — D-512 y D-520
+  lote               texto — dentro del cluster o de la manzana, y se
+                      conserva como se escribe («04»); con él, la clave de
+                      la casa («FRESNO 12», «10-04»)                       propuesta — D-512 y D-520
   proyecto_id        FK PROYECTO — solo en la urbanización                 propuesta — D-512
   prototipo_id       FK PRESUPUESTO (tipo=plantilla) — de qué prototipo
                       es la casa                                           propuesta — D-512
@@ -958,12 +964,12 @@ PRESUPUESTO — campos que gana (todos nullable)
                       entregada — solo en tipo=obra                         propuesta — D-514
 ```
 
-- **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote, única dentro del proyecto.
+- **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote («FRESNO 12») o manzana y lote («10-04»), única dentro del proyecto. **La sigla del cluster** (`CLUSTER.codigo`) no es la clave de la casa: forma la clave de lo que cuelga de ella, como un control de cambio, y dice de un vistazo a qué obra corresponde (D-520); no se dijo si «Antigua» usa una sigla.
 - **La urbanización también es un `PRESUPUESTO(tipo=obra)`, uno por proyecto,** con `proyecto_id` y sin cluster ni lote. Sus ramas —los clústeres y las amenidades— son nodos de su árbol, no tablas.
 - **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
 - **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
 - **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
-- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y el cliente, que no se dijo si es un dato de la obra.
+- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y **el cliente (D-520, idea):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_GARANTIA` y las OT de postventa y mantenimiento (§5i)—.
 - **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b), y **al entregarse la obra pasa a postventa** (§3b, D-516). «Antigua», que D-513 leyó como un estatus, es el nombre del segundo proyecto.
 
 ---

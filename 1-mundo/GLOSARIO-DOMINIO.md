@@ -889,13 +889,13 @@ El desarrollo completo: agrupa clústeres y una urbanización. Hoy hay dos: Magn
 
 ### Cluster
 
-Agrupación de lotes dentro del proyecto. Magnolia tiene siete. Su nombre forma parte de la clave de la casa. (D-512.)
+Agrupación de lotes dentro del proyecto. Magnolia tiene siete. Su nombre forma parte de la clave de la casa. En «Antigua» esa agrupación se llama **manzana** y la clave es manzana y lote («10-04»). (D-512 y D-520.)
 
 - **También:** Clúster
 - **No confundir con:** Proyecto; Frente
 - **Se usa con:** Proyecto; Lote; Control de cambio
-- **Ejemplo:** Alamo, Fresno, Olmo
-- **Hoy vive en:** dentro del texto del lote («FRESNO 12»); `cluster` en auditoría y en ObraCtrl; la sigla (`ALM`) en la clave de un control de cambio
+- **Ejemplo:** Alamo, Fresno, Olmo; en «Antigua», la manzana 10
+- **Hoy vive en:** dentro del texto del lote («FRESNO 12»); `cluster` en auditoría y en ObraCtrl; la sigla (`ALM`) en la clave de un control de cambio, que sirve para formarla y para reconocer a qué obra corresponde
 
 ### Lote
 
@@ -904,7 +904,7 @@ La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster
 - **También:** Obra; Casa
 - **No confundir con:** Prototipo (el modelo que se repite); Urbanización
 - **Se usa con:** Cluster; Prototipo; Presupuesto
-- **Ejemplo:** FRESNO 12; ALAMO 18
+- **Ejemplo:** FRESNO 12; ALAMO 18; 10-04 (manzana 10, lote 4, en «Antigua»)
 - **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, propuesta)
 - **Estatus:** pendiente (en planeación o próxima a construir), iniciada, en proceso, por entregar (desde el 90 % de avance, hasta que el cliente la recibe) y entregada, como en ObraCtrl (D-514)
 

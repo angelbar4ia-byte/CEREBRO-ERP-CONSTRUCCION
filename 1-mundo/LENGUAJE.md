@@ -662,6 +662,14 @@ Proyecto: Magnolia
 
 Cada casa es un prototipo, con o sin modificaciones y con o sin m² adicionales. En el modelo: `MODELO.md` §3c. El concentrador trae **dos** proyectos (D-506): Magnolia y **«Antigua»,** un proyecto viejo al que le quedan una o muy pocas obras por cerrar (D-516; D-513 había leído mal «Antigua» como un estatus de obra).
 
+**Tres precisiones del usuario sobre esta estructura (D-520).**
+
+| Pregunta | Respuesta | Qué queda |
+|---|---|---|
+| ¿Las obras de «Antigua» se identifican por cluster y lote? | «Manzana y lote, ejemplo: 10-04, manzana 10 lote 4» | En «Antigua» lo que agrupa los lotes es la **manzana,** y la clave de la casa es manzana y lote («10-04»). En el modelo: `PROYECTO.agrupacion` (cluster o manzana), y la manzana usa la misma tabla `CLUSTER` *(lectura mía)*. El lote se guarda como texto para no perder el cero («04») |
+| ¿Para qué sirve la sigla del cluster? | «Las siglas son para formar las claves e identificar a qué obra corresponde un control de cambio más rápido» | `CLUSTER.codigo` se queda: no es la clave de la casa sino la sigla con que se forman las claves de lo que cuelga de ella (`CC-ALM-18001`) |
+| ¿El cliente es un dato de la obra? | «El cliente es el dueño de la casa; más adelante veremos cómo un usuario para un módulo de vivienda, donde podrá solicitar cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega. Manéjalo como idea» | **Idea, sin modelar** (B-125). Los destinos ya existen: la orden de cambio, el ticket de garantía y las OT de postventa y mantenimiento |
+
 **2. Los niveles (R3).** El usuario avisó que «nivel» se dice de dos cosas distintas: el nivel del presupuesto y el nivel de la casa. Con el que el cerebro ya distinguía, son tres:
 
 | Palabra | Qué es | Ejemplo | Dónde está |
