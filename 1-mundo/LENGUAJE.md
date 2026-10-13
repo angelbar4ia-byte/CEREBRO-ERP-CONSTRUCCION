@@ -324,7 +324,7 @@ Un ERP sube un peldaño a la vez, con una decisión del usuario por peldaño. De
 | **ERP externo** | 1, y parte del 3 | Por archivo, y devuelve tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3). No es ninguno de los cuatro sistemas de abajo ni está en GitHub (el usuario, D-496) | Archivo contra API, `Flete` y los cuatro catálogos de salida |
 | **ObraCtrl** (control de obra por avance) | 1, por ahora | Su base es PostgreSQL con RLS en Supabase y su API es FastAPI; repo `CONTROL-AVANCE`. La parte 10 de su especificación define un set de catálogos canónicos. Dónde corre cada parte (API y panel, Render y Vercel) está por confirmar (D-496) | Reconciliar sus catálogos con el canon de aquí; ficha pendiente |
 | **Concentrador de estimaciones** | — | Flask con SQLite en la computadora del usuario; repo `ERP-ESTIMACI-N` | Ficha pendiente; la base y los Excel reales están dentro del repo |
-| **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor en la computadora del usuario, dos usuarios por wifi; **sin repo propio**: su carpeta será `apps/extraordinarios` en `Multi-erp`, todavía vacía (D-496) | Pila, base de datos y cómo se llega a ella |
+| **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor Node.js en la computadora del usuario, con su propio PostgreSQL, y tres usuarios por la red local; **sin repo propio**: vive en `apps/extraordinarios` de `Multi-erp` desde D-504 | Que el usuario confirme su ficha y diga si un archivo de muestra de respaldo trae datos reales |
 | **Control de obra, auditoría** | — | En la computadora del usuario; **sin repo propio**: su carpeta será `apps/auditoria` en `Multi-erp`, todavía vacía (D-496). La carpeta que se revisó (`obra-control`, por confirmar que sea esta) trae un backend con migraciones, un frontend de npm, un lanzador y un PostgreSQL con pgAdmin instalados adentro (D-498; por los nombres de archivo). La herramienta halló el directorio de datos de PostgreSQL en `data/pgdata` de esa misma carpeta: ahí viven las tablas reales (D-499). Esa base corre en el puerto 5433 y tiene 37 tablas con datos y unos 3.3 MB al volcarla (D-501). Su esquema se llama obra; de las 30 primeras tablas que se vieron (faltan 7), estas son las que tocan el dominio del cerebro: concepto, concepto_nuevo, concepto_version, familia_concepto, componente_cpu, estimacion, almacen, movimiento_almacen, motivo_almacen, cuadrilla, contratista, mano_de_obra, material, familia_material, nivel, cluster, etapa_construccion, prefijo_clave, lote_carga, bandeja_pendiente, hallazgo y discrepancia_reg. Solo se conocen los nombres de las tablas, no su contenido ni sus columnas. La especificación de ObraCtrl habla de un «Sistema de Control y Auditoría de Obra» como *Fuente de la Verdad*: parece ser este: su carpeta trae los documentos «FUENTE_DE_LA_VERDAD_Sistema_Control_Obra» y «MODULO_AUDITORIA_ESTIMACION» (D-500), leídos en D-503 | Confirmar con el usuario las preguntas marcadas en su ficha; ya subida a `Multi-erp` (D-503) |
 
 ### La ficha de auditoría, con lo que ya se sabe (D-503)
@@ -340,6 +340,22 @@ Subida a `Multi-erp` (carpeta `apps/auditoria`, 220 archivos, sin claves ni dato
 | 5 | ¿Hasta dónde puede actuar el cerebro? | **Sin decidir.** La API existe, así que el peldaño 2 (proponer) tiene por dónde entrar; el 4 sigue sin decidirse | del usuario |
 | 6 | Ejemplos reales | El volcado de la base (3.3 MB) existe y **no se subió**; siete reportes semanales en PDF quedaron fuera a propósito | el usuario decide si comparte alguno |
 | 7 | ¿Qué no se toca nunca? | La estimación pagada es inmutable (los ajustes del cruce se guardan aparte); el sistema propone y la persona decide; los catálogos no los cambia solo | el documento del módulo de auditoría de estimación |
+
+### La ficha de extraordinarios, con lo que ya se sabe (D-504)
+
+Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni datos). Todo sale de su README y de lo que midió la herramienta; **no se ha leído su código**.
+
+| # | Pregunta | Respuesta | De dónde sale |
+|---|---|---|---|
+| 1 | ¿Cuál es y qué guarda? | «MAGNOLIA · App Web de Gestión»: asignaciones, cotizaciones, órdenes de trabajo (OT) y pagos de subcontratos, con sus anticipos y garantías | su README y los nombres de sus migraciones |
+| 2 | ¿Quién lo usa y quién manda? | Tres usuarios con rol: `asignaciones` (asigna contratista a lote y trabajo), `cotizacion` (cotiza y concluye OT) y `pagos` (registra pagos y administra). Hay además un enlace público de solo lectura para gente externa | su README |
+| 3 | ¿Cómo se llega a sus datos? | Servidor en el puerto 3000; PostgreSQL propio con su directorio de datos en `.pgdata`; descarga de un respaldo completo en JSON (rol `pagos`) y restauración; exporta e importa Excel; sabe leer el respaldo de su versión anterior | su README y lo medido en la revisión |
+| 4 | ¿Dónde vive? | Una computadora con Windows (también Mac y Linux), sin internet una vez instalada; los otros usuarios entran por la IP local de esa computadora | su README |
+| 5 | ¿Hasta dónde puede actuar el cerebro? | **Sin decidir.** Con el respaldo en JSON y el Excel ya hay una vía para el peldaño 1 (leer) sin tocar la app | del usuario |
+| 6 | Ejemplos reales | En `tests/` quedó un archivo de muestra de respaldo (1.3 KB: 2 OT y 1 pago, de junio de 2026) que **puede traer datos reales**; el usuario debe decir si lo son | pendiente del usuario |
+| 7 | ¿Qué no se toca nunca? | **Por contestar.** Por su manual: un número de OT no se duplica (si ya existe, se actualiza) y solo `pagos` administra | su README |
+
+Toca el mismo dominio que el módulo «Control de OT (subcontratos)» de la «Fuente de la Verdad» de auditoría; si las dos apps se relacionan, lo dirá el usuario.
 
 ### Los cánones contra la «Fuente de la Verdad» — primera pasada (D-503)
 

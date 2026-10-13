@@ -57,6 +57,8 @@ CRITICO, AVISO, INFO = "CRÍTICO", "AVISO", "INFO"
 MARCA_DE_CLAVE = "CAMBIA_ESTA_CLAVE"
 SUFIJOS_DE_DOCUMENTO = {".md", ".txt", ".rst"}
 SUFIJOS_DE_GUION = {".bat", ".cmd", ".sh", ".ps1", ".ini", ".cfg", ".conf", ".yaml", ".yml", ".toml", ".properties", ".env"}
+NOMBRE_DE_MUESTRA = re.compile(r"(?i)(backup|respaldo|dump|export|sample|muestra|snapshot)")
+SUFIJOS_DE_MUESTRA = {".json", ".sql", ".xml", ".yaml", ".yml", ".txt", ".dat"}  # los de hojas y bases ya se apartan por su extensión
 SIN_VALOR = {".deps_ok", ".ds_store", "thumbs.db"}  # marcas y cachés que no son parte de la app
 SUFIJOS_SIN_VALOR = {".pyc", ".tsbuildinfo"}
 
@@ -172,7 +174,7 @@ def revisar(carpeta, excluir=()):
     No entra a node_modules, venv, .git ni demás carpetas que nunca van (entrar es lo que tardaba), ni al directorio de datos
     de una base, ni a lo que se pida con `excluir`."""
     pedidas = {e.strip("/\\").replace("\\", "/").lower() for e in excluir}
-    entra, aparta, hallazgos, variables, total = [], [], {}, set(), 0
+    entra, aparta, hallazgos, variables, total, parecen_datos = [], [], {}, set(), 0, []
     for raiz, subcarpetas, nombres in os.walk(carpeta):
         raiz = Path(raiz)
         base = base_de_datos_en(nombres, subcarpetas)
@@ -227,8 +229,10 @@ def revisar(carpeta, excluir=()):
                                 hallazgos[rel] = encontrados
                 except OSError:
                     pass
+            if ruta.suffix.lower() in SUFIJOS_DE_MUESTRA and NOMBRE_DE_MUESTRA.search(ruta.stem):
+                parecen_datos.append(rel)  # no se aparta: puede ser un ejemplo inventado; lo decide la persona
             entra.append(rel)
-    return {"entra": entra, "aparta": aparta, "hallazgos": hallazgos, "variables": variables, "total": total}
+    return {"entra": entra, "aparta": aparta, "hallazgos": hallazgos, "variables": variables, "total": total, "parecen_datos": parecen_datos}
 
 
 def con_critico(informe):
@@ -401,6 +405,10 @@ def imprimir(informe, carpeta, maximo=25, p=print):
     for motivo, lista in sorted(por_motivo.items(), key=lambda kv: -len(kv[1])):
         vista = lista if maximo is None else lista[:3]
         p(f"     – {len(lista):4}  {motivo}: " + ", ".join(r.as_posix() for r in vista) + (" …" if len(vista) < len(lista) else ""))
+    if informe.get("parecen_datos"):
+        p("\n  Por su nombre parecen respaldos o muestras de datos (NO se apartaron; ábrelos y mira si son datos reales antes de subir):")
+        for rel in informe["parecen_datos"]:
+            p(f"     ? {rel.as_posix()}")
     por_carpeta = Counter(carpeta_alta(r) for r in informe["hallazgos"])
     rango = {CRITICO: 0, AVISO: 1, INFO: 2}
     filas = [(rel, n, nivel, que, vista) for rel, hs in informe["hallazgos"].items() for n, nivel, que, vista, _ in hs]
@@ -466,6 +474,8 @@ def autoprueba():
         (app / "arranque.bat").write_bytes(b"set PGPASSWORD=Bd2026xyz\r\nset X=%PGPASSWORD%\r\n")
         (app / "api.json").write_text('{"password": "string", "x": {"password": {"type": "string"}}}\n', encoding="utf-8")
         (app / "plantilla.js").write_text("const cfg = { host: 'localhost', password: `Clave2026x`, db: `obra_${n}` };\n", encoding="utf-8")
+        (app / "muestra_respaldo.json").write_text('{"ots": []}\n', encoding="utf-8")
+        (app / "exportar_hoja.py").write_text("print('es código, no datos')\n", encoding="utf-8")  # se llama export pero es código: no se marca
         (app / "x.pyc").write_bytes(b"\x00")
         (app / "tsconfig.tsbuildinfo").write_text("{}", encoding="utf-8")
         (app / ".deps_ok").write_text("", encoding="utf-8")
@@ -520,6 +530,8 @@ def autoprueba():
         copia_doc = (sin / "LEEME.txt").read_text(encoding="utf-8")
         if "Admin2026x" in copia_doc or "Contraseña: " + MARCA_DE_CLAVE not in copia_doc or "La contraseña es obligatoria" not in copia_doc:
             errores.append("no quitó bien la contraseña escrita en un documento (LEEME.txt) o tocó una frase que no lo era")
+        if {r.as_posix() for r in informe["parecen_datos"]} != {"muestra_respaldo.json"}:
+            errores.append(f"los archivos que parecen muestras de datos: {sorted(r.as_posix() for r in informe['parecen_datos'])} ≠ ['muestra_respaldo.json']")
         copia_js = (sin / "plantilla.js").read_text(encoding="utf-8")
         if "Clave2026x" in copia_js or "password: `" + MARCA_DE_CLAVE + "`" not in copia_js or "db: `obra_${n}`" not in copia_js:
             errores.append("no quitó bien la contraseña entre comillas invertidas de JavaScript (plantilla.js), o tocó una plantilla con ${}")
