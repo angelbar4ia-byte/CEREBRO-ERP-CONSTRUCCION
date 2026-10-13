@@ -122,13 +122,13 @@ def hallazgos_de_texto(texto, modo="codigo"):
                 salida.append((n, CRITICO, "token de un servicio (AWS, GitHub, Slack, Anthropic, OpenAI o Google)", ocultar(m.group(0)), None))
         if re.search(r"os\.environ|getenv|process\.env|import\.meta\.env", linea):
             continue
-        for m in re.finditer(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)\s*[:=]\s*['\"]([^'\"\s]{6,})['\"]", linea):
+        for m in re.finditer(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)\s*[:=]\s*['\"`]([^'\"`\s]{6,})['\"`]", linea):
             if not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)) and not VALORES_QUE_NO_SON_CLAVES.match(m.group(2)):
                 salida.append((n, AVISO, "asignación de «" + m.group(1) + "» con un valor escrito en el código", ocultar(m.group(2)), ("asignacion", m.group(2))))
-        for m in re.finditer(r"(?i)['\"]([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)['\"]\s*:\s*['\"]([^'\"\s]{6,})['\"]", linea):
+        for m in re.finditer(r"(?i)['\"]([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)['\"`]\s*:\s*['\"`]([^'\"`\s]{6,})['\"`]", linea):
             if not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)) and not VALORES_QUE_NO_SON_CLAVES.match(m.group(2)):
                 salida.append((n, AVISO, "«" + m.group(1) + "» con un valor escrito dentro de un diccionario o JSON", ocultar(m.group(2)), ("asignacion", m.group(2))))
-        for m in re.finditer(r"(?i)\b[A-Za-z0-9_]*(?:password|passwd|pwd)[A-Za-z0-9_]*\s*\(\s*['\"]([^'\"\s]{6,})['\"]", linea):
+        for m in re.finditer(r"(?i)\b[A-Za-z0-9_]*(?:password|passwd|pwd)[A-Za-z0-9_]*\s*\(\s*['\"`]([^'\"`\s]{6,})['\"`]", linea):
             if not es_placeholder(m.group(1)):
                 salida.append((n, AVISO, "contraseña escrita como argumento de una llamada", ocultar(m.group(1)), ("asignacion", m.group(1))))
         if modo != "codigo":
@@ -296,7 +296,7 @@ def quitar_en_linea(linea, tipo, valor):
         return re.sub(r"(://[^\s:/@'\"]+:)" + v + r"(@)", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
     if tipo == "libre":
         return re.sub(r"(?i)((?:password|passwd|pwd|contrase[nñ]a)[A-Za-z0-9_]*\s*(?:=|:|\bes\b)\s*`?)" + v, lambda m: m.group(1) + MARCA_DE_CLAVE, linea)
-    return re.sub(r"(['\"])" + v + r"(['\"])", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
+    return re.sub(r"(['\"`])" + v + r"(['\"`])", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
 
 
 def quitar_contrasenas(archivo, quitables):
@@ -465,6 +465,7 @@ def autoprueba():
         (app / "LEEME.txt").write_text("Usuario: admin\nContraseña: Admin2026x\nLa contraseña es obligatoria\n", encoding="utf-8")
         (app / "arranque.bat").write_bytes(b"set PGPASSWORD=Bd2026xyz\r\nset X=%PGPASSWORD%\r\n")
         (app / "api.json").write_text('{"password": "string", "x": {"password": {"type": "string"}}}\n', encoding="utf-8")
+        (app / "plantilla.js").write_text("const cfg = { host: 'localhost', password: `Clave2026x`, db: `obra_${n}` };\n", encoding="utf-8")
         (app / "x.pyc").write_bytes(b"\x00")
         (app / "tsconfig.tsbuildinfo").write_text("{}", encoding="utf-8")
         (app / ".deps_ok").write_text("", encoding="utf-8")
@@ -519,6 +520,9 @@ def autoprueba():
         copia_doc = (sin / "LEEME.txt").read_text(encoding="utf-8")
         if "Admin2026x" in copia_doc or "Contraseña: " + MARCA_DE_CLAVE not in copia_doc or "La contraseña es obligatoria" not in copia_doc:
             errores.append("no quitó bien la contraseña escrita en un documento (LEEME.txt) o tocó una frase que no lo era")
+        copia_js = (sin / "plantilla.js").read_text(encoding="utf-8")
+        if "Clave2026x" in copia_js or "password: `" + MARCA_DE_CLAVE + "`" not in copia_js or "db: `obra_${n}`" not in copia_js:
+            errores.append("no quitó bien la contraseña entre comillas invertidas de JavaScript (plantilla.js), o tocó una plantilla con ${}")
         copia_guion = (sin / "arranque.bat").read_bytes()
         if b"Bd2026xyz" in copia_guion or b"PGPASSWORD=" + MARCA_DE_CLAVE.encode() not in copia_guion or b"%PGPASSWORD%" not in copia_guion or b"\r\n" not in copia_guion:
             errores.append("no quitó bien la contraseña sin comillas de un guion (arranque.bat), o tocó la referencia %PGPASSWORD%")
