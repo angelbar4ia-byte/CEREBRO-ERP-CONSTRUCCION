@@ -503,31 +503,34 @@ Las tres hojas de la estimación del concentrador (obra, instalaciones y urbaniz
 
 **Siguen abiertas** (no bloquean nada): el porcentaje y la lista exacta de los contratistas con retención (la lista es de memoria); si el 5 % varía por contratista; y si «extraordinario» es sinónimo de *adicional* o abarca también la postventa y el mantenimiento.
 
-### La OT en el cerebro: un primer borrador, para contestar (D-517)
+### La OT en el cerebro: del borrador a la propuesta (D-517 y D-518)
 
-Con lo que el usuario ha dicho de la OT (D-508 a D-516) ya se ve qué del cerebro la cubre y qué falta. **Es un borrador para contestar,** no un diseño: nada de esto entra a `MODELO.md` hasta que el usuario lo confirme. Una OT es el contrato informal con el contratista para ejecutar un subcontrato; empieza al contratar, y la venta al cliente (un presupuesto o un control de cambio) viene antes (D-511).
+Con lo que el usuario ha dicho de la OT (D-508 a D-516) ya se ve qué del cerebro la cubre y qué falta. El usuario contestó las cinco preguntas (D-518) y la propuesta quedó escrita en `MODELO.md` §5i; **sigue siendo propuesta** hasta que confirme los campos. Una OT es el contrato informal con el contratista para ejecutar un subcontrato; empieza al contratar, y la venta al cliente (un presupuesto o un control de cambio) viene antes (D-511).
 
 | Pieza | Hoy en la app de extraordinarios | Dónde cae en el cerebro | Estado |
 |---|---|---|---|
 | Quién la ejecuta | Asignación con historial; la hace Finanzas | `ASIGNACION_CONTRATISTA`, con alcance de concepto y cadena de reemplazos (D-453) | Ya está |
 | Contratar y fijar el precio | Al cotizar nace la OT | `ESTADO_CONGELAMIENTO` en `contratado` (D-475) | Ya está |
-| Número de la OT | Consecutivo único; se sugiere el siguiente y se puede escribir otro que no exista | Un número único | Por proponer |
-| Cotización del contratista | Partidas libres y un IVA que se teclea; al ampliar o disminuir el alcance se sobrescribe | Una cotización **con versión,** que se agrega y no se edita, con partidas libres (los «conceptos extraordinarios» de `CONOCIMIENTO.md` §1.4) | Por proponer |
-| Origen, quién absorbe el costo, forma de pago y estado | Un solo campo «tipo de contrato» con ocho valores | Cuatro campos: `origen`, `cobro`, `forma_de_pago` y `estado` (D-510) | Por proponer |
-| La venta al cliente de la que viene | No la guarda | Una liga a la orden de cambio (`PROPUESTA(orden_cambio)`), que viene del highlight o del adicional | Por proponer |
-| Pagos | Renglones por clase y tipo, que confirma Control de obra | Una tabla de pagos de la OT | Por proponer |
-| Retención de 5 % | Informativa | `CONTRATISTA.retencion_pct` y `RETENCION` (D-290 y B-112) | Por proponer |
-| Descuentos | Un número sin tipo | `DEDUCCION` con los siete tipos nuevos (B-110) | Por proponer |
+| Número de la OT | Consecutivo único; se sugiere el siguiente y se puede escribir otro que no exista | Un número único | Propuesto |
+| Cotización del contratista | Partidas libres y un IVA que se teclea; al ampliar o disminuir el alcance se sobrescribe | Una cotización **con versión,** que se agrega y no se edita, con partidas libres (los «conceptos extraordinarios» de `CONOCIMIENTO.md` §1.4) | Propuesto |
+| Origen, quién absorbe el costo, forma de pago y estado | Un solo campo «tipo de contrato» con ocho valores | Cuatro campos: `origen`, `cobro`, `forma_de_pago` y `estado` (D-510) | Propuesto |
+| La venta al cliente de la que viene | No la guarda | Una liga a la orden de cambio (`PROPUESTA(orden_cambio)`), que viene del highlight o del adicional | Propuesto |
+| Pagos | Renglones por clase y tipo, que confirma Control de obra | Una tabla de pagos de la OT | Propuesto |
+| Retención de 5 % | Informativa | `CONTRATISTA.retencion_pct` y `RETENCION` (D-290 y B-112) | Propuesto |
+| Descuentos | Un número sin tipo | `DEDUCCION` con los siete tipos nuevos (B-110) | Propuesto |
 | Saldo | Monto menos pagos confirmados | Se calcula, no se guarda | — |
-| Reasignar | Cambia el nombre del contratista | Cambio de contratista (mueve el anticipo y avisa) o de obra (D-510) | Por proponer |
-| Cancelar | No hay ruta | Un estado `cancelada` | Por proponer |
+| Reasignar | Cambia el nombre del contratista | Cambio de contratista (mueve el anticipo y avisa) o de obra (D-510) | Propuesto |
+| Cancelar | No hay ruta | Un estado `cancelada` | Propuesto |
 
-**Cinco preguntas, las que hacen falta para escribirlo:**
-1. Las tres clases de pago de la app son estimación, a cuenta (fuera de estimación) y transferencia: ¿qué diferencia hay entre «a cuenta» y «transferencia»?
-2. La retención de 5 %: ¿se descuenta de cada pago, o se calcula sobre el total de la OT y se retiene al finiquitar? Y el tipo de pago «garantía», ¿es la devolución de lo retenido?
-3. En una OT de tipo presupuesto, ¿el monto es el precio de venta del prototipo o lo que se le paga al contratista, que puede ser distinto? (El cerebro compara el real de un subcontrato contra su base, D-313.)
-4. Al ampliar o disminuir el alcance, ¿lo aprueba alguien o lo hace Proyectos directo, y cambia entonces la venta al cliente?
-5. ¿Quién concluye una OT y cuándo: Proyectos al terminar el trabajo, o cuando ya se pagó todo?
+**Las cinco respuestas del usuario (D-518).**
+
+| Pregunta | Respuesta | Qué queda |
+|---|---|---|
+| ¿Qué es «a cuenta» frente a «transferencia»? | «A cuenta se entrega en efectivo» | El **medio** de pago es estimación, efectivo o transferencia *(lectura mía: transferencia bancaria)* |
+| ¿La retención de 5 % sale de cada pago o del total? | «Total de la OT, y se retiene al finiquitar; el finiquito puede llevar la retención y/o la garantía, que es la retención» | Se calcula sobre el **total** y se retiene **al finiquitar.** «Garantía» **es** la retención: el pago `garantia` es su devolución |
+| ¿El monto de una OT de presupuesto es la venta o lo que se paga? | «El precio de venta del prototipo; pero en todos los casos, si hay un incremento o decremento, lo vamos a comparar con el presupuesto base, para entender incrementos, deducciones, ahorros y sobrecostos» | El monto es el precio de venta; **toda** OT se compara contra su base. *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra) y ahorro y sobrecosto, la misma obra a otro precio |
+| ¿Quién aprueba ampliar o disminuir el alcance? | «Lo realiza Proyectos y Control lo audita» | Proyectos lo hace y Control de obra lo **audita** *(lectura mía: después, no antes)* |
+| ¿Quién concluye la OT y cuándo? | «Los residentes estiman hasta el pago de garantías, si es el caso» | La OT sigue abierta a la estimación hasta que **se pagó todo,** garantía incluida; *(lectura mía: el sistema propone concluirla y Proyectos lo confirma)* |
 
 ### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
 

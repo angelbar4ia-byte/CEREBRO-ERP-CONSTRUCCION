@@ -3365,6 +3365,71 @@ cada fila. `PENDIENTES-MEJORAS.md` B-33.
 
 ---
 
+## 5i. La orden de trabajo (OT) — el subcontrato contratado (D-518, propuesta)
+
+El usuario describió la OT a lo largo de D-508 a D-518 y contestó lo que faltaba para escribirla. **Es propuesta del sistema,** a la espera de que confirme los campos, como pasó con `ASIGNACION_CONTRATISTA` (§4a, D-453 y D-454). La OT es **el contrato informal con el contratista** para ejecutar un subcontrato; empieza al contratar, y la venta al cliente (un presupuesto o un control de cambio) viene antes. Lo que el cerebro ya tenía no se repite: quién la ejecuta (`ASIGNACION_CONTRATISTA`, §4a) y contratar con el precio fijo (`ESTADO_CONGELAMIENTO`, §4a, D-475).
+
+```
+ORDEN_TRABAJO
+  id                   el «oid»: lo genera el sistema                          propuesta — D-518
+  numero               INTEGER, único — el consecutivo de la app de hoy: se
+                        sugiere el siguiente y se puede escribir otro que no
+                        exista; se conserva al migrar                           propuesta
+  presupuesto_id       FK PRESUPUESTO — la obra: una casa o la urbanización (§3c)   propuesta
+  nodo_id              FK Nodo, nullable — el subcontrato del presupuesto que
+                        contrata; nulo si no tiene partida base                 propuesta
+  asignacion_id        FK ASIGNACION_CONTRATISTA — quién la ejecuta; reasignar
+                        cierra una y abre otra                                  propuesta
+  origen               enum: presupuesto · adicional_al_cliente ·
+                        presupuesto_mas_adicional · postventa · mantenimiento ·
+                        otro                                                   propuesta — D-510
+  cobro                enum, nullable: cliente · garantia ·
+                        necesario_para_entrega — solo en postventa y
+                        mantenimiento                                          propuesta — D-510
+  forma_de_pago        enum: parcialidades · pago_unico                        propuesta — D-510
+  orden_cambio_id      FK PROPUESTA(tipo=orden_cambio), nullable — la venta al
+                        cliente de la que viene                                 propuesta — D-515
+  estado               enum: cotizada · concluida · cancelada                  propuesta
+  fecha, observaciones
+
+COTIZACION_OT
+  id, orden_trabajo_id FK ORDEN_TRABAJO
+  version              INTEGER — ampliar o disminuir el alcance agrega una
+                        nueva; la anterior no se edita (D-510)                  propuesta
+  vigente              boolean — la última                                     propuesta
+  iva_pct              NUMERIC — por defecto el de la configuración (16 %, B-114)   propuesta
+  hecha_por            FK USUARIO — Proyectos                                  propuesta
+  auditada_por, auditada_en   FK USUARIO, nullable — Control de obra, después   propuesta — D-518
+  notas
+
+PARTIDA_COTIZACION
+  id, cotizacion_id FK COTIZACION_OT
+  descripcion, unidad, cantidad, precio_unitario   libres, sin clave de catálogo   propuesta
+
+PAGO_OT
+  id                   el oid
+  orden_trabajo_id     FK ORDEN_TRABAJO
+  semana, anio
+  medio                enum: estimacion · efectivo · transferencia              propuesta — D-518
+  tipo                 enum: anticipo · avance · finiquito · garantia · pago_unico   propuesta
+  monto                NUMERIC
+  estimacion_linea_id  FK ESTIMACION_LINEA, nullable — solo si medio=estimacion
+  confirmado, confirmado_por   boolean, FK USUARIO — Control de obra; un anticipo
+                        planeado en la asignación nace sin confirmar y con monto 0
+```
+
+- **La cotización.** Solo cuentan las partidas con descripción, cantidad mayor a cero y precio unitario mayor a cero. Subtotal = suma de cantidad por precio; IVA = subtotal por `iva_pct`; el monto de la OT es el total de la cotización vigente. **Proyectos hace el cambio de alcance y Control de obra lo audita** (D-518): *lectura mía,* es una auditoría posterior y no una autorización previa.
+- **Los pagos.** El **medio** es la estimación semanal (que hacen los residentes), el **efectivo** («a cuenta», dicho por el usuario) o la transferencia *(lectura mía: bancaria)*. El **saldo** es el total vigente menos los pagos confirmados, y se calcula. El monto de una OT de **tipo presupuesto** es el precio de venta del prototipo (D-518).
+- **La retención.** Se calcula sobre el **total de la OT** y se **retiene al finiquitar,** no de cada pago: `CONTRATISTA.retencion_pct` (§4a) por el total vigente, solo si el contratista la lleva. **«Garantía» es la retención:** el pago de tipo `garantia` es su devolución, y el finiquito puede llevar la retención, la garantía o las dos. Se libera al entregarse la vivienda, o antes si el Supervisor lo autoriza, y Control de obra valida si hace falta. `RETENCION` (§5d) ganaría la OT de la que sale y el pago con que se devuelve.
+- **Los descuentos** ya no son un tipo de pago: son `DEDUCCION` (§5d) con los siete tipos nuevos (B-110), colgada también de un pago de OT. Por eso `PAGO_OT.tipo` no trae `descuento`, que la app de hoy sí tiene.
+- **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
+- **Concluir.** Los residentes estiman hasta el pago de la garantía, si la hay; la OT se concluye cuando **se pagó todo,** garantía incluida (D-518). *Lectura mía:* el sistema lo propone y Proyectos lo confirma, como hoy hace el usuario de cotización.
+- **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **Cómo se registra ese traspaso queda por diseñar** (se parece al préstamo que se salda con avance de obra, D-290). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
+- **Quién (funciones propuestas, que no entran todavía a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
+- **Fuera de aquí:** el contratista como usuario (B-121) y el traspaso del anticipo.
+
+---
+
 # 6. Lo que este modelo deliberadamente NO resuelve
 
 | No incluido | Por qué |
