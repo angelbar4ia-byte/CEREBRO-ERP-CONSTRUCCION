@@ -2680,13 +2680,36 @@ existe:**
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
 
-### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515, propuesta)
+### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515; firme desde D-522)
 
-Dos respuestas del usuario (D-515) sobre lo que ObraCtrl hace distinto, que aquí son propuesta.
+Dos respuestas del usuario (D-515) sobre lo que ObraCtrl hace distinto, que el usuario confirmó en D-522 y son firmes.
 
-**El cierre: dos candados.** Se solicita **por frente** (`CIERRE_FRENTE`, firme, arriba) y, **si se requiere, por una o varias actividades;** el segundo candado cierra **todo el lote**. Las manos son las de siempre (D-269): el residente solicita, el supervisor aprueba, control valida. Lo que se suma, sin escribirlo todavía como tabla:
+**El cierre: dos candados.** Se solicita **por frente** (`CIERRE_FRENTE`, firme, arriba) y, **si se requiere, por una o varias actividades;** el segundo candado cierra **todo el lote**. Las manos son las de siempre (D-269): el residente solicita, el supervisor aprueba, control valida. Lo que se suma, ahora como tablas (D-522):
+
+```
+CIERRE_ACTIVIDADES                  el cierre de una o varias actividades
+  id, presupuesto_id FK PRESUPUESTO
+  solicitado_por, solicitado_en     FK USUARIO — Residente                   firme — D-522
+  aprobado_por, aprobado_en         FK USUARIO — Supervisor                  firme — D-522
+  validado_por, validado_en         FK USUARIO — Control de obra             firme — D-522
+
+CIERRE_ACTIVIDADES_LINEA
+  cierre_id FK CIERRE_ACTIVIDADES, actividad_id FK ACTIVIDAD                  firme — D-522
+
+ENTREGA_OBRA                        el cierre del lote; una por obra
+  id, presupuesto_id FK PRESUPUESTO, único
+  entrega_por, entrega_en           FK USUARIO — Residente                   firme — D-522
+  visto_bueno_por, visto_bueno_en   FK USUARIO — Supervisor                  firme — D-522
+  calidad_por, calidad_en           FK USUARIO — Control de obra             firme — D-522
+  firma_por, firma_en               FK USUARIO — equipo de gestión de
+                                     proyectos                              firme — D-522
+  superintendente_por, superintendente_en   nullable — puede o no estar      firme — D-522
+
+INCIDENCIA gana orden_cambio_id     FK PROPUESTA(tipo=orden_cambio), nullable   firme — D-522
+```
+
 - **El cierre de actividades:** una solicitud puede llevar varias. ObraCtrl lo hace por actividad, con lista de verificación, adjuntos, cantidad y monto (`solicitud_cierre`).
-- **El cierre del lote:** la entrega de la obra, que la deja en `entregada` y la pasa a postventa (§3c y §3b). Confirmado en D-516: participan **el residente (entrega), el supervisor (visto bueno), control de obra (calidad y expediente) y el equipo de gestión de proyectos (firma);** el superintendente puede estar o no. La obra queda entregada cuando participan todos.
+- **El cierre del lote:** la entrega de la obra, que la deja en `entregada` y la pasa a postventa (§3c y §3b). Confirmado en D-516: participan **el residente (entrega), el supervisor (visto bueno), control de obra (calidad y expediente) y el equipo de gestión de proyectos (firma);** el superintendente puede estar o no. La obra queda entregada cuando participan los cuatro, **en cualquier orden** (D-522): entonces `PRESUPUESTO.estatus` pasa a `entregada`, se fija `fecha_entrega` y entra a postventa. *Idea del usuario (D-522), sin modelar:* con el tiempo la entrega puede escalar a un **acta de entrega y recepción.**
 - **Qué quiere decir «candado» (D-516):** cerrar un frente, una actividad o el lote **cierra al residente** —ya no registra avance ahí—, y para los demás roles sigue abierto hasta la entrega de la casa. Hoy el cierre de frente «pregunta, no impide» (§5c, arriba); esto lo vuelve una regla por rol: las funciones de captura del residente no aplican sobre lo cerrado (B-119). Al entregarse, la obra no queda solo congelada: **pasa a postventa.**
 
 **Una incidencia puede llegar al cliente.** Un «extra» de ObraCtrl —más cantidad que la tolerancia, trabajo fuera de catálogo, sustitución o alta de catálogo— se parece a una `INCIDENCIA` que cambia la actividad (`crece_actividad`, `crea_actividad`), y el usuario dice que **puede** pasar a una orden de cambio con el cliente (`PROPUESTA(tipo=orden_cambio)`, §5f). `CONOCIMIENTO.md` §13.6 ya decía que una incidencia puede o no generar un control de cambio; lo que faltaba es la liga: `INCIDENCIA.orden_cambio_id`, FK `PROPUESTA`, nullable, nula mientras el extra es interno.
@@ -2769,15 +2792,23 @@ es su forma de tabla.
 
 ```
 ESTIMACION
-  id, presupuesto_id FK PRESUPUESTO
+  id                 el «oid»: lo genera el sistema y no se teclea          firme — D-522
+  presupuesto_id FK PRESUPUESTO
   periodo_inicio, periodo_fin      semanal (`CONOCIMIENTO.md` §13.8)       firme
   fuente             enum: erp_externo · manual (D-284)                   firme
-  estado             enum: capturada · devuelta · validada · pagada       firme
+  estado             enum: capturada · enviada · devuelta · validada ·
+                      pagada                                              firme — D-522
+  enviada_por, enviada_en   FK USUARIO, nullable — Control de obra, que
+                      recolecta las estimaciones y las envía                firme — D-522
   validado_por        FK USUARIO — bajo validar_estimacion, D-299
   validado_en
+  pagada_por, pagada_en     FK USUARIO, nullable — Control de obra            firme — D-522
 
 ESTIMACION_LINEA
-  id, estimacion_id FK ESTIMACION
+  id                 el «oid» del renglón: viaja en el archivo que sale a
+                      revisión                                            firme — D-522
+  estimacion_id FK ESTIMACION
+  folio              texto, único — `[E-]SSAA-NNN`, armado por regla         firme — D-522
   concepto_id         FK Nodo — nullable si es fuera de catálogo
   actividad_id         FK ACTIVIDAD (§5c) — nullable
   incidencia_id         FK INCIDENCIA (§5c) — nullable, si esta línea nace
@@ -2787,6 +2818,14 @@ ESTIMACION_LINEA
   excede_tope           caché — compara contra el contratado vigente
                         (D-285) al validar. NUNCA fuente de verdad, mismo
                         principio que `ESTADO_CARGA.porcentaje_cargado` (§3)
+  justificacion, justificada_por   texto y FK USUARIO, nullable — solo en un
+                        renglón fuera de catálogo; la da el Supervisor        propuesta — D-522
+
+ESTIMACION_LINEA_HISTORIA   (solo se agrega, nunca se edita)
+  id, linea_id FK ESTIMACION_LINEA
+  cambio              enum: modificado · eliminado · agregado                firme — D-522
+  antes, despues      el renglón como estaba y como quedó
+  aceptado_por, aceptado_en   FK USUARIO — quien aceptó el cambio            firme — D-522
 
 DEDUCCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
@@ -2812,11 +2851,11 @@ vigente (D-285), se lee de donde ya vive (`VERSION_CONCEPTO`/`ACTIVIDAD`),
 nunca se copia. Guardarlo aparte lo desincroniza en cuanto el contratado
 cambie.
 
-*D-512 (propuesta): `ESTIMACION_LINEA` gana `folio` (texto, único), que se arma con una regla y no se teclea: `[E-]SSAA-NNN` —semana en dos dígitos, año en dos y un consecutivo de tres que no se corta—, con el prefijo `E-` solo si `ESTIMACION.fuente = erp_externo`. Es por renglón y no por documento, y si el campo de semana que llega ya trae esa forma, se toma como folio. Así lo define la «Fuente de la Verdad» de auditoría en su apartado 3.2, y el usuario confirmó que sigue vigente. Los parámetros que esa fuente da por vigentes (IVA, umbral, similitud) no tienen tabla todavía: B-114.*
+*D-512 (firme desde D-522): `ESTIMACION_LINEA` gana `folio` (texto, único), que se arma con una regla y no se teclea: `[E-]SSAA-NNN` —semana en dos dígitos, año en dos y un consecutivo de tres que no se corta—, con el prefijo `E-` solo si `ESTIMACION.fuente = erp_externo`. Es por renglón y no por documento, y si el campo de semana que llega ya trae esa forma, se toma como folio. Así lo define la «Fuente de la Verdad» de auditoría en su apartado 3.2, y el usuario confirmó que sigue vigente. Los parámetros que esa fuente da por vigentes (IVA, umbral, similitud) no tienen tabla todavía: B-114.*
 
-*D-514 (propuesta): el usuario confirmó el folio por renglón y pidió algo más: **la estimación necesita su propio identificador generado por el sistema** (su «oid»), porque los folios son de renglón y no la identifican. Es el `id` de `ESTIMACION`, que no se teclea ni se reutiliza. El `estado` gana `enviada` entre `capturada` y `validada` —la envía quien la captura, y si excede el tope vuelve como `devuelta`—, y **Control de obra la marca `pagada`**, una función nueva (`marcar_estimacion_pagada`, por asignar) que no está en la lista de §5b todavía; una estimación pagada ya no se toca. `estado` sigue siendo firme en sus otros valores; este es un añadido (B-118).*
+*D-514 (firme desde D-522): el usuario confirmó el folio por renglón y pidió algo más: **la estimación necesita su propio identificador generado por el sistema** (su «oid»), porque los folios son de renglón y no la identifican. Es el `id` de `ESTIMACION`, que no se teclea ni se reutiliza. El `estado` gana `enviada` entre `capturada` y `validada` —la envía quien la captura, y si excede el tope vuelve como `devuelta`—, y **Control de obra la marca `pagada`**, una función nueva (`marcar_estimacion_pagada`, por asignar) que no está en la lista de §5b todavía; una estimación pagada ya no se toca. `estado` sigue siendo firme en sus otros valores; este es un añadido (B-118).*
 
-*D-516 (propuesta) — la estimación sale y vuelve: su oid, tomado del presupuesto.* El usuario señaló que el presupuesto sí trae un oid, y que de ahí sale la idea: una estimación se **descarga y se manda a revisión fuera del sistema,** y allá se pueden **eliminar, cambiar, agregar y modificar renglones.** Sin una identidad que viaje en el archivo no hay forma de saber qué es qué cuando regresa. Se propone:
+*D-516 (firme desde D-522) — la estimación sale y vuelve: su oid, tomado del presupuesto.* El usuario señaló que el presupuesto sí trae un oid, y que de ahí sale la idea: una estimación se **descarga y se manda a revisión fuera del sistema,** y allá se pueden **eliminar, cambiar, agregar y modificar renglones.** Sin una identidad que viaje en el archivo no hay forma de saber qué es qué cuando regresa. Se propone:
 - **La estimación y cada renglón llevan un oid** que genera este sistema y **sale en una columna del archivo;** el folio no sirve para esto, porque viene del ERP o se arma por regla y también se puede teclear mal o cambiar afuera. La diferencia con el `OID` de OPUS (§1): aquel es de un sistema ajeno y no se adopta como identidad; este lo genera el cerebro, así que sí puede serlo (`ESTIMACION.id` y `ESTIMACION_LINEA.id`).
 - **Al volver, se casa por oid y se propone, no se aplica** (la bandeja, §5): mismo oid y mismos valores, nada; mismo oid con valores distintos, un renglón **modificado** (con lo de antes y lo de ahora); un oid que el sistema tiene y el archivo ya no trae, un renglón **eliminado afuera** —pide confirmación y no borra, como una baja de presupuesto (D-476)—; un renglón sin oid, o con uno que el sistema no conoce o repetido, un renglón **agregado.**
 - **Hasta dónde se puede:** una estimación `validada` o `pagada` ya no se edita desde un archivo; lo que regrese distinto genera una alerta, no un cambio. Cada cambio aceptado deja una fila de historia que solo se agrega (como `RENGLON_HISTORIA`, §4a), y ese rastro es lo que B-109 pedía para comparar la versión previa con la revisada.
@@ -2828,6 +2867,16 @@ cambie.
 - `ot_origen_id`, FK nullable: la OT **donde se hizo el trabajo** que originó el descuento; **solo referencia,** no cambia el saldo de esa OT. En el caso de arriba, la pérgola de Javier Galvan.
 - `ot_base_id`, FK nullable: cuando el monto es **el valor de otra OT** (D-510), esa OT. En el caso de arriba, la reparación de Floviesa.
 - *Lectura mía:* el descuento directo queda como **saldo del contratista** y se cobra de sus pagos siguientes, al modo del préstamo (D-290); y `absorbe_empresa` ya cubre que el contratista no siga activo. **Sin decidir:** si un descuento aplicado a una OT cuenta como liquidación en su saldo; el usuario pidió que la OT pagada no aparezca como falta por pagar, y eso solo está resuelto para el descuento directo (B-110).
+
+**El recorrido real de una estimación (D-522).** Al confirmar el bloque, el usuario contó cómo viaja hoy, y eso corrigió una lectura mía: **quien la envía no es el residente sino Control de obra.** El recorrido:
+1. **El residente crea su estimación en Excel.**
+2. **Control de obra las recolecta y las pasa al extractor** (el concentrador de estimaciones).
+3. **Control de obra las envía al validador de topes,** que hoy ejerce **Compras** —`enviada`—.
+4. **Vuelven a los residentes** para que revisen los ajustes de lo que no pasa por topes —`devuelta`—; se **solicita verificar la cuantificación** *(lectura mía: a los residentes, que son quienes cuantifican)* y **los supervisores dan la justificación de lo fuera de catálogo.**
+5. **El validador ajusta, y esa es la estimación que se paga** —`validada`—. *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por él, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
+6. **Control de obra comparte la estimación final para el pago** y la marca `pagada`.
+
+**Dos cosas quedan sin decidir.** (a) **El validador:** D-330 asignó `validar_estimacion` a Control de obra y dejó a Compras fuera de `ROL`; el recorrido dice que el validador de topes es de Compras. Mientras el usuario no decida, la tabla de funciones (§5b) sigue como está. *Propuesta del sistema:* agregar `compras` como fila de `ROL`, junto con `finanzas` y `proyectos` (B-115), y asignarle `validar_estimacion`; Control de obra conservaría recolectar, enviar, compartir y marcar `pagada`. `ROL_FUNCION` es de muchos a muchos, así que no cambia el esquema. (b) **La justificación del fuera de catálogo** es un campo mío (`justificacion` y `justificada_por`, arriba, propuesta).
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`

@@ -812,6 +812,26 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 
 **Las tres preguntas chicas, contestadas en D-517:** la calidad de la revisión física va **de 5 a 10** (ObraCtrl usa de 1 a 5 y tendría que cambiar); una estimación validada cierra la semana de esa obra **para todos;** y los contratistas **hoy no entran al sistema,** pero sí más adelante, para el cotizador, el programa de ejecución y, probablemente, su estado de cuenta (B-121).
 
+**Al confirmar la estimación y el cierre (D-522).** El usuario confirmó los dos bloques (`MODELO.md` §5d y `MODELO.md` §5c) y, al contestar quién envía la estimación, **contó el recorrido real,** que corrige mi lectura de que la enviaba quien la captura:
+
+| Paso | Qué pasa | Estado en el cerebro |
+|---|---|---|
+| 1 | El residente crea su estimación en Excel | — (es el archivo de origen) |
+| 2 | Control de obra las recolecta y las pasa al extractor (el concentrador) | `capturada` |
+| 3 | Salen y Control de obra las envía al **validador de topes,** que hoy es el rol de **Compras** | `enviada` |
+| 4 | Vuelven a los residentes para revisar los ajustes de lo que no pasa por topes; se solicita verificar la cuantificación; los **supervisores justifican lo fuera de catálogo** | `devuelta` |
+| 5 | El validador ajusta, y **esa es la estimación que se paga** | `validada` |
+| 6 | Control de obra comparte la estimación final para el pago | `pagada` (la marca Control de obra) |
+
+| Pregunta | Respuesta | Qué queda |
+|---|---|---|
+| ¿Quién envía la estimación? | El recorrido de arriba: **Control de obra** | `enviada_por` es de Control de obra, no del residente |
+| ¿Sirve la tabla de historia? | «Sí, sí me sirve» | `ESTIMACION_LINEA_HISTORIA` firme: con ella se compara la versión previa con la revisada (B-109) |
+| ¿Los cuatro participantes de la entrega, en orden? | «En cualquier orden» | `ENTREGA_OBRA` sin orden |
+| ¿Falta algo en el cierre o la entrega? | «No de momento, pero en algún momento puede escalar, como una acta de entrega y recepción» | Idea sin modelar: la entrega podría escalar a un acta de entrega y recepción |
+
+**Una diferencia con lo ya decidido.** D-330 asignó `validar_estimacion` a Control de obra «sin formalizar Compras como rol propio». El recorrido dice que el validador de topes es de Compras y que Control de obra recolecta, envía y comparte. Queda como **pregunta abierta para el usuario;** mi propuesta es sumar `compras` a `ROL` (como `finanzas` y `proyectos`, B-115) y asignarle `validar_estimacion`, sin cambiar el esquema.
+
 **Lo que el usuario contestó sobre ObraCtrl (D-514).**
 
 | Tema | Respuesta del usuario | Qué queda |

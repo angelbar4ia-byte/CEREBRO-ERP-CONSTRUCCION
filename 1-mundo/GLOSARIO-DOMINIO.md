@@ -762,7 +762,7 @@ Porcentaje o volumen ejecutado. Alimenta el Gantt y la estimación.
 
 ### Estimación
 
-Documento que cobra el avance ejecutado en un periodo.
+Documento que cobra el avance ejecutado en un periodo. Es **un solo documento que avanza:** el residente la crea en Excel, Control de obra la recolecta y la envía al validador de topes (hoy Compras), vuelve a los residentes y supervisores para ajustar y justificar, el validador la ajusta, y Control de obra comparte la final para el pago y la marca pagada (D-522).
 
 - **También:** Valuación; Corte; Generador
 - **No confundir con:** Presupuesto (eso es lo planeado)
