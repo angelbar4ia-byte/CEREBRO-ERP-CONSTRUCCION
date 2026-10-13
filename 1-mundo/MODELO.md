@@ -953,6 +953,8 @@ PRESUPUESTO — campos que gana (todos nullable)
                       es la casa                                           propuesta — D-512
   m2                 NUMERIC — solo en la plantilla: los m² del prototipo  propuesta — D-512
   m2_adicionales     NUMERIC — solo en la casa: lo que suma al prototipo   propuesta — D-512
+  estatus            enum: por_arrancar · en_construccion · por_entregar ·
+                      entregada · antigua — solo en tipo=obra               propuesta — D-513
 ```
 
 - **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote, única dentro del proyecto.
@@ -960,7 +962,8 @@ PRESUPUESTO — campos que gana (todos nullable)
 - **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
 - **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
 - **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta *(lectura por confirmar)*.
-- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); los valores del estatus de una obra, que no se dijeron (la entrega ya la marca `fecha_entrega`, §3b); y el cliente.
+- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y el cliente, que no se dijo si es un dato de la obra.
+- **El estatus de la obra (D-513)** son cinco valores, con las palabras del usuario: `por_arrancar` (aún en planeación o próxima a construir), `en_construccion`, `por_entregar` (terminada, pero el cliente no la ha recibido), `entregada` y `antigua` (una obra vieja que ya debe ser una o muy pocas por cerrar). `entregada` va con `fecha_entrega` (§3b). Se captura, no se deriva; la «Fuente de la Verdad» también lo trata como un dato editable.
 
 ---
 

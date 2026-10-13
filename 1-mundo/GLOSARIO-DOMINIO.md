@@ -183,6 +183,8 @@ física (recámara, sala, fachada). Se lee del árbol del presupuesto —frente 
 (Nivel 1), sub-frente = las etapas (Nivel 2) del frente agrupadas por gremio—; no hay
 «catálogo de conceptos-frentes».*
 
+*D-513: ObraCtrl llama «frente» a lo que aquí es un sub-frente (Estructura, Albañilería, Hidrosanitaria, Eléctrica…) y, otras veces, a un nivel (Preliminares, Cimentación, Acabados). Entre los dos manda esta definición.*
+
 *D-451, dato del usuario: **sub-frente = la etapa agrupada por gremio**, confirmado. Lo del
 «Catálogo de conceptos-frentes» **no queda resuelto**: la frase anterior («no hay…») iba
 de más. Solo se comprobó que ese catálogo no está en este entorno; no se sabe qué trae y
@@ -904,6 +906,7 @@ La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster
 - **Se usa con:** Cluster; Prototipo; Presupuesto
 - **Ejemplo:** FRESNO 12; ALAMO 18
 - **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, propuesta)
+- **Estatus:** por arrancar, en construcción, por entregar (terminada, pero el cliente no la ha recibido), entregada y antigua (una obra vieja que ya debe ser una o muy pocas por cerrar), según el usuario (D-513)
 
 ### Urbanización
 
