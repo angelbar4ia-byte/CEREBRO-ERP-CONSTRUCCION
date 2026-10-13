@@ -48,13 +48,17 @@ EXTENSIONES_DE_TEXTO = {".py", ".js", ".jsx", ".ts", ".tsx", ".json", ".yaml", "
 LIMITE_GRANDE = 20 * 1024 * 1024
 LIMITE_DE_LECTURA = 3 * 1024 * 1024
 PLACEHOLDERS = ("password", "contraseña", "contrasena", "xxx", "****", "tu_", "tu-", "your", "changeme", "cambia", "ejemplo", "example",
-                "<", ">", "${", "{{", "%s", "$", "secret_aqui", "aqui", "dummy", "ficticio", "placeholder", "test", "demo", "...")
+                "<", ">", "${", "{{", "%s", "$", "secret_aqui", "aqui", "dummy", "ficticio", "placeholder", "test", "demo", "...", "string")
 
 NOMBRES_QUE_NO_SON_CLAVES = re.compile(r"(?i)(type|placement|url|uri|endpoint|field|file|path|name|method|hint|source|header|expires?|algorithm|prefix|scope|style)$")
 VALORES_QUE_NO_SON_CLAVES = re.compile(r"^(https?://|urn:|#[0-9a-fA-F]{3,8}$)")
 
 CRITICO, AVISO, INFO = "CRÍTICO", "AVISO", "INFO"
 MARCA_DE_CLAVE = "CAMBIA_ESTA_CLAVE"
+SUFIJOS_DE_DOCUMENTO = {".md", ".txt", ".rst"}
+SUFIJOS_DE_GUION = {".bat", ".cmd", ".sh", ".ps1", ".ini", ".cfg", ".conf", ".yaml", ".yml", ".toml", ".properties", ".env"}
+SIN_VALOR = {".deps_ok", ".ds_store", "thumbs.db"}  # marcas y cachés que no son parte de la app
+SUFIJOS_SIN_VALOR = {".pyc", ".tsbuildinfo"}
 
 
 def es_placeholder(valor):
@@ -75,9 +79,21 @@ def decodificar_jwt(token):
         return {}
 
 
-def hallazgos_de_texto(texto):
+def modo_de(ruta):
+    """«documento» (md, txt), «guion» (bat, sh, ini, yaml, .env…) o «codigo»: decide qué formas de contraseña se buscan."""
+    nombre, sufijo = ruta.name.lower(), ruta.suffix.lower()
+    if sufijo in SUFIJOS_DE_DOCUMENTO:
+        return "documento"
+    if sufijo in SUFIJOS_DE_GUION or nombre.startswith(".env"):
+        return "guion"
+    return "codigo"
+
+
+def hallazgos_de_texto(texto, modo="codigo"):
     """[(línea, nivel, qué, vista, quitable)] de las claves que parecen de verdad. La vista nunca trae el valor completo;
-    `quitable` es (tipo, valor) para las contraseñas escritas en el código que --quitar-contrasenas puede sacar de la copia, o None."""
+    `quitable` es (tipo, valor) para las contraseñas escritas en el código que --quitar-contrasenas puede sacar de la copia, o None.
+    Busca la contraseña escrita de cuatro formas: asignación (`password = "x"`), dentro de un diccionario o JSON (`"password": "x"`),
+    como argumento de una llamada (`set_password("x")`) y, solo en guiones y documentos, sin comillas (`set PGPASSWORD=x`, `Contraseña: x`)."""
     salida = []
     for n, linea in enumerate(texto.split("\n"), 1):
         if len(linea) > 4000:  # una línea enorme es un archivo empacado, no código escrito a mano
@@ -109,6 +125,17 @@ def hallazgos_de_texto(texto):
         for m in re.finditer(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)\s*[:=]\s*['\"]([^'\"\s]{6,})['\"]", linea):
             if not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)) and not VALORES_QUE_NO_SON_CLAVES.match(m.group(2)):
                 salida.append((n, AVISO, "asignación de «" + m.group(1) + "» con un valor escrito en el código", ocultar(m.group(2)), ("asignacion", m.group(2))))
+        for m in re.finditer(r"(?i)['\"]([A-Za-z0-9_]*(?:password|passwd|pwd|secret|api[_-]?key|token|contrase[nñ]a)[A-Za-z0-9_]*)['\"]\s*:\s*['\"]([^'\"\s]{6,})['\"]", linea):
+            if not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)) and not VALORES_QUE_NO_SON_CLAVES.match(m.group(2)):
+                salida.append((n, AVISO, "«" + m.group(1) + "» con un valor escrito dentro de un diccionario o JSON", ocultar(m.group(2)), ("asignacion", m.group(2))))
+        for m in re.finditer(r"(?i)\b[A-Za-z0-9_]*(?:password|passwd|pwd)[A-Za-z0-9_]*\s*\(\s*['\"]([^'\"\s]{6,})['\"]", linea):
+            if not es_placeholder(m.group(1)):
+                salida.append((n, AVISO, "contraseña escrita como argumento de una llamada", ocultar(m.group(1)), ("asignacion", m.group(1))))
+        if modo != "codigo":
+            for m in re.finditer(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|pwd|contrase[nñ]a)[A-Za-z0-9_]*)\s*(?:=|:|\bes\b)\s*`?([^\s'\"`,;()<>{}$%]{6,})", linea):
+                if re.search(r"[0-9]|[^A-Za-z]", m.group(2)) and not es_placeholder(m.group(2)) and not NOMBRES_QUE_NO_SON_CLAVES.search(m.group(1)):
+                    salida.append((n, AVISO, "contraseña escrita sin comillas en un " + ("documento" if modo == "documento" else "guion o archivo de configuración"),
+                                   ocultar(m.group(2)), ("libre", m.group(2))))
     return salida
 
 
@@ -167,7 +194,7 @@ def revisar(carpeta, excluir=()):
             ruta = raiz / nombre
             rel = ruta.relative_to(carpeta)
             partes = rel.parts
-            if not ruta.is_file():
+            if not ruta.is_file() or nombre.lower() in SIN_VALOR or ruta.suffix.lower() in SUFIJOS_SIN_VALOR:
                 continue
             total += 1
             if total % 2000 == 0:
@@ -195,7 +222,7 @@ def revisar(carpeta, excluir=()):
                         texto = ruta.read_text(encoding="utf-8", errors="ignore")
                         if "\x00" not in texto[:8000]:
                             variables |= nombres_de_variables(texto)
-                            encontrados = hallazgos_de_texto(texto)
+                            encontrados = hallazgos_de_texto(texto, modo_de(ruta))
                             if encontrados:
                                 hallazgos[rel] = encontrados
                 except OSError:
@@ -266,6 +293,8 @@ def quitar_en_linea(linea, tipo, valor):
     v = re.escape(valor)
     if tipo == "url":
         return re.sub(r"(://[^\s:/@'\"]+:)" + v + r"(@)", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
+    if tipo == "libre":
+        return re.sub(r"(?i)((?:password|passwd|pwd|contrase[nñ]a)[A-Za-z0-9_]*\s*(?:=|:|\bes\b)\s*`?)" + v, lambda m: m.group(1) + MARCA_DE_CLAVE, linea)
     return re.sub(r"(['\"])" + v + r"(['\"])", lambda m: m.group(1) + MARCA_DE_CLAVE + m.group(2), linea)
 
 
@@ -336,7 +365,7 @@ def armar_copia(carpeta, informe, salida, nombre, incluir_datos, quitar=False):
             quitar_contrasenas(fin, quitables)
             informe.setdefault("sin_quitar", [])
             texto_final = fin.read_text(encoding="utf-8", errors="ignore")
-            if any(h[4] for h in hallazgos_de_texto(texto_final)):
+            if any(h[4] for h in hallazgos_de_texto(texto_final, modo_de(fin))):
                 informe["sin_quitar"].append(rel)  # sigue habiendo una contraseña: se avisa, no se calla
             else:
                 informe.setdefault("sin_contrasena", []).append(rel)
@@ -431,6 +460,13 @@ def autoprueba():
         (app / "inst.bat").write_text('psql -c "CREATE USER obra_usr WITH PASSWORD \'obra_dev1\'"\n', encoding="utf-8")  # la misma contraseña, en una forma que ninguna regla reconoce
         (app / "notas.txt").write_text("usuario postgres en la base postgres\n", encoding="utf-8")  # palabra común: se avisa, no se cambia
         (app / ".env.example").write_text("SUPABASE_URL=\n# comentario del autor\n", encoding="utf-8")
+        (app / "seed.py").write_text('USUARIOS = [{"email": "a@b.c", "password": "Inicial2026"}]\nu.set_password(\'Otro12345\')\n', encoding="utf-8")
+        (app / "LEEME.txt").write_text("Usuario: admin\nContraseña: Admin2026x\nLa contraseña es obligatoria\n", encoding="utf-8")
+        (app / "arranque.bat").write_bytes(b"set PGPASSWORD=Bd2026xyz\r\nset X=%PGPASSWORD%\r\n")
+        (app / "api.json").write_text('{"password": "string", "x": {"password": {"type": "string"}}}\n', encoding="utf-8")
+        (app / "x.pyc").write_bytes(b"\x00")
+        (app / "tsconfig.tsbuildinfo").write_text("{}", encoding="utf-8")
+        (app / ".deps_ok").write_text("", encoding="utf-8")
         (app / "tipos.py").write_text("TOKEN_TYPE = 'bearer-largo'\nAPI_KEY_URL = 'https://x.example/k'\n", encoding="utf-8")
         informe = revisar(app, excluir=["Vendor"])
         apartados = {r.as_posix() for r, _ in informe["aparta"]}
@@ -476,6 +512,20 @@ def autoprueba():
             errores.append("--quitar-contrasenas rompió los fines de línea o los bytes no UTF-8 de win.bat")
         if informe.get("sin_quitar"):
             errores.append("quedó una contraseña sin quitar: " + str(informe["sin_quitar"]))
+        copia_seed = (sin / "seed.py").read_text(encoding="utf-8")
+        if "Inicial2026" in copia_seed or "Otro12345" in copia_seed or '"email": "a@b.c"' not in copia_seed or copia_seed.count(MARCA_DE_CLAVE) != 2:
+            errores.append("no quitó bien las contraseñas escritas en un diccionario o como argumento de una llamada (seed.py)")
+        copia_doc = (sin / "LEEME.txt").read_text(encoding="utf-8")
+        if "Admin2026x" in copia_doc or "Contraseña: " + MARCA_DE_CLAVE not in copia_doc or "La contraseña es obligatoria" not in copia_doc:
+            errores.append("no quitó bien la contraseña escrita en un documento (LEEME.txt) o tocó una frase que no lo era")
+        copia_guion = (sin / "arranque.bat").read_bytes()
+        if b"Bd2026xyz" in copia_guion or b"PGPASSWORD=" + MARCA_DE_CLAVE.encode() not in copia_guion or b"%PGPASSWORD%" not in copia_guion or b"\r\n" not in copia_guion:
+            errores.append("no quitó bien la contraseña sin comillas de un guion (arranque.bat), o tocó la referencia %PGPASSWORD%")
+        if "api.json" in {r.as_posix() for r in informe["hallazgos"]}:
+            errores.append("marcó como contraseña el ejemplo «string» de una descripción de API")
+        for basura in ("x.pyc", "tsconfig.tsbuildinfo", ".deps_ok"):
+            if (sin / basura).exists():
+                errores.append("copió un archivo sin valor: " + basura)
         inst = (sin / "inst.bat").read_bytes()
         if b"obra_dev1" in inst or MARCA_DE_CLAVE.encode() not in inst:
             errores.append("el barrido no cambió la misma contraseña escrita en otra forma (inst.bat)")
