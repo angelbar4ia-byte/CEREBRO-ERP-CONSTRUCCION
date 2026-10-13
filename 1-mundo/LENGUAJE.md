@@ -323,7 +323,7 @@ Un ERP sube un peldaño a la vez, con una decisión del usuario por peldaño. De
 | **OPUS 2025** | 1 | Por archivo; «fuente, nunca destino» (`WORKFLOWS.md` §2.1) | Los cuatro catálogos que no se subieron (`MEMORIA.md` D-472) |
 | **ERP externo** | 1, y parte del 3 | Por archivo, y devuelve tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3). No es ninguno de los cuatro sistemas de abajo ni está en GitHub (el usuario, D-496) | Archivo contra API, `Flete` y los cuatro catálogos de salida |
 | **ObraCtrl** (control de obra por avance) | 1, por ahora | Su base es PostgreSQL con RLS en Supabase y su API es FastAPI; repo `CONTROL-AVANCE`. La parte 10 de su especificación define un set de catálogos canónicos. Dónde corre cada parte (API y panel, Render y Vercel) está por confirmar (D-496) | Reconciliar sus catálogos con el canon de aquí; ficha pendiente |
-| **Concentrador de estimaciones** | 1, por ahora | Flask con SQLite en la computadora del usuario (puerto 5000); repo `ERP-ESTIMACI-N`, privado. **Su Excel de salida tiene el formato que la app de auditoría sabe leer** (D-505) | Que el usuario confirme su ficha y decida qué hacer con los datos reales que están dentro del repo (B-106) |
+| **Concentrador de estimaciones** | 1, por ahora | Flask con SQLite en la computadora del usuario (puerto 5000); repo `ERP-ESTIMACI-N`, privado. **Su Excel de salida tiene el formato que la app de auditoría sabe leer** (D-505) | Que el usuario confirme su ficha. Sobre los datos reales dentro del repo decidió dejarlos como están (D-506) |
 | **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor Node.js en la computadora del usuario, con su propio PostgreSQL, y tres usuarios por la red local; **sin repo propio**: vive en `apps/extraordinarios` de `Multi-erp` desde D-504 | Que el usuario confirme su ficha y diga si un archivo de muestra de respaldo trae datos reales |
 | **Control de obra, auditoría** | — | En la computadora del usuario; **sin repo propio**: su carpeta será `apps/auditoria` en `Multi-erp`, todavía vacía (D-496). La carpeta que se revisó (`obra-control`, por confirmar que sea esta) trae un backend con migraciones, un frontend de npm, un lanzador y un PostgreSQL con pgAdmin instalados adentro (D-498; por los nombres de archivo). La herramienta halló el directorio de datos de PostgreSQL en `data/pgdata` de esa misma carpeta: ahí viven las tablas reales (D-499). Esa base corre en el puerto 5433 y tiene 37 tablas con datos y unos 3.3 MB al volcarla (D-501). Su esquema se llama obra; de las 30 primeras tablas que se vieron (faltan 7), estas son las que tocan el dominio del cerebro: concepto, concepto_nuevo, concepto_version, familia_concepto, componente_cpu, estimacion, almacen, movimiento_almacen, motivo_almacen, cuadrilla, contratista, mano_de_obra, material, familia_material, nivel, cluster, etapa_construccion, prefijo_clave, lote_carga, bandeja_pendiente, hallazgo y discrepancia_reg. Solo se conocen los nombres de las tablas, no su contenido ni sus columnas. La especificación de ObraCtrl habla de un «Sistema de Control y Auditoría de Obra» como *Fuente de la Verdad*: parece ser este: su carpeta trae los documentos «FUENTE_DE_LA_VERDAD_Sistema_Control_Obra» y «MODULO_AUDITORIA_ESTIMACION» (D-500), leídos en D-503 | Confirmar con el usuario las preguntas marcadas en su ficha; ya subida a `Multi-erp` (D-503) |
 
@@ -368,10 +368,43 @@ Ya estaba en GitHub (`ERP-ESTIMACI-N`, privado). Todo sale de su README, de la e
 | 3 | ¿Cómo se llega a sus datos? | API de Flask con unas 35 rutas `/api/...` (catálogos, alias, proyectos, sesiones, registros, alertas, exportar); SQLite en `db/estimaciones.db`; entra por Excel y sale por Excel | su código (rutas) |
 | 4 | ¿Dónde vive? | La computadora del usuario; se arranca con un guion de bash (en Windows, con `python app.py`). Corre con el modo de depuración encendido: no debe abrirse a la red | su código |
 | 5 | ¿Hasta dónde puede actuar el cerebro? | **Sin decidir.** Ya existe una vía natural para el peldaño 3 (devolver en su formato): el Excel consolidado | del usuario |
-| 6 | Ejemplos reales | 330 archivos de Excel dentro del repo (306 subidos y 24 generados) y la base completa. **Son datos reales** y están en GitHub | lo medido |
+| 6 | Ejemplos reales | 330 archivos de Excel dentro del repo (306 subidos y 24 generados) y la base completa. **Son datos reales** y están en GitHub; el usuario decidió dejarlos así (D-506) | lo medido |
 | 7 | ¿Qué no se toca nunca? | **Por contestar** | del usuario |
 
-**Un flujo entre dos apps del usuario (D-505).** El Excel que genera el concentrador lleva en la primera fila un título «proyecto · tipo — SEMANA nn — año», en la segunda las cabeceras y los datos desde la tercera, con las 15 primeras columnas que la «Fuente de la Verdad» de auditoría describe para OBRA (SEMANA, CONTRATISTA, RESIDENTE, LOTE/CLUSTER, UBICACIÓN, CLAVE, ACTIVIDAD, UNIDAD, %, CANTIDAD, P.U., TOTAL, OBSERVACIÓN, ⚠, TOTAL CONTRATISTA). Le faltan TOPE, ACUMULADO y X ESTIMAR, que esa fuente dice que no son confiables y que su cargador tolera ausentes. **El formato coincide; que el usuario cargue en auditoría lo que sale del concentrador es una inferencia por confirmar.**
+**Un flujo entre dos apps del usuario (D-505).** El Excel que genera el concentrador lleva en la primera fila un título «proyecto · tipo — SEMANA nn — año», en la segunda las cabeceras y los datos desde la tercera, con las 15 primeras columnas que la «Fuente de la Verdad» de auditoría describe para OBRA (SEMANA, CONTRATISTA, RESIDENTE, LOTE/CLUSTER, UBICACIÓN, CLAVE, ACTIVIDAD, UNIDAD, %, CANTIDAD, P.U., TOTAL, OBSERVACIÓN, ⚠, TOTAL CONTRATISTA). Le faltan TOPE, ACUMULADO y X ESTIMAR, que esa fuente dice que no son confiables y que su cargador tolera ausentes. **El formato coincide, y el usuario confirmó (D-506) que carga en auditoría lo que sale del concentrador.**
+
+### Dónde vive cada dato hoy, en las cuatro apps (D-506)
+
+El usuario fijó la dirección de largo plazo (D-506): **unir las apps, o crear una nueva en segundo plano que use lo que ya funciona, sin perder datos**, mientras las actuales siguen operando. Para eso, lo primero es saber dónde está cada dato. Este mapa sale de los nombres de las tablas que crean sus migraciones (y, en auditoría, del volcado de su base); **todavía no baja a las columnas**.
+
+| Dato | Concentrador de estimaciones (8 tablas) | Extraordinarios (8 tablas) | Auditoría (37 tablas) | ObraCtrl (69 tablas) |
+|---|---|---|---|---|
+| Contratistas | Tabla `contratistas` (29), solo el nombre, con alias | **Texto suelto** en cada asignación, OT y pago; solo hay una tabla de archivos adjuntos por contratista | Tabla `contratista` | Tabla `contratista`, con especialidad y frente |
+| Residentes | Tabla `residentes` (13), solo el nombre | No aparece | Tabla `residente` | `residente_obra`, más supervisores y superintendentes |
+| Proyecto, cluster, obra o lote, prototipo | `proyectos` (2); el lote es **texto suelto** en cada renglón | El lote es **texto suelto** | Las cuatro: `proyecto`, `cluster`, `obra`, `prototipo` | Las cuatro |
+| Conceptos (clave, actividad, unidad) | **Texto suelto** en cada renglón, sin catálogo | El trabajo es texto | `concepto`, con versiones y variantes de análisis de precio | `concepto`, `cpu`, `explosion` e `insumo` |
+| Estimación semanal | `registros` (12,848) y `sesiones` (45) | La estimación de un subcontrato es un tipo de pago | `estimacion` y `renglon_estimacion` (previa, revisada, pagada) | `estimacion` y `estimacion_concepto` |
+| Órdenes de trabajo y subcontratos | No | `asignaciones`, `cotizaciones`, `ots` y `pagos` | El catálogo `subcontrato` y la hoja EXT de la estimación | El modo de pago «subcontrato» |
+| Almacén | No | No | `movimiento_almacen`, `almacen`, `ubicacion`, `motivo_almacen` | `salida_almacen`, `motivo_almacen` |
+| Usuarios y roles | Sin inicio de sesión | `users`, con tres roles | Dos cuentas guardadas en `configuracion` | `usuario`, `organizacion` y roles |
+| Alias y mapeos | `alias_nombres` (59) | No | `mapeo` y `bandeja_pendiente` | `mapeo` y `pendiente` |
+| Bitácora | No | `asignaciones_historial` | `bitacora` | `bitacora` |
+| Cargas | `sesiones` | No | `lote_carga` y `periodo` | `carga_datos` y `carga_snapshot` |
+
+**Lo que muestra:**
+1. **Las listas maestras —contratistas, residentes, obras— viven por separado en las cuatro apps**, y en dos de ellas como texto suelto sin identificador. Ese texto suelto es lo más difícil de unir; las listas maestras son lo primero que habría que unificar.
+2. **Auditoría y ObraCtrl comparten casi todo el vocabulario** (mapeo, motivo de almacén, cluster, prototipo, cuadrilla, grupo funcional), lo que confirma D-503: ObraCtrl se adaptó de la «Fuente de la Verdad».
+3. **La base viva de auditoría no coincide del todo con sus migraciones:** el volcado trae `concepto_version` y sus migraciones crean `version_cpu`. Cualquier traslado de datos debe partir de la base real (su respaldo), no de las migraciones ni de los documentos.
+
+**Cómo se uniría sin perder datos — propuesta, no decisión (D-506):**
+1. Las apps actuales siguen operando. No se apaga ninguna hasta que la nueva reproduzca lo que hace, medido con la prueba de ida y vuelta de este archivo.
+2. Primero se une el dato, no la pantalla: listas maestras únicas y un diccionario de equivalencias entre los nombres.
+3. Se copia, no se mueve: cada app conserva sus datos y su respaldo, y el dato unificado guarda de qué app y de qué fila viene.
+4. Una pieza a la vez, empezando por el flujo que ya existe: concentrador, Excel consolidado, auditoría.
+5. Por los peldaños de arriba (leer, proponer, devolver en su formato y solo al final escribir directo), con decisión del usuario en el cuarto.
+6. Cada traslado parte de la base viva y de su respaldo.
+
+Qué base tendría la app nueva (¿ObraCtrl?, ¿otra?) **no está decidido**; se decide después de reconciliar los cánones (B-105).
 
 ### Los cánones contra la «Fuente de la Verdad» — primera pasada (D-503)
 
