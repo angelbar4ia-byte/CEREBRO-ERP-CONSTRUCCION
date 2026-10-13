@@ -323,7 +323,7 @@ Un ERP sube un peldaño a la vez, con una decisión del usuario por peldaño. De
 | **OPUS 2025** | 1 | Por archivo; «fuente, nunca destino» (`WORKFLOWS.md` §2.1) | Los cuatro catálogos que no se subieron (`MEMORIA.md` D-472) |
 | **ERP externo** | 1, y parte del 3 | Por archivo, y devuelve tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3). No es ninguno de los cuatro sistemas de abajo ni está en GitHub (el usuario, D-496) | Archivo contra API, `Flete` y los cuatro catálogos de salida |
 | **ObraCtrl** (control de obra por avance) | 1, por ahora | Su base es PostgreSQL con RLS en Supabase y su API es FastAPI; repo `CONTROL-AVANCE`. La parte 10 de su especificación define un set de catálogos canónicos. Dónde corre cada parte (API y panel, Render y Vercel) está por confirmar (D-496) | Reconciliar sus catálogos con el canon de aquí; ficha pendiente |
-| **Concentrador de estimaciones** | — | Flask con SQLite en la computadora del usuario; repo `ERP-ESTIMACI-N` | Ficha pendiente; la base y los Excel reales están dentro del repo |
+| **Concentrador de estimaciones** | 1, por ahora | Flask con SQLite en la computadora del usuario (puerto 5000); repo `ERP-ESTIMACI-N`, privado. **Su Excel de salida tiene el formato que la app de auditoría sabe leer** (D-505) | Que el usuario confirme su ficha y decida qué hacer con los datos reales que están dentro del repo (B-106) |
 | **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor Node.js en la computadora del usuario, con su propio PostgreSQL, y tres usuarios por la red local; **sin repo propio**: vive en `apps/extraordinarios` de `Multi-erp` desde D-504 | Que el usuario confirme su ficha y diga si un archivo de muestra de respaldo trae datos reales |
 | **Control de obra, auditoría** | — | En la computadora del usuario; **sin repo propio**: su carpeta será `apps/auditoria` en `Multi-erp`, todavía vacía (D-496). La carpeta que se revisó (`obra-control`, por confirmar que sea esta) trae un backend con migraciones, un frontend de npm, un lanzador y un PostgreSQL con pgAdmin instalados adentro (D-498; por los nombres de archivo). La herramienta halló el directorio de datos de PostgreSQL en `data/pgdata` de esa misma carpeta: ahí viven las tablas reales (D-499). Esa base corre en el puerto 5433 y tiene 37 tablas con datos y unos 3.3 MB al volcarla (D-501). Su esquema se llama obra; de las 30 primeras tablas que se vieron (faltan 7), estas son las que tocan el dominio del cerebro: concepto, concepto_nuevo, concepto_version, familia_concepto, componente_cpu, estimacion, almacen, movimiento_almacen, motivo_almacen, cuadrilla, contratista, mano_de_obra, material, familia_material, nivel, cluster, etapa_construccion, prefijo_clave, lote_carga, bandeja_pendiente, hallazgo y discrepancia_reg. Solo se conocen los nombres de las tablas, no su contenido ni sus columnas. La especificación de ObraCtrl habla de un «Sistema de Control y Auditoría de Obra» como *Fuente de la Verdad*: parece ser este: su carpeta trae los documentos «FUENTE_DE_LA_VERDAD_Sistema_Control_Obra» y «MODULO_AUDITORIA_ESTIMACION» (D-500), leídos en D-503 | Confirmar con el usuario las preguntas marcadas en su ficha; ya subida a `Multi-erp` (D-503) |
 
@@ -356,6 +356,22 @@ Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni
 | 7 | ¿Qué no se toca nunca? | **Por contestar.** Por su manual: un número de OT no se duplica (si ya existe, se actualiza) y solo `pagos` administra | su README |
 
 Toca el mismo dominio que el módulo «Control de OT (subcontratos)» de la «Fuente de la Verdad» de auditoría; si las dos apps se relacionan, lo dirá el usuario.
+
+### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
+
+Ya estaba en GitHub (`ERP-ESTIMACI-N`, privado). Todo sale de su README, de la estructura de su base y de la lista de sus rutas; **no se ha leído su lógica de extracción**, y no se leyó el contenido de sus datos.
+
+| # | Pregunta | Respuesta | De dónde sale |
+|---|---|---|---|
+| 1 | ¿Cuál es y qué guarda? | «Concentrador de Estimaciones de Residentes de Obra»: junta las estimaciones semanales en Excel de los residentes (Obra, Instalaciones y Urbanización), las extrae, normaliza la semana, el lote, el contratista y el residente contra un catálogo con alias, marca alertas (duplicados, nombres no reconocidos) y genera un Excel consolidado. Su base tiene 12,848 renglones de 45 sesiones semanales de 2026 (semanas 1 a 40): 8,449 de Obra, 3,960 de Instalaciones y 439 de Urbanización; 29 contratistas, 13 residentes y 59 alias | su README y la estructura de su base |
+| 2 | ¿Quién lo usa y quién manda? | **Por contestar.** No tiene inicio de sesión: quien abre el puerto 5000 entra | la lista de sus rutas |
+| 3 | ¿Cómo se llega a sus datos? | API de Flask con unas 35 rutas `/api/...` (catálogos, alias, proyectos, sesiones, registros, alertas, exportar); SQLite en `db/estimaciones.db`; entra por Excel y sale por Excel | su código (rutas) |
+| 4 | ¿Dónde vive? | La computadora del usuario; se arranca con un guion de bash (en Windows, con `python app.py`). Corre con el modo de depuración encendido: no debe abrirse a la red | su código |
+| 5 | ¿Hasta dónde puede actuar el cerebro? | **Sin decidir.** Ya existe una vía natural para el peldaño 3 (devolver en su formato): el Excel consolidado | del usuario |
+| 6 | Ejemplos reales | 330 archivos de Excel dentro del repo (306 subidos y 24 generados) y la base completa. **Son datos reales** y están en GitHub | lo medido |
+| 7 | ¿Qué no se toca nunca? | **Por contestar** | del usuario |
+
+**Un flujo entre dos apps del usuario (D-505).** El Excel que genera el concentrador lleva en la primera fila un título «proyecto · tipo — SEMANA nn — año», en la segunda las cabeceras y los datos desde la tercera, con las 15 primeras columnas que la «Fuente de la Verdad» de auditoría describe para OBRA (SEMANA, CONTRATISTA, RESIDENTE, LOTE/CLUSTER, UBICACIÓN, CLAVE, ACTIVIDAD, UNIDAD, %, CANTIDAD, P.U., TOTAL, OBSERVACIÓN, ⚠, TOTAL CONTRATISTA). Le faltan TOPE, ACUMULADO y X ESTIMAR, que esa fuente dice que no son confiables y que su cargador tolera ausentes. **El formato coincide; que el usuario cargue en auditoría lo que sale del concentrador es una inferencia por confirmar.**
 
 ### Los cánones contra la «Fuente de la Verdad» — primera pasada (D-503)
 
