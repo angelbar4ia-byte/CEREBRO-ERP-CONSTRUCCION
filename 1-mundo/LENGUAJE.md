@@ -322,9 +322,9 @@ Un ERP sube un peldaño a la vez, con una decisión del usuario por peldaño. De
 |---|---|---|---|
 | **OPUS 2025** | 1 | Por archivo; «fuente, nunca destino» (`WORKFLOWS.md` §2.1) | Los cuatro catálogos que no se subieron (`MEMORIA.md` D-472) |
 | **ERP externo** | 1, y parte del 3 | Por archivo, y devuelve tres reportes de salida confirmados (`CONOCIMIENTO.md` §4.3). No es ninguno de los cuatro sistemas de abajo ni está en GitHub (el usuario, D-496) | Archivo contra API, `Flete` y los cuatro catálogos de salida |
-| **ObraCtrl** (control de obra por avance) | 1, por ahora | Su base es PostgreSQL con RLS en Supabase y su API es FastAPI; repo `CONTROL-AVANCE`. La parte 10 de su especificación define un set de catálogos canónicos. Según su propia documentación (D-507): la API y un proceso de fondo en Render, el panel en Vercel, la base y el acceso en Supabase y los archivos en R2; el usuario dijo al principio lo contrario y luego confirmó «hosting invertido», que admite dos lecturas: se resuelve abriendo la dirección real del panel | Reconciliar sus catálogos con el canon de aquí; ficha pendiente |
+| **ObraCtrl** (control de obra por avance) | 1, por ahora | Su base es PostgreSQL con RLS en Supabase y su API es FastAPI; repo `CONTROL-AVANCE`. La parte 10 de su especificación define un set de catálogos canónicos. Dónde corre (D-508): **el panel está en Vercel**, en `control-avance-chi.vercel.app` (la dirección la dio el usuario como la del panel, y así resolvió la duda de D-507; desde esta sesión no se puede abrir porque la red lo bloquea, así que no se vio qué sirve); según su documentación la API y un proceso de fondo están en Render, la base y el acceso en Supabase y los archivos en R2. La dirección de la API no se ha visto. **Es la app que más le importa al usuario** y se queda funcionando por ahora (D-508) | Reconciliar sus catálogos con el canon de aquí; ficha pendiente |
 | **Concentrador de estimaciones** | 1, por ahora | Flask con SQLite en la computadora del usuario (puerto 5000); repo `ERP-ESTIMACI-N`, privado. **Su Excel de salida tiene el formato que la app de auditoría sabe leer** (D-505) | Que el usuario confirme su ficha. Sobre los datos reales dentro del repo decidió dejarlos como están (D-506) |
-| **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor Node.js en la computadora del usuario, con su propio PostgreSQL, y tres usuarios por la red local; **sin repo propio**: vive en `apps/extraordinarios` de `Multi-erp` desde D-504 | Que el usuario confirme su ficha y diga si un archivo de muestra de respaldo trae datos reales |
+| **Extraordinarios** (subcontratos con órdenes de trabajo) | — | Servidor Node.js en la computadora del usuario, con su propio PostgreSQL, y tres usuarios por la red local; **sin repo propio**: vive en `apps/extraordinarios` de `Multi-erp` desde D-504. **Se queda funcionando como está** y su código se leyó para anotar cómo trabaja (D-508) | Que el usuario confirme su ficha y diga si un archivo de muestra de respaldo trae datos reales |
 | **Control de obra, auditoría** | — | En la computadora del usuario; **sin repo propio**: vive en `apps/auditoria` de `Multi-erp` desde D-503. La carpeta que se revisó (`obra-control`, por confirmar que sea esta) trae un backend con migraciones, un frontend de npm, un lanzador y un PostgreSQL con pgAdmin instalados adentro (D-498; por los nombres de archivo). La herramienta halló el directorio de datos de PostgreSQL en `data/pgdata` de esa misma carpeta: ahí viven las tablas reales (D-499). Esa base corre en el puerto 5433 y tiene 37 tablas con datos y unos 3.3 MB al volcarla (D-501). Su esquema se llama obra; de las 30 primeras tablas que se vieron (faltan 7), estas son las que tocan el dominio del cerebro: concepto, concepto_nuevo, concepto_version, familia_concepto, componente_cpu, estimacion, almacen, movimiento_almacen, motivo_almacen, cuadrilla, contratista, mano_de_obra, material, familia_material, nivel, cluster, etapa_construccion, prefijo_clave, lote_carga, bandeja_pendiente, hallazgo y discrepancia_reg. Solo se conocen los nombres de las tablas, no su contenido ni sus columnas. La especificación de ObraCtrl habla de un «Sistema de Control y Auditoría de Obra» como *Fuente de la Verdad*: parece ser este: su carpeta trae los documentos «FUENTE_DE_LA_VERDAD_Sistema_Control_Obra» y «MODULO_AUDITORIA_ESTIMACION» (D-500), leídos en D-503 | Confirmar con el usuario las preguntas marcadas en su ficha; ya subida a `Multi-erp` (D-503) |
 
 ### La ficha de auditoría, con lo que ya se sabe (D-503)
@@ -343,7 +343,7 @@ Subida a `Multi-erp` (carpeta `apps/auditoria`, 220 archivos, sin claves ni dato
 
 ### La ficha de extraordinarios, con lo que ya se sabe (D-504)
 
-Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni datos). Todo sale de su README y de lo que midió la herramienta; **no se ha leído su código**.
+Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni datos). Las siete preguntas salen de su README y de lo que midió la herramienta; **su código se leyó después y está en la sección siguiente (D-508)**.
 
 | # | Pregunta | Respuesta | De dónde sale |
 |---|---|---|---|
@@ -356,6 +356,55 @@ Subida a `Multi-erp` (carpeta `apps/extraordinarios`, 36 archivos, sin claves ni
 | 7 | ¿Qué no se toca nunca? | **Por contestar.** Por su manual: un número de OT no se duplica (si ya existe, se actualiza) y solo `pagos` administra | su README |
 
 Toca el mismo dominio que el módulo «Control de OT (subcontratos)» de la «Fuente de la Verdad» de auditoría; si las dos apps se relacionan, lo dirá el usuario.
+
+### Cómo funciona extraordinarios hoy, leído en su código (D-508)
+
+El usuario decidió que la app **se queda funcionando como está** y que el cerebro **anota cómo trabaja hoy para aprenderlo** (D-508). Esto sale de leer su código en `Multi-erp/apps/extraordinarios`: las rutas del servidor, el esquema (seis migraciones) y la lógica de la pantalla de pagos. **No se ejecutó la app ni se vieron sus datos**: describe lo que el código hace, no lo que la base contiene. Y el código no es una especificación: lo que parece un descuido se anota como observación, no como regla.
+
+**El recorrido de un trabajo extraordinario.**
+
+| Paso | Quién (rol) | Qué hace el código | Qué queda guardado |
+|---|---|---|---|
+| 1. Asignar | `ASIGNACION` | Crea una asignación: lote, modelo, tipo de trabajo, contratista, descripción y observaciones, en estatus `PENDIENTE`. El lote se normaliza a «NOMBRE NN» más letra opcional, en mayúsculas y con el número a dos dígitos («fresno 3» queda «FRESNO 03»). Puede anotar un monto provisional y **planear un anticipo** (semana, año y clase) | `asignaciones` |
+| 2. Reasignar o editar | `ASIGNACION` | Cambiar el contratista deja una fila de historial (anterior, nuevo, quién, cuándo); editar una asignación que ya tiene OT mueve también la OT; cancelar una pendiente la borra | `asignaciones_historial` |
+| 3. Cotizar | `COTIZACION` | Desde una asignación pendiente, o **directa** sin asignación previa (entonces crea la asignación ya cotizada). Captura partidas (descripción, unidad, cantidad, precio unitario); solo cuentan las que tienen descripción, cantidad mayor a cero y precio mayor a cero, y sin ninguna válida no se genera (se valida en el servidor, no solo en pantalla). Subtotal = suma de cantidad × precio; IVA = subtotal × el porcentaje que mande la pantalla (el servidor no fija 16 %: si no llega nada, es 0); total = subtotal + IVA | `cotizaciones` (partidas como JSON) y **la OT** |
+| 4. Numerar la OT | — | Consecutivo global y único (`ot_numero`). La pantalla sugiere el siguiente sin consumirlo y el usuario puede escribir otro que no exista; la secuencia se adelanta para no chocar después. Tipo de contrato por defecto `PRESUPUESTO`; el monto de la OT es el total cotizado | `ots` |
+| 5. Concluir | `COTIZACION` | La OT pasa a `CONCLUIDA`, en un solo sentido (no vi ruta para reabrirla). El estatus `CANCELADA` existe en el esquema, pero **no vi ruta que lo ponga** | `ots.estatus` |
+| 6. Pagar | `ADMIN` («pagos») | Registra renglones de pago por OT (tabla siguiente). Un anticipo planeado en el paso 1 aparece como **borrador sin confirmar**, con monto 0, hasta que el administrador lo captura y lo confirma | `pagos` |
+| 7. Ver | todos | Resumen por lote o por contratista (contratado, pagado, por pagar y porcentaje); la OT en PDF con su resumen de pagos; la lista «Estimación» (pagos de clase estimación por semana, con casillas, subtotales por tipo y por contratista, y salida a Excel); y un enlace público de solo lectura con token | — |
+
+**El renglón de pago, campo por campo.**
+
+| Campo | Qué es |
+|---|---|
+| `clase` | `ESTIMACION` · `CUENTA` (pago a cuenta, «fuera de estimación») · `TRANSFERENCIA`. **Una OT puede pagarse dentro de la estimación o fuera de ella** |
+| `tipo` | `ANTICIPO · AVANCE · FINIQUITO · GARANTIA · PAGO UNICO · DESCUENTO` |
+| `ppto` | La base del cálculo; se llena con el monto de la OT |
+| `pct` y `monto` | Se escribe uno y el otro se deriva: monto = ppto × pct / 100, o pct = monto / ppto × 100 |
+| `garantia` | **5 % del presupuesto**, fijo en la pantalla; se guarda con cada renglón y es informativo: **no se resta del monto** |
+| `anticipo`, `avance`, `finiquito`, `pago_unico` | El mismo `monto`, repetido en la columna que corresponde al tipo (las otras quedan vacías); sirven para el Excel de salida |
+| `descuento` | Un número capturado aparte; **no se resta del monto ni entra en el saldo**; solo sale en el Excel |
+| `por_pagar` | Del renglón: ppto − monto. No es el saldo acumulado de la OT |
+| `confirmado` | Falso en los borradores; guardar o editar un pago lo confirma; confirmar exige monto mayor a cero |
+
+**El saldo de una OT** es su monto (o, si no lo tiene, el mayor `ppto` visto en sus pagos) menos la suma del `monto` de sus renglones **confirmados**, de cualquier tipo y sumado tal cual. Ningún cálculo resta `garantia` ni `descuento`: los dos se guardan para el Excel, no para el saldo. Si el usuario los usa para retener o descontar de verdad, esa regla vive fuera del código.
+
+**Otras reglas que el código impone.** El número de OT es único y la importación desde Excel actualiza si ya existe, nunca duplica. Una OT se busca siempre por su identificador interno y no por su número (un error anterior mostraba la OT equivocada). El reflejo de un anticipo planeado nunca toca un pago ya confirmado. Los permisos: `ASIGNACION` tiene las pestañas de asignaciones y resumen, y es el único (con `ADMIN`) que sube y borra archivos de contratistas; `COTIZACION` tiene cotizaciones, OT y resumen; `ADMIN` tiene todas y además da de alta y borra OT, importa Excel, administra usuarios, descarga y restaura respaldos y genera el enlace público.
+
+**Dos cosas más que conviene saber.** Los archivos de contratistas (PDF, Excel, JPG o PNG, hasta 20 MB y diez a la vez) se guardan **dentro de la base**, ligados a un contratista y, si se quiere, a un lote y una asignación. Y **el contratista y el lote son texto libre en todas las tablas**: no hay catálogo de contratistas ni de lotes, así que el mismo contratista puede aparecer con distintas grafías entre una OT y otra (el lote sí se normaliza al escribirlo; el contratista no).
+
+**Contra el cerebro** (no cambia nada del canon; es para aprender):
+
+| Tema | Extraordinarios hoy | El cerebro hoy | Lectura |
+|---|---|---|---|
+| Asignar contratista a lote y trabajo | `asignaciones` y su historial; el contratista es texto | `ASIGNACION_CONTRATISTA`: alcance, vigencias, motivo y cadena de reemplazos | El cerebro la cubre; falta el anticipo planeado que cuelga de ella |
+| Cotización y OT | Partidas libres (sin clave de catálogo) y un número de OT consecutivo | No existen. Lo más cercano: `ESTIMACION_LINEA.concepto_id`, que puede ir vacío si es fuera de catálogo | Una OT se parece a un trabajo adicional de monto fijo; **no hay que asumirlo**, es una pregunta para el usuario |
+| Descuentos y retenciones | `garantia` (5 %) y `descuento` guardados sin restarse | `DEDUCCION` (sobrepago, rehacer trabajo), `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` | El cerebro **ya tiene** el mecanismo; falta saber si la garantía de 5 % es la misma retención |
+| Anticipo, finiquito, pago único | Tipos de pago por OT | No existen | Dominio que el cerebro no modela |
+| Estimación o fuera de ella | `clase` del pago: estimación, a cuenta, transferencia | `ESTIMACION.fuente` (ERP externo o manual) es otra cosa | No son el mismo eje |
+| Ver lo pagado | Resumen por lote o contratista; enlace público | Reporte «Real contra Base» (D-313) | Parecido en espíritu, otro nivel de detalle |
+
+**Para el usuario, cuando se toque este dominio** (no bloquea nada): ¿la garantía de 5 % es una retención que se devuelve? ¿el descuento se captura como número positivo y se resta a mano? ¿una OT es siempre un trabajo adicional fuera del contrato original? ¿hay OT canceladas y cómo se registran hoy?
 
 ### La ficha del concentrador de estimaciones, con lo que ya se sabe (D-505)
 
@@ -432,14 +481,14 @@ Dos cifras del concentrador que sostienen una regla ya escrita: **562 claves con
 | R4 | Contratista | **Amplía** | Solo id y nombre, porque el crudo no trae más | `clave` y `activo` (auditoría); RFC, contacto, calificación (ObraCtrl) | Agregar `activo` (se retira, no se borra, igual que `USUARIO`); `clave` y lo demás solo cuando haya dato |
 | R5 | Residente | **Amplía** | Es una persona con cuenta (`USUARIO`) asignada a una obra con vigencias | En los Excel es solo un nombre | Se queda la persona; los nombres de los Excel se traducen a ella con el diccionario de equivalencias |
 | R6 | Asignación de contratista | **Confirma y supera** | Alcance, vigencias, motivo y cadena | `asignaciones` y su historial, por lote y tipo de trabajo | Se queda el cerebro; cada asignación y cada cambio de la app caben en él (los cambios, con motivo «otro») |
-| R7 | Estados de la estimación | **Contradice** | `capturada · devuelta · validada · pagada`, en un solo registro | `previa · revisada · pagada` como **tres versiones** que se comparan entre sí; ObraCtrl: `borrador · enviada · validada` | Se queda el cerebro como flujo; las tres versiones de la «Fuente» se guardan como cortes de la misma estimación. **Hay que revisarlo con el usuario** |
+| R7 | Estados de la estimación | **Contradice** → ✅ **decidido (D-508)** | `capturada · devuelta · validada · pagada`, en un solo registro | `previa · revisada · pagada` como **tres versiones** que se comparan entre sí; ObraCtrl: `borrador · enviada · validada` | **Decidió el usuario: es el mismo documento que va avanzando**, así que se queda el cerebro. Equivalencia que propongo y falta confirmar: previa ≈ capturada, revisada ≈ validada, pagada = pagada; `devuelta` no existe en la «Fuente». Lo que se rescata de las tres versiones es poder comparar cómo cambió el documento: se guardaría un corte de sus líneas al pasar de un estado a otro (B-109) |
 | R8 | Categoría de los insumos | **Contradice en nivel** | `destajo` y `subcontrato` son la clase de la categoría `trabajo` | ObraCtrl los pone al nivel de la categoría | Se queda el cerebro (sale de los datos de OPUS) |
-| R9 | Control de pagos de subcontratos | **Amplía** | Solo conoce garantía de postventa y el real contra la base de un subcontrato | Extraordinarios: anticipo, garantía, avance, finiquito, pago único, descuento, cotizaciones y OT | Es un dominio que el cerebro **no modela**. Hay que decidir si entra |
+| R9 | Control de pagos de subcontratos | **Amplía** → ✅ **decidido (D-508)** | Conoce `DEDUCCION`, `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` por línea de estimación, la garantía de postventa y el real contra la base de un subcontrato (D-313); **no tiene** cotización, OT, clase de pago, anticipo, finiquito ni pago único | Extraordinarios: anticipo, garantía de 5 %, avance, finiquito, pago único, descuento, cotizaciones y OT | **Decidió el usuario: la app se queda por ahora y el cerebro anota cómo funciona hoy para aprenderlo** (sección anterior). No entra al canon todavía. *Nota: D-507 dijo que el cerebro «no modela» este dominio; era incompleto, porque ya tiene el mecanismo de retención, préstamo y deducción* |
 | R10 | Roles | **Amplía** | Seis roles | ObraCtrl: cuatro (todos están en el cerebro); la «Fuente»: dos perfiles de la app | Se queda el cerebro; los perfiles de la app son otro eje |
 | R11 | Motivos de almacén y prefijos de mano de obra | **Amplía** | Diez motivos y ocho prefijos, de datos reales | La «Fuente»: nueve y dos | Se queda el cerebro; es la «Fuente» la que se amplía (D-503) |
 | R12 | Jerarquía de fuentes, folio de estimación y parámetros | **Amplía** | No los tiene | La «Fuente» y ObraCtrl los definen | Revisar si entran al canon; son reglas del negocio del usuario |
 
-> Los **tipos** son una lectura mía de las dos fuentes; no se contrastó con el código de las apps. Nada de esto cambia todavía el canon.
+> Los **tipos** son una lectura mía de las dos fuentes; no se contrastó con el código de las apps salvo extraordinarios (D-508). **R7 y R9 ya están decididos;** los demás siguen con el cerebro por defecto, a la espera de revisión. Nada de esto cambia todavía el canon.
 
 ### Los cánones contra la «Fuente de la Verdad» — primera pasada (D-503)
 
@@ -451,7 +500,7 @@ La especificación de ObraCtrl declara que su glosario, sus reglas transversales
 | Signo de los movimientos de almacén | Viene en `Efecto Qty` y `Efecto Costo` del archivo | `cantidad` con signo, mismo origen | ✅ coincide |
 | Motivos de almacén | 9 motivos canónicos | 10: agrega `reversion_movimiento_erroneo`, que apareció en cinco meses de datos reales | 🔶 difiere: la «Fuente» dice que la lista es extensible; falta darlo de alta allá |
 | Origen de la estimación | El prefijo `E-` del folio marca que salió del ERP | `fuente` ∈ erp_externo · manual (D-284) | ✅ misma idea, forma distinta |
-| Estados de la estimación | previa · revisada · pagada | capturada · devuelta · validada · pagada; ObraCtrl: borrador · enviada · validada (otra entidad, la de campo) | ⏸️ tres vocabularios; la equivalencia la decide el usuario |
+| Estados de la estimación | previa · revisada · pagada | capturada · devuelta · validada · pagada; ObraCtrl: borrador · enviada · validada (otra entidad, la de campo) | ✅ decidido (D-508): un solo documento que avanza, como el cerebro; falta confirmar la equivalencia previa ≈ capturada y revisada ≈ validada |
 | Prefijos de mano de obra | `MOA` y `MOS` | En los CSV del repo: MOA 85 · MOE 78 · MOS 46 · MOH 23 · MOG 17 · MOC 8 · MOP 7 · MOO 1 claves distintas | 🔶 difiere: faltan seis en la lista de la «Fuente»; la tabla viva de la app (`prefijo_clave`) puede traerlos |
 | Semana | Ordinaria (lun–dom) y de obra (jue–mié, 5 días laborales), con selector por reporte | Pregunta abierta: con cuál se cortan los baldes del programa | ✅ la «Fuente» la contesta: las dos, a elección por reporte |
 | Roles | `operador` y `gerencia` (un eje distinto: operar o leer) | residente · supervisor · superintendente · costos · cotizador · control de obra; ObraCtrl: residente · supervisor · control de obra · superintendente | ⏸️ tres conjuntos; ObraCtrl y el cerebro comparten cuatro |
