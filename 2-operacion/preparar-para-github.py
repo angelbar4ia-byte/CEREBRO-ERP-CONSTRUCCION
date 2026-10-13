@@ -25,6 +25,7 @@ correr. Las hojas de datos y las bases se piden aparte con --incluir-datos, por 
 import argparse
 import base64
 import json
+import os
 import re
 import shutil
 import sys
@@ -117,15 +118,25 @@ def es_archivo_de_claves(ruta):
     return bool(re.match(r"(id_rsa|id_ed25519|\.npmrc|\.pypirc|\.netrc)", nombre) or re.search(r"(credential|service[-_]?account)", nombre) and nombre.endswith(".json"))
 
 
+def archivos_de(carpeta):
+    """Los archivos de la carpeta, sin entrar a node_modules, venv, .git ni las demás carpetas que nunca van (entrar es lo que tardaba)."""
+    for raiz, subcarpetas, archivos in os.walk(carpeta):
+        subcarpetas[:] = sorted(d for d in subcarpetas if d not in CARPETAS_QUE_NUNCA_VAN)
+        for nombre in sorted(archivos):
+            yield Path(raiz) / nombre
+
+
 def revisar(carpeta):
     """Recorre la carpeta y devuelve un informe: qué entra, qué se aparta y por qué, y qué claves aparecen."""
     entra, aparta, hallazgos, variables, total = [], [], {}, set(), 0
-    for ruta in sorted(carpeta.rglob("*")):
+    for ruta in archivos_de(carpeta):
         rel = ruta.relative_to(carpeta)
         partes = rel.parts
-        if any(p in CARPETAS_QUE_NUNCA_VAN for p in partes) or not ruta.is_file():
+        if not ruta.is_file():
             continue
         total += 1
+        if total % 2000 == 0:
+            print(f"  … {total} archivos revisados", flush=True)
         if es_archivo_de_claves(ruta):
             aparta.append((rel, "archivo de claves"))
             continue
@@ -135,12 +146,17 @@ def revisar(carpeta):
         if ruta.suffix.lower() in EXTENSIONES_DE_DATOS:
             aparta.append((rel, "datos (base o hoja)"))
             continue
-        if ruta.stat().st_size > LIMITE_GRANDE:
+        try:
+            tamano = ruta.stat().st_size
+        except OSError:
+            aparta.append((rel, "no se pudo leer (¿la tiene abierta otro programa?)"))
+            continue
+        if tamano > LIMITE_GRANDE:
             aparta.append((rel, "pesa más de 20 MB"))
             continue
         if ruta.suffix.lower() in EXTENSIONES_DE_TEXTO or ruta.name.lower().startswith(".env") or ruta.suffix == "":
             try:
-                if ruta.stat().st_size <= LIMITE_DE_LECTURA:
+                if tamano <= LIMITE_DE_LECTURA:
                     texto = ruta.read_text(encoding="utf-8", errors="ignore")
                     if "\x00" not in texto[:8000]:
                         variables |= nombres_de_variables(texto)
@@ -292,7 +308,7 @@ def autoprueba():
             errores.append(f"variables {sorted(informe['variables'])}")
         destino, copiados = armar_copia(app, informe, raiz / "salida", "prueba", False)
         dentro = {p.relative_to(destino).as_posix() for p in destino.rglob("*") if p.is_file()}
-        for prohibido in ("app.py", "config.js", ".env", "datos.db", "uploads/estimacion.xlsx", "uploads/recibo.png", "grande.bin"):
+        for prohibido in ("app.py", "config.js", ".env", "datos.db", "uploads/estimacion.xlsx", "uploads/recibo.png", "grande.bin", "node_modules/x/i.js"):
             if prohibido in dentro:
                 errores.append(f"copió {prohibido}")
         for requerido in ("limpio.py", "dev.py", ".gitignore", ".env.example", "FICHA.md", "README.md"):
@@ -318,6 +334,7 @@ def main():
         ap.error("hace falta la CARPETA y --nombre")
     if not a.carpeta.is_dir():
         raise SystemExit(f"{a.carpeta} no es una carpeta")
+    print(f"Revisando {a.carpeta} … (si la carpeta es grande puede tardar; irá avisando)", flush=True)
     informe = revisar(a.carpeta)
     imprimir(informe, a.carpeta)
     destino, copiados = armar_copia(a.carpeta, informe, a.salida, a.nombre, a.incluir_datos)
