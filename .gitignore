@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 *.zip
+
+# Archivos de bloqueo de Excel: aparecen al subir una carpeta con un libro abierto y traen el nombre de quien lo abrió
+~$*
