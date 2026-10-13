@@ -572,20 +572,20 @@ Dos cifras del concentrador que sostienen una regla ya escrita: **562 claves con
 
 | # | Tema | Tipo | Cerebro dice | Las apps dicen | Por defecto (cerebro) |
 |---|---|---|---|---|---|
-| R1 | Qué es una obra | **Contradice en forma** | Es un `PRESUPUESTO` de tipo obra; no hay tabla de obras | Un catálogo con clave «CLUSTER + LOTE» y atributos propios (m², fechas, estatus) | Se queda el `PRESUPUESTO`; la clave «FRESNO 12» es su nombre. Los atributos de las apps que el cerebro no tiene se revisan uno a uno |
-| R2 | Proyecto y cluster | **Amplía** | No existen como entidad | Agrupan las obras: proyecto, cluster, obra | Agregarlos como agrupaciones sobre las obras, porque los Excel de las apps ya traen el cluster; no cambia lo que ya está |
-| R3 | Prototipo | **Contradice en forma** | Plantilla = `PRESUPUESTO` de tipo plantilla, que ya trae `plantas` y `plazo_semanas` | Tabla propia con m², niveles y recámaras | Se queda la plantilla; m² y recámaras como atributos de ella si el usuario los quiere; si «niveles» es lo mismo que `plantas`, se revisa |
-| R4 | Contratista | **Amplía** | Solo id y nombre, porque el crudo no trae más | `clave` y `activo` (auditoría); RFC, contacto, calificación (ObraCtrl) | Agregar `activo` (se retira, no se borra, igual que `USUARIO`); `clave` y lo demás solo cuando haya dato |
-| R5 | Residente | **Amplía** | Es una persona con cuenta (`USUARIO`) asignada a una obra con vigencias | En los Excel es solo un nombre | Se queda la persona; los nombres de los Excel se traducen a ella con el diccionario de equivalencias |
-| R6 | Asignación de contratista | **Confirma y supera** | Alcance, vigencias, motivo y cadena | `asignaciones` y su historial, por lote y tipo de trabajo | Se queda el cerebro; cada asignación y cada cambio de la app caben en él (los cambios, con motivo «otro») |
+| R1 | Qué es una obra | **Contradice en forma** → ✅ **decidido (D-512)** | Es un `PRESUPUESTO` de tipo obra; no hay tabla de obras | Un catálogo con clave «CLUSTER + LOTE» y atributos propios (m², fechas, estatus) | **Decidió el usuario: cada lote o casa es una obra,** identificada por cluster y lote; el proyecto es Magnolia, con 7 clústeres y n lotes en cada uno. Se queda el `PRESUPUESTO` de tipo obra, que gana `cluster_id`, `lote`, `prototipo_id` y `m2_adicionales` (`MODELO.md` §3c, propuesta). La urbanización también es una obra (R2). Falta el estatus y el cliente |
+| R2 | Proyecto y cluster | **Amplía** → ✅ **decidido (D-512)** | No existen como entidad | Agrupan las obras: proyecto, cluster, obra | **Decidió el usuario: el orden es proyecto > cluster > lote.** Entran `PROYECTO` y `CLUSTER` (`MODELO.md` §3c, propuesta). **La urbanización es una sola obra para todo Magnolia,** y sus ramas son los clústeres y las amenidades |
+| R3 | Prototipo | **Contradice en forma** → ✅ **decidido (D-512)** | Plantilla = `PRESUPUESTO` de tipo plantilla, que ya trae `plantas` y `plazo_semanas` | Tabla propia con m², niveles y recámaras | **Los m² son del prototipo;** una casa es un prototipo con o sin modificaciones y con o sin m² adicionales. Hay **niveles de presupuesto y niveles de casa** (planta baja, planta alta, roof garden), y no son lo mismo: el glosario los separa (*Nivel de casa*). En algún momento se desglosará por espacios y m² de espacios (B-113) |
+| R4 | Contratista | **Amplía** → ✅ **decidido (D-512)** | Solo id y nombre, porque el crudo no trae más | `clave` y `activo` (auditoría); RFC, contacto, calificación (ObraCtrl) | **Se acepta la propuesta** (`activo` y la retención). **No hay clave corta y no se inventa una:** se toma la de OPUS si llega ese catálogo. **Nuevo: se categoriza por tipo y por oficio** (`MODELO.md` §4a, propuesta) |
+| R5 | Residente | **Amplía** → ✅ **decidido (D-512)** | Es una persona con cuenta (`USUARIO`) asignada a una obra con vigencias | En los Excel es solo un nombre | **Los nombres son personas reales; falta asignarles cuenta y rol, y dos están inactivos** (se conservan con `activo` falso, no se borran). Se queda el cerebro (B-115) |
+| R6 | Asignación de contratista | **Confirma y supera** → ✅ **decidido (D-512)** | Alcance, vigencias, motivo y cadena | `asignaciones` y su historial, por lote y tipo de trabajo | Se queda el cerebro. **Dos momentos:** la asignación de la obra se hace **antes de la junta de arranque, en la planeación,** y la de los subcontratos, **en la OT** |
 | R7 | Estados de la estimación | **Contradice** → ✅ **decidido (D-508)** | `capturada · devuelta · validada · pagada`, en un solo registro | `previa · revisada · pagada` como **tres versiones** que se comparan entre sí; ObraCtrl: `borrador · enviada · validada` | **Decidió el usuario: es el mismo documento que va avanzando**, así que se queda el cerebro. Equivalencia que propongo y falta confirmar: previa ≈ capturada, revisada ≈ validada, pagada = pagada; `devuelta` no existe en la «Fuente». Lo que se rescata de las tres versiones es poder comparar cómo cambió el documento: se guardaría un corte de sus líneas al pasar de un estado a otro (B-109) |
-| R8 | Categoría de los insumos | **Contradice en nivel** | `destajo` y `subcontrato` son la clase de la categoría `trabajo` | ObraCtrl los pone al nivel de la categoría | Se queda el cerebro (sale de los datos de OPUS) |
+| R8 | Categoría de los insumos | **Contradice en nivel** → ✅ **decidido (D-512)** | `destajo` y `subcontrato` son la clase de la categoría `trabajo` | ObraCtrl los pone al nivel de la categoría | Se queda el cerebro (el usuario: «ok») |
 | R9 | Control de pagos de subcontratos | **Amplía** → ✅ **decidido (D-508)** | Conoce `DEDUCCION`, `RETENCION` (solo subcontratos, D-290) y `PRESTAMO` por línea de estimación, la garantía de postventa y el real contra la base de un subcontrato (D-313); **no tiene** cotización, OT, clase de pago, anticipo, finiquito ni pago único | Extraordinarios: anticipo, garantía de 5 %, avance, finiquito, pago único, descuento, cotizaciones y OT | **Decidió el usuario: la app se queda por ahora y el cerebro anota cómo funciona hoy para aprenderlo** (sección anterior). No entra al canon todavía. *Nota: D-507 dijo que el cerebro «no modela» este dominio; era incompleto, porque ya tiene el mecanismo de retención, préstamo y deducción* |
-| R10 | Roles | **Amplía** | Seis roles | ObraCtrl: cuatro (todos están en el cerebro); la «Fuente»: dos perfiles de la app | Se queda el cerebro; los perfiles de la app son otro eje |
-| R11 | Motivos de almacén y prefijos de mano de obra | **Amplía** | Diez motivos y ocho prefijos, de datos reales | La «Fuente»: nueve y dos | Se queda el cerebro; es la «Fuente» la que se amplía (D-503) |
-| R12 | Jerarquía de fuentes, folio de estimación y parámetros | **Amplía** | No los tiene | La «Fuente» y ObraCtrl los definen | Revisar si entran al canon; son reglas del negocio del usuario |
+| R10 | Roles | **Amplía** → ✅ **decidido (D-512)** | Seis roles | ObraCtrl: cuatro (todos están en el cerebro); la «Fuente»: dos perfiles de la app | Se queda el cerebro. **Las tres cuentas de extraordinarios son áreas:** Asignaciones es **Finanzas,** Cotización es **Proyectos y atención al cliente,** Pagos es **Control de obra;** los demás roles corresponden con los del cerebro. Finanzas y Proyectos no son todavía roles del cerebro (B-111 y B-115) |
+| R11 | Motivos de almacén y prefijos de mano de obra | **Amplía** → ✅ **decidido (D-512)** | Diez motivos y ocho prefijos, de datos reales | La «Fuente»: nueve y dos | **El cerebro es el correcto.** El usuario dice que «en algún momento» se evaluará **adaptar las apps al cerebro** (B-107) |
+| R12 | Jerarquía de fuentes, folio de estimación y parámetros | **Amplía** → ✅ **decidido (D-512)** | No los tiene | La «Fuente» y ObraCtrl los definen | **El usuario confirmó que siguen vigentes** el folio, el IVA, los umbrales y la jerarquía de fuentes. Entran al canon la jerarquía y el folio, y los parámetros como configuración con esos valores iniciales (abajo; B-114) |
 
-> Los **tipos** son una lectura mía de las dos fuentes; no se contrastó con el código de las apps salvo extraordinarios (D-508). **R7 y R9 ya están decididos;** los demás siguen con el cerebro por defecto, a la espera de revisión. Nada de esto cambia todavía el canon.
+> Los **tipos** son una lectura mía de las dos fuentes; no se contrastó con el código de las apps salvo extraordinarios (D-508). **Los doce temas están revisados:** R7 y R9 en D-508 y los otros diez en D-512. Lo que cambia en el modelo queda como **propuesta** hasta que el usuario confirme los campos (`MODELO.md` §3c, `MODELO.md` §4a y `MODELO.md` §5d); el canon de nombres no cambia.
 
 ### Los cánones contra la «Fuente de la Verdad» — primera pasada (D-503)
 
@@ -595,17 +595,79 @@ La especificación de ObraCtrl declara que su glosario, sus reglas transversales
 |---|---|---|---|
 | Principio rector | El sistema propone, la persona confirma; lo dudoso va a una bandeja única | Propuestas con evidencia y bandeja (D-485) | ✅ coincide |
 | Signo de los movimientos de almacén | Viene en `Efecto Qty` y `Efecto Costo` del archivo | `cantidad` con signo, mismo origen | ✅ coincide |
-| Motivos de almacén | 9 motivos canónicos | 10: agrega `reversion_movimiento_erroneo`, que apareció en cinco meses de datos reales | 🔶 difiere: la «Fuente» dice que la lista es extensible; falta darlo de alta allá |
+| Motivos de almacén | 9 motivos canónicos | 10: agrega `reversion_movimiento_erroneo`, que apareció en cinco meses de datos reales | ✅ decidido (D-512): el cerebro es el correcto; la «Fuente» dice que su lista es extensible y falta darlo de alta allá |
 | Origen de la estimación | El prefijo `E-` del folio marca que salió del ERP | `fuente` ∈ erp_externo · manual (D-284) | ✅ misma idea, forma distinta |
 | Estados de la estimación | previa · revisada · pagada | capturada · devuelta · validada · pagada; ObraCtrl: borrador · enviada · validada (otra entidad, la de campo) | ✅ decidido (D-508): un solo documento que avanza, como el cerebro; falta confirmar la equivalencia previa ≈ capturada y revisada ≈ validada |
-| Prefijos de mano de obra | `MOA` y `MOS` | En los CSV del repo: MOA 85 · MOE 78 · MOS 46 · MOH 23 · MOG 17 · MOC 8 · MOP 7 · MOO 1 claves distintas | 🔶 difiere: faltan seis en la lista de la «Fuente»; la tabla viva de la app (`prefijo_clave`) puede traerlos |
+| Prefijos de mano de obra | `MOA` y `MOS` | En los CSV del repo: MOA 85 · MOE 78 · MOS 46 · MOH 23 · MOG 17 · MOC 8 · MOP 7 · MOO 1 claves distintas | ✅ decidido (D-512): el cerebro es el correcto; faltan seis en la lista de la «Fuente» |
 | Semana | Ordinaria (lun–dom) y de obra (jue–mié, 5 días laborales), con selector por reporte | Pregunta abierta: con cuál se cortan los baldes del programa | ✅ la «Fuente» la contesta: las dos, a elección por reporte |
-| Roles | `operador` y `gerencia` (un eje distinto: operar o leer) | residente · supervisor · superintendente · costos · cotizador · control de obra; ObraCtrl: residente · supervisor · control de obra · superintendente | ⏸️ tres conjuntos; ObraCtrl y el cerebro comparten cuatro |
-| Jerarquía de fuentes | Catálogos mandan; entre datos cargados, almacén gana a estimación | No está escrita | ⏸️ solo en uno; decidir si entra al canon |
-| Folio de la estimación | `[E-]SSAA-NNN` (semana, año, consecutivo) | No lo tiene: su «folio» es el de la orden de producción | ⏸️ solo en uno |
-| Parámetros del negocio | IVA 16 % (exentos pétreos y jardinería), umbral ±5 % de consumo, similitud 90 %, razón material/mano de obra ~60 % | No los tiene; su `umbral_pct` es de otra cosa (identidad dudosa) | ⏸️ solo en uno |
+| Roles | `operador` y `gerencia` (un eje distinto: operar o leer) | residente · supervisor · superintendente · costos · cotizador · control de obra; ObraCtrl: residente · supervisor · control de obra · superintendente | ✅ decidido (D-512): se queda el cerebro; las tres cuentas de extraordinarios son áreas (Finanzas, Proyectos y atención al cliente, Control de obra) |
+| Jerarquía de fuentes | Catálogos mandan; entre datos cargados, almacén gana a estimación | No está escrita | ✅ entra al canon (D-512): catálogos primero y, entre datos cargados, almacén antes que estimación; se combina con «la clave manda» (`CONOCIMIENTO.md` §2.1) |
+| Folio de la estimación | `[E-]SSAA-NNN` (semana, año, consecutivo) | No lo tiene: su «folio» es el de la orden de producción | ✅ entra al canon (D-512), **por renglón y no por documento** (`MODELO.md` §5d, propuesta) |
+| Parámetros del negocio | IVA 16 % (exentos pétreos y jardinería), umbral ±5 % de consumo, similitud 90 %, razón material/mano de obra ~60 % | No los tiene; su `umbral_pct` es de otra cosa (identidad dudosa) | ✅ vigentes (D-512); entran como configuración con estos valores iniciales (abajo) |
 
 > Primera pasada: cada fila se verificó contra el texto o contra los CSV del repo, pero no se leyeron las cabeceras por archivo ni los módulos 5 a 8, y no se ha visto el código de la app. Nada de esto cambia un canon todavía: son diferencias a decidir (B-105).
+
+### La revisión de los diez temas, con lo que dijo el usuario (D-512)
+
+El usuario contestó los diez temas que quedaban (R1 a R6, R8 y R10 a R12). Esto es lo que queda decidido y lo que cambia en el cerebro. Los campos nuevos de modelo son **propuesta** hasta que él los confirme.
+
+**1. La estructura de Magnolia (R1 y R2).**
+
+```
+Proyecto: Magnolia
+├─ Urbanización ......... una sola obra para todo el proyecto; sus ramas son los clústeres y las amenidades
+└─ Clúster (siete hoy)
+   └─ Lote = una casa = una obra ......... se identifica por clúster y lote («FRESNO 12»)
+```
+
+Cada casa es un prototipo, con o sin modificaciones y con o sin m² adicionales. En el modelo: `MODELO.md` §3c. El concentrador trae **dos** proyectos (D-506) y el usuario habla de uno, Magnolia: falta saber cuál es el otro.
+
+**2. Los niveles (R3).** El usuario avisó que «nivel» se dice de dos cosas distintas: el nivel del presupuesto y el nivel de la casa. Con el que el cerebro ya distinguía, son tres:
+
+| Palabra | Qué es | Ejemplo | Dónde está |
+|---|---|---|---|
+| Nivel 2 y Nivel 3 | La profundidad en el árbol del presupuesto | Etapa de construcción (Nivel 2); concepto auxiliar (Nivel 3) | `NODO`; glosario |
+| **Nivel de presupuesto** | Cada división del presupuesto bajo el prototipo; en el cerebro es el **frente** (D-450) | Cimentación, planta baja, planta alta, azotea, acabados, obras exteriores… (quince en el catálogo, `NIV-00001` a `NIV-00015`) | `Nivel ERP`; `CATALOGOS.md` |
+| **Nivel de casa** | Cada piso de la vivienda | Planta baja, planta alta y roof garden | `Nivel OP` del avance (las órdenes de producción); `PRESUPUESTO.plantas` cuenta planta baja y planta alta |
+
+El choque está en que «planta baja» y «planta alta» son **a la vez** un nivel de presupuesto (`NIV-00002` y `NIV-00003`) y un nivel de casa. Por eso el glosario los llama distinto. *Lectura mía, por confirmar:* el roof garden es la azotea (`NIV-00004`, que el catálogo escribe «Azotea» y «Azotea/Roof») y **no cuenta en `plantas`**, igual que el plazo de 28 y 30 semanas (D-419), que depende de si la casa tiene una o dos plantas.
+
+**3. Los m² (R3).** Son del prototipo. Hoy viajan escritos en el nombre de su capítulo («ZAFIRO 1.0 (172 M2)»; son siete, de 172 a 300 m²) y no como dato. Una casa suma `m2_adicionales` si los tiene, y los m² totales se calculan, no se guardan. **En algún momento se desglosará por espacios** y por los m² de cada espacio (B-113).
+
+**4. Contratistas (R4).** Se categorizan por **tipo** y por **oficio**; hay `activo`; no hay clave corta, y la que cite el catálogo de OPUS se toma cuando ese archivo llegue. El glosario cita la clave `FRE-00005` del catálogo de contratistas (29) de la generación anterior de OPUS, que no está en el repo y habría que pedir. Dos lecturas mías, por confirmar: el **tipo** es destajo o subcontrato (las dos clases de trabajo que el cerebro ya tiene), y el **oficio** es lo que el glosario llama *Especialidad*, uno o varios. En el modelo: `MODELO.md` §4a.
+
+**5. Residentes (R5).** Los nombres son personas reales. Falta asignarles cuenta y rol, y dos están inactivos: se conservan con `activo` falso, no se borran. El concentrador trae 13 residentes con 28 grafías; el diccionario de equivalencias las lleva a cada persona (B-115).
+
+**6. Asignar contratista (R6).** Hay dos momentos: la asignación de la **obra** se hace antes de la junta de arranque, en la planeación, y la de los **subcontratos**, en la OT. En el cerebro lo primero es `ASIGNACION_CONTRATISTA` con motivo `inicial`, y la junta de arranque ya existe como momento del programa (`disparador_fecha=contractual`, `MODELO.md` §5c); lo segundo sería la misma tabla con alcance de concepto, en el momento en que se contrata el subcontrato (`ESTADO_CONGELAMIENTO`, D-475).
+
+**7. Roles y áreas (R10).** Las tres cuentas de extraordinarios son **áreas**, no roles del cerebro:
+
+| Cuenta de extraordinarios | Área del usuario | Qué hace en la app | En el cerebro |
+|---|---|---|---|
+| `asignaciones` | **Finanzas** | Asigna contratista a lote y trabajo | No es un rol |
+| `cotizacion` | **Proyectos y atención al cliente** | Cotiza y genera la OT, y la concluye | Se parece al *Cotizador* (D-280), que hoy no es un rol activo |
+| `pagos` | **Control de obra** | Registra y confirma pagos | `control_de_obra` |
+
+Hay precedente: Compras ejerce `validar_estimacion` sin ser un rol del cerebro (D-299). `ROL` es una tabla (migración 0004), así que sumar `finanzas` y `proyectos` es agregar filas y no cambiar el esquema. Se propone hacerlo cuando se modele la OT (B-111).
+
+**8. Reglas y parámetros que el canon adopta (R12).** El usuario confirmó que siguen vigentes.
+
+- **Jerarquía de fuentes:** los catálogos son la verdad; entre datos cargados, **el almacén gana a la estimación** para normalizar nombres de contratista, obra, material y concepto. Se combina con «la clave manda» (`CONOCIMIENTO.md` §2.1): primero se empata por clave y la jerarquía resuelve las discrepancias de texto. La estimación se normaliza hacia lo que dice el almacén.
+- **Folio de la estimación:** `[E-]SSAA-NNN`, con la semana en dos dígitos, el año en dos y un consecutivo de tres que no se corta; el prefijo `E-` solo si el origen es el ERP externo. Es **por renglón, no por documento**, y si el campo de semana que llega ya trae esa forma, se toma como folio.
+- **Parámetros**, que son valores iniciales y siempre se leen de la configuración, nunca de una constante en código:
+
+| Parámetro | Valor vigente | Cómo funciona | En el cerebro |
+|---|---|---|---|
+| IVA | 16 % | Exentas las familias Pétreos y Jardinería; se resuelve por la casilla del material, luego por la familia y al final por el 16 % | No lo maneja todavía |
+| Umbral de auditoría | ±5 % | Consumo real contra teórico; configurable en tres niveles (global, familia o concepto, insumo); se guarda el umbral usado en cada cruce | `ALERTA.parametro_usado.umbral_pct` guarda el usado; los tres niveles no están |
+| Similitud | 90 % | Para proponer coincidencias de clave o descripción; el sistema propone y la persona confirma | Hay una alerta por diferencia de texto (D-477); no se comparó su umbral con este |
+| Razón material y mano de obra | ~60 %, con banda de tolerancia | Salidas de almacén ÷ mano de obra pagada, por obra, contratista y tipo de estimación | No está |
+
+La «Fuente» dice también que las estimaciones **no generan IVA, ni llevan retenciones ni amortización de anticipo**. Cuadra con lo dicho de extraordinarios: la retención es del subcontrato (la OT) y no de la estimación de destajo; en el cerebro `RETENCION` solo aplica a líneas de subcontrato (D-290).
+
+**9. Dirección (R11).** El cerebro es el correcto, y el usuario dice que «en algún momento» se evaluará **adaptar las apps al cerebro**. Es un tercer camino junto a los dos de D-506 (unir las apps o crear una nueva en segundo plano); la decisión sigue siendo suya (B-107) y D-487 sigue en pie.
+
+**Quedan abiertos, sin bloquear nada:** los valores del estatus de una obra y si el cliente es un dato de la obra; cuál es el segundo proyecto del concentrador; si «tipo» de contratista es destajo o subcontrato; si el roof garden cuenta en `plantas`; si los tres contratistas con retención son todos subcontratistas; y qué significa el prefijo `MOO` (una sola clave).
 
 ---
 

@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 82 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 87 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 82 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 82 términos · 25 ambigüedades · 2026-09-21
+> 87 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -49,6 +49,8 @@ verificado: 82 términos · 25 ambigüedades · ejemplos con cifra releídos con
 **El paramétrico** — Ensamble · Plantilla · Instancia · Divisor · Cohorte
 
 **Tiempo y ejecución** — Rendimiento calculado · Rendimiento teórico · Rendimiento real · Gantt · Actividad · Asignación · Avance · Estimación
+
+**El lugar** — Proyecto · Cluster · Lote · Urbanización · Nivel de casa
 
 **Precios y cambios** — Precio propuesto · Precio pactado · Descuento · Presupuesto Formado · Orden de cambio · Highlight · Orden de trabajo (OT) · Extraordinario · Desviación · Ejecutado sin respaldo
 
@@ -553,7 +555,7 @@ Margen del constructor, aplicado como capa. La base sobre la que se calcula camb
 
 ### Prototipo
 
-Modelo de vivienda que se repite. Cada uno con su presupuesto completo.
+Modelo de vivienda que se repite. Cada uno con su presupuesto completo. Los m² son del prototipo; una casa es un prototipo con o sin modificaciones y con o sin m² adicionales (D-512).
 
 - **También:** Modelo; Tipo de casa
 - **No confundir con:** Frente; Nivel
@@ -573,10 +575,10 @@ El nivel más alto del presupuesto. En esta empresa se usa para el prototipo, pe
 
 ### Nivel de construcción
 
-División física de la obra por altura o zona. Primer nivel bajo el capítulo.
+División del presupuesto bajo el capítulo: mezcla pisos, zonas y oficios (Cimentación, Planta baja, Azotea, Acabados, Cancelería…). El usuario la llama *nivel de presupuesto* y en el cerebro es el frente (D-450). No es el nivel de casa (D-512).
 
-- **También:** Subcapítulo; Planta; Zona
-- **No confundir con:** Nivel 2 / Nivel 3, que son profundidad
+- **También:** Subcapítulo; Zona; Nivel de presupuesto
+- **No confundir con:** Nivel 2 / Nivel 3, que son profundidad; Nivel de casa
 - **Se usa con:** Etapa de construcción; Prototipo
 - **Ejemplo:** NIV-00001 Cimentación
 - **Hoy vive en:** ``Nivel ERP` + filas `Subcapítulo``
@@ -871,6 +873,60 @@ Obra registrada sin presupuesto aprobado. Es una deuda medible, con antigüedad.
 - **Hoy vive en:** `— pendiente`
 
 
+## El lugar
+
+### Proyecto
+
+El desarrollo completo: agrupa clústeres y una urbanización. Hoy hay uno, Magnolia. (D-512.)
+
+- **También:** Desarrollo
+- **No confundir con:** Lote (una casa); Prototipo; Presupuesto
+- **Se usa con:** Cluster; Urbanización; Lote
+- **Ejemplo:** Magnolia
+- **Hoy vive en:** `proyectos` del concentrador (2), `proyecto` en auditoría y en ObraCtrl; el modelo del cerebro aún no lo tiene (`MODELO.md` §3c, propuesta)
+
+### Cluster
+
+Agrupación de lotes dentro del proyecto. Magnolia tiene siete. Su nombre forma parte de la clave de la casa. (D-512.)
+
+- **También:** Clúster
+- **No confundir con:** Proyecto; Frente
+- **Se usa con:** Proyecto; Lote; Control de cambio
+- **Ejemplo:** Alamo, Fresno, Olmo
+- **Hoy vive en:** dentro del texto del lote («FRESNO 12»); `cluster` en auditoría y en ObraCtrl; la sigla (`ALM`) en la clave de un control de cambio
+
+### Lote
+
+La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster y número de lote. Es un prototipo con o sin modificaciones, con o sin m² adicionales. (D-512.)
+
+- **También:** Obra; Casa
+- **No confundir con:** Prototipo (el modelo que se repite); Urbanización
+- **Se usa con:** Cluster; Prototipo; Presupuesto
+- **Ejemplo:** FRESNO 12; ALAMO 18
+- **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, propuesta)
+
+### Urbanización
+
+La obra única del proyecto, que sirve a todos los clústeres y a las amenidades. Hay una sola por proyecto y sus ramas son los clústeres y las amenidades. (D-512.)
+
+- **También:** URBA, que es como se llama su hoja en las estimaciones
+- **No confundir con:** Lote (la obra de una casa)
+- **Se usa con:** Proyecto; Cluster
+- **Ejemplo:** La urbanización de Magnolia
+- **Hoy vive en:** la hoja URBA de las estimaciones; en el modelo, un `PRESUPUESTO` de tipo obra con `proyecto_id` (`MODELO.md` §3c, propuesta)
+
+### Nivel de casa
+
+Cada piso de la vivienda: planta baja, planta alta y roof garden. No es el nivel del presupuesto. (D-512.)
+
+- **También:** Planta; Piso; Roof garden (que el catálogo escribe «Azotea» o «Azotea/Roof»)
+- **No confundir con:** Nivel de construcción (el del presupuesto, que es el frente); Nivel 2 y Nivel 3 (profundidad)
+- **Se usa con:** Prototipo; Nivel de construcción
+- **Ejemplo:** Castillo K1 (`EST-02110`) se ejecuta en planta baja, planta alta y azotea/roof
+- **Hoy vive en:** `Nivel OP` del avance (las órdenes de producción); `PRESUPUESTO.plantas` cuenta planta baja y planta alta
+
+---
+
 ## Operaciones
 
 ### Fusión
@@ -1005,6 +1061,17 @@ es decisión, no vocabulario.**
 
 Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 
+| Casa | Lote |
+| Clúster | Cluster |
+| Cluster | **Cluster** |
+| Desarrollo | Proyecto |
+| Lote | **Lote** |
+| Nivel de casa | **Nivel de casa** |
+| Nivel de presupuesto | Nivel de construcción |
+| Obra | Lote |
+| Piso | Nivel de casa |
+| Proyecto | **Proyecto** |
+| Roof garden | Nivel de casa |
 | Se dice | Término canónico |
 |---|---|
 | %MO | **%MO** |
@@ -1152,7 +1219,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | Parcial | Importe |
 | Partida | Concepto |
 | Parámetro | Divisor |
-| Planta | Nivel de construcción |
+| Planta | Nivel de casa |
 | Plantilla | **Plantilla** |
 | Porcentaje sobre mano de obra | %MO |
 | Precio a destajo | Destajo |
@@ -1200,6 +1267,7 @@ Cualquier forma de decirlo → término canónico. Es lo que consulta el agente.
 | UM | Unidad |
 | Unidad | **Unidad** |
 | Unidad de medida | Unidad |
+| Urbanización | **Urbanización** |
 | Utilidad | **Utilidad** |
 | Valuación | Estimación |
 | Variación | Desviación |
