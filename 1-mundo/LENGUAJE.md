@@ -859,7 +859,7 @@ El usuario pidió ver el avance de obra para planear si hace falta rediseñar y 
 | Web | **825 pruebas pasan** y la web compila |
 | No se verificó | El móvil, las pruebas de navegador, la reversa de las migraciones, y **lo que está desplegado hoy:** el panel de Vercel no se pudo abrir desde la sesión y no se sabe qué hay en Render, Supabase, Redis y R2 |
 
-**Qué avance real existe hoy (corregido en D-524).** Las exportaciones `grid_AvanceOPEventosOpr` del ERP externo (marzo a julio de 2026, en `1-mundo/fuentes/avance`) traen **2,920 eventos de operación** en 41 combinaciones de ubicación y lote, con 24 contratistas, 216 operaciones de destajo y 22 semanas con eventos; el avance es un porcentaje por operación (1,137 en 100 % y 1,783 por debajo, ninguno arriba) y el estatus del ERP no sirve (2,889 de 2,920 dicen «En Especificación»). Aparecen los **siete clústeres** por nombre —Acacia, Alamo, Fresno, Maple, Olivo, Olmo y Tabachín— y la planta tratadora, la vía Magnolia y la casa club. **Pero el usuario aclaró (D-524) que el ERP externo no lleva avance, solo salidas de almacén y estimaciones.** Entonces D-523 se equivocó al decir que el avance físico ya existía en otro sistema: *lectura mía, por confirmar,* esos eventos son lo que reconoce la estimación (avance **pagado**) o un derivado del almacén, y **no hay en ninguna parte un avance físico capturado en campo.** ObraCtrl sería el primero, que es justo el hueco de `CONOCIMIENTO.md` §13.7. Queda por saber qué son exactamente esas exportaciones, porque D-375 y D-377 las usaron como una de tres fuentes de avance (B-127).
+**Qué avance real existe hoy (corregido en D-524).** Las exportaciones `grid_AvanceOPEventosOpr` del ERP externo (marzo a julio de 2026, en `1-mundo/fuentes/avance`) traen **2,920 eventos de operación** en 41 combinaciones de ubicación y lote, con 24 contratistas, 216 operaciones de destajo y 22 semanas con eventos; el avance es un porcentaje por operación (1,137 en 100 % y 1,783 por debajo, ninguno arriba) y el estatus del ERP no sirve (2,889 de 2,920 dicen «En Especificación»). Aparecen los **siete clústeres** por nombre —Acacia, Alamo, Fresno, Maple, Olivo, Olmo y Tabachín— y la planta tratadora, la vía Magnolia y la casa club. **El usuario aclaró (D-524 y D-525)** que el ERP externo no lleva avance, solo salidas de almacén y estimaciones, y que estas exportaciones **sí son avance, pero de pago:** no dice que no coincida con el físico, y sirven para **cruzar** contra él. Por eso D-523 se equivocó al decir que el avance físico ya existía en otro sistema: lo que existe es avance **pagado,** y **no hay en ninguna parte un avance físico capturado en campo.** ObraCtrl sería el primero, que es justo el hueco de `CONOCIMIENTO.md` §13.7. **No cambia nada de lo ya definido** (D-375 y D-377 siguen como están); el cruce solo lo mejora.
 
 **¿Se necesita rediseño? Para operar el avance, no.** Lo que difiere del cerebro se reparte así:
 
@@ -888,61 +888,62 @@ El usuario pidió ver el avance de obra para planear si hace falta rediseñar y 
 
 **Lo que respondió el usuario (D-524)** y lo que sigue pendiente (B-126): lo desplegado son solo catálogos e ingenierías por prototipo, sin avance, y quiere cambiarlos; los residentes del piloto son Leonardo López y Guadalupe y las obras se definen después; no hay señal en campo, y eso se deja para el final; el ERP externo no lleva avance; y no está seguro de levantar D-487, pero quiere una comparativa de qué reemplazar en ObraCtrl, que es la sección siguiente.
 
-### Qué reemplazar en ObraCtrl: comparativa y orden (D-524)
+### Qué alinear en ObraCtrl al cerebro: comparativa y orden (D-524 y D-525)
 
-El usuario contestó las cinco preguntas de D-523 y pidió, sin decidir todavía si levanta D-487, **un plan o una comparativa de qué hay que reemplazar en ObraCtrl.** Esto es solo el plan: no se tocó ObraCtrl ni se construyó nada.
+El usuario pidió, sin decidir todavía si levanta D-487, **un plan o una comparativa de qué hay que cambiar en ObraCtrl.** En D-525 aclaró el criterio: lo del árbol no es un disgusto, **tiene que estar alineado al cerebro.** Esto es solo el plan: no se tocó ObraCtrl ni se construyó nada.
 
 | Pregunta | Respuesta | Qué queda |
 |---|---|---|
-| ¿Qué hay desplegado y con qué datos? | «Catálogos y ingenierías por prototipo, que es algo que quiero cambiar; realmente no pasa nada si se elimina, porque no hay más datos de programas de avances empezados, pues el árbol no me convence cómo se forma» | Lo desplegado es **solo catálogos y el árbol de los prototipos,** sin una sola captura de avance. Se puede borrar, y el usuario quiere cambiar cómo se forma el árbol |
-| ¿Qué obra y qué residentes? | «Las obras las podemos definir; los residentes piloto son Leonardo López y Guadalupe» | Residentes del piloto definidos; **obras por definir** |
-| ¿Hay señal en campo? | «No hay señal, pero esto lo dejamos al final» | El móvil sin conexión será necesario, y queda **para el final.** Mientras tanto el piloto captura donde haya señal; la web reintenta sin duplicar (llave de idempotencia) |
-| ¿Corre en paralelo al avance del ERP? | «El ERP externo no lleva avance, solo salidas de almacén y estimaciones» | **No hay avance previo con qué correr en paralelo,** y se corrige D-523 (arriba) |
-| ¿Se levanta D-487? | «No estoy seguro, pero quiero realizar un plan o comparativa de qué tengo que reemplazar» | D-487 sigue en pie; este plan dice qué paso pediría levantarlo |
+| ¿Qué hay desplegado y con qué datos? (D-524) | «Catálogos y ingenierías por prototipo, que es algo que quiero cambiar; realmente no pasa nada si se elimina, porque no hay más datos de programas de avances empezados» | Lo desplegado es **solo catálogos y el árbol de los prototipos,** sin una sola captura de avance; se puede borrar |
+| ¿Qué le disgusta del árbol? (D-525) | «No es disgusto, pero tiene que estar alineado al cerebro» | **El cerebro manda:** el árbol, los frentes, los catálogos y las cantidades de ObraCtrl se alinean a él, sin importar cuál esté mejor hecho |
+| ¿Qué obra y qué residentes? | D-524: residentes Leonardo López y Guadalupe. D-525: «lo definimos más adelante» (las obras) | Residentes del piloto definidos; **obras por definir más adelante** |
+| ¿Hay señal en campo? | «No hay señal, pero esto lo dejamos al final» | El móvil sin conexión será necesario y queda **para el final.** Mientras tanto el piloto captura donde haya señal; la web reintenta sin duplicar (llave de idempotencia) |
+| ¿Qué son las exportaciones de OP? (D-525) | «Sí son avance, pero de pago; no digo que no corresponda con físico, solo es para cruzar. No debería alterar nada de lo ya definido en el cerebro, solo mejorar» | Son avance **pagado,** para cruzar con el físico; D-375 y D-377 no cambian (B-127 cerrado) |
+| ¿Quién hace el respaldo y el reinicio? (D-525) | «Lo voy a realizar desde la rama de avance de obra; aquí lo debe entender el cerebro» | **Lo hace el usuario desde el trabajo de avance de obra;** el cerebro no lo ejecuta ni lo autoriza, pero tiene que entenderlo (abajo). D-487 sigue en pie |
 
-**Cómo forma ObraCtrl el árbol, y cómo lo forma el cerebro.** Es el centro de lo que el usuario quiere cambiar, y la diferencia se puede ver en el código de ObraCtrl y en los datos del cerebro:
+**Cómo forman el árbol ObraCtrl y el cerebro** (corregido en D-525: D-524 había dicho que ObraCtrl lo deduce por el orden de las filas, y el cerebro también usa el orden):
 
 | | ObraCtrl | Cerebro |
 |---|---|---|
-| De dónde sale | Un archivo plano del prototipo (en la prueba real, 7 prototipos y 8,014 filas) | Los tres catálogos de OPUS: 7 capítulos, 102 subcapítulos, 325 y 345 niveles intermedios y 2,452 conceptos en 3,231 filas (`1-mundo/opus`) |
-| Cómo se arma | El padre se **infiere por el orden de las filas** consecutivas (clave padre y clave hijo, en recorrido en profundidad) | El **nivel viene declarado** en cada fila (0 a 4) y la identidad de un nodo es su posición |
-| Qué clases tiene | Cuatro fijas: prototipo, nivel, etapa y concepto (más sus componentes) | Capítulo, subcapítulo, niveles 2 y 3 intermedios y concepto: la profundidad varía |
-| Un concepto repetido | La misma clave de concepto puede colgar de **dos etapas** del mismo prototipo; hubo que cambiar la identidad a (prototipo, padre, clave) para que no se pisaran | El prefijo no es llave y la posición es la identidad (`MEMORIA.md`, patrones); filtrar por la clave de ingeniería perdía 11 filas y por posición cuadra exacto |
+| De dónde sale | Un archivo **propio de ObraCtrl,** distinto del export de OPUS: con una columna de tipo y otra de la clave del padre (en la prueba real, 7 prototipos y 8,014 filas) | El **export nativo de OPUS** (`CATALOGO_DE_PRESUPUESTO`): 7 capítulos, 102 subcapítulos, 325 y 345 niveles intermedios y 2,452 conceptos en 3,231 filas (`1-mundo/opus`) |
+| Cómo se arma el padre | Por la **clave del padre** que trae cada fila; si una clave se repite, gana la última vista de ese prototipo | **No hay columna de padre:** el nivel viene declarado y el padre de una fila de nivel *n* es la última fila vista de nivel *n−1* (una pila); el código de ingeniería sirve para ubicar, no para identificar (`CATALOGOS.md`, «Cómo se arma la jerarquía») |
+| Qué clases tiene | Cuatro fijas en secuencia: prototipo, nivel, etapa y concepto (más sus componentes) | La profundidad **no dice qué es un nodo:** un concepto puede colgar de cualquier nivel (1,233 cuelgan de un Nivel 2 y 1,219 de un Nivel 3), y los Nivel 3 son agrupadores por prototipo |
+| Un nodo repetido | La misma clave de concepto puede colgar de **dos etapas;** hubo que cambiar la identidad a (prototipo, padre, clave) para que no se pisaran | Cuatro claves aparecen como Nivel 3 y como Concepto a la vez: la clave sola no distingue, hace falta el tipo o la profundidad |
 | Qué es un «frente» | Ocho frentes canónicos que mezclan niveles y gremios; cada etapa pertenece a uno | **Frente = nivel constructivo** (Nivel 1) y **sub-frente = etapa** (Nivel 2), D-450 |
 | De dónde salen las cantidades de una obra | Se **copian las del prototipo** al generar la obra (157 actividades por casa) | Prototipo como plantilla y casa como instancia: la cantidad real viene de la **ingeniería del lote** y lo que cambia es una orden de cambio |
 
-*Lectura mía de lo que «no convence»:* el árbol de ObraCtrl se adivina por el orden del archivo y se copia igual a todas las casas del prototipo; el del cerebro se lee por su nivel declarado y distingue el prototipo (la plantilla) de la casa (la ingeniería real). No sé cuál de las dos cosas, u otra, es la que el usuario ve mal; la pregunta está al final.
+**Comparativa: qué se conserva, qué se alinea y qué se deja para después.**
 
-**Comparativa: qué se conserva, qué se ajusta y qué se reemplaza.**
-
-| Pieza | Veredicto | Por qué |
+| Pieza | Veredicto | Qué debe cumplir (dónde lo define el cerebro) |
 |---|---|---|
-| Árbol del prototipo (cómo se lee y qué clases tiene) | **Reemplazar** | Es lo que el usuario quiere cambiar; la regla del cerebro (nivel declarado, posición como identidad, profundidad variable) |
-| Frentes | **Reemplazar** | Pasan a ser el nivel constructivo, con la etapa como sub-frente |
-| Catálogos y sus cargadores (conceptos, matrices, materiales, mano de obra, subcontratos, niveles y etapas) | **Reemplazar los datos y la lectura;** conservar la mecánica de prueba en seco, versión y reversa | Hoy están cargados con el árbol viejo y pueden borrarse; el cerebro ya tiene los catálogos de OPUS en el repo |
-| Cantidades de la obra | **Reemplazar** | De copiar el prototipo a partir de la plantilla, con la ingeniería del lote cuando exista |
-| Programa base (duraciones y dependencias a mano por etapa y prototipo) | **Ajustar** | Los datos de la red, los relevos y las duraciones vienen de los siete programas del cerebro; su motor de ruta crítica puede quedarse (tiene sus pruebas de referencia) |
-| Captura de avance, cierre por actividad, ruta crítica, calendario | **Conservar** | Es el núcleo que funciona; la propuesta automática del porcentaje queda para después |
-| Cierre de obra (cuatro participantes) | **Ajustar** | Pasa al doble candado de D-515, D-516 y D-522 |
-| Estatus de obra, clave del contratista, obra sin cluster (urbanización y amenidades) | **Ajustar** | G1 a G3 de D-523 |
-| Estimación (se genera del avance validado) | **Reemplazar, pero después** | El recorrido real es otro (D-522); en el piloto sigue en Excel |
-| Órdenes de trabajo y extraordinarios | **Fuera** | Extraordinarios se queda (R9) |
+| Árbol del prototipo | **Alinear** | Leer el export nativo de OPUS; nivel declarado y padre por pila; el concepto puede colgar de cualquier nivel; identidad por posición (`CATALOGOS.md` y `MODELO.md` §1) |
+| Frentes | **Alinear** | Frente = nivel constructivo y sub-frente = etapa (`GLOSARIO-DOMINIO.md`, Frente) |
+| Catálogos y sus cargadores | **Alinear los datos y la lectura;** conservar la mecánica de prueba en seco, versión y reversa | Los catálogos de OPUS que ya están en el repo (`CATALOGOS.md`, «Qué archivos de OPUS están en el repo») |
+| Cantidades de la obra | **Alinear** | Plantilla e instancia, con la ingeniería del lote cuando exista (`MODELO.md` §3) |
+| Programa base | **Alinear los datos;** el motor de ruta crítica de ObraCtrl puede quedarse (tiene sus pruebas de referencia) | La red, los relevos y las duraciones de los siete programas (`PROGRAMA-CPM.md` y `MODELO.md` §5c) |
+| Captura de avance, cierre por actividad, ruta crítica, calendario | **Conservar** | El avance físico queda separado del pagado, y no se corrigen entre sí (`CONOCIMIENTO.md` §13.7) |
+| Cierre de obra | **Alinear** | Doble candado: cierre de actividades y entrega de obra (`MODELO.md` §5c) |
+| Estatus de obra, clave del contratista, obra sin cluster | **Alinear** | G1 a G3 de D-523; estructura en `MODELO.md` §3c y `MODELO.md` §4a |
+| Estimación (se genera del avance validado) | **Después** | El recorrido real es otro (D-522, `MODELO.md` §5d); en el piloto sigue en Excel |
+| Órdenes de trabajo y extraordinarios | **Fuera** | Extraordinarios se queda (R9); la OT firme está en `MODELO.md` §5i |
 | Evaluaciones, revisión física, expediente, notificaciones, bitácora, respaldo, aislamiento por rol, varias organizaciones, captura sin conexión | **Conservar** | Plomería y piezas que el cerebro ya aceptó (D-516) |
 
-**El orden de reemplazo.** Cada paso se puede pedir por separado, y solo los dos primeros tocan la nube del usuario:
+**El orden de los pasos.** Cada uno se puede pedir por separado:
 
-| # | Paso | Qué pide |
+| # | Paso | Quién |
 |---|---|---|
-| 0 | **Respaldo y reinicio de la organización de ObraCtrl.** ObraCtrl ya trae la función de reiniciar: borra catálogos, prototipos, presupuestos y programas, y **conserva las cuentas** | **Una acción destructiva sobre producción: la hace o la autoriza el usuario,** con respaldo antes |
-| 1 | **Árbol y frentes nuevos:** cambiar cómo se lee el archivo del prototipo y qué clases tiene | Cambio de código en ObraCtrl: **levanta D-487** |
-| 2 | **Catálogos desde los CSV de OPUS** del cerebro, en el formato que pide ObraCtrl | Preparar archivos: **levanta D-487** solo para eso |
-| 3 | **Plantilla y obra:** generar la casa desde el prototipo con su ingeniería | Cambio de código: **levanta D-487** |
+| 0 | **Respaldo y reinicio de la organización de ObraCtrl.** ObraCtrl ya trae la función de reiniciar: borra catálogos, prototipos, presupuestos y programas, y **conserva las cuentas** | **El usuario,** desde el trabajo de avance de obra (D-525), con respaldo antes y avisando al cerebro cuando lo haga |
+| 1 | **Árbol y frentes alineados:** leer el export de OPUS y las clases del cerebro | Cambio de código en ObraCtrl: **pide levantar D-487** |
+| 2 | **Catálogos desde los CSV de OPUS** del cerebro, en el formato que pida ObraCtrl | Preparar archivos: **pide levantar D-487** solo para eso |
+| 3 | **Plantilla y obra:** generar la casa desde el prototipo con su ingeniería | Cambio de código: **pide levantar D-487** |
 | 4 | **Programa:** red, relevos y duraciones de los siete prototipos | Preparar archivos y ajustar la carga |
 | 5 | Ajustes menores: estatus, clave del contratista, obra sin cluster, cierre en doble candado | Cambios chicos de código |
-| 6 | **Piloto** con Leonardo López y Guadalupe, cuatro semanas, la estimación en Excel y el avance físico comparado cada semana con el pagado | Definir las obras |
-| 7 | Después: móvil sin conexión (no hay señal en campo), estimación, propuesta automática del porcentaje | Se decide con lo que deje el piloto |
+| 6 | **Piloto** con Leonardo López y Guadalupe, cuatro semanas, la estimación en Excel y el avance físico **cruzado cada semana con el pagado** (las exportaciones de OP y las estimaciones) | Definir las obras más adelante |
+| 7 | Después: móvil sin conexión (no hay señal en campo), estimación y propuesta automática del porcentaje | Se decide con lo que deje el piloto |
 
-**Lo que se necesita del usuario** (B-126): decir **qué le disgusta del árbol** —que se adivine por el orden del archivo, que sea igual para todas las casas de un prototipo, que mezcle niveles con gremios, u otra cosa—; **elegir las obras del piloto** con los dos residentes; y, cuando quiera avanzar del paso 0, **autorizar el respaldo y el reinicio.** Levantar D-487 se pediría hasta el paso 1.
+**Cómo entiende el cerebro lo que pasa en el trabajo de avance de obra (D-525).** El cerebro no ejecuta nada allá ni se conecta (D-487): **entiende por lo que se le dice.** Por eso, cuando se haga cada paso, el usuario avisa aquí y el cerebro lo registra con cuatro datos: qué paso fue y qué día; qué respaldo se hizo y dónde quedó; qué quedó cargado (o borrado) en ObraCtrl; y si algo difiere de la tabla de arriba. Si la rama o el repo de avance de obra se agrega a esta sesión, el cerebro puede además leerlo y compararlo (solo lectura). En el repo de ObraCtrl no hay hoy una rama con ese nombre (sus ramas son `main`, `fase-1/proyectos-obras-y-captura-offline` y `claude/app-folder-structure-perxoy`); no se sabe en cuál se trabajará.
+
+**Lo que se necesita del usuario** (B-126): las **obras del piloto,** más adelante; **avisar al cerebro** cuando haga el respaldo y el reinicio (paso 0); y, cuando quiera pasar al paso 1, **levantar D-487** para ese cambio.
 
 ## Versión del canon
 
