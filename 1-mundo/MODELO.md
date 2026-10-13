@@ -953,17 +953,17 @@ PRESUPUESTO — campos que gana (todos nullable)
                       es la casa                                           propuesta — D-512
   m2                 NUMERIC — solo en la plantilla: los m² del prototipo  propuesta — D-512
   m2_adicionales     NUMERIC — solo en la casa: lo que suma al prototipo   propuesta — D-512
-  estatus            enum: por_arrancar · en_construccion · por_entregar ·
-                      entregada · antigua — solo en tipo=obra               propuesta — D-513
+  estatus            enum: pendiente · iniciada · en_proceso · por_entregar ·
+                      entregada — solo en tipo=obra                         propuesta — D-514
 ```
 
 - **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote, única dentro del proyecto.
 - **La urbanización también es un `PRESUPUESTO(tipo=obra)`, uno por proyecto,** con `proyecto_id` y sin cluster ni lote. Sus ramas —los clústeres y las amenidades— son nodos de su árbol, no tablas.
 - **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
 - **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
-- **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta *(lectura por confirmar)*.
+- **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
 - **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y el cliente, que no se dijo si es un dato de la obra.
-- **El estatus de la obra (D-513)** son cinco valores, con las palabras del usuario: `por_arrancar` (aún en planeación o próxima a construir), `en_construccion`, `por_entregar` (terminada, pero el cliente no la ha recibido), `entregada` y `antigua` (una obra vieja que ya debe ser una o muy pocas por cerrar). `entregada` va con `fecha_entrega` (§3b). Se captura, no se deriva; la «Fuente de la Verdad» también lo trata como un dato editable.
+- **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b) y una obra entregada queda congelada. `antigua`, que se había leído en D-513, no se agrega.
 
 ---
 
@@ -1180,7 +1180,7 @@ son la misma persona**, una sola letra de diferencia — homologa con el
 mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
 `NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
 
-*D-512 (propuesta): el usuario pidió categorizar a los contratistas **por tipo y por oficio**. `CONTRATISTA` gana `activo` (boolean — se retira, no se borra, igual que `USUARIO`), `tipo` (FK `CLASE_TRABAJO`, la tabla abierta de §2: destajo o subcontrato; si un contratista trabaja de las dos maneras habrá que permitir más de uno) y `clave` (texto, nullable: la de OPUS si llega ese catálogo; no se inventa una). Los oficios van en `CONTRATISTA_ESPECIALIDAD` (`contratista_id`, `familia_id` —la `Familia` del trabajo, que es el oficio—): una persona puede tener varios. La retención por garantías (B-112) es `retencion_pct`, NUMERIC nullable: nulo no la lleva y 5 es lo normal.*
+*D-512 (propuesta): el usuario pidió categorizar a los contratistas **por tipo y por oficio**. `CONTRATISTA` gana `activo` (boolean — se retira, no se borra, igual que `USUARIO`), `tipo` (FK `CLASE_TRABAJO`, la tabla abierta de §2: destajo o subcontrato; si un contratista trabaja de las dos maneras habrá que permitir más de uno) y `clave` (texto, nullable: la de OPUS si llega ese catálogo; no se inventa una). **D-514:** el usuario confirmó que no hay clave, solo el id; que el `rfc` es opcional; y que van el contacto (`contacto`, `telefono` y `correo`, opcionales) y la `calificacion` (NUMERIC, nullable), cuyo método de calificar se define después (B-117). Los oficios van en `CONTRATISTA_ESPECIALIDAD` (`contratista_id`, `familia_id` —la `Familia` del trabajo, que es el oficio—): una persona puede tener varios. La retención por garantías (B-112) es `retencion_pct`, NUMERIC nullable: nulo no la lleva y 5 es lo normal.*
 
 ### Lo que esto ya resuelve, de paso
 
@@ -2779,6 +2779,8 @@ nunca se copia. Guardarlo aparte lo desincroniza en cuanto el contratado
 cambie.
 
 *D-512 (propuesta): `ESTIMACION_LINEA` gana `folio` (texto, único), que se arma con una regla y no se teclea: `[E-]SSAA-NNN` —semana en dos dígitos, año en dos y un consecutivo de tres que no se corta—, con el prefijo `E-` solo si `ESTIMACION.fuente = erp_externo`. Es por renglón y no por documento, y si el campo de semana que llega ya trae esa forma, se toma como folio. Así lo define la «Fuente de la Verdad» de auditoría en su apartado 3.2, y el usuario confirmó que sigue vigente. Los parámetros que esa fuente da por vigentes (IVA, umbral, similitud) no tienen tabla todavía: B-114.*
+
+*D-514 (propuesta): el usuario confirmó el folio por renglón y pidió algo más: **la estimación necesita su propio identificador generado por el sistema** (su «oid»), porque los folios son de renglón y no la identifican. Es el `id` de `ESTIMACION`, que no se teclea ni se reutiliza. El `estado` gana `enviada` entre `capturada` y `validada` —la envía quien la captura, y si excede el tope vuelve como `devuelta`—, y **Control de obra la marca `pagada`**, una función nueva (`marcar_estimacion_pagada`, por asignar) que no está en la lista de §5b todavía; una estimación pagada ya no se toca. `estado` sigue siendo firme en sus otros valores; este es un añadido (B-118).*
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`

@@ -906,7 +906,7 @@ La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster
 - **Se usa con:** Cluster; Prototipo; Presupuesto
 - **Ejemplo:** FRESNO 12; ALAMO 18
 - **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, propuesta)
-- **Estatus:** por arrancar, en construcción, por entregar (terminada, pero el cliente no la ha recibido), entregada y antigua (una obra vieja que ya debe ser una o muy pocas por cerrar), según el usuario (D-513)
+- **Estatus:** pendiente (en planeación o próxima a construir), iniciada, en proceso, por entregar (desde el 90 % de avance, hasta que el cliente la recibe) y entregada, como en ObraCtrl (D-514)
 
 ### Urbanización
 
@@ -920,7 +920,7 @@ La obra única del proyecto, que sirve a todos los clústeres y a las amenidades
 
 ### Nivel de casa
 
-Cada piso de la vivienda: planta baja, planta alta y roof garden. No es el nivel del presupuesto. (D-512.)
+Cada piso de la vivienda: planta baja, planta alta y la azotea, que es roof garden cuando el cliente lo pide. No es el nivel del presupuesto. El roof garden no cuenta como planta. (D-512 y D-514.)
 
 - **También:** Planta; Piso; Roof garden (que el catálogo escribe «Azotea» o «Azotea/Roof»)
 - **No confundir con:** Nivel de construcción (el del presupuesto, que es el frente); Nivel 2 y Nivel 3 (profundidad)
