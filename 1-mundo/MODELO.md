@@ -886,7 +886,8 @@ PRESUPUESTO.metodo_precio     enum: por_m2 · por_diferencia, nullable — solo 
                                tipo=cotizacion                                       propuesta — D-533
 PRESUPUESTO.m2_ampliacion     NUMERIC, nullable — solo si metodo_precio=por_m2       propuesta — D-533
 PRESUPUESTO.precio_m2         NUMERIC, nullable — solo si metodo_precio=por_m2:
-                               17,000 hoy; parámetro editable                        regla firme (D-533); campo propuesta
+                               17,000 pesos por defecto; se puede ajustar en cada
+                               cotización                                            regla firme (D-533 y D-534); campo propuesta
 PRESUPUESTO.factor_precio     NUMERIC, nullable — solo si tipo=cotizacion: el
                                precio por diferencia es el costo directo dividido
                                entre este factor. Por defecto 0.7, editable          regla firme (D-532); campo propuesta
@@ -900,8 +901,8 @@ PRESUPUESTO.factor_precio     NUMERIC, nullable — solo si tipo=cotizacion: el
 | **Algo específico** (por ejemplo, un cambio de sanitarios) | **Se presenta la diferencia:** el costo directo de lo que entra menos el de lo que sale, **entre 0.7** | — es el cálculo |
 
 - **El factor 0.7** (dato del usuario, D-532): un costo directo de 70 se cobra en 100. Como 1 ÷ 0.7 es 1.4286, el costo es el 70 % del precio y el 30 % restante es lo que cubre indirectos y utilidad. **Es un solo factor, no las capas de sobrecosto de §6,** que siguen fuera del modelo. Da igual restar los costos y luego dividir que dividir cada uno y restar los precios. *Lectura mía:* el factor y el precio por m² se guardan como parámetros con su fecha, como los umbrales que ya lo son (el 20 % de las alertas, el 5 % de la retención), para cambiarlos sin tocar código.
-- **El 17,000 por m²:** la moneda, si incluye IVA y si varía por proyecto o por prototipo no se dijeron (se asume pesos, con el IVA aparte como en la cotización de una OT). *Lectura mía:* los m² de una ampliación aceptada son los `m2_adicionales` de la casa (§3c).
-- **Si el presupuesto de la ampliación no coincide con m² × 17,000,** no se corrige solo: es una diferencia que alguien resuelve. **Cuál de los dos manda no se dijo.**
+- **El 17,000 por m²** son **pesos** y **el precio por m² se puede ajustar** (dato del usuario, D-534): 17,000 es el valor por defecto y cada cotización puede llevar el suyo. Si incluye IVA y si varía por proyecto o por prototipo no se dijeron (el IVA se asume aparte, como en la cotización de una OT). *Lectura mía:* los m² de una ampliación aceptada son los `m2_adicionales` de la casa (§3c).
+- **Si el presupuesto de la ampliación no coincide con m² × 17,000,** no se corrige solo: alguien lo resuelve. A la pregunta de cuál de los dos manda, el usuario contestó que **se puede ajustar el precio por m²** (D-534). *Lectura mía:* esa es la palanca para resolver la diferencia; el presupuesto de la ampliación sigue siendo lo que confirma el precio.
 - **Qué entra y qué sale:** una cotización por diferencia necesita decir qué se quita. La regla de cantidades negativas de la ingeniería del lote (`CONOCIMIENTO.md` §11.10) es de esos archivos y no cierra el caso; si se representa con dos bloques, «lo que sale» y «lo que entra», o con líneas con signo, se decide al diseñar el cotizador.
 - **Aceptada, se convierte en control de cambio.** Al aceptarla el cliente nace una `PROPUESTA(tipo=orden_cambio)` (§5f) que **agrega** al final de la rama congelada, sin reescribir lo contratado (`CONOCIMIENTO.md` §13.4). Su `delta_monto` sigue siendo el impacto en costo, es decir, **el costo directo de la cotización;** lo que paga el cliente se lee de la cotización, y si conviene guardarlo también en la orden se decide al diseñar el cotizador (B-123). Si el trabajo además se subcontrata, nace una OT (§5i) y, como siempre, se compara contra lo que se cotizó.
 - **Qué no se ha dicho:** el formato del folio, qué pasa con una cotización rechazada más allá de conservarse, y si Proyectos o Control de obra la hace (hoy la ejecuta Control de obra, §5b). **D-487:** el cerebro no construye nada hasta que el usuario lo levante.
@@ -2742,6 +2743,20 @@ P-4 decía que las fechas contratadas no se mueven solas: *reprogramar propone l
 - **Es el primer aviso que el usuario dice:** al aplicarse una reprogramación, **se notifica a los demás.** Quiénes son «los demás» no se dijo (`WORKFLOWS.md` §8, hueco 6).
 - **Lectura mía:** la cadena es para **lo contratado.** Mientras la rama está en diseño no hay nada que proponer: el residente edita las fechas y Control de obra la estructura, como en `editar_fechas_programa` y `editar_estructura_programa`.
 - **No se dijo:** si Control de obra puede proponerla él mismo, y si el supervisor da seguimiento hasta cerrar, como en la incidencia. Tampoco **dónde se guarda la cadena** —con la misma forma que `INCIDENCIA` (pasos nullable si se saltan) o como un tipo de `PROPUESTA`—, que se decide al construirla (D-487).
+
+### El nivel en que se captura y se confirma el avance, y qué corrige la estimación pagada (D-534)
+
+Dato del usuario (D-534). Dice que **ya estaba definido,** pero **no estaba escrito en el cerebro:** el avance se captura y se confirma en el nivel más fino que el nodo permite.
+
+| Si el nodo es… | Se captura y se confirma en… | Qué pasa |
+|---|---|---|
+| **Una actividad** (lo ideal) | La actividad: cantidad o porcentaje | Queda como `REGISTRO_AVANCE` de esa actividad, con `fuente = fisico` |
+| **Paramétrico** (un ensamble) | Su concepto paramétrico, el ensamble o sub-ensamble, que es la unidad natural de contratación (`CONOCIMIENTO.md` §5.5) | Es el avance del ensamble |
+| **Un frente, capturado en porcentaje** | El frente | El porcentaje **se baja a los niveles siguientes,** hasta las actividades |
+
+- **Quién confirma:** el **residente** (D-534). Es el paso «confirmar avances» de antes de estimar; hay dos momentos, al terminar una actividad y antes de estimar (D-533).
+- **Lecturas mías, por confirmar:** *(a)* «bajar» es aplicar el mismo porcentaje a cada nodo de abajo, y no repartirlo según el peso de cada uno (el tablero sí pondera por costo, pero hacia arriba); *(b)* lo bajado queda **marcado como bajado,** y una captura posterior en la actividad manda sobre ello; *(c)* no pide tabla: bajar es agregar filas de `REGISTRO_AVANCE` a las actividades de abajo, y la marca se decide al construirlo (D-487).
+- **Qué corrige la estimación pagada:** *«la estimación pagada corrige lo administrativo»* (D-534). *Lectura mía:* **confirmar no es un candado de la estimación;** lo que no se confirmó se estima de todos modos, el validador ajusta (D-522) y la estimación pagada corrige el **registro administrativo,** que es el avance pagado. El avance físico no se sobrescribe: físico y pagado siguen sin corregirse entre sí (`CONOCIMIENTO.md` §13.7) y su diferencia es la señal.
 
 ### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515; firme desde D-522)
 
