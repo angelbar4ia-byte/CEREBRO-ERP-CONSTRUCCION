@@ -1873,6 +1873,7 @@ FUNCION_ATOMICA
                      liberar_retencion · abrir_ticket_garantia ·
                      asignar_subcontrato · cotizar_ot · cambiar_alcance_ot ·
                      confirmar_pago_ot · auditar_alcance_ot               nuevo — D-537, ver abajo
+                     · replicar_estimacion · justificar_aumento_cantidad  nuevo — D-538, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -1897,6 +1898,8 @@ sin existir en `ROL` — Control de obra absorbe la función en la práctica,
 sin que eso impida reasignarla después: `ROL_FUNCION` es muchos-a-muchos
 precisamente para que una asignación no sea definitiva.
 
+> **D-538: `validar_estimacion` pasa a Compras.** El usuario contó el proceso de hoy —Compras revisa los topes, modifica y la envía a Control de obra, que establece la estimación pagada— y la función dejó de ser de Control de obra. `ROL_FUNCION` es de muchos a muchos: fue una fila que cambió de rol, no un cambio de esquema.
+
 > **La reasignación no pide mecanismo nuevo — pide dueño para el
 > mecanismo que ya existe.** `ROL_FUNCION` ya es una tabla, no una regla
 > de código: reasignar `validar_estimacion` de Control de obra a otro rol
@@ -1920,7 +1923,7 @@ fecha, en un solo lugar.
 | `trazar` | Costos, Control de obra, Residente, Supervisor | §1b, B-45 |
 | `aprobar_trazo` | Control de obra | §1b, B-45 |
 | `anotar_plano` | Residente, Supervisor | §1b, B-45 |
-| `validar_estimacion` | Control de obra | dato del usuario, cierra B-75 |
+| `validar_estimacion` | **Compras** — revisa los topes y modifica la estimación | dato del usuario, D-538 (antes Control de obra: D-330 y B-75) |
 | `originar_incidencia` | Residente, Supervisor, Control de obra | §5c, D-329 |
 | `aprobar_incidencia` | Supervisor | §5c, D-329 |
 | `validar_incidencia` | Control de obra | §5c, D-329 |
@@ -1960,18 +1963,19 @@ fecha, en un solo lugar.
 | `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
 | `cotizar_cambio_cliente` | Control de obra — hoy hace de cotizador | propuesto, D-537 |
 | `confirmar_avance` | Residente — al terminar la actividad y antes de estimar | propuesto, D-537; el rol lo dijo el usuario (D-534) |
-| `capturar_estimacion` | Residente | propuesto, D-537; el rol lo dijo el usuario (D-522) |
-| `enviar_estimacion` | Control de obra | propuesto, D-537; el rol lo dijo el usuario (D-522) |
-| `devolver_estimacion` | Compras — el validador | propuesto, D-537; pendiente de la decisión de `validar_estimacion` |
+| `capturar_estimacion` | Residente | dato del usuario, D-538 |
+| `enviar_estimacion` | Control de obra — la concentra y la envía a Compras | dato del usuario, D-538 |
+| `devolver_estimacion` | Compras — la devuelve a todos | dato del usuario, D-538 |
 | `justificar_fuera_de_catalogo` | Supervisor | propuesto, D-537; el rol lo dijo el usuario (D-522) |
-| `marcar_estimacion_pagada` | Control de obra | propuesto, D-537; viene de B-118 |
+| `marcar_estimacion_pagada` | Control de obra — establece la estimación pagada | dato del usuario, D-538; viene de B-118 |
 | `entregar_obra` | Residente | propuesto, D-537; el rol lo dijo el usuario (D-516 y D-522) |
 | `dar_visto_bueno_entrega` | Supervisor | propuesto, D-537; ídem |
 | `validar_calidad_entrega` | Control de obra — calidad y expediente | propuesto, D-537; ídem |
 | `liberar_retencion` | Supervisor la autoriza; Control de obra la valida si hace falta | propuesto, D-537; viene de §5i |
 | `confirmar_pago_ot` | Control de obra | propuesto, D-537; viene de §5i |
 | `auditar_alcance_ot` | Control de obra | propuesto, D-537; viene de §5i |
-| `validar_estimacion` | **Compras, además de Control de obra** | propuesto, D-537; **si el usuario lo confirma se quita la fila de Control de obra** (D-330) |
+| `replicar_estimacion` | Residente — la réplica si alguna cantidad bajó | propuesto, D-538; el rol lo dijo el usuario |
+| `justificar_aumento_cantidad` | Costos y Control de obra — regresan a Compras las justificaciones de por qué debe subir la cantidad | propuesto, D-538; los roles los dijo el usuario |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
 | `revisar_patrones_desviacion` | **Sin asignar** | P-21 |
@@ -1984,7 +1988,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -2984,15 +2988,16 @@ cambie.
 - `ot_base_id`, FK nullable: cuando el monto es **el valor de otra OT** (D-510), esa OT. En el caso de arriba, la reparación de Floviesa.
 - *Lectura mía:* el descuento directo queda como **saldo del contratista** y se cobra de sus pagos siguientes, al modo del préstamo (D-290); y `absorbe_empresa` ya cubre que el contratista no siga activo. **Sin decidir:** si un descuento aplicado a una OT cuenta como liquidación en su saldo; el usuario pidió que la OT pagada no aparezca como falta por pagar, y eso solo está resuelto para el descuento directo (B-110).
 
-**El recorrido real de una estimación (D-522).** Al confirmar el bloque, el usuario contó cómo viaja hoy, y eso corrigió una lectura mía: **quien la envía no es el residente sino Control de obra.** El recorrido:
-1. **El residente crea su estimación en Excel.**
-2. **Control de obra las recolecta y las pasa al extractor** (el concentrador de estimaciones).
-3. **Control de obra las envía al validador de topes,** que hoy ejerce **Compras** —`enviada`—.
-4. **Vuelven a los residentes** para que revisen los ajustes de lo que no pasa por topes —`devuelta`—; se **solicita verificar la cuantificación** *(lectura mía: a los residentes, que son quienes cuantifican)* y **los supervisores dan la justificación de lo fuera de catálogo.**
-5. **El validador ajusta, y esa es la estimación que se paga** —`validada`—. *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por él, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
-6. **Control de obra comparte la estimación final para el pago** y la marca `pagada`.
+**El recorrido de una estimación (D-522, y como lo contó el usuario en D-538).** *Es el proceso de hoy y se irá puliendo con el sistema* (dato del usuario). Quien la envía no es el residente sino Control de obra, y quien revisa los topes es Compras:
+1. **El residente crea su estimación en Excel** —`capturada`—.
+2. **Control de obra la concentra** (recolecta las de los residentes y las pasa al extractor, el concentrador de estimaciones) **y la envía a Compras** —`enviada`—.
+3. **Compras revisa los topes** y **la devuelve a todos** —`devuelta`—: residentes, supervisores, Costos y Control de obra.
+4. **El residente tiene oportunidad de réplica** si alguna cantidad bajó.
+5. **Costos y Control de obra regresan a Compras las justificaciones** de por qué debe subir la cantidad. Los supervisores dan la justificación de lo fuera de catálogo (D-522; en D-538 no se mencionó, y no se contradijo).
+6. **Compras modifica, y esa es la estimación que se paga** —`validada`—, y **se la envía a Control de obra.** *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por Compras, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
+7. **Control de obra establece la estimación pagada** —`pagada`—.
 
-**Dos cosas quedan sin decidir.** (a) **El validador:** D-330 asignó `validar_estimacion` a Control de obra y dejó a Compras fuera de `ROL`; el recorrido dice que el validador de topes es de Compras. Mientras el usuario no decida, la tabla de funciones (§5b) sigue como está. *Propuesta del sistema:* agregar `compras` como fila de `ROL`, junto con `finanzas` y `proyectos` (B-115), y asignarle `validar_estimacion`; Control de obra conservaría recolectar, enviar, compartir y marcar `pagada`. `ROL_FUNCION` es de muchos a muchos, así que no cambia el esquema. **D-537:** el usuario confirmó los tres roles, `compras`, `finanzas` y `proyectos`; falta decidir que `validar_estimacion` pase de Control de obra a Compras (hasta entonces la tienen los dos). (b) **La justificación del fuera de catálogo** es un campo mío (`justificacion` y `justificada_por`, arriba, propuesta).
+**Lo que queda decidido (D-538).** El validador es **Compras:** `validar_estimacion` pasó de Control de obra a Compras (§5b), junto con `devolver_estimacion`; Control de obra conserva concentrar, enviar y marcar `pagada`. Los tres roles `compras`, `finanzas` y `proyectos` los confirmó el usuario en D-537. **Lo que no se dijo:** si la réplica y las justificaciones pueden dar más de una vuelta antes de que Compras modifique, y dónde se guardan las justificaciones de por qué sube una cantidad. *Lectura mía:* una sola vuelta por ahora, y las justificaciones junto a la fila de `ESTIMACION_LINEA_HISTORIA` que ajusta la cantidad, sin campo nuevo hasta construirlo (D-487). Sigue siendo un campo mío la justificación del fuera de catálogo (`justificacion` y `justificada_por`, arriba, propuesta).
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`

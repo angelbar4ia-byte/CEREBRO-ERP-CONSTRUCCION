@@ -830,7 +830,7 @@ Para lo demás se leyeron las 50 migraciones de `database/migrations` de `CONTRO
 | ¿Los cuatro participantes de la entrega, en orden? | «En cualquier orden» | `ENTREGA_OBRA` sin orden |
 | ¿Falta algo en el cierre o la entrega? | «No de momento, pero en algún momento puede escalar, como una acta de entrega y recepción» | Idea sin modelar: la entrega podría escalar a un acta de entrega y recepción |
 
-**Una diferencia con lo ya decidido.** D-330 asignó `validar_estimacion` a Control de obra «sin formalizar Compras como rol propio». El recorrido dice que el validador de topes es de Compras y que Control de obra recolecta, envía y comparte. Queda como **pregunta abierta para el usuario;** mi propuesta es sumar `compras` a `ROL` (como `finanzas` y `proyectos`, B-115) y asignarle `validar_estimacion`, sin cambiar el esquema.
+**Una diferencia con lo ya decidido.** D-330 asignó `validar_estimacion` a Control de obra «sin formalizar Compras como rol propio». El recorrido dice que el validador de topes es de Compras y que Control de obra recolecta, envía y comparte. Queda como **pregunta abierta para el usuario;** mi propuesta es sumar `compras` a `ROL` (como `finanzas` y `proyectos`, B-115) y asignarle `validar_estimacion`, sin cambiar el esquema. **Resuelta (D-537 y D-538):** los tres roles se sumaron y `validar_estimacion` pasó a Compras.
 
 **Lo que el usuario contestó sobre ObraCtrl (D-514).**
 
