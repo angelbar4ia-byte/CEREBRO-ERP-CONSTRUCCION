@@ -724,7 +724,7 @@ queda completo; el caso real que lo ejerza, no.
 PRESUPUESTO
   id, nombre, estado (por SUBÁRBOL, ver hallazgo 6)                    firme
   raiz_id            FK Nodo                                            firme
-  tipo               enum: plantilla · obra                             nuevo — cierra P-40, ver abajo
+  tipo               enum: plantilla · obra · escenario (§3a) · cotizacion (§3a, D-532)   nuevo — cierra P-40, ver abajo
   plantas            INTEGER, nullable — solo si tipo=plantilla: cuántas
                       plantas tiene el prototipo. Ya decidía el plazo
                       (28 semanas una, 30 dos, D-419) y es el filtro del
@@ -865,6 +865,31 @@ construir. La política (D-107) y el mecanismo quedan listos; falta el
 primer caso real que lo use, mismo principio que las devoluciones de
 almacén (`MODELO.md` §5e) o `Flete` en los reportes de salida
 (`CONOCIMIENTO.md` §4.3).
+
+
+### `PRESUPUESTO.tipo` gana un cuarto valor — la cotización al cliente del cambio o adicional (D-532)
+
+Dato del usuario (D-531 y D-532): **antes de que un cambio o un adicional sea control de cambio, se hace un presupuesto al cliente;** el usuario confirmó que ese presupuesto lleva **su propio `tipo`** y que **se convierte en control de cambio una vez que el cliente lo acepta.** El Cotizador ya lo nombraba con dos artefactos, el *Highlight* (antes de la ejecución, un estimado preliminar) y el *Adicional al presupuesto* (ya en ejecución), foliados y estructurados como presupuesto por PU (§5b y `CONOCIMIENTO.md` §13.4). No es un escenario: el escenario clona el árbol de toda la obra para comparar opciones y elegir una; la cotización trae solo los conceptos agregados y es una oferta que el cliente acepta o no.
+
+```
+PRESUPUESTO.tipo              enum: plantilla · obra · escenario · cotizacion      firme — D-532
+PRESUPUESTO.cotizacion_de_id  FK PRESUPUESTO(tipo=obra), nullable — solo si
+                               tipo=cotizacion: la obra a la que se cotiza           propuesta — D-532
+PRESUPUESTO.clase_cotizacion  enum: highlight · adicional, nullable — solo si
+                               tipo=cotizacion                                       propuesta — D-532
+PRESUPUESTO.folio             texto, nullable — «se foliaban» (§5b); el formato no
+                               se ha dicho                                           propuesta — D-532
+PRESUPUESTO.estado_cotizacion enum: cotizada · aceptada · rechazada, nullable —
+                               solo si tipo=cotizacion. Al pasar a `aceptada` nace
+                               la orden de cambio (abajo)                            propuesta — D-532
+PRESUPUESTO.factor_precio     NUMERIC, nullable — solo si tipo=cotizacion: el
+                               precio al cliente es el costo directo dividido entre
+                               este factor. Por defecto 0.7, editable                regla firme (D-532); campo propuesta
+```
+
+- **El precio al cliente es el costo directo entre 0.7** (dato del usuario, D-532): un costo directo de 70 se cobra en 100. Como 1 ÷ 0.7 es 1.4286, el costo es el 70 % del precio y el 30 % restante es lo que cubre indirectos y utilidad. **Es un solo factor, no las capas de sobrecosto de §6,** que siguen fuera del modelo. *Lectura mía:* el factor se guarda en la cotización, como los umbrales que ya son parámetro (el 20 % de las alertas, el 5 % de la retención), para poder cambiarlo sin tocar código; se asume que es el mismo para el Highlight y el Adicional, y la venta del prototipo no se toca.
+- **Aceptada, se convierte en control de cambio.** Al aceptarla el cliente nace una `PROPUESTA(tipo=orden_cambio)` (§5f) que **agrega** al final de la rama congelada, sin reescribir lo contratado (`CONOCIMIENTO.md` §13.4). Su `delta_monto` sigue siendo el impacto en costo, es decir, **el costo directo de la cotización;** lo que paga el cliente se lee de la cotización, y si conviene guardarlo también en la orden se decide al diseñar el cotizador (B-123). Si el trabajo además se subcontrata, nace una OT (§5i) y, como siempre, se compara contra lo que se cotizó.
+- **Qué no se ha dicho:** el formato del folio, qué pasa con una cotización rechazada más allá de conservarse, y si Proyectos o Control de obra la hace (hoy la ejecuta Control de obra, §5b). **D-487:** el cerebro no construye nada hasta que el usuario lo levante.
 
 ---
 
@@ -3514,7 +3539,7 @@ PAGO_OT
 | No incluido | Por qué |
 |---|---|
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
-| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`erp-construccion.md` §6) |
+| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`erp-construccion.md` §6). La cotización al cliente usa un solo factor, el costo directo entre 0.7 (§3a, D-532), que no es una capa |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
 | Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). *Resuelto en parte (D-461): el motor existe en `backend/core/motor_cpm.py`, probado contra los siete programas reales; la visualización del Gantt cierra en D-463 (`PROGRAMA-CPM.md` §8). D-462: el cargador con las reglas de D-442 y D-443 está en `backend/core/programa.py`; D-463: la reprogramación por empuje mínimo, también; D-464: la bitácora de ediciones y su persistencia.* `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos; antes hay que decidir qué es un frente (D-448)*Resuelto (D-450): el frente es el nivel constructivo y se lee subiendo por el árbol desde la partida, así que `ACTIVIDAD` no necesita `frente_id`; el tope se compara por frente y oficio, por ventana de trabajo (D-449).* |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |

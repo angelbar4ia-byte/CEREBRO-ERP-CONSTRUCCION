@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido»
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -319,7 +319,7 @@ Es lo que ocurre entre «la obra existe» y «la rama se contrata». No es una p
 
 Una misma obra suele mezclar las tres, rama por rama: *«el tercer caso es el normal: la cimentación ya está en planos y se mide, acabados todavía no y se estima»* (`CONOCIMIENTO.md` §5.10). Por eso el arranque no es un campo de la obra, sino el `modo_cantidad` de cada renglón.
 
-### ¿Cuándo está «definido» un presupuesto? Cuatro niveles (D-531)
+### ¿Cuándo está «definido» un presupuesto? Cuatro niveles (D-531, confirmado en D-532)
 
 El usuario pidió **más contexto** sobre esta pregunta (§8.6, hueco 9). Lo que el cerebro ya tiene son **cuatro niveles de «listo», por nodo y no por obra,** de menos a más exigente:
 
@@ -337,13 +337,13 @@ El usuario pidió **más contexto** sobre esta pregunta (§8.6, hueco 9). Lo que
 - **¿Puede arrancar el programa con la rama en diseño?** Sí, y no hay que inventar la regla: programar pide que el nodo esté **costeado,** no contratado ni medido; una cantidad `estimada` sirve para programar (aunque con precisión baja y declarada). Lo que una rama en diseño no puede es contratarse con precio alzado sobre una cantidad estimada sin que el sistema lo advierta (`CONOCIMIENTO.md` §4.1, «la combinación peligrosa»).
 - **¿Quién declara que una rama está lista para contratarse?** No hay una declaración aparte: **contratar la rama es la declaración,** y la hace Control de obra. El sistema la frena y pide confirmación si el PU de un concepto se mueve más de 5 % o si un concepto sin matriz valdría cero (`MODELO.md` §4a, D-475).
 
-**Tres lecturas posibles de «definido»,** y la que propongo:
+**Tres lecturas posibles de «definido»,** y la que el usuario confirmó (D-532):
 
-| Lectura | Qué implicaría | Mi opinión |
+| Lectura | Qué implicaría | Qué pasó |
 |---|---|---|
-| **A. Costeado** | «Definido» es lo que ya se puede programar; contratado es otro estado | **🔶 La propongo.** Es lo que el cerebro ya dice, y deja programar mientras el resto de la obra sigue en diseño |
-| **B. Contratado** | Solo se programa lo contratado | No: obligaría a contratar antes de programar, y el programa del prototipo se cuelga cuando la obra aún está `pendiente` |
-| **C. Cargado completo o medido** | No se programa hasta tener toda la ingeniería o todos los planos | No: la obra tendría que esperar niveles que llegan meses después. *«La obra no para»* |
+| **A. Costeado** | «Definido» es lo que ya se puede programar; contratado es otro estado | **✅ Confirmada (D-532).** Es lo que el cerebro ya dice, y deja programar mientras el resto de la obra sigue en diseño |
+| **B. Contratado** | Solo se programa lo contratado | Descartada: obligaría a contratar antes de programar, y el programa del prototipo se cuelga cuando la obra aún está `pendiente` |
+| **C. Cargado completo o medido** | No se programa hasta tener toda la ingeniería o todos los planos | Descartada: la obra tendría que esperar niveles que llegan meses después. *«La obra no para»* |
 
 ### Los tipos de presupuesto: tres ejes, y el cerebro ya los tiene
 
@@ -351,13 +351,13 @@ El usuario pidió **más contexto** sobre esta pregunta (§8.6, hueco 9). Lo que
 
 | Eje | Pregunta | Valores | Dónde vive | Marca |
 |---|---|---|---|---|
-| **Para qué sirve** | ¿Qué es este presupuesto? | **plantilla** (el prototipo: siete, de 172 a 300 m²) · **obra** (una casa, o la urbanización: una por proyecto) · **escenario** (un candidato para comparar precio/proveedor, alcance o programa, D-107) | `PRESUPUESTO.tipo` | ✅ |
+| **Para qué sirve** | ¿Qué es este presupuesto? | **plantilla** (el prototipo: siete, de 172 a 300 m²) · **obra** (una casa, o la urbanización: una por proyecto) · **escenario** (un candidato para comparar precio/proveedor, alcance o programa, D-107) · **cotización** (la oferta al cliente de un cambio o adicional, D-532) | `PRESUPUESTO.tipo` | ✅ |
 | **Cómo se valúa cada renglón** | ¿Cómo se llega al importe? | **por PU** (la matriz) · **por ensamble** (paramétrico) · **alzado** (precio declarado, con o sin desglose) | El nodo, no el presupuesto: *«el presupuesto no tiene tipo; “mixto” no se guarda, se reporta en porcentaje»* | ✅ |
 | **De dónde viene cada cantidad** | ¿Quién dice cuánto? | **medida** · **estimada** · **capturada** · **heredada** | `modo_cantidad` en la relación | ✅ |
 
-**El usuario (D-531) dijo que el único tipo que falta es el del control de cambio:** *«antes de que sea control de cambio se realiza un presupuesto al cliente del cambio o adicional»*. Con eso los tipos quedan en esos tres ejes más esa cotización (siguiente subsección). La cotización de una OT (`COTIZACION_OT`) es el costo del subcontrato, no un presupuesto al cliente: es otra cosa.
+**El usuario (D-531) dijo que el único tipo que falta es el del control de cambio:** *«antes de que sea control de cambio se realiza un presupuesto al cliente del cambio o adicional»*. Con eso los tipos quedan en esos tres ejes, y la cotización es **el cuarto valor de `PRESUPUESTO.tipo`** (D-532, `MODELO.md` §3a; siguiente subsección). La cotización de una OT (`COTIZACION_OT`) es el costo del subcontrato, no un presupuesto al cliente: es otra cosa.
 
-### Después de contratar: la cotización al cliente y el control de cambio (D-531)
+### Después de contratar: la cotización al cliente y el control de cambio (D-531 y D-532)
 
 **El cerebro ya la nombra.** El Cotizador (`MODELO.md` §5b) tiene **dos artefactos:** el **Highlight** (antes de la ejecución, el cliente pide un estimado preliminar) y el **Adicional al presupuesto** (ya en ejecución, un presupuesto extra sobre lo contratado). Los dos se foliaban y, al aprobarse, se vuelven control de cambio (`CONOCIMIENTO.md` §13.4), y una cotización se estructura como presupuesto por PU. Hoy lo ejecuta Control de obra.
 
@@ -371,11 +371,11 @@ El usuario pidió **más contexto** sobre esta pregunta (§8.6, hueco 9). Lo que
 
 Lo que hace al control de cambio distinto de editar el presupuesto: **no edita, agrega;** lleva causa, impacto en monto y plazo, quién autoriza y **si se autorizó antes o después de ejecutar** (el porcentaje de retroactivas mide qué tan sano está el proceso, `CONOCIMIENTO.md` §13.4).
 
-**Lo que no está decidido (B-123):** *(a)* si la cotización es un `PRESUPUESTO` con su propio valor de `tipo` o algo más chico. *Lectura mía:* valor propio, y no un escenario de alcance, porque el escenario clona el árbol de toda la obra para comparar opciones y la cotización solo trae los conceptos agregados y es una oferta que el cliente acepta o no; no se agrega nada al modelo hasta diseñar el cotizador (D-487). *(b)* **cómo se calcula lo que se le cobra al cliente:** el presupuesto del cerebro es de costo y las capas de indirectos y utilidad están fuera del modelo por falta de datos (`MODELO.md` §6).
+**Lo que el usuario resolvió (D-532):** *(a)* la cotización **es un presupuesto con su propio `tipo`** (`cotizacion`) y **se convierte en control de cambio una vez que el cliente la acepta**; *(b)* **el precio al cliente es el costo directo entre 0.7:** un costo de 70 se cobra en 100, es un solo factor y no las capas de sobrecosto, y se guarda como parámetro editable para no fijarlo en el código (`MODELO.md` §3a). *Lectura mía, por confirmar:* el 0.7 vale igual para el Highlight y el Adicional. **Sigue abierto (B-123):** el formato del folio, quién la hace (hoy Control de obra) y si la orden de cambio guarda también el precio al cliente. **D-487:** nada se construye.
 
-### El cuantificador: un motor con dos entradas (D-531)
+### El cuantificador: un motor con dos entradas (D-531, confirmado en D-532)
 
-**El usuario (D-531)** no se decide y pide ayuda; ofrece una salida: *«puede ser un módulo para profundizar y proyectos desde cero o partidas grandes, y una herramienta para un concepto en específico»*. **Propuesta 🔶 que sale de esa idea, para confirmar: adoptarla.** Es un **solo motor** con **dos entradas** que se distinguen por **alcance,** no por etapa:
+**El usuario (D-531)** no se decidía y pidió ayuda; ofrece una salida: *«puede ser un módulo para profundizar y proyectos desde cero o partidas grandes, y una herramienta para un concepto en específico»*. **Se adoptó y el usuario lo confirmó (D-532) ✅.** Es un **solo motor** con **dos entradas** que se distinguen por **alcance,** no por etapa:
 
 | Entrada | Alcance | Cuándo se usa | Cómo se abre |
 |---|---|---|---|
@@ -383,6 +383,8 @@ Lo que hace al control de cambio distinto de editar el presupuesto: **no edita, 
 | **Módulo (espacio de trabajo)** | Un nivel, una partida grande o una obra completa | Arrancar **desde cero;** cuando llega un nivel nuevo de planos; cuantificar cimentación o acabados de una vez | Una entrada propia del menú: el plano completo, con el árbol del cuantificador reflejando el del presupuesto |
 
 **Lo que no cambia entre las dos entradas:** el mismo motor y los mismos datos —trazo → medida → cantidad, con su evidencia, una sola cantidad vigente por elemento y el modo en el nodo que recibe—. Lo que se descarta es **partirlo por etapa,** uno de «diseño» y otro de «comprobación»: diseñar o comprobar es lo que el motor hace con un renglón según lo que ese renglón ya traiga.
+
+**Cómo se abre la herramienta (D-532).** El usuario preguntó si la herramienta lleva al módulo o es una ventana flotante y dejó la decisión a la experiencia de uso. **Decisión: una ventana flotante sobre el renglón o la actividad, con un botón «Abrir en el módulo».** Por qué: *(1)* conserva el contexto: el renglón y su cantidad siguen a la vista y se actualizan al cerrar el trazo, y lo habitual en la herramienta es medir un concepto y volver, así que mandar al usuario a otra pantalla le hace perder dónde estaba; *(2)* puede crecer sin empezar de nuevo: «Abrir en el módulo» lleva el mismo plano, el mismo concepto y lo ya trazado, para cuando la tarea se vuelve un nivel entero; *(3)* se puede mover y minimizar para ver el presupuesto debajo, y en una pantalla chica se vuelve una hoja a pantalla completa; *(4)* ventana y módulo son la misma sesión de trazo, así que lo trazado no se pierde al pasar de una a otro. Una sola ventana a la vez.
 
 **Tres usos, que son el «para qué» (y no el «dónde»):**
 
@@ -404,7 +406,108 @@ Cualquiera de los tres usos puede entrar por cualquiera de las dos entradas: dis
 
 **Dos «comprobaciones» que no hay que mezclar.** *(a)* **Comparar la ingeniería del lote contra su prototipo** (movimiento 3): compara **cantidades ya cargadas** entre dos presupuestos y **no necesita plano ni cuantificador;** es el mecanismo de precio y consumo de `CONOCIMIENTO.md` §13.6. *(b)* **Medir contra el plano** (uso «comprobación» de arriba): sí es el cuantificador.
 
-**En el App flow** aparece de dos formas: un botón «medir» en el renglón y la actividad, y una entrada del menú para trabajar un nivel o una obra completa; no es un paso del recorrido, por eso las etapas de §8.3 no le dan una fila propia. **Lo que sigue abierto:** el umbral de «discrepan mucho» para comprobar un presupuesto no está dicho (el 20 % es el del programa y el de la identidad de la ingeniería), y quién traza y quién aprueba se define por obra, pero nadie ha dicho cuál es la regla de una obra normal.
+**En el App flow** aparece de dos formas: un botón «medir» que abre la ventana flotante en el renglón y la actividad, y una entrada del menú para trabajar un nivel o una obra completa; no es un paso del recorrido, por eso las etapas de §8.3 no le dan una fila propia. **Lo que sigue abierto:** el umbral de «discrepan mucho» para comprobar un presupuesto no está dicho (el 20 % es el del programa y el de la identidad de la ingeniería), y quién traza y quién aprueba se define por obra, pero nadie ha dicho cuál es la regla de una obra normal.
+
+### La otra mitad de la cadena: del programa a la ejecución (D-532)
+
+**Pedido del usuario (D-532):** «Continuamos con el programa a la ejecución». Todo lo que sigue **ya está en el cerebro** (`MODELO.md` §5c y §5a, `PROPUESTA-CUATRO-MODULOS.md` §4 y `CONOCIMIENTO.md` §13); aquí se junta como recorrido de información, sin agregar reglas.
+
+```
+ PRESUPUESTO ── cantidad (el techo) ──┐
+ CATÁLOGO ── rendimiento y tiempo de entrega ──┤
+                                      ▼
+                  PROGRAMA  (ACTIVIDAD · PRECEDENCIA · TRAMO · CALENDARIO)
+                      │  duración · vínculos · fechas · cuadrillas · ruta crítica
+                      ├──► PROYECCIONES: material, mano de obra, subcontratos y flujo de efectivo, por fecha
+                      ▼
+          JUNTA DE ARRANQUE ── dispara las fechas contractuales; la obra pasa a `iniciada`
+                      ▼
+          LA SEMANA DE OBRA:  avance físico · almacén · incidencias · control de cambio
+                      ▼                                         ▼
+              ESTIMACIÓN → avance pagado → pago        TABLERO Y ALERTAS (se calculan; avisan, no corrigen)
+                      └──────────────┬───────────────────────────┘
+                                     ▼
+            reprogramar (propone) ◄── incidencia · control de cambio · lo real contra lo teórico
+                                     ▼
+            CIERRE: frente → actividades → lote → entrega → postventa   ·   lo aprendido vuelve a la plantilla y al catálogo
+```
+
+#### El programa: de qué está hecho y de dónde sale cada dato
+
+| Dato | De dónde sale | Quién lo toca |
+|---|---|---|
+| **Cantidad** de la actividad | El presupuesto: es el **techo.** El cuantificador de programación la mide contra él; hasta el 20 % sigue solo, más se solicita a Control de obra | El planeador; Control de obra si pasa del umbral |
+| **Duración** | Cinco modos: capturada · **calculada** (cantidad ÷ rendimiento × cuadrillas) · **preestablecida por nivel** (lo que se contrata terminado: cancelería, carpintería, herrería, cubiertas, pérgolas e impermeabilización) · derivada de fechas (obra sin presupuesto colgado) · derivada de hijos (un bloque) | Control de obra la estructura; el residente las fechas |
+| **Herencia** | La duración sigue a su referencia (Zafiro por defecto); al editarla se elige a quién alcanza: este programa, todos, 1 planta, 2 plantas o los que se señalen | El planeador |
+| **Precedencias** | Técnica (el sistema la propone sola) · de recurso · de decisión; fin-inicio, inicio-inicio o fin-fin, con traslape o espera | La técnica, el sistema; las otras, quien programa |
+| **Calendario** | Uno por obra: días laborables, días no hábiles, excepciones por cuadrilla y el paso del plan (un día hábil por defecto) | Control de obra |
+| **Tramos** | La actividad se interrumpe (el muro se detiene para colar la cadena): reparte material y cuadrillas por tramo | Se deduce de la precedencia técnica; el resto se captura |
+| **Cuadrillas** | Se proponen desde el rendimiento; hay un **tope por oficio dentro del frente** | El planeador confirma |
+| **Disparador de fecha** | Precedencia · recurso · **contractual** (el anticipo o la junta de arranque) | Quien programa; lo contractual lo fija el contrato |
+
+*Fuentes:* `MODELO.md` §5c (`ACTIVIDAD`, `TRAMO`, `CALENDARIO_OBRA`, `FRENTE_TOPE_CUADRILLA`) y `PROPUESTA-CUATRO-MODULOS.md` §4. **El patrón que se repite:** Control de obra edita la **estructura** (duraciones y vínculos, función `editar_estructura_programa`) y el residente edita las **fechas;** cada edición se agrega a una bitácora que no se borra, y una versión nueva del programa es otro programa con su traspaso.
+
+#### Lo que el programa le da al resto: las proyecciones
+
+*Diseñadas, sin construir.* El programa multiplicado por la explosión de insumos da **qué se necesita y cuándo:** material por fecha (y de ahí la **fecha de pedido** = inicio de la actividad − tiempo de entrega − holgura), mano de obra por fecha, subcontratos por fecha y el **egreso por fecha, que es el flujo de efectivo.** Salen **con sus supuestos a la vista,** nunca el número solo (`PROPUESTA-CUATRO-MODULOS.md` §4).
+
+#### El arranque: la junta de arranque y lo que se congela
+
+- **Hay fechas que las dispara un contrato y no una precedencia:** `disparador_fecha = contractual` con su `fecha_disparador`, la fija el anticipo o la **junta de arranque.** Es el caso de lo que se contrata terminado. *Aquí el contrato arranca el reloj,* al revés de lo habitual (`MODELO.md` §5c).
+- **La obra pasa a `iniciada` cuando alguien la marca** (`MODELO.md` §3c); es una de las dos marcas manuales del estatus, junto con `entregada`.
+- **Contratar una rama congela sus fechas:** *las fechas contratadas no se mueven solas;* reprogramar **propone** la fecha nueva y alguien la acepta (P-4, `MODELO.md` §5c).
+- **Queda abierto:** quién declara cerrada la junta de arranque (§8.6, hueco 4) y **quién acepta** una fecha nueva de lo contratado (§8.6, hueco 11).
+
+#### La semana de obra: qué entra y adónde va
+
+| Qué entra | Quién lo registra | Dónde queda | A qué alimenta |
+|---|---|---|---|
+| **Avance físico** | El **residente** anota la cantidad o el porcentaje, la vía rápida y siempre disponible; el **trazo** de lo realmente construido es opcional y lo hacen control, residente y supervisor (Costos no) | `REGISTRO_AVANCE` con `fuente = fisico` | El tablero, las alertas de atraso, el cierre de frente y el rendimiento real |
+| **Lo que surtió el almacén** | El almacén (ERP externo) | `MOVIMIENTO_ALMACEN` | El cruce contra lo estimado y contra el avance |
+| **Incidencias** | Residente, supervisor o control de obra; quien origina no se aprueba a sí mismo y el supervisor da seguimiento hasta cerrar | `INCIDENCIA` | El programa, de tres formas: pausa una actividad, la crea o la hace crecer, o propone una (se aprueba antes de existir) |
+| **Control de cambio** | Se origina en una cotización al cliente aceptada o en una incidencia que llega al cliente | `PROPUESTA(tipo=orden_cambio)` | El árbol del presupuesto y, por eso, el programa |
+| **Estimación y pago** | Residente (Excel), control de obra, validador de topes (§8.2 y §8.3) | `ESTIMACION` y el avance pagado, `REGISTRO_AVANCE` con `fuente = pagado` | El cruce de físico y pagado (§8.5), la retención y los pagos |
+
+**Registrar nunca se bloquea.** Lo ejecutado sin respaldo se registra y queda como una deuda medible con su antigüedad, que tiene dos destinos: se vuelve control de cambio, o es pérdida (`CONOCIMIENTO.md` §13.3). **Físico y pagado no se corrigen entre sí;** su diferencia es la señal y la resuelve Control de obra con evidencia (`CONOCIMIENTO.md` §13.7).
+
+#### Lo que se calcula solo: el tablero y las alertas
+
+El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la suma de las de sus partidas y se lee a cualquier fecha. Las alertas contestan cuatro preguntas; **todas avisan, ninguna corrige,** nunca se resuelven solas y cuentan cuántas veces se han visto (`MODELO.md` §5a):
+
+| Pregunta | Alertas | Qué la dispara |
+|---|---|---|
+| **¿Va atrasada?** | `obra_atrasada` · `subfrente_atrasado` · `subfrente_detenido` · `plazo_excedido` · `vinculo_incumplido` | Un día hábil detrás del programa; 21 días sin avance; el cierre pasa del plazo; las fechas contradicen un vínculo |
+| **¿Va al ritmo?** | `ritmo_sobre_referencia` · `rendimiento_bajo_para_destajo` · `rendimiento_excede_destajo` · `rendimiento_en_perdida` · `duracion_propia_en_herencia` | El rendimiento real contra el teórico; heredar los días no hereda el ritmo |
+| **¿Lo pagado, lo construido y lo surtido coinciden?** | `pago_sin_respaldo_avance` · `avance_sin_respaldo_pago` · `estimacion_sin_respaldo_material` · `consumo_material_sin_respaldo_avance` · `subcontrato_fuera_de_base` | El cruce de las tres corrientes de la semana |
+| **¿Ya se puede cerrar, o se pasó?** | `frente_listo_para_cierre` · `ejecutado_sobre_ingenieria` | El frente llega al 90 %; lo ejecutado excede la ingeniería del lote |
+
+*Hoy la bandeja guarda y cuenta las alertas; los detectores están sin construir* (§2.3).
+
+#### Cómo vuelve la ejecución al programa
+
+| Disparador | Qué pasa | La regla |
+|---|---|---|
+| **Una incidencia** | Cambia cuándo (pausa) o qué (crea o crece una actividad) | Un error de ejecución puede cobrarse al contratista sin tocar el costo y el programa **igual se retrasa:** son dos registros que no dependen uno del otro |
+| **Un control de cambio** | Cambia qué hay que construir y, con eso, cuándo | Agrega, no edita; lo contratado no se reescribe |
+| **Lo real contra lo teórico** | El rendimiento real da una segunda proyección calculada al vuelo | **Nunca sobrescribe el teórico y nunca reprograma sola:** avisa si diverge más de un umbral (P-7) |
+| **Registrar avance** | En una obra sin presupuesto colgado, el programa se reprograma solo con el avance | Solo en ese modo; en los demás, el residente ajusta fechas y Control de obra la estructura |
+
+#### El cierre, y lo que se aprende
+
+**El cierre** va de lo chico a lo grande: al 90 % de un frente el residente solicita, el supervisor aprueba y control valida (con una incidencia de calidad si hace falta); luego, si se requiere, por actividades; y al final **el lote,** con los cuatro participantes en cualquier orden, que lo pasa a `entregada` y a postventa. Cerrar un frente, una actividad o el lote **cierra al residente:** ya no registra avance ahí (`MODELO.md` §5c, D-515, D-516 y D-522).
+
+**Lo que se aprende vuelve por la bandeja,** nunca aplicado solo: el rendimiento real se compara con el teórico y, si el planeador lo decide, lleva a cambiar duraciones (se propone, no se aplica), los precios nuevos entran al catálogo con doble aprobación, y lo medido alimenta al paramétrico y a las plantillas (la red de aprendizaje de arriba).
+
+#### Qué hay hecho de esta mitad
+
+| Pieza | Estado |
+|---|---|
+| **Programa** (subir, editar estructura o fechas, deshacer) | ✅ Servicios, API y pantalla (`MODELO.md` §5c) |
+| **Avance, incidencias, cierre, estimación y almacén** | Diseñado; el avance físico es lo que el piloto de ObraCtrl va a capturar primero (B-126) |
+| **Proyecciones** (material, mano de obra, subcontratos y flujo de efectivo) | Diseñadas, sin construir |
+| **Alertas** | La bandeja las guarda; los detectores, sin construir |
+
+**Lo que esta mitad deja abierto:** *(a)* **quién acepta una fecha nueva de lo contratado** (hueco 11); *(b)* **cada cuánto captura el residente el avance** (hueco 12): la estimación es semanal, pero el cerebro no dice si el avance se anota a diario, por semana o justo antes de estimar; y *(c)* **quién registra el avance físico:** el cerebro ya lo dice —el residente la cantidad o el porcentaje; control, residente y supervisor el trazo—, y lo que falta es la **clave de la función** `registrar_avance` (§7, hueco 1); se recomienda confirmarlo tal como está.
 
 ## 8.2 Quién aparece en el flujo
 
@@ -427,8 +530,8 @@ Cualquiera de los tres usos puede entrar por cualquiera de las dos entradas: dis
 |---|---|---|---|---|---|
 | 1 | **Preparar el catálogo y las plantillas** | Costos carga el export de OPUS; Control de obra decide lo detenido y las bajas; Costos propone precios nuevos y Control de obra y Superintendente los aprueban | El catálogo con sus versiones y el presupuesto de cada prototipo como plantilla | §6 (recorrido a) y `MODELO.md` §3 | ✅ sin pantalla |
 | 2 | **Dar de alta el lugar** | Proyecto (Magnolia y «Antigua»), clusters o manzanas y lotes: cada casa es una obra, con su prototipo y sus m² adicionales; una urbanización por proyecto | El proyecto, el cluster y la obra con su estatus `pendiente` | `MODELO.md` §3c (D-512, D-520, D-521) | ✅ |
-| 3 | **Diseñar el presupuesto de la obra** (D-530) | Al darle de alta, la obra ya es un presupuesto. Se arranca de la base, de una ingeniería o desde cero (§8.1); Costos cuantifica, donde hay plano se mide con el cuantificador (capa de medición) y donde no se estima; se compara la ingeniería del lote contra su prototipo; Control de obra contrata la rama cuando está lista | El presupuesto de la obra con `modo_cantidad` por renglón, `ESTADO_CARGA` y `ESTADO_CONGELAMIENTO` por rama | §8.1; `MODELO.md` §3 y §3a; `CONOCIMIENTO.md` §5.10 y `CONOCIMIENTO.md` §11.7 | ✅ el modelo y que Costos prepara la ingeniería, en Excel y por niveles · 🔶 el cuantificador, un motor con dos entradas · 🔶 «definido» = costeado |
-| 4 | **Programar la obra y asignar a quienes la ejecutan, antes de la junta de arranque** | Se asignan residente y supervisor; se asigna el contratista por obra y tipo de trabajo, y de ahí por etapa o concepto; se cuelga el programa del prototipo y el residente ajusta las fechas; Control de obra contrata un bloque y con eso se fija el precio | `RESIDENTE_OBRA`, `SUPERVISION`, `ASIGNACION_CONTRATISTA`, el programa de la obra y `ESTADO_CONGELAMIENTO` | `MODELO.md` §4a y `MODELO.md` §5c; D-475 y D-512 | ✅ · ❓ cuándo cierra la junta de arranque |
+| 3 | **Diseñar el presupuesto de la obra** (D-530) | Al darle de alta, la obra ya es un presupuesto. Se arranca de la base, de una ingeniería o desde cero (§8.1); Costos cuantifica, donde hay plano se mide con el cuantificador (capa de medición) y donde no se estima; se compara la ingeniería del lote contra su prototipo; Control de obra contrata la rama cuando está lista | El presupuesto de la obra con `modo_cantidad` por renglón, `ESTADO_CARGA` y `ESTADO_CONGELAMIENTO` por rama | §8.1; `MODELO.md` §3 y §3a; `CONOCIMIENTO.md` §5.10 y `CONOCIMIENTO.md` §11.7 | ✅ el modelo y que Costos prepara la ingeniería, en Excel y por niveles · ✅ el cuantificador, un motor con dos entradas, y «definido» = costeado |
+| 4 | **Programar la obra y asignar a quienes la ejecutan, antes de la junta de arranque** | Se asignan residente y supervisor; se asigna el contratista por obra y tipo de trabajo, y de ahí por etapa o concepto; se cuelga el programa del prototipo y el residente ajusta las fechas; Control de obra contrata un bloque y con eso se fija el precio | `RESIDENTE_OBRA`, `SUPERVISION`, `ASIGNACION_CONTRATISTA`, el programa de la obra y `ESTADO_CONGELAMIENTO` | `MODELO.md` §4a y `MODELO.md` §5c; D-475 y D-512; §8.1, «del programa a la ejecución» | ✅ · ❓ cuándo cierra la junta de arranque |
 | 5 | **Contratar un subcontrato (la OT)** | La venta al cliente es un presupuesto o un control de cambio (y antes del control de cambio, una cotización al cliente del cambio o adicional, §8.1); Finanzas asigna el contratista; Proyectos cotiza y genera la OT; Control de obra, después, la confirma o la modifica contra el presupuesto base | `ORDEN_TRABAJO` en `cotizada`, con su `COTIZACION_OT` por versión | `MODELO.md` §5i (D-518 y D-519) | ✅ · 🔶 descuentos y cotizador |
 | 6 | **Ejecutar y registrar el avance, cada semana** | El residente captura el avance físico (el sistema propone el porcentaje y se corrige solo lo raro); origina incidencias que aprueba el supervisor, valida control, ejecuta el residente y cierra el supervisor; un extra puede pasar a orden de cambio con el cliente; el almacén surte | `REGISTRO_AVANCE` físico, `INCIDENCIA` y `ALERTA` | `CONOCIMIENTO.md` §13.7 y `MODELO.md` §5c | ✅ · ❓ quién captura el avance (§7, hueco 1) |
 | 7 | **Estimar y pagar, cada semana** | El residente crea su estimación en Excel; Control de obra las recolecta, las pasa al extractor y las envía al validador de topes (hoy Compras); vuelven a residentes y supervisores para ajustar y justificar lo fuera de catálogo; el validador ajusta y esa es la que se paga; Control de obra comparte la final y la marca pagada. Los pagos de una OT entran por la estimación, en efectivo o por transferencia, y Control de obra los confirma | `ESTIMACION` de `capturada` a `pagada`, con el oid de cada renglón y su historia; `PAGO_OT` | `MODELO.md` §5d y `MODELO.md` §5i (D-522 y D-519) | ✅ · ❓ el validador |
@@ -462,7 +565,9 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | 4 | **La junta de arranque:** cuándo se cierra la planeación y quién la declara cerrada | El usuario |
 | 5 | **La urbanización:** una obra única con ramas de clústeres y amenidades; su flujo propio no está escrito, y ObraCtrl hoy no la representa (D-523, G3) | El usuario |
 | 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516) | El usuario |
-| 7 | **El cuantificador:** 🔶 propuesta (D-531): un motor con dos entradas, la herramienta puntual y el espacio de trabajo por nivel o partida grande (§8.1). *Por confirmar.* Sigue abierto el umbral de «discrepan mucho» al comprobar un presupuesto y la regla normal de quién traza y quién aprueba | El usuario |
-| 8 | **~~Los tipos de presupuesto~~ — ✅ cerrado (D-531):** el único que faltaba es la cotización al cliente del cambio o adicional, que el cerebro ya nombra en el Cotizador. *Queda abierto:* si es un `PRESUPUESTO` con su propio `tipo` y **cómo se calcula lo que se le cobra al cliente** (B-123; las capas de indirectos y utilidad están fuera del modelo) | El usuario |
-| 9 | **Cuándo está «definido» un presupuesto:** 🔶 propuesta (D-531): definido es **costeado** (lo que ya se puede programar); contratado es otro estado, y contratar la rama es la declaración, de Control de obra (§8.1). *Por confirmar* | El usuario |
+| 7 | **~~El cuantificador~~ — ✅ cerrado (D-532):** un motor con dos entradas, la herramienta como ventana flotante que abre el módulo y el espacio de trabajo por nivel o partida grande (§8.1). *Queda abierto:* el umbral de «discrepan mucho» al comprobar un presupuesto y la regla normal de quién traza y quién aprueba | El usuario |
+| 8 | **~~Los tipos de presupuesto~~ — ✅ cerrado (D-532):** la cotización al cliente es el cuarto valor de `PRESUPUESTO.tipo`, se vuelve control de cambio al aceptarla el cliente, y su precio es el costo directo entre 0.7. *Queda por confirmar:* que el 0.7 sea el mismo para el Highlight y el Adicional, el folio y quién la hace (B-123) | El usuario |
+| 9 | **~~Cuándo está «definido» un presupuesto~~ — ✅ cerrado (D-532):** definido es **costeado**; contratado es otro estado, y contratar la rama es la declaración, de Control de obra (§8.1) | — |
 | 10 | **~~La ingeniería del lote~~ — ✅ cerrado (D-531):** la prepara Costos (ingeniería de costos), llega como un Excel, por partes y normalmente por niveles. *Idea 💭:* en algún momento Costos podrá hacerla en esta plataforma | — |
+| 11 | **Quién acepta una fecha nueva de lo contratado:** las fechas contratadas no se mueven solas; reprogramar propone y alguien acepta (P-4), pero no se ha dicho quién. *Recomendación:* Control de obra, que ya edita la estructura del programa y gobierna entre obras | El usuario |
+| 12 | **Cada cuánto se captura el avance físico:** a diario, por semana o justo antes de estimar. Decide cuándo se ven el atraso y los días sin avance, y si una estimación puede cerrar la semana sin avance capturado | El usuario |
