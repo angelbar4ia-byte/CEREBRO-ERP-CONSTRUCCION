@@ -8944,7 +8944,7 @@ pagado en vez de lo programado.
 
 Un rol **distinto** valida la estimación — no es Control de obra con otro
 sombrero. **Hoy lo realiza Compras**, y puede recaer en cualquier usuario
-existente; no está formalizado como los seis roles de `MODELO.md` §5b. Si algo
+existente; no estaba formalizado como los seis roles de `MODELO.md` §5b *(D-537: Compras ya es un rol)*. Si algo
 excede su tope, **se regresa**.
 
 En la conciliación: el Residente ve la brecha (sube lo que quedó bajo,

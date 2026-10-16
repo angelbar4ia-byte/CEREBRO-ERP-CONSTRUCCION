@@ -1838,6 +1838,7 @@ quien resuelve.
 ROL
   id, nombre        Residente · Supervisor · Superintendente · Costos ·
                      Cotizador · Control                                    firme
+                     · Compras · Finanzas · Proyectos y atención al cliente  nuevo — D-537
 
 FUNCION_ATOMICA
   id, clave         trazar · aprobar_trazo · registrar_avance ·
@@ -1861,6 +1862,17 @@ FUNCION_ATOMICA
                      · trazar_avance · proponer_reprogramacion ·
                      revisar_reprogramacion · validar_reprogramacion ·
                      aplicar_reprogramacion                              nuevo — D-533, ver abajo
+                     · dar_de_alta_obra · cargar_ingenieria ·
+                     asignar_contratista · marcar_obra_iniciada ·
+                     cotizar_cambio_cliente · confirmar_avance ·
+                     capturar_estimacion · enviar_estimacion ·
+                     devolver_estimacion · justificar_fuera_de_catalogo ·
+                     marcar_estimacion_pagada · entregar_obra ·
+                     dar_visto_bueno_entrega · validar_calidad_entrega ·
+                     firmar_entrega · firmar_entrega_superintendente ·
+                     liberar_retencion · abrir_ticket_garantia ·
+                     asignar_subcontrato · cotizar_ot · cambiar_alcance_ot ·
+                     confirmar_pago_ot · auditar_alcance_ot               nuevo — D-537, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -1936,19 +1948,43 @@ fecha, en un solo lugar.
 | `revisar_reprogramacion` | Supervisor — cuando la propone el Residente | dato del usuario, D-533; la clave es propuesta |
 | `validar_reprogramacion` | Control de obra | dato del usuario, D-533; la clave es propuesta |
 | `aplicar_reprogramacion` | Control de obra — la realiza y se notifica a los demás | dato del usuario, D-533; la clave es propuesta |
+| `dar_de_alta_obra` | Control de obra — crear el proyecto, el cluster y la obra | dato del usuario, D-537 |
+| `asignar_contratista` | Control de obra — por obra y tipo de trabajo; el de un subcontrato lo asigna Finanzas | dato del usuario, D-537 |
+| `marcar_obra_iniciada` | Control de obra — declara la junta de arranque | dato del usuario, D-537 |
+| `asignar_subcontrato` | Finanzas | dato del usuario, D-537; viene de §5i |
+| `cotizar_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
+| `cambiar_alcance_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
+| `abrir_ticket_garantia` | Proyectos y atención al cliente | dato del usuario, D-537 (garantías y postventa) |
+| `firmar_entrega` | Proyectos y atención al cliente — el equipo de gestión de proyectos | dato del usuario, D-537; viene de D-516 y D-522 |
+| `firmar_entrega_superintendente` | Superintendente — puede estar o no | propuesto, D-537; viene de D-516 y D-522 |
+| `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
+| `cotizar_cambio_cliente` | Control de obra — hoy hace de cotizador | propuesto, D-537 |
+| `confirmar_avance` | Residente — al terminar la actividad y antes de estimar | propuesto, D-537; el rol lo dijo el usuario (D-534) |
+| `capturar_estimacion` | Residente | propuesto, D-537; el rol lo dijo el usuario (D-522) |
+| `enviar_estimacion` | Control de obra | propuesto, D-537; el rol lo dijo el usuario (D-522) |
+| `devolver_estimacion` | Compras — el validador | propuesto, D-537; pendiente de la decisión de `validar_estimacion` |
+| `justificar_fuera_de_catalogo` | Supervisor | propuesto, D-537; el rol lo dijo el usuario (D-522) |
+| `marcar_estimacion_pagada` | Control de obra | propuesto, D-537; viene de B-118 |
+| `entregar_obra` | Residente | propuesto, D-537; el rol lo dijo el usuario (D-516 y D-522) |
+| `dar_visto_bueno_entrega` | Supervisor | propuesto, D-537; ídem |
+| `validar_calidad_entrega` | Control de obra — calidad y expediente | propuesto, D-537; ídem |
+| `liberar_retencion` | Supervisor la autoriza; Control de obra la valida si hace falta | propuesto, D-537; viene de §5i |
+| `confirmar_pago_ot` | Control de obra | propuesto, D-537; viene de §5i |
+| `auditar_alcance_ot` | Control de obra | propuesto, D-537; viene de §5i |
+| `validar_estimacion` | **Compras, además de Control de obra** | propuesto, D-537; **si el usuario lo confirma se quita la fila de Control de obra** (D-330) |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
 | `revisar_patrones_desviacion` | **Sin asignar** | P-21 |
 | `aprobar_version_concepto` | **Sin asignar** | P-21 |
-| `pactar_precio_contratista` | **Sin asignar** | P-21 |
+| `pactar_precio_contratista` | Control de obra | dato del usuario, D-537 (antes sin asignar, P-21) |
 | `aplicar_descuento` | **Sin asignar** | P-21 |
-| `autorizar_orden_cambio` | **Sin asignar** | P-21 |
+| `autorizar_orden_cambio` | Control de obra | dato del usuario, D-537 (antes sin asignar, P-21). *Idea, sin confirmar:* doble, con el Superintendente, como el precio nuevo |
 | `aprobar_propuesta` | Control de obra — propuesto | D-485: resolver la bandeja (aprobar o rechazar). No aplica: aplicar pide además la función de la acción |
 | `resolver_alerta` | Supervisor y Control de obra — propuesto | D-485: el Supervisor da seguimiento hasta el cierre; Control de obra gobierna entre obras |
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -2956,7 +2992,7 @@ cambie.
 5. **El validador ajusta, y esa es la estimación que se paga** —`validada`—. *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por él, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
 6. **Control de obra comparte la estimación final para el pago** y la marca `pagada`.
 
-**Dos cosas quedan sin decidir.** (a) **El validador:** D-330 asignó `validar_estimacion` a Control de obra y dejó a Compras fuera de `ROL`; el recorrido dice que el validador de topes es de Compras. Mientras el usuario no decida, la tabla de funciones (§5b) sigue como está. *Propuesta del sistema:* agregar `compras` como fila de `ROL`, junto con `finanzas` y `proyectos` (B-115), y asignarle `validar_estimacion`; Control de obra conservaría recolectar, enviar, compartir y marcar `pagada`. `ROL_FUNCION` es de muchos a muchos, así que no cambia el esquema. (b) **La justificación del fuera de catálogo** es un campo mío (`justificacion` y `justificada_por`, arriba, propuesta).
+**Dos cosas quedan sin decidir.** (a) **El validador:** D-330 asignó `validar_estimacion` a Control de obra y dejó a Compras fuera de `ROL`; el recorrido dice que el validador de topes es de Compras. Mientras el usuario no decida, la tabla de funciones (§5b) sigue como está. *Propuesta del sistema:* agregar `compras` como fila de `ROL`, junto con `finanzas` y `proyectos` (B-115), y asignarle `validar_estimacion`; Control de obra conservaría recolectar, enviar, compartir y marcar `pagada`. `ROL_FUNCION` es de muchos a muchos, así que no cambia el esquema. **D-537:** el usuario confirmó los tres roles, `compras`, `finanzas` y `proyectos`; falta decidir que `validar_estimacion` pase de Control de obra a Compras (hasta entonces la tienen los dos). (b) **La justificación del fuera de catálogo** es un campo mío (`justificacion` y `justificada_por`, arriba, propuesta).
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`
@@ -3584,7 +3620,7 @@ PAGO_OT
 - **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
 - **Concluir.** Los residentes estiman hasta el pago de la garantía, si la hay; la OT se concluye cuando **se pagó todo,** garantía incluida (D-518). *Lectura mía:* el sistema lo propone y Proyectos lo confirma, como hoy hace el usuario de cotización.
 - **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **Cómo se registra ese traspaso queda por diseñar** (se parece al préstamo que se salda con avance de obra, D-290; B-124). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
-- **Quién (funciones propuestas, que no entran todavía a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
+- **Quién (funciones propuestas; D-537 las pasa a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
 - **Fuera de aquí:** el contratista como usuario (B-121), el traspaso del anticipo (B-124), el cotizador (B-123) y la estructura de los descuentos (B-110).
 
 ---
