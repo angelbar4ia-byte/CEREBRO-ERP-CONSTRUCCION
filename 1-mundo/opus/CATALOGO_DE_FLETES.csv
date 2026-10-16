@@ -1,0 +1,10 @@
+C,Clave,Descripción,Comentarios,Unidad,Costo base M. N.,Costo base M. E.,Costo unitario,Fecha,Familia,Subfamilia,Tipo
+ ,MAD-00004,TABLAS (se les da 10 pza por lote),3,PZ,198,0,198,2023-08-01 00:00:00,Maderas,Cimbra,Flete
+ ,HID-00026,LIJA PLOMERO FANDELI 01920 J86,3,PZ,12.5,0,12.5,2026-09-08 00:00:00,Hidráulico,Prueba,Flete
+ ,PET-00002,ARENA  7 M3,7,SERV,2250,0,2250,2024-02-05 00:00:00,Pétreos,Agregado,Flete
+ ,SER-00003,PIPA 10000,7,SERV,850,0,850,2023-07-12 00:00:00,Servicio,Agregado,Flete
+ ,PET-00003,GRAVA 7 M3,7,SERV,2500,0,2500,2024-02-05 00:00:00,Pétreos,Agregado,Flete
+ ,SAN-00091,TAPA INSERCION 6 REX 2L,3,PZ,40,0,40,2025-01-28 00:00:00,Sanitario,Prueba,Flete
+ ,SAN-00092,COPLE SAN CEMENTAR 150MM 6 1L,3,PZ,35,0,35,2026-09-08 00:00:00,Hidráulico,Prueba,Flete
+ ,HID-00038,MANOMETRO INSTRUTEK,3,PZ,96.5,0,96.5,2023-08-01 00:00:00,Hidráulico,Prueba,Flete
+ ,PET-00015,ARENA DE RIO 14 M3,7,SERV,4500,0,4500,2026-07-22 00:00:00,Pétreos,Agregado,Flete

@@ -39,7 +39,7 @@ PREFIJO_DE_LA_PLATAFORMA = re.compile(r"^[0-9a-f]{8}-")
 # (patrón del nombre ya limpio, carpeta): el primero que coincide manda
 DESTINOS: Tuple[Tuple[str, str], ...] = (
     (r"^INGENIERIA_-_ALAMO_18.*\.csv$", "1-mundo/opus/ingenieria-alamo-18"),
-    (r"^(ANALISIS_DE_BASICOS_|CATALOGO_DE_).*\.csv$", "1-mundo/opus"),
+    (r"^(ANALISIS_DE_BASICOS_|CATALOGO_DE_).*\.(csv|xlsx)$", "1-mundo/opus"),  # los catálogos de OPUS llegan en CSV o en Excel
     (r".*MOVIMIENTOS_DE_ALMACEN.*", "1-mundo/fuentes/almacen"),
     (r"^grid_AvanceOPEventosOpr.*", "1-mundo/fuentes/avance"),
     (r"^PRECIO_REAL.*", "1-mundo/fuentes/precio-real"),

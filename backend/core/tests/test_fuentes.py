@@ -53,14 +53,14 @@ class PruebasDeLoGuardado(unittest.TestCase):
     def test_todo_lo_compartido_sigue_ahi_sin_cambios(self):
         self.assertEqual(verificar(RAIZ), [])
 
-    def test_estan_los_28_archivos_que_el_usuario_subio(self):
+    def test_estan_los_32_archivos_que_el_usuario_subio(self):
         subidos = [nombre_limpio(r.subido_como) for r in self.filas.values() if r.subido_como]
-        self.assertEqual(len(subidos), 28)
-        self.assertEqual(len(set(subidos)), 27)  # `PRECIO_REAL_ALAMO_18.xlsx` se subió dos veces, con otro contenido
+        self.assertEqual(len(subidos), 32)  # los 28 de D-479 y los cuatro catálogos de OPUS en Excel de D-527
+        self.assertEqual(len(set(subidos)), 31)  # `PRECIO_REAL_ALAMO_18.xlsx` se subió dos veces, con otro contenido
         for libro in ("03_MARZO_MOVIMIENTOS_DE_ALMACEN.xlsx", "07_JULIO_MOVIMIENTOS_DE_ALMACEN.xlsx", "PROGRAMA_ZAFIRO.xlsx", "SEMILLA-cuadrilla-rendimiento.xlsx",
                       "PRECIO_REAL_ALAMO_18.xlsx", "grid_AvanceOPEventosOpr_28.xlsx", "CATALOGO_DE_PRESUPUESTO.csv", "INGENIERIA_-_ALAMO_18__-_PB.csv"):
             self.assertIn(libro, subidos)
-        self.assertEqual(sum(1 for r in self.filas.values() if r.ruta.endswith(".xlsx")), 14)
+        self.assertEqual(sum(1 for r in self.filas.values() if r.ruta.endswith(".xlsx")), 18)
         self.assertEqual(sum(1 for r in self.filas.values() if r.subido_como and r.ruta.endswith(".csv")), 14)
         self.assertEqual(sum(1 for r in self.filas.values() if r.ruta.startswith("1-mundo/opus/ingenieria-alamo-18/")), 11)
 
@@ -114,7 +114,7 @@ class PruebasDeNombresYCarpetas(unittest.TestCase):
             "INGENIERIA_-_ALAMO_18__-_PB.csv": "1-mundo/opus/ingenieria-alamo-18",
             "03_MARZO_MOVIMIENTOS_DE_ALMACEN.xlsx": "1-mundo/fuentes/almacen", "grid_AvanceOPEventosOpr_JULIO.xlsx": "1-mundo/fuentes/avance",
             "PRECIO_REAL_ALAMO_18.xlsx": "1-mundo/fuentes/precio-real", "SEMILLA-cuadrilla-rendimiento.xlsx": "1-mundo/fuentes/semilla",
-            "PROGRAMA_ZAFIRO.xlsx": "1-mundo/fuentes/programa", "CATALOGO_DE_MATERIALES.csv": "1-mundo/opus", "algo-nuevo.xlsx": OTRAS,
+            "PROGRAMA_ZAFIRO.xlsx": "1-mundo/fuentes/programa", "CATALOGO_DE_MATERIALES.csv": "1-mundo/opus", "CATALOGO_DE_MANO_DE_OBRA.xlsx": "1-mundo/opus", "algo-nuevo.xlsx": OTRAS,
         }
         for nombre, carpeta in casos.items():
             self.assertEqual(carpeta_de(nombre), carpeta, nombre)
