@@ -882,12 +882,27 @@ PRESUPUESTO.folio             texto, nullable — «se foliaban» (§5b); el for
 PRESUPUESTO.estado_cotizacion enum: cotizada · aceptada · rechazada, nullable —
                                solo si tipo=cotizacion. Al pasar a `aceptada` nace
                                la orden de cambio (abajo)                            propuesta — D-532
+PRESUPUESTO.metodo_precio     enum: por_m2 · por_diferencia, nullable — solo si
+                               tipo=cotizacion                                       propuesta — D-533
+PRESUPUESTO.m2_ampliacion     NUMERIC, nullable — solo si metodo_precio=por_m2       propuesta — D-533
+PRESUPUESTO.precio_m2         NUMERIC, nullable — solo si metodo_precio=por_m2:
+                               17,000 hoy; parámetro editable                        regla firme (D-533); campo propuesta
 PRESUPUESTO.factor_precio     NUMERIC, nullable — solo si tipo=cotizacion: el
-                               precio al cliente es el costo directo dividido entre
-                               este factor. Por defecto 0.7, editable                regla firme (D-532); campo propuesta
+                               precio por diferencia es el costo directo dividido
+                               entre este factor. Por defecto 0.7, editable          regla firme (D-532); campo propuesta
 ```
 
-- **El precio al cliente es el costo directo entre 0.7** (dato del usuario, D-532): un costo directo de 70 se cobra en 100. Como 1 ÷ 0.7 es 1.4286, el costo es el 70 % del precio y el 30 % restante es lo que cubre indirectos y utilidad. **Es un solo factor, no las capas de sobrecosto de §6,** que siguen fuera del modelo. *Lectura mía:* el factor se guarda en la cotización, como los umbrales que ya son parámetro (el 20 % de las alertas, el 5 % de la retención), para poder cambiarlo sin tocar código; se asume que es el mismo para el Highlight y el Adicional, y la venta del prototipo no se toca.
+- **Dos maneras de fijar el precio** (dato del usuario, D-533: «depende»):
+
+| Cuándo | Cómo se fija el precio | Se confirma |
+|---|---|---|
+| **Una ampliación por m²** | **m² × 17,000.** Ese precio por m² abarca todo, desde la cimentación hasta los equipamientos | Con el presupuesto de la ampliación: su costo directo entre 0.7 |
+| **Algo específico** (por ejemplo, un cambio de sanitarios) | **Se presenta la diferencia:** el costo directo de lo que entra menos el de lo que sale, **entre 0.7** | — es el cálculo |
+
+- **El factor 0.7** (dato del usuario, D-532): un costo directo de 70 se cobra en 100. Como 1 ÷ 0.7 es 1.4286, el costo es el 70 % del precio y el 30 % restante es lo que cubre indirectos y utilidad. **Es un solo factor, no las capas de sobrecosto de §6,** que siguen fuera del modelo. Da igual restar los costos y luego dividir que dividir cada uno y restar los precios. *Lectura mía:* el factor y el precio por m² se guardan como parámetros con su fecha, como los umbrales que ya lo son (el 20 % de las alertas, el 5 % de la retención), para cambiarlos sin tocar código.
+- **El 17,000 por m²:** la moneda, si incluye IVA y si varía por proyecto o por prototipo no se dijeron (se asume pesos, con el IVA aparte como en la cotización de una OT). *Lectura mía:* los m² de una ampliación aceptada son los `m2_adicionales` de la casa (§3c).
+- **Si el presupuesto de la ampliación no coincide con m² × 17,000,** no se corrige solo: es una diferencia que alguien resuelve. **Cuál de los dos manda no se dijo.**
+- **Qué entra y qué sale:** una cotización por diferencia necesita decir qué se quita. La regla de cantidades negativas de la ingeniería del lote (`CONOCIMIENTO.md` §11.10) es de esos archivos y no cierra el caso; si se representa con dos bloques, «lo que sale» y «lo que entra», o con líneas con signo, se decide al diseñar el cotizador.
 - **Aceptada, se convierte en control de cambio.** Al aceptarla el cliente nace una `PROPUESTA(tipo=orden_cambio)` (§5f) que **agrega** al final de la rama congelada, sin reescribir lo contratado (`CONOCIMIENTO.md` §13.4). Su `delta_monto` sigue siendo el impacto en costo, es decir, **el costo directo de la cotización;** lo que paga el cliente se lee de la cotización, y si conviene guardarlo también en la orden se decide al diseñar el cotizador (B-123). Si el trabajo además se subcontrata, nace una OT (§5i) y, como siempre, se compara contra lo que se cotizó.
 - **Qué no se ha dicho:** el formato del folio, qué pasa con una cotización rechazada más allá de conservarse, y si Proyectos o Control de obra la hace (hoy la ejecuta Control de obra, §5b). **D-487:** el cerebro no construye nada hasta que el usuario lo levante.
 
@@ -1842,6 +1857,9 @@ FUNCION_ATOMICA
                      asignar_supervision · reclasificar_familia ·
                      resolver_revisar_parametro                          nuevo — B-73/B-75, ver abajo
                      · renovar_invariante_valor                          nuevo — B-54, ver abajo
+                     · trazar_avance · proponer_reprogramacion ·
+                     revisar_reprogramacion · validar_reprogramacion ·
+                     aplicar_reprogramacion                              nuevo — D-533, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -1911,7 +1929,12 @@ fecha, en un solo lugar.
 | `cargar_catalogo_opus` | Control de obra y Costos — propuesto | D-473: la carga del catálogo y los presupuestos de OPUS |
 | `contratar_subarbol` | Control de obra — propuesto | D-475: contratar un bloque del presupuesto fija sus PU y lo congela |
 | `clonar_insumo` | Control de obra — propuesto | D-478: clonar un insumo y sustituir el original cambia lo que citan los conceptos de todas las obras: gobierno cruzado |
-| `registrar_avance` | **Sin asignar** | P-21 |
+| `registrar_avance` | Residente — la cantidad o el porcentaje | dato del usuario, D-533 (antes sin asignar, P-21) |
+| `trazar_avance` | Control de obra, Residente y Supervisor — el trazo de lo realmente construido; Costos no | dato del usuario, D-533; la clave es propuesta |
+| `proponer_reprogramacion` | Residente y Supervisor — una fecha nueva de lo contratado | dato del usuario, D-533; la clave es propuesta |
+| `revisar_reprogramacion` | Supervisor — cuando la propone el Residente | dato del usuario, D-533; la clave es propuesta |
+| `validar_reprogramacion` | Control de obra | dato del usuario, D-533; la clave es propuesta |
+| `aplicar_reprogramacion` | Control de obra — la realiza y se notifica a los demás | dato del usuario, D-533; la clave es propuesta |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
 | `revisar_patrones_desviacion` | **Sin asignar** | P-21 |
@@ -1924,7 +1947,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -2704,6 +2727,21 @@ existe:**
 > en todo el módulo: aprobar/validar/ejecutar una incidencia, solicitar o
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
+
+### Reprogramar lo contratado: una cadena con salto, y el primer aviso (D-533)
+
+P-4 decía que las fechas contratadas no se mueven solas: *reprogramar propone la fecha nueva y alguien la acepta.* Dato del usuario (D-533): ese «alguien» es una **cadena con salto,** del mismo molde que la de la incidencia (D-269), con una diferencia: **la realiza Control de obra,** no el residente.
+
+| Propone | Revisa | Valida | Realiza | Después |
+|---|---|---|---|---|
+| **Residente** | Supervisor | Control de obra | Control de obra | Se notifica el cambio a los demás |
+| **Supervisor** | *(se salta: es quien propone)* | Control de obra | Control de obra | Se notifica el cambio a los demás |
+
+- **Las funciones** son las cuatro nuevas de la lista de §5b: `proponer_reprogramacion`, `revisar_reprogramacion`, `validar_reprogramacion` y `aplicar_reprogramacion`. Los roles los dijo el usuario; los nombres de las claves son propuestos.
+- **Al realizarla** se agrega una fila a `EDICION_PROGRAMA` (arriba), que ya guarda quién la hizo, con qué rol y qué impacto tuvo; la bitácora no se reescribe.
+- **Es el primer aviso que el usuario dice:** al aplicarse una reprogramación, **se notifica a los demás.** Quiénes son «los demás» no se dijo (`WORKFLOWS.md` §8, hueco 6).
+- **Lectura mía:** la cadena es para **lo contratado.** Mientras la rama está en diseño no hay nada que proponer: el residente edita las fechas y Control de obra la estructura, como en `editar_fechas_programa` y `editar_estructura_programa`.
+- **No se dijo:** si Control de obra puede proponerla él mismo, y si el supervisor da seguimiento hasta cerrar, como en la incidencia. Tampoco **dónde se guarda la cadena** —con la misma forma que `INCIDENCIA` (pasos nullable si se saltan) o como un tipo de `PROPUESTA`—, que se decide al construirla (D-487).
 
 ### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515; firme desde D-522)
 

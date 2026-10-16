@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -58,17 +58,17 @@ Derivado de la tabla de `MODELO.md` §5b; no agrega ninguna asignación.
 
 | Rol | Ve | Hace (funciones asignadas) |
 |---|---|---|
-| **Residente** | Sus obras (`RESIDENTE_OBRA`) | `trazar` · `anotar_plano` · `originar_incidencia` · `ejecutar_incidencia` · `solicitar_cierre_frente` · `editar_fechas_programa` |
-| **Supervisor** | Las de los residentes que supervisa (`SUPERVISION`) | `trazar` · `anotar_plano` · `originar_incidencia` · `aprobar_incidencia` · `cerrar_incidencia` · `aprobar_cierre_frente` · `resolver_alerta` (propuesta, D-485) |
+| **Residente** | Sus obras (`RESIDENTE_OBRA`) | `trazar` · `anotar_plano` · `originar_incidencia` · `ejecutar_incidencia` · `solicitar_cierre_frente` · `editar_fechas_programa` · `registrar_avance` · `trazar_avance` · `proponer_reprogramacion` (las tres últimas, D-533) |
+| **Supervisor** | Las de los residentes que supervisa (`SUPERVISION`) | `trazar` · `anotar_plano` · `originar_incidencia` · `aprobar_incidencia` · `cerrar_incidencia` · `aprobar_cierre_frente` · `resolver_alerta` (propuesta, D-485) · `trazar_avance` · `proponer_reprogramacion` · `revisar_reprogramacion` (las tres últimas, D-533) |
 | **Superintendente** | Las de los supervisores que le reportan | Solo `aprobar_precio_nuevo`, junto con Control de obra. §5b dice «mismos privilegios que Supervisor», pero la tabla no lo escribe (§7, hueco 2) |
 | **Costos** | Todas | `trazar` · `proponer_precio_nuevo` · `cargar_catalogo_opus` (propuesta) |
 | **Cotizador** | No es un rol activo | Hoy lo ejecuta Control de obra |
-| **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `validar_estimacion` · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · `aprobar_propuesta` y `resolver_alerta` (propuestas, D-485) · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` |
+| **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `validar_estimacion` · `trazar_avance` · `validar_reprogramacion` · `aplicar_reprogramacion` (las tres, D-533) · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · `aprobar_propuesta` y `resolver_alerta` (propuestas, D-485) · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` |
 
 **Lo que se ve de un vistazo:** el trabajo de obra se reparte en cadena —Residente ejecuta y pide, Supervisor aprueba
-y cierra, Control de obra valida— y **el gobierno cruzado entre obras cae en Control de obra** (diecinueve de las
-veintisiete funciones asignadas). Diez funciones existen sin dueño (§7, hueco 1): entre ellas `registrar_avance`, la que
-alimenta las alertas de frente y de atraso.
+y cierra, Control de obra valida— y **el gobierno cruzado entre obras cae en Control de obra** (veintidós de las
+treinta y tres funciones asignadas). Nueve funciones existen sin dueño (§7, hueco 1), como `comprometer_gasto` o
+`autorizar_orden_cambio`; `registrar_avance`, la que alimenta las alertas de frente y de atraso, ya lo tiene (D-533).
 
 ## 2.3 Los módulos, y qué tan hechos están
 
@@ -234,13 +234,13 @@ la simulación como evidencia y su `base`. Control de obra la aprueba; corre `co
 
 | # | Hueco | Quién lo mueve | Por qué importa |
 |---|---|---|---|
-| 1 | **`registrar_avance` sigue sin dueño** (quién captura el avance que alimenta las alertas de frente y de atraso). Recomendación, siguiendo lo que ya hay: Residente y Supervisor, que ejecutan y dan seguimiento. *D-485 asignó, como propuestas, las otras dos del lazo: `aprobar_propuesta` a Control de obra, que ya gobierna entre obras, y `resolver_alerta` a Supervisor y Control de obra* | **El usuario** | Confirmar o cambiar las dos asignadas, y decidir la tercera. Corregirlas no toca esquema (`gestionar_rol_funcion`) |
+| 1 | **~~`registrar_avance` sin dueño~~ — ✅ cerrado (D-533):** el residente anota la cantidad o el porcentaje, y control, residente y supervisor hacen el trazo del avance (Costos no). *Queda por confirmar de D-485:* `aprobar_propuesta` a Control de obra y `resolver_alerta` a Supervisor y Control de obra, que siguen como propuestas | **El usuario** | Confirmar o cambiar las dos asignadas. Corregirlas no toca esquema (`gestionar_rol_funcion`) |
 | 2 | **Superintendente tiene una sola función en la tabla**, aunque §5b le da «los mismos privilegios que Supervisor» | **El usuario** | Hoy un Superintendente no puede aprobar una incidencia que su Supervisor sí |
 | 3 | **El alcance por obra no se aplica en código** (B-98) | Construir | Mientras no esté, el agente y cualquier herramienta de lectura solo se pueden dar a quien ve todo |
 | 4 | **~~La bandeja no existe~~ — construida (D-485).** Quedan tres cosas: aprobar los demás tipos de propuesta (cada uno pide su operación y su función; hoy solo `clonacion`), los detectores que dejan alertas, y la pantalla (B-99) | Construir | La bandeja es el lugar; lo que la llena y lo que ejecuta cada tipo se construye tipo por tipo, no de golpe |
 | 5 | **El MCP no existe** (B-63) | Construir; la bandeja ya está | La API de D-482 es su base. Para no escribir a mano su catálogo, cada operación de la API puede declarar su **efecto** (lee, simula o aplica) y su **función**, y de ahí se derivan las herramientas |
 | 6 | **Con qué credencial actúa el agente**: la de quien pregunta para leer y simular (así se respeta su alcance y su función), y la suya propia, marcada `origen=agente`, para dejar propuestas | El usuario confirma | Es lo que hace que «quien decidió» siga siendo una persona. Mientras no exista, `dejar_propuesta` solo deja propuestas de personas: el servicio ya sabe recibir las del agente, la API no se las abre |
-| 7 | **Las funciones de capturar y devolver una estimación**, y las de capturar avance, no tienen clave (`MODELO.md` §5d) | El usuario | Estimación y avance no se pueden construir sin saber quién las escribe |
+| 7 | **Las funciones de capturar y devolver una estimación** no tienen clave (`MODELO.md` §5d); las de capturar avance ya la tienen (D-533) | El usuario | Estimación y avance no se pueden construir sin saber quién las escribe |
 | 8 | **~~`programa` no tenía skill~~ — compilado (D-486).** `2-operacion/skills/erp-programa.md` sale de `PROGRAMA-CPM.md` y `MODELO.md` §5c; `ESCALABILIDAD.md` §9 lo dejaba fuera porque sus reglas no estaban decididas | Hecho | Quien construya o cambie el motor del CPM, la reprogramación, la bitácora o el Gantt tiene sus reglas y sus 25 errores en un solo lugar |
 
 **En qué orden**, con el criterio de `PRIORIDADES.md` (desbloqueo ÷ costo, y qué cuesta deshacerlo): primero confirmar lo
@@ -371,7 +371,14 @@ El usuario pidió **más contexto** sobre esta pregunta (§8.6, hueco 9). Lo que
 
 Lo que hace al control de cambio distinto de editar el presupuesto: **no edita, agrega;** lleva causa, impacto en monto y plazo, quién autoriza y **si se autorizó antes o después de ejecutar** (el porcentaje de retroactivas mide qué tan sano está el proceso, `CONOCIMIENTO.md` §13.4).
 
-**Lo que el usuario resolvió (D-532):** *(a)* la cotización **es un presupuesto con su propio `tipo`** (`cotizacion`) y **se convierte en control de cambio una vez que el cliente la acepta**; *(b)* **el precio al cliente es el costo directo entre 0.7:** un costo de 70 se cobra en 100, es un solo factor y no las capas de sobrecosto, y se guarda como parámetro editable para no fijarlo en el código (`MODELO.md` §3a). *Lectura mía, por confirmar:* el 0.7 vale igual para el Highlight y el Adicional. **Sigue abierto (B-123):** el formato del folio, quién la hace (hoy Control de obra) y si la orden de cambio guarda también el precio al cliente. **D-487:** nada se construye.
+**Lo que el usuario resolvió (D-532 y D-533):** *(a)* la cotización **es un presupuesto con su propio `tipo`** (`cotizacion`) y **se convierte en control de cambio una vez que el cliente la acepta**; *(b)* **el precio depende de qué se cotiza** (`MODELO.md` §3a):
+
+| Cuándo | Cómo se fija el precio | Se confirma |
+|---|---|---|
+| **Una ampliación por m²** | **m² × 17,000.** Ese precio abarca todo, desde la cimentación hasta los equipamientos | Con el presupuesto de la ampliación (costo directo ÷ 0.7) |
+| **Algo específico,** como un cambio de sanitarios | **Se presenta la diferencia** (costo directo de lo que entra − el de lo que sale) **÷ 0.7** | — es el cálculo |
+
+El 0.7 y el 17,000 se guardan como parámetros editables con su fecha. *Lecturas mías, por confirmar:* los m² de una ampliación aceptada son los `m2_adicionales` de la casa; si el presupuesto no coincide con m² × 17,000, no se corrige solo y alguien lo resuelve. **Sigue abierto (B-123):** cuál de los dos manda cuando no coinciden, la moneda y el IVA del 17,000 y si varía por proyecto o prototipo, cómo se representa lo que sale, el folio, quién la hace (hoy Control de obra) y si la orden de cambio guarda también el precio al cliente. **D-487:** nada se construye.
 
 ### El cuantificador: un motor con dos entradas (D-531, confirmado en D-532)
 
@@ -456,13 +463,15 @@ Cualquiera de los tres usos puede entrar por cualquiera de las dos entradas: dis
 - **Hay fechas que las dispara un contrato y no una precedencia:** `disparador_fecha = contractual` con su `fecha_disparador`, la fija el anticipo o la **junta de arranque.** Es el caso de lo que se contrata terminado. *Aquí el contrato arranca el reloj,* al revés de lo habitual (`MODELO.md` §5c).
 - **La obra pasa a `iniciada` cuando alguien la marca** (`MODELO.md` §3c); es una de las dos marcas manuales del estatus, junto con `entregada`.
 - **Contratar una rama congela sus fechas:** *las fechas contratadas no se mueven solas;* reprogramar **propone** la fecha nueva y alguien la acepta (P-4, `MODELO.md` §5c).
-- **Queda abierto:** quién declara cerrada la junta de arranque (§8.6, hueco 4) y **quién acepta** una fecha nueva de lo contratado (§8.6, hueco 11).
+- **Reprogramar lo contratado es una cadena con salto ✅ (D-533).** El **residente propone, el supervisor revisa y control valida;** o el **supervisor propone y control valida;** y **finalmente Control de obra la realiza y se notifica el cambio a los demás.** Es el molde de la incidencia, con la diferencia de que aquí la realiza Control de obra (`MODELO.md` §5c). *Lectura mía:* es para lo contratado; mientras la rama está en diseño, el residente edita las fechas y Control de obra la estructura.
+- **Queda abierto:** quién declara cerrada la junta de arranque (§8.6, hueco 4) y a quiénes se notifica (§8.6, hueco 6).
 
 #### La semana de obra: qué entra y adónde va
 
 | Qué entra | Quién lo registra | Dónde queda | A qué alimenta |
 |---|---|---|---|
-| **Avance físico** | El **residente** anota la cantidad o el porcentaje, la vía rápida y siempre disponible; el **trazo** de lo realmente construido es opcional y lo hacen control, residente y supervisor (Costos no) | `REGISTRO_AVANCE` con `fuente = fisico` | El tablero, las alertas de atraso, el cierre de frente y el rendimiento real |
+| **Avance físico** | El **residente** anota la cantidad o el porcentaje, la vía rápida y siempre disponible; el **trazo** de lo realmente construido es opcional y lo hacen control, residente y supervisor (Costos no) ✅ D-533. Se puede anotar **a diario,** o **confirmarse al terminar una actividad** | `REGISTRO_AVANCE` con `fuente = fisico` | El tablero, las alertas de atraso, el cierre de frente y el rendimiento real |
+| **Confirmar los avances** (antes de estimar) | La intención de hacerlo antes de estimar es **confirmar los avances** (D-533). *Lectura mía:* lo confirma el residente, que es quien estima | Todavía sin lugar en el modelo: se decide al contestar el hueco 13 | La estimación del residente y el cruce de físico y pagado |
 | **Lo que surtió el almacén** | El almacén (ERP externo) | `MOVIMIENTO_ALMACEN` | El cruce contra lo estimado y contra el avance |
 | **Incidencias** | Residente, supervisor o control de obra; quien origina no se aprueba a sí mismo y el supervisor da seguimiento hasta cerrar | `INCIDENCIA` | El programa, de tres formas: pausa una actividad, la crea o la hace crecer, o propone una (se aprueba antes de existir) |
 | **Control de cambio** | Se origina en una cotización al cliente aceptada o en una incidencia que llega al cliente | `PROPUESTA(tipo=orden_cambio)` | El árbol del presupuesto y, por eso, el programa |
@@ -489,6 +498,7 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 |---|---|---|
 | **Una incidencia** | Cambia cuándo (pausa) o qué (crea o crece una actividad) | Un error de ejecución puede cobrarse al contratista sin tocar el costo y el programa **igual se retrasa:** son dos registros que no dependen uno del otro |
 | **Un control de cambio** | Cambia qué hay que construir y, con eso, cuándo | Agrega, no edita; lo contratado no se reescribe |
+| **Una fecha nueva de lo contratado** | La propone el residente o el supervisor | **Cadena con salto:** revisa el supervisor (si no fue quien propone), valida y realiza Control de obra, y se notifica a los demás (D-533) |
 | **Lo real contra lo teórico** | El rendimiento real da una segunda proyección calculada al vuelo | **Nunca sobrescribe el teórico y nunca reprograma sola:** avisa si diverge más de un umbral (P-7) |
 | **Registrar avance** | En una obra sin presupuesto colgado, el programa se reprograma solo con el avance | Solo en ese modo; en los demás, el residente ajusta fechas y Control de obra la estructura |
 
@@ -507,7 +517,7 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | **Proyecciones** (material, mano de obra, subcontratos y flujo de efectivo) | Diseñadas, sin construir |
 | **Alertas** | La bandeja las guarda; los detectores, sin construir |
 
-**Lo que esta mitad deja abierto:** *(a)* **quién acepta una fecha nueva de lo contratado** (hueco 11); *(b)* **cada cuánto captura el residente el avance** (hueco 12): la estimación es semanal, pero el cerebro no dice si el avance se anota a diario, por semana o justo antes de estimar; y *(c)* **quién registra el avance físico:** el cerebro ya lo dice —el residente la cantidad o el porcentaje; control, residente y supervisor el trazo—, y lo que falta es la **clave de la función** `registrar_avance` (§7, hueco 1); se recomienda confirmarlo tal como está.
+**Lo que esta mitad deja abierto:** *(a)* **a quiénes se notifica** un cambio de fechas (hueco 6) y si Control de obra puede proponer él mismo; y *(b)* **quién confirma los avances antes de estimar y qué pasa con lo que no se confirmó** (hueco 13). **Ya contestado (D-533):** quién acepta una fecha nueva de lo contratado (la cadena de arriba), cada cuánto se captura el avance (a diario, o confirmándolo al terminar la actividad, y antes de estimar se confirman) y quién lo registra (el residente la cantidad o el porcentaje; control, residente y supervisor el trazo).
 
 ## 8.2 Quién aparece en el flujo
 
@@ -533,7 +543,7 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | 3 | **Diseñar el presupuesto de la obra** (D-530) | Al darle de alta, la obra ya es un presupuesto. Se arranca de la base, de una ingeniería o desde cero (§8.1); Costos cuantifica, donde hay plano se mide con el cuantificador (capa de medición) y donde no se estima; se compara la ingeniería del lote contra su prototipo; Control de obra contrata la rama cuando está lista | El presupuesto de la obra con `modo_cantidad` por renglón, `ESTADO_CARGA` y `ESTADO_CONGELAMIENTO` por rama | §8.1; `MODELO.md` §3 y §3a; `CONOCIMIENTO.md` §5.10 y `CONOCIMIENTO.md` §11.7 | ✅ el modelo y que Costos prepara la ingeniería, en Excel y por niveles · ✅ el cuantificador, un motor con dos entradas, y «definido» = costeado |
 | 4 | **Programar la obra y asignar a quienes la ejecutan, antes de la junta de arranque** | Se asignan residente y supervisor; se asigna el contratista por obra y tipo de trabajo, y de ahí por etapa o concepto; se cuelga el programa del prototipo y el residente ajusta las fechas; Control de obra contrata un bloque y con eso se fija el precio | `RESIDENTE_OBRA`, `SUPERVISION`, `ASIGNACION_CONTRATISTA`, el programa de la obra y `ESTADO_CONGELAMIENTO` | `MODELO.md` §4a y `MODELO.md` §5c; D-475 y D-512; §8.1, «del programa a la ejecución» | ✅ · ❓ cuándo cierra la junta de arranque |
 | 5 | **Contratar un subcontrato (la OT)** | La venta al cliente es un presupuesto o un control de cambio (y antes del control de cambio, una cotización al cliente del cambio o adicional, §8.1); Finanzas asigna el contratista; Proyectos cotiza y genera la OT; Control de obra, después, la confirma o la modifica contra el presupuesto base | `ORDEN_TRABAJO` en `cotizada`, con su `COTIZACION_OT` por versión | `MODELO.md` §5i (D-518 y D-519) | ✅ · 🔶 descuentos y cotizador |
-| 6 | **Ejecutar y registrar el avance, cada semana** | El residente captura el avance físico (el sistema propone el porcentaje y se corrige solo lo raro); origina incidencias que aprueba el supervisor, valida control, ejecuta el residente y cierra el supervisor; un extra puede pasar a orden de cambio con el cliente; el almacén surte | `REGISTRO_AVANCE` físico, `INCIDENCIA` y `ALERTA` | `CONOCIMIENTO.md` §13.7 y `MODELO.md` §5c | ✅ · ❓ quién captura el avance (§7, hueco 1) |
+| 6 | **Ejecutar y registrar el avance, cada semana** | El residente captura el avance físico (el sistema propone el porcentaje y se corrige solo lo raro; se anota a diario o se confirma al terminar la actividad, y antes de estimar se confirman los avances); origina incidencias que aprueba el supervisor, valida control, ejecuta el residente y cierra el supervisor; un extra puede pasar a orden de cambio con el cliente; el almacén surte | `REGISTRO_AVANCE` físico, `INCIDENCIA` y `ALERTA` | `CONOCIMIENTO.md` §13.7 y `MODELO.md` §5c | ✅ incluido quién captura el avance (D-533) · ❓ quién confirma antes de estimar |
 | 7 | **Estimar y pagar, cada semana** | El residente crea su estimación en Excel; Control de obra las recolecta, las pasa al extractor y las envía al validador de topes (hoy Compras); vuelven a residentes y supervisores para ajustar y justificar lo fuera de catálogo; el validador ajusta y esa es la que se paga; Control de obra comparte la final y la marca pagada. Los pagos de una OT entran por la estimación, en efectivo o por transferencia, y Control de obra los confirma | `ESTIMACION` de `capturada` a `pagada`, con el oid de cada renglón y su historia; `PAGO_OT` | `MODELO.md` §5d y `MODELO.md` §5i (D-522 y D-519) | ✅ · ❓ el validador |
 | 8 | **Cerrar** | Frente al 90 %: el residente solicita, el supervisor aprueba, control valida; si se requiere, también por actividades; el lote se entrega con los cuatro participantes en cualquier orden; cerrar cierra al residente | `CIERRE_FRENTE`, `CIERRE_ACTIVIDADES` y `ENTREGA_OBRA` | `MODELO.md` §5c (D-515, D-516 y D-522) | ✅ |
 | 9 | **Entregar y atender la postventa** | La obra pasa a `entregada` y entra a postventa: garantía, y OT de postventa y de mantenimiento (con cobro al cliente, por garantía o necesaria para la entrega); la retención se libera al entregar la vivienda o antes si el supervisor lo autoriza; la OT concluye cuando se pagó todo | `TICKET_GARANTIA` y `ORDEN_TRABAJO` | `MODELO.md` §3b y `MODELO.md` §5i | ✅ |
@@ -560,14 +570,15 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | # | Hueco | Quién lo mueve |
 |---|---|---|
 | 1 | **Compras como validador de topes:** ¿rol nuevo con `validar_estimacion`, o sigue Control de obra? (B-115) | El usuario |
-| 2 | **Funciones sin clave:** capturar, enviar, devolver y marcar pagada una estimación; asignar un subcontrato; cotizar y auditar una OT; liberar la retención; capturar avance (§7, hueco 7, y B-115) | El usuario |
+| 2 | **Funciones sin clave:** capturar, enviar, devolver y marcar pagada una estimación; asignar un subcontrato; cotizar y auditar una OT; liberar la retención; confirmar los avances (§7, hueco 7, y B-115). Las de avance y reprogramación ya tienen clave (D-533) | El usuario |
 | 3 | **Descuentos, traspaso del anticipo y cotizador** (B-110, B-124 y B-123) | El usuario |
 | 4 | **La junta de arranque:** cuándo se cierra la planeación y quién la declara cerrada | El usuario |
 | 5 | **La urbanización:** una obra única con ramas de clústeres y amenidades; su flujo propio no está escrito, y ObraCtrl hoy no la representa (D-523, G3) | El usuario |
-| 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516) | El usuario |
+| 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516). **El primero que se dice (D-533):** al aplicarse una reprogramación se notifica el cambio *a los demás;* quiénes son no se dijo | El usuario |
 | 7 | **~~El cuantificador~~ — ✅ cerrado (D-532):** un motor con dos entradas, la herramienta como ventana flotante que abre el módulo y el espacio de trabajo por nivel o partida grande (§8.1). *Queda abierto:* el umbral de «discrepan mucho» al comprobar un presupuesto y la regla normal de quién traza y quién aprueba | El usuario |
-| 8 | **~~Los tipos de presupuesto~~ — ✅ cerrado (D-532):** la cotización al cliente es el cuarto valor de `PRESUPUESTO.tipo`, se vuelve control de cambio al aceptarla el cliente, y su precio es el costo directo entre 0.7. *Queda por confirmar:* que el 0.7 sea el mismo para el Highlight y el Adicional, el folio y quién la hace (B-123) | El usuario |
+| 8 | **~~Los tipos de presupuesto~~ — ✅ cerrado (D-532 y D-533):** la cotización al cliente es el cuarto valor de `PRESUPUESTO.tipo` y se vuelve control de cambio al aceptarla el cliente. Su precio es **m² × 17,000** en una ampliación (que se confirma con el presupuesto) y **la diferencia ÷ 0.7** en algo específico. *Queda por confirmar (B-123):* cuál manda cuando el presupuesto no da m² × 17,000, la moneda y el IVA del 17,000, cómo se representa lo que sale, el folio y quién la hace | El usuario |
 | 9 | **~~Cuándo está «definido» un presupuesto~~ — ✅ cerrado (D-532):** definido es **costeado**; contratado es otro estado, y contratar la rama es la declaración, de Control de obra (§8.1) | — |
 | 10 | **~~La ingeniería del lote~~ — ✅ cerrado (D-531):** la prepara Costos (ingeniería de costos), llega como un Excel, por partes y normalmente por niveles. *Idea 💭:* en algún momento Costos podrá hacerla en esta plataforma | — |
-| 11 | **Quién acepta una fecha nueva de lo contratado:** las fechas contratadas no se mueven solas; reprogramar propone y alguien acepta (P-4), pero no se ha dicho quién. *Recomendación:* Control de obra, que ya edita la estructura del programa y gobierna entre obras | El usuario |
-| 12 | **Cada cuánto se captura el avance físico:** a diario, por semana o justo antes de estimar. Decide cuándo se ven el atraso y los días sin avance, y si una estimación puede cerrar la semana sin avance capturado | El usuario |
+| 11 | **~~Quién acepta una fecha nueva de lo contratado~~ — ✅ cerrado (D-533):** el residente propone, el supervisor revisa y control valida; o el supervisor propone y control valida; y control la realiza y se notifica a los demás (`MODELO.md` §5c) | — |
+| 12 | **~~Cada cuánto se captura el avance físico~~ — ✅ contestado (D-533):** a diario, o confirmándolo al terminar la actividad; y antes de estimar se confirman los avances | — |
+| 13 | **Confirmar los avances antes de estimar:** ¿quién los confirma (lectura mía: el residente)? ¿Qué pasa con lo que no se confirmó: entra a la estimación o espera la siguiente? ¿La confirmación es por actividad, por frente o de toda la semana? | El usuario |
