@@ -1,0 +1,387 @@
+C,Clave,Descripción,Comentarios,Unidad,Costo base M. N.,Costo base M. E.,Costo unitario,Fecha,Familia,Subfamilia,Tipo
+ ,ACE-00001,ALAMBRE RECOCIDO,1,KG,24.68,0,24.68,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00002,ALAMBRON,1,KG,22.02,0,22.02,2026-07-22 00:00:00,Aceros,Habilitable,Material
+ ,ACE-00003,ANILLO 10X10,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00004,ANILLO 10X15,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00005,ANILLO 10X20,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00006,ANILLO 10X25,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00007,ANILLO 15X20,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00008,ANILLO 15X25,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00009,ANILLO 20X20,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00010,ANILLO 20X25,1,KG,24.01,0,24.01,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00011,ARMEX 10X10-4 ,3,PZ,140.07,0,140.07,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00012,CLAVO 2 1/2,1,KG,30.68,0,30.68,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00013,CLAVO 4,1,KG,30.68,0,30.68,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00015,MALLA HEXAGONAL 1.75X45ML CAL 22,11,RLL,1728.95,0,1728.95,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00017,ELECTROMALLA 66/1010 ROLLO 2.5 X 40 MTS ,11,RLL,1800.9,0,1800.9,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00018,ELECTROMALLA 66/66 ROLLO 2.5 X 40 MTS,11,RLL,3868.6,0,3868.6,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00019,Anillo 25x25,1,KG,30.69,0,30.69,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00020,Armex 10x15,3,PZ,170.76,0,170.76,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00021,Anillo 15x15,1,KG,32.02,0,32.02,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACE-00023,CLAVO CONCRETO GALV 2 BOLSA 9L,1,KG,110,0,110,2026-07-22 00:00:00,Aceros,Consumible,Material
+ ,ACE-00029,ANILLO 8X15,1,KG,30.69,0,30.69,2026-07-22 00:00:00,Aceros,Prefabricado,Material
+ ,ACR-00001,VARILLA 3/8,3,PZ,133.01,0,133.01,2026-07-22 00:00:00,Acero De Refuerzo,Habilitable,Material
+ ,ACR-00002,VARILLA 1/2,3,PZ,237.52,0,237.52,2026-07-22 00:00:00,Acero De Refuerzo,Habilitable,Material
+ ,ACR-00003,VARILLA 5/8,3,PZ,376.45,0,376.45,2026-07-22 00:00:00,Acero De Refuerzo,Habilitable,Material
+ ,ACR-00004,VARILLA 3/4,3,PZ,479.68,0,479.68,2026-07-22 00:00:00,Acero De Refuerzo,Habilitable,Material
+ ,ADH-00001,PEGAPISO UNITILE GRIS SACO DE 40 KG,13,BTS,139.83,0,139.83,2026-07-22 00:00:00,Adhesivos,Polvos,Material
+ ,ADH-00005,CEMENTO SACO DE 50 KG,13,BTS,232,0,232,2026-07-22 00:00:00,Adhesivos,Polvos,Material
+ ,ADH-00006,Estuco saco 40 kg,3,PZ,164.08,0,164.08,2026-07-22 00:00:00,Adhesivos,Polvos,Material
+ ,ADH-00011,SELLADOR ACRILASTIC 300ML BLANCO SAC1B30,3,PZ,60,0,60,2026-07-22 00:00:00,Adhesivos,Consumible,Material
++,AUX-00001,Trabe T-3 de 15x25 cm 4 var. del #3 est. no. 2 @25 cm.,8,M,72.14,0,72.14,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00005,Malla electrosoldada 66/1010,12,M2,21.95,0,21.95,2026-07-22 00:00:00,Aceros,Parrillas,Material
++,AUX-00006,Malla hexagonal cal. 22,12,M2,23.05,0,23.05,2026-07-22 00:00:00,Aceros,Parrillas,Material
++,AUX-00008,Trabe T-1 de 15x25 cm 4 var. del #3 est. no. 2 @25 cm.,8,M,72.96,0,72.96,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00009,Trabe T-1 de 15x15 cm 4 var. del #3 est. no. 2 @25 cm.,8,M,67.7,0,67.7,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00010,Trabe T-2 de 20x30 cm 8 var. del #4 est. no. 3 @25 cm.,8,M,221.03,0,221.03,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00011,Trabe T-4 de 25x25 cm 4 var. del #4 y 4 var. del #5 est. no. 2 @25 cm.,8,M,271.05,0,271.05,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00016,Trabe T-2 de 20x25 cm 5 var. del #4 est. no. 2 @25 cm.,8,M,134.59,0,134.59,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00021,"Nervadura N1 de 10x30 cm 1 var. del no.3 y 1 var. del no.4 , est. del no 2 @30 cm.",8,M,40.66,0,40.66,2026-07-22 00:00:00,Elemento Estructural,Nervadura,Material
++,AUX-00030,Malla electrosoldada 66/66,12,M2,45.72,0,45.72,2026-07-22 00:00:00,Aceros,Parrillas,Material
++,AUX-00040,"Nervadura N-1 de 12x25 cm 2 var. del no.4 , est. del no 2 @25 cm.",8,M,52.81,0,52.81,2026-07-22 00:00:00,Elemento Estructural,Nervadura,Material
++,AUX-00042,"Nervadura N-2 de 10x25 cm 2 var. del no.3 , est. del no 2 @20 cm.",8,M,34.91,0,34.91,2026-07-22 00:00:00,Elemento Estructural,Nervadura,Material
++,AUX-00051,"Nervadura N-1 de 10x25 cm 2 var. del no.3 , est. del no 2 @30 cm.",8,M,31.25,0,31.25,2026-07-22 00:00:00,Elemento Estructural,Nervadura,Material
++,AUX-00052,"Nervadura N-2 de 12x25 cm 2 var. del no.4 , est. del no 2 @30 cm.",8,M,50.06,0,50.06,2026-07-22 00:00:00,Elemento Estructural,Nervadura,Material
++,AUX-00060,Trabe T-5 de 12x30 cm 3 var. del #4 y 3 var. del #3 est. no. 2 @12 cm.,8,M,158.06,0,158.06,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-00201,MURO DE MAMPOSTERÍA PIEDRA DE CERRO,14,M3,1633.14,0,1633.14,2026-07-29 00:00:00,Elemento Estructural,Mampostería,Material
++,AUX-01010,Contratrabe CT1 de 15x25 cm 5 var. del #3 est. no. 2 @15 cm.,8,M,99.51,0,99.51,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-01011,"Contratrabe CT1 de 20x30 cm 4 var. del #4, 2 var. del #3 est. no. 2 @20 cm.",8,M,146.79,0,146.79,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-01020,Contratrabe CT2 de 15x20 cm 4 var. del #3 est. no. 2 @15 cm.,8,M,81.8,0,81.8,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-01030,"Contratrabe CT3 de 25x30 cm 3 var. del #3 y 3 var. del #4, est. no. 2 @20 cm.",8,M,140.67,0,140.67,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-01031,Contratrabe CT3 de 30x30 cm 6 var. del #4  no. 2 @20 cm.,8,M,182.69,0,182.69,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-01040,Contratrabe CT4 de 30x30 cm 4 var. del #4 y 2 var. del #3 est. no. 2 @20 cm.,8,M,163.88,0,163.88,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-01041,Contratrabe CT4 de 25x30 cm 4 var. del #4 y 2 var. del #3 est. no. 2 @20 cm.,8,M,150.08,0,150.08,2026-07-22 00:00:00,Elemento Estructural,Contratrabe,Material
++,AUX-02010,"Bastones var 3/8"" de 1.20 @25 cm ",8,M,61.53,0,61.53,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02011,"Bastones var 3/8"" de 1.20 @15 cm ",8,M,99.84,0,99.84,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02012,"Bastones var 3/8"" de 1.20 @20 cm ",8,M,75.9,0,75.9,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02013,"Bastones var 3/8"" de 1.20 @18 cm ",8,M,126.49,0,126.49,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02014,"Bastones var 3/8"" de 1.20 @40 cm ",8,M,37.43,0,37.43,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02020,"Bastones var 3/8"" de 1.50 @25 cm ",8,M,76.71,0,76.71,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02021,"Bastones var 3/8"" de 1.50 @20 cm ",8,M,95.88,0,95.88,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02022,"Bastones var 3/8"" de 1.50 @50 cm ",8,M,38.35,0,38.35,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02023,"Bastones var 3/8"" de 1.50 @40 cm ",8,M,47.94,0,47.94,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02030,"Bastones var 3/8"" de 2.00 @25 cm ",8,M,101.46,0,101.46,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02031,"Bastones var 3/8"" de 2.00 @20 cm ",8,M,126.82,0,126.82,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02033,"Bastones var 3/8"" de 2.00 @40 cm ",8,M,62.9,0,62.9,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02040,"Bastones var 3/8"" de 1.00 @25 cm ",8,M,50.32,0,50.32,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02041,"Bastones var 3/8"" de 1.00 @20 cm ",8,M,62.9,0,62.9,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02042,"Bastones var 3/8"" de 1.00 @15 cm ",8,M,104.84,0,104.84,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02043,"Bastones var 3/8"" de 1.00 @40 cm ",8,M,31.45,0,31.45,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02051,"Bastones var 3/8"" de 1.71 @20 cm ",8,M,108.69,0,108.69,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02053,"Bastones var 3/8"" de 1.71 @50 cm ",8,M,42.97,0,42.97,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02060,"Bastones var 3/8"" de 0.90 @40 cm ",8,M,28.45,0,28.45,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02072,"Bastones var 3/8"" de 0.80 @50 cm",8,M,20.37,0,20.37,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02080,"Bastones var 3/8"" de 2.40 @25 cm ",8,M,119.8,0,119.8,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02082,"Bastones var 3/8"" de 2.40 @20 cm ",8,M,149.75,0,149.75,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02083,"Bastones var 3/8"" de 2.40 @50 cm ",8,M,59.9,0,59.9,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02090,"Bastones var 3/8"" de 0.65 @20 cm ",8,M,40.94,0,40.94,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02100,"Bastones var 3/8"" de 4.00 @40 cm ",8,M,124.28,0,124.28,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02110,"Bastones var 3/8"" de 0.85 @20 cm ",8,M,52.91,0,52.91,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02120,"Bastones var 3/8"" de 0.90 @20 cm ",8,M,55.9,0,55.9,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-02141,"Bastones var 3/8"" de 1.70 @18 cm ",8,M,118.71,0,118.71,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-04010,"Muro de 14 cm. de espesor, de tabique rojo recocido, asentado con mezcla mortero-arena 1:5 acabado común.",12,M2,237,0,237,2026-07-29 00:00:00,Elemento Estructural,Mampostería,Material
++,AUX-06010,Acero para losa varilla del no. 3 @20 cm.,12,M2,124.82,0,124.82,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-06012,Acero para losa varilla del no. 3 @18 cm.,12,M2,147.19,0,147.19,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-09010,Capitel de 80x80x30 armado var de no 4 @15 cm,3,PZ,519.54,0,519.54,2026-07-22 00:00:00,Acero De Refuerzo,Parrillas,Material
++,AUX-10106,Trabe T-1 de 15x20 cm 4 var. del #3 est. no. 2 @25 cm.,8,M,69.51,0,69.51,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-10205,Trabe T-2 de 12x20 cm 4 var. del #3 est. no. 2 @25 cm.,8,M,88.74,0,88.74,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-10302,Trabe T-3B de 12x15 cm Armex 10x10-4,8,M,26.09,0,26.09,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11010,Trabe T-10 de 15x30 cm 6 var. del #3 est. no. 2 @20 cm.,8,M,111.09,0,111.09,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11101,Trabe T-11 de 15x25 cm 4 var. del #4 est. no. 2 @20 cm.,8,M,115.52,0,115.52,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11210,Trabe T-12 de 15x25 cm 4 var. del #3 est. no. 2 @20 cm.,8,M,81.82,0,81.82,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11301,Trabe T-13 de 15x30 cm 4 var. del #4 est. no. 2 @20 cm.,8,M,118.81,0,118.81,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11302,Trabe T-13' de 20x30 cm 4 var. del #4 est. no. 2 @20 cm.,8,M,122.1,0,122.1,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11401,Trabe T-14 de 17x60 cm 8 var. del #6 est. no. 3 @15 cm.,8,M,505.25,0,505.25,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11410,"Trabe T-14 de 17x70 cm 8 var. del #6, 2 var del no.4, est. no. 3 @15 cm.",8,M,525.97,0,525.97,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11510,"Trabe T-15 de 35x30 cm 10 var. de 5/8"" est. no. 3 @15 cm.",8,M,471.5,0,471.5,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11610,"Trabe T-16 de 35x30 cm 10 var. de 6/8"" est. no. 3 @15 cm.",8,M,564.4,0,564.4,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11710,Trabe T-17 de 12x12 cm armex 10-10,8,M,26.09,0,26.09,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-11801,"Trabe T-18 de 35x25 cm 10 var. de 5/8"" est. no. 3 @15 cm.",8,M,463.37,0,463.37,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-12110,"Trabe T-21 de 15x20 cm 4 var. del #3, est. no. 2 @25 cm.",8,M,71.1,0,71.1,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-12210,"Trabe T-22' de 12x20 cm 4 var. del #3, est. no. 2 @25 cm.",8,M,71.1,0,71.1,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-12211,"Trabe T-22 de 15x25 cm 2 var. del #3 y 2 var. del #4, est. no. 2 @15 cm.",8,M,108.85,0,108.85,2026-07-22 00:00:00,Elemento Estructural,Trabe,Material
++,AUX-20001,MALLA HEXAGONAL EN MUROS CON CLAVO DE CONCRETO,12,M2,26.65,0,26.65,2026-07-22 00:00:00,Aceros,Parrillas,Material
++,AUX-50001,Losa nervada N-1 (12 cm 2 var no4 est @25 cm) y N-2 (10 cm 2 var no3 est @20 cm),12,M2,713.67,0,713.67,2026-07-22 00:00:00,Elemento Estructural,Losa Nervada,Material
++,AUX-50002,Losa nervada de 25 cm. con N-2 (12 cm 2 var no4 est no.2 @30 cm) y N-3 (10 cm 2 var no3 est no.2 @30 cm),12,M2,701.82,0,701.82,2026-07-22 00:00:00,Elemento Estructural,Losa Nervada,Material
++,AUX-50006,Losa nervada de 25 cm  N-3 (10 cm 2 var no3 est @30 cm),12,M2,645.36,0,645.36,2026-07-22 00:00:00,Elemento Estructural,Losa Nervada,Material
++,AUX-50008,"Losa nervada de 30 cm. N-1 (10 cm 1 var no4, 1 var no3 y est @30 cm)",12,M2,751.8,0,751.8,2026-07-22 00:00:00,Elemento Estructural,Losa Nervada,Material
++,AUX-50009,Losa nervada de 25 cm  N-1 (12 cm 2 var no4 est @25 cm) y N-2 (10 cm 2 var no3 est @20 cm) Concreto bombeado 250 a 28 dias,12,M2,713.67,0,713.67,2026-07-22 00:00:00,Elemento Estructural,Losa Nervada,Material
++,AUX-50010,Losa nervada de 25 cm N-1 (10 cm 2 var no3 est @30 cm) y N-2 (10 cm 2 var no3 est @20 cm),12,M2,700.85,0,700.85,2026-07-22 00:00:00,Elemento Estructural,Losa Nervada,Material
+ ,COM-00054,Grapa Anclo Rec Tipo P 8 Mm Gp8 9l,4,CJ,34.48,0,34.48,2026-07-22 00:00:00,Consumibles,Fijación,Material
+ ,COM-00058,"/12503 Cinta de Aislar de 18 M X 19 Mm, Amarillo",3,PZ,15,0,15,2026-07-22 00:00:00,Consumibles,Consumible,Material
+ ,COM-00079,Canaleta Pegamento D12012 20x12x 1 Via Btic Nl,3,PZ,31.51,0,31.51,2026-07-22 00:00:00,Consumibles,Accesorios,Material
+ ,COM-00101,Rondana Plana Galvanizada 1/2 12.7mm 5l,3,PZ,0.5,0,0.5,2026-07-22 00:00:00,Consumibles,Fijación,Material
+ ,COM-00200,Pija Lamina Tipo Ab 8 X 1/2 6l,4,CJ,8.96,0,8.96,2026-07-22 00:00:00,Consumibles,Fijación,Material
+ ,COM-00239,Cinta Aislar Temflex 155 Negra (1600) 18mt 7f,3,PZ,12.93,0,12.93,2026-07-22 00:00:00,Consumibles,Consumible,Material
+ ,COM-00273,45031 Rollo de Rafia de 410 M Colores Surt,11,RLL,79.5,0,79.5,2026-07-22 00:00:00,Consumibles,Consumible,Material
+ ,COM-00372,Silicon Multi Blanco 618608 Fischer 1l,3,PZ,78,0,78,2026-07-22 00:00:00,Consumibles,Sellador,Material
+ ,CON-00001,CONCRETO TD 200 28 DIAS 10 REV IMPERMEABILIZANTE 1% (LOSA CIMENTACION),14,M3,2442.33,0,2442.33,2026-07-22 00:00:00,Prefabricados,Concretos,Material
+ ,CON-00003,CONCRETO BOMBEADO 250 28 DIAS 14 REV (LOSAS ENTREPISO),14,M3,2500.8,0,2500.8,2026-07-22 00:00:00,Prefabricados,Concretos,Material
+ ,CON-00004,CONCRETO BOMBEADO 250 RAPISO 7 DIAS REVENIMIENTO (LOSAS AZOTEA Y ROOF),14,M3,2980.26,0,2980.26,2026-07-22 00:00:00,Prefabricados,Concretos,Material
+ ,CON-00020,"Mortero fc 50 kg/cm2, Normal a 28 días, TMA 05mm Rev 14 cm, bombeado con IMPER 1%",14,M3,2390,0,2390,2026-07-22 00:00:00,Prefabricados,Concretos,Material
+ ,ELE-00001,POLIDUCTO NARANJA 100 MTS 1/2,11,RLL,413.01,0,413.01,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00003,CHALUPA GALVANIZADA 1/2,3,PZ,3.6,0,3.6,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00004,CAJA CUADRADA GALVANIZADA 3/4 4X4,3,PZ,6.91,0,6.91,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00005,CAJA CUADRADA GALVANIZADA 1/2 3X3,3,PZ,3.66,0,3.66,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00006,CAJA PARA REGISTRO REDONDA 1/2 GAL,3,PZ,3.66,0,3.66,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00007,SOBRETAPA CUADRADA 4X4 3/4,3,PZ,4.21,0,4.21,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00010,BP06-M/A PLACA CONTACTO DUPLEX,3,PZ,91.33,0,91.33,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00011,BP01-M/A PLACA APAGADOR SENCILLO,3,PZ,72.93,0,72.93,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00012,BP02-M/A PLACA DOS APAGADORES SENCILLOS,3,PZ,97.14,0,97.14,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00013,BP03-M/A PLACA TRES APAGADORES SENCILLOS,3,PZ,111.76,0,111.76,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00014,BP01/3-M/A PLACA APAGADOR ESCALERA,3,PZ,62.4,0,62.4,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00015,BP09-M/A PLACA DOS APAGADORES ESCALERA,3,PZ,103.16,0,103.16,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00016,BP1200-M/A PLACA CIEGA ,3,PZ,56.25,0,56.25,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00017,BP15-M/A PLACA ZUMBADOR,3,PZ,185.59,0,185.59,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00018,BP07-M/A PLACA APAGADOR Y CONTACTO,3,PZ,93.24,0,93.24,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00019,BP03/3-M/A PLACA DOS SENCILLOS Y UN ESCALERA,3,PZ,114.63,0,114.63,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00020,BP10-M/A PLACA TRES APAGADORES ESCALERA,3,PZ,120.76,0,120.76,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00021,BP25-M/A PLACA USB,3,PZ,376.74,0,376.74,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00023,BP11-M/A PLACA TIMBRE,3,PZ,77.22,0,77.22,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00024,310732 SOQUET DE PORCELANA RED 660W 102MM IUSA ,3,PZ,20.86,0,20.86,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00025,CABLE ROJO 14,11,RLL,664.5,0,664.5,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00026,CABLE BLANCO 14,11,RLL,664.5,0,664.5,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00027,CABLE NEGRO 14,11,RLL,664.5,0,664.5,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00028,CABLE NEGRO 12,11,RLL,933.01,0,933.01,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00029,CABLE BLANCO 12,11,RLL,933.01,0,933.01,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00030,CABLE VERDE 14,11,RLL,664.5,0,664.5,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00031,CABLE BLANCO 10,11,RLL,1474.51,0,1474.51,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00032,CABLE NEGRO 10,11,RLL,1474.51,0,1474.51,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00033,EXT LUZ DE CORTESIA LED,3,PZ,190.09,0,190.09,2026-07-22 00:00:00,Eléctrico,Iluminación,Material
+ ,ELE-00034,INTERIOR EMPOTRADOS SL,3,PZ,90.24,0,90.24,2026-07-22 00:00:00,Eléctrico,Iluminación,Material
+ ,ELE-00035,FOCO LED MR 16 7W LUZ CALIDAD,3,PZ,24.51,0,24.51,2026-07-22 00:00:00,Eléctrico,Iluminación,Material
+ ,ELE-00036,INTERRUPTOR FLOTADOR 1HP,3,PZ,364.81,0,364.81,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00037,CENTRO CARGA QO120-L125PG 7L,3,PZ,3700,0,3700,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00043,POLIFLEX NARANJA 50 MTS 3/4 5L,3,PZ,630,0,630,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00044,"POLIFLEX NARANJA 50 MTS 1"" 5L",3,PZ,580,0,580,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00046,"POLIFLEX NARANJA 50 MTS 1"" 5L",8,M,29,0,29,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00048,PIJA LAMINA TIPO AB 8 X 1 1/2 6L,3,PZ,0.5,0,0.5,2026-07-22 00:00:00,Eléctrico,Fijación,Material
+ ,ELE-00049,PIJA LAMINA TIPO AB 8 X 2 8L,3,PZ,0.7,0,0.7,2026-07-22 00:00:00,Eléctrico,Fijación,Material
+ ,ELE-00052,PLACA INTEM DUP PLAST 002-04976-GY LEV 2L,3,PZ,70,0,70,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00057,BASE MEDIDOR WATTHORIMETRO Watthorimetro 4-100 IUSA 7F,3,PZ,150,0,150,2026-07-22 00:00:00,Eléctrico,Medición,Material
+ ,ELE-00059,BOTE INTEGRAL 8 X 8 CHICO 50/8 3L,3,PZ,35,0,35,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00064,VARILLA P/TIERRA 1/2 X 1.00 MT BARFON 2F,3,PZ,80,0,80,2026-07-22 00:00:00,Eléctrico,Tierra Física,Material
+ ,ELE-00065,CONECTOR VARILLA TIERRA 3F,3,PZ,6,0,6,2026-07-22 00:00:00,Eléctrico,Tierra Física,Material
+ ,ELE-00077,CENTROCARGA QO24-L70F SQUARED 7L,3,PZ,900,0,900,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00078,CABLE NEGRO 8,11,RLL,2140,0,2140,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00080,POLDUCTO NARANJA 100 MTS 3/4 9L,8,M,10,0,10,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00085,FRENTE CENTRODE CARGA Q0c20uUF SQUARED 7L,3,PZ,850,0,850,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00088,POLIFLEX NARANJA 1/2 5l,3,PZ,760,0,760,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00163,TAPA CUADRADA GALV 1 1/2 6 X 6 6l,3,PZ,15.09,0,15.09,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00164,Caja Cuadrada Galvanizada 11/2 6 X 6 6l,3,PZ,96.98,0,96.98,2026-07-22 00:00:00,Eléctrico,Cajas y Registros,Material
+ ,ELE-00198,*Ep-130c Interruptor TermomagnÉtico Plug 1x30a Cu,3,PZ,87,0,87,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00199,*Ep-120c Interruptor TermomagnÉtico Plug 1x20a Cu,3,PZ,77,0,77,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00202,Quinta Terminal Iusa 3l,3,PZ,26.5,0,26.5,2026-07-22 00:00:00,Eléctrico,Medición,Material
+ ,ELE-00226,Ep-260c Interruptor TermomagnÉtico Plug 2x60a Cu,3,PZ,194.5,0,194.5,2026-07-22 00:00:00,Eléctrico,Protección y Control,Material
+ ,ELE-00239,Contacto Duplex Polar 3232-W Blanco Legran 22,3,PZ,23,0,23,2026-07-22 00:00:00,Eléctrico,Accesorios,Material
+ ,ELE-00267,Codo Conduit Pvc 1 1/4 4l,3,PZ,12,0,12,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00268,Conector Conduit Pvc R-1 1 1/4 Pesado 4l,3,PZ,18,0,18,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00294,CABLE BLANCO 8,11,RLL,2140,0,2140,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00321,CABLE ROJO 8,11,RLL,2140,0,2140,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,ELE-00332,Poliducto Naranja 100 Mts 3/4 9l,11,RLL,758.51,0,758.51,2026-07-22 00:00:00,Eléctrico,Ductería,Material
+ ,ELE-00375,CORDON POT CAFE SPT 16 IUSA 7l,8,M,10.21,0,10.21,2026-07-22 00:00:00,Eléctrico,Conductores,Material
+ ,EQU-00001,MEZCLADORA PARA BAÑO ALTA MONOMANDO SKU 174398,3,PZ,745.93,0,745.93,2026-07-22 00:00:00,Equipamiento,Grifería,Material
+ ,EQU-00003,JUEGO MANERALES CRUCETA GRANDES CROMADO SKU 100316,20,JGO,351.82,0,351.82,2026-07-22 00:00:00,Equipamiento,Grifería,Material
+ ,EQU-00004,GATILLO BRUNEI CERROJO DOBLE PLATA OSCURA SKU 131107,3,PZ,969.22,0,969.22,2026-07-22 00:00:00,Equipamiento,Cerrajería,Material
+ ,EQU-00005,SANITARIO VENUS TAZA Y TANQUE GRADO ECOLOGICO CERAMICA ESMALTADA EN COLOR BLANCO SISTEMA DE PUSH TAPA ASIENTO DE CIERRE LENTO,3,PZ,2475,0,2475,2026-07-22 00:00:00,Equipamiento,Equipo Hidráulico,Material
+ ,EQU-00006,MEZCLADORA DE COCINA NEGRO RETRACTIL,3,PZ,1717.37,0,1717.37,2026-07-22 00:00:00,Equipamiento,Grifería,Material
+ ,EQU-00007,ASADOR ,3,PZ,2800,0,2800,2026-07-22 00:00:00,Equipamiento,Electrodomésticos,Material
+ ,EQU-00008,TANQUE ESTACIONARIO 300,3,PZ,8178,0,8178,2026-07-22 00:00:00,Equipamiento,Equipo Hidráulico,Material
+ ,EQU-00011,CALENTADOR 80LTS,3,PZ,2987,0,2987,2026-07-22 00:00:00,Equipamiento,Electrodomésticos,Material
+ ,EQU-00013,CAMPANA COCINA,3,PZ,2079,0,2079,2026-07-22 00:00:00,Equipamiento,Electrodomésticos,Material
+ ,EQU-00014,81197 CERRADURA MANIJA SAURA 5 BL BAÑO,3,PZ,356.01,0,356.01,2026-07-22 00:00:00,Equipamiento,Cerrajería,Material
+ ,EQU-00015,81200 CERR MANIJA SAURA RECA LA BP 5 8L,3,PZ,366.51,0,366.51,2026-07-22 00:00:00,Equipamiento,Cerrajería,Material
+ ,EQU-00016,ESTUFA,3,PZ,6799,0,6799,2026-07-22 00:00:00,Equipamiento,Electrodomésticos,Material
+ ,EQU-00019,BRAZO PARA REGADERA,3,PZ,43.01,0,43.01,2026-07-22 00:00:00,Equipamiento,Muebles de Baño,Material
+ ,EQU-00021, COLADERA REDONDA 302 ,3,PZ,333.5,0,333.5,2026-07-22 00:00:00,Equipamiento,Accesorios Muebles,Material
+ ,EQU-00023,CONTRACANASTA PH-300,3,PZ,166,0,166,2026-07-22 00:00:00,Equipamiento,Accesorios Muebles,Material
+ ,EQU-00046,"REGADERA CR RD 6"" MODULATI MOD. IGUAZU 302SS 631058",3,PZ,569.65,0,569.65,2026-07-22 00:00:00,Equipamiento,Muebles de Baño,Material
+ ,EQU-00068,6858 Tope P/Piso Tipo Domo L.A Dexter,3,PZ,60.51,0,60.51,2026-07-22 00:00:00,Equipamiento,Cerrajería,Material
+ ,EQU-00070,Bomba + Pres. Pres-10 1hp Pres.Fix10e,3,PZ,3315,0,3315,2026-07-22 00:00:00,Equipamiento,Equipo Hidráulico,Material
+ ,EQU-00081,Cisterna 3000 lts,3,PZ,6035,0,6035,2026-07-22 00:00:00,Equipamiento,Equipo Hidráulico,Material
+ ,EQU-00084,SOLANA GRIFO DE PARED PARA EMPOTRAR DE ACERO INOXIDABLE MODELO ORION COLOR NEGRO/LLAVE PARA AGUA FRIA DE UNA SOLA PALANCA PARA BAÑO UNIVERSAL,3,PZ,699,0,699,2026-07-22 00:00:00,Equipamiento,Grifería,Material
+ ,EQU-00089,SET DE 5 TOALLERO CUADRADO JUEGO DE ACCESORIOS DE BAÑO CROMO,20,JGO,759,0,759,2026-07-22 00:00:00,Equipamiento,Muebles de Baño,Material
+ ,HER-00001,TAPAS REGISTRO 40X60,3,PZ,900,0,900,2026-07-22 00:00:00,Herrerías,Tapas,Material
+ ,HER-00003,TAPAS DE CISTERNA 70X70,3,PZ,1700,0,1700,2026-07-22 00:00:00,Herrerías,Tapas,Material
+ ,HER-00005,Base para boiler,3,PZ,650,0,650,2026-07-22 00:00:00,Herrerías,Soportes,Material
+ ,HER-00007,LETRERO MURETE DE SERVICIOS ,3,PZ,3000,0,3000,2026-07-22 00:00:00,Herrerías,Señalización,Material
+ ,HER-00008,PLACA PARA VIGA,3,PZ,300,0,300,2026-07-22 00:00:00,Herrerías,Soportes,Material
+ ,HID-00001,CEMENTO CPVC 1/8 FLOWGUARD,3,PZ,50,0,50,2026-07-22 00:00:00,Hidráulico,Consumible,Material
+ ,HID-00002,CODO CPVC 3/4X90 FLOWGUARD,3,PZ,3.95,0,3.95,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00003,CODO CPVC 3/4 X 45,3,PZ,6.11,0,6.11,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00004,CODO CPVC 1/2X90,3,PZ,2.05,0,2.05,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00005,CODO CPVC 1/2 X 45,3,PZ,3.3,0,3.3,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00006,CODO CPVC 1 X 90,3,PZ,8.5,0,8.5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00008,CODO 90 HEM 1/2RHX3/8 16 9043100,3,PZ,64.01,0,64.01,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00009,RED BUSHING CPVC 3/4X1/2 FLOWGUARD,3,PZ,2.46,0,2.46,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00010,RED BUSHING CPVC 1X3/4 FLOWGUARD,3,PZ,7.91,0,7.91,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00012,TEE CPVC 3/4 FLOWGUARD,3,PZ,5.66,0,5.66,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00013,TEE CPVC 1/2,3,PZ,2.76,0,2.76,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00015,TEE 3/8X38X1/2 RH 16 K32201 5L,3,PZ,69.5,0,69.5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00016,TAPA CACHUCHA CPVC 1/2,3,PZ,1.7,0,1.7,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00017,TAPON CACHUCHA CPVC 3/4,3,PZ,2.76,0,2.76,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00018,TAPON CACHUCHA CPVC 1,3,PZ,7.6,0,7.6,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00019,TAPON MACHO GALVANIZADO 1/2,3,PZ,5.21,0,5.21,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00020,COPLE CPVC 3/4,3,PZ,2.95,0,2.95,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00021,COPLE CPVC 1/2,3,PZ,1.45,0,1.45,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00022,TUBO CPVC 1,8,M,44,0,44,2026-07-22 00:00:00,Hidráulico,Tuberías,Material
+ ,HID-00023,TUBO CPVC 3/4 FLOWGUARD,8,M,27.51,0,27.51,2026-07-22 00:00:00,Hidráulico,Tuberías,Material
+ ,HID-00024,TUBO CPVC 1/2 FLOWGUARD 9L,8,M,13.01,0,13.01,2026-07-22 00:00:00,Hidráulico,Tuberías,Material
+ ,HID-00025,TUBO DG PE-AL-PE GAS 3/8 2024446 100 25 MTS,11,RLL,863.51,0,863.51,2026-07-22 00:00:00,Hidráulico,Tuberías,Material
+ ,HID-00027,TUERCA UNION CPVC 3/4 FLOWGUARD,3,PZ,42.5,0,42.5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00028,TUERCA UNION CPVC 1/2 FLOWGUARD 7l,3,PZ,32.5,0,32.5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00029,TUERCA UNION CPVC 1 FLOWGUARD,3,PZ,56.51,0,56.51,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00030,VALVULA BOLA CPVC 3/4 FLOWGUARD,3,PZ,89.01,0,89.01,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00031,VALVULA CHECK COLUMPIO DE 1/2,3,PZ,160.01,0,160.01,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00032,VALVULA PAS NPT 1/2X3/8 IP200,3,PZ,72,0,72,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00033,VALVULA CODO GAS 1/2X3/8 P 206,3,PZ,190,0,190,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00034,ADAPTADOR MACHO CPVC 1/2,3,PZ,2.7,0,2.7,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00039,LLAVE DE EMPOTRAR ROSCABLE 52 JGO URREA 6L,3,PZ,325,0,325,2026-07-22 00:00:00,Hidráulico,Accesorios,Material
+ ,HID-00040,CINTA TEFLON 1/2X12 M PLOME 7L,3,PZ,5.11,0,5.11,2026-07-22 00:00:00,Hidráulico,Consumible,Material
+ ,HID-00041,VALVULA ANG TUB IP104,3,PZ,103.51,0,103.51,2026-07-22 00:00:00,Hidráulico,Válvulas,Material
+ ,HID-00045,VALVULA ESF JARDIN IP 701,3,PZ,170.51,0,170.51,2026-07-22 00:00:00,Hidráulico,Válvulas,Material
+ ,HID-00046,VALVULA ESF JARDIN IP 702,3,PZ,168,0,168,2026-07-22 00:00:00,Hidráulico,Válvulas,Material
+ ,HID-00048, VALVULA PICHANCHA YACHT 1 ,3,PZ,183.5,0,183.5,2026-07-22 00:00:00,Hidráulico,Válvulas,Material
+ ,HID-00049, FLOTADOR DE POLIURETANO # 6 CON VARILLA ,3,PZ,40.5,0,40.5,2026-07-22 00:00:00,Hidráulico,Accesorios,Material
+ ,HID-00053,VALVULA BOLA CPVC 1/2 FLOWGUARD 9L,3,PZ,70,0,70,2026-07-22 00:00:00,Hidráulico,Válvulas,Material
+ ,HID-00055,CODO HD CEMENTAR 90 13MM 1/2 NL,3,PZ,5,0,5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00056,TEE HD CEMENTAR PVC 13MM 1/2 NL,3,PZ,5,0,5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00057,CODO HD CEMENTAR 45 13MM 1/2 NL,3,PZ,5,0,5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00058,COPLE HD CEMENTAR 13MM 1/2 NL,3,PZ,3,0,3,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00059,TAPON HD CEMENTAR 13MM 1/2 NL,3,PZ,5,0,5,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00061,TUBO HD 1/2 CED 40 NL,16,TMO,95,0,95,2026-07-22 00:00:00,Hidráulico,Tuberías,Material
+ ,HID-00213,Conector Macho Kitec 1/2 Ak-10-13 Alfa 4l,3,PZ,65,0,65,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,HID-00330,RED HD CEM BUSH 38X13 MM 11/2 X 1/2,3,PZ,7.32,0,7.32,2026-07-22 00:00:00,Hidráulico,Conexiones,Material
+ ,IGS-00014,"Tubo Dg Pe-Al-Pe Gas 3/8"" 2024446 100mt 1f",11,RLL,2284.5,0,2284.5,2026-07-22 00:00:00,Gas,Tuberías,Material
+ ,IGS-00036,Niple Terminal Gas 1/2 X 3/8 8l,3,PZ,25,0,25,2026-07-22 00:00:00,Gas,Conexiones,Material
+ ,IGS-00060,Niple Campana 3/8 X 3/8 Unc-66 Coflex 7l,3,PZ,15,0,15,2026-07-22 00:00:00,Gas,Conexiones,Material
+ ,MAD-00001,CIMBRA 3 MTS,12,M2,95,0,95,2026-07-22 00:00:00,Maderas,Cimbra,Material
+ ,MAD-00002,CIMBRA 4 MTS,12,M2,150,0,150,2026-07-22 00:00:00,Maderas,Cimbra,Material
+ ,MAD-00003,CIMBRAPLAY 12 MM,3,PZ,395.69,0,395.69,2026-07-22 00:00:00,Maderas,Cimbra,Material
+ ,MAD-00007,Durmiente,3,PZ,750,0,750,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00014,GUALDRA 6X12X20,3,PZ,3600,0,3600,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00023,VIGA 4X4X2.5 2DA,3,PZ,205,0,205,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00024,CEPILLADO,3,PZ,20,0,20,2026-07-22 00:00:00,Maderas,Habilitable,Material
+ ,MAD-00028,VIGA 31/2X8X14,3,PZ,882,0,882,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00030,TUINO CHAFLAN,3,PZ,20,0,20,2026-07-22 00:00:00,Maderas,Cimbra,Material
+ ,MAD-00031,GUALDRA 6X12X18,3,PZ,3240,0,3240,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00033,GUALDRA 6X12X6,3,PZ,1080,0,1080,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00041,GUALDRA 6X12X8,3,PZ,1440,0,1440,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00042,VIGA 31/2X8X2,3,PZ,126,0,126,2026-07-22 00:00:00,Maderas,Ornamental,Material
+ ,MAD-00073,CORTE Y ENTINTADO VIGA 1.25 ML,3,PZ,250,0,250,2026-07-22 00:00:00,Maderas,Habilitable,Material
+ ,MAR-00001,MARMOL TRAVERTINO 30.5 LARGOS LIBRES ACABADO PULIDO MATE,12,M2,295,0,295,2026-07-22 00:00:00,Loseta,Mármol,Material
+ ,MAR-00002,MARMOL TOMBOLEADO MEDIDA DE .10X.10 CMS,12,M2,260,0,260,2026-07-22 00:00:00,Loseta,Mármol,Material
++,MEZ-01010,CONCRETO H.O. F'C=100 KG/CM2,14,M3,1351.11,0,1351.11,2026-07-22 00:00:00,Mezclas,Concretos,Material
++,MEZ-01020,CONCRETO H.O. F'C=150 KG/CM2,14,M3,1721.06,0,1721.06,2026-07-22 00:00:00,Mezclas,Concretos,Material
++,MEZ-01030,CONCRETO H.O. F'C=200 KG/CM2,14,M3,1900.02,0,1900.02,2026-07-22 00:00:00,Mezclas,Concretos,Material
++,MEZ-03010,MORTERO ESTUCO BLANCO,12,M2,20.68,0,20.68,2026-07-22 00:00:00,Mezclas,Estuco,Material
++,MEZ-03020,MEZCLA CEMENTO-ARENA 1:2 ,14,M3,2651.76,0,2651.76,2026-07-22 00:00:00,Mezclas,Morteros,Material
++,MEZ-03060,MEZCLA CEMENTO-ARENA 1:6,14,M3,1558.47,0,1558.47,2026-07-22 00:00:00,Mezclas,Morteros,Material
++,MEZ-05010,MEZCLA PEGAPISO,14,M3,11652.5,0,11652.5,2026-07-22 00:00:00,Mezclas,Pegapiso,Material
++,MEZ-07010,MEZCLA CEMENTO-ARENA 1:4,14,M3,2058.26,0,2058.26,2026-07-29 00:00:00,Mezclas,Morteros,Material
+ ,PET-00001,TABIQUE,3,PZ,2.9,0,2.9,2026-07-22 00:00:00,Pétreos,Barro,Material
+ ,PET-00004,PIEDRA DE CERRO (FACHADAS Y INTERIORES) 6 M3,7,SERV,3500,0,3500,2026-07-22 00:00:00,Pétreos,Piedras,Material
+ ,PET-00006,PORFIDO ROJO ESPESOR 6-8 CM (COCHERAS),12,M2,130.01,0,130.01,2026-07-22 00:00:00,Pétreos,Piedras,Material
+ ,PET-00008,SILLAR 19X25X45 AMARILLO,3,PZ,13,0,13,2026-07-22 00:00:00,Pétreos,Barro,Material
+ ,PET-00009,RODAPIE DE CANTERA 60X40 CM,12,M2,215,0,215,2026-07-22 00:00:00,Pétreos,Canteras,Material
+ ,PET-00014,SILLAR ROSA 45X25X20,3,PZ,22,0,22,2026-07-22 00:00:00,Pétreos,Canteras,Material
+ ,PET-00020,BLOCK DE CANTERA DE 18X44X05 ,3,PZ,12,0,12,2026-07-22 00:00:00,Pétreos,Canteras,Material
+ ,PET-00022,PORFIDO VERDE ESPESOR 6-8 CM,12,M2,160,0,160,2026-07-22 00:00:00,Pétreos,Piedras,Material
+ ,PET-00025,LAJA OXIDADA,12,M2,120,0,120,2026-07-22 00:00:00,Pétreos,Piedras,Material
+ ,PET-00027,SELLO PARA JARDINERIA,7,SERV,2800,0,2800,2026-07-22 00:00:00,Pétreos,Piedras,Material
+ ,PET-00029,RODAPIE DE CANTERA 20X40 CM,12,M2,215,0,215,2026-07-22 00:00:00,Pétreos,Canteras,Material
+ ,PET-00032,PIEDRA GALARZA 60X40 PZA,3,PZ,67.2,0,67.2,2026-07-22 00:00:00,Pétreos,Mármol,Material
+ ,PET-00033,PIEDRA GALARZA 40X40 PZA,3,PZ,100.8,0,100.8,2026-07-22 00:00:00,Pétreos,Mármol,Material
+ ,PET-00069,TEZONTLE ROJO 7 MTS,7,SERV,4650,0,4650,2026-07-22 00:00:00,Pétreos,Piedras,Material
+ ,PIN-00006,SELLADOR DEL TORO,15,CUB,890.01,0,890.01,2026-07-22 00:00:00,Pinturas,Sellador,Material
+ ,PIN-00012,FESTEXSILICON,15,CUB,4402,0,4402,2026-07-22 00:00:00,Pinturas,Impermeabilizante,Material
+ ,PIN-00015,IMPERMEABILIZANTE ELASTOMERICO ACRILICO A5,15,CUB,1606.75,0,1606.75,2026-07-22 00:00:00,Pinturas,Impermeabilizante,Material
+ ,PIN-00024,ACIDO MURIATICO,19,GLL,140.01,0,140.01,2026-07-22 00:00:00,Pinturas,Consumible,Material
+ ,PIN-00066,COMEX PROF VIN HIGH PERFOR MATE BLANCO OSTION HUESO,15,CUB,1797,0,1797,2026-07-22 00:00:00,Pinturas,Recubrimiento,Material
+ ,PIN-00067,COMEX PROF VIN HIGH PERFOR MATE FOCO,15,CUB,1797,0,1797,2026-07-22 00:00:00,Pinturas,Recubrimiento,Material
+ ,PIN-00099,SELLADOR ENTINTABLE,15,CUB,1181,0,1181,2026-07-22 00:00:00,Pinturas,Sellador,Material
+ ,PIN-00129,SELLADOR ACRILICO S10 5 LITROS (TITAN),15,CUB,899.92,0,899.92,2026-07-22 00:00:00,Pinturas,Sellador,Material
+ ,PIN-00142,PINTURA BLANCO OSTION (TITAN) ,15,CUB,1622.33,0,1622.33,2026-07-22 00:00:00,Pinturas,Recubrimiento,Material
+ ,PIN-00143,PINTURA FOCO (TITAN),15,CUB,1622.33,0,1622.33,2026-07-22 00:00:00,Pinturas,Recubrimiento,Material
+ ,PIN-00147,PINTURA DEVILLE (TITAN),15,CUB,1622.33,0,1622.33,2026-07-22 00:00:00,Pinturas,Recubrimiento,Material
+ ,PIN-00181,VINIMEX 3 EN 1 MATE DEVILLE 002-01 19 LTS,,CUB ,3051.28,0,3051.28,2026-07-21 00:00:00,Pinturas,Recubrimiento,Material
+ ,PIS-00002,BRUNEI BEIGE 60X60 1.44 MTS,4,CJ,299.82,0,299.82,2026-07-22 00:00:00,Loseta,Cerámico,Material
+ ,PIS-00005,LUGANO NATURALE 15X50 PRIMERA .975 MTS,4,CJ,220.73,0,220.73,2026-07-22 00:00:00,Loseta,Cerámico,Material
+ ,PIS-00009,DOVER BERKSHIRE RED 40X60 PRIMERA 1.44 MTS,4,CJ,299.81,0,299.81,2026-07-22 00:00:00,Loseta,Cerámico,Material
+ ,PIS-00011,BOQUILLA SELLADOR INT. ANTIQUE SACO 10 KGS ,13,BTS,143.11,0,143.11,2026-07-22 00:00:00,Loseta,Consumible,Material
+ ,PIS-00015,BOQUILLA SELLADOR INT. OYSTER GRAY SACO 10 K (PISOS),13,BTS,143.11,0,143.11,2026-07-22 00:00:00,Loseta,Consumible,Material
+ ,PIS-00016,BOQUILLA SIN ARENA WHITE PEARL SCO 5 KGS (MARMOL),13,BTS,161.11,0,161.11,2026-07-22 00:00:00,Loseta,Mármol,Material
+ ,PIS-00019,TEJA DE BARRO NATURAL DE 45X17X13CM 30 PZA X MTO,12,M2,190,0,190,2026-07-22 00:00:00,Pétreos,Barro,Material
+ ,PLA-00001,PASTO KIKUYO,12,M2,55,0,55,2026-07-22 00:00:00,Plantas,Cubresuelos,Material
+ ,PLA-00002,LAVANDA DE 20 A 30 CM,3,PZ,40,0,40,2026-07-22 00:00:00,Plantas,Ornamental,Material
+ ,PLA-00003,DURANTA DE 20 A 30 CM ,3,PZ,25,0,25,2026-07-22 00:00:00,Plantas,Ornamental,Material
+ ,PLA-00004,FORNIO VERDE (ESPADA) DE 1.00 A 1.20 MTS.,3,PZ,80,0,80,2026-07-22 00:00:00,Plantas,Ornamental,Material
+ ,PLA-00006,LIRIO,3,PZ,30,0,30,2026-07-22 00:00:00,Plantas,Ornamental,Material
+ ,PLA-00007,SUCULENTA ROJA,3,PZ,80,0,80,2026-07-22 00:00:00,Plantas,Ornamental,Material
+ ,PRE-00001,VIGUETA DE ALMA ABIERTA H-15 DE 2.20 (CISTERNA),3,PZ,215.93,0,215.93,2026-07-22 00:00:00,Prefabricados,Losa Nervada,Material
+ ,PRE-00004,BOVEDILLA JALCRETO MEDIANA 75 15 25 (CISTERNA),3,PZ,18,0,18,2026-07-22 00:00:00,Prefabricados,Losa Nervada,Material
+ ,PRE-00006,LAVADERO SIN PILA,3,PZ,325.01,0,325.01,2026-07-22 00:00:00,Prefabricados,Muebles,Material
+ ,PRE-00007,MARCO DE CANTERA 20X60 CM M,8,M,165,0,165,2026-07-22 00:00:00,Prefabricados,Canteras,Material
+ ,PRE-00008,OJO DE BUEY,3,PZ,2250,0,2250,2026-07-22 00:00:00,Prefabricados,Canteras,Material
+ ,PRE-00009,COLUMNAS DE CANTERA .30X3 MTS,3,PZ,2850.01,0,2850.01,2026-07-22 00:00:00,Prefabricados,Canteras,Material
+ ,PRE-00011,CASETON 40X40  ESPESOR 20 CMS,3,PZ,32.99,0,32.99,2026-07-22 00:00:00,Prefabricados,Losa Nervada,Material
+ ,PRE-00012,CASETON 60X50  ESPESOR 10 CMS,3,PZ,26.66,0,26.66,2026-07-22 00:00:00,Prefabricados,Losa Nervada,Material
+ ,PRE-00013,CASETON 60X50  ESPESOR 15 CMS,3,PZ,39.98,0,39.98,2026-07-22 00:00:00,Prefabricados,Losa Nervada,Material
+ ,PRE-00020,CASETON 40X40  ESPESOR 25 CMS,3,PZ,35.53,0,35.53,2026-07-22 00:00:00,Prefabricados,Losa Nervada,Material
+ ,SAN-00002,PEGAMENTO WELD*ON 747 1/2 LT,3,PZ,200,0,200,2026-07-22 00:00:00,Sanitario,Consumible,Material
+ ,SAN-00003,YEE SANITARIA SENCILLA 2X2 CEMENT,3,PZ,8.81,0,8.81,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00004,YEE SANITARIA SENCILLA 4X2 CEMENT,3,PZ,20,0,20,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00005,YEE SANITARIA SENCILLA 4X4 CEMENTAR,3,PZ,63.5,0,63.5,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00006,YEE SANITARIA 6X4,3,PZ,94.01,0,94.01,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00007,CODO SANITARIO CEMENTAR 2X45,3,PZ,4.6,0,4.6,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00008,CODO SANITARIO CEMENTAR 2X90,3,PZ,4.6,0,4.6,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00009,CODO SANITARIO CEMENTAR 3X90,3,PZ,10.2,0,10.2,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00010,CODO SANITARIO CEMENTAR 4X45,3,PZ,15,0,15,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00011,CODO SANITARIO CEMENTAR 4X90,3,PZ,18,0,18,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00012,CODO SANITARIO 4X90 SAL TRASERA,3,PZ,23,0,23,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00013,CODO SANITARIO CEMENTAR 4X90 SAL LAT,3,PZ,23,0,23,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00014,REDUCCION 75X50,3,PZ,6.01,0,6.01,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00015,REDUCCION SANITAR CEM 100X75,3,PZ,11.3,0,11.3,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00016,REDUCCION 100X50,3,PZ,10.2,0,10.2,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00017,TEE SANITARIA SENCILLA 3X3 CEMENTAR,3,PZ,12.5,0,12.5,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00018,"TUBO SANITARIO REFORZADO 6"" 150 MM P",16,TMO,758.5,0,758.5,2026-07-22 00:00:00,Sanitario,Tuberías,Material
+ ,SAN-00019,"TUBO SANITARIO REFORZADO 4"" 110 MM P",16,TMO,307.51,0,307.51,2026-07-22 00:00:00,Sanitario,Tuberías,Material
+ ,SAN-00020,"TUBO SANITARIO REFORZADO 3"" 75 MM",16,TMO,200,0,200,2026-07-22 00:00:00,Sanitario,Tuberías,Material
+ ,SAN-00021,"TUBO SANITARIO REFORZADO 2"" 50 MM P",16,TMO,122.01,0,122.01,2026-07-22 00:00:00,Sanitario,Tuberías,Material
+ ,SAN-00024,LATA DE GAS,3,PZ,38.01,0,38.01,2026-07-22 00:00:00,Sanitario,Consumible,Material
+ ,SAN-00029,EXTENSION CORRUGADA P DESA P-B9022,3,PZ,34,0,34,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00038,COPLE 3/8 16 CG-CU00-CC 3L,3,PZ,60,0,60,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00039,CODO SAN. CEMENTAR 3X45 1F,3,PZ,15,0,15,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00041,COPLE SAN. CEMENTAR 75 MM 3 1L,3,PZ,10,0,10,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00043,ADAPTADOR MACHO METAL CPVC 1/2 FLOWGUARD 9L,3,PZ,55,0,55,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00044,CODO C/OREJAS META CPVC 1/2X90 FLOWGUARD 9L,3,PZ,105,0,105,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00045,REDUCCION SAN. CEM 50 X 40 2L,3,PZ,8,0,8,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00046,CONECTOR CESPOL UNIVERSAL P-B9030 COFLEX 7L,3,PZ,20,0,20,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00050,MANGUERA SANITAR ACER 35CM AS-A35 COFLEX 7L,3,PZ,80,0,80,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00055,ADAPTADOR HEMBR METAL CPVC 1/2 FLOWGUARD 3L,3,PZ,55,0,55,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00056,*001-4 REJILLA FINAL PLASTICA 4-PG,3,PZ,120,0,120,2026-07-22 00:00:00,Sanitario,Accesorios,Material
+ ,SAN-00058,"CESPOL LAVABO FLEX 20"" C/CUBIERTA A.L.EL PRO",3,PZ,65,0,65,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00059,VALVULA ALIVIO BOILER 3/4 IP-801C COFLEX 7L,3,PZ,285,0,285,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00060,MAN BOILER 3/4M-3/4H 60CM AB-B60 COFLEX 7L,3,PZ,175,0,175,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00062,MANGUERA GAS ALU 3/8 1 MT AG-B100 COFLEX 7L,3,PZ,95,0,95,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00066,ADAPTADOR HEMBRA METAL CPVC 1 FLOWGUARD 9L,3,PZ,145,0,145,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00069,ADAPTADOR MACHO METAL CPVC 3/4 FLOWGUARD 9L,3,PZ,70,0,70,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00075,ANCLAS TX 3/8 TX38300 6L,3,PZ,10,0,10,2026-07-22 00:00:00,Sanitario,Fijación,Material
+ ,SAN-00080,ADAPTADOR MACHO METAL CPVC 1 FLOWGUARD 8F,3,PZ,140,0,140,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00104,CODO SAN. CEMENTAR 6 X 45 1L,3,PZ,55,0,55,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00106,VALVULA FLOTADOR SIN FIN 3/4-1/2 ROTOPLAS 3L,3,PZ,130,0,130,2026-07-22 00:00:00,Sanitario,Válvulas,Material
+ ,SAN-00107,CODO CPVC 1 X45 FLOWGUARD 9L,3,PZ,15,0,15,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00130,VALVULA DE PASO 3/8X3/8 CG-VE00-CC OL,3,PZ,150,0,150,2026-07-22 00:00:00,Sanitario,Válvulas,Material
+ ,SAN-00132,TEE 3/8 16 CG-TE000-CC 2L,3,PZ,85,0,85,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00133,CODO 90º 3/8 16 CG-Eu00-CG 4L,3,PZ,60,0,60,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00141,TEE REFORZADA GALVANIZADA 3/4 8F,3,PZ,22,0,22,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00142,NIPLE GALVANIZADO 3/4 X 2 1/2 8L,3,PZ,11,0,11,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00143,SILICON BAÑO/COCINA  TRANS 280ML SSJ4T36,3,PZ,105,0,105,2026-07-22 00:00:00,Sanitario,Consumible,Material
+ ,SAN-00160,MANGUERA BOILER 3/4M-3/4H 40CM AB-B40 COFLEX 7l,3,PZ,150,0,150,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00178,TAPA INSERCION 3 REX 2l,3,PZ,6.38,0,6.38,2026-07-22 00:00:00,Sanitario,Conexiones,Material
+ ,SAN-00180,TUBO SAN. REFORZADO 11/2 40MM PVC 2l,8,M,25,0,25,2026-07-22 00:00:00,Sanitario,Tuberías,Material
+ ,SAN-00186,TRAMPA FREGADERO 2 TARJA Tf-110 COFLEX 7l ,3,PZ,202.5,0,202.5,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
+ ,SAN-00192,Coladera Cuadrada Ai Rej Pc-303 Coflex 7f,3,PZ,293.1,0,293.1,2026-07-22 00:00:00,Sanitario,Accesorios,Material
+ ,SAN-00208,Cuello de Cera C/Guia Y Pijas 345 Urrea 23,3,PZ,30.5,0,30.5,2026-07-22 00:00:00,Sanitario,Accesorios Muebles,Material
++,ZA1-000001,Zapata ZA-1 1.00X1.00,3,PZ,1135.48,0,1135.48,2026-07-22 00:00:00,Elemento Estructural,Zapata,Material
++,ZA2-000001,Zapata ZA-2 1.00X2.6,3,PZ,1756.23,0,1756.23,2026-07-22 00:00:00,Elemento Estructural,Zapata,Material

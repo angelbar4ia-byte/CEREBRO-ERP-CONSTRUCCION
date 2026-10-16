@@ -57,8 +57,15 @@ dato para probar se guarda en el repo, tal cual.
 | `ANALISIS_DE_BASICOS_CONCEPTOS` | 2,568 | `1-mundo/opus/ANALISIS_DE_BASICOS_CONCEPTOS.csv` — trae también los compuestos y las 39 cuadrillas |
 | `ANALISIS_DE_BASICOS_COMPUESTOS` | 267 | `1-mundo/opus/ANALISIS_DE_BASICOS_COMPUESTOS.csv` — son las líneas de `Origen = Material` del anterior, idénticas |
 | `INGENIERIA - ALAMO 18 - …` | 11 archivos | `1-mundo/opus/ingenieria-alamo-18/` |
-| `CATALOGO_DE_MATERIALES` (387), `_TRABAJOS`, `_MANO_DE_OBRA`, `_FLETES`, `_CONCEPTOS` | — | **No están.** Se describen arriba porque se leyeron en sesiones anteriores; el archivo no está ni en el repo ni en la máquina |
-| Los de la generación anterior: unidades (16), niveles (15), etapas (50), familias (35), contratistas (29), cuadrillas, auxiliares, materiales (325), subcontratos | — | **No están**, por lo mismo |
+| `CATALOGO_DE_MATERIALES` | 386 | `1-mundo/opus/CATALOGO_DE_MATERIALES.xlsx` y su `.csv` (D-527; la versión descrita antes decía 387) |
+| `CATALOGO_DE_MANO_DE_OBRA` | 97 | `1-mundo/opus/CATALOGO_DE_MANO_DE_OBRA.xlsx` y su `.csv` (D-527): 58 categorías y puestos y **las 39 cuadrillas**, con el cálculo del salario real |
+| `CATALOGO_DE_MATRICES` | 472 | `1-mundo/opus/CATALOGO_DE_MATRICES.xlsx` y su `.csv` (D-527): los conceptos con su costo, en 14 familias |
+| `CATALOGO_DE_FLETES` | 9 | `1-mundo/opus/CATALOGO_DE_FLETES.xlsx` y su `.csv` (D-527) |
+| `CATALOGO_DE_TRABAJOS` (destajos y subcontratos) | 265 | `1-mundo/opus/CATALOGO_DE_TRABAJOS.xlsx` y su `.csv` (D-528): 259 destajos y 6 subcontratos, en 14 columnas (la descripción de abajo decía 12) |
+| `CATALOGO_DE_CONCEPTOS` | — | **No está, y no parece hacer falta:** las matrices ya traen todos los conceptos del presupuesto |
+| Los de la generación anterior: unidades (16), niveles (15), etapas (50), familias (35), contratistas (29), cuadrillas, auxiliares, materiales (325), subcontratos | — | **No están**, por lo mismo. Las unidades y las familias vienen en los catálogos nuevos, y los niveles y las etapas salen del árbol del presupuesto (15 y 52) |
+
+**Qué cubren los cuatro catálogos de D-527.** Cruzados con el análisis de básicos (`ANALISIS_DE_BASICOS_CONCEPTOS`): **todas las líneas de material (1,943), de mano de obra (112) y de flete (51) están en un catálogo,** y **los 596 conceptos y compuestos que el análisis declara** salen de las matrices (468), de los 89 materiales compuestos y de las 39 cuadrillas. **Las 471 claves de concepto del presupuesto están en `CATALOGO_DE_MATRICES`.** Lo único que quedaba sin catálogo eran las líneas de tipo `Contrato` (462 líneas, 263 claves: los destajos `MOA`, `MOE`, `MOS`, `MOH`, `MOG`, `MOC`, `MOP` y `MOO`, y seis subcontratos `SUB`), y **D-528 las cubre con `CATALOGO_DE_TRABAJOS`:** con los cinco catálogos, **las 1,208 claves del análisis de básicos (padres e hijos) tienen catálogo, y el costo de las 462 líneas de contrato coincide con el del catálogo, sin una sola diferencia.** El catálogo trae dos claves de más que el análisis no usa (una `MOE` y una `MOS`).
 
 *Lo que falta bloquea P-09, P-32, M-14, B-07 y el cierre de P-14. Quien los tenga puede subirlos tal cual (`.xlsx` o `.csv`).*
 
@@ -66,7 +73,7 @@ dato para probar se guarda en el repo, tal cual.
 
 ### Las demás tablas que el usuario compartió, a salvo (D-479)
 
-Además de los 14 CSV de OPUS (arriba), el usuario subió 14 libros de Excel que solo vivían en la carpeta temporal de la sesión. Cada uno está **tal cual** (la huella lo prueba) y cada hoja, también como CSV, en `1-mundo/fuentes/`; `1-mundo/fuentes/MANIFIESTO.csv` lista los 59 archivos con su huella sha256.
+Además de los 14 CSV de OPUS (arriba), el usuario subió 14 libros de Excel que solo vivían en la carpeta temporal de la sesión. Cada uno está **tal cual** (la huella lo prueba) y cada hoja, también como CSV, en `1-mundo/fuentes/`; `1-mundo/fuentes/MANIFIESTO.csv` lista los 69 archivos con su huella sha256 (59 de D-479, 8 de D-527 y 2 de D-528).
 
 | Tabla | Qué es | Dónde está |
 |---|---|---|
@@ -453,7 +460,7 @@ todos de la misma semana: **el catálogo de materiales está al día.**
 
 ## 3 Trabajos — `CATALOGO_DE_TRABAJOS.xlsx`
 
-**265 filas · 12 columnas.** Es el catálogo de mano de obra que faltaba: aquí viven
+**265 filas · 12 columnas** *(el archivo que llegó en D-528 trae 14, con `Clave usuario` y `Comentarios`; las demás cifras coinciden con las de abajo).* Es el catálogo de mano de obra que faltaba: aquí viven
 los destajos que el árbol referencia.
 
 > `MOA-00112 MO FINAS INTERIORES EN MUROS 0-3.00 MTS`, $50.00 por M2 — **el mismo
