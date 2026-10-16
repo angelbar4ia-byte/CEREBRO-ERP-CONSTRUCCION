@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -570,11 +570,11 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | # | Hueco | Quién lo mueve |
 |---|---|---|
 | 1 | **Compras como validador de topes:** ¿rol nuevo con `validar_estimacion`, o sigue Control de obra? (B-115) | El usuario |
-| 2 | **Funciones sin clave:** capturar, enviar, devolver y marcar pagada una estimación; asignar un subcontrato; cotizar y auditar una OT; liberar la retención; confirmar los avances (§7, hueco 7, y B-115). Las de avance y reprogramación ya tienen clave (D-533) | El usuario |
+| 2 | **Funciones sin clave:** son las de la columna ❓ de §8.7, con una propuesta de dueño para cada una. Las de avance y reprogramación ya tienen clave (D-533) | El usuario |
 | 3 | **Descuentos, traspaso del anticipo y cotizador** (B-110, B-124 y B-123) | El usuario |
-| 4 | **La junta de arranque:** cuándo se cierra la planeación y quién la declara cerrada | El usuario |
+| 4 | **La junta de arranque:** cuándo se cierra la planeación y quién la declara cerrada. *Recomendación (D-536):* Control de obra, que es quien asigna al residente y contrata la rama, con una función `marcar_obra_iniciada` | El usuario |
 | 5 | **La urbanización:** una obra única con ramas de clústeres y amenidades; su flujo propio no está escrito, y ObraCtrl hoy no la representa (D-523, G3) | El usuario |
-| 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516). **El primero que se dice (D-533):** al aplicarse una reprogramación se notifica el cambio *a los demás;* quiénes son no se dijo | El usuario |
+| 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516). **El primero que se dice (D-533):** al aplicarse una reprogramación se notifica el cambio *a los demás;* quiénes son no se dijo. §8.7 propone una regla de partida | El usuario |
 | 7 | **~~El cuantificador~~ — ✅ cerrado (D-532):** un motor con dos entradas, la herramienta como ventana flotante que abre el módulo y el espacio de trabajo por nivel o partida grande (§8.1). *Queda abierto:* el umbral de «discrepan mucho» al comprobar un presupuesto y la regla normal de quién traza y quién aprueba | El usuario |
 | 8 | **~~Los tipos de presupuesto~~ — ✅ cerrado (D-532 a D-535):** la cotización al cliente es el cuarto valor de `PRESUPUESTO.tipo` y se vuelve control de cambio al aceptarla el cliente. Su precio es **m² × el precio pactado** en una ampliación (17,000 pesos de lista, IVA incluido, **no fijo**) y **la diferencia ÷ 0.7** en algo específico. *Queda por confirmar (B-123):* si el precio varía por proyecto o prototipo, cómo se representa lo que sale, el folio y quién la hace | El usuario |
 | 9 | **~~Cuándo está «definido» un presupuesto~~ — ✅ cerrado (D-532):** definido es **costeado**; contratado es otro estado, y contratar la rama es la declaración, de Control de obra (§8.1) | — |
@@ -582,3 +582,184 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | 11 | **~~Quién acepta una fecha nueva de lo contratado~~ — ✅ cerrado (D-533):** el residente propone, el supervisor revisa y control valida; o el supervisor propone y control valida; y control la realiza y se notifica a los demás (`MODELO.md` §5c) | — |
 | 12 | **~~Cada cuánto se captura el avance físico~~ — ✅ contestado (D-533):** a diario, o confirmándolo al terminar la actividad; y antes de estimar se confirman los avances | — |
 | 13 | **~~Confirmar los avances antes de estimar~~ — ✅ cerrado (D-534 y D-535):** lo confirma el residente, al nivel en que se capturó (actividad; concepto paramétrico; o el frente en porcentaje, que se baja y cuyo reparto decide el usuario). No es un candado de la estimación, pero lo estimado por encima de lo confirmado es una alerta importante y se pueden bajar las cantidades de la estimación | — |
+| 14 | **Los roles que faltan:** Compras, Finanzas, y Proyectos y atención al cliente, y si el equipo de gestión de proyectos es esta última (§8.7). *Recomendación:* sumar los tres | El usuario |
+| 15 | **Los dueños de 26 funciones sin clave o sin asignar,** con la propuesta de §8.7. La advertencia: Control de obra pasaría de 22 a 33 funciones | El usuario |
+
+## 8.7 Los roles paso por paso (D-536)
+
+**Pedido del usuario (D-536):** «Sí, seguimos con los roles paso por paso». Cada etapa de §8.3 se abre en sus pasos, y cada paso dice **quién lo hace, con qué función y en qué estado está esa asignación.** Todo sale de lo ya decidido (`MODELO.md` §5b y las funciones de D-533) y de las propuestas que ya había (B-115, B-118 y `MODELO.md` §5i); donde falta el dueño, marco **mi recomendación** para que el usuario la confirme o la cambie. **No toqué la lista de funciones de `MODELO.md` §5b:** se cambia cuando el usuario decida (D-487).
+
+Marcas: ✅ rol y función asignados y confirmados · 🔶 dicho o propuesto, con la clave o el rol sin confirmar · ❓ falta el dueño o la clave · ⚙ no es una persona del cerebro. Donde actúa el Supervisor, el Superintendente podría hacerlo igual (§7, hueco 2; recomendación: hereda).
+
+**Etapa 1 · Preparar el catálogo y las plantillas**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Cargar el export de OPUS y decidir lo detenido y las bajas al reconciliar | Costos y Control de obra | `cargar_catalogo_opus` | 🔶 | Propuesta de D-473; la misma carga cubre la reconciliación (D-476) |
+| Proponer un precio nuevo | Costos | `proponer_precio_nuevo` | ✅ |  |
+| Aprobar el precio nuevo | Control de obra **y** Superintendente, los dos | `aprobar_precio_nuevo` | ✅ | Doble aprobación obligatoria |
+| Clonar un insumo o corregir un prefijo | Control de obra | `clonar_insumo` | 🔶 | Propuesta de D-478: cambia lo que citan los conceptos de todas las obras |
+| Reclasificar una familia o resolver un parámetro por revisar | Control de obra | `reclasificar_familia` · `resolver_revisar_parametro` | 🔶 | Menos firme |
+
+**Etapa 2 · Dar de alta el lugar**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Crear el proyecto, el cluster (o la manzana) y la obra, con su prototipo y sus m² adicionales | ❓ *Recomiendo Control de obra,* que gobierna entre obras | ❓ sin clave (`dar_de_alta_obra`) | ❓ | Crear la obra es crear su presupuesto (§8.1) |
+
+**Etapa 3 · Diseñar el presupuesto de la obra**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Cargar la ingeniería del lote (el Excel de Costos, por niveles) | Costos *(la prepara; quién la carga es mi lectura)* | ❓ sin clave (`cargar_ingenieria`) | ❓ | `cargar_catalogo_opus` es del catálogo y los presupuestos de OPUS |
+| Trazar sobre el plano | Costos, Control de obra, Residente y Supervisor | `trazar` | ✅ |  |
+| Aprobar el trazo | Control de obra | `aprobar_trazo` | ✅ |  |
+| Anotar el plano | Residente y Supervisor | `anotar_plano` | ✅ |  |
+| Resolver una alerta de comparación (diferencia sin causa, identidad dudosa) | Supervisor y Control de obra | `resolver_alerta` | 🔶 | Propuesta de D-485 |
+| Contratar la rama: fija los PU y la congela | Control de obra | `contratar_subarbol` | 🔶 | Propuesta de D-475 |
+
+**Etapa 4 · Programar y asignar, hasta la junta de arranque**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Asignar al residente | Control de obra | `asignar_residente` | ✅ |  |
+| Asignar la supervisión | Control de obra | `asignar_supervision` | ✅ |  |
+| Asignar al contratista, por obra y tipo de trabajo y de ahí por etapa o concepto | ❓ *Recomiendo Control de obra* (el de un subcontrato lo asigna Finanzas) | ❓ sin clave (`asignar_contratista`) | ❓ | `MODELO.md` §4a |
+| Pactar el precio con el contratista | ❓ *Recomiendo Control de obra* | `pactar_precio_contratista` | ❓ | Existe sin dueño desde P-21 |
+| Colgar el programa del prototipo y editar su estructura | Control de obra | `editar_estructura_programa` | ✅ | También subir un programa (D-466) |
+| Ajustar las fechas del programa | Residente | `editar_fechas_programa` | ✅ |  |
+| Declarar la junta de arranque y marcar la obra `iniciada` | ❓ *Recomiendo Control de obra* | ❓ sin clave (`marcar_obra_iniciada`) | ❓ | Dispara las fechas contractuales (§8.1) |
+
+**Etapa 5 · Contratar un subcontrato (OT) y cotizar al cliente**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Cotizar al cliente un cambio o adicional (Highlight o Adicional) | Control de obra *(hoy, como cotizador)* | ❓ sin clave (`cotizar_cambio_cliente`) | 🔶 | El cotizador no es un rol activo |
+| Autorizar el control de cambio cuando el cliente acepta | ❓ *Recomiendo Control de obra* | `autorizar_orden_cambio` | ❓ | Existe sin dueño desde P-21 |
+| Asignar al contratista de un subcontrato | Finanzas *(no es un rol)* | `asignar_subcontrato` | 🔶 | Propuesta de `MODELO.md` §5i |
+| Cotizar y generar la OT; cambiar su alcance | Proyectos y atención al cliente *(no es un rol)* | propuesta de `MODELO.md` §5i | 🔶 | Va primero Proyectos y después Control (D-519) |
+| Confirmar o modificar la cotización contra el presupuesto base; auditar el cambio de alcance | Control de obra | propuesta de `MODELO.md` §5i | 🔶 |  |
+| Confirmar los pagos de una OT | Control de obra | propuesta de `MODELO.md` §5i | 🔶 |  |
+| Autorizar liberar la retención | Supervisor; Control de obra la valida si hace falta | `liberar_retencion` *(propuesta)* | 🔶 | `MODELO.md` §5i |
+
+**Etapa 6 · Ejecutar y registrar el avance, cada semana**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Anotar la cantidad o el porcentaje del avance | Residente | `registrar_avance` | ✅ | D-533 |
+| Trazar el avance | Control de obra, Residente y Supervisor; Costos no | `trazar_avance` | 🔶 | El rol lo dijo el usuario (D-533); la clave es propuesta |
+| Confirmar los avances: al terminar la actividad y antes de estimar | Residente | ❓ sin clave (`confirmar_avance`) | 🔶 | El rol lo dijo el usuario (D-534) |
+| Originar una incidencia | Residente, Supervisor o Control de obra | `originar_incidencia` | ✅ |  |
+| Aprobar la incidencia | Supervisor | `aprobar_incidencia` | ✅ | Quien origina no se aprueba a sí mismo |
+| Validar la incidencia en sitio | Control de obra | `validar_incidencia` | ✅ |  |
+| Ejecutar la incidencia | Residente | `ejecutar_incidencia` | ✅ |  |
+| Cerrar la incidencia | Supervisor | `cerrar_incidencia` | ✅ | Da seguimiento hasta cerrar |
+| Proponer, revisar, validar y realizar una fecha nueva de lo contratado | Residente o Supervisor · Supervisor · Control de obra · Control de obra | `proponer_reprogramacion` · `revisar_reprogramacion` · `validar_reprogramacion` · `aplicar_reprogramacion` | 🔶 | Los roles los dijo el usuario (D-533); las claves son propuestas |
+| Resolver una alerta de atraso, de ritmo o de respaldo | Supervisor y Control de obra | `resolver_alerta` | 🔶 | Propuesta de D-485 |
+| Surtir el almacén | El almacén *(ERP externo)* | — | ⚙ | No es un usuario del cerebro |
+
+**Etapa 7 · Estimar y pagar, cada semana**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Crear la estimación (en Excel) | Residente | ❓ sin clave (`capturar_estimacion`) | ❓ | El rol lo dijo el usuario (D-522) |
+| Recolectarla, pasarla por el extractor y enviarla al validador de topes | Control de obra | ❓ sin clave (`enviar_estimacion`) | ❓ | El rol lo dijo el usuario (D-522) |
+| Validar topes y devolverla si algo excede | El validador: Compras hoy; Control de obra según D-330 | `validar_estimacion` · ❓ `devolver_estimacion` | ❓ | B-115: ¿rol nuevo o sigue Control de obra? |
+| Revisar los ajustes que no pasan por topes y verificar la cuantificación | Residente | ❓ sin clave | ❓ | Se apoya en la alerta de lo estimado de más (D-535) |
+| Justificar lo fuera de catálogo | Supervisor | ❓ sin clave (`justificar_fuera_de_catalogo`) | ❓ | El campo de la justificación es mío (`MODELO.md` §5d) |
+| Ajustar y validar la final: es la que se paga | El validador | `validar_estimacion` | ❓ | B-115 |
+| Compartir la final para el pago y marcarla pagada | Control de obra | `marcar_estimacion_pagada` *(propuesta)* | 🔶 | Propuesta de B-118 |
+| Aplicar un descuento o una deducción | ❓ | `aplicar_descuento` | ❓ | Existe sin dueño desde P-21; B-110 |
+
+**Etapa 8 · Cerrar**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Solicitar el cierre del frente, al 90 % | Residente | `solicitar_cierre_frente` | ✅ |  |
+| Aprobar el cierre del frente | Supervisor | `aprobar_cierre_frente` | ✅ |  |
+| Validar el cierre del frente | Control de obra | `validar_cierre_frente` | ✅ |  |
+| Cerrar por una o varias actividades, si se requiere | Residente · Supervisor · Control de obra: las mismas manos | ❓ sin claves propias *(lectura mía: las tres de arriba)* | 🔶 | `MODELO.md` §5c, D-522 |
+| Entregar la obra | Residente | ❓ sin clave (`entregar_obra`) | ❓ | En cualquier orden; la obra queda entregada cuando participan los cuatro |
+| Dar el visto bueno de la entrega | Supervisor | ❓ sin clave (`dar_visto_bueno_entrega`) | ❓ |  |
+| Revisar la calidad y el expediente de la entrega | Control de obra | ❓ sin clave (`validar_calidad_entrega`) | ❓ |  |
+| Firmar la entrega | El equipo de gestión de proyectos; el Superintendente puede estar o no | ❓ sin clave (`firmar_entrega`) | ❓ | Qué es el equipo sigue sin contestarse |
+
+**Etapa 9 · Entregar y atender la postventa**
+
+| Paso | Quién | Función | Estado | Nota |
+|---|---|---|---|---|
+| Pasar la obra a `entregada` y a postventa | El sistema, cuando participan los cuatro de la entrega | — | ⚙ | `MODELO.md` §3c y §3b |
+| Abrir y atender una garantía | ❓ *Recomiendo Proyectos y atención al cliente,* que atiende al cliente | ❓ sin clave (`abrir_ticket_garantia`) | ❓ | `TICKET_GARANTIA` |
+| Cotizar y generar la OT de postventa o de mantenimiento | Proyectos y atención al cliente *(no es un rol)* | propuesta de `MODELO.md` §5i | 🔶 |  |
+| Concluir la OT cuando se pagó todo | El sistema lo propone y Proyectos y atención al cliente lo confirma | propuesta de `MODELO.md` §5i | 🔶 | Los residentes estiman hasta el pago de la garantía |
+
+### Qué dice el conjunto
+
+De los **57 pasos,** 18 están ✅, 19 son 🔶, 18 están ❓ y 2 son ⚙. **Lo que ya funciona de punta a punta** son las incidencias, el cierre de frente, la edición del programa y la aprobación de un precio nuevo. **Donde faltan dueños** es en la estimación (siete pasos), en la entrega de la obra (cuatro) y en el arranque (tres): justo los puntos donde el recorrido real de la empresa no coincide con los seis roles que el cerebro tiene.
+
+### Las áreas que todavía no son rol
+
+Hoy `ROL` tiene seis: Residente, Supervisor, Superintendente, Costos, Cotizador (sin activar) y Control de obra. Los usuarios pueden tener varios roles a la vez (`USUARIO_ROL`), así que sumar uno es una fila y no un cambio de esquema.
+
+| Área | Qué haría | Recomendación |
+|---|---|---|
+| **Compras** | El validador de topes: `validar_estimacion` y devolver la estimación | **Sí, rol nuevo** (B-115). El cerebro pide que valide un rol distinto, no Control de obra con otro sombrero (`CONOCIMIENTO.md` §13.8), y el usuario lo llama «rol de Compras» (D-522). Control de obra recolecta, envía, comparte y marca pagada |
+| **Finanzas** | Asignar al contratista de un subcontrato | **Sí,** un rol de una sola función |
+| **Proyectos y atención al cliente** | Cotizar y generar la OT, cambiar su alcance, atender garantías y postventa | **Sí** |
+| **Equipo de gestión de proyectos** | Firmar la entrega de la obra | ❓ *Si es el mismo equipo que Proyectos y atención al cliente, no hace falta otro rol;* falta que el usuario lo diga |
+| **Cotizador** | Cotizar al cliente un cambio o adicional | Dejarlo sin activar: Control de obra lo hace hoy (B-123) |
+
+Con las tres primeras, `ROL` pasaría de seis a nueve.
+
+### Las funciones que faltan, con mi propuesta de dueño
+
+| Función | Dueño propuesto | Por qué |
+|---|---|---|
+| `dar_de_alta_obra` | Control de obra | Gobierna entre obras, como `asignar_residente` |
+| `cargar_ingenieria` | Costos | La ingeniería de costos es suya |
+| `asignar_contratista` | Control de obra | Igual que el residente y la supervisión; el de un subcontrato lo asigna Finanzas |
+| `pactar_precio_contratista` *(ya existe)* | Control de obra | Contrata el bloque y con eso se fija el precio |
+| `marcar_obra_iniciada` | Control de obra | Declara la junta de arranque |
+| `cotizar_cambio_cliente` | Control de obra | Hoy hace de cotizador |
+| `autorizar_orden_cambio` *(ya existe)* | Control de obra | Cambia el costo y el plazo. *Idea:* doble, con el Superintendente, como el precio nuevo |
+| `confirmar_avance` | Residente | D-534 |
+| `capturar_estimacion` | Residente | D-522 |
+| `enviar_estimacion` | Control de obra | D-522 |
+| `devolver_estimacion` | Compras | *«Si algo excede su tope, se regresa»* (`CONOCIMIENTO.md` §13.8) |
+| `justificar_fuera_de_catalogo` | Supervisor | D-522 |
+| `marcar_estimacion_pagada` | Control de obra | B-118 |
+| `aplicar_descuento` *(ya existe)* | Sin proponer | Esperan los descuentos (B-110) |
+| `entregar_obra` | Residente | D-516 y D-522 |
+| `dar_visto_bueno_entrega` | Supervisor | D-516 y D-522 |
+| `validar_calidad_entrega` | Control de obra | D-516 y D-522 |
+| `firmar_entrega` y `firmar_entrega_superintendente` | El equipo de gestión de proyectos; el Superintendente, opcional | D-516 y D-522 |
+| `liberar_retencion` | Supervisor la autoriza; Control de obra la valida si hace falta | `MODELO.md` §5i |
+| `abrir_ticket_garantia` | Proyectos y atención al cliente | Atiende al cliente |
+| `asignar_subcontrato` | Finanzas | `MODELO.md` §5i |
+| `cotizar_ot` y `cambiar_alcance_ot` | Proyectos y atención al cliente | `MODELO.md` §5i |
+| `confirmar_pago_ot` y `auditar_alcance_ot` | Control de obra | `MODELO.md` §5i |
+
+**Una advertencia de diseño.** Con esta propuesta Control de obra pasaría de **22 a 33 funciones.** Sale de la regla que ya existe, el gobierno cruzado entre obras (D-330), pero junta en una sola mano el alta de obras, los contratistas, el arranque, el control de cambio, el envío y el pago de las estimaciones. Si en la práctica eso es un cuello de botella, el remedio no cambia el esquema: es reasignar filas de `ROL_FUNCION`.
+
+### Los avisos: una regla de partida
+
+El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y así sigue: **solo anota a quién le toca enterarse cuando el usuario lo dice.** Lo único dicho (D-533): al aplicarse una reprogramación se avisa **a los demás.** *Regla de partida, mía, para que la app la use mientras el usuario decide:* se avisa **a quien tiene que dar el siguiente paso de la cadena,** y a los demás de la obra cuando cambian las fechas. Por ejemplo:
+
+| Qué pasó | A quién se avisa |
+|---|---|
+| Se aplicó una reprogramación | A los demás de la obra: el residente, el supervisor y control de obra de esa obra *(quiénes son no se dijo)* |
+| Un paso de una incidencia o de un cierre | Al que sigue en la cadena; al cerrar, a quienes participaron |
+| Se envió, se devolvió, se validó o se pagó una estimación | Al que sigue; si se devuelve, al residente y al supervisor; si se paga, a ellos también |
+| Hay una alerta nueva, sobre todo la de lo estimado de más | A quienes la resuelven: supervisor y control de obra |
+| Se contrató una rama | Al residente y al supervisor de la obra |
+| Se propuso un precio nuevo | A quienes lo aprueban: control de obra y superintendente |
+| El cliente aceptó una cotización | A quien autoriza el control de cambio |
+
+### Lo que necesita el usuario
+
+Cuatro decisiones desbloquean casi todo; lo demás sigue las recomendaciones de arriba si no se dice otra cosa:
+
+1. **Los tres roles nuevos:** Compras, Finanzas, y Proyectos y atención al cliente.
+2. **Si el equipo de gestión de proyectos es el área de Proyectos y atención al cliente.**
+3. **Control de obra como dueño** del alta de la obra, el contratista, el precio pactado, el arranque y el control de cambio.
+4. **Los dueños de la estimación:** el residente la crea y revisa, Control de obra la envía y la marca pagada, Compras la valida y la devuelve, y el supervisor justifica lo fuera de catálogo.
