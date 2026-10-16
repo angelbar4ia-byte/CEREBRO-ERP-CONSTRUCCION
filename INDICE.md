@@ -42,7 +42,7 @@ cerebro/
 ├── INDICE.md                  ← fuera de las capas: las conecta
 ├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
 │   ├── programas/             los siete programas y sus listas, en CSV (13 archivos)
-│   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices e ingenierías de ALAMO 18 (14 archivos)
+│   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices, los cinco catálogos de D-527 y D-528 e ingenierías de ALAMO 18 (24 archivos)
 │   └── fuentes/               las demás tablas que el usuario compartió, a salvo (D-479): almacén, avance, precio real, semilla y programa, cada libro tal cual y cada hoja en CSV, con su MANIFIESTO de huellas
 ├── 2-operacion/               METODO · METACOGNICION · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
@@ -250,7 +250,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 528 decisiones · 12 descartes · 35 correcciones |
+| `MEMORIA.md` | III | ✅ 529 decisiones · 12 descartes · 35 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
@@ -261,7 +261,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `PRIORIDADES.md` | IV | 🆕 Criterio de orden |
 | `APRENDIZAJE.md` | III | 🆕 Diseñado, no construido |
 | `ESCALABILIDAD.md` | II | 🆕 Contrato de módulo · dos escenarios de crecimiento |
-| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir |
+| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir · el flujo de la app (§8, D-529) |
 | `skills/erp-importacion.md` | II | 🆕 Compilado · carga desde OPUS |
 | `skills/erp-rediseno.md` | II | 🆕 Compilado · las seis operaciones y las tres capas |
 | `skills/erp-parametrico.md` | II | 🆕 Compilado · ensambles, cohorte, dispersión |

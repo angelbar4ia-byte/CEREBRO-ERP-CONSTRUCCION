@@ -5,8 +5,8 @@
 capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
-corte:      2026-10-12
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485)
+corte:      2026-10-16
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -248,3 +248,63 @@ del hueco 1 —es una decisión, no cuesta código y deshacerla es una fila de `
 sigue el filtro por obra (3); después el MCP de lectura y simulación con las herramientas de Consulta (5), que no propone nada y por eso es lo
 primero seguro de soltar; y al final el primer detector que propone. Cada paso necesita su cifra de paro antes de
 empezar (`INVARIANTES.md`).
+
+---
+
+# 8. El flujo de la app, de punta a punta (D-529)
+
+> **Pedido del usuario (D-529):** «Vamos a trabajar en el App flow solo para quedar anotado en el cerebro.» Esto es el **primer borrador**, armado con lo ya decidido (D-453 a D-528); **no agrega reglas ni construye nada** (D-487). *Lectura mía:* el «App flow» es el recorrido de una obra por la app, por rol y por etapa; el flujo de pantallas vendrá cuando se diseñe la app. Marcas: ✅ firme en el modelo · 🔶 propuesta · ❓ abierto · 💭 idea del usuario, sin modelar.
+
+## 8.1 Quién aparece en el flujo
+
+| Quién | Qué hace en el flujo | ¿Es un rol del cerebro? |
+|---|---|---|
+| **Residente** | Planea su obra y ajusta las fechas del programa; captura el avance; origina incidencias; crea su estimación en Excel y revisa los ajustes; solicita los cierres; entrega la casa; estima hasta el pago de las garantías | ✅ |
+| **Supervisor** | Aprueba y cierra incidencias; aprueba el cierre de frente; justifica lo fuera de catálogo; da el visto bueno de la entrega; autoriza liberar la retención | ✅ |
+| **Superintendente y equipo de gestión de proyectos** | Firman la entrega de obra (el superintendente puede estar o no). *Lectura mía:* el equipo es el área de Proyectos | ✅ el superintendente, con una sola función (§7, hueco 2) · ❓ el equipo |
+| **Control de obra** | Recolecta y envía las estimaciones y comparte la final para el pago; la marca pagada; valida cierres y la calidad de la entrega; confirma los pagos de una OT; confirma o modifica su cotización; contrata un bloque | ✅ |
+| **Compras** | Validador de topes: ajusta la estimación, y esa es la que se paga | ❓ no es un rol; D-330 asignó `validar_estimacion` a Control de obra |
+| **Finanzas** | Asigna el contratista de un subcontrato | 🔶 no es un rol (B-115) |
+| **Proyectos y atención al cliente** | Cotiza y genera la OT; cambia su alcance; atiende al cliente | 🔶 no es un rol (B-115) |
+| **Costos** | Carga el export de OPUS; propone precios nuevos | ✅ |
+| **Cotizador** | Hoy lo ejecuta Control de obra; sería una herramienta (B-123) | 💭 |
+| **Contratista y cliente** | Más adelante entran como usuarios: el contratista al cotizador, al programa de ejecución y a su estado de cuenta (B-121); el cliente a un módulo de vivienda (B-125) | 💭 |
+
+## 8.2 Las nueve etapas
+
+| # | Etapa | Quién hace qué | Qué queda registrado | Dónde está decidido | Marca |
+|---|---|---|---|---|---|
+| 1 | **Preparar el catálogo y los presupuestos** | Costos carga el export de OPUS; Control de obra decide lo detenido y las bajas; Costos propone precios nuevos y Control de obra y Superintendente los aprueban | El catálogo con sus versiones y el presupuesto de cada prototipo como plantilla | §6 (recorrido a) y `MODELO.md` §3 | ✅ sin pantalla |
+| 2 | **Dar de alta el lugar** | Proyecto (Magnolia y «Antigua»), clusters o manzanas y lotes: cada casa es una obra, con su prototipo y sus m² adicionales; una urbanización por proyecto | El proyecto, el cluster y la obra con su estatus `pendiente` | `MODELO.md` §3c (D-512, D-520, D-521) | ✅ |
+| 3 | **Planear la obra, antes de la junta de arranque** | Se asignan residente y supervisor; se asigna el contratista por obra y tipo de trabajo, y de ahí por etapa o concepto; se cuelga el programa del prototipo y el residente ajusta las fechas; Control de obra contrata un bloque y con eso se fija el precio | `RESIDENTE_OBRA`, `SUPERVISION`, `ASIGNACION_CONTRATISTA`, el programa de la obra y `ESTADO_CONGELAMIENTO` | `MODELO.md` §4a y `MODELO.md` §5c; D-475 y D-512 | ✅ · ❓ cuándo cierra la junta de arranque |
+| 4 | **Contratar un subcontrato (la OT)** | La venta al cliente es un presupuesto o un control de cambio; Finanzas asigna el contratista; Proyectos cotiza y genera la OT; Control de obra, después, la confirma o la modifica contra el presupuesto base | `ORDEN_TRABAJO` en `cotizada`, con su `COTIZACION_OT` por versión | `MODELO.md` §5i (D-518 y D-519) | ✅ · 🔶 descuentos y cotizador |
+| 5 | **Ejecutar y registrar el avance, cada semana** | El residente captura el avance físico (el sistema propone el porcentaje y se corrige solo lo raro); origina incidencias que aprueba el supervisor, valida control, ejecuta el residente y cierra el supervisor; un extra puede pasar a orden de cambio con el cliente; el almacén surte | `REGISTRO_AVANCE` físico, `INCIDENCIA` y `ALERTA` | `CONOCIMIENTO.md` §13.7 y `MODELO.md` §5c | ✅ · ❓ quién captura el avance (§7, hueco 1) |
+| 6 | **Estimar y pagar, cada semana** | El residente crea su estimación en Excel; Control de obra las recolecta, las pasa al extractor y las envía al validador de topes (hoy Compras); vuelven a residentes y supervisores para ajustar y justificar lo fuera de catálogo; el validador ajusta y esa es la que se paga; Control de obra comparte la final y la marca pagada. Los pagos de una OT entran por la estimación, en efectivo o por transferencia, y Control de obra los confirma | `ESTIMACION` de `capturada` a `pagada`, con el oid de cada renglón y su historia; `PAGO_OT` | `MODELO.md` §5d y `MODELO.md` §5i (D-522 y D-519) | ✅ · ❓ el validador |
+| 7 | **Cerrar** | Frente al 90 %: el residente solicita, el supervisor aprueba, control valida; si se requiere, también por actividades; el lote se entrega con los cuatro participantes en cualquier orden; cerrar cierra al residente | `CIERRE_FRENTE`, `CIERRE_ACTIVIDADES` y `ENTREGA_OBRA` | `MODELO.md` §5c (D-515, D-516 y D-522) | ✅ |
+| 8 | **Entregar y atender la postventa** | La obra pasa a `entregada` y entra a postventa: garantía, y OT de postventa y de mantenimiento (con cobro al cliente, por garantía o necesaria para la entrega); la retención se libera al entregar la vivienda o antes si el supervisor lo autoriza; la OT concluye cuando se pagó todo | `TICKET_GARANTIA` y `ORDEN_TRABAJO` | `MODELO.md` §3b y `MODELO.md` §5i | ✅ |
+| 9 | **Más adelante** | El cliente pide cambios antes y durante la obra, y postventas y mantenimientos después; el contratista entra al sistema; la entrega puede escalar a un acta de entrega y recepción | — | B-125, B-121 y D-522 | 💭 |
+
+## 8.3 Cómo cambia de estado lo que viaja
+
+| Cosa | Estados | Quién los mueve |
+|---|---|---|
+| **Obra** | `pendiente` → `iniciada` → `en_proceso` → `por_entregar` → `entregada` y postventa | `iniciada` y `entregada` se marcan; los demás se derivan del avance (desde el 90 %, `por_entregar`) |
+| **Estimación** | `capturada` → `enviada` → `devuelta` → `validada` → `pagada` | Control de obra envía y marca pagada; el validador de topes la ajusta y valida |
+| **OT** | `cotizada` → `concluida` o `cancelada` | Proyectos la cotiza; el sistema propone concluirla y Proyectos lo confirma |
+| **Incidencia** | `originada` → `aprobada` → `validada` → `ejecutada` → `cerrada`, o `descartada` | Residente y supervisor, control y supervisor; quien origina no se aprueba a sí mismo |
+| **Cierre de frente** | solicitado → aprobado → validado | Residente, supervisor y control de obra |
+
+## 8.4 Dónde se cruzan el avance físico y el pagado
+
+Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **físico,** que captura el residente (etapa 5), y el **pagado,** que sale de la estimación (etapa 6) y que las exportaciones de OP también reflejan (D-525). La diferencia es la señal, y la resuelve Control de obra con evidencia (`CONOCIMIENTO.md` §13.7). Antes del pago, la estimación se cruza además con lo que el almacén surtió (§2.3). Una estimación validada **cierra esa semana de la obra para todos** (B-120, 🔶).
+
+## 8.5 Lo que el flujo todavía no resuelve
+
+| # | Hueco | Quién lo mueve |
+|---|---|---|
+| 1 | **Compras como validador de topes:** ¿rol nuevo con `validar_estimacion`, o sigue Control de obra? (B-115) | El usuario |
+| 2 | **Funciones sin clave:** capturar, enviar, devolver y marcar pagada una estimación; asignar un subcontrato; cotizar y auditar una OT; liberar la retención; capturar avance (§7, hueco 7, y B-115) | El usuario |
+| 3 | **Descuentos, traspaso del anticipo y cotizador** (B-110, B-124 y B-123) | El usuario |
+| 4 | **La junta de arranque:** cuándo se cierra la planeación y quién la declara cerrada | El usuario |
+| 5 | **La urbanización:** una obra única con ramas de clústeres y amenidades; su flujo propio no está escrito, y ObraCtrl hoy no la representa (D-523, G3) | El usuario |
+| 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516) | El usuario |

@@ -932,7 +932,7 @@ El usuario pidió, sin decidir todavía si levanta D-487, **un plan o una compar
 
 | # | Paso | Quién |
 |---|---|---|
-| 0 | **Respaldo y reinicio de la organización de ObraCtrl.** ObraCtrl ya trae la función de reiniciar: borra catálogos, prototipos, presupuestos y programas, y **conserva las cuentas** | **Hecho por el usuario (D-526):** reinició la organización desde el trabajo de avance de obra; falta saber dónde quedó el respaldo |
+| 0 | **Respaldo y reinicio de la organización de ObraCtrl.** ObraCtrl ya trae la función de reiniciar: borra catálogos, prototipos, presupuestos y programas, y **conserva las cuentas** | **Pendiente (corregido en D-529):** D-526 lo dio por hecho, pero el usuario aclaró que **no se realizó: la base de datos no se borró para empezar de nuevo.** Falta repetirlo y comprobar que quedó vacía |
 | 1 | **Árbol y frentes alineados:** leer el export de OPUS y las clases del cerebro | Cambio de código en ObraCtrl: **pide levantar D-487** |
 | 2 | **Catálogos desde los CSV de OPUS** del cerebro, en el formato que pida ObraCtrl | Preparar archivos: **pide levantar D-487** solo para eso |
 | 3 | **Plantilla y obra:** generar la casa desde el prototipo con su ingeniería | Cambio de código: **pide levantar D-487** |
@@ -947,7 +947,7 @@ El usuario pidió, sin decidir todavía si levanta D-487, **un plan o una compar
 
 ### Los pasos para el trabajo de avance de obra (D-526)
 
-El usuario ya reinició la organización de ObraCtrl (paso 0) y pidió los pasos para la rama de control de avance. El cerebro **no construye** (D-487): estos pasos son el encargo para quien trabaje en ObraCtrl, partiendo de su `main` (la copia verificada en D-523 estaba en la fusión #90). **Estado de partida:** quedan las cuentas de usuario y la organización; no hay catálogos, prototipos, presupuestos, programas ni avance.
+El usuario pidió los pasos para la rama de control de avance. El cerebro **no construye** (D-487): estos pasos son el encargo para quien trabaje en ObraCtrl, partiendo de su `main` (la copia verificada en D-523 estaba en la fusión #90). **Corrección de D-529:** D-526 escribió que el paso 0 estaba hecho porque el usuario dijo «ya reinicié la organización»; después aclaró que **no se realizó, porque la base de datos no se borró para empezar de nuevo.** **Estado de partida:** lo desplegado sigue siendo lo de D-524 —catálogos y el árbol de los prototipos, sin una captura de avance—, y el paso 0 sigue pendiente. Para dar por hecho el paso 0 hay que **contar filas** de las tablas de catálogos, prototipos, presupuestos, programas y obras, y que den cero (las cuentas de usuario no cuentan).
 
 | # | Paso | Dónde se toca en ObraCtrl | Qué manda el cerebro | Cómo se sabe que quedó |
 |---|---|---|---|---|
@@ -959,7 +959,7 @@ El usuario ya reinició la organización de ObraCtrl (paso 0) y pidió los pasos
 | 6 | **Piloto de cuatro semanas** | Cuentas de Leonardo López y Guadalupe como residentes (con su supervisor y control de obra), una obra para cada uno y su alcance | Las obras las define el usuario más adelante. La **estimación sigue en Excel;** cada semana el avance físico se cruza con el pagado (las exportaciones de OP y las estimaciones) | Cuatro semanas con captura completa; cada diferencia entre físico y pagado explicada o anotada (`CONOCIMIENTO.md` §13.7) |
 | 7 | **Después del piloto** | Móvil sin conexión (no hay señal en campo), estimación (D-522), obra sin cluster (urbanización), cierre en doble candado, propuesta automática del porcentaje | `MODELO.md` §5d, `MODELO.md` §5c y `MODELO.md` §3c | Se decide con lo que deje el piloto |
 
-**Cómo se entera el cerebro.** Al terminar cada paso, quien lo hizo avisa aquí con cuatro datos: qué paso y qué día; qué quedó cargado o cambiado en ObraCtrl; si algo difiere de esta tabla; y, si falló algo, qué. El cerebro lo registra y ajusta el plan. Del paso 0 falta un dato: dónde quedó el respaldo.
+**Cómo se entera el cerebro.** Al terminar cada paso, quien lo hizo avisa aquí con cuatro datos: qué paso y qué día; qué quedó cargado o cambiado en ObraCtrl; si algo difiere de esta tabla; y, si falló algo, qué. El cerebro lo registra y ajusta el plan. El paso 0 está pendiente (D-529); cuando se haga, además de los cuatro datos, dónde quedó el respaldo y el conteo de filas que prueba que la base quedó vacía.
 
 ## Versión del canon
 
