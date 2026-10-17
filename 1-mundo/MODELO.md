@@ -1877,6 +1877,7 @@ ROL
                      · Compras · Finanzas · Proyectos y atención al cliente  nuevo — D-537
                      · Atención a postventa                               nuevo — D-541
                      · Colono (el cliente, dueño de la casa)              nuevo — D-542
+                     · Contratista (externo, ve solo lo suyo)             nuevo — D-544
 
 FUNCION_ATOMICA
   id, clave         trazar · aprobar_trazo · registrar_avance ·
@@ -1914,6 +1915,8 @@ FUNCION_ATOMICA
                      · replicar_estimacion · justificar_aumento_cantidad  nuevo — D-538, ver abajo
                      · solicitar_cierre_ticket · confirmar_cierre_ticket  nuevo — D-541, ver abajo
                      · aprobar_cierre_ticket_sin_confirmar                nuevo — D-542, ver abajo
+                     · traspasar_anticipo · subir_documento_expediente ·
+                     registrar_revision_fisica                            nuevo — D-544, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -2001,6 +2004,9 @@ fecha, en un solo lugar.
 | `solicitar_cierre_ticket` | Atención a postventa | propuesto, D-541; el rol lo dijo el usuario |
 | `confirmar_cierre_ticket` | Colono — confirma con su nivel de satisfacción, de 5 a 10 | propuesto, D-541; el rol lo dijo el usuario |
 | `aprobar_cierre_ticket_sin_confirmar` | Control de obra — con nota de insatisfacción o de desatención del colono | propuesto, D-542; el rol lo dijo el usuario |
+| `traspasar_anticipo` | Control de obra | propuesto, D-544; viene de B-124 |
+| `subir_documento_expediente` | Residente y Supervisor | dato del usuario, D-544 |
+| `registrar_revision_fisica` | Control de obra — la revisión física es «de control» | dato del usuario, D-544 |
 | `firmar_entrega` | Proyectos y atención al cliente — el equipo de gestión de proyectos | dato del usuario, D-537; viene de D-516 y D-522 |
 | `firmar_entrega_superintendente` | Superintendente — puede estar o no | propuesto, D-537; viene de D-516 y D-522 |
 | `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
@@ -2024,14 +2030,14 @@ fecha, en un solo lugar.
 | `revisar_patrones_desviacion` | **Sin asignar** | P-21 |
 | `aprobar_version_concepto` | **Sin asignar** | P-21 |
 | `pactar_precio_contratista` | Control de obra | dato del usuario, D-537 (antes sin asignar, P-21) |
-| `aplicar_descuento` | **Sin asignar** | P-21 |
+| `aplicar_descuento` | Control de obra — cuando hay estimación del contratista, en parcialidades si se define así | dato del usuario, D-544 (antes sin asignar, P-21) |
 | `autorizar_orden_cambio` | Control de obra | dato del usuario, D-537 (antes sin asignar, P-21). *Idea, sin confirmar:* doble, con el Superintendente, como el precio nuevo |
 | `aprobar_propuesta` | Control de obra — propuesto | D-485: resolver la bandeja (aprobar o rechazar). No aplica: aplicar pide además la función de la acción |
 | `resolver_alerta` | Supervisor y Control de obra — propuesto | D-485: el Supervisor da seguimiento hasta el cierre; Control de obra gobierna entre obras |
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles. D-544 asigna `aplicar_descuento`, agrega tres funciones y el rol externo `contratista`: setenta y tres funciones, sesenta y siete asignadas, seis sin asignar, y doce roles.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -2877,6 +2883,30 @@ INCIDENCIA gana orden_cambio_id     FK PROPUESTA(tipo=orden_cambio), nullable   
 
 **Una incidencia puede llegar al cliente.** Un «extra» de ObraCtrl —más cantidad que la tolerancia, trabajo fuera de catálogo, sustitución o alta de catálogo— se parece a una `INCIDENCIA` que cambia la actividad (`crece_actividad`, `crea_actividad`), y el usuario dice que **puede** pasar a una orden de cambio con el cliente (`PROPUESTA(tipo=orden_cambio)`, §5f). `CONOCIMIENTO.md` §13.6 ya decía que una incidencia puede o no generar un control de cambio; lo que faltaba es la liga: `INCIDENCIA.orden_cambio_id`, FK `PROPUESTA`, nullable, nula mientras el extra es interno.
 
+### Expediente, revisión física, bloqueo de periodo y tolerancia (D-544; cierra B-120)
+
+Cuatro piezas de ObraCtrl que el cerebro aceptó en D-516 y D-517, ahora con sus campos. El usuario confirmó el borrador (D-544).
+
+```
+EXPEDIENTE_DOCUMENTO   (el expediente técnico de una obra)
+  id, presupuesto_id FK PRESUPUESTO — la obra
+  tipo                 enum: plano · contrato · acta · evidencia ·
+                        bitacora · otro                                      firme — D-544
+  nombre, archivo      el documento y dónde se guarda                        propuesta
+  subido_por, subido_en   FK USUARIO — Residente o Supervisor                firme — D-544
+
+REVISION_FISICA   (la revisión de Control de obra en la obra)
+  id, presupuesto_id FK PRESUPUESTO, nodo_id FK Nodo nullable — el frente o la actividad
+  fecha, revisado_por  FK USUARIO — Control de obra                          firme — D-544
+  calidad              NUMERIC, de 5 a 10 (D-517)                            firme
+  comentario, fotos    texto y archivos                                      firme — D-544
+```
+
+- **Quién sube al expediente:** el residente y el supervisor (`subir_documento_expediente`). **Control de obra solo lo revisa** en la entrega de la obra, junto con la calidad (`validar_calidad_entrega`, §5b).
+- **La revisión física la hace Control de obra** (`registrar_revision_fisica`). Una calidad baja es una **alerta,** no una incidencia automática: una persona decide si origina la incidencia de calidad que ya prevé `CIERRE_FRENTE.incidencia_calidad_id`.
+- **El bloqueo de periodo no es una tabla, es una regla** (D-517 y D-540): cuando Compras deja una estimación `validada`, esa semana de esa obra ya no admite capturar ni confirmar avance, para nadie.
+- **La tolerancia de extra** es un **parámetro de 20 %, por obra y por actividad,** el mismo 20 % que usan las alertas; vive donde vivan los parámetros (B-114).
+
 ### El tablero del frente se calcula, no se guarda (D-455, cierra B-88)
 
 El frente (obra, nivel) y el sub-frente (etapa) son el nodo de Nivel 1 y el de Nivel 2; su
@@ -2998,10 +3028,21 @@ ESTIMACION_LINEA_HISTORIA   (solo se agrega, nunca se edita)
 
 DEDUCCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
-  tipo                enum: sobrepago · rehacer_trabajo (D-289)           firme
+  tipo                enum: sobrepago · rehacer_trabajo (D-289) ·
+                       mal_trabajo · no_terminada · mala_calidad ·
+                       afectacion_otros_trabajos · abandono ·
+                       pagado_a_otro_contratista · monto_mal_capturado ·
+                       cantidad_mal_capturada                              firme — D-544 (los ocho nuevos)
   monto
+  base_calculo         enum: porcentaje · valor_otra_ot · linea_estimacion ·
+                       monto_capturado — cómo se llegó al monto; se elige
+                       en cada descuento                                   propuesta — D-544
   contratista_responsable_id   FK CONTRATISTA — cierra P-39 (§4a)          firme — corregido
   absorbe_empresa      boolean — true si el responsable ya no está activo
+
+DEDUCCION_PARCIALIDAD   (el plan de cobro de un descuento)                propuesta — D-544
+  deduccion_id FK DEDUCCION, orden, monto
+  aplicada_en_linea_id FK ESTIMACION_LINEA, nullable — nula mientras no se cobra
 
 RETENCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
@@ -3036,6 +3077,14 @@ cambie.
 - `ot_origen_id`, FK nullable: la OT **donde se hizo el trabajo** que originó el descuento; **solo referencia,** no cambia el saldo de esa OT. En el caso de arriba, la pérgola de Javier Galvan.
 - `ot_base_id`, FK nullable: cuando el monto es **el valor de otra OT** (D-510), esa OT. En el caso de arriba, la reparación de Floviesa.
 - *Lectura mía:* el descuento directo queda como **saldo del contratista** y se cobra de sus pagos siguientes, al modo del préstamo (D-290); y `absorbe_empresa` ya cubre que el contratista no siga activo. **Sin decidir:** si un descuento aplicado a una OT cuenta como liquidación en su saldo; el usuario pidió que la OT pagada no aparezca como falta por pagar, y eso solo está resuelto para el descuento directo (B-110).
+
+**Lo que el usuario confirmó de los descuentos (D-544).** Responde a B-110:
+- **Los siete tipos de D-509 quedan, y se agregan dos: monto mal capturado y cantidad mal capturada.** Con los dos que ya existían (`sobrepago` y `rehacer_trabajo`, que es el segundo de su lista) son **diez** valores de `tipo`.
+- **Se descuenta cuando hay estimación del contratista.** El contratista **no puede regresar dinero:** si no tiene una estimación contra la cual descontar, el descuento no se cobra, y si ya no la va a tener la empresa lo absorbe (`absorbe_empresa`). El descuento es un saldo del contratista que se cobra de sus estimaciones, al modo del préstamo (D-290).
+- **Puede cobrarse en parcialidades,** que **se definen al momento de hacer el descuento** (`DEDUCCION_PARCIALIDAD`, propuesta). El saldo por cobrar se lee de las parcialidades sin aplicar, no se guarda.
+- **La base del monto se elige en cada descuento.** Punto de partida, mío y corregido (D-544): `mala_calidad`, porcentaje; `afectacion_otros_trabajos`, valor de otra OT o línea de estimación; `rehacer_trabajo` y `pagado_a_otro_contratista`, el valor de la OT de la reparación o de lo pagado al otro contratista (`ot_base_id`); `no_terminada`, la cantidad pendiente por su precio; `monto_mal_capturado` y `cantidad_mal_capturada`, la diferencia contra lo correcto (monto, o cantidad por precio); `mal_trabajo` y `abandono`, a elegir. **`abandono` no se usa para recuperar un anticipo sobrante** (§5i): si el contratista se fue, no regresa dinero.
+- **Quién lo aplica:** Control de obra (`aplicar_descuento`, que existía sin dueño).
+- **Sigue sin confirmar, lectura mía:** que un descuento aplicado al pago de una OT cuente como liquidación en el saldo de esa OT (la OT queda saldada cuando pagos y descuentos igualan su monto); el descuento directo al contratista nunca toca el saldo de una OT (D-519). La estructura de D-519 (`estimacion_linea_id` nullable, `orden_trabajo_id`, `ot_origen_id` y `ot_base_id`) sigue como propuesta.
 
 **El recorrido de una estimación (D-522, y como lo contó el usuario en D-538).** *Es el proceso de hoy y se irá puliendo con el sistema* (dato del usuario). Quien la envía no es el residente sino Control de obra, y quien revisa los topes es Compras:
 1. **El residente crea su estimación en Excel** —`capturada`—.
@@ -3665,6 +3714,8 @@ PAGO_OT
   estimacion_linea_id  FK ESTIMACION_LINEA, nullable — solo si medio=estimacion
   confirmado, confirmado_por   boolean, FK USUARIO — Control de obra; un anticipo
                         planeado en la asignación nace sin confirmar y con monto 0
+  traspaso_de_id       FK PAGO_OT, nullable — el pago, de otra OT del mismo
+                        contratista, que este movió                            propuesta — D-544
 ```
 
 - **La cotización.** Solo cuentan las partidas con descripción, cantidad mayor a cero y precio unitario mayor a cero. Subtotal = suma de cantidad por precio; IVA = subtotal por `iva_pct`; el monto de la OT es el total de la cotización vigente. **Proyectos cotiza y genera la OT; Control de obra va después** y la confirma o la modifica si algo no está dentro del presupuesto (D-519: antes era lectura mía y el usuario la confirmó; no es una autorización previa). *Lectura mía:* si Control la modifica, es una versión nueva de la cotización con su propia autora y no una edición de la anterior. **Las partidas siguen libres por ahora (D-519):** el usuario va a hacer un **cotizador,** y el presupuesto ya trae algo adelantado en carpintería y herrería que hay que complementar con, por ejemplo, el costo de las puertas y de los muebles (B-123). No se agrega ningún campo hasta diseñarlo.
@@ -3673,7 +3724,7 @@ PAGO_OT
 - **Los descuentos** ya no son un tipo de pago: son `DEDUCCION` (§5d) con los siete tipos nuevos (B-110). Por eso `PAGO_OT.tipo` no trae `descuento`, que la app de hoy sí tiene. **Un descuento puede ir a una OT o directo al contratista** (D-519), y en el segundo caso **no toca el saldo de ninguna OT.** El caso del usuario: Floviesa reparó una pérgola que había hecho Javier Galvan, con una OT ya pagada. Primero se hace la OT de la reparación y lleva un descuento a Javier Galvan que **hace referencia** a la OT inicial; no se descuenta de esa OT porque, si se hiciera, aparecería como falta por pagar, así que **el descuento es solo al contratista** y la empresa no paga por ese arreglo. Cómo queda en `DEDUCCION`, abajo en §5d (propuesta).
 - **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
 - **Concluir.** Los residentes estiman hasta el pago de la garantía, si la hay; la OT se concluye cuando **se pagó todo,** garantía incluida (D-518). *Lectura mía:* el sistema lo propone y Proyectos lo confirma, como hoy hace el usuario de cotización.
-- **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **Cómo se registra ese traspaso queda por diseñar** (se parece al préstamo que se salda con avance de obra, D-290; B-124). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
+- **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **El traspaso** (D-544, responde a B-124): el anticipo se mueve **como avance o como otro anticipo** de otra OT, y **solo del mismo contratista:** un anticipo entregado a un contratista no puede pasar a otro. Se registra como un pago nuevo en la OT destino que apunta al movido (`traspaso_de_id`); el original queda marcado como traspasado y no se borra. **Si sobra,** el sobrante se pasa a otra OT del mismo contratista o queda como **préstamo** (`PRESTAMO`, D-290); **nunca como descuento por abandono,** porque el contratista que se fue no regresa dinero, y lo que no se recupere es **pérdida para la empresa.** Lo autoriza Control de obra (`traspasar_anticipo`, propuesta). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
 - **Quién (funciones propuestas; D-537 las pasa a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
 - **Fuera de aquí:** el contratista como usuario (B-121), el traspaso del anticipo (B-124), el cotizador (B-123) y la estructura de los descuentos (B-110).
 

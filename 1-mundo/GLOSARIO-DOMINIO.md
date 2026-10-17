@@ -801,7 +801,7 @@ Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Ant
 - **No confundir con:** Renegociación
 - **Se usa con:** Precio pactado; Estimación
 - **Ejemplo:** Cobró a $55, se le deduce $5
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `DEDUCCION` (`MODELO.md` §5d): diez tipos desde D-544 —los siete de calidad y cumplimiento, más monto mal capturado y cantidad mal capturada—, que se cobran de las estimaciones del contratista y, si se define así, en parcialidades
 
 ### Presupuesto Formado
 
