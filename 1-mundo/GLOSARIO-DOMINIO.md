@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 88 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 89 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 88 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 88 términos · 25 ambigüedades · 2026-09-21
+> 89 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -844,6 +844,16 @@ El contrato informal con un contratista para ejecutar un subcontrato. Se contrat
 - **Se usa con:** Subcontrato; Contratista; Asignación; Highlight; Cotización
 - **Ejemplo:** *(sin ejemplo con cifra: no se han visto los datos de la app)*
 - **Hoy vive en:** la tabla `ots` de la app de extraordinarios, con un campo de tipo de contrato que mezcla origen, forma de pago y estado (`LENGUAJE.md`); no está en el modelo del cerebro
+
+### SOV (Schedule of Values)
+
+En la construcción de habla inglesa, el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor; sirve de base para revisar los avances y los pagos (en los contratos AIA se carga en la hoja G703 de la solicitud de pago). No es el presupuesto interno de la empresa. En postventa lo hace Atención a postventa después de dictaminar y antes de programar la ejecución. (D-553 y D-554.)
+
+- **También:** desglose de valores *(traducción mía)*; en las siglas del usuario, «SOV»
+- **No confundir con:** el presupuesto de la obra; la cotización al cliente
+- **Se usa con:** Orden de trabajo (OT); Estimación; Postventa
+- **Ejemplo:** tras dictaminar que una fuga no está en garantía, Atención a postventa parte la compostura en partidas con su valor y programa la ejecución
+- **Hoy vive en:** nada propio. *Lectura mía:* las partidas de la cotización de la OT (`PARTIDA_COTIZACION`, `MODELO.md` §5i); su significado en el cerebro lo confirma el usuario
 
 ### Extraordinario
 

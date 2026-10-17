@@ -1063,10 +1063,10 @@ TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo      
 |---|---|---|
 | Levanta el ticket en su app: **reporta un problema, solicita un servicio o solicita un mantenimiento** | El colono | `abrir_ticket_garantia` |
 | Le da seguimiento | Atención a postventa | *(por definir con el módulo)* |
-| **Programa una visita y la realiza,** para determinar si la garantía es válida | Atención a postventa | *(por definir)* |
-| **Dictamina:** la garantía es válida, o el cliente quiere la compostura con costo a él | Atención a postventa | *(por definir)* |
-| **Realiza un SOV** | Atención a postventa | *(por definir; las siglas, abajo)* |
-| **Se programa la ejecución** | *(por decir; lectura mía: Atención a postventa)* | *(por definir)* |
+| **Programa una visita y la realiza** (**todo ticket la lleva,** también el de mantenimiento, D-554) | Atención a postventa | *(por definir)* |
+| **Dictamina:** la garantía es válida, o no lo es porque **venció o el problema fue provocado** (D-554), y entonces el cliente decide si quiere la compostura con costo a él | Atención a postventa | *(por definir)* |
+| **Realiza un SOV** (*Schedule of Values*, abajo) | Atención a postventa | *(por definir)* |
+| **Programa la ejecución** | Atención a postventa (D-554, confirmado) | *(por definir)* |
 | Se ejecuta, por una cuadrilla propia o por contratistas (D-547 y D-548), y sigue el cierre de D-541 | — | — |
 
 ```
@@ -1079,16 +1079,19 @@ VISITA_POSTVENTA  una visita programada para dictaminar                         
   programada_para      DATE
   realizada_en         DATE, nullable
   realizada_por        FK USUARIO, nullable — Atención a postventa
-  dictamen             enum: garantia_valida · con_costo_cliente, nullable —
-                        vacío hasta que se hace la visita
+  dictamen             enum: garantia_valida · garantia_no_valida, nullable —
+                        vacío hasta que se hace la visita; propio de un ticket
+                        de falla (lectura mía)                                propuesta — D-554
+  motivo_no_valida     enum: garantia_vencida · dano_provocado, nullable —
+                        solo si garantia_no_valida                            dato del usuario (D-554); campo propuesta
   notas                TEXT, nullable
 ```
 
-- **El dictamen decide el cobro de la OT** (§5i): `garantia_valida` → `cobro = garantia`, que no se cobra al cliente; `con_costo_cliente` → `cobro = cliente`. *Lectura mía:* un ticket de mantenimiento lleva `cobro = cliente`, como ya decía D-547 («el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`»).
+- **El dictamen decide el cobro de la OT** (§5i): `garantia_valida` → `cobro = garantia`, que no se cobra al cliente; `garantia_no_valida` → si el cliente quiere la compostura con costo a él, `cobro = cliente`. **La garantía no es válida si venció o si el problema fue provocado** (D-554, dato del usuario). *Lectura mía:* un ticket de mantenimiento o de servicio lleva `cobro = cliente`, como ya decía D-547 («el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`»), y su visita sirve para definir el trabajo, no para dictaminar una garantía.
 - *Lectura mía:* **el ticket conserva sus tres estados** (`abierto`, `cierre_solicitado`, `cerrado`), y **el avance entre ellos** —visita programada, dictaminado, SOV hecho, en ejecución— **se deriva** de la visita, del SOV y de la OT, no se guarda como estado: son más estados que mantener sincronizados. La app del colono puede mostrar ese avance.
-- **«SOV»:** las siglas **no están en el cerebro** y no sé qué documento es. Lo único que se dijo es su lugar: lo hace Atención a postventa **después de dictaminar y antes de programar la ejecución.** *Lectura mía, sin confirmar:* es lo que lleva el trabajo a una OT (la cotización de la OT, §5i), pero puede ser otra cosa.
+- **SOV = *Schedule of Values*** (D-554, investigado): en la construcción de habla inglesa es **el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor,** que sirve de base para revisar los avances y los pagos; no es el presupuesto interno (AIA A201-2017, §9.2, y la hoja G703). Su lugar en el recorrido cuadra con eso: Atención a postventa lo hace **después de dictaminar y antes de programar la ejecución.** *Lectura mía, por confirmar:* es el desglose de la compostura en partidas con su valor, es decir, **las partidas de la cotización de la OT** (`PARTIDA_COTIZACION`, §5i), que después sirven para pagar la OT y, si es garantía, para medir su costo.
 - *Lectura mía:* el nombre `TICKET_GARANTIA` queda corto, porque un ticket de servicio o de mantenimiento puede no ser una garantía; se renombraría `TICKET_POSTVENTA` al diseñar el módulo (B-129). No se renombra ahora.
-- **Falta:** qué es el SOV; qué pasa si la garantía no es válida y el cliente no quiere pagar la compostura (*lectura mía:* el ticket se cierra sin OT, con el dictamen guardado); si un mantenimiento también lleva visita; y quién programa la ejecución. **D-487:** nada se construye.
+- **Falta:** **el plazo de la garantía,** que no está en el cerebro y del que depende decidir si «venció» (¿cuánto desde `fecha_entrega`, y es el mismo para toda falla o cambia con la causa, como la impermeabilización o las instalaciones?); y confirmar que el SOV son las partidas de la cotización de la OT. *Lectura mía:* si el cliente no acepta pagar la compostura que no es de garantía, no hay OT y el ticket se cierra con el dictamen guardado. **D-487:** nada se construye.
 
 ---
 
