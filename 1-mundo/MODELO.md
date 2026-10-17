@@ -973,23 +973,34 @@ pasó suelto.
 
 | Paso | Quién | Función |
 |---|---|---|
-| Abre el ticket | El colono | `abrir_ticket_garantia` |
+| Abre el ticket | El colono, o Atención a postventa en su nombre (D-542) | `abrir_ticket_garantia` |
 | Atiende: asigna a quien lo resuelve y, si hace falta un trabajo, genera la OT de postventa o de mantenimiento (§5i) *(lectura mía)* | Atención a postventa | `cotizar_ot` *(la del módulo, por definir)* |
 | Solicita el cierre | Atención a postventa | `solicitar_cierre_ticket` *(propuesta)* |
-| Confirma el cierre y da su nivel de satisfacción | El colono | `confirmar_cierre_ticket` *(propuesta)* |
+| Confirma el cierre y da su nivel de satisfacción, de 5 a 10 | El colono | `confirmar_cierre_ticket` *(propuesta)* |
+| **Si el colono no confirma, o no queda satisfecho:** aprueba cerrarlo sin su confirmación, con una nota de insatisfacción o de desatención del colono (D-542) | Control de obra | `aprobar_cierre_ticket_sin_confirmar` *(propuesta)* |
 
 ```
 TICKET_GARANTIA  (lo que ganaría, propuesta — D-541)
-  abierto_por           FK USUARIO — el colono que lo abre                    propuesta
+  abierto_por           FK USUARIO — el colono, o Atención a postventa en su
+                         nombre                                                 propuesta
   estado                enum: abierto · cierre_solicitado · cerrado — hoy, abierto · cerrado   propuesta
   cierre_solicitado_por, cierre_solicitado_en   FK USUARIO — Atención a postventa   propuesta
-  nivel_satisfaccion    el que da el colono al confirmar el cierre; la escala no se dijo   propuesta
+  nivel_satisfaccion    NUMERIC, de 5 a 10, nullable — el que da el colono al
+                         confirmar el cierre                                    escala firme (D-542); campo propuesta
   cerrado_por, cerrado_en   FK USUARIO — el colono que confirma               propuesta
+  motivo_cierre_sin_confirmar   enum: insatisfaccion_del_colono ·
+                         desatencion_del_colono, nullable — solo si Control de
+                         obra aprobó cerrarlo sin la confirmación del colono     regla firme (D-542); campo propuesta
+  nota_cierre           texto, nullable — la nota que acompaña a ese motivo      propuesta
+  cierre_aprobado_por, cierre_aprobado_en   FK USUARIO — Control de obra       propuesta
 ```
 
-- **El colono es un usuario externo,** no un empleado: *lectura mía,* ve solo su casa, con una asignación del estilo de `RESIDENTE_OBRA` (§4a) que el módulo definirá. Es la primera parte concreta del módulo de vivienda (B-125); lo demás —pedir cambios antes y durante la obra— sigue como idea.
-- **Escala del nivel de satisfacción:** no se dijo. *Propuesta:* la misma de la revisión física de control, de 5 a 10 (D-517), para no tener dos escalas de calidad.
-- **No se dijo:** si Atención a postventa puede abrir el ticket en nombre del colono (por ejemplo, por teléfono), qué pasa si el colono no confirma, y si puede rechazar el cierre. **D-487:** nada se construye.
+- **El colono es un usuario externo,** no un empleado, y **el rol queda confirmado (D-542):** ve solo su casa, con una asignación del estilo de `RESIDENTE_OBRA` (§4a) que el módulo definirá. Es la primera parte concreta del módulo de vivienda (B-125).
+- **Pedir cambios antes y durante la obra** es **el control de cambio a solicitud del cliente,** y **ya estaba definido** (D-540, punto 3 de `WORKFLOWS.md` §8.8): la petición del cliente, la cotización al cliente y el control de cambio (§3a y `CONOCIMIENTO.md` §13.4). Lo que el módulo de vivienda agregará es solo la puerta: que el colono pueda entrar la petición él mismo, en lugar de que la registre Proyectos y atención al cliente.
+- **La escala del nivel de satisfacción es de 5 a 10,** la misma de la revisión física de control (D-517). Queda confirmada (D-542).
+- **Atención a postventa puede abrir el ticket en nombre del colono** (D-542), por ejemplo por teléfono.
+- **Si el colono no confirma el cierre, o no queda satisfecho** (D-542): el ticket **se puede cerrar solo si Control de obra lo aprueba,** y la aprobación lleva **una nota de insatisfacción del colono o de desatención del colono.** El nivel de satisfacción queda vacío si el colono no lo dio.
+- **No se dijo:** cuánto espera el sistema la confirmación del colono antes de que Atención a postventa pueda pedir la aprobación de Control de obra. **D-487:** nada se construye.
 
 ---
 
@@ -1864,7 +1875,7 @@ ROL
                      Cotizador · Control                                    firme
                      · Compras · Finanzas · Proyectos y atención al cliente  nuevo — D-537
                      · Atención a postventa                               nuevo — D-541
-                     · Colono (el cliente, dueño de la casa)              propuesto — D-541
+                     · Colono (el cliente, dueño de la casa)              nuevo — D-542
 
 FUNCION_ATOMICA
   id, clave         trazar · aprobar_trazo · registrar_avance ·
@@ -1901,6 +1912,7 @@ FUNCION_ATOMICA
                      confirmar_pago_ot · auditar_alcance_ot               nuevo — D-537, ver abajo
                      · replicar_estimacion · justificar_aumento_cantidad  nuevo — D-538, ver abajo
                      · solicitar_cierre_ticket · confirmar_cierre_ticket  nuevo — D-541, ver abajo
+                     · aprobar_cierre_ticket_sin_confirmar                nuevo — D-542, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -1984,9 +1996,10 @@ fecha, en un solo lugar.
 | `asignar_subcontrato` | Finanzas | dato del usuario, D-537; viene de §5i |
 | `cotizar_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
 | `cambiar_alcance_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
-| `abrir_ticket_garantia` | **Colono** — el dueño de la casa, que es el cliente | dato del usuario, D-541 (antes Proyectos y atención al cliente, D-537) |
+| `abrir_ticket_garantia` | **Colono** — el dueño de la casa, que es el cliente — **y Atención a postventa,** en su nombre | dato del usuario, D-541 y D-542 (antes Proyectos y atención al cliente, D-537) |
 | `solicitar_cierre_ticket` | Atención a postventa | propuesto, D-541; el rol lo dijo el usuario |
-| `confirmar_cierre_ticket` | Colono — confirma con su nivel de satisfacción | propuesto, D-541; el rol lo dijo el usuario |
+| `confirmar_cierre_ticket` | Colono — confirma con su nivel de satisfacción, de 5 a 10 | propuesto, D-541; el rol lo dijo el usuario |
+| `aprobar_cierre_ticket_sin_confirmar` | Control de obra — con nota de insatisfacción o de desatención del colono | propuesto, D-542; el rol lo dijo el usuario |
 | `firmar_entrega` | Proyectos y atención al cliente — el equipo de gestión de proyectos | dato del usuario, D-537; viene de D-516 y D-522 |
 | `firmar_entrega_superintendente` | Superintendente — puede estar o no | propuesto, D-537; viene de D-516 y D-522 |
 | `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
@@ -2017,7 +2030,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin

@@ -916,7 +916,7 @@ El dueño de la casa, que es el cliente. Es quien abre un ticket de postventa y 
 - **No confundir con:** Contratista; Residente (empleados de la empresa)
 - **Se usa con:** Lote; Postventa; Control de cambio
 - **Ejemplo:** el dueño de FRESNO 12 abre un ticket por humedad en la azotea
-- **Hoy vive en:** la idea del módulo de vivienda (B-125); en el modelo, el rol propuesto `colono` y la función `abrir_ticket_garantia` (`MODELO.md` §3b y §5b)
+- **Hoy vive en:** la idea del módulo de vivienda (B-125); en el modelo, el rol `colono` (confirmado en D-542) y las funciones `abrir_ticket_garantia` y `confirmar_cierre_ticket` (`MODELO.md` §3b y §5b)
 
 ### Urbanización
 

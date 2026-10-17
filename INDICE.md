@@ -250,7 +250,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 541 decisiones · 12 descartes · 35 correcciones |
+| `MEMORIA.md` | III | ✅ 542 decisiones · 12 descartes · 35 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
@@ -261,7 +261,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `PRIORIDADES.md` | IV | 🆕 Criterio de orden |
 | `APRENDIZAJE.md` | III | 🆕 Diseñado, no construido |
 | `ESCALABILIDAD.md` | II | 🆕 Contrato de módulo · dos escenarios de crecimiento |
-| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir · el flujo de la app (§8, D-529), empezando por la cadena de la información (§8.1, D-530 a D-532), con la otra mitad: del programa a la ejecución, y los roles paso por paso (§8.7, D-536 a D-538), y dónde queda (§8.8, D-539 a D-541) |
+| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir · el flujo de la app (§8, D-529), empezando por la cadena de la información (§8.1, D-530 a D-532), con la otra mitad: del programa a la ejecución, y los roles paso por paso (§8.7, D-536 a D-538), y dónde queda (§8.8, D-539 a D-542) |
 | `skills/erp-importacion.md` | II | 🆕 Compilado · carga desde OPUS |
 | `skills/erp-rediseno.md` | II | 🆕 Compilado · las seis operaciones y las tres capas |
 | `skills/erp-parametrico.md` | II | 🆕 Compilado · ensambles, cohorte, dispersión |

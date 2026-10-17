@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8 · D-540: el App flow se cierra, y la postventa será un módulo con una persona encargada · D-541: el colono abre el ticket de postventa, Atención a postventa es un rol propio y el cierre se confirma con la satisfacción del colono
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8 · D-540: el App flow se cierra, y la postventa será un módulo con una persona encargada · D-541: el colono abre el ticket de postventa, Atención a postventa es un rol propio y el cierre se confirma con la satisfacción del colono · D-542: el colono confirmado, la escala de 5 a 10, el cierre sin confirmación y que pedir cambios ya estaba definido
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -65,10 +65,10 @@ Derivado de la tabla de `MODELO.md` §5b; no agrega ninguna asignación.
 | **Compras** | Ve todas | `validar_estimacion` (pasó de Control de obra) y `devolver_estimacion` (D-538) |
 | **Finanzas** | Ve todas | `asignar_subcontrato` (D-537) |
 | **Proyectos y atención al cliente** | Ve todas | `cotizar_ot` · `cambiar_alcance_ot` · `firmar_entrega` (D-537): es también el equipo de gestión de proyectos |
-| **Atención a postventa** (D-541) | Las casas entregadas *(lectura mía)* | `solicitar_cierre_ticket` (propuesta, D-541) |
-| **Colono** *(rol propuesto, D-541)* | Solo su casa *(lectura mía)* | `abrir_ticket_garantia` (D-541) · `confirmar_cierre_ticket` (propuesta, D-541) |
+| **Atención a postventa** (D-541) | Las casas entregadas *(lectura mía)* | `solicitar_cierre_ticket` (propuesta, D-541) · `abrir_ticket_garantia`, en nombre del colono (D-542) |
+| **Colono** (D-542) | Solo su casa | `abrir_ticket_garantia` (D-541) · `confirmar_cierre_ticket` (propuesta, D-541) |
 | **Cotizador** | No es un rol activo | Hoy lo ejecuta Control de obra |
-| **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `trazar_avance` · `validar_reprogramacion` · `aplicar_reprogramacion` (las tres, D-533) · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · `aprobar_propuesta` y `resolver_alerta` (propuestas, D-485) · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` · y, desde D-537, `dar_de_alta_obra` · `asignar_contratista` · `pactar_precio_contratista` · `marcar_obra_iniciada` · `autorizar_orden_cambio` · `enviar_estimacion` · `marcar_estimacion_pagada` (confirmadas; las dos últimas en D-538) y `cotizar_cambio_cliente` · `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` (propuestas) |
+| **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `trazar_avance` · `validar_reprogramacion` · `aplicar_reprogramacion` (las tres, D-533) · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · `aprobar_propuesta` y `resolver_alerta` (propuestas, D-485) · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` · y, desde D-537, `dar_de_alta_obra` · `asignar_contratista` · `pactar_precio_contratista` · `marcar_obra_iniciada` · `autorizar_orden_cambio` · `enviar_estimacion` · `marcar_estimacion_pagada` (confirmadas; las dos últimas en D-538) y `cotizar_cambio_cliente` · `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` · `aprobar_cierre_ticket_sin_confirmar` (propuestas) |
 
 **Lo que se ve de un vistazo:** el trabajo de obra se reparte en cadena —Residente ejecuta y pide, Supervisor aprueba
 y cierra, Control de obra valida— y **el gobierno cruzado entre obras cae en Control de obra** (treinta y tres de las
@@ -535,12 +535,12 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | **Compras** | Validador de topes: revisa los topes, devuelve la estimación, y al modificarla deja la que se paga | ✅ rol nuevo (D-537); `validar_estimacion` ya es suya (D-538) |
 | **Finanzas** | Asigna el contratista de un subcontrato | ✅ rol nuevo (D-537) |
 | **Proyectos y atención al cliente** | Cotiza y genera la OT; cambia su alcance; atiende al cliente; firma la entrega como equipo de gestión de proyectos | ✅ rol nuevo (D-537) |
-| **Atención a postventa** | Atiende los tickets de garantía y pide su cierre. La postventa será un módulo completo (B-129) | ✅ rol propio (D-541) |
-| **Colono** | El dueño de la casa, que es el cliente: abre el ticket de garantía y confirma su cierre con su nivel de satisfacción | 🔶 rol propuesto (D-541); el cliente como usuario era una idea (B-125) |
+| **Atención a postventa** | Atiende los tickets de garantía, los abre en nombre del colono si hace falta y pide su cierre. La postventa será un módulo completo (B-129) | ✅ rol propio (D-541) |
+| **Colono** | El dueño de la casa, que es el cliente: abre el ticket de garantía y confirma su cierre con su nivel de satisfacción, de 5 a 10 | ✅ rol (D-542); es un usuario externo |
 | **Costos** | Carga el export de OPUS; cuantifica (produce el presupuesto) y propone precios nuevos | ✅ |
 | **Cotizador** | Hoy lo ejecuta Control de obra; sería una herramienta (B-123) | 💭 |
 | **Contratista** | Más adelante entra como usuario: al cotizador, al programa de ejecución y a su estado de cuenta (B-121) | 💭 |
-| **Cliente** | Ya es el colono para la postventa (arriba); el resto del módulo de vivienda, pedir cambios antes y durante la obra, sigue como idea (B-125) | 💭 el resto |
+| **Cliente** | Ya es el colono para la postventa (arriba). Pedir cambios antes y durante la obra **ya está definido** como la petición del cliente, la cotización y el control de cambio (§8.8, punto 3); el módulo de vivienda (B-125) solo sería la puerta para que el colono la entre él mismo | 💭 la puerta |
 
 ## 8.3 Las diez etapas
 
@@ -554,7 +554,7 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | 6 | **Ejecutar y registrar el avance, cada semana** | El residente captura el avance físico (el sistema propone el porcentaje y se corrige solo lo raro; se anota a diario o se confirma al terminar la actividad, y antes de estimar se confirman los avances); origina incidencias que aprueba el supervisor, valida control, ejecuta el residente y cierra el supervisor; un extra puede pasar a orden de cambio con el cliente; el almacén surte | `REGISTRO_AVANCE` físico, `INCIDENCIA` y `ALERTA` | `CONOCIMIENTO.md` §13.7 y `MODELO.md` §5c | ✅ incluido quién captura y quién confirma el avance (D-533 y D-534) |
 | 7 | **Estimar y pagar, cada semana** | *El proceso de hoy (D-538), que se irá puliendo con el sistema:* el residente crea su estimación en Excel; Control de obra la concentra y la envía a Compras; Compras revisa los topes y la devuelve a todos; el residente tiene oportunidad de réplica si alguna cantidad bajó; Costos y Control de obra regresan a Compras las justificaciones de por qué debe subir la cantidad (los supervisores justifican lo fuera de catálogo); Compras modifica, y esa es la que se paga, y se la envía a Control de obra, que establece la estimación pagada. Si lo estimado excede lo confirmado, una alerta importante invita a bajar las cantidades. Los pagos de una OT entran por la estimación, en efectivo o por transferencia, y Control de obra los confirma | `ESTIMACION` de `capturada` a `pagada`, con el oid de cada renglón y su historia; `PAGO_OT` | `MODELO.md` §5d y `MODELO.md` §5i (D-522, D-538 y D-519) | ✅ incluido el validador, que es Compras (D-538) |
 | 8 | **Cerrar** | Frente al 90 %: el residente solicita, el supervisor aprueba, control valida; si se requiere, también por actividades; el lote se entrega con los cuatro participantes en cualquier orden; cerrar cierra al residente | `CIERRE_FRENTE`, `CIERRE_ACTIVIDADES` y `ENTREGA_OBRA` | `MODELO.md` §5c (D-515, D-516 y D-522) | ✅ |
-| 9 | **Entregar y atender la postventa** | La obra pasa a `entregada` y entra a postventa, **que será un módulo completo con una persona encargada, Atención a postventa** (D-540 y D-541): el colono abre el ticket de garantía, Atención a postventa lo atiende y solicita su cierre, y el colono lo confirma con su nivel de satisfacción; hay también OT de postventa y de mantenimiento (con cobro al cliente, por garantía o necesaria para la entrega); la retención se libera al entregar la vivienda o antes si el supervisor lo autoriza; la OT concluye cuando se pagó todo | `TICKET_GARANTIA` y `ORDEN_TRABAJO` | `MODELO.md` §3b y `MODELO.md` §5i | ✅ el mínimo y el ticket · 🔶 el módulo completo, por diseñar (B-129) |
+| 9 | **Entregar y atender la postventa** | La obra pasa a `entregada` y entra a postventa, **que será un módulo completo con una persona encargada, Atención a postventa** (D-540 y D-541): el colono abre el ticket de garantía (o Atención a postventa en su nombre), Atención a postventa lo atiende y solicita su cierre, y el colono lo confirma con su nivel de satisfacción, de 5 a 10; si no lo confirma, Control de obra puede aprobar cerrarlo con una nota de insatisfacción o de desatención del colono; hay también OT de postventa y de mantenimiento (con cobro al cliente, por garantía o necesaria para la entrega); la retención se libera al entregar la vivienda o antes si el supervisor lo autoriza; la OT concluye cuando se pagó todo | `TICKET_GARANTIA` y `ORDEN_TRABAJO` | `MODELO.md` §3b y `MODELO.md` §5i | ✅ el mínimo y el ticket · 🔶 el módulo completo, por diseñar (B-129) |
 | 10 | **Más adelante** | El cliente pide cambios antes y durante la obra, y postventas y mantenimientos después; el contratista entra al sistema; la entrega puede escalar a un acta de entrega y recepción | — | B-125, B-121 y D-522 | 💭 |
 
 ## 8.4 Cómo cambia de estado lo que viaja
@@ -566,7 +566,7 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | **Obra** | `pendiente` → `iniciada` → `en_proceso` → `por_entregar` → `entregada` y postventa | `iniciada` y `entregada` se marcan; los demás se derivan del avance (desde el 90 %, `por_entregar`) |
 | **Estimación** | `capturada` → `enviada` → `devuelta` → `validada` → `pagada` | Control de obra la envía a Compras y establece la pagada; Compras la devuelve y, al modificarla, la deja `validada` |
 | **OT** | `cotizada` → `concluida` o `cancelada` | Proyectos la cotiza; el sistema propone concluirla y Proyectos lo confirma |
-| **Ticket de garantía** (D-541) | `abierto` → `cierre_solicitado` → `cerrado` *(los nombres de los estados son propuestos)* | El colono lo abre; Atención a postventa solicita el cierre; el colono lo confirma con su nivel de satisfacción |
+| **Ticket de garantía** (D-541) | `abierto` → `cierre_solicitado` → `cerrado` *(los nombres de los estados son propuestos)* | El colono lo abre; Atención a postventa solicita el cierre; el colono lo confirma con su nivel de satisfacción, o Control de obra aprueba cerrarlo con una nota de insatisfacción o de desatención del colono (D-542) |
 | **Incidencia** | `originada` → `aprobada` → `validada` → `ejecutada` → `cerrada`, o `descartada` | Residente y supervisor, control y supervisor; quien origina no se aprueba a sí mismo |
 | **Cierre de frente** | solicitado → aprobado → validado | Residente, supervisor y control de obra |
 
@@ -592,7 +592,7 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | 12 | **~~Cada cuánto se captura el avance físico~~ — ✅ contestado (D-533):** a diario, o confirmándolo al terminar la actividad; y antes de estimar se confirman los avances | — |
 | 13 | **~~Confirmar los avances antes de estimar~~ — ✅ cerrado (D-534 y D-535):** lo confirma el residente, al nivel en que se capturó (actividad; concepto paramétrico; o el frente en porcentaje, que se baja y cuyo reparto decide el usuario). No es un candado de la estimación, pero lo estimado por encima de lo confirmado es una alerta importante y se pueden bajar las cantidades de la estimación | — |
 | 14 | **~~Los roles que faltan~~ — ✅ cerrado (D-537):** Compras, Finanzas, y Proyectos y atención al cliente, que es también el equipo de gestión de proyectos | — |
-| 15 | **~~Los dueños de 26 funciones~~ — ✅ pasados a `MODELO.md` §5b (D-537 y D-538).** Control de obra pasa de 22 a 28 funciones con lo confirmado y a 33 con lo propuesto (§8.7) | — |
+| 15 | **~~Los dueños de 26 funciones~~ — ✅ pasados a `MODELO.md` §5b (D-537 y D-538).** Control de obra pasa de 22 a 28 funciones con lo confirmado y a 34 con lo propuesto (§8.7) | — |
 | 16 | **~~La estimación, para pulir con el sistema~~ — ✅ contestado (D-539):** la réplica y las justificaciones pueden dar más de una vuelta; la justificación va en el renglón del concepto, como una celda de texto, y también la de lo fuera de catálogo. *Lo demás se pule con el sistema* (D-538) | — |
 
 ## 8.7 Los roles paso por paso (D-536 y D-537)
@@ -697,50 +697,52 @@ Marcas: ✅ rol y función asignados y confirmados · 🔶 dicho o propuesto, co
 | Firmar la entrega | Proyectos y atención al cliente: es el equipo de gestión de proyectos | `firmar_entrega` | ✅ | Confirmado en D-537 |
 | Firmar la entrega, si está | Superintendente | `firmar_entrega_superintendente` | 🔶 | Puede estar o no (D-522) |
 
-**Etapa 9 · Entregar y atender la postventa** *(la postventa será un módulo completo, D-540 y D-541)*
+**Etapa 9 · Entregar y atender la postventa** *(la postventa será un módulo completo, D-540 a D-542)*
 
 | Paso | Quién | Función | Estado | Nota |
 |---|---|---|---|---|
 | Pasar la obra a `entregada` y a postventa | El sistema, cuando participan los cuatro de la entrega | — | ⚙ | `MODELO.md` §3c y §3b |
-| Abrir el ticket de garantía | El colono: el dueño de la casa | `abrir_ticket_garantia` | ✅ | D-541. El rol de colono es propuesto |
+| Abrir el ticket de garantía | El colono: el dueño de la casa; o Atención a postventa en su nombre | `abrir_ticket_garantia` | ✅ | D-541 y D-542 |
 | Atender el ticket y, si hace falta un trabajo, generar la OT de postventa o de mantenimiento | Atención a postventa *(lectura mía)* | `cotizar_ot` | 🔶 | El módulo lo definirá |
 | Solicitar el cierre del ticket | Atención a postventa | `solicitar_cierre_ticket` | 🔶 | El rol lo dijo el usuario (D-541); la clave es propuesta |
-| Confirmar el cierre con el nivel de satisfacción | El colono | `confirmar_cierre_ticket` | 🔶 | El rol lo dijo el usuario (D-541); la clave y la escala son propuestas |
+| Confirmar el cierre con el nivel de satisfacción, de 5 a 10 | El colono | `confirmar_cierre_ticket` | 🔶 | El rol y la escala los dijo el usuario (D-541 y D-542); la clave es propuesta |
+| Si el colono no confirma o no queda satisfecho: aprobar cerrarlo con una nota de insatisfacción o de desatención | Control de obra | `aprobar_cierre_ticket_sin_confirmar` | 🔶 | El rol lo dijo el usuario (D-542); la clave es propuesta |
 | Concluir la OT cuando se pagó todo | El sistema lo propone y Atención a postventa lo confirma *(lectura mía)* | propuesta de `MODELO.md` §5i | 🔶 | Los residentes estiman hasta el pago de la garantía |
 
 ### Qué dice el conjunto
 
-De los **62 pasos,** 33 están ✅, 26 son 🔶, 1 está ❓ y 2 son ⚙. Con D-537 y D-538 los pasos del arranque, de la OT y de la estimación tienen dueño. **El único ❓ son los descuentos,** que esperan a B-110. La postventa es la más provisional: será un módulo completo (D-540 y D-541).
+De los **63 pasos,** 33 están ✅, 27 son 🔶, 1 está ❓ y 2 son ⚙. Con D-537 y D-538 los pasos del arranque, de la OT y de la estimación tienen dueño. **El único ❓ son los descuentos,** que esperan a B-110. La postventa es la más provisional: será un módulo completo (D-540 a D-542).
 
 ### Los roles nuevos (D-537)
 
-`ROL` pasa de seis a **nueve**, y con la postventa (D-540 y D-541) a **diez**, **once** si se confirma el colono (la clave de máquina entre paréntesis, como `control_de_obra`). Los usuarios pueden tener varios roles a la vez (`USUARIO_ROL`).
+`ROL` pasa de seis a **nueve**, y con la postventa (D-540 a D-542) a **once**: Atención a postventa y el colono (la clave de máquina entre paréntesis, como `control_de_obra`). Los usuarios pueden tener varios roles a la vez (`USUARIO_ROL`).
 
 | Rol | Qué hace | Estado |
 |---|---|---|
 | **Compras** (`compras`) | El validador de topes: `validar_estimacion` y `devolver_estimacion` | ✅ El rol y sus dos funciones (D-538) |
 | **Finanzas** (`finanzas`) | `asignar_subcontrato`: asigna al contratista de un subcontrato | ✅ |
 | **Proyectos y atención al cliente** (`proyectos`) | `cotizar_ot` y `cambiar_alcance_ot` y, como equipo de gestión de proyectos, `firmar_entrega` | ✅ |
-| **Atención a postventa** (`atencion_postventa`) | La persona encargada de postventa: atiende los tickets de garantía y solicita su cierre (`solicitar_cierre_ticket`) | ✅ El rol (D-541); 🔶 la clave de la función |
-| **Colono** (`colono`) | El dueño de la casa, que es el cliente: `abrir_ticket_garantia` y `confirmar_cierre_ticket`, con su nivel de satisfacción | 🔶 El rol es propuesto; es un usuario externo, que ve solo su casa |
+| **Atención a postventa** (`atencion_postventa`) | La persona encargada de postventa: atiende los tickets de garantía, los abre en nombre del colono (`abrir_ticket_garantia`) y solicita su cierre (`solicitar_cierre_ticket`) | ✅ El rol (D-541); 🔶 la clave de la segunda función |
+| **Colono** (`colono`) | El dueño de la casa, que es el cliente: `abrir_ticket_garantia` y `confirmar_cierre_ticket`, con su nivel de satisfacción de 5 a 10 | ✅ El rol (D-542): un usuario externo que ve solo su casa; 🔶 la clave de la segunda función |
 | **Cotizador** | Cotizar al cliente un cambio o adicional | Sin activar: Control de obra lo hace hoy (B-123) |
 
 *El código no cambia (D-487):* la migración de permisos solo siembra los seis roles de antes y las dos funciones del programa; los tres roles nuevos y sus funciones se siembran cuando se levante D-487.
 
 ### Las funciones nuevas y su dueño
 
-Las veintisiete funciones nuevas (veintitrés de D-537, dos de D-538 y dos de D-541) y las dos que existían sin dueño (`pactar_precio_contratista` y `autorizar_orden_cambio`) ya están en la lista de `MODELO.md` §5b. `aplicar_descuento` sigue sin dueño hasta que se resuelvan los descuentos (B-110).
+Las veintiocho funciones nuevas (veintitrés de D-537, dos de D-538, dos de D-541 y una de D-542) y las dos que existían sin dueño (`pactar_precio_contratista` y `autorizar_orden_cambio`) ya están en la lista de `MODELO.md` §5b. `aplicar_descuento` sigue sin dueño hasta que se resuelvan los descuentos (B-110).
 
 | Función | Dueño | Estado |
 |---|---|---|
 | `dar_de_alta_obra` · `asignar_contratista` · `pactar_precio_contratista` · `marcar_obra_iniciada` · `autorizar_orden_cambio` | Control de obra | ✅ D-537 |
 | `asignar_subcontrato` | Finanzas | ✅ D-537 |
 | `cotizar_ot` · `cambiar_alcance_ot` · `firmar_entrega` | Proyectos y atención al cliente | ✅ D-537 |
-| `abrir_ticket_garantia` · `confirmar_cierre_ticket` | Colono | ✅ la primera (D-541) · 🔶 la segunda |
+| `abrir_ticket_garantia` · `confirmar_cierre_ticket` | Colono (la primera, también Atención a postventa en su nombre) | ✅ la primera (D-541 y D-542) · 🔶 la segunda |
 | `solicitar_cierre_ticket` | Atención a postventa | 🔶 D-541 |
+| `aprobar_cierre_ticket_sin_confirmar` | Control de obra | 🔶 D-542 |
 | `cargar_ingenieria` · `justificar_aumento_cantidad` | Costos | 🔶 |
 | `enviar_estimacion` · `marcar_estimacion_pagada` | Control de obra | ✅ D-538 |
-| `cotizar_cambio_cliente` · `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` | Control de obra (la última, junto con Costos) | 🔶 |
+| `cotizar_cambio_cliente` · `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` *(con Costos)* | Control de obra | 🔶 |
 | `capturar_estimacion` | Residente | ✅ D-538 |
 | `confirmar_avance` · `replicar_estimacion` · `entregar_obra` | Residente | 🔶 |
 | `justificar_fuera_de_catalogo` · `dar_visto_bueno_entrega` | Supervisor | 🔶 |
@@ -748,7 +750,7 @@ Las veintisiete funciones nuevas (veintitrés de D-537, dos de D-538 y dos de D-
 | `validar_estimacion` *(pasó de Control de obra)* · `devolver_estimacion` | Compras | ✅ D-538 |
 | `firmar_entrega_superintendente` | Superintendente | 🔶 |
 
-**Una advertencia de diseño.** Con lo confirmado Control de obra pasa de **22 a 28 funciones** (gana siete y pierde `validar_estimacion`, que pasó a Compras), y con lo propuesto, a **33.** Sale de la regla que ya existe, el gobierno cruzado entre obras (D-330), pero junta en una sola mano el alta de obras, los contratistas, el arranque, el control de cambio, el envío y el pago de las estimaciones. Si en la práctica eso es un cuello de botella, el remedio no cambia el esquema: es reasignar filas de `ROL_FUNCION`.
+**Una advertencia de diseño.** Con lo confirmado Control de obra pasa de **22 a 28 funciones** (gana siete y pierde `validar_estimacion`, que pasó a Compras), y con lo propuesto, a **34.** Sale de la regla que ya existe, el gobierno cruzado entre obras (D-330), pero junta en una sola mano el alta de obras, los contratistas, el arranque, el control de cambio, el envío y el pago de las estimaciones. Si en la práctica eso es un cuello de botella, el remedio no cambia el esquema: es reasignar filas de `ROL_FUNCION`.
 
 ### Los avisos: una regla de partida
 
@@ -772,7 +774,7 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 
 ## 8.8 Dónde queda el App flow (D-539 y D-540)
 
-**D-539:** las **pantallas son de las apps** y no se escriben en el cerebro. **D-540:** el usuario revisó los seis puntos que quedaban, aceptó cinco («todo lo demás correcto») y precisó la postventa. **D-541:** precisó quién abre el ticket y cómo se cierra. **El App flow queda cerrado en el cerebro.** Lo que tiene, de lo más general a lo más fino:
+**D-539:** las **pantallas son de las apps** y no se escriben en el cerebro. **D-540:** el usuario revisó los seis puntos que quedaban, aceptó cinco («todo lo demás correcto») y precisó la postventa. **D-541:** precisó quién abre el ticket y cómo se cierra. **D-542:** confirmó el colono, la escala de la satisfacción, el cierre sin confirmación y que pedir cambios ya estaba definido. **El App flow queda cerrado en el cerebro.** Lo que tiene, de lo más general a lo más fino:
 
 | Capa | Dónde | Estado |
 |---|---|---|
@@ -789,9 +791,9 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 |---|---|---|---|
 | 1 | **El orden de las etapas** | Las diez son un **orden de dependencia, no de calendario:** cada rama avanza a su paso, y la OT (5) puede ocurrir en cualquier momento entre la planeación y la postventa. Esquema abajo | ✅ |
 | 2 | **Los avisos** | Se avisa a quien da el siguiente paso, y a los demás de la obra cuando cambian las fechas (regla de §8.7) | ✅ |
-| 3 | **La petición del cliente** de un cambio o adicional | Proyectos y atención al cliente la recibe y la registra; Control de obra cotiza (hoy hace de cotizador); el cliente la acepta; Control de obra autoriza el control de cambio | ✅ |
+| 3 | **La petición del cliente** de un cambio o adicional | Proyectos y atención al cliente la recibe y la registra; Control de obra cotiza (hoy hace de cotizador); el cliente la acepta; Control de obra autoriza el control de cambio. **Es lo que el módulo de vivienda llamaba «pedir cambios antes y durante la obra»** (D-542): ya estaba definido, y el módulo solo sería la puerta para que el colono la entre él mismo | ✅ |
 | 4 | **La urbanización** | Sigue el mismo flujo que una casa, con cada clúster o amenidad como un frente que se cierra por separado. *Queda:* si tiene entrega y postventa, y a quién | ✅ en lo esencial |
-| 5 | **La postventa** | **Será un módulo completo, con una persona encargada: Atención a postventa, un rol propio** (D-540 y D-541). **Lo abre el dueño de la casa, que es el cliente y se llama colono; se cierra a solicitud de Atención a postventa, confirmando el colono con su nivel de satisfacción.** El detalle —estados del ticket, cómo llega a una OT, la escala de la satisfacción— se diseña con el módulo (B-129) | ✅ el flujo · 🔶 el rol de colono y las claves |
+| 5 | **La postventa** | **Será un módulo completo, con una persona encargada: Atención a postventa, un rol propio** (D-540 y D-541). **Lo abre el dueño de la casa, que es el cliente y se llama colono** (o Atención a postventa en su nombre); **se cierra a solicitud de Atención a postventa, confirmando el colono con su nivel de satisfacción, de 5 a 10; y si no confirma o no queda satisfecho, Control de obra puede aprobar cerrarlo con una nota de insatisfacción o de desatención del colono** (D-542). El detalle —cuánto espera la confirmación, cómo llega a una OT— se diseña con el módulo (B-129) | ✅ el flujo y los roles · 🔶 las claves |
 | 6 | **El cierre de semana** | Se cierra al pasar la estimación a `validada` (cuando Compras la modifica), y lo anterior sigue abierto (D-517) | ✅ |
 
 **El orden de las etapas, como quedó:**
