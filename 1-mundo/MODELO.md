@@ -877,8 +877,9 @@ PRESUPUESTO.cotizacion_de_id  FK PRESUPUESTO(tipo=obra), nullable — solo si
                                tipo=cotizacion: la obra a la que se cotiza           propuesta — D-532
 PRESUPUESTO.clase_cotizacion  enum: highlight · adicional, nullable — solo si
                                tipo=cotizacion                                       propuesta — D-532
-PRESUPUESTO.folio             texto, nullable — «se foliaban» (§5b); el formato no
-                               se ha dicho                                           propuesta — D-532
+PRESUPUESTO.folio             texto, nullable — CZ-{cluster}-{lote}{consecutivo},
+                               p. ej. CZ-ALM-18001, con el mismo patrón del control
+                               de cambio                                             firme — D-546
 PRESUPUESTO.estado_cotizacion enum: cotizada · aceptada · rechazada, nullable —
                                solo si tipo=cotizacion. Al pasar a `aceptada` nace
                                la orden de cambio (abajo)                            propuesta — D-532
@@ -903,9 +904,9 @@ PRESUPUESTO.factor_precio     NUMERIC, nullable — solo si tipo=cotizacion: el
 - **El factor 0.7** (dato del usuario, D-532): un costo directo de 70 se cobra en 100. Como 1 ÷ 0.7 es 1.4286, el costo es el 70 % del precio y el 30 % restante es lo que cubre indirectos y utilidad. **Es un solo factor, no las capas de sobrecosto de §6,** que siguen fuera del modelo. Da igual restar los costos y luego dividir que dividir cada uno y restar los precios. *Lectura mía:* el factor y el precio por m² se guardan como parámetros con su fecha, como los umbrales que ya lo son (el 20 % de las alertas, el 5 % de la retención), para cambiarlos sin tocar código.
 - **El 17,000 por m²** (dato del usuario, D-534 y D-535) son **pesos y es lo que el cliente paga por cada m² de construcción adicional.** **No es fijo:** a veces se **pacta más barato,** y cada cotización lleva el precio que se pactó; 17,000 es el de lista. **El IVA va incluido: en la vivienda no se presenta por separado.** Si varía por proyecto o por prototipo no se dijo. *Lectura mía:* el de lista vive como parámetro con su fecha, y lo pactado se compara con él; los m² de una ampliación son m² de construcción adicional, es decir, los `m2_adicionales` de la casa (§3c).
 - **Si el presupuesto de la ampliación no coincide con el precio por m² pactado,** no se corrige solo: alguien lo resuelve, y el precio por m² se puede ajustar (D-534). Como el precio **no es fijo,** el que manda es el **pactado con el cliente;** el presupuesto de la ampliación **confirma** qué tan lejos queda del costo directo entre 0.7. *Lectura mía:* si lo pactado queda por debajo, se muestra la diferencia (un margen menor al 30 %) y no se bloquea.
-- **Qué entra y qué sale:** una cotización por diferencia necesita decir qué se quita. La regla de cantidades negativas de la ingeniería del lote (`CONOCIMIENTO.md` §11.10) es de esos archivos y no cierra el caso; si se representa con dos bloques, «lo que sale» y «lo que entra», o con líneas con signo, se decide al diseñar el cotizador.
-- **Aceptada, se convierte en control de cambio.** Al aceptarla el cliente nace una `PROPUESTA(tipo=orden_cambio)` (§5f) que **agrega** al final de la rama congelada, sin reescribir lo contratado (`CONOCIMIENTO.md` §13.4). Su `delta_monto` sigue siendo el impacto en costo, es decir, **el costo directo de la cotización;** lo que paga el cliente se lee de la cotización, y si conviene guardarlo también en la orden se decide al diseñar el cotizador (B-123). Si el trabajo además se subcontrata, nace una OT (§5i) y, como siempre, se compara contra lo que se cotizó.
-- **Qué no se ha dicho:** el formato del folio, qué pasa con una cotización rechazada más allá de conservarse, y si Proyectos o Control de obra la hace (hoy la ejecuta Control de obra, §5b). **D-487:** el cerebro no construye nada hasta que el usuario lo levante.
+- **Qué entra y qué sale, y los descuentos al cliente** (D-546): una cotización por diferencia necesita decir qué se quita. Mi propuesta de dos bloques con cantidades positivas **no se aceptó:** el usuario va a **evaluar las cantidades negativas,** porque **sí hay descuentos al cliente.** Hay precedente: las matrices ya tienen cantidades negativas legítimas (58 líneas en 23 conceptos, `CONOCIMIENTO.md` §11.10 y `INVARIANTES.md`), y la regla contraria es solo de las ingenierías de lote. Queda por decidir cómo se representa un descuento al cliente: línea con signo, porcentaje o campo propio.
+- **Aceptada, se convierte en control de cambio.** Al aceptarla el cliente nace una `PROPUESTA(tipo=orden_cambio)` (§5f) que **agrega** al final de la rama congelada, sin reescribir lo contratado (`CONOCIMIENTO.md` §13.4). **El control de cambio tiene su propio consecutivo** (`CC-ALM-18001`, el siguiente de esa obra) **y se encadena a la cotización de la que viene** (D-546): no comparte el número, lleva su referencia. La orden guarda **el costo directo** (`delta_monto`, el impacto en costo) **y el precio al cliente** (`precio_cliente`), para poder ver el margen (D-546). Si el trabajo además se subcontrata, nace una OT (§5i) y, como siempre, se compara contra lo que se cotizó.
+- **Quién (D-546):** **Control de obra cotiza** (hoy hace de cotizador) y autoriza el control de cambio; **Proyectos y atención al cliente registra la respuesta del cliente,** si acepta o rechaza (`registrar_respuesta_cotizacion`, §5b). **No se ha dicho** qué pasa con una cotización rechazada más allá de conservarse. **D-487:** el cerebro no construye nada hasta que el usuario lo levante.
 
 ---
 
@@ -1917,6 +1918,7 @@ FUNCION_ATOMICA
                      · aprobar_cierre_ticket_sin_confirmar                nuevo — D-542, ver abajo
                      · traspasar_anticipo · subir_documento_expediente ·
                      registrar_revision_fisica                            nuevo — D-544, ver abajo
+                     · registrar_respuesta_cotizacion                     nuevo — D-546, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -2010,7 +2012,8 @@ fecha, en un solo lugar.
 | `firmar_entrega` | Proyectos y atención al cliente — el equipo de gestión de proyectos | dato del usuario, D-537; viene de D-516 y D-522 |
 | `firmar_entrega_superintendente` | Superintendente — puede estar o no | propuesto, D-537; viene de D-516 y D-522 |
 | `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
-| `cotizar_cambio_cliente` | Control de obra — hoy hace de cotizador | propuesto, D-537 |
+| `cotizar_cambio_cliente` | Control de obra — hoy hace de cotizador | dato del usuario, D-546 (propuesto en D-537) |
+| `registrar_respuesta_cotizacion` | Proyectos y atención al cliente — si el cliente acepta o rechaza | propuesto, D-546; el rol lo dijo el usuario |
 | `confirmar_avance` | Residente — al terminar la actividad y antes de estimar | propuesto, D-537; el rol lo dijo el usuario (D-534) |
 | `capturar_estimacion` | Residente | dato del usuario, D-538 |
 | `enviar_estimacion` | Control de obra — la concentra y la envía a Compras | dato del usuario, D-538 |
@@ -2037,7 +2040,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles. D-544 asigna `aplicar_descuento`, agrega tres funciones y el rol externo `contratista`: setenta y tres funciones, sesenta y siete asignadas, seis sin asignar, y doce roles.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles. D-544 asigna `aplicar_descuento`, agrega tres funciones y el rol externo `contratista`: setenta y tres funciones, sesenta y siete asignadas, seis sin asignar, y doce roles. D-546 agrega `registrar_respuesta_cotizacion`: setenta y cuatro funciones, sesenta y ocho asignadas, seis sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -2152,6 +2155,8 @@ Control de obra **y** Superintendente.
 > `estado` pasa a `aprobada` solo cuando los dos están llenos — el motor lo
 > verifica, no un campo booleano nuevo que pueda desincronizarse de los
 > dos anteriores.
+
+> **D-546 — para replantear (B-130).** El usuario aceptó que un concepto nuevo de una cotización se quede en la cotización y, si se contrata, Costos lo proponga como precio nuevo, **pero dijo que se va a profundizar o replantear,** y dejó esta nota: **Costos solo cuantifica todo lo de precios nuevos; Control de obra valida o realiza; eso no significa que Costos no proponga precios nuevos; y en la OT, solo Control de obra.** Mientras no se replantee, esta sección y la doble aprobación quedan como están.
 
 ### Programa: cinco funciones de incidencia, tres de cierre de frente, dos de edición — cierra B-73
 
@@ -3375,6 +3380,10 @@ valor_propuesto (JSON, tipo=orden_cambio)
   causa                enum: cambio_proyecto · error · condicion_sitio
   ejecutado_en         TIMESTAMP, nullable — si ya se ejecutó en obra
                         antes de esta propuesta
+  cotizacion_id        FK PRESUPUESTO(tipo=cotizacion), nullable — la
+                        cotización al cliente de la que viene             firme — D-546
+  precio_cliente       NUMERIC, nullable — lo que paga el cliente; el
+                        `delta_monto` sigue siendo el costo directo       firme — D-546
 ```
 
 **`objeto_id` (el campo que ya existe en `PROPUESTA`) es el nodo
@@ -3702,7 +3711,11 @@ COTIZACION_OT
 
 PARTIDA_COTIZACION
   id, cotizacion_id FK COTIZACION_OT
-  descripcion, unidad, cantidad, precio_unitario   libres, sin clave de catálogo   firme
+  descripcion, unidad, cantidad, precio_unitario   libres                      firme
+  concepto_id          FK Nodo, nullable — la liga opcional a un concepto del
+                        catálogo o a un nodo del presupuesto: sugiere descripción,
+                        unidad y precio, y la auditoría contra el presupuesto base
+                        sale por renglón. Nula = partida libre                   firme — D-546
 
 PAGO_OT
   id                   el oid
