@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8 · D-540: el App flow se cierra, y la postventa será un módulo con una persona encargada
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -64,7 +64,8 @@ Derivado de la tabla de `MODELO.md` §5b; no agrega ninguna asignación.
 | **Costos** | Todas | `trazar` · `proponer_precio_nuevo` · `cargar_catalogo_opus` (propuesta) · `cargar_ingenieria` (propuesta, D-537) · `justificar_aumento_cantidad` (propuesta, D-538) |
 | **Compras** | Ve todas | `validar_estimacion` (pasó de Control de obra) y `devolver_estimacion` (D-538) |
 | **Finanzas** | Ve todas | `asignar_subcontrato` (D-537) |
-| **Proyectos y atención al cliente** | Ve todas | `cotizar_ot` · `cambiar_alcance_ot` · `abrir_ticket_garantia` · `firmar_entrega` (D-537): es también el equipo de gestión de proyectos |
+| **Proyectos y atención al cliente** | Ve todas | `cotizar_ot` · `cambiar_alcance_ot` · `firmar_entrega` (D-537): es también el equipo de gestión de proyectos |
+| **Postventa** *(rol propuesto, D-540)* | Ve todas | `abrir_ticket_garantia` (propuesta, D-540) |
 | **Cotizador** | No es un rol activo | Hoy lo ejecuta Control de obra |
 | **Control de obra** | Todas | `trazar` · `aprobar_trazo` · `originar_incidencia` · `validar_incidencia` · `validar_cierre_frente` · `trazar_avance` · `validar_reprogramacion` · `aplicar_reprogramacion` (las tres, D-533) · `editar_estructura_programa` (también subir un programa) · `aprobar_precio_nuevo` · `cargar_catalogo_opus` · `contratar_subarbol` · `clonar_insumo` · `aprobar_propuesta` y `resolver_alerta` (propuestas, D-485) · y el gobierno entre obras: `gestionar_rol_funcion` · `asignar_residente` · `asignar_supervision` · `renovar_invariante_valor` · `reclasificar_familia` · `resolver_revisar_parametro` · y, desde D-537, `dar_de_alta_obra` · `asignar_contratista` · `pactar_precio_contratista` · `marcar_obra_iniciada` · `autorizar_orden_cambio` · `enviar_estimacion` · `marcar_estimacion_pagada` (confirmadas; las dos últimas en D-538) y `cotizar_cambio_cliente` · `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` (propuestas) |
 
@@ -532,7 +533,8 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | **Control de obra** | Recolecta y envía las estimaciones y comparte la final para el pago; la marca pagada; valida cierres y la calidad de la entrega; confirma los pagos de una OT; confirma o modifica su cotización; contrata un bloque | ✅ |
 | **Compras** | Validador de topes: revisa los topes, devuelve la estimación, y al modificarla deja la que se paga | ✅ rol nuevo (D-537); `validar_estimacion` ya es suya (D-538) |
 | **Finanzas** | Asigna el contratista de un subcontrato | ✅ rol nuevo (D-537) |
-| **Proyectos y atención al cliente** | Cotiza y genera la OT; cambia su alcance; atiende al cliente y las garantías; firma la entrega como equipo de gestión de proyectos | ✅ rol nuevo (D-537) |
+| **Proyectos y atención al cliente** | Cotiza y genera la OT; cambia su alcance; atiende al cliente; firma la entrega como equipo de gestión de proyectos | ✅ rol nuevo (D-537) |
+| **Postventa** | La persona encargada de postventa: abre y atiende los tickets de garantía. La postventa será un módulo completo (B-129) | 🔶 rol propuesto (D-540) |
 | **Costos** | Carga el export de OPUS; cuantifica (produce el presupuesto) y propone precios nuevos | ✅ |
 | **Cotizador** | Hoy lo ejecuta Control de obra; sería una herramienta (B-123) | 💭 |
 | **Contratista y cliente** | Más adelante entran como usuarios: el contratista al cotizador, al programa de ejecución y a su estado de cuenta (B-121); el cliente a un módulo de vivienda (B-125) | 💭 |
@@ -549,7 +551,7 @@ El **tablero del frente se calcula, no se guarda:** cada cifra de un nodo es la 
 | 6 | **Ejecutar y registrar el avance, cada semana** | El residente captura el avance físico (el sistema propone el porcentaje y se corrige solo lo raro; se anota a diario o se confirma al terminar la actividad, y antes de estimar se confirman los avances); origina incidencias que aprueba el supervisor, valida control, ejecuta el residente y cierra el supervisor; un extra puede pasar a orden de cambio con el cliente; el almacén surte | `REGISTRO_AVANCE` físico, `INCIDENCIA` y `ALERTA` | `CONOCIMIENTO.md` §13.7 y `MODELO.md` §5c | ✅ incluido quién captura y quién confirma el avance (D-533 y D-534) |
 | 7 | **Estimar y pagar, cada semana** | *El proceso de hoy (D-538), que se irá puliendo con el sistema:* el residente crea su estimación en Excel; Control de obra la concentra y la envía a Compras; Compras revisa los topes y la devuelve a todos; el residente tiene oportunidad de réplica si alguna cantidad bajó; Costos y Control de obra regresan a Compras las justificaciones de por qué debe subir la cantidad (los supervisores justifican lo fuera de catálogo); Compras modifica, y esa es la que se paga, y se la envía a Control de obra, que establece la estimación pagada. Si lo estimado excede lo confirmado, una alerta importante invita a bajar las cantidades. Los pagos de una OT entran por la estimación, en efectivo o por transferencia, y Control de obra los confirma | `ESTIMACION` de `capturada` a `pagada`, con el oid de cada renglón y su historia; `PAGO_OT` | `MODELO.md` §5d y `MODELO.md` §5i (D-522, D-538 y D-519) | ✅ incluido el validador, que es Compras (D-538) |
 | 8 | **Cerrar** | Frente al 90 %: el residente solicita, el supervisor aprueba, control valida; si se requiere, también por actividades; el lote se entrega con los cuatro participantes en cualquier orden; cerrar cierra al residente | `CIERRE_FRENTE`, `CIERRE_ACTIVIDADES` y `ENTREGA_OBRA` | `MODELO.md` §5c (D-515, D-516 y D-522) | ✅ |
-| 9 | **Entregar y atender la postventa** | La obra pasa a `entregada` y entra a postventa: garantía, y OT de postventa y de mantenimiento (con cobro al cliente, por garantía o necesaria para la entrega); la retención se libera al entregar la vivienda o antes si el supervisor lo autoriza; la OT concluye cuando se pagó todo | `TICKET_GARANTIA` y `ORDEN_TRABAJO` | `MODELO.md` §3b y `MODELO.md` §5i | ✅ |
+| 9 | **Entregar y atender la postventa** | La obra pasa a `entregada` y entra a postventa, **que será un módulo completo con una persona encargada** (D-540): garantía, y OT de postventa y de mantenimiento (con cobro al cliente, por garantía o necesaria para la entrega); la retención se libera al entregar la vivienda o antes si el supervisor lo autoriza; la OT concluye cuando se pagó todo | `TICKET_GARANTIA` y `ORDEN_TRABAJO` | `MODELO.md` §3b y `MODELO.md` §5i | ✅ el mínimo · 🔶 el módulo completo, por diseñar (B-129) |
 | 10 | **Más adelante** | El cliente pide cambios antes y durante la obra, y postventas y mantenimientos después; el contratista entra al sistema; la entrega puede escalar a un acta de entrega y recepción | — | B-125, B-121 y D-522 | 💭 |
 
 ## 8.4 Cómo cambia de estado lo que viaja
@@ -576,8 +578,8 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | 2 | **~~Funciones sin clave~~ — ✅ pasadas a la lista de `MODELO.md` §5b (D-537),** las confirmadas y las propuestas. *Quedan sin dueño:* `aplicar_descuento` (B-110) y la revisión de los ajustes que no pasan por topes | — |
 | 3 | **Descuentos, traspaso del anticipo y cotizador** (B-110, B-124 y B-123) | El usuario |
 | 4 | **~~La junta de arranque~~ — ✅ cerrado (D-537):** la declara Control de obra con `marcar_obra_iniciada`, y eso dispara las fechas contractuales | — |
-| 5 | **La urbanización:** una obra única con ramas de clústeres y amenidades; su flujo propio no está escrito, y ObraCtrl hoy no la representa (D-523, G3) | El usuario |
-| 6 | **Los avisos:** quién se entera de qué en cada paso (devoluciones, cierres, pagos); ObraCtrl los tiene y el cerebro los dejó fuera (D-516). **El primero que se dice (D-533):** al aplicarse una reprogramación se notifica el cambio *a los demás;* quiénes son no se dijo. §8.7 propone una regla de partida | El usuario |
+| 5 | **~~La urbanización~~ — ✅ cerrado en lo esencial (D-540):** sigue el mismo flujo que una casa —presupuesto, programa, avance y estimación—, con cada clúster o amenidad como un frente que se cierra por separado. *Queda:* si tiene entrega y postventa, y a quién (D-523, G3) | — |
+| 6 | **~~Los avisos~~ — ✅ la regla de partida de §8.7 queda aceptada (D-540):** se avisa a quien tiene que dar el siguiente paso de la cadena, y a los demás de la obra (el residente, el supervisor y control de obra de esa obra) cuando cambian las fechas. Los avisos siguen siendo plomería de la aplicación (D-516) | — |
 | 7 | **~~El cuantificador~~ — ✅ cerrado (D-532):** un motor con dos entradas, la herramienta como ventana flotante que abre el módulo y el espacio de trabajo por nivel o partida grande (§8.1). *Queda abierto:* el umbral de «discrepan mucho» al comprobar un presupuesto y la regla normal de quién traza y quién aprueba | El usuario |
 | 8 | **~~Los tipos de presupuesto~~ — ✅ cerrado (D-532 a D-535):** la cotización al cliente es el cuarto valor de `PRESUPUESTO.tipo` y se vuelve control de cambio al aceptarla el cliente. Su precio es **m² × el precio pactado** en una ampliación (17,000 pesos de lista, IVA incluido, **no fijo**) y **la diferencia ÷ 0.7** en algo específico. *Queda por confirmar (B-123):* si el precio varía por proyecto o prototipo, cómo se representa lo que sale, el folio y quién la hace | El usuario |
 | 9 | **~~Cuándo está «definido» un presupuesto~~ — ✅ cerrado (D-532):** definido es **costeado**; contratado es otro estado, y contratar la rama es la declaración, de Control de obra (§8.1) | — |
@@ -691,28 +693,29 @@ Marcas: ✅ rol y función asignados y confirmados · 🔶 dicho o propuesto, co
 | Firmar la entrega | Proyectos y atención al cliente: es el equipo de gestión de proyectos | `firmar_entrega` | ✅ | Confirmado en D-537 |
 | Firmar la entrega, si está | Superintendente | `firmar_entrega_superintendente` | 🔶 | Puede estar o no (D-522) |
 
-**Etapa 9 · Entregar y atender la postventa**
+**Etapa 9 · Entregar y atender la postventa** *(la postventa será un módulo completo, D-540)*
 
 | Paso | Quién | Función | Estado | Nota |
 |---|---|---|---|---|
 | Pasar la obra a `entregada` y a postventa | El sistema, cuando participan los cuatro de la entrega | — | ⚙ | `MODELO.md` §3c y §3b |
-| Abrir y atender una garantía | Proyectos y atención al cliente | `abrir_ticket_garantia` | ✅ | Rol confirmado en D-537 (garantías y postventa) |
-| Cotizar y generar la OT de postventa o de mantenimiento | Proyectos y atención al cliente | `cotizar_ot` | ✅ |  |
-| Concluir la OT cuando se pagó todo | El sistema lo propone y Proyectos y atención al cliente lo confirma | propuesta de `MODELO.md` §5i | 🔶 | Los residentes estiman hasta el pago de la garantía |
+| Abrir y atender una garantía | Postventa: la persona encargada | `abrir_ticket_garantia` | 🔶 | El rol lo dijo el usuario (D-540); el nombre del rol y la clave son propuestos |
+| Generar la OT de postventa o de mantenimiento | Postventa *(lectura mía)* | `cotizar_ot` | 🔶 | El módulo lo definirá |
+| Concluir la OT cuando se pagó todo | El sistema lo propone y Postventa lo confirma *(lectura mía)* | propuesta de `MODELO.md` §5i | 🔶 | Los residentes estiman hasta el pago de la garantía |
 
 ### Qué dice el conjunto
 
-De los **60 pasos,** 34 están ✅, 23 son 🔶, 1 está ❓ y 2 son ⚙. Con D-537 y D-538 los pasos del arranque, de la OT y de la estimación tienen dueño. **El único ❓ son los descuentos,** que esperan a B-110.
+De los **60 pasos,** 32 están ✅, 25 son 🔶, 1 está ❓ y 2 son ⚙. Con D-537 y D-538 los pasos del arranque, de la OT y de la estimación tienen dueño. **El único ❓ son los descuentos,** que esperan a B-110. La postventa es la más provisional: será un módulo completo (D-540).
 
 ### Los roles nuevos (D-537)
 
-`ROL` pasa de seis a **nueve** (la clave de máquina entre paréntesis, como `control_de_obra`). Los usuarios pueden tener varios roles a la vez (`USUARIO_ROL`).
+`ROL` pasa de seis a **nueve**, y con la postventa (D-540) a **diez** (la clave de máquina entre paréntesis, como `control_de_obra`). Los usuarios pueden tener varios roles a la vez (`USUARIO_ROL`).
 
 | Rol | Qué hace | Estado |
 |---|---|---|
 | **Compras** (`compras`) | El validador de topes: `validar_estimacion` y `devolver_estimacion` | ✅ El rol y sus dos funciones (D-538) |
 | **Finanzas** (`finanzas`) | `asignar_subcontrato`: asigna al contratista de un subcontrato | ✅ |
-| **Proyectos y atención al cliente** (`proyectos`) | `cotizar_ot` y `cambiar_alcance_ot`, `abrir_ticket_garantia` y, como equipo de gestión de proyectos, `firmar_entrega` | ✅ |
+| **Proyectos y atención al cliente** (`proyectos`) | `cotizar_ot` y `cambiar_alcance_ot` y, como equipo de gestión de proyectos, `firmar_entrega` | ✅ |
+| **Postventa** (`postventa`) | `abrir_ticket_garantia`: la persona encargada de postventa | 🔶 El rol lo dijo el usuario (D-540); el nombre y la clave son propuestos |
 | **Cotizador** | Cotizar al cliente un cambio o adicional | Sin activar: Control de obra lo hace hoy (B-123) |
 
 *El código no cambia (D-487):* la migración de permisos solo siembra los seis roles de antes y las dos funciones del programa; los tres roles nuevos y sus funciones se siembran cuando se levante D-487.
@@ -725,7 +728,8 @@ Las veinticinco funciones nuevas (veintitrés de D-537 y dos de D-538) y las dos
 |---|---|---|
 | `dar_de_alta_obra` · `asignar_contratista` · `pactar_precio_contratista` · `marcar_obra_iniciada` · `autorizar_orden_cambio` | Control de obra | ✅ D-537 |
 | `asignar_subcontrato` | Finanzas | ✅ D-537 |
-| `cotizar_ot` · `cambiar_alcance_ot` · `abrir_ticket_garantia` · `firmar_entrega` | Proyectos y atención al cliente | ✅ D-537 |
+| `cotizar_ot` · `cambiar_alcance_ot` · `firmar_entrega` | Proyectos y atención al cliente | ✅ D-537 |
+| `abrir_ticket_garantia` | Postventa | 🔶 D-540 |
 | `cargar_ingenieria` · `justificar_aumento_cantidad` | Costos | 🔶 |
 | `enviar_estimacion` · `marcar_estimacion_pagada` | Control de obra | ✅ D-538 |
 | `cotizar_cambio_cliente` · `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` | Control de obra (la última, junto con Costos) | 🔶 |
@@ -758,9 +762,9 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 2. **El orden de las etapas** (de D-529).
 3. **Pulir la estimación con el sistema,** sin prisa: el usuario dijo que este es el proceso de hoy y que se irá puliendo. Las dudas de D-538 (las vueltas, dónde va la justificación y si los supervisores siguen justificando lo fuera de catálogo) quedaron contestadas en D-539.
 
-## 8.8 Dónde queda el App flow (D-539)
+## 8.8 Dónde queda el App flow (D-539 y D-540)
 
-**Pedido del usuario (D-539):** «Las pantallas las dejamos para las apps, ¿hay algo más del App flow?» **Las pantallas son de las apps** y no se escriben en el cerebro. Lo que el cerebro tiene del App flow, de lo más general a lo más fino:
+**D-539:** las **pantallas son de las apps** y no se escriben en el cerebro. **D-540:** el usuario revisó los seis puntos que quedaban, aceptó cinco («todo lo demás correcto») y precisó la postventa. **El App flow queda cerrado en el cerebro.** Lo que tiene, de lo más general a lo más fino:
 
 | Capa | Dónde | Estado |
 |---|---|---|
@@ -771,18 +775,18 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 | Las diez etapas, los estados y los roles paso por paso | §8.3, §8.4 y §8.7 | ✅ |
 | La estimación, como la hace hoy la empresa | `MODELO.md` §5d y §8.7 | ✅ El proceso de hoy, que se irá puliendo con el sistema |
 
-**Lo que queda, ordenado por lo cerca que está de cerrarse.** Cada punto trae mi recomendación para que baste con un «sí» o un cambio:
+**Los seis puntos, como quedaron (D-540):**
 
-| # | Qué | Recomendación | Estado |
+| # | Qué | Cómo quedó | Estado |
 |---|---|---|---|
-| 1 | **El orden de las etapas** (de D-529). *Lectura mía:* las diez son un **orden de dependencia, no de calendario.** Cada rama avanza a su paso, y la OT (5) puede ocurrir en cualquier momento entre la planeación y la postventa | Confirmarlo con el esquema de abajo | 🔶 |
-| 2 | **Los avisos** (hueco 6): a quiénes se avisa cuando cambian las fechas y en cada paso de una cadena | Aceptar la regla de partida de §8.7: se avisa a quien da el siguiente paso, y a los demás de la obra cuando cambian las fechas | 🔶 |
-| 3 | **La petición del cliente** de un cambio o un adicional: quién la recibe y la registra antes de cotizar | Proyectos y atención al cliente la recibe y la registra; Control de obra cotiza (hoy hace de cotizador); el cliente la acepta; Control de obra autoriza el control de cambio | ❓ |
-| 4 | **La urbanización** (hueco 5): una sola por proyecto, con ramas de clústeres y amenidades; su flujo propio no está escrito | Que siga el mismo flujo que una casa —presupuesto, programa, avance, estimación—, con cada clúster o amenidad como un frente que se cierra por separado. Falta saber si tiene entrega y postventa, y a quién | ❓ |
-| 5 | **La postventa** (etapa 9) está delgada: el ticket de garantía solo tiene `abierto` y `cerrado` y no dice quién lo abre ni cómo llega a una OT | Que lo abra Proyectos y atención al cliente (`abrir_ticket_garantia`) y que, si hace falta un trabajo, nazca una OT de postventa | ❓ |
-| 6 | **El cierre de semana** (B-120): *una estimación validada cierra esa semana de la obra para todos* (D-517). Con la confirmación de avances y las vueltas de la estimación, el momento exacto es cuando Compras la deja `validada` | Dejarlo así: se cierra al pasar a `validada`, y lo anterior sigue abierto | 🔶 |
+| 1 | **El orden de las etapas** | Las diez son un **orden de dependencia, no de calendario:** cada rama avanza a su paso, y la OT (5) puede ocurrir en cualquier momento entre la planeación y la postventa. Esquema abajo | ✅ |
+| 2 | **Los avisos** | Se avisa a quien da el siguiente paso, y a los demás de la obra cuando cambian las fechas (regla de §8.7) | ✅ |
+| 3 | **La petición del cliente** de un cambio o adicional | Proyectos y atención al cliente la recibe y la registra; Control de obra cotiza (hoy hace de cotizador); el cliente la acepta; Control de obra autoriza el control de cambio | ✅ |
+| 4 | **La urbanización** | Sigue el mismo flujo que una casa, con cada clúster o amenidad como un frente que se cierra por separado. *Queda:* si tiene entrega y postventa, y a quién | ✅ en lo esencial |
+| 5 | **La postventa** | **Será un módulo completo, y hay una persona encargada de postventa.** Por eso ya no la abre Proyectos y atención al cliente: `abrir_ticket_garantia` pasa a un rol propio, `postventa` (propuesto). El detalle —estados del ticket, cómo llega a una OT, qué ve el cliente— se diseña con el módulo (B-129) | ✅ la persona · 🔶 el rol · el resto, módulo aparte |
+| 6 | **El cierre de semana** | Se cierra al pasar la estimación a `validada` (cuando Compras la modifica), y lo anterior sigue abierto (D-517) | ✅ |
 
-**El orden de las etapas (punto 1), como lo leo:**
+**El orden de las etapas, como quedó:**
 
 ```
  1 catálogo ─► 2 lugar ─► 3 presupuesto ─► 4 programar y asignar ─► (junta de arranque)
@@ -795,4 +799,4 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
         5 la OT y la cotización al cliente: en cualquier momento, de la etapa 4 a la 9
 ```
 
-**No son del App flow, aunque lo tocan:** los descuentos y el traspaso del anticipo (B-110 y B-124, cada uno con sus preguntas), los campos del expediente y la revisión física (B-120) y el contratista y el cliente como usuarios (B-121 y B-125, ideas). Se resuelven aparte.
+**No son del App flow, aunque lo tocan:** el módulo de postventa (B-129), los descuentos y el traspaso del anticipo (B-110 y B-124, cada uno con sus preguntas), los campos del expediente y la revisión física (B-120) y el contratista y el cliente como usuarios (B-121 y B-125, ideas). Se resuelven aparte.

@@ -967,6 +967,8 @@ reconstruir a cuál pertenecía cada una de esas 160 filas ya capturadas.
 El diseño corrige la captura hacia adelante, no reescribe lo que ya
 pasó suelto.
 
+**D-540: postventa será un módulo completo,** y **hay una persona encargada de postventa** (dato del usuario). Lo de esta sección es el mínimo que el cerebro ya tenía; el módulo lo ampliará (B-129), y el cliente podrá pedir postventas y mantenimientos desde el módulo de vivienda (B-125). *Lectura mía, por confirmar:* la persona encargada es un rol propio, `postventa`, que abre y atiende el ticket de garantía (`abrir_ticket_garantia`); como `USUARIO_ROL` es de muchos a muchos, también puede tenerlo alguien de Proyectos y atención al cliente. No se agrega ningún campo (D-487).
+
 ---
 
 ## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512 y D-520; firme desde D-521)
@@ -1839,6 +1841,7 @@ ROL
   id, nombre        Residente · Supervisor · Superintendente · Costos ·
                      Cotizador · Control                                    firme
                      · Compras · Finanzas · Proyectos y atención al cliente  nuevo — D-537
+                     · Postventa                                          propuesto — D-540
 
 FUNCION_ATOMICA
   id, clave         trazar · aprobar_trazo · registrar_avance ·
@@ -1957,7 +1960,7 @@ fecha, en un solo lugar.
 | `asignar_subcontrato` | Finanzas | dato del usuario, D-537; viene de §5i |
 | `cotizar_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
 | `cambiar_alcance_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
-| `abrir_ticket_garantia` | Proyectos y atención al cliente | dato del usuario, D-537 (garantías y postventa) |
+| `abrir_ticket_garantia` | **Postventa** — la persona encargada de postventa | propuesto, D-540 (antes Proyectos y atención al cliente, D-537); el rol lo dijo el usuario |
 | `firmar_entrega` | Proyectos y atención al cliente — el equipo de gestión de proyectos | dato del usuario, D-537; viene de D-516 y D-522 |
 | `firmar_entrega_superintendente` | Superintendente — puede estar o no | propuesto, D-537; viene de D-516 y D-522 |
 | `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
@@ -1988,7 +1991,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
