@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -256,7 +256,7 @@ empezar (`INVARIANTES.md`).
 
 # 8. El flujo de la app, de punta a punta (D-529)
 
-> **Pedido del usuario (D-529):** «Vamos a trabajar en el App flow solo para quedar anotado en el cerebro.» Esto es el **primer borrador**, armado con lo ya decidido (D-453 a D-528); **no agrega reglas ni construye nada** (D-487). *Lectura mía:* el «App flow» es el recorrido de una obra por la app, por rol y por etapa; el flujo de pantallas vendrá cuando se diseñe la app. Marcas: ✅ firme en el modelo · 🔶 propuesta · ❓ abierto · 💭 idea del usuario, sin modelar.
+> **Pedido del usuario (D-529):** «Vamos a trabajar en el App flow solo para quedar anotado en el cerebro.» Esto es el **primer borrador**, armado con lo ya decidido (D-453 a D-528); **no agrega reglas ni construye nada** (D-487). *Lectura mía:* el «App flow» es el recorrido de una obra por la app, por rol y por etapa. **El flujo de pantallas no es del cerebro: es de las apps** (D-539). Marcas: ✅ firme en el modelo · 🔶 propuesta · ❓ abierto · 💭 idea del usuario, sin modelar.
 
 > **Por dónde se empieza (D-530).** El usuario pidió ver «todas» las lecturas —el recorrido por rol y por etapa, y el flujo de pantallas—, «pero primero entender el flujo de la información y sus redes: para que una obra exista debe haber un presupuesto, después un programa y su ejecución; el presupuesto pasa por un proceso de diseño; hay varios tipos de presupuesto y se puede partir de una base o de una ingeniería; y no sé si definir el cuantificador como una herramienta o como módulo de diseño o de comprobación». Por eso §8.1 es nueva y va antes que los roles: dice **qué viaja y de dónde sale** antes de decir **quién lo mueve**. Sigue siendo anotación (D-487): nada de esto agrega reglas.
 
@@ -587,7 +587,7 @@ Cada semana el flujo produce **dos avances que no se corrigen entre sí:** el **
 | 13 | **~~Confirmar los avances antes de estimar~~ — ✅ cerrado (D-534 y D-535):** lo confirma el residente, al nivel en que se capturó (actividad; concepto paramétrico; o el frente en porcentaje, que se baja y cuyo reparto decide el usuario). No es un candado de la estimación, pero lo estimado por encima de lo confirmado es una alerta importante y se pueden bajar las cantidades de la estimación | — |
 | 14 | **~~Los roles que faltan~~ — ✅ cerrado (D-537):** Compras, Finanzas, y Proyectos y atención al cliente, que es también el equipo de gestión de proyectos | — |
 | 15 | **~~Los dueños de 26 funciones~~ — ✅ pasados a `MODELO.md` §5b (D-537 y D-538).** Control de obra pasa de 22 a 28 funciones con lo confirmado y a 33 con lo propuesto (§8.7) | — |
-| 16 | **La estimación, para pulir con el sistema (D-538):** si la réplica y las justificaciones pueden dar más de una vuelta antes de que Compras modifique; dónde se guardan las justificaciones de por qué sube una cantidad; y si los supervisores siguen dando la justificación de lo fuera de catálogo (D-522), que en D-538 no se mencionó | El usuario |
+| 16 | **~~La estimación, para pulir con el sistema~~ — ✅ contestado (D-539):** la réplica y las justificaciones pueden dar más de una vuelta; la justificación va en el renglón del concepto, como una celda de texto, y también la de lo fuera de catálogo. *Lo demás se pule con el sistema* (D-538) | — |
 
 ## 8.7 Los roles paso por paso (D-536 y D-537)
 
@@ -670,9 +670,9 @@ Marcas: ✅ rol y función asignados y confirmados · 🔶 dicho o propuesto, co
 | Concentrarla (recolectar y pasar por el extractor) y enviarla a Compras | Control de obra | `enviar_estimacion` | ✅ | D-538 |
 | Revisar los topes | Compras | `validar_estimacion` | ✅ | D-538: pasó de Control de obra a Compras |
 | Devolverla a todos | Compras | `devolver_estimacion` | ✅ | D-538. *Todos:* residentes, supervisores, Costos y Control de obra |
-| Réplica, si alguna cantidad bajó | Residente | `replicar_estimacion` | 🔶 | El rol lo dijo el usuario (D-538); la clave es propuesta. Se apoya en la alerta de lo estimado de más (D-535) |
-| Regresar a Compras las justificaciones de por qué debe subir la cantidad | Costos y Control de obra | `justificar_aumento_cantidad` | 🔶 | Los roles los dijo el usuario (D-538); la clave es propuesta |
-| Justificar lo fuera de catálogo | Supervisor | `justificar_fuera_de_catalogo` | 🔶 | D-522; en D-538 no se mencionó. El campo de la justificación es mío (`MODELO.md` §5d) |
+| Réplica, si alguna cantidad bajó | Residente | `replicar_estimacion` | 🔶 | El rol lo dijo el usuario (D-538); la clave es propuesta. Puede dar más de una vuelta (D-539). Se apoya en la alerta de lo estimado de más (D-535) |
+| Regresar a Compras las justificaciones de por qué debe subir la cantidad | Costos y Control de obra | `justificar_aumento_cantidad` | 🔶 | Los roles los dijo el usuario (D-538); la clave es propuesta. Va en la celda de texto del renglón del concepto (D-539) |
+| Justificar lo fuera de catálogo | Supervisor | `justificar_fuera_de_catalogo` | 🔶 | D-522. Va en la misma celda de texto del renglón (D-539), que es firme |
 | Modificar la estimación (es la que se paga) y enviarla a Control de obra | Compras | `validar_estimacion` | ✅ | D-538 |
 | Establecer la estimación pagada | Control de obra | `marcar_estimacion_pagada` | ✅ | D-538. Propuesta de B-118 |
 | Aplicar un descuento o una deducción | ❓ | `aplicar_descuento` | ❓ | Existe sin dueño desde P-21; esperan los descuentos (B-110) |
@@ -756,4 +756,43 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 
 1. **A quiénes se avisa** cuando cambian las fechas (hueco 6).
 2. **El orden de las etapas** (de D-529).
-3. **Pulir la estimación con el sistema** (hueco 16), sin prisa: el usuario dijo que este es el proceso de hoy y que se irá puliendo. Lo único que dejé anotado como duda es si la réplica y las justificaciones dan más de una vuelta, dónde se guardan las justificaciones y si los supervisores siguen justificando lo fuera de catálogo.
+3. **Pulir la estimación con el sistema,** sin prisa: el usuario dijo que este es el proceso de hoy y que se irá puliendo. Las dudas de D-538 (las vueltas, dónde va la justificación y si los supervisores siguen justificando lo fuera de catálogo) quedaron contestadas en D-539.
+
+## 8.8 Dónde queda el App flow (D-539)
+
+**Pedido del usuario (D-539):** «Las pantallas las dejamos para las apps, ¿hay algo más del App flow?» **Las pantallas son de las apps** y no se escriben en el cerebro. Lo que el cerebro tiene del App flow, de lo más general a lo más fino:
+
+| Capa | Dónde | Estado |
+|---|---|---|
+| La cadena de la información: presupuesto, programa y ejecución, y sus redes | §8.1 | ✅ |
+| El diseño del presupuesto, los tipos y el cuantificador | §8.1 | ✅ |
+| La cotización al cliente y el control de cambio | §8.1 y `MODELO.md` §3a | ✅ |
+| Del programa a la ejecución, con el avance, su confirmación y la reprogramación | §8.1, `MODELO.md` §5c | ✅ |
+| Las diez etapas, los estados y los roles paso por paso | §8.3, §8.4 y §8.7 | ✅ |
+| La estimación, como la hace hoy la empresa | `MODELO.md` §5d y §8.7 | ✅ El proceso de hoy, que se irá puliendo con el sistema |
+
+**Lo que queda, ordenado por lo cerca que está de cerrarse.** Cada punto trae mi recomendación para que baste con un «sí» o un cambio:
+
+| # | Qué | Recomendación | Estado |
+|---|---|---|---|
+| 1 | **El orden de las etapas** (de D-529). *Lectura mía:* las diez son un **orden de dependencia, no de calendario.** Cada rama avanza a su paso, y la OT (5) puede ocurrir en cualquier momento entre la planeación y la postventa | Confirmarlo con el esquema de abajo | 🔶 |
+| 2 | **Los avisos** (hueco 6): a quiénes se avisa cuando cambian las fechas y en cada paso de una cadena | Aceptar la regla de partida de §8.7: se avisa a quien da el siguiente paso, y a los demás de la obra cuando cambian las fechas | 🔶 |
+| 3 | **La petición del cliente** de un cambio o un adicional: quién la recibe y la registra antes de cotizar | Proyectos y atención al cliente la recibe y la registra; Control de obra cotiza (hoy hace de cotizador); el cliente la acepta; Control de obra autoriza el control de cambio | ❓ |
+| 4 | **La urbanización** (hueco 5): una sola por proyecto, con ramas de clústeres y amenidades; su flujo propio no está escrito | Que siga el mismo flujo que una casa —presupuesto, programa, avance, estimación—, con cada clúster o amenidad como un frente que se cierra por separado. Falta saber si tiene entrega y postventa, y a quién | ❓ |
+| 5 | **La postventa** (etapa 9) está delgada: el ticket de garantía solo tiene `abierto` y `cerrado` y no dice quién lo abre ni cómo llega a una OT | Que lo abra Proyectos y atención al cliente (`abrir_ticket_garantia`) y que, si hace falta un trabajo, nazca una OT de postventa | ❓ |
+| 6 | **El cierre de semana** (B-120): *una estimación validada cierra esa semana de la obra para todos* (D-517). Con la confirmación de avances y las vueltas de la estimación, el momento exacto es cuando Compras la deja `validada` | Dejarlo así: se cierra al pasar a `validada`, y lo anterior sigue abierto | 🔶 |
+
+**El orden de las etapas (punto 1), como lo leo:**
+
+```
+ 1 catálogo ─► 2 lugar ─► 3 presupuesto ─► 4 programar y asignar ─► (junta de arranque)
+                                │                                           │
+                                └──── por rama: una rama puede estar en 6 mientras otra sigue en 3
+                                                                            ▼
+                                                   6 avance ⇄ 7 estimar y pagar   (cada semana)
+                                                                            ▼
+                                           8 cerrar: frente → actividades → lote ─► 9 entregar y postventa
+        5 la OT y la cotización al cliente: en cualquier momento, de la etapa 4 a la 9
+```
+
+**No son del App flow, aunque lo tocan:** los descuentos y el traspaso del anticipo (B-110 y B-124, cada uno con sus preguntas), los campos del expediente y la revisión física (B-120) y el contratista y el cliente como usuarios (B-121 y B-125, ideas). Se resuelven aparte.

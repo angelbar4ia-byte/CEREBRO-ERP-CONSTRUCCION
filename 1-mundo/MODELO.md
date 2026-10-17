@@ -2938,8 +2938,14 @@ ESTIMACION_LINEA
   excede_tope           caché — compara contra el contratado vigente
                         (D-285) al validar. NUNCA fuente de verdad, mismo
                         principio que `ESTADO_CARGA.porcentaje_cargado` (§3)
-  justificacion, justificada_por   texto y FK USUARIO, nullable — solo en un
-                        renglón fuera de catálogo; la da el Supervisor        propuesta — D-522
+  justificacion        texto, nullable — la celda de texto del renglón del
+                        concepto. Lleva la justificación de por qué debe subir
+                        la cantidad (Costos y Control de obra) y la de lo fuera
+                        de catálogo (el Supervisor). La réplica y las
+                        justificaciones pueden dar más de una vuelta             firme — D-539
+  justificada_por      FK USUARIO, nullable — quien escribió el texto
+                        vigente; las vueltas anteriores quedan en
+                        `ESTIMACION_LINEA_HISTORIA`                             propuesta — D-522 y D-539
 
 ESTIMACION_LINEA_HISTORIA   (solo se agrega, nunca se edita)
   id, linea_id FK ESTIMACION_LINEA
@@ -2993,11 +2999,11 @@ cambie.
 2. **Control de obra la concentra** (recolecta las de los residentes y las pasa al extractor, el concentrador de estimaciones) **y la envía a Compras** —`enviada`—.
 3. **Compras revisa los topes** y **la devuelve a todos** —`devuelta`—: residentes, supervisores, Costos y Control de obra.
 4. **El residente tiene oportunidad de réplica** si alguna cantidad bajó.
-5. **Costos y Control de obra regresan a Compras las justificaciones** de por qué debe subir la cantidad. Los supervisores dan la justificación de lo fuera de catálogo (D-522; en D-538 no se mencionó, y no se contradijo).
+5. **Costos y Control de obra regresan a Compras las justificaciones** de por qué debe subir la cantidad. Los supervisores dan la justificación de lo fuera de catálogo (D-522). **Todas van en la celda de texto del renglón del concepto** (`ESTIMACION_LINEA.justificacion`), y **la réplica y las justificaciones pueden dar más de una vuelta** (D-539) antes de que Compras modifique; mientras tanto la estimación sigue `devuelta`.
 6. **Compras modifica, y esa es la estimación que se paga** —`validada`—, y **se la envía a Control de obra.** *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por Compras, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
 7. **Control de obra establece la estimación pagada** —`pagada`—.
 
-**Lo que queda decidido (D-538).** El validador es **Compras:** `validar_estimacion` pasó de Control de obra a Compras (§5b), junto con `devolver_estimacion`; Control de obra conserva concentrar, enviar y marcar `pagada`. Los tres roles `compras`, `finanzas` y `proyectos` los confirmó el usuario en D-537. **Lo que no se dijo:** si la réplica y las justificaciones pueden dar más de una vuelta antes de que Compras modifique, y dónde se guardan las justificaciones de por qué sube una cantidad. *Lectura mía:* una sola vuelta por ahora, y las justificaciones junto a la fila de `ESTIMACION_LINEA_HISTORIA` que ajusta la cantidad, sin campo nuevo hasta construirlo (D-487). Sigue siendo un campo mío la justificación del fuera de catálogo (`justificacion` y `justificada_por`, arriba, propuesta).
+**Lo que queda decidido (D-538).** El validador es **Compras:** `validar_estimacion` pasó de Control de obra a Compras (§5b), junto con `devolver_estimacion`; Control de obra conserva concentrar, enviar y marcar `pagada`. Los tres roles `compras`, `finanzas` y `proyectos` los confirmó el usuario en D-537. **Lo que quedó resuelto después (D-539).** Sí hay más de una vuelta, y la justificación va **en el renglón del concepto, como una celda de texto,** también la de lo fuera de catálogo; las vueltas anteriores se reconstruyen de `ESTIMACION_LINEA_HISTORIA`. *Lectura mía:* la estimación se queda `devuelta` mientras dan vueltas la réplica y las justificaciones, y pasa a `validada` cuando Compras modifica; no se agrega ningún estado. La justificación del supervisor deja de ser solo un campo mío: la celda es firme y el autor sigue como propuesta.
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`
