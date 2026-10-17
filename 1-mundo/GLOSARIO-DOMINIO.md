@@ -847,13 +847,13 @@ El contrato informal con un contratista para ejecutar un subcontrato. Se contrat
 
 ### SOV (Schedule of Values)
 
-En la construcción de habla inglesa, el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor; sirve de base para revisar los avances y los pagos (en los contratos AIA se carga en la hoja G703 de la solicitud de pago). No es el presupuesto interno de la empresa. En postventa lo hace Atención a postventa después de dictaminar y antes de programar la ejecución. (D-553 y D-554.)
+En la construcción de habla inglesa, el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor; sirve de base para revisar los avances y los pagos (en los contratos AIA se carga en la hoja G703 de la solicitud de pago). No es el presupuesto interno de la empresa. **En esta empresa** (D-555) es el desglose con que Atención a postventa solicita los recursos y los insumos de un trabajo y saca su costo: lo que se le cobra al cliente o lo que le va a costar a la empresa una garantía. Se hace después de dictaminar y antes de programar la ejecución. (D-553 a D-555.)
 
 - **También:** desglose de valores *(traducción mía)*; en las siglas del usuario, «SOV»
-- **No confundir con:** el presupuesto de la obra; la cotización al cliente
+- **No confundir con:** el presupuesto de la obra; la cotización al cliente (el SOV es de uso interno y puede acabar en una)
 - **Se usa con:** Orden de trabajo (OT); Estimación; Postventa
-- **Ejemplo:** tras dictaminar que una fuga no está en garantía, Atención a postventa parte la compostura en partidas con su valor y programa la ejecución
-- **Hoy vive en:** nada propio. *Lectura mía:* las partidas de la cotización de la OT (`PARTIDA_COTIZACION`, `MODELO.md` §5i); su significado en el cerebro lo confirma el usuario
+- **Ejemplo:** tras dictaminar que una fuga no está en garantía, Atención a postventa parte la compostura en renglones con su valor, de ahí sale lo que se le cobra al cliente y se piden los insumos
+- **Hoy vive en:** nada propio. *Lectura mía:* los renglones de la cotización de la OT (`PARTIDA_COTIZACION`, `MODELO.md` §5i); el desglose de lo que cuesta la garantía lo confirma el usuario
 
 ### Extraordinario
 
