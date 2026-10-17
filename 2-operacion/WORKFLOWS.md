@@ -6,7 +6,7 @@ capa:       II — Operación
 pregunta:   ¿cómo trabajan juntos las personas, el sistema, el agente interno y las skills?
 tiempo:     se hace así
 corte:      2026-10-16
-verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8 · D-540: el App flow se cierra, y la postventa será un módulo con una persona encargada · D-541: el colono abre el ticket de postventa, Atención a postventa es un rol propio y el cierre se confirma con la satisfacción del colono · D-542: el colono confirmado, la escala de 5 a 10, el cierre sin confirmación y que pedir cambios ya estaba definido · D-543: la re-solicitud al colono, el paso 0 de ObraCtrl descartado y las obras del piloto en la app · D-544: descuentos, traspaso del anticipo, expediente y contratista externo · D-545: el descuento después de liquidar una OT y la revisión de carpintería y herrería para el cotizador · D-546: el cotizador acordado y el catálogo de muebles y herrería · D-547: quién resuelve un ticket de postventa y cómo se cobra · D-548: la cuadrilla de postventa va por nómina y su rendimiento se audita · D-549: cómo se registra hoy el trabajo de la cuadrilla y si la mecánica sirve a los destajos · D-550: los descuentos al cliente y los precios nuevos · D-551: el crédito de un concepto descontado es su costo directo
+verificado: mapa derivado de lo decidido en MODELO, CONOCIMIENTO, gravity-obra y ESCALABILIDAD y de lo construido hasta D-485 · tres propuestas sin confirmar (D-484), construidas en la bandeja (D-485) · §8, el flujo de la app, armado en D-529 con lo decidido hasta D-528 · §8.1, la cadena de la información y el diseño del presupuesto, agregada en D-530 con lo ya escrito en MODELO, CONOCIMIENTO y PROPUESTA-CUATRO-MODULOS · D-531: el cuantificador, la cotización al cliente, la ingeniería de costos y los niveles de «definido» · D-532: esas respuestas confirmadas y la segunda mitad de la cadena, del programa a la ejecución · D-533: quién registra el avance, la cadena para reprogramar lo contratado, cuándo se confirma el avance y los dos modos de precio de la cotización · D-534: quién confirma el avance y a qué nivel, qué corrige la estimación pagada y el precio por m² ajustable · D-535: confirmar no es candado pero lo estimado de más es una alerta importante, el usuario decide cómo se baja un porcentaje, y el precio por m² incluye IVA y no es fijo · D-536: §8.7, los roles paso por paso · D-537: tres roles nuevos y sus funciones, pasadas a `MODELO.md` · D-538: el proceso de hoy de la estimación y `validar_estimacion` en Compras · D-539: la justificación en el renglón, las pantallas son de las apps y §8.8 · D-540: el App flow se cierra, y la postventa será un módulo con una persona encargada · D-541: el colono abre el ticket de postventa, Atención a postventa es un rol propio y el cierre se confirma con la satisfacción del colono · D-542: el colono confirmado, la escala de 5 a 10, el cierre sin confirmación y que pedir cambios ya estaba definido · D-543: la re-solicitud al colono, el paso 0 de ObraCtrl descartado y las obras del piloto en la app · D-544: descuentos, traspaso del anticipo, expediente y contratista externo · D-545: el descuento después de liquidar una OT y la revisión de carpintería y herrería para el cotizador · D-546: el cotizador acordado y el catálogo de muebles y herrería · D-547: quién resuelve un ticket de postventa y cómo se cobra · D-548: la cuadrilla de postventa va por nómina y su rendimiento se audita · D-549: cómo se registra hoy el trabajo de la cuadrilla y si la mecánica sirve a los destajos · D-550: los descuentos al cliente y los precios nuevos · D-551: el crédito de un concepto descontado es su costo directo · D-552: Proyectos y atención al cliente autoriza el descuento al cliente
 ```
 
 > **Este archivo no define reglas del dominio.** Junta lo que ya está dicho en cuatro lugares para que se vea cómo
@@ -64,7 +64,7 @@ Derivado de la tabla de `MODELO.md` §5b; no agrega ninguna asignación.
 | **Costos** | Todas | `trazar` · `proponer_precio_nuevo` · `cargar_catalogo_opus` (propuesta) · `cargar_ingenieria` (propuesta, D-537) · `justificar_aumento_cantidad` (propuesta, D-538) |
 | **Compras** | Ve todas | `validar_estimacion` (pasó de Control de obra) y `devolver_estimacion` (D-538) |
 | **Finanzas** | Ve todas | `asignar_subcontrato` (D-537) |
-| **Proyectos y atención al cliente** | Ve todas | `cotizar_ot` · `cambiar_alcance_ot` · `firmar_entrega` (D-537) · `registrar_respuesta_cotizacion` (propuesta, D-546): es también el equipo de gestión de proyectos |
+| **Proyectos y atención al cliente** | Ve todas | `cotizar_ot` · `cambiar_alcance_ot` · `firmar_entrega` (D-537) · `registrar_respuesta_cotizacion` (propuesta, D-546) · `autorizar_descuento_cliente` (propuesta, D-552): es también el equipo de gestión de proyectos |
 | **Atención a postventa** (D-541) | Las casas entregadas *(lectura mía)* | `solicitar_cierre_ticket` (propuesta, D-541) · `abrir_ticket_garantia`, en nombre del colono (D-542) |
 | **Colono** (D-542) | Solo su casa | `abrir_ticket_garantia` (D-541) · `confirmar_cierre_ticket` (propuesta, D-541) |
 | **Cotizador** | No es un rol activo | Hoy lo ejecuta Control de obra |
@@ -646,6 +646,7 @@ Marcas: ✅ rol y función asignados y confirmados · 🔶 dicho o propuesto, co
 |---|---|---|---|---|
 | Cotizar al cliente un cambio o adicional (Highlight o Adicional) | Control de obra *(hoy, como cotizador)* | `cotizar_cambio_cliente` | ✅ | D-546. El cotizador no es un rol activo. Lleva líneas con cantidad negativa para lo que se descuenta, acreditado a su costo directo sin dividir (D-551), y, si hay, el descuento al cliente por monto o porcentaje (D-550) |
 | Registrar la respuesta del cliente: acepta o rechaza | Proyectos y atención al cliente | `registrar_respuesta_cotizacion` | 🔶 | El rol lo dijo el usuario (D-546); la clave es propuesta |
+| Autorizar el descuento al cliente de una cotización, por monto o por porcentaje | Proyectos y atención al cliente | `autorizar_descuento_cliente` | 🔶 | El rol lo dijo el usuario (D-552); la clave es propuesta |
 | Autorizar el control de cambio cuando el cliente acepta | Control de obra | `autorizar_orden_cambio` | ✅ | Asignada en D-537. *Idea, sin confirmar:* doble, con el Superintendente |
 | Asignar al contratista de un subcontrato | Finanzas | `asignar_subcontrato` | ✅ | Rol confirmado en D-537 |
 | Cotizar y generar la OT; cambiar su alcance | Proyectos y atención al cliente | `cotizar_ot` · `cambiar_alcance_ot` | ✅ | Va primero Proyectos y después Control (D-519). Rol confirmado en D-537 |
@@ -716,7 +717,7 @@ Marcas: ✅ rol y función asignados y confirmados · 🔶 dicho o propuesto, co
 
 ### Qué dice el conjunto
 
-De los **68 pasos,** 35 están ✅, 30 son 🔶, 0 están ❓ y 3 son ⚙. **Todos los pasos tienen dueño** (D-544). La postventa es la más provisional: será un módulo completo (D-540 a D-543).
+De los **69 pasos,** 35 están ✅, 31 son 🔶, 0 están ❓ y 3 son ⚙. **Todos los pasos tienen dueño** (D-544). La postventa es la más provisional: será un módulo completo (D-540 a D-543).
 
 ### Los roles nuevos (D-537)
 
@@ -726,7 +727,7 @@ De los **68 pasos,** 35 están ✅, 30 son 🔶, 0 están ❓ y 3 son ⚙. **Tod
 |---|---|---|
 | **Compras** (`compras`) | El validador de topes: `validar_estimacion` y `devolver_estimacion` | ✅ El rol y sus dos funciones (D-538) |
 | **Finanzas** (`finanzas`) | `asignar_subcontrato`: asigna al contratista de un subcontrato | ✅ |
-| **Proyectos y atención al cliente** (`proyectos`) | `cotizar_ot` y `cambiar_alcance_ot`, `registrar_respuesta_cotizacion` (D-546) y, como equipo de gestión de proyectos, `firmar_entrega` | ✅ |
+| **Proyectos y atención al cliente** (`proyectos`) | `cotizar_ot` y `cambiar_alcance_ot`, `registrar_respuesta_cotizacion` (D-546), `autorizar_descuento_cliente` (D-552) y, como equipo de gestión de proyectos, `firmar_entrega` | ✅ |
 | **Atención a postventa** (`atencion_postventa`) | La persona encargada de postventa: atiende los tickets de garantía, los abre en nombre del colono (`abrir_ticket_garantia`) y solicita su cierre (`solicitar_cierre_ticket`) | ✅ El rol (D-541); 🔶 la clave de la segunda función |
 | **Colono** (`colono`) | El dueño de la casa, que es el cliente: `abrir_ticket_garantia` y `confirmar_cierre_ticket`, con su nivel de satisfacción de 5 a 10 | ✅ El rol (D-542): un usuario externo que ve solo su casa; 🔶 la clave de la segunda función |
 | **Contratista** (`contratista`) | Externo: ve solo lo suyo —sus asignaciones, OT, estimaciones, programa y estado de cuenta— y por ahora solo lee. Cotizar queda para cuando se construya (B-121, B-123) | ✅ El rol (D-544) |
@@ -736,7 +737,7 @@ De los **68 pasos,** 35 están ✅, 30 son 🔶, 0 están ❓ y 3 son ⚙. **Tod
 
 ### Las funciones nuevas y su dueño
 
-Las treinta y dos funciones nuevas (veintitrés de D-537, dos de D-538, dos de D-541, una de D-542, tres de D-544 y una de D-546) y las tres que existían sin dueño (`pactar_precio_contratista`, `autorizar_orden_cambio` y `aplicar_descuento`) ya están en la lista de `MODELO.md` §5b.
+Las treinta y tres funciones nuevas (veintitrés de D-537, dos de D-538, dos de D-541, una de D-542, tres de D-544, una de D-546 y una de D-552) y las tres que existían sin dueño (`pactar_precio_contratista`, `autorizar_orden_cambio` y `aplicar_descuento`) ya están en la lista de `MODELO.md` §5b.
 
 | Función | Dueño | Estado |
 |---|---|---|
@@ -754,6 +755,7 @@ Las treinta y dos funciones nuevas (veintitrés de D-537, dos de D-538, dos de D
 | `cotizar_cambio_cliente` | Control de obra | ✅ D-546 |
 | `validar_calidad_entrega` · `confirmar_pago_ot` · `auditar_alcance_ot` · `justificar_aumento_cantidad` *(con Costos)* | Control de obra | 🔶 |
 | `registrar_respuesta_cotizacion` | Proyectos y atención al cliente | 🔶 D-546 |
+| `autorizar_descuento_cliente` | Proyectos y atención al cliente | 🔶 D-552 |
 | `capturar_estimacion` | Residente | ✅ D-538 |
 | `confirmar_avance` · `replicar_estimacion` · `entregar_obra` | Residente | 🔶 |
 | `justificar_fuera_de_catalogo` · `dar_visto_bueno_entrega` | Supervisor | 🔶 |
