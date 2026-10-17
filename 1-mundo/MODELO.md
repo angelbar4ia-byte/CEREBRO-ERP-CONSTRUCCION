@@ -1005,10 +1005,33 @@ TICKET_GARANTIA  (lo que ganaría, propuesta — D-541)
 - **Cuánto espera el sistema la confirmación del colono** (D-543): **re-solicita hasta la tercera re-solicitud.** Si el colono sigue sin responder, Atención a postventa puede pedir que Control de obra apruebe el cierre, con una nota de desatención del colono. *Lectura mía:* el número de re-solicitudes es un parámetro (3), como los umbrales que ya lo son, y la primera cuenta desde la solicitud de cierre. **No se dijo:** cada cuánto se re-solicita ni por qué medio. **D-487:** nada se construye.
 
 **D-547: quién resuelve el ticket y cómo se cobra** (dato del usuario):
-- **Lo resuelve una cuadrilla, o los mismos contratistas de la obra y de los subcontratos** (`TICKET_GARANTIA.contratista_id`, que ya es la FK a `CONTRATISTA`). *Dudas mías:* se entiende que hay **una cuadrilla de postventa;** falta saber si cobra por destajo (sería un `CONTRATISTA` de clase destajo y todo el flujo de la OT le sirve tal cual) o va en nómina (haría falta otro tipo).
+- **Lo resuelve una cuadrilla, o los mismos contratistas de la obra y de los subcontratos** (`TICKET_GARANTIA.contratista_id`, que ya es la FK a `CONTRATISTA`). Hay **una cuadrilla de postventa,** que **va por nómina** (D-548, abajo): no es un `CONTRATISTA`.
 - **Hay garantías que no se deben cobrar al cliente.** La OT de postventa lleva `cobro = garantia` (§5i) y no se le cobra; el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`.
 - **También se puede hacer responsable al contratista que realizó la actividad:** es una `DEDUCCION` (§5d), con `contratista_responsable_id` el de la asignación vigente cuando se hizo (`ASIGNACION_CONTRATISTA`, §4a), `ot_origen_id` la OT donde se hizo el trabajo y `ot_base_id` la OT de postventa que lo repara. Es **una posibilidad, no una regla:** lo decide quien aplica el descuento, Control de obra.
 - *Lectura mía:* el ticket llega a la OT con una referencia, `TICKET_GARANTIA.orden_trabajo_id` (nullable, propuesta); un ticket puede resolverse sin OT.
+
+**D-548: la cuadrilla de postventa va por nómina, y su rendimiento se audita** (dato del usuario). Es **una cuadrilla propia,** no un contratista: no hay estimación que le pague, ni retención, ni descuentos; su costo es la nómina más lo que el almacén despacha al ticket. Los contratistas de obra y de subcontratos siguen pudiendo resolver tickets (D-547).
+
+```
+CUADRILLA_PROPIA            una cuadrilla en nómina, no un contratista            propuesta — D-548
+  id, nombre, activa
+TICKET_GARANTIA             gana cuadrilla_propia_id FK, nullable — resuelve esta o
+                            el contratista_id, no las dos                          propuesta — D-548
+ORDEN_TRABAJO               asignacion_id nulo cuando la ejecuta una cuadrilla
+                            propia, que no se paga con PAGO_OT (§5i)               propuesta — D-548
+```
+
+- **Auditar su rendimiento, «en algún momento»** (dato del usuario): los rendimientos **se van evaluando por concepto,** y a una **actividad nueva se le asigna un rendimiento comparable** que vale para **las futuras actividades iguales.** No es un mecanismo nuevo: la semilla de cuadrilla y rendimiento (`CATALOGOS.md` §10) ya completó **5 de sus 265 filas** con el rendimiento de otra cuadrilla por un factor de 1.085, y lo dejó anotado en su columna `Origen`.
+```
+RENDIMIENTO_CUADRILLA       la referencia de una cuadrilla propia en un concepto   propuesta — D-548
+  cuadrilla_propia_id FK, concepto_id FK Nodo
+  rendimiento          NUMERIC — unidades por jornada
+  origen               enum: catalogo · comparable · medido
+  comparable_de_id     FK Nodo, nullable — el concepto con que se comparó; solo si origen=comparable
+```
+- **El rendimiento real se calcula, no se guarda** (cantidad ejecutada ÷ jornadas) y **nunca sobrescribe la referencia** (P-7, §5c); cuando hay datos suficientes, el sistema **propone** cambiarla por la bandeja y una persona decide.
+- *Lectura mía:* el concepto comparable lo propone Costos, que cuantifica, y lo valida Control de obra (la nota de D-546 sobre los precios nuevos).
+- **Falta:** cómo se captura qué hizo la cuadrilla —cantidad y jornadas— en cada trabajo. **D-487:** nada se construye.
 
 ---
 
