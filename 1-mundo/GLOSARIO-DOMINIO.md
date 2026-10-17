@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 87 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 88 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 87 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 87 términos · 25 ambigüedades · 2026-09-21
+> 88 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -907,6 +907,16 @@ La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster
 - **Ejemplo:** FRESNO 12; ALAMO 18; 10-04 (manzana 10, lote 4, en «Antigua»)
 - **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, firme desde D-521)
 - **Estatus:** pendiente (en planeación o próxima a construir), iniciada, en proceso, por entregar (desde el 90 % de avance, hasta que el cliente la recibe) y entregada, como en ObraCtrl (D-514)
+
+### Colono
+
+El dueño de la casa, que es el cliente. Es quien abre un ticket de postventa y quien confirma su cierre con un nivel de satisfacción; más adelante será el usuario del módulo de vivienda. (D-541.)
+
+- **También:** Cliente; Dueño de la casa
+- **No confundir con:** Contratista; Residente (empleados de la empresa)
+- **Se usa con:** Lote; Postventa; Control de cambio
+- **Ejemplo:** el dueño de FRESNO 12 abre un ticket por humedad en la azotea
+- **Hoy vive en:** la idea del módulo de vivienda (B-125); en el modelo, el rol propuesto `colono` y la función `abrir_ticket_garantia` (`MODELO.md` §3b y §5b)
 
 ### Urbanización
 
