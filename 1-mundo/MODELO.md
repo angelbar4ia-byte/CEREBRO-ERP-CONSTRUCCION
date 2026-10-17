@@ -976,6 +976,7 @@ pasó suelto.
 | Abre el ticket | El colono, o Atención a postventa en su nombre (D-542) | `abrir_ticket_garantia` |
 | Atiende: asigna a quien lo resuelve y, si hace falta un trabajo, genera la OT de postventa o de mantenimiento (§5i) *(lectura mía)* | Atención a postventa | `cotizar_ot` *(la del módulo, por definir)* |
 | Solicita el cierre | Atención a postventa | `solicitar_cierre_ticket` *(propuesta)* |
+| Si no responde, se le re-solicita la confirmación, **hasta la tercera re-solicitud** (D-543) | El sistema | — |
 | Confirma el cierre y da su nivel de satisfacción, de 5 a 10 | El colono | `confirmar_cierre_ticket` *(propuesta)* |
 | **Si el colono no confirma, o no queda satisfecho:** aprueba cerrarlo sin su confirmación, con una nota de insatisfacción o de desatención del colono (D-542) | Control de obra | `aprobar_cierre_ticket_sin_confirmar` *(propuesta)* |
 
@@ -1000,7 +1001,7 @@ TICKET_GARANTIA  (lo que ganaría, propuesta — D-541)
 - **La escala del nivel de satisfacción es de 5 a 10,** la misma de la revisión física de control (D-517). Queda confirmada (D-542).
 - **Atención a postventa puede abrir el ticket en nombre del colono** (D-542), por ejemplo por teléfono.
 - **Si el colono no confirma el cierre, o no queda satisfecho** (D-542): el ticket **se puede cerrar solo si Control de obra lo aprueba,** y la aprobación lleva **una nota de insatisfacción del colono o de desatención del colono.** El nivel de satisfacción queda vacío si el colono no lo dio.
-- **No se dijo:** cuánto espera el sistema la confirmación del colono antes de que Atención a postventa pueda pedir la aprobación de Control de obra. **D-487:** nada se construye.
+- **Cuánto espera el sistema la confirmación del colono** (D-543): **re-solicita hasta la tercera re-solicitud.** Si el colono sigue sin responder, Atención a postventa puede pedir que Control de obra apruebe el cierre, con una nota de desatención del colono. *Lectura mía:* el número de re-solicitudes es un parámetro (3), como los umbrales que ya lo son, y la primera cuenta desde la solicitud de cierre. **No se dijo:** cada cuánto se re-solicita ni por qué medio. **D-487:** nada se construye.
 
 ---
 
