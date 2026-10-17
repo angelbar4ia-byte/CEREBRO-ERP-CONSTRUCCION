@@ -2162,7 +2162,7 @@ Control de obra **y** Superintendente.
 > verifica, no un campo booleano nuevo que pueda desincronizarse de los
 > dos anteriores.
 
-> **D-546 — para replantear (B-130).** El usuario aceptó que un concepto nuevo de una cotización se quede en la cotización y, si se contrata, Costos lo proponga como precio nuevo, **pero dijo que se va a profundizar o replantear,** y dejó esta nota: **Costos solo cuantifica todo lo de precios nuevos; Control de obra valida o realiza; eso no significa que Costos no proponga precios nuevos; y en la OT, solo Control de obra.** Mientras no se replante, esta sección y la doble aprobación quedan como están. **D-547:** el usuario confirmó la lectura de la OT —los conceptos nuevos de una cotización de OT los resuelve solo Control de obra—.
+> **D-546 — para replantear (B-130).** El usuario aceptó que un concepto nuevo de una cotización se quede en la cotización y, si se contrata, Costos lo proponga como precio nuevo, **pero dijo que se va a profundizar o replantear,** y dejó esta nota: **Costos solo cuantifica todo lo de precios nuevos; Control de obra valida o realiza; eso no significa que Costos no proponga precios nuevos; y en la OT, solo Control de obra.** Mientras no se replantee, esta sección y la doble aprobación quedan como están. **D-547:** el usuario confirmó la lectura de la OT —los conceptos nuevos de una cotización de OT los resuelve solo Control de obra—.
 
 ### Programa: cinco funciones de incidencia, tres de cierre de frente, dos de edición — cierra B-73
 
