@@ -1030,8 +1030,22 @@ RENDIMIENTO_CUADRILLA       la referencia de una cuadrilla propia en un concepto
   comparable_de_id     FK Nodo, nullable — el concepto con que se comparó; solo si origen=comparable
 ```
 - **El rendimiento real se calcula, no se guarda** (cantidad ejecutada ÷ jornadas) y **nunca sobrescribe la referencia** (P-7, §5c); cuando hay datos suficientes, el sistema **propone** cambiarla por la bandeja y una persona decide.
-- *Lectura mía:* el concepto comparable lo propone Costos, que cuantifica, y lo valida Control de obra (la nota de D-546 sobre los precios nuevos).
-- **Falta:** cómo se captura qué hizo la cuadrilla —cantidad y jornadas— en cada trabajo. **D-487:** nada se construye.
+- **Quién autoriza el comparable (D-549, dato del usuario):** **Control de obra.** Un rendimiento comparable no vale como referencia hasta que Control de obra lo autoriza; Costos puede proponerlo, porque cuantifica y propone precios nuevos (la nota de D-546 sobre los precios nuevos). *Lectura mía:* una función propia, `autorizar_rendimiento_comparable`, que se agregará a la lista de §5b cuando se diseñe B-132; todavía no está entre las setenta y cuatro.
+
+**D-549: cómo se registra hoy el trabajo de la cuadrilla, y si la mecánica sirve a los destajos** (dato del usuario).
+
+- **Hoy se registra una actividad sin catálogo y las horas de trabajo.** No se registra la cantidad ejecutada, y sin ella no hay rendimiento real (cantidad ÷ jornadas). La jornada es de 8 h, así que las horas ya dan las jornadas (horas ÷ 8); lo que falta es la cantidad y su unidad. La actividad sin catálogo es un concepto nuevo de la OT, y esos los resuelve solo Control de obra (D-547).
+```
+TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo         propuesta — D-549
+  cuadrilla_propia_id FK, orden_trabajo_id FK, partida_cotizacion_id FK nullable
+  fecha                DATE
+  descripcion          TEXT — la actividad sin catálogo, como se registra hoy
+  horas                NUMERIC — de trabajo; jornadas = horas ÷ 8
+  cantidad, unidad     nullable — lo ejecutado en la unidad del concepto; es lo que hoy no se captura
+```
+- **Los destajos (dato del usuario):** la mecánica «puede servir, pero tendría que autorizar Control de obra», y **los rendimientos de destajo sirven a las cuadrillas propias en primer lugar como parámetro, y en segundo lugar para confirmar o verificar el rendimiento de destajo.**
+- *Lectura mía:* **(1)** el rendimiento que el catálogo da a un concepto de destajo es el **parámetro** con que arranca la cuadrilla propia en ese concepto (`origen = catalogo`); **(2)** a la inversa, el rendimiento **medido** de la cuadrilla propia es un **segundo testigo** del que supone el precio de destajo: si difieren de forma notable, el sistema lo señala por la bandeja y **Control de obra decide;** no cambia nada solo (P-7); **(3)** al contratista de destajo no se le pide horas: se le paga por unidad, y su rendimiento no se mide; la mecánica llega a los destajos por esta verificación, y usarla ahí lo autoriza Control de obra.
+- **Falta:** quién captura las horas y la cantidad, y si las horas son las de la cuadrilla completa o la suma de las de cada persona. **D-487:** nada se construye.
 
 ---
 
