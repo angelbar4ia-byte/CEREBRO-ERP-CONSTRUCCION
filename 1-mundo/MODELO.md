@@ -1057,6 +1057,39 @@ TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo      
 - *Lectura mía:* **(1)** el rendimiento que el catálogo da a un concepto de destajo es el **parámetro** con que arranca la cuadrilla propia en ese concepto (`origen = catalogo`); **(2)** a la inversa, el rendimiento **medido** de la cuadrilla propia es un **segundo testigo** del que supone el precio de destajo: si difieren de forma notable, el sistema lo señala por la bandeja y **Control de obra decide;** no cambia nada solo (P-7); **(3)** al contratista de destajo no se le pide horas: se le paga por unidad, y su rendimiento no se mide; la mecánica llega a los destajos por esta verificación, y usarla ahí lo autoriza Control de obra.
 - **Falta:** quién captura las horas y la cantidad, y si las horas son las de la cuadrilla completa o la suma de las de cada persona. **D-487:** nada se construye.
 
+**D-553: el recorrido completo de un ticket, de la app del colono a la ejecución** (dato del usuario: «el cliente, en su app, levanta un ticket; reporta un problema o solicita un servicio; Atención a postventa le da seguimiento y realiza una visita programada para determinar si hace válida la garantía o si el cliente quiere la compostura con costo a él; también puede solicitar mantenimiento. Ya definido esto, Atención a postventa realiza un SOV y se programa la ejecución»).
+
+| Paso | Quién | Función |
+|---|---|---|
+| Levanta el ticket en su app: **reporta un problema, solicita un servicio o solicita un mantenimiento** | El colono | `abrir_ticket_garantia` |
+| Le da seguimiento | Atención a postventa | *(por definir con el módulo)* |
+| **Programa una visita y la realiza,** para determinar si la garantía es válida | Atención a postventa | *(por definir)* |
+| **Dictamina:** la garantía es válida, o el cliente quiere la compostura con costo a él | Atención a postventa | *(por definir)* |
+| **Realiza un SOV** | Atención a postventa | *(por definir; las siglas, abajo)* |
+| **Se programa la ejecución** | *(por decir; lectura mía: Atención a postventa)* | *(por definir)* |
+| Se ejecuta, por una cuadrilla propia o por contratistas (D-547 y D-548), y sigue el cierre de D-541 | — | — |
+
+```
+TICKET_GARANTIA   (gana, propuesta — D-553)
+  tipo                 enum: falla · servicio · mantenimiento — lo que pide el
+                        colono al abrirlo                                       propuesta
+
+VISITA_POSTVENTA  una visita programada para dictaminar                         propuesta — D-553
+  id, ticket_id FK TICKET_GARANTIA
+  programada_para      DATE
+  realizada_en         DATE, nullable
+  realizada_por        FK USUARIO, nullable — Atención a postventa
+  dictamen             enum: garantia_valida · con_costo_cliente, nullable —
+                        vacío hasta que se hace la visita
+  notas                TEXT, nullable
+```
+
+- **El dictamen decide el cobro de la OT** (§5i): `garantia_valida` → `cobro = garantia`, que no se cobra al cliente; `con_costo_cliente` → `cobro = cliente`. *Lectura mía:* un ticket de mantenimiento lleva `cobro = cliente`, como ya decía D-547 («el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`»).
+- *Lectura mía:* **el ticket conserva sus tres estados** (`abierto`, `cierre_solicitado`, `cerrado`), y **el avance entre ellos** —visita programada, dictaminado, SOV hecho, en ejecución— **se deriva** de la visita, del SOV y de la OT, no se guarda como estado: son más estados que mantener sincronizados. La app del colono puede mostrar ese avance.
+- **«SOV»:** las siglas **no están en el cerebro** y no sé qué documento es. Lo único que se dijo es su lugar: lo hace Atención a postventa **después de dictaminar y antes de programar la ejecución.** *Lectura mía, sin confirmar:* es lo que lleva el trabajo a una OT (la cotización de la OT, §5i), pero puede ser otra cosa.
+- *Lectura mía:* el nombre `TICKET_GARANTIA` queda corto, porque un ticket de servicio o de mantenimiento puede no ser una garantía; se renombraría `TICKET_POSTVENTA` al diseñar el módulo (B-129). No se renombra ahora.
+- **Falta:** qué es el SOV; qué pasa si la garantía no es válida y el cliente no quiere pagar la compostura (*lectura mía:* el ticket se cierra sin OT, con el dictamen guardado); si un mantenimiento también lleva visita; y quién programa la ejecución. **D-487:** nada se construye.
+
 ---
 
 ## 3c. Proyecto, cluster, lote y urbanización — la estructura de Magnolia (D-512 y D-520; firme desde D-521)
