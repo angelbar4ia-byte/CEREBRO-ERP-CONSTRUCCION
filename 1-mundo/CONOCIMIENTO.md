@@ -8729,7 +8729,7 @@ cliente.**
 | 6 | **Contrato cambiado sin propagar** — autorizado, pero nadie bajó el impacto | **Sí** | **El cliente** | Orden de cambio · ver abajo |
 | 7 | **Falta de insumos** | No | No aplica — es causa de tiempo, no de costo | Programa: tramo de una actividad existente (P-5 abajo) |
 | 8 | **Temporalidad o clima** | Depende — si solo detiene, no; si daña, la reparación sí | Si solo detiene, nadie; si daña, **Tú** (salvo que el contrato diga otra cosa) | Si solo detiene: calendario, sin pasar de ahí. Si daña y crece obra: incidencia + merma por daño/clima (fila Materiales, arriba) |
-| 9 | **Mejora de proyecto** — nadie la pidió, ni el proyecto ni el cliente | **Sí** | **Sin definir** — no es error que se absorba (3/4) ni petición del cliente que se cobre sola (5) | Incidencia, propuesta — no se ejecuta sola |
+| 9 | **Mejora de proyecto** — nadie la pidió, ni el proyecto ni el cliente | **Sí** | **La empresa** (D-559, dato del usuario) — antes estaba «sin definir»: no es error que se absorba (3/4) ni petición del cliente que se cobre sola (5) | Incidencia, propuesta — no se ejecuta sola |
 
 > **Las causas 7 a 9 se agregaron leyendo el programa, no el costo** — mismo
 > vocabulario, pero no siempre caen limpio en las columnas de arriba: una falta de
