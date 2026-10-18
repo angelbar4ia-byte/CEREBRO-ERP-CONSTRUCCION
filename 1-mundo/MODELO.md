@@ -1033,6 +1033,8 @@ TICKET_GARANTIA  (lo que ganaría, propuesta — D-541)
 ```
 CUADRILLA_PROPIA            una cuadrilla en nómina, no un contratista            propuesta — D-548
   id, nombre, activa
+  responsable_id       FK USUARIO — a quién está asignada; no siempre es quien
+                        la dirige (D-560)                                      propuesta — D-560
 TICKET_GARANTIA             gana cuadrilla_propia_id FK, nullable — resuelve esta o
                             el contratista_id, no las dos                          propuesta — D-548
 ORDEN_TRABAJO               asignacion_id nulo cuando la ejecuta una cuadrilla
@@ -1048,22 +1050,28 @@ RENDIMIENTO_CUADRILLA       la referencia de una cuadrilla propia en un concepto
   comparable_de_id     FK Nodo, nullable — el concepto con que se comparó; solo si origen=comparable
 ```
 - **El rendimiento real se calcula, no se guarda** (cantidad ejecutada ÷ jornadas) y **nunca sobrescribe la referencia** (P-7, §5c); cuando hay datos suficientes, el sistema **propone** cambiarla por la bandeja y una persona decide.
-- **Quién autoriza el comparable (D-549, dato del usuario):** **Control de obra.** Un rendimiento comparable no vale como referencia hasta que Control de obra lo autoriza; Costos puede proponerlo, porque cuantifica y propone precios nuevos (la nota de D-546 sobre los precios nuevos). *Lectura mía:* una función propia, `autorizar_rendimiento_comparable`, que se agregará a la lista de §5b cuando se diseñe B-132; todavía no está en la lista de §5b.
+- **Quién autoriza el comparable (D-549, dato del usuario):** **Control de obra.** Un rendimiento comparable no vale como referencia hasta que Control de obra lo autoriza; Costos puede proponerlo, porque cuantifica y propone precios nuevos (la nota de D-546 sobre los precios nuevos). **D-560, lectura mía:** no hace falta la función propia que dije en D-549 (`autorizar_rendimiento_comparable`): el cambio de la referencia es una `PROPUESTA` de la bandeja (tipo `rendimiento`; el enum es abierto, hoy el servicio conoce diez) y la aprueba Control de obra con `aprobar_propuesta`.
 
 **D-549: cómo se registra hoy el trabajo de la cuadrilla, y si la mecánica sirve a los destajos** (dato del usuario).
 
 - **Hoy se registra una actividad sin catálogo y las horas de trabajo.** No se registra la cantidad ejecutada, y sin ella no hay rendimiento real (cantidad ÷ jornadas). La jornada es de 8 h, así que las horas ya dan las jornadas (horas ÷ 8); lo que falta es la cantidad y su unidad. La actividad sin catálogo es un concepto nuevo de la OT, y esos los resuelve solo Control de obra (D-547).
 ```
-TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo         propuesta — D-549
-  cuadrilla_propia_id FK, orden_trabajo_id FK, partida_cotizacion_id FK nullable
+TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo         propuesta — D-549 y D-560
+  cuadrilla_propia_id FK
   fecha                DATE
-  descripcion          TEXT — la actividad sin catálogo, como se registra hoy
-  horas                NUMERIC — de trabajo; jornadas = horas ÷ 8
-  cantidad, unidad     nullable — lo ejecutado en la unidad del concepto; es lo que hoy no se captura
+  horas                NUMERIC — las anotadas en ese trabajo ese día; jornadas = horas ÷ 8
+  actividad_id         FK ACTIVIDAD, nullable — acabados y urbanización: la actividad
+                        del programa donde se anotan las horas (§5c)           propuesta — D-560
+  orden_trabajo_id FK, partida_cotizacion_id FK nullable — postventa: el trabajo
+                        del ticket, una partida del SOV
+  descripcion          TEXT, nullable — la actividad sin catálogo, como se registra hoy
+  cantidad, unidad     nullable — solo en postventa; en obra la cantidad sale del
+                        avance de la actividad y no se captura aquí (lectura mía)
+  registrado_por       FK USUARIO                                              propuesta — D-560
 ```
 - **Los destajos (dato del usuario):** la mecánica «puede servir, pero tendría que autorizar Control de obra», y **los rendimientos de destajo sirven a las cuadrillas propias en primer lugar como parámetro, y en segundo lugar para confirmar o verificar el rendimiento de destajo.**
 - *Lectura mía:* **(1)** el rendimiento que el catálogo da a un concepto de destajo es el **parámetro** con que arranca la cuadrilla propia en ese concepto (`origen = catalogo`); **(2)** a la inversa, el rendimiento **medido** de la cuadrilla propia es un **segundo testigo** del que supone el precio de destajo: si difieren de forma notable, el sistema lo señala por la bandeja y **Control de obra decide;** no cambia nada solo (P-7); **(3)** al contratista de destajo no se le pide horas: se le paga por unidad, y su rendimiento no se mide; la mecánica llega a los destajos por esta verificación, y usarla ahí lo autoriza Control de obra.
-- **Falta:** quién captura las horas y la cantidad, y si las horas son las de la cuadrilla completa o la suma de las de cada persona. **D-487:** nada se construye.
+- **Falta (D-549):** quién captura las horas y la cantidad —lo contesta D-560, abajo—, y si las horas son las de la cuadrilla completa o la suma de las de cada persona. **D-487:** nada se construye.
 
 **D-553: el recorrido completo de un ticket, de la app del colono a la ejecución** (dato del usuario: «el cliente, en su app, levanta un ticket; reporta un problema o solicita un servicio; Atención a postventa le da seguimiento y realiza una visita programada para determinar si hace válida la garantía o si el cliente quiere la compostura con costo a él; también puede solicitar mantenimiento. Ya definido esto, Atención a postventa realiza un SOV y se programa la ejecución»).
 
@@ -1107,7 +1115,20 @@ VISITA_POSTVENTA  una visita programada para dictaminar                         
 - *Lectura mía:* el nombre `TICKET_GARANTIA` queda corto, porque un ticket de servicio o de mantenimiento puede no ser una garantía; se renombraría `TICKET_POSTVENTA` al diseñar el módulo (B-129). No se renombra ahora.
 - **D-558: el SOV de una obra y el retraso por falta de material** (dato del usuario). **(1) Lo llena el residente de obra,** y **«no depende del cliente, depende de los ajustes de obra»:** puede ser **una mejora en obra, una omisión de proyectos, una omisión de costos o un error de ejecución.** Son cuatro de las nueve causas de `CONOCIMIENTO.md` §13.6: la **mejora de proyecto** (9), la **omisión de proyecto** dentro del contrato (4), la **omisión de presupuesto** (3) y el **error de ejecución** (1). *Lectura mía:* por eso no es la cotización al cliente de §3a —esa es para una petición nueva del cliente (5) o un contrato cambiado (6), y se cobra—, sino un `PRESUPUESTO` de `tipo = sov`, que cuelga de la obra (`cotizacion_de_id`) y lleva `causa_ajuste`; lo que cuesta el ajuste se calcula con el SOV, y quién lo paga lo dice la causa (`CONOCIMIENTO.md` §13.6: 1, 3 y 4 los absorbe la empresa o, en un error de ejecución, se le cobra al contratista como dice D-559; **la 9 la paga la empresa** (D-559)). `hacer_sov` es entonces también del **Residente**. **(2)** **Cuando el SOV llega a Control de obra o a Costos, se hace el control de cambio,** con `autorizar_orden_cambio` de Control de obra (D-537); Costos cuantifica (D-546). **(3) El programa no depende del almacén:** si el material no está en almacén cuando se ejecuta, **es un retraso en el programa por falta de material** (D-558, confirmado). *Lectura mía:* se registra con el vocabulario que ya existe, la incidencia `falta_material` con impacto `retraso` (`LENGUAJE.md` S12) y la causa 7 de `CONOCIMIENTO.md` §13.6, que es de tiempo y no de costo; en una compostura, Atención a postventa reprograma la ejecución.
 - **D-559: quién paga un ajuste de obra** (dato del usuario). **Una mejora en obra la paga la empresa** (la causa 9, que estaba «sin definir»). **Un error de ejecución:** si lo repara el mismo contratista que lo cometió, **solo paga el material nuevo** que se usa para repararlo; si lo repara **otro contratista, lo paga el primero como un descuento** (§5d). *Lectura mía:* es el descuento `rehacer_trabajo` en el primer caso, con el material nuevo como base, y `pagado_a_otro_contratista` en el segundo, con lo pagado al otro contratista (`ot_base_id`); y vale igual para **la garantía** que se debe a un trabajo mal hecho (D-547). **Y el tipo `sov` es propio** (confirmado).
-- **Falta:** quién captura las horas y la cantidad de la cuadrilla propia (D-549, B-132). El almacén que despacha no es un rol del cerebro hoy (los movimientos vienen del ERP externo). *Lectura mía:* si el cliente no acepta pagar la compostura que no es de garantía, no hay OT y el ticket se cierra con el dictamen guardado. **D-487:** nada se construye.
+- **Falta:** el cierre del B-132, que está en el bloque de D-560, abajo. El almacén que despacha no es un rol del cerebro hoy (los movimientos vienen del ERP externo). *Lectura mía:* si el cliente no acepta pagar la compostura que no es de garantía, no hay OT y el ticket se cierra con el dictamen guardado. **D-487:** nada se construye.
+
+**D-560: las tres cuadrillas propias y quién anota las horas** (dato del usuario: «tenemos tres cuadrillas: una de postventa, una de acabados y una de urbanización; postventa está asignada a Atención a postventa; acabados, a los supervisores, a uno de ellos, aunque se la comparten entre los residentes, que la dirigen y anotan sus horas en la actividad que realizan; urbanización, su supervisor la dirige y anota las horas»).
+
+| Cuadrilla | Asignada a | La dirige | Anota sus horas | Dónde |
+|---|---|---|---|---|
+| **Postventa** | Atención a postventa | Atención a postventa | Atención a postventa | El trabajo del ticket (una partida del SOV) |
+| **Acabados** | Uno de los supervisores; los residentes se la comparten | El residente que la usa *(lectura mía)* | El residente que la dirige | La actividad que realizan |
+| **Urbanización** | Su supervisor | Su supervisor | Su supervisor | La actividad que realiza |
+
+- **Lo que cambia en el modelo** (bloque de D-549, arriba): `CUADRILLA_PROPIA.responsable_id` dice a quién está asignada, y `TRABAJO_CUADRILLA` pasa a colgar de una **actividad del programa** en acabados y urbanización, y del **trabajo del ticket** en postventa. Una cuadrilla de acabados compartida entre varios residentes anota sus horas en la actividad de cada uno, sin partirse entre obras.
+- **En obra solo se anotan las horas:** la cantidad ya la registra el residente como avance de la actividad (`registrar_avance`, D-533). *Lectura mía:* el **rendimiento real** de una actividad de obra es el avance del periodo ÷ las jornadas anotadas; en postventa, la cantidad del trabajo ÷ sus jornadas.
+- **Una función nueva, propuesta:** `registrar_horas_cuadrilla`, del **Residente** (acabados), del **Supervisor** (urbanización) y de **Atención a postventa** (postventa). **Ochenta y tres funciones, setenta y siete asignadas, seis sin asignar.** El cambio de la referencia no necesita otra función: es la bandeja (arriba).
+- **Falta:** si «anotan sus horas» son las de la cuadrilla completa o las de cada persona (*lectura mía:* una cifra por cuadrilla, actividad y día, con las personas que trabajaron, para saber si faltó alguien de la cuadrilla tipo); y cuántos trabajos del mismo concepto hacen falta antes de proponer cambiar una referencia (*lectura mía:* un parámetro, de 3 al principio). **D-487:** nada se construye.
 
 ---
 
@@ -2029,6 +2050,7 @@ FUNCION_ATOMICA
                      registrar_dictamen_postventa · hacer_sov ·
                      cerrar_sov · programar_ejecucion_postventa           nuevo — D-556, ver abajo
                      · cotizar_con_proveedores · comprar_material         nuevo — D-557, ver abajo
+                     · registrar_horas_cuadrilla                          nuevo — D-560, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -2131,6 +2153,7 @@ fecha, en un solo lugar.
 | `cerrar_sov` | Control de obra, que evalúa y confirma el SOV de una compostura (D-557 y D-558); y Costos, en un cambio en obra | propuesto, D-556; el rol lo dijo el usuario, y D-557 lo cambió de Costos a Control de obra para la postventa |
 | `cotizar_con_proveedores` | Compras — lo que pide el SOV | propuesto, D-557; el rol lo dijo el usuario |
 | `comprar_material` | Compras — el material llega a almacén y se le da la salida para la ejecución | propuesto, D-557; el rol lo dijo el usuario |
+| `registrar_horas_cuadrilla` | Residente (la cuadrilla de acabados), Supervisor (la de urbanización) y Atención a postventa (la de postventa) — las horas en la actividad o el trabajo que realizan | propuesto, D-560; los roles los dijo el usuario |
 | `programar_ejecucion_postventa` | Atención a postventa | propuesto, D-556; el rol lo dijo el usuario (D-554) |
 | `confirmar_avance` | Residente — al terminar la actividad y antes de estimar | propuesto, D-537; el rol lo dijo el usuario (D-534) |
 | `capturar_estimacion` | Residente | dato del usuario, D-538 |
@@ -2158,7 +2181,7 @@ fecha, en un solo lugar.
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles. D-544 asigna `aplicar_descuento`, agrega tres funciones y el rol externo `contratista`: setenta y tres funciones, sesenta y siete asignadas, seis sin asignar, y doce roles. D-546 agrega `registrar_respuesta_cotizacion`: setenta y cuatro funciones, sesenta y ocho asignadas, seis sin asignar. D-552 agrega `autorizar_descuento_cliente`: setenta y cinco funciones, sesenta y nueve asignadas, seis sin asignar. D-556 agrega cinco funciones de la postventa: ochenta funciones, setenta y cuatro asignadas, seis sin asignar. D-557 agrega dos de Compras: ochenta y dos funciones, setenta y seis asignadas, seis sin asignar.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles. D-544 asigna `aplicar_descuento`, agrega tres funciones y el rol externo `contratista`: setenta y tres funciones, sesenta y siete asignadas, seis sin asignar, y doce roles. D-546 agrega `registrar_respuesta_cotizacion`: setenta y cuatro funciones, sesenta y ocho asignadas, seis sin asignar. D-552 agrega `autorizar_descuento_cliente`: setenta y cinco funciones, sesenta y nueve asignadas, seis sin asignar. D-556 agrega cinco funciones de la postventa: ochenta funciones, setenta y cuatro asignadas, seis sin asignar. D-557 agrega dos de Compras: ochenta y dos funciones, setenta y seis asignadas, seis sin asignar. D-560 agrega `registrar_horas_cuadrilla`: ochenta y tres funciones, setenta y siete asignadas, seis sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
