@@ -1054,12 +1054,14 @@ RENDIMIENTO_CUADRILLA       la referencia de una cuadrilla propia en un concepto
 
 **D-549: cómo se registra hoy el trabajo de la cuadrilla, y si la mecánica sirve a los destajos** (dato del usuario).
 
-- **Hoy se registra una actividad sin catálogo y las horas de trabajo.** No se registra la cantidad ejecutada, y sin ella no hay rendimiento real (cantidad ÷ jornadas). La jornada es de 8 h, así que las horas ya dan las jornadas (horas ÷ 8); lo que falta es la cantidad y su unidad. La actividad sin catálogo es un concepto nuevo de la OT, y esos los resuelve solo Control de obra (D-547).
+- **Hoy se registra una actividad sin catálogo y las horas de trabajo.** No se registra la cantidad ejecutada, y sin ella no hay rendimiento real (cantidad ÷ jornadas). La jornada es de 8 h, así que las horas ya dan las jornadas (por integrante, D-561: horas ÷ 8); lo que falta es la cantidad y su unidad. La actividad sin catálogo es un concepto nuevo de la OT, y esos los resuelve solo Control de obra (D-547).
 ```
 TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo         propuesta — D-549 y D-560
   cuadrilla_propia_id FK
   fecha                DATE
-  horas                NUMERIC — las anotadas en ese trabajo ese día; jornadas = horas ÷ 8
+  integrante_id        FK INTEGRANTE_CUADRILLA — quién trabajó: una fila por
+                        integrante, actividad y día                          propuesta — D-561
+  horas                NUMERIC — las de ese integrante en ese trabajo ese día   propuesta — D-561
   actividad_id         FK ACTIVIDAD, nullable — acabados y urbanización: la actividad
                         del programa donde se anotan las horas (§5c)           propuesta — D-560
   orden_trabajo_id FK, partida_cotizacion_id FK nullable — postventa: el trabajo
@@ -1128,7 +1130,23 @@ VISITA_POSTVENTA  una visita programada para dictaminar                         
 - **Lo que cambia en el modelo** (bloque de D-549, arriba): `CUADRILLA_PROPIA.responsable_id` dice a quién está asignada, y `TRABAJO_CUADRILLA` pasa a colgar de una **actividad del programa** en acabados y urbanización, y del **trabajo del ticket** en postventa. Una cuadrilla de acabados compartida entre varios residentes anota sus horas en la actividad de cada uno, sin partirse entre obras.
 - **En obra solo se anotan las horas:** la cantidad ya la registra el residente como avance de la actividad (`registrar_avance`, D-533). *Lectura mía:* el **rendimiento real** de una actividad de obra es el avance del periodo ÷ las jornadas anotadas; en postventa, la cantidad del trabajo ÷ sus jornadas.
 - **Una función nueva, propuesta:** `registrar_horas_cuadrilla`, del **Residente** (acabados), del **Supervisor** (urbanización) y de **Atención a postventa** (postventa). **Ochenta y tres funciones, setenta y siete asignadas, seis sin asignar.** El cambio de la referencia no necesita otra función: es la bandeja (arriba).
-- **Falta:** si «anotan sus horas» son las de la cuadrilla completa o las de cada persona (*lectura mía:* una cifra por cuadrilla, actividad y día, con las personas que trabajaron, para saber si faltó alguien de la cuadrilla tipo); y cuántos trabajos del mismo concepto hacen falta antes de proponer cambiar una referencia (*lectura mía:* un parámetro, de 3 al principio). **D-487:** nada se construye.
+- **Horas por integrante y por hora** (D-561, dato del usuario; antes era pregunta): las horas se anotan **por integrante de la cuadrilla** y en **horas.** Cuántos trabajos del mismo concepto hacen falta antes de proponer cambiar una referencia: **3, como parámetro** (D-561, confirmado).
+
+**D-561: las horas, por integrante.** Hace falta saber quiénes son los integrantes de cada cuadrilla propia:
+
+```
+INTEGRANTE_CUADRILLA        una persona de una cuadrilla propia, en nómina         propuesta — D-561
+  id, cuadrilla_propia_id FK CUADRILLA_PROPIA
+  nombre               texto
+  puesto               texto, nullable — oficial, ayudante u otro
+  activo               boolean
+```
+
+- **Cada fila de `TRABAJO_CUADRILLA` es de un integrante** (arriba). El total de la actividad o del trabajo es la suma de sus filas, así que **se ve quién faltó** sin preguntar.
+- *Lectura mía:* las **jornadas de la cuadrilla** de un trabajo son la suma de las horas de sus integrantes ÷ (8 × las personas de la cuadrilla tipo del concepto), y esas personas salen de la composición de su `MOCU-` (`CATALOGOS.md` §10); con eso el rendimiento real queda en las mismas unidades por jornada que el del catálogo. Si faltó alguien, salen menos jornadas y el rendimiento no se castiga a la cuadrilla.
+- *Lectura mía:* los integrantes son personal de nómina, no usuarios del sistema; quien anota las horas es quien dirige (la tabla de arriba). No se guarda ningún dato de sueldo en el cerebro.
+- **«Por hora»:** *lectura mía:* la unidad es la hora, no una anotación hora por hora; si quiso decir que se anota a qué hora entró y salió, se ajusta.
+- **El parámetro de 3 trabajos** es de la forma de los demás (el 0.7, el plazo de la garantía): un valor con su fecha, editable. **D-487:** nada se construye.
 
 ---
 
