@@ -431,7 +431,7 @@ Clase de trabajo: mover material dentro de la obra. **Hoy sin renglones.**
 
 ### Cuadrilla
 
-Conjunto de personas que ejecuta un trabajo. Modelo de CAPACIDAD —cuánto tarda y con cuánta gente—, no de costo.
+Conjunto de personas que ejecuta un trabajo. Modelo de CAPACIDAD —cuánto tarda y con cuánta gente—, no de costo. Se cobra por jornada: el precio de su jornada es la suma de los jornales de las personas que la integran, y la hora de cada persona vale su jornal entre 8 (D-568).
 
 - **También:** Brigada; Equipo de trabajo
 - **No confundir con:** Destajo (ese es el costo)

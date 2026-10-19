@@ -1141,12 +1141,15 @@ INTEGRANTE_CUADRILLA        una persona de una cuadrilla propia, en nómina     
   id, cuadrilla_propia_id FK CUADRILLA_PROPIA
   nombre               texto
   puesto               texto, nullable — oficial, ayudante u otro
+  jornal               NUMERIC — el precio de su jornada de 8 horas; la hora vale
+                        jornal ÷ 8 (D-568)                                  propuesta — D-568
   activo               boolean
 ```
 
 - **Cada fila de `TRABAJO_CUADRILLA` es de un integrante** (arriba). El total de la actividad o del trabajo es la suma de sus filas, así que **se ve quién faltó** sin preguntar.
-- *Lectura mía:* las **jornadas de la cuadrilla** de un trabajo son la suma de las horas de sus integrantes ÷ (8 × las personas de la cuadrilla tipo del concepto), y esas personas salen de la composición de su `MOCU-` (`CATALOGOS.md` §10); con eso el rendimiento real queda en las mismas unidades por jornada que el del catálogo. Si faltó alguien, salen menos jornadas y el rendimiento no se castiga a la cuadrilla.
-- *Lectura mía:* los integrantes son personal de nómina, no usuarios del sistema; quien anota las horas es quien dirige (la tabla de arriba). No se guarda ningún dato de sueldo en el cerebro.
+- **Una cuadrilla se cobra por jornada** (D-568, dato del usuario): **el precio de su jornada es la suma de los jornales de las personas que la integran** (como en el catálogo: `MOCU-002`, 1 albañil y 1 peón, $1,452 por jornada; `CATALOGOS.md` §10). **A cada persona se le asigna una actividad, que se registra por hora, y su hora vale su jornal entre 8 horas de trabajo;** al revés, **la jornada de una persona es su hora por 8** (`jornada_horas`, §5j).
+- *Lectura mía (D-568, reemplaza la de D-561):* el **costo real de una actividad** es la suma, por integrante, de sus horas por su hora (`horas × jornal ÷ 8`); y las **jornadas de la cuadrilla** que gastó son ese costo ÷ el precio de la jornada de la cuadrilla tipo del concepto (su `MOCU-`), de modo que si todos trabajan 8 horas salga 1 y si faltó alguien salga menos; con eso el rendimiento real queda en las mismas unidades por jornada que el del catálogo. Con jornales iguales es lo mismo que sumar las horas ÷ (8 × las personas de la cuadrilla tipo).
+- *Lectura mía:* los integrantes son personal de nómina, no usuarios del sistema; quien anota las horas es quien dirige (la tabla de arriba). **El `jornal` guardado es el del puesto en el catálogo de mano de obra** (el oficial, el ayudante) y **no el sueldo de la persona,** para no guardar datos de nómina; si el jornal que quiso decir el usuario es el de nómina, se cambia aquí.
 - **«Por hora»:** *lectura mía:* la unidad es la hora, no una anotación hora por hora; si quiso decir que se anota a qué hora entró y salió, se ajusta.
 - **El parámetro de 3 trabajos** es de la forma de los demás (el 0.7, el plazo de la garantía): un valor con su fecha, editable. **D-487:** nada se construye.
 
