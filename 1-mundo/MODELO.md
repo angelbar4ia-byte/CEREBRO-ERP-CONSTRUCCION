@@ -724,7 +724,7 @@ queda completo; el caso real que lo ejerza, no.
 PRESUPUESTO
   id, nombre, estado (por SUBÁRBOL, ver hallazgo 6)                    firme
   raiz_id            FK Nodo                                            firme
-  tipo               enum: plantilla · obra                             nuevo — cierra P-40, ver abajo
+  tipo               enum: plantilla · obra · escenario (§3a) · cotizacion (§3a, D-532)   nuevo — cierra P-40, ver abajo
   plantas            INTEGER, nullable — solo si tipo=plantilla: cuántas
                       plantas tiene el prototipo. Ya decidía el plazo
                       (28 semanas una, 30 dos, D-419) y es el filtro del
@@ -866,6 +866,66 @@ primer caso real que lo use, mismo principio que las devoluciones de
 almacén (`MODELO.md` §5e) o `Flete` en los reportes de salida
 (`CONOCIMIENTO.md` §4.3).
 
+
+### `PRESUPUESTO.tipo` gana un cuarto valor — la cotización al cliente del cambio o adicional (D-532)
+
+Dato del usuario (D-531 y D-532): **antes de que un cambio o un adicional sea control de cambio, se hace un presupuesto al cliente;** el usuario confirmó que ese presupuesto lleva **su propio `tipo`** y que **se convierte en control de cambio una vez que el cliente lo acepta.** El Cotizador ya lo nombraba con dos artefactos, el *Highlight* (antes de la ejecución, un estimado preliminar) y el *Adicional al presupuesto* (ya en ejecución), foliados y estructurados como presupuesto por PU (§5b y `CONOCIMIENTO.md` §13.4). No es un escenario: el escenario clona el árbol de toda la obra para comparar opciones y elegir una; la cotización trae solo los conceptos agregados y es una oferta que el cliente acepta o no.
+
+```
+PRESUPUESTO.tipo              enum: plantilla · obra · escenario · cotizacion      firme — D-532
+                               · sov (el desglose de un ajuste de obra o de una
+                               compostura de postventa, §3b)                     firme — D-559 (el usuario: «tipo propio sov»)
+PRESUPUESTO.cotizacion_de_id  FK PRESUPUESTO(tipo=obra), nullable — solo si
+                               tipo=cotizacion o sov: la obra a la que se cotiza o
+                               se ajusta                                              propuesta — D-532 y D-558
+PRESUPUESTO.clase_cotizacion  enum: highlight · adicional, nullable — solo si
+                               tipo=cotizacion                                       propuesta — D-532
+PRESUPUESTO.folio             texto, nullable — CZ-{cluster}-{lote}{consecutivo},
+                               p. ej. CZ-ALM-18001, con el mismo patrón del control
+                               de cambio                                             firme — D-546
+PRESUPUESTO.estado_cotizacion enum: cotizada · aceptada · rechazada, nullable —
+                               solo si tipo=cotizacion. Al pasar a `aceptada` nace
+                               la orden de cambio (abajo)                            propuesta — D-532
+PRESUPUESTO.metodo_precio     enum: por_m2 · por_diferencia, nullable — solo si
+                               tipo=cotizacion                                       propuesta — D-533
+PRESUPUESTO.m2_ampliacion     NUMERIC, nullable — solo si metodo_precio=por_m2       propuesta — D-533
+PRESUPUESTO.precio_m2         NUMERIC, nullable — solo si metodo_precio=por_m2:
+                               el precio pactado con el cliente, IVA incluido; el
+                               de lista son 17,000 pesos y no es fijo                 regla firme (D-533 a D-535); campo propuesta
+PRESUPUESTO.factor_precio     NUMERIC, nullable — solo si tipo=cotizacion o sov: el
+                               precio por diferencia es el costo directo dividido
+                               entre este factor. Por defecto 0.7, editable          regla firme (D-532); campo propuesta
+PRESUPUESTO.descuento_pct     NUMERIC, nullable — solo si tipo=cotizacion: descuento
+                               al cliente como porcentaje del precio                  propuesta — D-550
+PRESUPUESTO.descuento_monto   NUMERIC, nullable — solo si tipo=cotizacion: descuento
+                               al cliente como monto, en el mismo precio (IVA incluido) propuesta — D-550
+PRESUPUESTO.descuento_motivo  texto, nullable — por qué se descuenta                  propuesta — D-550
+PRESUPUESTO.ticket_postventa_id FK TICKET_POSTVENTA, nullable — solo si tipo=sov: el SOV
+                               de un ticket de postventa (§3b)                       propuesta — D-557 (allí era tipo=cotizacion) y D-558
+PRESUPUESTO.causa_ajuste      enum: mejora_obra · omision_proyecto · omision_costos ·
+                               error_ejecucion, nullable — solo si tipo=sov y es de
+                               una obra: por qué se ajusta                          dato del usuario (D-558); campo propuesta
+NODO.tipo_credito             enum: a_costo · por_diferencia, nullable — solo en una
+                               línea con cantidad negativa de una cotización: a_costo
+                               es un concepto que se descuenta (se resta del precio al
+                               costo directo, sin dividir); por_diferencia es lo que
+                               sale de un cambio (entra en el costo y se divide)       propuesta — D-551
+```
+
+- **Dos maneras de fijar el precio** (dato del usuario, D-533: «depende»):
+
+| Cuándo | Cómo se fija el precio | Se confirma |
+|---|---|---|
+| **Una ampliación por m²** | **m² × 17,000.** Ese precio por m² abarca todo, desde la cimentación hasta los equipamientos | Con el presupuesto de la ampliación: su costo directo entre 0.7 |
+| **Algo específico** (por ejemplo, un cambio de sanitarios) | **Se presenta la diferencia:** el costo directo de lo que entra menos el de lo que sale, **entre 0.7** | — es el cálculo |
+
+- **El factor 0.7** (dato del usuario, D-532): un costo directo de 70 se cobra en 100. Como 1 ÷ 0.7 es 1.4286, el costo es el 70 % del precio y el 30 % restante es lo que cubre indirectos y utilidad. **Es un solo factor, no las capas de sobrecosto de §6,** que siguen fuera del modelo. Da igual restar los costos y luego dividir que dividir cada uno y restar los precios. *Lectura mía:* el factor y el precio por m² se guardan como parámetros con su fecha, como los umbrales que ya lo son (el 20 % de las alertas, el 5 % de la retención), para cambiarlos sin tocar código.
+- **El 17,000 por m²** (dato del usuario, D-534 y D-535) son **pesos y es lo que el cliente paga por cada m² de construcción adicional.** **No es fijo:** a veces se **pacta más barato,** y cada cotización lleva el precio que se pactó; 17,000 es el de lista. **El IVA va incluido: en la vivienda no se presenta por separado.** Si varía por proyecto o por prototipo no se dijo. *Lectura mía:* el de lista vive como parámetro con su fecha, y lo pactado se compara con él; los m² de una ampliación son m² de construcción adicional, es decir, los `m2_adicionales` de la casa (§3c).
+- **Si el presupuesto de la ampliación no coincide con el precio por m² pactado,** no se corrige solo: alguien lo resuelve, y el precio por m² se puede ajustar (D-534). Como el precio **no es fijo,** el que manda es el **pactado con el cliente;** el presupuesto de la ampliación **confirma** qué tan lejos queda del costo directo entre 0.7. *Lectura mía:* si lo pactado queda por debajo, se muestra la diferencia (un margen menor al 30 %) y no se bloquea.
+- **Lo que sale y los descuentos al cliente** (D-546, D-550 y D-551, dato del usuario): son tres cosas, no una. **(1) Un concepto o un material que se descuenta** —la estufa, la carpintería— **se descuenta a costo directo, y el cliente recibe de crédito ese costo directo, sin dividir entre 0.7** (D-551: si cuesta 7,000, el crédito es de 7,000, menos que el precio al que se le vendió). Es una línea de la cotización con **cantidad negativa** (`NODO.tipo_credito = a_costo`, arriba); no hay un bloque aparte (la propuesta de dos bloques con cantidades positivas no se aceptó, D-546). Hay precedente: las matrices ya tienen cantidades negativas legítimas (58 líneas en 23 conceptos, `CONOCIMIENTO.md` §11.10 y `INVARIANTES.md`), y la regla contraria es solo de las ingenierías de lote. *Lectura mía:* una cantidad negativa se admite solo en una cotización y en el control de cambio que nace de ella, nunca en el presupuesto de la obra, y lleva su motivo. **(2) y (3) Un descuento al cliente, por monto o por porcentaje: «pueden ser ambos».** Se aplica **al precio,** no al costo, después del ÷ 0.7, y por eso el margen real se ve (`descuento_pct`, `descuento_monto` y `descuento_motivo`, arriba). *Lectura mía:* si hay los dos, primero el porcentaje y luego el monto. **El precio de una cotización queda así:** lo que entra, a su costo directo entre 0.7, menos el crédito de lo que se descuenta a costo directo, menos el descuento al cliente. **Un descuento al cliente lo autoriza Proyectos y atención al cliente** (D-552, dato del usuario; `autorizar_descuento_cliente`, §5b); Control de obra sigue cotizando (D-546). *Lectura mía:* si el margen baja del 30 % se muestra la diferencia y no se bloquea, como con el precio por m² pactado. **El monto del contrato puede quedar menor** (D-551, «también, en su defecto»): *lectura mía:* ya cabe en la orden de cambio, cuyo `delta_monto` es **con signo** desde D-334 («un descuento al cliente es la misma fila, con el signo al revés»), y también `precio_cliente`; al aceptar el descuento nace un control de cambio con signo negativo y el monto vigente del cliente baja, sin mecanismo nuevo. **Por confirmar:** si lo que sale de un **cambio** (los sanitarios viejos) también se acredita a costo directo, o se queda por la diferencia entre 0.7 de D-533.
+- **Aceptada, se convierte en control de cambio.** Al aceptarla el cliente nace una `PROPUESTA(tipo=orden_cambio)` (§5f) que **agrega** al final de la rama congelada, sin reescribir lo contratado (`CONOCIMIENTO.md` §13.4). **El control de cambio tiene su propio consecutivo** (`CC-ALM-18001`, el siguiente de esa obra) **y se encadena a la cotización de la que viene** (D-546): no comparte el número, lleva su referencia. La orden guarda **el costo directo** (`delta_monto`, el impacto en costo) **y el precio al cliente** (`precio_cliente`), para poder ver el margen (D-546). Si el trabajo además se subcontrata, nace una OT (§5i) y, como siempre, se compara contra lo que se cotizó.
+- **Quién (D-546 y D-552):** **Control de obra cotiza** (hoy hace de cotizador) y autoriza el control de cambio; **Proyectos y atención al cliente registra la respuesta del cliente,** si acepta o rechaza (`registrar_respuesta_cotizacion`, §5b), **y autoriza el descuento al cliente** (`autorizar_descuento_cliente`). **No se ha dicho** qué pasa con una cotización rechazada más allá de conservarse. **D-487:** el cerebro no construye nada hasta que el usuario lo levante.
+
 ---
 
 ## 3b. Postventa — la casa entregada abre una garantía (P-41 cierra, dato del usuario)
@@ -885,7 +945,7 @@ PRESUPUESTO.fecha_entrega   DATE, nullable — cuándo se entregó al
                              nodo): entrega es un solo evento de la obra
                              entera, no una etapa de un subárbol           nuevo
 
-TICKET_GARANTIA
+TICKET_POSTVENTA            (antes TICKET_GARANTIA; renombrada en D-562)
   id
   presupuesto_id       FK PRESUPUESTO — la casa                            nuevo
   fecha_reporte        DATE — cuándo se reporta el defecto. Dato nuevo:
@@ -905,7 +965,7 @@ TICKET_GARANTIA
   contratista_id       FK CONTRATISTA — quien resuelve (D-366)             nuevo
   estado               enum: abierto · cerrado                            nuevo
 
-MOVIMIENTO_ALMACEN.ticket_garantia_id   FK TICKET_GARANTIA, nullable —
+MOVIMIENTO_ALMACEN.ticket_postventa_id   FK TICKET_POSTVENTA, nullable —
                              qué ticket generó este despacho; reemplaza
                              la `Referencia` en texto libre como forma de
                              ligar un movimiento a su causa                 nuevo
@@ -915,7 +975,7 @@ MOVIMIENTO_ALMACEN.ticket_garantia_id   FK TICKET_GARANTIA, nullable —
 (`MODELO.md` §5f) — mismo criterio que ya excluyó ahí a
 `PRESUPUESTO(tipo=escenario)`: es otra pregunta, sobre otro periodo (después
 de la entrega, no durante la obra). `SUM(MOVIMIENTO_ALMACEN.costo_total)
-WHERE ticket_garantia_id IS NOT NULL`, agrupable por `presupuesto_id`,
+WHERE ticket_postventa_id IS NOT NULL`, agrupable por `presupuesto_id`,
 `causa` o periodo — sin tabla nueva de reporte.
 
 **Lo que este diseño no resuelve retroactivo:** de las 213 filas reales,
@@ -925,6 +985,173 @@ ticket exige una casa desde que se abre, pero no hay forma honesta de
 reconstruir a cuál pertenecía cada una de esas 160 filas ya capturadas.
 El diseño corrige la captura hacia adelante, no reescribe lo que ya
 pasó suelto.
+
+**D-540: postventa será un módulo completo,** y **hay una persona encargada de postventa** (dato del usuario). Lo de esta sección es el mínimo que el cerebro ya tenía; el módulo lo ampliará (B-129).
+
+**D-541: quién abre el ticket y cómo se cierra** (dato del usuario). **Lo abre el dueño de la casa, que es el cliente y se llama colono.** **«Atención a postventa» es un rol propio** y es el que atiende. **El ticket se cierra a solicitud de Atención a postventa, y lo confirma el colono con su nivel de satisfacción.** La cadena:
+
+| Paso | Quién | Función |
+|---|---|---|
+| Abre el ticket | El colono, o Atención a postventa en su nombre (D-542) | `abrir_ticket_garantia` |
+| Atiende: asigna a quien lo resuelve y, si hace falta un trabajo, genera la OT de postventa o de mantenimiento (§5i) *(lectura mía)* | Atención a postventa | `cotizar_ot` *(la del módulo, por definir)* |
+| Solicita el cierre | Atención a postventa | `solicitar_cierre_ticket` *(propuesta)* |
+| Si no responde, se le re-solicita la confirmación, **hasta la tercera re-solicitud** (D-543); **no deben pasar más de 20 días entre las tres** (D-557) | El sistema | — |
+| Confirma el cierre y da su nivel de satisfacción, de 5 a 10 | El colono | `confirmar_cierre_ticket` *(propuesta)* |
+| **Si el colono no confirma, o no queda satisfecho:** aprueba cerrarlo sin su confirmación, con una nota de insatisfacción o de desatención del colono (D-542) | Control de obra | `aprobar_cierre_ticket_sin_confirmar` *(propuesta)* |
+
+```
+TICKET_POSTVENTA  (lo que ganaría, propuesta — D-541)
+  abierto_por           FK USUARIO — el colono, o Atención a postventa en su
+                         nombre                                                 propuesta
+  estado                enum: abierto · cierre_solicitado · cerrado — hoy, abierto · cerrado   propuesta
+  cierre_solicitado_por, cierre_solicitado_en   FK USUARIO — Atención a postventa   propuesta
+  nivel_satisfaccion    NUMERIC, de 5 a 10, nullable — el que da el colono al
+                         confirmar el cierre                                    escala firme (D-542); campo propuesta
+  cerrado_por, cerrado_en   FK USUARIO — el colono que confirma               propuesta
+  motivo_cierre_sin_confirmar   enum: insatisfaccion_del_colono ·
+                         desatencion_del_colono, nullable — solo si Control de
+                         obra aprobó cerrarlo sin la confirmación del colono     regla firme (D-542); campo propuesta
+  nota_cierre           texto, nullable — la nota que acompaña a ese motivo      propuesta
+  cierre_aprobado_por, cierre_aprobado_en   FK USUARIO — Control de obra       propuesta
+```
+
+- **El colono es un usuario externo,** no un empleado, y **el rol queda confirmado (D-542):** ve solo su casa, con una asignación del estilo de `RESIDENTE_OBRA` (§4a) que el módulo definirá. Es la primera parte concreta del módulo de vivienda (B-125).
+- **Pedir cambios antes y durante la obra** es **el control de cambio a solicitud del cliente,** y **ya estaba definido** (D-540, punto 3 de `WORKFLOWS.md` §8.8): la petición del cliente, la cotización al cliente y el control de cambio (§3a y `CONOCIMIENTO.md` §13.4). Lo que el módulo de vivienda agregará es solo la puerta: que el colono pueda entrar la petición él mismo, en lugar de que la registre Proyectos y atención al cliente.
+- **La escala del nivel de satisfacción es de 5 a 10,** la misma de la revisión física de control (D-517). Queda confirmada (D-542).
+- **Atención a postventa puede abrir el ticket en nombre del colono** (D-542), por ejemplo por teléfono.
+- **Si el colono no confirma el cierre, o no queda satisfecho** (D-542): el ticket **se puede cerrar solo si Control de obra lo aprueba,** y la aprobación lleva **una nota de insatisfacción del colono o de desatención del colono.** El nivel de satisfacción queda vacío si el colono no lo dio.
+- **Cuánto espera el sistema la confirmación del colono** (D-543): **re-solicita hasta la tercera re-solicitud.** Si el colono sigue sin responder, Atención a postventa puede pedir que Control de obra apruebe el cierre, con una nota de desatención del colono. *Lectura mía:* el número de re-solicitudes es un parámetro (3), como los umbrales que ya lo son, y la primera cuenta desde la solicitud de cierre. **No se dijo:** cada cuánto se re-solicita ni por qué medio. **D-487:** nada se construye.
+
+**D-547: quién resuelve el ticket y cómo se cobra** (dato del usuario):
+- **Lo resuelve una cuadrilla, o los mismos contratistas de la obra y de los subcontratos** (`TICKET_POSTVENTA.contratista_id`, que ya es la FK a `CONTRATISTA`). Hay **una cuadrilla de postventa,** que **va por nómina** (D-548, abajo): no es un `CONTRATISTA`.
+- **Hay garantías que no se deben cobrar al cliente.** La OT de postventa lleva `cobro = garantia` (§5i) y no se le cobra; el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`.
+- **También se puede hacer responsable al contratista que realizó la actividad:** es una `DEDUCCION` (§5d), con `contratista_responsable_id` el de la asignación vigente cuando se hizo (`ASIGNACION_CONTRATISTA`, §4a), `ot_origen_id` la OT donde se hizo el trabajo y `ot_base_id` la OT de postventa que lo repara. Es **una posibilidad, no una regla:** lo decide quien aplica el descuento, Control de obra. **D-559:** si lo repara el mismo contratista, solo paga el material nuevo; si lo repara otro, el primero lo paga como un descuento.
+- **El ticket llega a la OT con una referencia, `TICKET_POSTVENTA.orden_trabajo_id`** (nullable); **un ticket puede resolverse sin OT** (D-562, confirmado; era lectura mía).
+
+**D-548: la cuadrilla de postventa va por nómina, y su rendimiento se audita** (dato del usuario). Es **una cuadrilla propia,** no un contratista: no hay estimación que le pague, ni retención, ni descuentos; su costo es la nómina más lo que el almacén despacha al ticket. Los contratistas de obra y de subcontratos siguen pudiendo resolver tickets (D-547).
+
+```
+CUADRILLA_PROPIA            una cuadrilla en nómina, no un contratista            propuesta — D-548
+  id, nombre, activa
+  responsable_id       FK USUARIO — a quién está asignada; no siempre es quien
+                        la dirige (D-560)                                      propuesta — D-560
+TICKET_POSTVENTA             gana cuadrilla_propia_id FK, nullable — resuelve esta o
+                            el contratista_id, no las dos                          propuesta — D-548
+ORDEN_TRABAJO               asignacion_id nulo cuando la ejecuta una cuadrilla
+                            propia, que no se paga con PAGO_OT (§5i)               propuesta — D-548
+```
+
+- **Auditar su rendimiento, «en algún momento»** (dato del usuario): los rendimientos **se van evaluando por concepto,** y a una **actividad nueva se le asigna un rendimiento comparable** que vale para **las futuras actividades iguales.** No es un mecanismo nuevo: la semilla de cuadrilla y rendimiento (`CATALOGOS.md` §10) ya completó **5 de sus 265 filas** con el rendimiento de otra cuadrilla por un factor de 1.085, y lo dejó anotado en su columna `Origen`.
+```
+RENDIMIENTO_CUADRILLA       la referencia de una cuadrilla propia en un concepto   propuesta — D-548
+  cuadrilla_propia_id FK, concepto_id FK Nodo
+  rendimiento          NUMERIC — unidades por jornada
+  origen               enum: catalogo · comparable · medido
+  comparable_de_id     FK Nodo, nullable — el concepto con que se comparó; solo si origen=comparable
+```
+- **El rendimiento real se calcula, no se guarda** (cantidad ejecutada ÷ jornadas) y **nunca sobrescribe la referencia** (P-7, §5c); cuando hay datos suficientes, el sistema **propone** cambiarla por la bandeja y una persona decide.
+- **Quién autoriza el comparable (D-549, dato del usuario):** **Control de obra.** Un rendimiento comparable no vale como referencia hasta que Control de obra lo autoriza; Costos puede proponerlo, porque cuantifica y propone precios nuevos (la nota de D-546 sobre los precios nuevos). **D-560, lectura mía:** no hace falta la función propia que dije en D-549 (`autorizar_rendimiento_comparable`): el cambio de la referencia es una `PROPUESTA` de la bandeja (tipo `rendimiento`; el enum es abierto, hoy el servicio conoce diez) y la aprueba Control de obra con `aprobar_propuesta`.
+
+**D-549: cómo se registra hoy el trabajo de la cuadrilla, y si la mecánica sirve a los destajos** (dato del usuario).
+
+- **Hoy se registra una actividad sin catálogo y las horas de trabajo.** No se registra la cantidad ejecutada, y sin ella no hay rendimiento real (cantidad ÷ jornadas). La jornada es de 8 h, así que las horas ya dan las jornadas (por integrante, D-561: horas ÷ 8); lo que falta es la cantidad y su unidad. La actividad sin catálogo es un concepto nuevo de la OT, y esos los resuelve solo Control de obra (D-547).
+```
+TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo         propuesta — D-549 y D-560
+  cuadrilla_propia_id FK
+  fecha                DATE
+  integrante_id        FK INTEGRANTE_CUADRILLA — quién trabajó: una fila por
+                        integrante, actividad y día                          propuesta — D-561
+  horas                NUMERIC — las de ese integrante en ese trabajo ese día   propuesta — D-561
+  actividad_id         FK ACTIVIDAD, nullable — acabados y urbanización: la actividad
+                        del programa donde se anotan las horas (§5c)           propuesta — D-560
+  orden_trabajo_id FK, partida_cotizacion_id FK nullable — postventa: el trabajo
+                        del ticket, una partida del SOV
+  descripcion          TEXT, nullable — la actividad sin catálogo, como se registra hoy
+  cantidad, unidad     nullable — solo en postventa; en obra la cantidad sale del
+                        avance de la actividad y no se captura aquí (lectura mía)
+  registrado_por       FK USUARIO                                              propuesta — D-560
+```
+- **Los destajos (dato del usuario):** la mecánica «puede servir, pero tendría que autorizar Control de obra», y **los rendimientos de destajo sirven a las cuadrillas propias en primer lugar como parámetro, y en segundo lugar para confirmar o verificar el rendimiento de destajo.**
+- *Lectura mía:* **(1)** el rendimiento que el catálogo da a un concepto de destajo es el **parámetro** con que arranca la cuadrilla propia en ese concepto (`origen = catalogo`); **(2)** a la inversa, el rendimiento **medido** de la cuadrilla propia es un **segundo testigo** del que supone el precio de destajo: si difieren de forma notable, el sistema lo señala por la bandeja y **Control de obra decide;** no cambia nada solo (P-7); **(3)** al contratista de destajo no se le pide horas: se le paga por unidad, y su rendimiento no se mide; la mecánica llega a los destajos por esta verificación, y usarla ahí lo autoriza Control de obra.
+- **Falta (D-549):** quién captura las horas y la cantidad —lo contesta D-560, abajo—, y si las horas son las de la cuadrilla completa o la suma de las de cada persona. **D-487:** nada se construye.
+
+**D-553: el recorrido completo de un ticket, de la app del colono a la ejecución** (dato del usuario: «el cliente, en su app, levanta un ticket; reporta un problema o solicita un servicio; Atención a postventa le da seguimiento y realiza una visita programada para determinar si hace válida la garantía o si el cliente quiere la compostura con costo a él; también puede solicitar mantenimiento. Ya definido esto, Atención a postventa realiza un SOV y se programa la ejecución»).
+
+| Paso | Quién | Función |
+|---|---|---|
+| Levanta el ticket en su app: **reporta un problema, solicita un servicio o solicita un mantenimiento** | El colono | `abrir_ticket_garantia` |
+| Le da seguimiento | Atención a postventa | — *(es atender el ticket)* |
+| **Programa una visita** (**todo ticket la lleva,** también el de mantenimiento, D-554) | Atención a postventa | `programar_visita_postventa` *(propuesta, D-556)* |
+| **Dictamina:** la garantía es válida, o no lo es porque **venció o el problema fue provocado** (D-554), y entonces el cliente decide si quiere la compostura con costo a él | Atención a postventa, que hace la visita | `registrar_dictamen_postventa` *(propuesta, D-556)* |
+| **El sistema otorga el SOV** al dictaminar (D-557): un `PRESUPUESTO` que cuelga del ticket, listo para llenar | El sistema | — |
+| **Llena el SOV** (*Schedule of Values*: el desglose con que se solicitan los recursos y los insumos y se saca el costo, abajo) con **conceptos** y, si no hay concepto para esa actividad, **por insumos,** como si formara un concepto; con él solicita (D-557) | Atención a postventa | `hacer_sov` *(propuesta, D-556)* |
+| **Evalúa y confirma el SOV** (D-557 y D-558, confirmado; en D-556 era de Costos, y el usuario dejó «Costos más para obra») | Control de obra *(en una compostura; Costos lo cierra en un cambio en obra)* | `cerrar_sov` *(propuesta, D-556)* |
+| **Cotiza con proveedores** lo que pide el SOV (D-557) | Compras | `cotizar_con_proveedores` *(propuesta, D-557)* |
+| **Compra el material,** que llega a almacén y se le da la salida para la ejecución (D-557) | Compras *(el almacén despacha, con el movimiento ligado al ticket, `MOVIMIENTO_ALMACEN.ticket_postventa_id`)* | `comprar_material` *(propuesta, D-557)* |
+| **Programa la ejecución** (no depende del almacén: si falta material, es un retraso por falta de material, D-558) | Atención a postventa (D-554, confirmado) | `programar_ejecucion_postventa` *(propuesta, D-556)* |
+| Se ejecuta, por una cuadrilla propia o por contratistas (D-547 y D-548), y sigue el cierre de D-541 | — | — |
+
+```
+TICKET_POSTVENTA   (gana, propuesta — D-553)
+  tipo                 enum: falla · servicio · mantenimiento — lo que pide el
+                        colono al abrirlo                                       propuesta
+  espacio_id           FK NODO, nullable — el espacio de la casa (§3c) donde está
+                        el problema o se pide el servicio                       propuesta — D-564
+
+VISITA_POSTVENTA  una visita programada para dictaminar                         propuesta — D-553
+  id, ticket_id FK TICKET_POSTVENTA
+  programada_para      DATE
+  realizada_en         DATE, nullable
+  realizada_por        FK USUARIO, nullable — Atención a postventa
+  dictamen             enum: garantia_valida · garantia_no_valida, nullable —
+                        vacío hasta que se hace la visita; propio de un ticket
+                        de falla (lectura mía)                                propuesta — D-554
+  motivo_no_valida     enum: garantia_vencida · dano_provocado, nullable —
+                        solo si garantia_no_valida                            dato del usuario (D-554); campo propuesta
+  notas                TEXT, nullable
+
+```
+
+- **El plazo de la garantía es de un año para todos** (D-556, dato del usuario; D-555 había dicho «normalmente un año, pero depende» y el usuario lo dejó fijo). *Lectura mía:* es un parámetro con su fecha, `plazo_garantia_meses = 12`, como el 0.7 o el 5 % de la retención, y no un campo de la obra; una garantía **vence** si el ticket se reportó (`fecha_reporte`) después de `fecha_entrega` más ese plazo —se compara el reporte y no la visita, porque la visita se programa después—.
+- **El dictamen decide el cobro de la OT** (§5i): `garantia_valida` → `cobro = garantia`, que no se cobra al cliente; `garantia_no_valida` → si el cliente quiere la compostura con costo a él, `cobro = cliente`. **La garantía no es válida si venció o si el problema fue provocado** (D-554, dato del usuario). *Lectura mía:* un ticket de mantenimiento o de servicio lleva `cobro = cliente`, como ya decía D-547 («el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`»), y su visita sirve para definir el trabajo, no para dictaminar una garantía.
+- *Lectura mía:* **el ticket conserva sus tres estados** (`abierto`, `cierre_solicitado`, `cerrado`), y **el avance entre ellos** —visita programada, dictaminado, SOV hecho, en ejecución— **se deriva** de la visita, del SOV y de la OT, no se guarda como estado: son más estados que mantener sincronizados. La app del colono puede mostrar ese avance.
+- **SOV = *Schedule of Values*** (D-554, investigado): en la construcción de habla inglesa es **el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor,** que sirve de base para revisar los avances y los pagos; no es el presupuesto interno (AIA A201-2017, §9.2, y la hoja G703). Su lugar en el recorrido cuadra con eso: Atención a postventa lo hace **después de dictaminar y antes de programar la ejecución.** **Cómo lo usan (D-555, dato del usuario):** **como un desglose para solicitar recursos e insumos,** y también **para sacar un costo:** el que se le cobra al cliente, o **lo que le va a costar a la empresa la garantía.** *Lectura mía:* son tres usos de un mismo desglose del ticket —**(1)** la solicitud de los recursos y los insumos, **(2)** el precio al cliente, si el cobro es `cliente`, y **(3)** el costo esperado de la garantía, si el cobro es `garantia`—, y el costo esperado se compara después con el real, que ya es una consulta (`SUM(MOVIMIENTO_ALMACEN.costo_total)` por ticket, más la nómina de la cuadrilla y lo que se pague a contratistas). Por eso **no es solo** «las partidas de la cotización de la OT»: lleva recursos e insumos. **Sus renglones** pueden ser **insumos** (material y mano de obra) o **conceptos** del catálogo con su precio unitario, o ambos (como los de la cotización de la OT, §5i: un concepto con liga opcional, y un insumo suelto cuando la actividad no tiene catálogo, D-548), y **a quién se le solicitan** los recursos. **D-556, confirmado:** los renglones son **insumos y conceptos** («así es»); **Atención a postventa lo hace, Costos termina de cerrarlo y con él solicita los recursos y los insumos a Compras, y Control de obra observa.** **El precio al cliente** es el costo directo entre 0.7, **salvo que se pacte costo directo,** y entonces se da el costo directo (el mismo `factor_precio` de §3a, que vale 1 en ese caso); lo que cuesta la garantía a la empresa es el costo directo. *Lectura mía:* el SOV es un `PRESUPUESTO` que cuelga del ticket, para reutilizar nodos, insumos, conceptos y `factor_precio`. **D-557:** el usuario contestó «así es» a esa lectura (`PRESUPUESTO.ticket_postventa_id`, §3a) y agregó: **(a)** **el sistema otorga el SOV;** **(b)** Atención a postventa lo llena **con conceptos,** y si no hay concepto para esa actividad **solicita por insumos, como si se formara un concepto** (un concepto provisional, B-130); **(c)** en una compostura, **«postventa solicita, Control de obra evalúa y confirma»,** y el usuario dijo **«vamos a dejar Costos más para obra»:** *lectura mía:* `cerrar_sov` pasa de Costos a **Control de obra** en postventa (reemplaza el «observa» de D-556) y Costos lo cierra cuando es de un cambio en obra; **D-558, confirmado:** Control de obra, y no Costos, es quien lo evalúa, lo confirma y pule en una compostura los conceptos formados por insumos; **(d)** **Compras cotiza con proveedores y compra el material,** que llega a almacén para darle salida a la ejecución; **(e)** **en obra es muy similar:** para un **cambio en obra también se hace un SOV,** y **cuando llega a Control de obra o a Costos se realiza un control de cambio.** *Mi lectura de D-557* —que ese SOV era la `cotizacion` de §3a— **queda corregida en D-558** (siguiente punto).
+- **El nombre (D-562, confirmado):** la entidad se llama **`TICKET_POSTVENTA`** (antes `TICKET_GARANTIA`), porque un ticket de servicio o de mantenimiento puede no ser una garantía. Sus campos se renombran con ella (`ticket_postventa_id`). **Las claves de las funciones conservan «garantia»** (`abrir_ticket_garantia`) hasta que se construya, para no tocar lo ya firme.
+- **D-558: el SOV de una obra y el retraso por falta de material** (dato del usuario). **(1) Lo llena el residente de obra,** y **«no depende del cliente, depende de los ajustes de obra»:** puede ser **una mejora en obra, una omisión de proyectos, una omisión de costos o un error de ejecución.** Son cuatro de las nueve causas de `CONOCIMIENTO.md` §13.6: la **mejora de proyecto** (9), la **omisión de proyecto** dentro del contrato (4), la **omisión de presupuesto** (3) y el **error de ejecución** (1). *Lectura mía:* por eso no es la cotización al cliente de §3a —esa es para una petición nueva del cliente (5) o un contrato cambiado (6), y se cobra—, sino un `PRESUPUESTO` de `tipo = sov`, que cuelga de la obra (`cotizacion_de_id`) y lleva `causa_ajuste`; lo que cuesta el ajuste se calcula con el SOV, y quién lo paga lo dice la causa (`CONOCIMIENTO.md` §13.6: 1, 3 y 4 los absorbe la empresa o, en un error de ejecución, se le cobra al contratista como dice D-559; **la 9 la paga la empresa** (D-559)). `hacer_sov` es entonces también del **Residente**. **(2)** **Cuando el SOV llega a Control de obra o a Costos, se hace el control de cambio,** con `autorizar_orden_cambio` de Control de obra (D-537); Costos cuantifica (D-546). **(3) El programa no depende del almacén:** si el material no está en almacén cuando se ejecuta, **es un retraso en el programa por falta de material** (D-558, confirmado). *Lectura mía:* se registra con el vocabulario que ya existe, la incidencia `falta_material` con impacto `retraso` (`LENGUAJE.md` S12) y la causa 7 de `CONOCIMIENTO.md` §13.6, que es de tiempo y no de costo; en una compostura, Atención a postventa reprograma la ejecución.
+- **D-559: quién paga un ajuste de obra** (dato del usuario). **Una mejora en obra la paga la empresa** (la causa 9, que estaba «sin definir»). **Un error de ejecución:** si lo repara el mismo contratista que lo cometió, **solo paga el material nuevo** que se usa para repararlo; si lo repara **otro contratista, lo paga el primero como un descuento** (§5d). *Lectura mía:* es el descuento `rehacer_trabajo` en el primer caso, con el material nuevo como base, y `pagado_a_otro_contratista` en el segundo, con lo pagado al otro contratista (`ot_base_id`); y vale igual para **la garantía** que se debe a un trabajo mal hecho (D-547). **Y el tipo `sov` es propio** (confirmado).
+- **Falta:** el cierre del B-132, que está en el bloque de D-560, abajo. El almacén que despacha no es un rol del cerebro hoy (los movimientos vienen del ERP externo). *Lectura mía:* si el cliente no acepta pagar la compostura que no es de garantía, no hay OT y el ticket se cierra con el dictamen guardado. **D-487:** nada se construye.
+
+**D-560: las tres cuadrillas propias y quién anota las horas** (dato del usuario: «tenemos tres cuadrillas: una de postventa, una de acabados y una de urbanización; postventa está asignada a Atención a postventa; acabados, a los supervisores, a uno de ellos, aunque se la comparten entre los residentes, que la dirigen y anotan sus horas en la actividad que realizan; urbanización, su supervisor la dirige y anota las horas»).
+
+| Cuadrilla | Asignada a | La dirige | Anota sus horas | Dónde |
+|---|---|---|---|---|
+| **Postventa** | Atención a postventa | Atención a postventa | Atención a postventa | El trabajo del ticket (una partida del SOV) |
+| **Acabados** | Uno de los supervisores; los residentes se la comparten | El residente que la usa *(lectura mía)* | El residente que la dirige | La actividad que realizan |
+| **Urbanización** | Su supervisor | Su supervisor | Su supervisor | La actividad que realiza |
+
+- **Lo que cambia en el modelo** (bloque de D-549, arriba): `CUADRILLA_PROPIA.responsable_id` dice a quién está asignada, y `TRABAJO_CUADRILLA` pasa a colgar de una **actividad del programa** en acabados y urbanización, y del **trabajo del ticket** en postventa. Una cuadrilla de acabados compartida entre varios residentes anota sus horas en la actividad de cada uno, sin partirse entre obras.
+- **En obra solo se anotan las horas:** la cantidad ya la registra el residente como avance de la actividad (`registrar_avance`, D-533). *Lectura mía:* el **rendimiento real** de una actividad de obra es el avance del periodo ÷ las jornadas anotadas; en postventa, la cantidad del trabajo ÷ sus jornadas.
+- **Una función nueva, propuesta:** `registrar_horas_cuadrilla`, del **Residente** (acabados), del **Supervisor** (urbanización) y de **Atención a postventa** (postventa). **Ochenta y tres funciones, setenta y siete asignadas, seis sin asignar.** El cambio de la referencia no necesita otra función: es la bandeja (arriba).
+- **Horas por integrante y por hora** (D-561, dato del usuario; antes era pregunta): las horas se anotan **por integrante de la cuadrilla** y en **horas.** Cuántos trabajos del mismo concepto hacen falta antes de proponer cambiar una referencia: **3, como parámetro** (D-561, confirmado).
+
+**D-561: las horas, por integrante.** Hace falta saber quiénes son los integrantes de cada cuadrilla propia:
+
+```
+INTEGRANTE_CUADRILLA        una persona de una cuadrilla propia, en nómina         propuesta — D-561
+  id, cuadrilla_propia_id FK CUADRILLA_PROPIA
+  nombre               texto
+  puesto               texto, nullable — oficial, ayudante u otro
+  jornal               NUMERIC — su sueldo propio por jornada de 8 horas; la hora
+                        vale jornal ÷ 8 (D-568 y D-569)                     dato del usuario (D-569); campo propuesta
+  activo               boolean
+```
+
+- **Cada fila de `TRABAJO_CUADRILLA` es de un integrante** (arriba). El total de la actividad o del trabajo es la suma de sus filas, así que **se ve quién faltó** sin preguntar.
+- **Una cuadrilla se cobra por jornada** (D-568, dato del usuario): **el precio de su jornada es la suma de los jornales de las personas que la integran** (como en el catálogo: `MOCU-002`, 1 albañil y 1 peón, $1,452 por jornada; `CATALOGOS.md` §10). **A cada persona se le asigna una actividad, que se registra por hora, y su hora vale su jornal entre 8 horas de trabajo;** al revés, **la jornada de una persona es su hora por 8** (`jornada_horas`, §5j).
+- **Cada integrante tiene un sueldo por jornal propio** (D-569, dato del usuario): `INTEGRANTE_CUADRILLA.jornal` es **el de la persona,** no el de su puesto en el catálogo. *Lectura mía (D-569, reemplaza la de D-568):* con jornales distintos hay que separar dos cuentas. **El costo real de una actividad** es la suma, por integrante, de `horas × jornal ÷ 8`, con el jornal propio de cada uno; y el **precio de la jornada de la cuadrilla propia** es la suma de los jornales de sus integrantes, que se compara con el de la cuadrilla del catálogo (`MOCU-`) para ver si la propia cuesta más o menos. **El rendimiento real no depende de los sueldos:** las jornadas de una actividad son las **jornadas-persona** (la suma de las horas de sus integrantes ÷ 8) entre las **personas de la cuadrilla tipo del concepto,** que salen de su `MOCU-` (`CATALOGOS.md` §10); así el rendimiento queda en las mismas unidades por jornada que el del catálogo, y si faltó alguien salen menos jornadas. *(La fórmula de D-568, que dividía el costo entre el precio de la jornada, solo valía con jornales iguales.)*
+- *Lectura mía:* los integrantes son personal de nómina, no usuarios del sistema; quien anota las horas es quien dirige (la tabla de arriba). **Un jornal propio es un dato de nómina,** así que **no debería verlo quien solo anota horas** (el residente, el supervisor o Atención a postventa): las filas de `TRABAJO_CUADRILLA` llevan horas, y el costo sale de cruzarlas con el jornal solo para quien tenga permiso. **Quién ve y quién cambia los jornales no se ha dicho** (pregunta abierta). El cerebro guarda el modelo, no los sueldos reales.
+- **«Por hora»:** *lectura mía:* la unidad es la hora, no una anotación hora por hora; si quiso decir que se anota a qué hora entró y salió, se ajusta.
+- **El parámetro de 3 trabajos** es de la forma de los demás (el 0.7, el plazo de la garantía): un valor con su fecha, editable. **D-487:** nada se construye.
 
 ---
 
@@ -967,9 +1194,16 @@ PRESUPUESTO — campos que gana (todos nullable)
 - **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote («FRESNO 12») o manzana y lote («10-04»), única dentro del proyecto. **La sigla del cluster** (`CLUSTER.codigo`) no es la clave de la casa: forma la clave de lo que cuelga de ella, como un control de cambio, y dice de un vistazo a qué obra corresponde (D-520); no se dijo si «Antigua» usa una sigla.
 - **La urbanización también es un `PRESUPUESTO(tipo=obra)`, uno por proyecto,** con `proyecto_id` y sin cluster ni lote. Sus ramas —los clústeres y las amenidades— son nodos de su árbol, no tablas.
 - **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
-- **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
+- **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m². *D-564 y D-565:* con los espacios (abajo), los m² del prototipo son la suma de las áreas de sus espacios base y se calculan.
 - **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
-- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y **el cliente (D-520, idea):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_GARANTIA` y las OT de postventa y mantenimiento (§5i)—.
+- **Los espacios de una casa (D-564 y D-565, dato del usuario; B-113).** Lo importante es poder crear **módulos de crecimiento independientes:** si el cliente decide **crecer una recámara,** solo cambian **el precio y los conceptos de esa recámara.** En la práctica es **un presupuesto por espacios, o un paramétrico por áreas,** y **se reutilizan la estructura de árbol y el cuantificador:** no hay tabla de espacios.
+  - **La forma del árbol (D-565):** **el tronco es la casa; las ramas son los espacios; las subramas, los niveles y las etapas de construcción; y las hojas, los conceptos o las matrices.** *Lectura mía:* hoy los siete prototipos están por etapa y sin espacios, así que cuantificarlos por espacio es trabajo nuevo, y **el programa por etapa (§5c) lee las etapas de cada espacio y las suma** (D-566, «sí, correcto»).
+  - **Lo único que se captura a mano son los m² del área** (D-565). **Los conceptos sí hay que cuantificarlos, de la cimentación a los equipamientos,** con el cuantificador (§1b). **La primera captura es cuantificar las áreas con un plano y establecer eso como la base** (la otra opción es capturar los m² a mano); la base se **congela** al contratar (`contratar_subarbol`, D-475).
+  - **Crecimiento (D-565, «crecimiento correcto»):** de ahí las áreas solo cambian por crecimientos: un control de cambio que suma m² a un espacio o agrega uno nuevo, al final de la rama congelada (`CONOCIMIENTO.md` §13.4).
+  - **Paramétrico por áreas (D-565, «paramétrico correcto»):** el ensamble de un espacio lleva un `ENSAMBLE_PARAMETRO` (§1c) con el parámetro `m2_espacio` y una tasa de pesos por m² aprendida de las casas ya cuantificadas (la cohorte es el tipo de espacio). **Solo debe calcular la diferencia real contra lo cobrado:** en el ejemplo del usuario, el crecimiento de 10 m² costó 120,000 en paramétrico y **la diferencia con lo cobrado es de 5,000;** se muestra esa diferencia, sin corregir el precio ni bloquear (como el precio por m² pactado, §3a). El precio de la ampliación sigue siendo el pactado, de 17,000 pesos por m² de lista (§3a).
+  - **Los m² del prototipo son la suma de las áreas** de sus espacios base (D-565, «sí»), **pero las cantidades de los conceptos pueden salir un poco mayores por los muros compartidos:** cada área cuantifica sus muros completos y las áreas que comparten un muro lo duplican; **eso no significa más área.** **Cómo se resuelve (D-566, dato del usuario):** **«ambos, y que el usuario decida»:** un muro compartido se **asigna a un solo espacio** o se reparte **mitad y mitad,** y lo decide quien cuantifica. **Y cuando la altura cambia, por ejemplo de 3.00 a 4.20 m, el excedente de los tres metros se le otorga a un área: no se comparte.** *Lectura mía:* «ambos» son los dos primeros caminos que propuse (el muro a un solo espacio y mitad y mitad); **el tercero, el ajuste negativo en la casa, no se usa.** **No hace falta mecanismo nuevo:** un trazo de muro puede tener un enlace por cada espacio (`ENLACE_CUANTIFICACION`, §1b) y **el reparto es su `factor`:** 1 y 0 si se asigna a un espacio, 0.5 y 0.5 si es mitad y mitad; y en un muro de 4.20 m contra uno de 3.00, la banda de 0 a 3.00 m se reparte como se haya decidido, y la de 3.00 a 4.20 m (1.20 m) lleva factor 1 para **el espacio de mayor altura** *(lectura mía)*.
+  - **Un concepto cuelga de su espacio** por su lugar en el árbol, y **el ticket de postventa se liga a un espacio** (`TICKET_POSTVENTA.espacio_id`, §3b), para costear y reportar por espacio.
+- **No se modela todavía:** **el cliente (D-520, idea; B-125 lo cerró como definido en D-563):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_POSTVENTA` y las OT de postventa y mantenimiento (§5i)—.
 - **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b), y **al entregarse la obra pasa a postventa** (§3b, D-516). «Antigua», que D-513 leyó como un estatus, es el nombre del segundo proyecto.
 
 ---
@@ -1179,7 +1413,7 @@ CONTRATISTA
   rfc              texto, nullable                                         firme — D-521
   contacto, telefono, correo   texto, nullable — el correo será el del
                     inicio de sesión cuando entren al sistema (B-121)      firme — D-521
-  calificacion     NUMERIC, nullable — el método se define después (B-117)  firme — D-521
+  calificacion     NUMERIC, nullable — el método se propuso en D-564 (abajo)  firme — D-521
   retencion_pct    NUMERIC, nullable — nulo no lleva retención; por defecto
                     5, el mismo para todos y editable por contratista;
                     se aplica sobre el total de la OT (§5i)                firme — D-521
@@ -1204,6 +1438,25 @@ mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
 `NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
 
 *Cómo llegó a ser firme (D-512 a D-521).* El usuario pidió categorizar a los contratistas **por tipo y por oficio** (D-512), dijo que no hay clave, solo el id; que el `rfc` es opcional; que van el contacto y la `calificacion`, cuyo método se define después (D-514); y que el correo es el del inicio de sesión (D-516). **En D-521 confirmó el bloque y contestó tres cosas:** un contratista puede ser destajo y subcontrato a la vez, por eso el tipo es una tabla de relación (`CONTRATISTA_TIPO`) y no un campo; el oficio es la `Familia` del trabajo; y la retención de 5 % es igual para todos pero **editable por contratista.** Por eso `retencion_pct` es un campo del contratista: el 5 es el valor por defecto (parámetro de B-114) y nulo significa que no la lleva. El `tipo` se pensó como FK a `CLASE_TRABAJO` (§2) y la `clave` como nullable; ambas quedan fuera.
+
+**D-564: cómo se calificaría a un contratista (B-117; propuesta, con los criterios y el orden que dio el usuario).** Son **siete criterios:** **tiempo de ejecución, mal trabajo, rendimiento de materiales, calidad, limpieza, incidencias del contratista y atención al residente y al supervisor;** y lo que más pesa es **tiempo, calidad y costo, de preferencia en ese orden.** *Lectura mía:*
+
+| Pilar | Criterios | De dónde sale |
+|---|---|---|
+| **Tiempo** | Tiempo de ejecución · incidencias del contratista | El programa contra el avance y las incidencias que origina (§5c) |
+| **Calidad** | Calidad · mal trabajo · limpieza · atención al residente y al supervisor | La revisión física de 5 a 10 (§5c, D-544) y los descuentos `mal_trabajo`, `mala_calidad` y `rehacer_trabajo` (§5d); **la limpieza y la atención no salen de ningún dato:** las evalúan el residente, el supervisor y Control de obra, como las evaluaciones de ObraCtrl |
+| **Costo** | Rendimiento de materiales | El consumo real contra el teórico por contratista (§5g) |
+
+```
+CALIFICACION_CONTRATISTA   la calificación de un contratista en una OT, al finiquitar   propuesta — D-564
+  id, contratista_id FK CONTRATISTA, orden_trabajo_id FK ORDEN_TRABAJO
+  tiempo_ejecucion, incidencias, calidad, mal_trabajo, limpieza, atencion,
+  rendimiento_materiales   NUMERIC de 5 a 10, nullable — uno por criterio
+  calculada_en         DATE
+```
+
+- **Los pilares y el total se calculan:** cada pilar es el promedio de sus criterios y el total es el promedio de los pilares con sus pesos, que viven en `PARAMETRO` (§5j): `peso_tiempo` **40,** `peso_calidad` **35** y `peso_costo` **25** (D-566, confirmados: respetan el orden tiempo, calidad y costo). `CONTRATISTA.calificacion` guarda el promedio de las calificaciones de sus OT. **El reparto de los criterios en los pilares quedó como está en la tabla** (D-566, «sí»).
+- **Quién evalúa (D-566, confirmado):** la limpieza y la atención las evalúan **el residente y el supervisor durante la obra, y Control de obra al final** (`evaluar_contratista`, propuesta; ObraCtrl tiene tres niveles, auto, control y final). **Por definir:** cómo se convierte cada señal del sistema a la escala de 5 a 10 (por ejemplo, cuánto baja el tiempo por cada día de atraso): **se deja como parámetro y se define con datos reales** (D-566). **D-487:** nada se construye.
 
 ### Lo que esto ya resuelve, de paso
 
@@ -1797,6 +2050,10 @@ quien resuelve.
 ROL
   id, nombre        Residente · Supervisor · Superintendente · Costos ·
                      Cotizador · Control                                    firme
+                     · Compras · Finanzas · Proyectos y atención al cliente  nuevo — D-537
+                     · Atención a postventa                               nuevo — D-541
+                     · Colono (el cliente, dueño de la casa)              nuevo — D-542
+                     · Contratista (externo, ve solo lo suyo)             nuevo — D-544
 
 FUNCION_ATOMICA
   id, clave         trazar · aprobar_trazo · registrar_avance ·
@@ -1817,6 +2074,36 @@ FUNCION_ATOMICA
                      asignar_supervision · reclasificar_familia ·
                      resolver_revisar_parametro                          nuevo — B-73/B-75, ver abajo
                      · renovar_invariante_valor                          nuevo — B-54, ver abajo
+                     · cargar_catalogo_opus · contratar_subarbol ·
+                     clonar_insumo                                       nuevo — D-473, D-475 y D-478, ver abajo
+                     · trazar_avance · proponer_reprogramacion ·
+                     revisar_reprogramacion · validar_reprogramacion ·
+                     aplicar_reprogramacion                              nuevo — D-533, ver abajo
+                     · dar_de_alta_obra · cargar_ingenieria ·
+                     asignar_contratista · marcar_obra_iniciada ·
+                     cotizar_cambio_cliente · confirmar_avance ·
+                     capturar_estimacion · enviar_estimacion ·
+                     devolver_estimacion · justificar_fuera_de_catalogo ·
+                     marcar_estimacion_pagada · entregar_obra ·
+                     dar_visto_bueno_entrega · validar_calidad_entrega ·
+                     firmar_entrega · firmar_entrega_superintendente ·
+                     liberar_retencion · abrir_ticket_garantia ·
+                     asignar_subcontrato · cotizar_ot · cambiar_alcance_ot ·
+                     confirmar_pago_ot · auditar_alcance_ot               nuevo — D-537, ver abajo
+                     · replicar_estimacion · justificar_aumento_cantidad  nuevo — D-538, ver abajo
+                     · solicitar_cierre_ticket · confirmar_cierre_ticket  nuevo — D-541, ver abajo
+                     · aprobar_cierre_ticket_sin_confirmar                nuevo — D-542, ver abajo
+                     · traspasar_anticipo · subir_documento_expediente ·
+                     registrar_revision_fisica                            nuevo — D-544, ver abajo
+                     · registrar_respuesta_cotizacion                     nuevo — D-546, ver abajo
+                     · autorizar_descuento_cliente                        nuevo — D-552, ver abajo
+                     · programar_visita_postventa ·
+                     registrar_dictamen_postventa · hacer_sov ·
+                     cerrar_sov · programar_ejecucion_postventa           nuevo — D-556, ver abajo
+                     · cotizar_con_proveedores · comprar_material         nuevo — D-557, ver abajo
+                     · registrar_horas_cuadrilla                          nuevo — D-560, ver abajo
+                     · editar_parametro                                   nuevo — D-563, ver abajo
+                     · evaluar_contratista                                nuevo — D-566, ver abajo
 
 ROL_FUNCION
   id, rol_id FK, funcion_id FK                                              firme
@@ -1841,6 +2128,8 @@ sin existir en `ROL` — Control de obra absorbe la función en la práctica,
 sin que eso impida reasignarla después: `ROL_FUNCION` es muchos-a-muchos
 precisamente para que una asignación no sea definitiva.
 
+> **D-538: `validar_estimacion` pasa a Compras.** El usuario contó el proceso de hoy —Compras revisa los topes, modifica y la envía a Control de obra, que establece la estimación pagada— y la función dejó de ser de Control de obra. `ROL_FUNCION` es de muchos a muchos: fue una fila que cambió de rol, no un cambio de esquema.
+
 > **La reasignación no pide mecanismo nuevo — pide dueño para el
 > mecanismo que ya existe.** `ROL_FUNCION` ya es una tabla, no una regla
 > de código: reasignar `validar_estimacion` de Control de obra a otro rol
@@ -1864,7 +2153,7 @@ fecha, en un solo lugar.
 | `trazar` | Costos, Control de obra, Residente, Supervisor | §1b, B-45 |
 | `aprobar_trazo` | Control de obra | §1b, B-45 |
 | `anotar_plano` | Residente, Supervisor | §1b, B-45 |
-| `validar_estimacion` | Control de obra | dato del usuario, cierra B-75 |
+| `validar_estimacion` | **Compras** — revisa los topes y modifica la estimación | dato del usuario, D-538 (antes Control de obra: D-330 y B-75) |
 | `originar_incidencia` | Residente, Supervisor, Control de obra | §5c, D-329 |
 | `aprobar_incidencia` | Supervisor | §5c, D-329 |
 | `validar_incidencia` | Control de obra | §5c, D-329 |
@@ -1886,20 +2175,68 @@ fecha, en un solo lugar.
 | `cargar_catalogo_opus` | Control de obra y Costos — propuesto | D-473: la carga del catálogo y los presupuestos de OPUS |
 | `contratar_subarbol` | Control de obra — propuesto | D-475: contratar un bloque del presupuesto fija sus PU y lo congela |
 | `clonar_insumo` | Control de obra — propuesto | D-478: clonar un insumo y sustituir el original cambia lo que citan los conceptos de todas las obras: gobierno cruzado |
-| `registrar_avance` | **Sin asignar** | P-21 |
+| `registrar_avance` | Residente — la cantidad o el porcentaje | dato del usuario, D-533 (antes sin asignar, P-21) |
+| `trazar_avance` | Control de obra, Residente y Supervisor — el trazo de lo realmente construido; Costos no | dato del usuario, D-533; la clave es propuesta |
+| `proponer_reprogramacion` | Residente y Supervisor — una fecha nueva de lo contratado | dato del usuario, D-533; la clave es propuesta |
+| `revisar_reprogramacion` | Supervisor — cuando la propone el Residente | dato del usuario, D-533; la clave es propuesta |
+| `validar_reprogramacion` | Control de obra | dato del usuario, D-533; la clave es propuesta |
+| `aplicar_reprogramacion` | Control de obra — la realiza y se notifica a los demás | dato del usuario, D-533; la clave es propuesta |
+| `dar_de_alta_obra` | Control de obra — crear el proyecto, el cluster y la obra | dato del usuario, D-537 |
+| `asignar_contratista` | Control de obra — por obra y tipo de trabajo; el de un subcontrato lo asigna Finanzas | dato del usuario, D-537 |
+| `marcar_obra_iniciada` | Control de obra — declara la junta de arranque | dato del usuario, D-537 |
+| `asignar_subcontrato` | Finanzas | dato del usuario, D-537; viene de §5i |
+| `cotizar_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
+| `cambiar_alcance_ot` | Proyectos y atención al cliente | dato del usuario, D-537; viene de §5i |
+| `abrir_ticket_garantia` | **Colono** — el dueño de la casa, que es el cliente — **y Atención a postventa,** en su nombre | dato del usuario, D-541 y D-542 (antes Proyectos y atención al cliente, D-537) |
+| `solicitar_cierre_ticket` | Atención a postventa | propuesto, D-541; el rol lo dijo el usuario |
+| `confirmar_cierre_ticket` | Colono — confirma con su nivel de satisfacción, de 5 a 10 | propuesto, D-541; el rol lo dijo el usuario |
+| `aprobar_cierre_ticket_sin_confirmar` | Control de obra — con nota de insatisfacción o de desatención del colono | propuesto, D-542; el rol lo dijo el usuario |
+| `traspasar_anticipo` | Control de obra | propuesto, D-544; viene de B-124 |
+| `subir_documento_expediente` | Residente y Supervisor | dato del usuario, D-544 |
+| `registrar_revision_fisica` | Control de obra — la revisión física es «de control» | dato del usuario, D-544 |
+| `firmar_entrega` | Proyectos y atención al cliente — el equipo de gestión de proyectos | dato del usuario, D-537; viene de D-516 y D-522 |
+| `firmar_entrega_superintendente` | Superintendente — puede estar o no | propuesto, D-537; viene de D-516 y D-522 |
+| `cargar_ingenieria` | Costos — la ingeniería de costos llega en un Excel, por niveles | propuesto, D-537 |
+| `cotizar_cambio_cliente` | Control de obra — hoy hace de cotizador | dato del usuario, D-546 (propuesto en D-537) |
+| `registrar_respuesta_cotizacion` | Proyectos y atención al cliente — si el cliente acepta o rechaza | propuesto, D-546; el rol lo dijo el usuario |
+| `autorizar_descuento_cliente` | Proyectos y atención al cliente — el descuento al cliente de una cotización, por monto o por porcentaje | propuesto, D-552; el rol lo dijo el usuario |
+| `programar_visita_postventa` | Atención a postventa — la visita que lleva todo ticket | propuesto, D-556; el rol lo dijo el usuario (D-553 y D-554) |
+| `registrar_dictamen_postventa` | Atención a postventa — hace la visita y dictamina si la garantía es válida o no, y por qué | propuesto, D-556; el rol lo dijo el usuario |
+| `hacer_sov` | Atención a postventa — una compostura, antes de programar la ejecución; y el Residente — un ajuste de obra | propuesto, D-556; el rol lo dijo el usuario; el Residente, D-558 |
+| `cerrar_sov` | Control de obra, que evalúa y confirma el SOV de una compostura (D-557 y D-558); y Costos, en un cambio en obra | propuesto, D-556; el rol lo dijo el usuario, y D-557 lo cambió de Costos a Control de obra para la postventa |
+| `cotizar_con_proveedores` | Compras — lo que pide el SOV | propuesto, D-557; el rol lo dijo el usuario |
+| `comprar_material` | Compras — el material llega a almacén y se le da la salida para la ejecución | propuesto, D-557; el rol lo dijo el usuario |
+| `registrar_horas_cuadrilla` | Residente (la cuadrilla de acabados), Supervisor (la de urbanización) y Atención a postventa (la de postventa) — las horas en la actividad o el trabajo que realizan | propuesto, D-560; los roles los dijo el usuario |
+| `editar_parametro` | Control de obra — cambia un parámetro del negocio (§5j) | propuesto, D-563; el rol lo confirmó el usuario |
+| `evaluar_contratista` | Residente y Supervisor — durante la obra; Control de obra — al final: la limpieza y la atención, de 5 a 10 (§4a) | propuesto, D-566; los roles los confirmó el usuario |
+| `programar_ejecucion_postventa` | Atención a postventa | propuesto, D-556; el rol lo dijo el usuario (D-554) |
+| `confirmar_avance` | Residente — al terminar la actividad y antes de estimar | propuesto, D-537; el rol lo dijo el usuario (D-534) |
+| `capturar_estimacion` | Residente y Supervisor — cada uno registra su parte | dato del usuario, D-538 y D-570 |
+| `enviar_estimacion` | Control de obra — la concentra y la envía a Compras | dato del usuario, D-538 |
+| `devolver_estimacion` | Compras — la devuelve a todos | dato del usuario, D-538 |
+| `justificar_fuera_de_catalogo` | Supervisor | propuesto, D-537; el rol lo dijo el usuario (D-522) |
+| `marcar_estimacion_pagada` | Control de obra — establece la estimación pagada | dato del usuario, D-538; viene de B-118 |
+| `entregar_obra` | Residente | propuesto, D-537; el rol lo dijo el usuario (D-516 y D-522) |
+| `dar_visto_bueno_entrega` | Supervisor | propuesto, D-537; ídem |
+| `validar_calidad_entrega` | Control de obra — calidad y expediente | propuesto, D-537; ídem |
+| `liberar_retencion` | Supervisor la autoriza; Control de obra la valida si hace falta | propuesto, D-537; viene de §5i |
+| `confirmar_pago_ot` | Control de obra | propuesto, D-537; viene de §5i |
+| `auditar_alcance_ot` | Control de obra | propuesto, D-537; viene de §5i |
+| `replicar_estimacion` | Residente — la réplica si alguna cantidad bajó | propuesto, D-538; el rol lo dijo el usuario |
+| `justificar_aumento_cantidad` | Costos y Control de obra — regresan a Compras las justificaciones de por qué debe subir la cantidad | propuesto, D-538; los roles los dijo el usuario |
 | `comprometer_gasto` | **Sin asignar** | P-21 |
 | `capturar_causa_desviacion` | **Sin asignar** | P-21 |
 | `revisar_patrones_desviacion` | **Sin asignar** | P-21 |
 | `aprobar_version_concepto` | **Sin asignar** | P-21 |
-| `pactar_precio_contratista` | **Sin asignar** | P-21 |
-| `aplicar_descuento` | **Sin asignar** | P-21 |
-| `autorizar_orden_cambio` | **Sin asignar** | P-21 |
+| `pactar_precio_contratista` | Control de obra | dato del usuario, D-537 (antes sin asignar, P-21) |
+| `aplicar_descuento` | Control de obra — cuando hay estimación del contratista, en parcialidades si se define así | dato del usuario, D-544 (antes sin asignar, P-21) |
+| `autorizar_orden_cambio` | Control de obra | dato del usuario, D-537 (antes sin asignar, P-21). *Idea, sin confirmar:* doble, con el Superintendente, como el precio nuevo |
 | `aprobar_propuesta` | Control de obra — propuesto | D-485: resolver la bandeja (aprobar o rechazar). No aplica: aplicar pide además la función de la acción |
 | `resolver_alerta` | Supervisor y Control de obra — propuesto | D-485: el Supervisor da seguimiento hasta el cierre; Control de obra gobierna entre obras |
 | `clasificar_manualmente` | **Sin asignar** | P-21 |
 | `correr_invariantes` | **Sin asignar** | P-21 |
 
-**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar.)*
+**Veintidós asignadas, doce sin asignar — a propósito, no por olvido.** *(D-473 agrega `cargar_catalogo_opus`, D-475 agrega `contratar_subarbol` y D-478 agrega `clonar_insumo`: treinta y siete funciones, veinticinco asignadas. D-484 completó la tabla: le faltaba la última. D-485 asigna `aprobar_propuesta` y `resolver_alerta`: veintisiete asignadas, diez sin asignar. D-533 asigna `registrar_avance` y agrega cinco funciones, `trazar_avance` y las cuatro de la reprogramación: cuarenta y dos funciones, treinta y tres asignadas, nueve sin asignar. D-537 asigna `pactar_precio_contratista` y `autorizar_orden_cambio` y agrega veintitrés funciones: sesenta y cinco funciones, cincuenta y ocho asignadas, siete sin asignar, y tres roles nuevos, `compras`, `finanzas` y `proyectos`. D-538 pasa `validar_estimacion` de Control de obra a Compras y agrega dos funciones: sesenta y siete funciones, sesenta asignadas, siete sin asignar. D-540 pasa `abrir_ticket_garantia` al rol `postventa`, propuesto; las funciones siguen siendo sesenta y siete. D-541 lo pasa al colono, confirma el rol propio `atencion_postventa` y agrega dos funciones: sesenta y nueve funciones, sesenta y dos asignadas, siete sin asignar, y diez roles confirmados más el colono, propuesto. D-542 confirma el colono y agrega una función: setenta funciones, sesenta y tres asignadas, siete sin asignar, y once roles. D-544 asigna `aplicar_descuento`, agrega tres funciones y el rol externo `contratista`: setenta y tres funciones, sesenta y siete asignadas, seis sin asignar, y doce roles. D-546 agrega `registrar_respuesta_cotizacion`: setenta y cuatro funciones, sesenta y ocho asignadas, seis sin asignar. D-552 agrega `autorizar_descuento_cliente`: setenta y cinco funciones, sesenta y nueve asignadas, seis sin asignar. D-556 agrega cinco funciones de la postventa: ochenta funciones, setenta y cuatro asignadas, seis sin asignar. D-557 agrega dos de Compras: ochenta y dos funciones, setenta y seis asignadas, seis sin asignar. D-560 agrega `registrar_horas_cuadrilla`: ochenta y tres funciones, setenta y siete asignadas, seis sin asignar. D-563 agrega `editar_parametro`: ochenta y cuatro funciones, setenta y ocho asignadas, seis sin asignar. D-566 agrega `evaluar_contratista`: ochenta y cinco funciones, setenta y nueve asignadas, seis sin asignar.)*
 Las doce existen como clave desde P-21 (D-206): están catalogadas para
 que el sistema pueda apuntar a ellas, pero nunca tuvieron un caso
 concreto que forzara decidir el rol, y este cerebro no asigna sin
@@ -2014,6 +2351,14 @@ Control de obra **y** Superintendente.
 > `estado` pasa a `aprobada` solo cuando los dos están llenos — el motor lo
 > verifica, no un campo booleano nuevo que pueda desincronizarse de los
 > dos anteriores.
+
+> **D-546 y D-550 — replanteado (B-130).** La doble aprobación de arriba **se queda, pero solo para que un precio entre al catálogo** (el usuario, en D-550: «está bien»). Según dónde nace el concepto nuevo:
+>
+> - **En una cotización de obra:** Costos cuantifica y puede proponer el precio; Control de obra valida o realiza, es decir, puede crearlo él mismo. **Una sola firma, la de Control de obra:** no nace una `PROPUESTA(tipo=precio_nuevo)`, porque todavía no hay nada contratado y el concepto se queda en la cotización.
+> - **En una cotización de OT:** solo Control de obra, sin Costos y **sin pasar por el Superintendente** (D-547 y D-550, confirmado).
+> - **Al catálogo:** `PROPUESTA(tipo=precio_nuevo)`; `proponer_precio_nuevo` es de Costos y `aprobar_precio_nuevo` es de Control de obra y Superintendente, los dos, como dice arriba. Se propone cuando el concepto **se repite** —el sistema lo detecta y lo deja en la bandeja— y también cuando **Control de obra lo decide caso por caso** (el usuario contestó «sí» a las dos maneras). *Lectura mía:* es lo que ObraCtrl llama `alta_catalogo` (`LENGUAJE.md` S10).
+>
+> No se agrega ninguna función: crear el concepto en la cotización es parte de cotizar, (D-550: ninguna función nueva).
 
 ### Programa: cinco funciones de incidencia, tres de cierre de frente, dos de edición — cierra B-73
 
@@ -2680,6 +3025,37 @@ existe:**
 > validar un cierre de frente, editar estructura contra editar fechas
 > (P-20 arriba) — ninguna tiene clave todavía en `FUNCION_ATOMICA`.
 
+### Reprogramar lo contratado: una cadena con salto, y el primer aviso (D-533)
+
+P-4 decía que las fechas contratadas no se mueven solas: *reprogramar propone la fecha nueva y alguien la acepta.* Dato del usuario (D-533): ese «alguien» es una **cadena con salto,** del mismo molde que la de la incidencia (D-269), con una diferencia: **la realiza Control de obra,** no el residente.
+
+| Propone | Revisa | Valida | Realiza | Después |
+|---|---|---|---|---|
+| **Residente** | Supervisor | Control de obra | Control de obra | Se notifica el cambio a los demás |
+| **Supervisor** | *(se salta: es quien propone)* | Control de obra | Control de obra | Se notifica el cambio a los demás |
+
+- **Las funciones** son las cuatro nuevas de la lista de §5b: `proponer_reprogramacion`, `revisar_reprogramacion`, `validar_reprogramacion` y `aplicar_reprogramacion`. Los roles los dijo el usuario; los nombres de las claves son propuestos.
+- **Al realizarla** se agrega una fila a `EDICION_PROGRAMA` (arriba), que ya guarda quién la hizo, con qué rol y qué impacto tuvo; la bitácora no se reescribe.
+- **Es el primer aviso que el usuario dice:** al aplicarse una reprogramación, **se notifica a los demás.** Quiénes son «los demás» no se dijo (`WORKFLOWS.md` §8, hueco 6).
+- **Lectura mía:** la cadena es para **lo contratado.** Mientras la rama está en diseño no hay nada que proponer: el residente edita las fechas y Control de obra la estructura, como en `editar_fechas_programa` y `editar_estructura_programa`.
+- **No se dijo:** si Control de obra puede proponerla él mismo, y si el supervisor da seguimiento hasta cerrar, como en la incidencia. Tampoco **dónde se guarda la cadena** —con la misma forma que `INCIDENCIA` (pasos nullable si se saltan) o como un tipo de `PROPUESTA`—, que se decide al construirla (D-487).
+
+### El nivel en que se captura y se confirma el avance, y qué corrige la estimación pagada (D-534)
+
+Dato del usuario (D-534). Dice que **ya estaba definido,** pero **no estaba escrito en el cerebro:** el avance se captura y se confirma en el nivel más fino que el nodo permite.
+
+| Si el nodo es… | Se captura y se confirma en… | Qué pasa |
+|---|---|---|
+| **Una actividad** (lo ideal) | La actividad: cantidad o porcentaje | Queda como `REGISTRO_AVANCE` de esa actividad, con `fuente = fisico` |
+| **Paramétrico** (un ensamble) | Su concepto paramétrico, el ensamble o sub-ensamble, que es la unidad natural de contratación (`CONOCIMIENTO.md` §5.5) | Es el avance del ensamble |
+| **Un frente, capturado en porcentaje** | El frente | El porcentaje **se baja a los niveles siguientes,** hasta las actividades |
+
+- **Quién confirma:** el **residente** (D-534). Es el paso «confirmar avances» de antes de estimar; hay dos momentos, al terminar una actividad y antes de estimar (D-533).
+- **Cómo se reparte al bajar: lo decide el usuario** (D-535). El sistema propone un punto de partida y quien captura lo cambia: *lectura mía,* el mismo porcentaje a cada nodo de abajo por defecto, con la opción de repartirlo según el peso de cada uno (el tablero sí pondera por costo, pero hacia arriba) o de ajustarlo a mano.
+- **Lecturas mías, por confirmar:** *(a)* lo bajado queda **marcado como bajado,** y una captura posterior en la actividad manda sobre ello; *(b)* no pide tabla: bajar es agregar filas de `REGISTRO_AVANCE` a las actividades de abajo, y la marca se decide al construirlo (D-487).
+- **Qué corrige la estimación pagada:** *«la estimación pagada corrige lo administrativo»* (D-534). *Lectura mía:* la estimación pagada corrige el **registro administrativo,** que es el avance pagado. El avance físico no se sobrescribe: físico y pagado siguen sin corregirse entre sí (`CONOCIMIENTO.md` §13.7) y su diferencia es la señal.
+- **Confirmar no es un candado, pero lo estimado por encima de lo confirmado es una alerta importante** (dato del usuario, D-535), y **su salida es bajar las cantidades de la estimación.** *Lectura mía:* la alerta es la que el modelo ya tiene, `pago_sin_respaldo_avance` (§5a), que compara la línea de estimación con el avance físico, y se corre al validar, antes del pago; «importante» es que va arriba de la cola de atención, y no un campo de severidad, que el modelo no tiene. Bajar las cantidades lo hacen quienes ya ajustan la estimación, el residente al revisarla y el validador (D-522); esa es la forma de resolver la alerta, junto con justificar lo fuera de catálogo.
+
 ### El cierre tiene doble candado, y una incidencia puede llegar al cliente (D-515; firme desde D-522)
 
 Dos respuestas del usuario (D-515) sobre lo que ObraCtrl hace distinto, que el usuario confirmó en D-522 y son firmes.
@@ -2713,6 +3089,30 @@ INCIDENCIA gana orden_cambio_id     FK PROPUESTA(tipo=orden_cambio), nullable   
 - **Qué quiere decir «candado» (D-516):** cerrar un frente, una actividad o el lote **cierra al residente** —ya no registra avance ahí—, y para los demás roles sigue abierto hasta la entrega de la casa. Hoy el cierre de frente «pregunta, no impide» (§5c, arriba); esto lo vuelve una regla por rol: las funciones de captura del residente no aplican sobre lo cerrado (B-119). Al entregarse, la obra no queda solo congelada: **pasa a postventa.**
 
 **Una incidencia puede llegar al cliente.** Un «extra» de ObraCtrl —más cantidad que la tolerancia, trabajo fuera de catálogo, sustitución o alta de catálogo— se parece a una `INCIDENCIA` que cambia la actividad (`crece_actividad`, `crea_actividad`), y el usuario dice que **puede** pasar a una orden de cambio con el cliente (`PROPUESTA(tipo=orden_cambio)`, §5f). `CONOCIMIENTO.md` §13.6 ya decía que una incidencia puede o no generar un control de cambio; lo que faltaba es la liga: `INCIDENCIA.orden_cambio_id`, FK `PROPUESTA`, nullable, nula mientras el extra es interno.
+
+### Expediente, revisión física, bloqueo de periodo y tolerancia (D-544; cierra B-120)
+
+Cuatro piezas de ObraCtrl que el cerebro aceptó en D-516 y D-517, ahora con sus campos. El usuario confirmó el borrador (D-544).
+
+```
+EXPEDIENTE_DOCUMENTO   (el expediente técnico de una obra)
+  id, presupuesto_id FK PRESUPUESTO — la obra
+  tipo                 enum: plano · contrato · acta · evidencia ·
+                        bitacora · otro                                      firme — D-544
+  nombre, archivo      el documento y dónde se guarda                        propuesta
+  subido_por, subido_en   FK USUARIO — Residente o Supervisor                firme — D-544
+
+REVISION_FISICA   (la revisión de Control de obra en la obra)
+  id, presupuesto_id FK PRESUPUESTO, nodo_id FK Nodo nullable — el frente o la actividad
+  fecha, revisado_por  FK USUARIO — Control de obra                          firme — D-544
+  calidad              NUMERIC, de 5 a 10 (D-517)                            firme
+  comentario, fotos    texto y archivos                                      firme — D-544
+```
+
+- **Quién sube al expediente:** el residente y el supervisor (`subir_documento_expediente`). **Control de obra solo lo revisa** en la entrega de la obra, junto con la calidad (`validar_calidad_entrega`, §5b).
+- **La revisión física la hace Control de obra** (`registrar_revision_fisica`). Una calidad baja es una **alerta,** no una incidencia automática: una persona decide si origina la incidencia de calidad que ya prevé `CIERRE_FRENTE.incidencia_calidad_id`.
+- **El bloqueo de periodo no es una tabla, es una regla** (D-517 y D-540): cuando Compras deja una estimación `validada`, esa semana de esa obra ya no admite capturar ni confirmar avance, para nadie.
+- **La tolerancia de extra** es un **parámetro de 20 %, por obra y por actividad,** el mismo 20 % que usan las alertas; vive donde vivan los parámetros (B-114).
 
 ### El tablero del frente se calcula, no se guarda (D-455, cierra B-88)
 
@@ -2799,7 +3199,8 @@ ESTIMACION
   estado             enum: capturada · enviada · devuelta · validada ·
                       pagada                                              firme — D-522
   enviada_por, enviada_en   FK USUARIO, nullable — Control de obra, que
-                      recolecta las estimaciones y las envía                firme — D-522
+                      recolecta las estimaciones y las envía (la concentración
+                      es automática desde D-570)                            firme — D-522
   validado_por        FK USUARIO — bajo validar_estimacion, D-299
   validado_en
   pagada_por, pagada_en     FK USUARIO, nullable — Control de obra            firme — D-522
@@ -2818,8 +3219,14 @@ ESTIMACION_LINEA
   excede_tope           caché — compara contra el contratado vigente
                         (D-285) al validar. NUNCA fuente de verdad, mismo
                         principio que `ESTADO_CARGA.porcentaje_cargado` (§3)
-  justificacion, justificada_por   texto y FK USUARIO, nullable — solo en un
-                        renglón fuera de catálogo; la da el Supervisor        propuesta — D-522
+  justificacion        texto, nullable — la celda de texto del renglón del
+                        concepto. Lleva la justificación de por qué debe subir
+                        la cantidad (Costos y Control de obra) y la de lo fuera
+                        de catálogo (el Supervisor). La réplica y las
+                        justificaciones pueden dar más de una vuelta             firme — D-539
+  justificada_por      FK USUARIO, nullable — quien escribió el texto
+                        vigente; las vueltas anteriores quedan en
+                        `ESTIMACION_LINEA_HISTORIA`                             propuesta — D-522 y D-539
 
 ESTIMACION_LINEA_HISTORIA   (solo se agrega, nunca se edita)
   id, linea_id FK ESTIMACION_LINEA
@@ -2829,15 +3236,36 @@ ESTIMACION_LINEA_HISTORIA   (solo se agrega, nunca se edita)
 
 DEDUCCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
-  tipo                enum: sobrepago · rehacer_trabajo (D-289)           firme
+  tipo                enum: sobrepago · rehacer_trabajo (D-289) ·
+                       mal_trabajo · no_terminada · mala_calidad ·
+                       afectacion_otros_trabajos · abandono ·
+                       pagado_a_otro_contratista · monto_mal_capturado ·
+                       cantidad_mal_capturada                              firme — D-544 (los ocho nuevos)
   monto
+  base_calculo         enum: porcentaje · valor_otra_ot · linea_estimacion ·
+                       monto_capturado — cómo se llegó al monto; se elige
+                       en cada descuento                                   propuesta — D-544
   contratista_responsable_id   FK CONTRATISTA — cierra P-39 (§4a)          firme — corregido
   absorbe_empresa      boolean — true si el responsable ya no está activo
+
+DEDUCCION_PARCIALIDAD   (el plan de cobro de un descuento)                propuesta — D-544
+  deduccion_id FK DEDUCCION, orden, monto
+  aplicada_en_linea_id FK ESTIMACION_LINEA, nullable — nula mientras no se cobra
 
 RETENCION
   id, estimacion_linea_id FK ESTIMACION_LINEA
   monto                — solo si el contratista de esa línea es
                         subcontrato (D-290)
+  orden_trabajo_id     FK ORDEN_TRABAJO — la OT de la que sale (se calcula sobre su total
+                        y se retiene al finiquitar, §5i)                   propuesta — D-563
+  pago_devolucion_id   FK PAGO_OT, nullable — el pago `garantia` con que se devuelve  propuesta — D-563
+  liberada_en, liberada_por FK USUARIO, nullable — la libera el Supervisor;
+                        validada_por FK USUARIO, nullable — Control de obra, si hace falta  propuesta — D-563
+
+DEDUCCION  (gana, propuesta — D-563)
+  retencion_id         FK RETENCION, nullable — si el descuento se cobra de la
+                        retención retenida y no de una estimación; lo que se
+                        libera es la retención menos esos descuentos
 
 PRESTAMO
   id, contratista_id   FK CONTRATISTA — cierra P-39 (§4a)                 firme — corregido
@@ -2845,6 +3273,8 @@ PRESTAMO
   salda_via            enum: avance_obra · estimacion_futura (D-290)      firme
   saldo_restante
 ```
+
+**D-570: la estimación única, con hojas separadas** (dato del usuario: «los residentes y supervisores registran, Control de obra concentra en la estimación —este paso será automático— y al final, una sola estimación con hojas separadas; más adelante te comparto el archivo de Excel»). **(1)** Quien registra la estimación son **los residentes y los supervisores,** cada uno su parte (`capturar_estimacion`, de los dos). **(2)** **Concentrarlas ya no es un paso manual de Control de obra:** lo hace el sistema (hoy, Control de obra recolecta y pasa por el extractor). **(3)** El resultado es **una sola estimación, con hojas separadas.** *Lectura mía:* hoy hay **una `ESTIMACION` por obra y semana,** así que «una sola» pediría un **encabezado semanal que las agrupe,** y cada hoja sería la de **un residente o supervisor** (o la de una obra), con sus renglones; el estado (`enviada`, `devuelta`, `validada`, `pagada`) viajaría con el documento entero, y Control de obra seguiría enviándola a Compras. **Cómo queda exactamente espera el archivo de Excel que el usuario va a compartir** (B-133); hasta entonces, nada de esto se diseña a fondo. **D-487:** nada se construye.
 
 **No hay columna `tope` guardada en ningún lado** — el tope es el contratado
 vigente (D-285), se lee de donde ya vive (`VERSION_CONCEPTO`/`ACTIVIDAD`),
@@ -2868,15 +3298,24 @@ cambie.
 - `ot_base_id`, FK nullable: cuando el monto es **el valor de otra OT** (D-510), esa OT. En el caso de arriba, la reparación de Floviesa.
 - *Lectura mía:* el descuento directo queda como **saldo del contratista** y se cobra de sus pagos siguientes, al modo del préstamo (D-290); y `absorbe_empresa` ya cubre que el contratista no siga activo. **Sin decidir:** si un descuento aplicado a una OT cuenta como liquidación en su saldo; el usuario pidió que la OT pagada no aparezca como falta por pagar, y eso solo está resuelto para el descuento directo (B-110).
 
-**El recorrido real de una estimación (D-522).** Al confirmar el bloque, el usuario contó cómo viaja hoy, y eso corrigió una lectura mía: **quien la envía no es el residente sino Control de obra.** El recorrido:
-1. **El residente crea su estimación en Excel.**
-2. **Control de obra las recolecta y las pasa al extractor** (el concentrador de estimaciones).
-3. **Control de obra las envía al validador de topes,** que hoy ejerce **Compras** —`enviada`—.
-4. **Vuelven a los residentes** para que revisen los ajustes de lo que no pasa por topes —`devuelta`—; se **solicita verificar la cuantificación** *(lectura mía: a los residentes, que son quienes cuantifican)* y **los supervisores dan la justificación de lo fuera de catálogo.**
-5. **El validador ajusta, y esa es la estimación que se paga** —`validada`—. *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por él, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
-6. **Control de obra comparte la estimación final para el pago** y la marca `pagada`.
+**Lo que el usuario confirmó de los descuentos (D-544).** Responde a B-110:
+- **Los siete tipos de D-509 quedan, y se agregan dos: monto mal capturado y cantidad mal capturada.** Con los dos que ya existían (`sobrepago` y `rehacer_trabajo`, que es el segundo de su lista) son **diez** valores de `tipo`.
+- **Se descuenta cuando hay estimación del contratista.** El contratista **no puede regresar dinero:** si no tiene una estimación contra la cual descontar, el descuento no se cobra, y si ya no la va a tener la empresa lo absorbe (`absorbe_empresa`). El descuento es un saldo del contratista que se cobra de sus estimaciones, al modo del préstamo (D-290).
+- **Puede cobrarse en parcialidades,** que **se definen al momento de hacer el descuento** (`DEDUCCION_PARCIALIDAD`, propuesta). El saldo por cobrar se lee de las parcialidades sin aplicar, no se guarda.
+- **La base del monto se elige en cada descuento.** Punto de partida, mío y corregido (D-544): `mala_calidad`, porcentaje; `afectacion_otros_trabajos`, valor de otra OT o línea de estimación; `rehacer_trabajo` y `pagado_a_otro_contratista`, el valor de la OT de la reparación o de lo pagado al otro contratista (`ot_base_id`) *(D-559, lectura mía: si el mismo contratista repara su error, `rehacer_trabajo` cobra solo el material nuevo; si lo repara otro, `pagado_a_otro_contratista` cobra lo que se le pagó)*; `no_terminada`, la cantidad pendiente por su precio; `monto_mal_capturado` y `cantidad_mal_capturada`, la diferencia contra lo correcto (monto, o cantidad por precio); `mal_trabajo` y `abandono`, a elegir. **`abandono` no se usa para recuperar un anticipo sobrante** (§5i): si el contratista se fue, no regresa dinero.
+- **Quién lo aplica:** Control de obra (`aplicar_descuento`, que existía sin dueño).
+- **Cómo cuenta en el saldo de una OT (D-545, confirmado):** un descuento aplicado al pago de una OT **cuenta como liquidación:** la OT queda saldada cuando pagos y descuentos igualan su monto. **Si el descuento llega después de que la OT ya está liquidada,** se cobra **como si fuera un préstamo** —un saldo del contratista que se cobra de sus estimaciones siguientes, en parcialidades si se define así— **pero su referencia sigue siendo descuento:** es una `DEDUCCION`, no una fila de `PRESTAMO`. El descuento directo al contratista nunca toca el saldo de una OT (D-519). La estructura de D-519 (`estimacion_linea_id` nullable, `orden_trabajo_id`, `ot_origen_id` y `ot_base_id`) sigue como propuesta.
 
-**Dos cosas quedan sin decidir.** (a) **El validador:** D-330 asignó `validar_estimacion` a Control de obra y dejó a Compras fuera de `ROL`; el recorrido dice que el validador de topes es de Compras. Mientras el usuario no decida, la tabla de funciones (§5b) sigue como está. *Propuesta del sistema:* agregar `compras` como fila de `ROL`, junto con `finanzas` y `proyectos` (B-115), y asignarle `validar_estimacion`; Control de obra conservaría recolectar, enviar, compartir y marcar `pagada`. `ROL_FUNCION` es de muchos a muchos, así que no cambia el esquema. (b) **La justificación del fuera de catálogo** es un campo mío (`justificacion` y `justificada_por`, arriba, propuesta).
+**El recorrido de una estimación (D-522, y como lo contó el usuario en D-538).** *Es el proceso de hoy y se irá puliendo con el sistema* (dato del usuario). Quien la envía no es el residente sino Control de obra, y quien revisa los topes es Compras:
+1. **El residente crea su estimación en Excel** —`capturada`—.
+2. **Control de obra la concentra** (recolecta las de los residentes y las pasa al extractor, el concentrador de estimaciones) **y la envía a Compras** —`enviada`—.
+3. **Compras revisa los topes** y **la devuelve a todos** —`devuelta`—: residentes, supervisores, Costos y Control de obra.
+4. **El residente tiene oportunidad de réplica** si alguna cantidad bajó.
+5. **Costos y Control de obra regresan a Compras las justificaciones** de por qué debe subir la cantidad. Los supervisores dan la justificación de lo fuera de catálogo (D-522). **Todas van en la celda de texto del renglón del concepto** (`ESTIMACION_LINEA.justificacion`), y **la réplica y las justificaciones pueden dar más de una vuelta** (D-539) antes de que Compras modifique; mientras tanto la estimación sigue `devuelta`.
+6. **Compras modifica, y esa es la estimación que se paga** —`validada`—, y **se la envía a Control de obra.** *Lectura mía:* sus ajustes son filas de `ESTIMACION_LINEA_HISTORIA` aceptadas por Compras, de modo que la versión previa y la revisada se reconstruyen de ahí (B-109).
+7. **Control de obra establece la estimación pagada** —`pagada`—.
+
+**Lo que queda decidido (D-538).** El validador es **Compras:** `validar_estimacion` pasó de Control de obra a Compras (§5b), junto con `devolver_estimacion`; Control de obra conserva concentrar, enviar y marcar `pagada`. Los tres roles `compras`, `finanzas` y `proyectos` los confirmó el usuario en D-537. **Lo que quedó resuelto después (D-539).** Sí hay más de una vuelta, y la justificación va **en el renglón del concepto, como una celda de texto,** también la de lo fuera de catálogo; las vueltas anteriores se reconstruyen de `ESTIMACION_LINEA_HISTORIA`. *Lectura mía:* la estimación se queda `devuelta` mientras dan vueltas la réplica y las justificaciones, y pasa a `validada` cuando Compras modifica; no se agrega ningún estado. La justificación del supervisor deja de ser solo un campo mío: la celda es firme y el autor sigue como propuesta.
 
 **`contratista_responsable_id` y `PRESTAMO.contratista_id` ya apuntan a
 `CONTRATISTA`** — cierran junto con `TABULADOR_CONTRATISTA.contratista_id`
@@ -2953,7 +3392,7 @@ MOVIMIENTO_ALMACEN
   proveedor          texto, nullable — solo poblado en `motivo=recepcion`
                       (1,764 de 1,767 filas reales)                         firme — nuevo
   referencia         texto libre, nullable                                  firme — nuevo
-  ticket_garantia_id FK TICKET_GARANTIA, nullable — cierra P-41 (§3b),
+  ticket_postventa_id FK TICKET_POSTVENTA, nullable — cierra P-41 (§3b),
                       solo poblado cuando el despacho es para una
                       reparación de garantía, no obra nueva                 nuevo
 ```
@@ -3156,6 +3595,10 @@ valor_propuesto (JSON, tipo=orden_cambio)
   causa                enum: cambio_proyecto · error · condicion_sitio
   ejecutado_en         TIMESTAMP, nullable — si ya se ejecutó en obra
                         antes de esta propuesta
+  cotizacion_id        FK PRESUPUESTO(tipo=cotizacion), nullable — la
+                        cotización al cliente de la que viene             firme — D-546
+  precio_cliente       NUMERIC, nullable — lo que paga el cliente; el
+                        `delta_monto` sigue siendo el costo directo       firme — D-546
 ```
 
 **`objeto_id` (el campo que ya existe en `PROPUESTA`) es el nodo
@@ -3483,7 +3926,11 @@ COTIZACION_OT
 
 PARTIDA_COTIZACION
   id, cotizacion_id FK COTIZACION_OT
-  descripcion, unidad, cantidad, precio_unitario   libres, sin clave de catálogo   firme
+  descripcion, unidad, cantidad, precio_unitario   libres                      firme
+  concepto_id          FK Nodo, nullable — la liga opcional a un concepto del
+                        catálogo o a un nodo del presupuesto: sugiere descripción,
+                        unidad y precio, y la auditoría contra el presupuesto base
+                        sale por renglón. Nula = partida libre                   firme — D-546
 
 PAGO_OT
   id                   el oid
@@ -3495,17 +3942,41 @@ PAGO_OT
   estimacion_linea_id  FK ESTIMACION_LINEA, nullable — solo si medio=estimacion
   confirmado, confirmado_por   boolean, FK USUARIO — Control de obra; un anticipo
                         planeado en la asignación nace sin confirmar y con monto 0
+  traspaso_de_id       FK PAGO_OT, nullable — el pago, de otra OT del mismo
+                        contratista, que este movió                            propuesta — D-544
 ```
 
 - **La cotización.** Solo cuentan las partidas con descripción, cantidad mayor a cero y precio unitario mayor a cero. Subtotal = suma de cantidad por precio; IVA = subtotal por `iva_pct`; el monto de la OT es el total de la cotización vigente. **Proyectos cotiza y genera la OT; Control de obra va después** y la confirma o la modifica si algo no está dentro del presupuesto (D-519: antes era lectura mía y el usuario la confirmó; no es una autorización previa). *Lectura mía:* si Control la modifica, es una versión nueva de la cotización con su propia autora y no una edición de la anterior. **Las partidas siguen libres por ahora (D-519):** el usuario va a hacer un **cotizador,** y el presupuesto ya trae algo adelantado en carpintería y herrería que hay que complementar con, por ejemplo, el costo de las puertas y de los muebles (B-123). No se agrega ningún campo hasta diseñarlo.
 - **Los pagos.** El **medio** es la estimación semanal (que hacen los residentes), el **efectivo** («a cuenta», dicho por el usuario) o la transferencia, **bancaria** (D-519), aunque por ahora **no se ven transferencias SPEI ni bancos:** el medio es solo una etiqueta, sin cuenta, banco ni clave de rastreo. El **saldo** es el total vigente menos los pagos confirmados, y se calcula. El monto de una OT de **tipo presupuesto** es el precio de venta del prototipo (D-518).
-- **La retención.** Se calcula sobre el **total de la OT** y se **retiene al finiquitar,** no de cada pago: `CONTRATISTA.retencion_pct` (§4a) por el total vigente, solo si el contratista la lleva (5 por defecto, editable por contratista, D-521). **«Garantía» es la retención:** el pago de tipo `garantia` es su devolución, y el finiquito puede llevar la retención, la garantía o las dos. Se libera al entregarse la vivienda, o antes si el Supervisor lo autoriza, y Control de obra valida si hace falta. `RETENCION` (§5d) ganaría la OT de la que sale y el pago con que se devuelve.
+- **La retención.** Se calcula sobre el **total de la OT** y se **retiene al finiquitar,** no de cada pago: `CONTRATISTA.retencion_pct` (§4a) por el total vigente, solo si el contratista la lleva (5 por defecto, editable por contratista, D-521). **«Garantía» es la retención:** el pago de tipo `garantia` es su devolución, y el finiquito puede llevar la retención, la garantía o las dos. Se libera al entregarse la vivienda, o antes si el Supervisor lo autoriza, y Control de obra valida si hace falta. `RETENCION` (§5d) gana la OT de la que sale y el pago con que se devuelve (D-563). **D-563:** mientras no se libera, **un descuento por error de ejecución o por garantía (D-559) puede cobrarse de la retención retenida** (`DEDUCCION.retencion_id`), sin esperar una estimación; lo que se libera es la retención menos esos descuentos.
 - **Los descuentos** ya no son un tipo de pago: son `DEDUCCION` (§5d) con los siete tipos nuevos (B-110). Por eso `PAGO_OT.tipo` no trae `descuento`, que la app de hoy sí tiene. **Un descuento puede ir a una OT o directo al contratista** (D-519), y en el segundo caso **no toca el saldo de ninguna OT.** El caso del usuario: Floviesa reparó una pérgola que había hecho Javier Galvan, con una OT ya pagada. Primero se hace la OT de la reparación y lleva un descuento a Javier Galvan que **hace referencia** a la OT inicial; no se descuenta de esa OT porque, si se hiciera, aparecería como falta por pagar, así que **el descuento es solo al contratista** y la empresa no paga por ese arreglo. Cómo queda en `DEDUCCION`, abajo en §5d (propuesta).
-- **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). *Lectura mía:* incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
+- **Contra el presupuesto base.** En todos los casos se compara el total vigente de la OT contra el precio base de su `nodo_id` —para una OT de tipo presupuesto, el precio de venta del prototipo— para entender **incrementos, deducciones, ahorros y sobrecostos** (D-518). **Confirmado en D-563:** incremento y deducción son cambio de alcance (más o menos obra: una orden de cambio con el cliente), y ahorro y sobrecosto son la misma obra a otro precio (una desviación, que se absorbe); `CONOCIMIENTO.md` §13.6 ya separa las dos. Es el mismo cruce de la alerta `subcontrato_fuera_de_base` (§5a, D-313, B-78), ahora para todas las OT. Se calcula, no se guarda.
 - **Concluir.** Los residentes estiman hasta el pago de la garantía, si la hay; la OT se concluye cuando **se pagó todo,** garantía incluida (D-518). *Lectura mía:* el sistema lo propone y Proyectos lo confirma, como hoy hace el usuario de cotización.
-- **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **Cómo se registra ese traspaso queda por diseñar** (se parece al préstamo que se salda con avance de obra, D-290; B-124). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
-- **Quién (funciones propuestas, que no entran todavía a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
+- **Conceptos nuevos de una cotización de OT** (D-547, confirmado): los resuelve **solo Control de obra,** sin Costos; la cotización de la OT sigue siendo de Proyectos y la audita Control de obra (D-519). Crearlos **no pasa por el Superintendente** (D-550): esa doble aprobación es solo para que un precio entre al catálogo (§5b, «Costos: cuantifica y crea precios»).
+- **Reasignar y cancelar.** Hay dos clases de reasignación (D-510): de contratista y de obra. En la primera se cierra la asignación vigente y se abre otra; el anticipo ya entregado se puede mover como avance de otras OT pendientes del mismo contratista que sale, con la alerta de que esté enterado y no tenga avanzado el trabajo. **El traspaso** (D-544, responde a B-124): el anticipo se mueve **como avance o como otro anticipo** de otra OT, y **solo del mismo contratista:** un anticipo entregado a un contratista no puede pasar a otro. Se registra como un pago nuevo en la OT destino que apunta al movido (`traspaso_de_id`); el original queda marcado como traspasado y no se borra. **Si sobra,** el sobrante se pasa a otra OT del mismo contratista o queda como **préstamo** (`PRESTAMO`, D-290); **nunca como descuento por abandono,** porque el contratista que se fue no regresa dinero, y lo que no se recupere es **pérdida para la empresa.** Lo autoriza Control de obra (`traspasar_anticipo`, propuesta). Cancelar es `estado = cancelada`, y aplica a cualquier origen.
+- **Quién (funciones propuestas; D-537 las pasa a la lista de §5b):** asignar el subcontrato, Finanzas; cotizar y cambiar el alcance, Proyectos y atención al cliente; confirmar un pago y auditar el cambio de alcance, Control de obra; liberar la retención, la autoriza el Supervisor y la valida Control de obra si hace falta.
 - **Fuera de aquí:** el contratista como usuario (B-121), el traspaso del anticipo (B-124), el cotizador (B-123) y la estructura de los descuentos (B-110).
+
+## 5j. Los parámetros del negocio — una tabla con ámbito y vigencia (D-563; cierra B-114)
+
+Hasta D-562 cada parámetro vivía donde nació: el umbral de una alerta en `ALERTA.parametro_usado` (§5a), la retención en `CONTRATISTA.retencion_pct` (§4a) y los demás, sueltos en el texto. Con los de D-532 a D-561 ya son demasiados para eso, y B-114 lo había dejado «cuando haga falta»: **ya hace falta.** *Propuesta (D-563), con la forma de la `configuracion` de ObraCtrl (ámbito y vigencia, D-513):*
+
+```
+PARAMETRO
+  id
+  clave                texto — p. ej. factor_precio
+  valor                NUMERIC (o texto, cuando no es un número)
+  unidad               texto, nullable
+  ambito               enum: global · familia · insumo · contratista · obra
+  ambito_id            nullable — la familia, el insumo, el contratista o la obra
+  vigente_desde        DATE
+  vigente_hasta        DATE, nullable                                     propuesta — D-563
+```
+
+- **Se lee el más específico y vigente:** uno de la obra gana al global, y el que vale en la fecha del hecho es el de esa fecha, para que cambiar un parámetro no reescriba lo que ya pasó (mismo criterio que el precio, §4a).
+- **Los parámetros que ya tienen valor**, con la decisión de donde salen: `factor_precio` 0.7 (D-532), `precio_m2_lista` 17,000 pesos con IVA incluido (D-534), `plazo_garantia_meses` 12 (D-556), `re_solicitudes_max` 3 (D-543), `dias_max_re_solicitudes` 20, de la primera a la tercera (D-558), `trabajos_para_proponer_rendimiento` 3 (D-561) y `jornada_horas` 8 (D-549); y `peso_tiempo` 40, `peso_calidad` 35 y `peso_costo` 25 de la calificación de los contratistas (§4a, D-566). **La retención** (5 %, editable por contratista) **se queda en `CONTRATISTA.retencion_pct`** (firme, D-521), y el umbral de las alertas, en `ALERTA.parametro_usado`: son campos firmes y no se mueven. Los demás de B-114 (el IVA de 16 % con exentas Pétreos y Jardinería, la similitud de 90 %, la razón de ~60 % entre material y mano de obra) **entran a esta tabla cuando se necesiten.** El cerebro sigue sin manejar el IVA (la vivienda lo lleva incluido).
+- **Quién los cambia:** **Control de obra** (D-563, confirmado), con la función `editar_parametro` (propuesta), como el resto del gobierno entre obras (D-330).
+- **D-487:** nada se construye.
 
 ---
 
@@ -3514,7 +3985,7 @@ PAGO_OT
 | No incluido | Por qué |
 |---|---|
 | Motor de cálculo (funciones, no tablas) | Es código sobre este modelo, no schema |
-| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`erp-construccion.md` §6) |
+| Capas de sobrecosto (indirectos/utilidad) | Sin datos reales que las usen (`erp-construccion.md` §6). La cotización al cliente usa un solo factor, el costo directo entre 0.7 (§3a, D-532), que no es una capa |
 | Constructor de matrices (B-18) | Motor de cálculo (fórmula), no schema — `CONSTANTE_FISICA` que consulta ya tiene tabla, §1c |
 | Programa / CPM — solo lo que queda | Las diez decisiones de política y toda la tabla (`ACTIVIDAD`, `PRECEDENCIA`, `CALENDARIO_OBRA`, `TRAMO`, los dos cuantificadores, `FRENTE_TOPE_CUADRILLA`, `CIERRE_FRENTE`) ya cerraron en §5c. Queda: motor de cálculo del CPM (fechas tempranas/tardías, ruta crítica — código, no schema) y reglas de visualización del Gantt (pantalla, no entidad). *Resuelto en parte (D-461): el motor existe en `backend/core/motor_cpm.py`, probado contra los siete programas reales; la visualización del Gantt cierra en D-463 (`PROGRAMA-CPM.md` §8). D-462: el cargador con las reglas de D-442 y D-443 está en `backend/core/programa.py`; D-463: la reprogramación por empuje mínimo, también; D-464: la bitácora de ediciones y su persistencia.* `ACTIVIDAD.frente_id` sigue sin campo —no es elección deliberada, es hueco real (`PENDIENTES-MEJORAS.md` B-82, D-396, D-440): sin él, `FRENTE_TOPE_CUADRILLA` no tiene contra qué comparar su tope, y ni el texto de la descripción ni `TRAMO.cuadrillas` alcanzan para deducirlo solos; antes hay que decidir qué es un frente (D-448)*Resuelto (D-450): el frente es el nivel constructivo y se lee subiendo por el árbol desde la partida, así que `ACTIVIDAD` no necesita `frente_id`; el tope se compara por frente y oficio, por ventana de trabajo (D-449).* |
 | Código externo (Ingenieria ERP) | Pendiente P-17. Sin campo propuesto — ver §hallazgos |

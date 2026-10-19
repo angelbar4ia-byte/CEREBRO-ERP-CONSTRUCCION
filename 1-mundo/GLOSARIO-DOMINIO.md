@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 87 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 93 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 87 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 87 términos · 25 ambigüedades · 2026-09-21
+> 93 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -431,7 +431,7 @@ Clase de trabajo: mover material dentro de la obra. **Hoy sin renglones.**
 
 ### Cuadrilla
 
-Conjunto de personas que ejecuta un trabajo. Modelo de CAPACIDAD —cuánto tarda y con cuánta gente—, no de costo.
+Conjunto de personas que ejecuta un trabajo. Modelo de CAPACIDAD —cuánto tarda y con cuánta gente—, no de costo. Se cobra por jornada: el precio de su jornada es la suma de los jornales de las personas que la integran, y la hora de cada persona vale su jornal entre 8 (D-568).
 
 - **También:** Brigada; Equipo de trabajo
 - **No confundir con:** Destajo (ese es el costo)
@@ -762,7 +762,7 @@ Porcentaje o volumen ejecutado. Alimenta el Gantt y la estimación.
 
 ### Estimación
 
-Documento que cobra el avance ejecutado en un periodo. Es **un solo documento que avanza:** el residente la crea en Excel, Control de obra la recolecta y la envía al validador de topes (hoy Compras), vuelve a los residentes y supervisores para ajustar y justificar, el validador la ajusta, y Control de obra comparte la final para el pago y la marca pagada (D-522).
+Documento que cobra el avance ejecutado en un periodo. Es **un solo documento que avanza:** el residente la crea en Excel, Control de obra la concentra y la envía a Compras, Compras revisa los topes y la devuelve a todos, el residente tiene oportunidad de réplica si alguna cantidad bajó, Costos y Control de obra regresan a Compras las justificaciones de por qué debe subir la cantidad, Compras la modifica (esa es la que se paga) y se la envía a Control de obra, que establece la estimación pagada (D-522 y D-538; es el proceso de hoy y se irá puliendo con el sistema).
 
 - **También:** Valuación; Corte; Generador
 - **No confundir con:** Presupuesto (eso es lo planeado)
@@ -801,7 +801,7 @@ Deducción sobre un pago ya hecho, para que el costo efectivo respete el PU. Ant
 - **No confundir con:** Renegociación
 - **Se usa con:** Precio pactado; Estimación
 - **Ejemplo:** Cobró a $55, se le deduce $5
-- **Hoy vive en:** `— pendiente`
+- **Hoy vive en:** `DEDUCCION` (`MODELO.md` §5d): diez tipos desde D-544 —los siete de calidad y cumplimiento, más monto mal capturado y cantidad mal capturada—, que se cobran de las estimaciones del contratista y, si se define así, en parcialidades
 
 ### Presupuesto Formado
 
@@ -844,6 +844,16 @@ El contrato informal con un contratista para ejecutar un subcontrato. Se contrat
 - **Se usa con:** Subcontrato; Contratista; Asignación; Highlight; Cotización
 - **Ejemplo:** *(sin ejemplo con cifra: no se han visto los datos de la app)*
 - **Hoy vive en:** la tabla `ots` de la app de extraordinarios, con un campo de tipo de contrato que mezcla origen, forma de pago y estado (`LENGUAJE.md`); no está en el modelo del cerebro
+
+### SOV (Schedule of Values)
+
+En la construcción de habla inglesa, el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor; sirve de base para revisar los avances y los pagos (en los contratos AIA se carga en la hoja G703 de la solicitud de pago). No es el presupuesto interno de la empresa. **En esta empresa** (D-555) es el desglose con que Atención a postventa solicita los recursos y los insumos de un trabajo y saca su costo: lo que se le cobra al cliente o lo que le va a costar a la empresa una garantía. Se hace después de dictaminar y antes de programar la ejecución: lo otorga el sistema, lo llena Atención a postventa (una compostura) o el residente (un ajuste de obra: mejora, omisión de proyecto o de costos, error de ejecución), lo evalúa y confirma Control de obra (en un cambio en obra, también Costos) y Compras cotiza con proveedores y compra el material. (D-553 a D-558.)
+
+- **También:** desglose de valores *(traducción mía)*; en las siglas del usuario, «SOV»
+- **No confundir con:** el presupuesto de la obra; la cotización al cliente (el SOV es de uso interno y puede acabar en una)
+- **Se usa con:** Orden de trabajo (OT); Estimación; Postventa
+- **Ejemplo:** tras dictaminar que una fuga no está en garantía, Atención a postventa parte la compostura en renglones con su valor, de ahí sale lo que se le cobra al cliente y se piden los insumos
+- **Hoy vive en:** nada propio. *Lectura mía:* los renglones de la cotización de la OT (`PARTIDA_COTIZACION`, `MODELO.md` §5i); el desglose de lo que cuesta la garantía lo confirma el usuario
 
 ### Extraordinario
 
@@ -907,6 +917,55 @@ La casa y, a la vez, la obra: cada lote es una obra y se identifica por clúster
 - **Ejemplo:** FRESNO 12; ALAMO 18; 10-04 (manzana 10, lote 4, en «Antigua»)
 - **Hoy vive en:** la columna `Lote` del almacén y de las estimaciones (texto suelto: 114 valores distintos en el concentrador); `PRESUPUESTO` de tipo obra en el modelo (`MODELO.md` §3c, firme desde D-521)
 - **Estatus:** pendiente (en planeación o próxima a construir), iniciada, en proceso, por entregar (desde el 90 % de avance, hasta que el cliente la recibe) y entregada, como en ObraCtrl (D-514)
+
+### Colono
+
+El dueño de la casa, que es el cliente. Es quien abre un ticket de postventa y quien confirma su cierre con un nivel de satisfacción; más adelante será el usuario del módulo de vivienda. (D-541.)
+
+- **También:** Cliente; Dueño de la casa
+- **No confundir con:** Contratista; Residente (empleados de la empresa)
+- **Se usa con:** Lote; Postventa; Control de cambio
+- **Ejemplo:** el dueño de FRESNO 12 abre un ticket por humedad en la azotea
+- **Hoy vive en:** la idea del módulo de vivienda (B-125); en el modelo, el rol `colono` (confirmado en D-542) y las funciones `abrir_ticket_garantia` y `confirmar_cierre_ticket` (`MODELO.md` §3b y §5b)
+
+### Ticket de postventa
+
+El pedido de un colono después de entregada la casa: reporta un problema, solicita un servicio o solicita un mantenimiento. Atención a postventa le da seguimiento, programa una visita, dictamina si la garantía es válida, hace un SOV y programa la ejecución; se cierra a solicitud de Atención a postventa, con la confirmación y el nivel de satisfacción del colono (de 5 a 10). (D-541 a D-562.)
+
+- **También:** ticket de garantía (el nombre anterior)
+- **No confundir con:** Orden de trabajo (el ticket puede llegar a una OT, o resolverse sin ella)
+- **Se usa con:** Colono; Garantía; SOV; Cuadrilla
+- **Ejemplo:** el dueño de FRESNO 12 reporta humedad en la azotea
+- **Hoy vive en:** `TICKET_POSTVENTA` y `VISITA_POSTVENTA` (`MODELO.md` §3b); propuesta, nada construido (D-487)
+
+### Garantía
+
+Dice dos cosas. **La de la vivienda** dura **un año desde la entrega, para todos;** no es válida si venció o si el problema fue provocado, y cuando es válida no se cobra al cliente. **La del contratista** es su retención (5 % normalmente): el pago de tipo `garantia` es su devolución. (D-518, D-554 y D-556.)
+
+- **También:** retención por garantías (la del contratista)
+- **No confundir con:** Postventa (el proceso); una OT de postventa cobrada al cliente
+- **Se usa con:** Ticket de postventa; Retención; Contratista
+- **Ejemplo:** una fuga reportada a los 14 meses de la entrega no es de garantía; se le ofrece la compostura con costo al cliente
+- **Hoy vive en:** `PARAMETRO` `plazo_garantia_meses` y `VISITA_POSTVENTA.dictamen` (`MODELO.md` §3b y §5j); `RETENCION` (§5d); propuesta, nada construido
+
+### Espacio
+
+Una rama de la casa en el árbol del presupuesto: una recámara, la cocina, un baño. El tronco es la casa; las subramas del espacio son los niveles y las etapas de construcción, y las hojas, los conceptos o las matrices. Su área en m² es lo único que se captura a mano. Sirve para que una casa crezca por módulos, sin tocar el resto. (D-564 a D-566.)
+
+- **También:** área; módulo de crecimiento
+- **No confundir con:** Nivel de casa (planta baja, planta alta); Frente (el nivel constructivo del programa)
+- **Se usa con:** Control de cambio; Paramétrico; Ampliación
+- **Ejemplo:** el cliente crece una recámara 10 m²: cambian solo el precio y los conceptos de esa recámara
+- **Hoy vive en:** nada propio: reutiliza el árbol, el cuantificador y `ENSAMBLE_PARAMETRO` (`MODELO.md` §3c); propuesta, nada construido
+
+### Parámetro del negocio
+
+Un valor que cambia con el tiempo y que no debe vivir en el código: el factor 0.7, los 17,000 pesos por m² de lista, el plazo de un año de la garantía, los 20 días de las re-solicitudes. Lo cambia Control de obra, y el que vale es el de la fecha del hecho. (D-563.)
+
+- **No confundir con:** el parámetro de un ensamble paramétrico (`ENSAMBLE_PARAMETRO`: una tasa de pesos por m², por pieza o por salida)
+- **Se usa con:** Control de obra; Garantía; Descuento
+- **Ejemplo:** `factor_precio` = 0.7, vigente desde el 2026-10-12
+- **Hoy vive en:** `PARAMETRO` (`MODELO.md` §5j); propuesta, nada construido
 
 ### Urbanización
 

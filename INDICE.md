@@ -42,7 +42,7 @@ cerebro/
 ├── INDICE.md                  ← fuera de las capas: las conecta
 ├── 1-mundo/                   CONOCIMIENTO · CATALOGOS · MODELO · PROGRAMA-CPM · LENGUAJE · GLOSARIO · DICCIONARIO-DATOS
 │   ├── programas/             los siete programas y sus listas, en CSV (13 archivos)
-│   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices e ingenierías de ALAMO 18 (14 archivos)
+│   ├── opus/                  los archivos de OPUS que sí hay, tal cual: presupuesto, matrices, los cinco catálogos de D-527 y D-528 e ingenierías de ALAMO 18 (24 archivos)
 │   └── fuentes/               las demás tablas que el usuario compartió, a salvo (D-479): almacén, avance, precio real, semilla y programa, cada libro tal cual y cada hoja en CSV, con su MANIFIESTO de huellas
 ├── 2-operacion/               METODO · METACOGNICION · RAZONAMIENTO · INVARIANTES · ESCALABILIDAD · WORKFLOWS
 │   ├── verificar-cerebro.py    ← comprueba lo de abajo contra sí mismo
@@ -84,7 +84,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-09-10
-verificado: MEMORIA §2 · 12 descartes
+verificado: MEMORIA §2 · 13 descartes
 ```
 
 **Las dos últimas líneas son el registro de vigencia.** Una regla sin corte y sin
@@ -250,18 +250,18 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 528 decisiones · 12 descartes · 35 correcciones |
+| `MEMORIA.md` | III | ✅ 570 decisiones · 13 descartes · 35 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
-| `GLOSARIO-DOMINIO.md` | I | **87 términos · 25 ambigüedades** |
+| `GLOSARIO-DOMINIO.md` | I | **93 términos · 25 ambigüedades** |
 | `DICCIONARIO-DATOS.md` | I | Homologación y equivalencias |
 | `CASO-TRABAJADO.md` | III | ✅ Un caso de punta a punta |
 | `INVARIANTES.md` | II | 🆕 Cifras de control y condición de paro |
 | `PRIORIDADES.md` | IV | 🆕 Criterio de orden |
 | `APRENDIZAJE.md` | III | 🆕 Diseñado, no construido |
 | `ESCALABILIDAD.md` | II | 🆕 Contrato de módulo · dos escenarios de crecimiento |
-| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir |
+| `WORKFLOWS.md` | II | 🆕 Personas, sistema, agente interno y skills: cómo se conectan y qué falta decidir · el flujo de la app (§8, D-529), empezando por la cadena de la información (§8.1, D-530 a D-532), con la otra mitad: del programa a la ejecución, y los roles paso por paso (§8.7, D-536 a D-538), y dónde queda (§8.8, D-539 a D-544) |
 | `skills/erp-importacion.md` | II | 🆕 Compilado · carga desde OPUS |
 | `skills/erp-rediseno.md` | II | 🆕 Compilado · las seis operaciones y las tres capas |
 | `skills/erp-parametrico.md` | II | 🆕 Compilado · ensambles, cohorte, dispersión |

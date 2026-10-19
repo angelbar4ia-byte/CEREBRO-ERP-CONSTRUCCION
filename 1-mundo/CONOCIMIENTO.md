@@ -8005,7 +8005,7 @@ garantía por igual.
 
 ### Dato del usuario: modelo completo — 10 de las 223 filas eran gasto de oficina, no garantía
 
-Al diseñar `TICKET_GARANTIA` (`MODELO.md` §3b, D-370) apareció una
+Al diseñar `TICKET_POSTVENTA` (`MODELO.md` §3b, D-370) apareció una
 depuración pendiente: `"cierre oficinas de bodega"`, `"oficina bodega"`
 y `"VENTILADOR PARA OFICINA"` —10 filas, $11,417.25— son gasto de
 oficina/bodega capturado bajo el mismo paraguas `POSTVENTA`, no
@@ -8020,7 +8020,7 @@ monomandos), pintura, y **23 filas genuinamente sin más causa que
 
 De esas 213, **160 ($69,771.87) no traen `Lote` real** — cayeron en la
 bolsa general `Ubicacion=POSTVENTA` sin casa asignada. El nuevo
-`TICKET_GARANTIA` exige una casa desde que se abre un folio; esas 160
+`TICKET_POSTVENTA` exige una casa desde que se abre un folio; esas 160
 filas ya capturadas se quedan sin forma honesta de reconstruirse — el
 diseño corrige la captura hacia adelante, no reescribe lo que ya pasó
 suelto.
@@ -8729,7 +8729,7 @@ cliente.**
 | 6 | **Contrato cambiado sin propagar** — autorizado, pero nadie bajó el impacto | **Sí** | **El cliente** | Orden de cambio · ver abajo |
 | 7 | **Falta de insumos** | No | No aplica — es causa de tiempo, no de costo | Programa: tramo de una actividad existente (P-5 abajo) |
 | 8 | **Temporalidad o clima** | Depende — si solo detiene, no; si daña, la reparación sí | Si solo detiene, nadie; si daña, **Tú** (salvo que el contrato diga otra cosa) | Si solo detiene: calendario, sin pasar de ahí. Si daña y crece obra: incidencia + merma por daño/clima (fila Materiales, arriba) |
-| 9 | **Mejora de proyecto** — nadie la pidió, ni el proyecto ni el cliente | **Sí** | **Sin definir** — no es error que se absorba (3/4) ni petición del cliente que se cobre sola (5) | Incidencia, propuesta — no se ejecuta sola |
+| 9 | **Mejora de proyecto** — nadie la pidió, ni el proyecto ni el cliente | **Sí** | **La empresa** (D-559, dato del usuario) — antes estaba «sin definir»: no es error que se absorba (3/4) ni petición del cliente que se cobre sola (5) | Incidencia, propuesta — no se ejecuta sola |
 
 > **Las causas 7 a 9 se agregaron leyendo el programa, no el costo** — mismo
 > vocabulario, pero no siempre caen limpio en las columnas de arriba: una falta de
@@ -8944,7 +8944,7 @@ pagado en vez de lo programado.
 
 Un rol **distinto** valida la estimación — no es Control de obra con otro
 sombrero. **Hoy lo realiza Compras**, y puede recaer en cualquier usuario
-existente; no está formalizado como los seis roles de `MODELO.md` §5b. Si algo
+existente; no estaba formalizado como los seis roles de `MODELO.md` §5b *(D-537: Compras ya es un rol)*. Si algo
 excede su tope, **se regresa**.
 
 En la conciliación: el Residente ve la brecha (sube lo que quedó bajo,
