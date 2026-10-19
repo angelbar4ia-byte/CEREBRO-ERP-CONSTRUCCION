@@ -1095,6 +1095,8 @@ TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo      
 TICKET_POSTVENTA   (gana, propuesta — D-553)
   tipo                 enum: falla · servicio · mantenimiento — lo que pide el
                         colono al abrirlo                                       propuesta
+  espacio_id           FK NODO, nullable — el espacio de la casa (§3c) donde está
+                        el problema o se pide el servicio                       propuesta — D-564
 
 VISITA_POSTVENTA  una visita programada para dictaminar                         propuesta — D-553
   id, ticket_id FK TICKET_POSTVENTA
@@ -1189,9 +1191,14 @@ PRESUPUESTO — campos que gana (todos nullable)
 - **Una casa es un `PRESUPUESTO(tipo=obra)` con `cluster_id` y `lote`.** Sigue sin haber tabla `OBRA` (§5b). La clave de la casa se arma, no se teclea: cluster más lote («FRESNO 12») o manzana y lote («10-04»), única dentro del proyecto. **La sigla del cluster** (`CLUSTER.codigo`) no es la clave de la casa: forma la clave de lo que cuelga de ella, como un control de cambio, y dice de un vistazo a qué obra corresponde (D-520); no se dijo si «Antigua» usa una sigla.
 - **La urbanización también es un `PRESUPUESTO(tipo=obra)`, uno por proyecto,** con `proyecto_id` y sin cluster ni lote. Sus ramas —los clústeres y las amenidades— son nodos de su árbol, no tablas.
 - **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
-- **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
+- **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m². *D-564, lectura mía:* con los espacios (abajo), los m² del prototipo son la suma de las áreas de sus espacios base y se calculan.
 - **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
-- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y **el cliente (D-520, idea):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_POSTVENTA` y las OT de postventa y mantenimiento (§5i)—.
+- **Los espacios de una casa (D-564, dato del usuario; cierra B-113).** Lo importante es poder crear **módulos de crecimiento independientes:** si el cliente decide **crecer una recámara,** solo cambian **el precio y los conceptos de esa recámara.** En la práctica es **un presupuesto por espacios, o un paramétrico por áreas,** y **para esto se reutilizan la estructura de árbol y el cuantificador:** no hay tabla de espacios. *Lectura mía:*
+  - **Un espacio es un ensamble del árbol** (`NODO` con `rol=ensamble`, §1c): un subárbol con sus conceptos, cuya cantidad es su **área en m²** (`modo_cantidad = medida`, del cuantificador, §1b).
+  - **La primera captura es cuantificar las áreas con un plano** y **establecer eso como la base** (el usuario: «ambas», y esa es la primera opción; la otra es capturarlas a mano). La base se **congela** al contratar (`contratar_subarbol`, D-475), y **de ahí las áreas solo cambian por crecimientos:** un control de cambio que suma m² a un espacio o agrega uno nuevo, al final de la rama congelada (`CONOCIMIENTO.md` §13.4).
+  - **Paramétrico por áreas:** el ensamble de un espacio lleva un `ENSAMBLE_PARAMETRO` (§1c) con el parámetro `m2_espacio` y una tasa de pesos por m² que se aprende de las casas ya cuantificadas (la cohorte es el tipo de espacio); con ella se estima el crecimiento de una recámara antes de tener su presupuesto. Se une con la **ampliación por m² de 17,000 pesos** (§3a): ese precio se confirma con el presupuesto de los espacios que crecen.
+  - **Un concepto cuelga de su espacio** por su lugar en el árbol, y **el ticket de postventa se liga a un espacio** (`TICKET_POSTVENTA.espacio_id`, §3b), para costear y reportar por espacio.
+- **No se modela todavía:** **el cliente (D-520, idea; B-125 lo cerró como definido en D-563):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_POSTVENTA` y las OT de postventa y mantenimiento (§5i)—.
 - **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b), y **al entregarse la obra pasa a postventa** (§3b, D-516). «Antigua», que D-513 leyó como un estatus, es el nombre del segundo proyecto.
 
 ---
@@ -1401,7 +1408,7 @@ CONTRATISTA
   rfc              texto, nullable                                         firme — D-521
   contacto, telefono, correo   texto, nullable — el correo será el del
                     inicio de sesión cuando entren al sistema (B-121)      firme — D-521
-  calificacion     NUMERIC, nullable — el método se define después (B-117)  firme — D-521
+  calificacion     NUMERIC, nullable — el método se propuso en D-564 (abajo)  firme — D-521
   retencion_pct    NUMERIC, nullable — nulo no lleva retención; por defecto
                     5, el mismo para todos y editable por contratista;
                     se aplica sobre el total de la OT (§5i)                firme — D-521
@@ -1426,6 +1433,25 @@ mismo mecanismo que ya resolvió `nescesario`×32 (`EQUIVALENCIA`/
 `NORMALIZACION`, `MODELO.md` §4b), no pide tabla propia.
 
 *Cómo llegó a ser firme (D-512 a D-521).* El usuario pidió categorizar a los contratistas **por tipo y por oficio** (D-512), dijo que no hay clave, solo el id; que el `rfc` es opcional; que van el contacto y la `calificacion`, cuyo método se define después (D-514); y que el correo es el del inicio de sesión (D-516). **En D-521 confirmó el bloque y contestó tres cosas:** un contratista puede ser destajo y subcontrato a la vez, por eso el tipo es una tabla de relación (`CONTRATISTA_TIPO`) y no un campo; el oficio es la `Familia` del trabajo; y la retención de 5 % es igual para todos pero **editable por contratista.** Por eso `retencion_pct` es un campo del contratista: el 5 es el valor por defecto (parámetro de B-114) y nulo significa que no la lleva. El `tipo` se pensó como FK a `CLASE_TRABAJO` (§2) y la `clave` como nullable; ambas quedan fuera.
+
+**D-564: cómo se calificaría a un contratista (B-117; propuesta, con los criterios y el orden que dio el usuario).** Son **siete criterios:** **tiempo de ejecución, mal trabajo, rendimiento de materiales, calidad, limpieza, incidencias del contratista y atención al residente y al supervisor;** y lo que más pesa es **tiempo, calidad y costo, de preferencia en ese orden.** *Lectura mía:*
+
+| Pilar | Criterios | De dónde sale |
+|---|---|---|
+| **Tiempo** | Tiempo de ejecución · incidencias del contratista | El programa contra el avance y las incidencias que origina (§5c) |
+| **Calidad** | Calidad · mal trabajo · limpieza · atención al residente y al supervisor | La revisión física de 5 a 10 (§5c, D-544) y los descuentos `mal_trabajo`, `mala_calidad` y `rehacer_trabajo` (§5d); **la limpieza y la atención no salen de ningún dato:** las evalúan el residente, el supervisor y Control de obra, como las evaluaciones de ObraCtrl |
+| **Costo** | Rendimiento de materiales | El consumo real contra el teórico por contratista (§5g) |
+
+```
+CALIFICACION_CONTRATISTA   la calificación de un contratista en una OT, al finiquitar   propuesta — D-564
+  id, contratista_id FK CONTRATISTA, orden_trabajo_id FK ORDEN_TRABAJO
+  tiempo_ejecucion, incidencias, calidad, mal_trabajo, limpieza, atencion,
+  rendimiento_materiales   NUMERIC de 5 a 10, nullable — uno por criterio
+  calculada_en         DATE
+```
+
+- **Los pilares y el total se calculan:** cada pilar es el promedio de sus criterios y el total es el promedio de los pilares con sus pesos, que viven en `PARAMETRO` (§5j): `peso_tiempo`, `peso_calidad` y `peso_costo`. *Lectura mía:* de partida 40, 35 y 25, **sin confirmar,** para respetar el orden. `CONTRATISTA.calificacion` guarda el promedio de las calificaciones de sus OT.
+- **Por definir:** cómo se convierte cada señal del sistema a la escala de 5 a 10 (por ejemplo, cuánto baja el tiempo por cada día de atraso); quién evalúa la limpieza y la atención y en cuántos niveles (ObraCtrl tiene tres: auto, control y final); y en qué pilar cae cada criterio si mi reparto no es el tuyo. **D-487:** nada se construye.
 
 ### Lo que esto ya resuelve, de paso
 
@@ -3936,7 +3962,7 @@ PARAMETRO
 ```
 
 - **Se lee el más específico y vigente:** uno de la obra gana al global, y el que vale en la fecha del hecho es el de esa fecha, para que cambiar un parámetro no reescriba lo que ya pasó (mismo criterio que el precio, §4a).
-- **Los parámetros que ya tienen valor**, con la decisión de donde salen: `factor_precio` 0.7 (D-532), `precio_m2_lista` 17,000 pesos con IVA incluido (D-534), `plazo_garantia_meses` 12 (D-556), `re_solicitudes_max` 3 (D-543), `dias_max_re_solicitudes` 20, de la primera a la tercera (D-558), `trabajos_para_proponer_rendimiento` 3 (D-561) y `jornada_horas` 8 (D-549). **La retención** (5 %, editable por contratista) **se queda en `CONTRATISTA.retencion_pct`** (firme, D-521), y el umbral de las alertas, en `ALERTA.parametro_usado`: son campos firmes y no se mueven. Los demás de B-114 (el IVA de 16 % con exentas Pétreos y Jardinería, la similitud de 90 %, la razón de ~60 % entre material y mano de obra) **entran a esta tabla cuando se necesiten.** El cerebro sigue sin manejar el IVA (la vivienda lo lleva incluido).
+- **Los parámetros que ya tienen valor**, con la decisión de donde salen: `factor_precio` 0.7 (D-532), `precio_m2_lista` 17,000 pesos con IVA incluido (D-534), `plazo_garantia_meses` 12 (D-556), `re_solicitudes_max` 3 (D-543), `dias_max_re_solicitudes` 20, de la primera a la tercera (D-558), `trabajos_para_proponer_rendimiento` 3 (D-561) y `jornada_horas` 8 (D-549); y, cuando se confirmen, `peso_tiempo`, `peso_calidad` y `peso_costo` de la calificación de los contratistas (§4a, D-564). **La retención** (5 %, editable por contratista) **se queda en `CONTRATISTA.retencion_pct`** (firme, D-521), y el umbral de las alertas, en `ALERTA.parametro_usado`: son campos firmes y no se mueven. Los demás de B-114 (el IVA de 16 % con exentas Pétreos y Jardinería, la similitud de 90 %, la razón de ~60 % entre material y mano de obra) **entran a esta tabla cuando se necesiten.** El cerebro sigue sin manejar el IVA (la vivienda lo lleva incluido).
 - **Quién los cambia:** **Control de obra** (D-563, confirmado), con la función `editar_parametro` (propuesta), como el resto del gobierno entre obras (D-330).
 - **D-487:** nada se construye.
 
