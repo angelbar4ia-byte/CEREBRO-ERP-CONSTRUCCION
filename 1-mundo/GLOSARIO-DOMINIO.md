@@ -6,7 +6,7 @@ capa:       I — Mundo
 pregunta:   ¿cómo lo dicen las personas?
 tiempo:     es así
 corte:      2026-10-12
-verificado: 89 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
+verificado: 93 términos · 25 ambigüedades · ejemplos con cifra releídos contra los CSV del repo el 2026-10-12 (uno estaba mal: EST-01010); los de catálogos que no están en el repo —trabajos, mano de obra, fletes— sin releer
 ```
 
 > **Cómo lo dicen las personas.** Vocabulario del oficio, sinónimos y ambigüedades.
@@ -14,7 +14,7 @@ verificado: 89 términos · 25 ambigüedades · ejemplos con cifra releídos con
 > El comportamiento vive en `CONOCIMIENTO.md`; la traducción entre sistemas, en
 > `LENGUAJE.md`. Aquí solo qué significa cada palabra.
 >
-> 89 términos · 25 ambigüedades · 2026-09-21
+> 93 términos · 25 ambigüedades · 2026-09-21
 
 ---
 
@@ -927,6 +927,45 @@ El dueño de la casa, que es el cliente. Es quien abre un ticket de postventa y 
 - **Se usa con:** Lote; Postventa; Control de cambio
 - **Ejemplo:** el dueño de FRESNO 12 abre un ticket por humedad en la azotea
 - **Hoy vive en:** la idea del módulo de vivienda (B-125); en el modelo, el rol `colono` (confirmado en D-542) y las funciones `abrir_ticket_garantia` y `confirmar_cierre_ticket` (`MODELO.md` §3b y §5b)
+
+### Ticket de postventa
+
+El pedido de un colono después de entregada la casa: reporta un problema, solicita un servicio o solicita un mantenimiento. Atención a postventa le da seguimiento, programa una visita, dictamina si la garantía es válida, hace un SOV y programa la ejecución; se cierra a solicitud de Atención a postventa, con la confirmación y el nivel de satisfacción del colono (de 5 a 10). (D-541 a D-562.)
+
+- **También:** ticket de garantía (el nombre anterior)
+- **No confundir con:** Orden de trabajo (el ticket puede llegar a una OT, o resolverse sin ella)
+- **Se usa con:** Colono; Garantía; SOV; Cuadrilla
+- **Ejemplo:** el dueño de FRESNO 12 reporta humedad en la azotea
+- **Hoy vive en:** `TICKET_POSTVENTA` y `VISITA_POSTVENTA` (`MODELO.md` §3b); propuesta, nada construido (D-487)
+
+### Garantía
+
+Dice dos cosas. **La de la vivienda** dura **un año desde la entrega, para todos;** no es válida si venció o si el problema fue provocado, y cuando es válida no se cobra al cliente. **La del contratista** es su retención (5 % normalmente): el pago de tipo `garantia` es su devolución. (D-518, D-554 y D-556.)
+
+- **También:** retención por garantías (la del contratista)
+- **No confundir con:** Postventa (el proceso); una OT de postventa cobrada al cliente
+- **Se usa con:** Ticket de postventa; Retención; Contratista
+- **Ejemplo:** una fuga reportada a los 14 meses de la entrega no es de garantía; se le ofrece la compostura con costo al cliente
+- **Hoy vive en:** `PARAMETRO` `plazo_garantia_meses` y `VISITA_POSTVENTA.dictamen` (`MODELO.md` §3b y §5j); `RETENCION` (§5d); propuesta, nada construido
+
+### Espacio
+
+Una rama de la casa en el árbol del presupuesto: una recámara, la cocina, un baño. El tronco es la casa; las subramas del espacio son los niveles y las etapas de construcción, y las hojas, los conceptos o las matrices. Su área en m² es lo único que se captura a mano. Sirve para que una casa crezca por módulos, sin tocar el resto. (D-564 a D-566.)
+
+- **También:** área; módulo de crecimiento
+- **No confundir con:** Nivel de casa (planta baja, planta alta); Frente (el nivel constructivo del programa)
+- **Se usa con:** Control de cambio; Paramétrico; Ampliación
+- **Ejemplo:** el cliente crece una recámara 10 m²: cambian solo el precio y los conceptos de esa recámara
+- **Hoy vive en:** nada propio: reutiliza el árbol, el cuantificador y `ENSAMBLE_PARAMETRO` (`MODELO.md` §3c); propuesta, nada construido
+
+### Parámetro del negocio
+
+Un valor que cambia con el tiempo y que no debe vivir en el código: el factor 0.7, los 17,000 pesos por m² de lista, el plazo de un año de la garantía, los 20 días de las re-solicitudes. Lo cambia Control de obra, y el que vale es el de la fecha del hecho. (D-563.)
+
+- **No confundir con:** el parámetro de un ensamble paramétrico (`ENSAMBLE_PARAMETRO`: una tasa de pesos por m², por pieza o por salida)
+- **Se usa con:** Control de obra; Garantía; Descuento
+- **Ejemplo:** `factor_precio` = 0.7, vigente desde el 2026-10-12
+- **Hoy vive en:** `PARAMETRO` (`MODELO.md` §5j); propuesta, nada construido
 
 ### Urbanización
 

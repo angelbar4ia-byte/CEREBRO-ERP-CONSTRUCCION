@@ -2071,6 +2071,8 @@ FUNCION_ATOMICA
                      asignar_supervision · reclasificar_familia ·
                      resolver_revisar_parametro                          nuevo — B-73/B-75, ver abajo
                      · renovar_invariante_valor                          nuevo — B-54, ver abajo
+                     · cargar_catalogo_opus · contratar_subarbol ·
+                     clonar_insumo                                       nuevo — D-473, D-475 y D-478, ver abajo
                      · trazar_avance · proponer_reprogramacion ·
                      revisar_reprogramacion · validar_reprogramacion ·
                      aplicar_reprogramacion                              nuevo — D-533, ver abajo
