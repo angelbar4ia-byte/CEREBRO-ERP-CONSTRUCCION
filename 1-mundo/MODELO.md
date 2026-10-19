@@ -900,7 +900,7 @@ PRESUPUESTO.descuento_pct     NUMERIC, nullable — solo si tipo=cotizacion: des
 PRESUPUESTO.descuento_monto   NUMERIC, nullable — solo si tipo=cotizacion: descuento
                                al cliente como monto, en el mismo precio (IVA incluido) propuesta — D-550
 PRESUPUESTO.descuento_motivo  texto, nullable — por qué se descuenta                  propuesta — D-550
-PRESUPUESTO.ticket_garantia_id FK TICKET_GARANTIA, nullable — solo si tipo=sov: el SOV
+PRESUPUESTO.ticket_postventa_id FK TICKET_POSTVENTA, nullable — solo si tipo=sov: el SOV
                                de un ticket de postventa (§3b)                       propuesta — D-557 (allí era tipo=cotizacion) y D-558
 PRESUPUESTO.causa_ajuste      enum: mejora_obra · omision_proyecto · omision_costos ·
                                error_ejecucion, nullable — solo si tipo=sov y es de
@@ -945,7 +945,7 @@ PRESUPUESTO.fecha_entrega   DATE, nullable — cuándo se entregó al
                              nodo): entrega es un solo evento de la obra
                              entera, no una etapa de un subárbol           nuevo
 
-TICKET_GARANTIA
+TICKET_POSTVENTA            (antes TICKET_GARANTIA; renombrada en D-562)
   id
   presupuesto_id       FK PRESUPUESTO — la casa                            nuevo
   fecha_reporte        DATE — cuándo se reporta el defecto. Dato nuevo:
@@ -965,7 +965,7 @@ TICKET_GARANTIA
   contratista_id       FK CONTRATISTA — quien resuelve (D-366)             nuevo
   estado               enum: abierto · cerrado                            nuevo
 
-MOVIMIENTO_ALMACEN.ticket_garantia_id   FK TICKET_GARANTIA, nullable —
+MOVIMIENTO_ALMACEN.ticket_postventa_id   FK TICKET_POSTVENTA, nullable —
                              qué ticket generó este despacho; reemplaza
                              la `Referencia` en texto libre como forma de
                              ligar un movimiento a su causa                 nuevo
@@ -975,7 +975,7 @@ MOVIMIENTO_ALMACEN.ticket_garantia_id   FK TICKET_GARANTIA, nullable —
 (`MODELO.md` §5f) — mismo criterio que ya excluyó ahí a
 `PRESUPUESTO(tipo=escenario)`: es otra pregunta, sobre otro periodo (después
 de la entrega, no durante la obra). `SUM(MOVIMIENTO_ALMACEN.costo_total)
-WHERE ticket_garantia_id IS NOT NULL`, agrupable por `presupuesto_id`,
+WHERE ticket_postventa_id IS NOT NULL`, agrupable por `presupuesto_id`,
 `causa` o periodo — sin tabla nueva de reporte.
 
 **Lo que este diseño no resuelve retroactivo:** de las 213 filas reales,
@@ -1000,7 +1000,7 @@ pasó suelto.
 | **Si el colono no confirma, o no queda satisfecho:** aprueba cerrarlo sin su confirmación, con una nota de insatisfacción o de desatención del colono (D-542) | Control de obra | `aprobar_cierre_ticket_sin_confirmar` *(propuesta)* |
 
 ```
-TICKET_GARANTIA  (lo que ganaría, propuesta — D-541)
+TICKET_POSTVENTA  (lo que ganaría, propuesta — D-541)
   abierto_por           FK USUARIO — el colono, o Atención a postventa en su
                          nombre                                                 propuesta
   estado                enum: abierto · cierre_solicitado · cerrado — hoy, abierto · cerrado   propuesta
@@ -1023,10 +1023,10 @@ TICKET_GARANTIA  (lo que ganaría, propuesta — D-541)
 - **Cuánto espera el sistema la confirmación del colono** (D-543): **re-solicita hasta la tercera re-solicitud.** Si el colono sigue sin responder, Atención a postventa puede pedir que Control de obra apruebe el cierre, con una nota de desatención del colono. *Lectura mía:* el número de re-solicitudes es un parámetro (3), como los umbrales que ya lo son, y la primera cuenta desde la solicitud de cierre. **No se dijo:** cada cuánto se re-solicita ni por qué medio. **D-487:** nada se construye.
 
 **D-547: quién resuelve el ticket y cómo se cobra** (dato del usuario):
-- **Lo resuelve una cuadrilla, o los mismos contratistas de la obra y de los subcontratos** (`TICKET_GARANTIA.contratista_id`, que ya es la FK a `CONTRATISTA`). Hay **una cuadrilla de postventa,** que **va por nómina** (D-548, abajo): no es un `CONTRATISTA`.
+- **Lo resuelve una cuadrilla, o los mismos contratistas de la obra y de los subcontratos** (`TICKET_POSTVENTA.contratista_id`, que ya es la FK a `CONTRATISTA`). Hay **una cuadrilla de postventa,** que **va por nómina** (D-548, abajo): no es un `CONTRATISTA`.
 - **Hay garantías que no se deben cobrar al cliente.** La OT de postventa lleva `cobro = garantia` (§5i) y no se le cobra; el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`.
 - **También se puede hacer responsable al contratista que realizó la actividad:** es una `DEDUCCION` (§5d), con `contratista_responsable_id` el de la asignación vigente cuando se hizo (`ASIGNACION_CONTRATISTA`, §4a), `ot_origen_id` la OT donde se hizo el trabajo y `ot_base_id` la OT de postventa que lo repara. Es **una posibilidad, no una regla:** lo decide quien aplica el descuento, Control de obra. **D-559:** si lo repara el mismo contratista, solo paga el material nuevo; si lo repara otro, el primero lo paga como un descuento.
-- *Lectura mía:* el ticket llega a la OT con una referencia, `TICKET_GARANTIA.orden_trabajo_id` (nullable, propuesta); un ticket puede resolverse sin OT.
+- **El ticket llega a la OT con una referencia, `TICKET_POSTVENTA.orden_trabajo_id`** (nullable); **un ticket puede resolverse sin OT** (D-562, confirmado; era lectura mía).
 
 **D-548: la cuadrilla de postventa va por nómina, y su rendimiento se audita** (dato del usuario). Es **una cuadrilla propia,** no un contratista: no hay estimación que le pague, ni retención, ni descuentos; su costo es la nómina más lo que el almacén despacha al ticket. Los contratistas de obra y de subcontratos siguen pudiendo resolver tickets (D-547).
 
@@ -1035,7 +1035,7 @@ CUADRILLA_PROPIA            una cuadrilla en nómina, no un contratista         
   id, nombre, activa
   responsable_id       FK USUARIO — a quién está asignada; no siempre es quien
                         la dirige (D-560)                                      propuesta — D-560
-TICKET_GARANTIA             gana cuadrilla_propia_id FK, nullable — resuelve esta o
+TICKET_POSTVENTA             gana cuadrilla_propia_id FK, nullable — resuelve esta o
                             el contratista_id, no las dos                          propuesta — D-548
 ORDEN_TRABAJO               asignacion_id nulo cuando la ejecuta una cuadrilla
                             propia, que no se paga con PAGO_OT (§5i)               propuesta — D-548
@@ -1087,17 +1087,17 @@ TRABAJO_CUADRILLA           lo que hizo una cuadrilla propia en un trabajo      
 | **Llena el SOV** (*Schedule of Values*: el desglose con que se solicitan los recursos y los insumos y se saca el costo, abajo) con **conceptos** y, si no hay concepto para esa actividad, **por insumos,** como si formara un concepto; con él solicita (D-557) | Atención a postventa | `hacer_sov` *(propuesta, D-556)* |
 | **Evalúa y confirma el SOV** (D-557 y D-558, confirmado; en D-556 era de Costos, y el usuario dejó «Costos más para obra») | Control de obra *(en una compostura; Costos lo cierra en un cambio en obra)* | `cerrar_sov` *(propuesta, D-556)* |
 | **Cotiza con proveedores** lo que pide el SOV (D-557) | Compras | `cotizar_con_proveedores` *(propuesta, D-557)* |
-| **Compra el material,** que llega a almacén y se le da la salida para la ejecución (D-557) | Compras *(el almacén despacha, con el movimiento ligado al ticket, `MOVIMIENTO_ALMACEN.ticket_garantia_id`)* | `comprar_material` *(propuesta, D-557)* |
+| **Compra el material,** que llega a almacén y se le da la salida para la ejecución (D-557) | Compras *(el almacén despacha, con el movimiento ligado al ticket, `MOVIMIENTO_ALMACEN.ticket_postventa_id`)* | `comprar_material` *(propuesta, D-557)* |
 | **Programa la ejecución** (no depende del almacén: si falta material, es un retraso por falta de material, D-558) | Atención a postventa (D-554, confirmado) | `programar_ejecucion_postventa` *(propuesta, D-556)* |
 | Se ejecuta, por una cuadrilla propia o por contratistas (D-547 y D-548), y sigue el cierre de D-541 | — | — |
 
 ```
-TICKET_GARANTIA   (gana, propuesta — D-553)
+TICKET_POSTVENTA   (gana, propuesta — D-553)
   tipo                 enum: falla · servicio · mantenimiento — lo que pide el
                         colono al abrirlo                                       propuesta
 
 VISITA_POSTVENTA  una visita programada para dictaminar                         propuesta — D-553
-  id, ticket_id FK TICKET_GARANTIA
+  id, ticket_id FK TICKET_POSTVENTA
   programada_para      DATE
   realizada_en         DATE, nullable
   realizada_por        FK USUARIO, nullable — Atención a postventa
@@ -1113,8 +1113,8 @@ VISITA_POSTVENTA  una visita programada para dictaminar                         
 - **El plazo de la garantía es de un año para todos** (D-556, dato del usuario; D-555 había dicho «normalmente un año, pero depende» y el usuario lo dejó fijo). *Lectura mía:* es un parámetro con su fecha, `plazo_garantia_meses = 12`, como el 0.7 o el 5 % de la retención, y no un campo de la obra; una garantía **vence** si el ticket se reportó (`fecha_reporte`) después de `fecha_entrega` más ese plazo —se compara el reporte y no la visita, porque la visita se programa después—.
 - **El dictamen decide el cobro de la OT** (§5i): `garantia_valida` → `cobro = garantia`, que no se cobra al cliente; `garantia_no_valida` → si el cliente quiere la compostura con costo a él, `cobro = cliente`. **La garantía no es válida si venció o si el problema fue provocado** (D-554, dato del usuario). *Lectura mía:* un ticket de mantenimiento o de servicio lleva `cobro = cliente`, como ya decía D-547 («el mantenimiento o la postventa que sí se cobra lleva `cobro = cliente`»), y su visita sirve para definir el trabajo, no para dictaminar una garantía.
 - *Lectura mía:* **el ticket conserva sus tres estados** (`abierto`, `cierre_solicitado`, `cerrado`), y **el avance entre ellos** —visita programada, dictaminado, SOV hecho, en ejecución— **se deriva** de la visita, del SOV y de la OT, no se guarda como estado: son más estados que mantener sincronizados. La app del colono puede mostrar ese avance.
-- **SOV = *Schedule of Values*** (D-554, investigado): en la construcción de habla inglesa es **el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor,** que sirve de base para revisar los avances y los pagos; no es el presupuesto interno (AIA A201-2017, §9.2, y la hoja G703). Su lugar en el recorrido cuadra con eso: Atención a postventa lo hace **después de dictaminar y antes de programar la ejecución.** **Cómo lo usan (D-555, dato del usuario):** **como un desglose para solicitar recursos e insumos,** y también **para sacar un costo:** el que se le cobra al cliente, o **lo que le va a costar a la empresa la garantía.** *Lectura mía:* son tres usos de un mismo desglose del ticket —**(1)** la solicitud de los recursos y los insumos, **(2)** el precio al cliente, si el cobro es `cliente`, y **(3)** el costo esperado de la garantía, si el cobro es `garantia`—, y el costo esperado se compara después con el real, que ya es una consulta (`SUM(MOVIMIENTO_ALMACEN.costo_total)` por ticket, más la nómina de la cuadrilla y lo que se pague a contratistas). Por eso **no es solo** «las partidas de la cotización de la OT»: lleva recursos e insumos. **Sus renglones** pueden ser **insumos** (material y mano de obra) o **conceptos** del catálogo con su precio unitario, o ambos (como los de la cotización de la OT, §5i: un concepto con liga opcional, y un insumo suelto cuando la actividad no tiene catálogo, D-548), y **a quién se le solicitan** los recursos. **D-556, confirmado:** los renglones son **insumos y conceptos** («así es»); **Atención a postventa lo hace, Costos termina de cerrarlo y con él solicita los recursos y los insumos a Compras, y Control de obra observa.** **El precio al cliente** es el costo directo entre 0.7, **salvo que se pacte costo directo,** y entonces se da el costo directo (el mismo `factor_precio` de §3a, que vale 1 en ese caso); lo que cuesta la garantía a la empresa es el costo directo. *Lectura mía:* el SOV es un `PRESUPUESTO` que cuelga del ticket, para reutilizar nodos, insumos, conceptos y `factor_precio`. **D-557:** el usuario contestó «así es» a esa lectura (`PRESUPUESTO.ticket_garantia_id`, §3a) y agregó: **(a)** **el sistema otorga el SOV;** **(b)** Atención a postventa lo llena **con conceptos,** y si no hay concepto para esa actividad **solicita por insumos, como si se formara un concepto** (un concepto provisional, B-130); **(c)** en una compostura, **«postventa solicita, Control de obra evalúa y confirma»,** y el usuario dijo **«vamos a dejar Costos más para obra»:** *lectura mía:* `cerrar_sov` pasa de Costos a **Control de obra** en postventa (reemplaza el «observa» de D-556) y Costos lo cierra cuando es de un cambio en obra; **D-558, confirmado:** Control de obra, y no Costos, es quien lo evalúa, lo confirma y pule en una compostura los conceptos formados por insumos; **(d)** **Compras cotiza con proveedores y compra el material,** que llega a almacén para darle salida a la ejecución; **(e)** **en obra es muy similar:** para un **cambio en obra también se hace un SOV,** y **cuando llega a Control de obra o a Costos se realiza un control de cambio.** *Mi lectura de D-557* —que ese SOV era la `cotizacion` de §3a— **queda corregida en D-558** (siguiente punto).
-- *Lectura mía:* el nombre `TICKET_GARANTIA` queda corto, porque un ticket de servicio o de mantenimiento puede no ser una garantía; se renombraría `TICKET_POSTVENTA` al diseñar el módulo (B-129). No se renombra ahora.
+- **SOV = *Schedule of Values*** (D-554, investigado): en la construcción de habla inglesa es **el desglose de un trabajo o de un contrato en partidas cobrables, cada una con su valor,** que sirve de base para revisar los avances y los pagos; no es el presupuesto interno (AIA A201-2017, §9.2, y la hoja G703). Su lugar en el recorrido cuadra con eso: Atención a postventa lo hace **después de dictaminar y antes de programar la ejecución.** **Cómo lo usan (D-555, dato del usuario):** **como un desglose para solicitar recursos e insumos,** y también **para sacar un costo:** el que se le cobra al cliente, o **lo que le va a costar a la empresa la garantía.** *Lectura mía:* son tres usos de un mismo desglose del ticket —**(1)** la solicitud de los recursos y los insumos, **(2)** el precio al cliente, si el cobro es `cliente`, y **(3)** el costo esperado de la garantía, si el cobro es `garantia`—, y el costo esperado se compara después con el real, que ya es una consulta (`SUM(MOVIMIENTO_ALMACEN.costo_total)` por ticket, más la nómina de la cuadrilla y lo que se pague a contratistas). Por eso **no es solo** «las partidas de la cotización de la OT»: lleva recursos e insumos. **Sus renglones** pueden ser **insumos** (material y mano de obra) o **conceptos** del catálogo con su precio unitario, o ambos (como los de la cotización de la OT, §5i: un concepto con liga opcional, y un insumo suelto cuando la actividad no tiene catálogo, D-548), y **a quién se le solicitan** los recursos. **D-556, confirmado:** los renglones son **insumos y conceptos** («así es»); **Atención a postventa lo hace, Costos termina de cerrarlo y con él solicita los recursos y los insumos a Compras, y Control de obra observa.** **El precio al cliente** es el costo directo entre 0.7, **salvo que se pacte costo directo,** y entonces se da el costo directo (el mismo `factor_precio` de §3a, que vale 1 en ese caso); lo que cuesta la garantía a la empresa es el costo directo. *Lectura mía:* el SOV es un `PRESUPUESTO` que cuelga del ticket, para reutilizar nodos, insumos, conceptos y `factor_precio`. **D-557:** el usuario contestó «así es» a esa lectura (`PRESUPUESTO.ticket_postventa_id`, §3a) y agregó: **(a)** **el sistema otorga el SOV;** **(b)** Atención a postventa lo llena **con conceptos,** y si no hay concepto para esa actividad **solicita por insumos, como si se formara un concepto** (un concepto provisional, B-130); **(c)** en una compostura, **«postventa solicita, Control de obra evalúa y confirma»,** y el usuario dijo **«vamos a dejar Costos más para obra»:** *lectura mía:* `cerrar_sov` pasa de Costos a **Control de obra** en postventa (reemplaza el «observa» de D-556) y Costos lo cierra cuando es de un cambio en obra; **D-558, confirmado:** Control de obra, y no Costos, es quien lo evalúa, lo confirma y pule en una compostura los conceptos formados por insumos; **(d)** **Compras cotiza con proveedores y compra el material,** que llega a almacén para darle salida a la ejecución; **(e)** **en obra es muy similar:** para un **cambio en obra también se hace un SOV,** y **cuando llega a Control de obra o a Costos se realiza un control de cambio.** *Mi lectura de D-557* —que ese SOV era la `cotizacion` de §3a— **queda corregida en D-558** (siguiente punto).
+- **El nombre (D-562, confirmado):** la entidad se llama **`TICKET_POSTVENTA`** (antes `TICKET_GARANTIA`), porque un ticket de servicio o de mantenimiento puede no ser una garantía. Sus campos se renombran con ella (`ticket_postventa_id`). **Las claves de las funciones conservan «garantia»** (`abrir_ticket_garantia`) hasta que se construya, para no tocar lo ya firme.
 - **D-558: el SOV de una obra y el retraso por falta de material** (dato del usuario). **(1) Lo llena el residente de obra,** y **«no depende del cliente, depende de los ajustes de obra»:** puede ser **una mejora en obra, una omisión de proyectos, una omisión de costos o un error de ejecución.** Son cuatro de las nueve causas de `CONOCIMIENTO.md` §13.6: la **mejora de proyecto** (9), la **omisión de proyecto** dentro del contrato (4), la **omisión de presupuesto** (3) y el **error de ejecución** (1). *Lectura mía:* por eso no es la cotización al cliente de §3a —esa es para una petición nueva del cliente (5) o un contrato cambiado (6), y se cobra—, sino un `PRESUPUESTO` de `tipo = sov`, que cuelga de la obra (`cotizacion_de_id`) y lleva `causa_ajuste`; lo que cuesta el ajuste se calcula con el SOV, y quién lo paga lo dice la causa (`CONOCIMIENTO.md` §13.6: 1, 3 y 4 los absorbe la empresa o, en un error de ejecución, se le cobra al contratista como dice D-559; **la 9 la paga la empresa** (D-559)). `hacer_sov` es entonces también del **Residente**. **(2)** **Cuando el SOV llega a Control de obra o a Costos, se hace el control de cambio,** con `autorizar_orden_cambio` de Control de obra (D-537); Costos cuantifica (D-546). **(3) El programa no depende del almacén:** si el material no está en almacén cuando se ejecuta, **es un retraso en el programa por falta de material** (D-558, confirmado). *Lectura mía:* se registra con el vocabulario que ya existe, la incidencia `falta_material` con impacto `retraso` (`LENGUAJE.md` S12) y la causa 7 de `CONOCIMIENTO.md` §13.6, que es de tiempo y no de costo; en una compostura, Atención a postventa reprograma la ejecución.
 - **D-559: quién paga un ajuste de obra** (dato del usuario). **Una mejora en obra la paga la empresa** (la causa 9, que estaba «sin definir»). **Un error de ejecución:** si lo repara el mismo contratista que lo cometió, **solo paga el material nuevo** que se usa para repararlo; si lo repara **otro contratista, lo paga el primero como un descuento** (§5d). *Lectura mía:* es el descuento `rehacer_trabajo` en el primer caso, con el material nuevo como base, y `pagado_a_otro_contratista` en el segundo, con lo pagado al otro contratista (`ot_base_id`); y vale igual para **la garantía** que se debe a un trabajo mal hecho (D-547). **Y el tipo `sov` es propio** (confirmado).
 - **Falta:** el cierre del B-132, que está en el bloque de D-560, abajo. El almacén que despacha no es un rol del cerebro hoy (los movimientos vienen del ERP externo). *Lectura mía:* si el cliente no acepta pagar la compostura que no es de garantía, no hay OT y el ticket se cierra con el dictamen guardado. **D-487:** nada se construye.
@@ -1191,7 +1191,7 @@ PRESUPUESTO — campos que gana (todos nullable)
 - **Una casa es un prototipo con o sin modificaciones y con o sin m² adicionales.** `prototipo_id` dice de qué plantilla viene. Las modificaciones **no llevan marca:** son órdenes de cambio sobre el árbol de la casa (`CONOCIMIENTO.md` §13.4). Los m² totales son los del prototipo más `m2_adicionales` y se calculan, no se guardan.
 - **`m2` hoy no es un dato.** Viaja escrito en el nombre del capítulo («ZAFIRO 1.0 (172 M2)»); son siete prototipos, de 172 a 300 m².
 - **«Nivel» tiene tres sentidos** (el glosario los separa): la profundidad en el árbol, el nivel de presupuesto (que aquí es el frente) y el nivel de casa. `PRESUPUESTO.plantas` cuenta planta baja y planta alta; el roof garden no cuenta: es la azotea cuando el cliente lo pide (D-514).
-- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y **el cliente (D-520, idea):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_GARANTIA` y las OT de postventa y mantenimiento (§5i)—.
+- **No se modela todavía:** los espacios de una casa y los m² de cada uno, que el usuario quiere «en algún momento» (B-113); y **el cliente (D-520, idea):** es el dueño de la casa, y más adelante será un usuario de un **módulo de vivienda** donde podrá pedir cambios antes y durante la construcción, y postventas y mantenimientos después de la entrega (B-125). No gana tabla ni campo; lo que ya existe le sirve de destino —`PROPUESTA(orden_cambio)` (§5), `TICKET_POSTVENTA` y las OT de postventa y mantenimiento (§5i)—.
 - **El estatus de la obra (D-514)** es el de ObraCtrl, con «casi lista» llamada `por_entregar` por pedido del usuario: `pendiente` (aún en planeación o próxima a construir), `iniciada` (arrancó), `en_proceso` (avance mayor que cero), `por_entregar` (desde el 90 % de avance, hasta que el cliente la recibe) y `entregada`. Se **deriva del avance físico** salvo `iniciada` y `entregada`, que se marcan: `entregada` va con `fecha_entrega` (§3b), y **al entregarse la obra pasa a postventa** (§3b, D-516). «Antigua», que D-513 leyó como un estatus, es el nombre del segundo proyecto.
 
 ---
@@ -3342,7 +3342,7 @@ MOVIMIENTO_ALMACEN
   proveedor          texto, nullable — solo poblado en `motivo=recepcion`
                       (1,764 de 1,767 filas reales)                         firme — nuevo
   referencia         texto libre, nullable                                  firme — nuevo
-  ticket_garantia_id FK TICKET_GARANTIA, nullable — cierra P-41 (§3b),
+  ticket_postventa_id FK TICKET_POSTVENTA, nullable — cierra P-41 (§3b),
                       solo poblado cuando el despacho es para una
                       reparación de garantía, no obra nueva                 nuevo
 ```

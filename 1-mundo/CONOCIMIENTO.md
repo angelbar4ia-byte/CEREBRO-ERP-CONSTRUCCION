@@ -8005,7 +8005,7 @@ garantía por igual.
 
 ### Dato del usuario: modelo completo — 10 de las 223 filas eran gasto de oficina, no garantía
 
-Al diseñar `TICKET_GARANTIA` (`MODELO.md` §3b, D-370) apareció una
+Al diseñar `TICKET_POSTVENTA` (`MODELO.md` §3b, D-370) apareció una
 depuración pendiente: `"cierre oficinas de bodega"`, `"oficina bodega"`
 y `"VENTILADOR PARA OFICINA"` —10 filas, $11,417.25— son gasto de
 oficina/bodega capturado bajo el mismo paraguas `POSTVENTA`, no
@@ -8020,7 +8020,7 @@ monomandos), pintura, y **23 filas genuinamente sin más causa que
 
 De esas 213, **160 ($69,771.87) no traen `Lote` real** — cayeron en la
 bolsa general `Ubicacion=POSTVENTA` sin casa asignada. El nuevo
-`TICKET_GARANTIA` exige una casa desde que se abre un folio; esas 160
+`TICKET_POSTVENTA` exige una casa desde que se abre un folio; esas 160
 filas ya capturadas se quedan sin forma honesta de reconstruirse — el
 diseño corrige la captura hacia adelante, no reescribe lo que ya pasó
 suelto.
