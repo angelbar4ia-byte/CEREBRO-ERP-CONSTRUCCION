@@ -2211,7 +2211,7 @@ fecha, en un solo lugar.
 | `evaluar_contratista` | Residente y Supervisor — durante la obra; Control de obra — al final: la limpieza y la atención, de 5 a 10 (§4a) | propuesto, D-566; los roles los confirmó el usuario |
 | `programar_ejecucion_postventa` | Atención a postventa | propuesto, D-556; el rol lo dijo el usuario (D-554) |
 | `confirmar_avance` | Residente — al terminar la actividad y antes de estimar | propuesto, D-537; el rol lo dijo el usuario (D-534) |
-| `capturar_estimacion` | Residente | dato del usuario, D-538 |
+| `capturar_estimacion` | Residente y Supervisor — cada uno registra su parte | dato del usuario, D-538 y D-570 |
 | `enviar_estimacion` | Control de obra — la concentra y la envía a Compras | dato del usuario, D-538 |
 | `devolver_estimacion` | Compras — la devuelve a todos | dato del usuario, D-538 |
 | `justificar_fuera_de_catalogo` | Supervisor | propuesto, D-537; el rol lo dijo el usuario (D-522) |
@@ -3199,7 +3199,8 @@ ESTIMACION
   estado             enum: capturada · enviada · devuelta · validada ·
                       pagada                                              firme — D-522
   enviada_por, enviada_en   FK USUARIO, nullable — Control de obra, que
-                      recolecta las estimaciones y las envía                firme — D-522
+                      recolecta las estimaciones y las envía (la concentración
+                      es automática desde D-570)                            firme — D-522
   validado_por        FK USUARIO — bajo validar_estimacion, D-299
   validado_en
   pagada_por, pagada_en     FK USUARIO, nullable — Control de obra            firme — D-522
@@ -3272,6 +3273,8 @@ PRESTAMO
   salda_via            enum: avance_obra · estimacion_futura (D-290)      firme
   saldo_restante
 ```
+
+**D-570: la estimación única, con hojas separadas** (dato del usuario: «los residentes y supervisores registran, Control de obra concentra en la estimación —este paso será automático— y al final, una sola estimación con hojas separadas; más adelante te comparto el archivo de Excel»). **(1)** Quien registra la estimación son **los residentes y los supervisores,** cada uno su parte (`capturar_estimacion`, de los dos). **(2)** **Concentrarlas ya no es un paso manual de Control de obra:** lo hace el sistema (hoy, Control de obra recolecta y pasa por el extractor). **(3)** El resultado es **una sola estimación, con hojas separadas.** *Lectura mía:* hoy hay **una `ESTIMACION` por obra y semana,** así que «una sola» pediría un **encabezado semanal que las agrupe,** y cada hoja sería la de **un residente o supervisor** (o la de una obra), con sus renglones; el estado (`enviada`, `devuelta`, `validada`, `pagada`) viajaría con el documento entero, y Control de obra seguiría enviándola a Compras. **Cómo queda exactamente espera el archivo de Excel que el usuario va a compartir** (B-133); hasta entonces, nada de esto se diseña a fondo. **D-487:** nada se construye.
 
 **No hay columna `tope` guardada en ningún lado** — el tope es el contratado
 vigente (D-285), se lee de donde ya vive (`VERSION_CONCEPTO`/`ACTIVIDAD`),
