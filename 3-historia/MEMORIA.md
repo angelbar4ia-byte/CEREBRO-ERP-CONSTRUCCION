@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-10-12
-verificado: 573 decisiones · 13 descartes · 35 correcciones
+verificado: 574 decisiones · 13 descartes · 35 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -647,6 +647,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-571 | **Escenario 1 «Nuevo»: se entra por el cuantificador, se crea la obra, se elige el catálogo base de 1 o 2 plantas, se cuantifica, se envía a presupuesto, se autoriza o se rediseña a paramétrico o mixto, y se envía a programar y asignar** | **Dato del usuario:** «Nuevo: es una obra nueva, el proyecto es diferente del prototipo, vamos a cuantificador y se crea una obra nueva, elegimos catálogo base de cuantificación una o dos plantas…». **Respuestas a las cuatro preguntas:** el catálogo base son los dos tipos de prototipo (1 y 2 plantas), con su estructura y conceptos y sin cantidades; autorizar lo realiza Costos o Control y Control lo valida al final; se puede volver libremente hasta asignar; «todo validado» es por ahora un indicador, editable por Control en una pantalla de configuración. `WORKFLOWS.md` §8.9. |
 | D-572 | **Escenario 2 «Ingeniería»: en presupuesto se crea o se elige la obra, se asocia con un prototipo o con el más similar, se carga la ingeniería, se comprueba en el cuantificador si hay duda, se pasa a programar y se asigna** | **Dato del usuario:** «Ingeniería: en presupuesto se crea una obra o se elige, se puede asociar con un prototipo o si es modelo especial o nuevo se elige como el más similar, se carga la ingeniería…». **Respuestas:** «aceptable» es la misma autorización del escenario 1; asignar es el contratista y es lo que congela; con la carga a medias se puede mandar a programar, avisando; la regla de volver es la misma. De preferencia **la parte es la etapa de construcción.** `WORKFLOWS.md` §8.9. |
 | D-573 | **Escenario 3 «Prototipo modificado»: se elige el prototipo y el tipo de modificación (ampliación, o cambio de una a dos plantas), se recuantifica lo que cambia, se revisa, se envía a programar y se asigna, por partes o completo; no se asigna hasta confirmar «revisado» con anotación, si se configura así** | **Dato del usuario:** «Prototipo modificado. Primero en presupuesto se elige el prototipo y el tipo de modificación, ampliación, si es de una planta y se modifica a dos plantas (pueden nacer nuevas o aplicar los tipos de modificación), se puede seleccionar un concepto para recuantificar, ya estando revisado se envía a programar y finalmente asignar…». El candado de asignar es configurable. `WORKFLOWS.md` §8.9. |
+| D-574 | **«Nuevo» es la cuarta forma de arranque; la junta de arranque lista el requisito y el candado es asignar, por obra; los tipos de modificación son cambios y adicionales; Costos ve solo lo suyo** | **Respuestas del usuario a las cuatro preguntas de los escenarios:** «1. Nueva es cuarta forma de arranque. 2. Junta de arranque es un requisito, más el candado es asignar, es por obra. 3. Cambios y adicionales al cliente; cambios puede ser negativos, o sea que se elimina del presupuesto; también cambios son modificación de muebles; adicionales son los highlights y conceptos fuera de catálogo. 4. Solo lo suyo.» `WORKFLOWS.md` §8.9. |
 
 ---
 
