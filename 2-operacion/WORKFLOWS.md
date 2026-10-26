@@ -857,7 +857,8 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 
 ### Lo que los tres comparten (dato del usuario)
 
-- **El orden es por parte, no por obra.** *Parte* = una **etapa de construcción** (de preferencia; *lectura mía:* el tercer nivel del árbol, a confirmar contra el árbol real). Cada parte recorre sus estados a su paso: una puede estar programada mientras otra sigue cuantificándose.
+- **El orden es por parte, no por obra.** *Parte* = **una etapa de construcción, o un concepto independiente** como las losas o los pisos (D-575: no siempre es una etapa). Cada parte recorre sus estados a su paso: una puede estar programada mientras otra sigue cuantificándose.
+- **El presupuesto va por delante de la programación** (D-575): **si no hay programación, se retrasa la obra.** Por eso hay **alertas** cuando una parte que ya debería estar programada no lo está, o cuando el presupuesto de la siguiente no avanza al ritmo de la obra. Avisan; no bloquean.
 - **Los envíos son totales o por partes:** cuantificador → presupuesto → programa. Es **nuevo**: antes el cuantificador escribía directo en el presupuesto y no había pasos entre cuantificar y contratar.
 - **Autorizar:** lo **realiza Costos o Control de obra; Control de obra lo valida al final.** «Autorizada» es **un solo concepto** en los tres escenarios. *Lectura mía:* equivale al nivel «listo» de §8.1 (medida o cargada, costeada y aprobada); a confirmar.
 - **Volver atrás:** **en cualquier momento se puede regresar entre módulos** para modificar o replantear, **libre hasta asignar.** Al volver sobre una parte, lo posterior se marca «por revisar» y se avisa; no se borra ni se bloquea («propone, no aplica»). **Asignar** —el contratista de la parte, que es lo que ahora se llama *asignado*— equivale a **contratar:** de ahí en adelante, cambiar es control de cambio.
@@ -894,7 +895,7 @@ Es literalmente la fuente «de una ingeniería» de §8.1. Lo nuevo es **«el m�
 
 Una obra que parte de un prototipo **con modificaciones.**
 
-1. **En presupuesto se elige el prototipo y el tipo de modificación:** hay dos tipos, **cambios y adicionales al cliente** (D-574). **Cambios:** pueden ser **negativos** —se elimina del presupuesto— y también son **modificación de muebles.** **Adicionales:** los **highlights** y los **conceptos fuera de catálogo.** Los casos que se nombraron, **una ampliación** y **pasar de una planta a dos,** *(lectura mía)* se resuelven con estos tipos. Lo que cambia puede **nacer nuevo** o **aplicar el tipo de modificación.**
+1. **En presupuesto se elige el prototipo y el tipo de modificación:** hay dos tipos, **cambios y adicionales al cliente** (D-574). **Cambios:** pueden ser **negativos** —se elimina del presupuesto— y también son **modificación de muebles.** **Adicionales:** los **highlights** y los **conceptos fuera de catálogo.** **Una ampliación** puede ser un cambio, un adicional o **ambos** (D-575); *(lectura mía)* pasar de una planta a dos se resuelve con estos mismos tipos. Lo que cambia puede **nacer nuevo** o **aplicar el tipo de modificación.**
 2. **Se puede seleccionar un concepto para recuantificarlo** (el cuantificador, como herramienta sobre el renglón).
 3. **Ya revisado, se envía a programar.**
 4. **Finalmente se asigna, por partes o completo.**
@@ -906,8 +907,9 @@ Una obra que parte de un prototipo **con modificaciones.**
 
 | # | Qué | Quién |
 |---|---|---|
-| 1 | ¿«Parte» es siempre la etapa de construcción? Confirmarlo contra el árbol real | El usuario |
-| 2 | ¿«Autorizada» = «lista»? | El usuario |
-| 3 | La ampliación y el paso de una a dos plantas: ¿son un adicional o un cambio? | El usuario |
+| 1 | ¿«Autorizada» = «lista»? El usuario pidió más contexto | El usuario |
+| 2 | Cuándo se alerta que el presupuesto va atrasado: ¿con cuántos días de adelanto sobre la programación? | El usuario |
+
+**Contestado en D-575:** la parte es una etapa **o un concepto independiente** (losas, pisos); el presupuesto va por delante de la programación, con alertas; **la ampliación puede ser un cambio, un adicional o ambos;** **Costos ve todas las obras pero sin las funciones ni los privilegios de Control: se enfoca en cuantificar y formar el presupuesto.**
 
 **Contestado en D-574:** «Nuevo» es la cuarta forma de arranque; el requisito de la junta y el candado de asignar, por obra; los tipos de modificación son cambios (con negativos y muebles) y adicionales (highlights y conceptos fuera de catálogo); **Costos ve solo lo suyo.**
