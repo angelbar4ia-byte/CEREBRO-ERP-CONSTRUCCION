@@ -332,7 +332,7 @@ El usuario pidió **más contexto** sobre esta pregunta (§8.6, hueco 9). Lo que
 |---|---|---|---|---|
 | **Cargado** | La ingeniería de ese nivel llegó entera contra el presupuesto vigente (`ESTADO_CARGA = completo`) | Se marca solo al llegar al 100 % | Nada se bloquea si falta: avisa | `MODELO.md` §3, hallazgo 8 |
 | **Costeado** | El nodo tiene costo; no está «pendiente de costear» | Costos | **Programarlo y contratarlo.** Es la regla dura: *«lo que no está costeado no se puede contratar ni programar»* | `CONOCIMIENTO.md` §4.1 |
-| **Listo** | Cantidad `medida`, costeado y aprobado | Costos y quien aprueba | Sale de la cola de trabajo, que ordena la dispersión por el monto: *«el presupuesto nunca está incompleto, está provisional en algunas partes»* | `CONOCIMIENTO.md` §13.5 |
+| **Autorizado** *(antes «listo»; D-576)* | Cantidad `medida` o cargada, costeado y **autorizado:** lo realiza Costos o Control de obra y Control de obra lo valida | Costos o Control; valida Control | Sale de la cola de trabajo, que ordena la dispersión por el monto: *«el presupuesto nunca está incompleto, está provisional en algunas partes»* | `CONOCIMIENTO.md` §13.5 |
 | **Contratado** | PU fijados y rama congelada: solo admite adiciones al final | Control de obra | Pagar a un contratista a precio pactado; los cambios van por control de cambio | `MODELO.md` §4a, D-475 |
 
 **Un caso real.** `ALAMO 18` tuvo once ingenierías de abril a septiembre, casi todas por nivel (`CIM` es el nivel 1, `PB` el nivel 2, `PA` cubre los niveles 3 al 6 y 11 al 14, y `PISOS` ni siquiera declaraba el suyo). Sumadas llegaban al **92 %** del presupuesto del Diamante con chimenea; faltaban cinco niveles completos (cancelería, carpintería, muebles, herrería y consumibles) y el sistema lo detectó solo, comparando contra el presupuesto (`CONOCIMIENTO.md` §11.8). La obra no esperó, y el cerebro lo dice así: *comprometer —contratar, programar— exige costeo; registrar un avance nunca se bloquea* (`CONOCIMIENTO.md` §13.3).
@@ -858,9 +858,9 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 ### Lo que los tres comparten (dato del usuario)
 
 - **El orden es por parte, no por obra.** *Parte* = **una etapa de construcción, o un concepto independiente** como las losas o los pisos (D-575: no siempre es una etapa). Cada parte recorre sus estados a su paso: una puede estar programada mientras otra sigue cuantificándose.
-- **El presupuesto va por delante de la programación** (D-575): **si no hay programación, se retrasa la obra.** Por eso hay **alertas** cuando una parte que ya debería estar programada no lo está, o cuando el presupuesto de la siguiente no avanza al ritmo de la obra. Avisan; no bloquean.
+- **El presupuesto va por delante de la programación** (D-575): **si no hay programación, se retrasa la obra.** Por eso hay **alertas** cuando una parte que ya debería estar programada no lo está, o cuando el presupuesto de la siguiente no avanza al ritmo de la obra. Avisan; no bloquean. **El desfase (D-576):** una parte debe estar **presupuestada y autorizada al menos 1 semana antes de lo que el programa base necesita programarla, de preferencia 2.** *Lectura mía:* aviso a las 2 semanas, alerta importante a la semana; los umbrales, configurables.
 - **Los envíos son totales o por partes:** cuantificador → presupuesto → programa. Es **nuevo**: antes el cuantificador escribía directo en el presupuesto y no había pasos entre cuantificar y contratar.
-- **Autorizar:** lo **realiza Costos o Control de obra; Control de obra lo valida al final.** «Autorizada» es **un solo concepto** en los tres escenarios. *Lectura mía:* equivale al nivel «listo» de §8.1 (medida o cargada, costeada y aprobada); a confirmar.
+- **Autorizar:** lo **realiza Costos o Control de obra; Control de obra lo valida al final.** «Autorizada» es **un solo concepto** en los tres escenarios, y **es el nivel que §8.1 llamaba «listo»** (D-576: se renombró «listo» a «autorizado»). **Programar pide autorizada,** que es más estricto que el «costeado» de D-532.
 - **Volver atrás:** **en cualquier momento se puede regresar entre módulos** para modificar o replantear, **libre hasta asignar.** Al volver sobre una parte, lo posterior se marca «por revisar» y se avisa; no se borra ni se bloquea («propone, no aplica»). **Asignar** —el contratista de la parte, que es lo que ahora se llama *asignado*— equivale a **contratar:** de ahí en adelante, cambiar es control de cambio.
 - **Programar con la carga a medias:** se puede; **avisa y no impide** (la obra no espera).
 - **Ejecutar «ya todo validado»** (D-574): **es un requisito más de la junta de arranque,** y **el candado duro es asignar:** no se asigna hasta que la parte esté revisada y validada. **El candado se configura por obra,** en una pantalla de configuración que edita Control de obra. *Lectura mía:* la junta lista el requisito y avisa; lo que impide es asignar.
@@ -907,8 +907,9 @@ Una obra que parte de un prototipo **con modificaciones.**
 
 | # | Qué | Quién |
 |---|---|---|
-| 1 | ¿«Autorizada» = «lista»? El usuario pidió más contexto | El usuario |
-| 2 | Cuándo se alerta que el presupuesto va atrasado: ¿con cuántos días de adelanto sobre la programación? | El usuario |
+| 1 | Los umbrales de la alerta (aviso a 2 semanas, importante a 1): ¿así, y por obra o globales? | El usuario |
+
+**Contestado en D-576:** «autorizada» y «lista» son lo mismo —se renombró «listo» a «autorizado»—, y el presupuesto debe ir **al menos 1 semana, de preferencia 2,** por delante de lo que el programa base necesita programar.
 
 **Contestado en D-575:** la parte es una etapa **o un concepto independiente** (losas, pisos); el presupuesto va por delante de la programación, con alertas; **la ampliación puede ser un cambio, un adicional o ambos;** **Costos ve todas las obras pero sin las funciones ni los privilegios de Control: se enfoca en cuantificar y formar el presupuesto.**
 
