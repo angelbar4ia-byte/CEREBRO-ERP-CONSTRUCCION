@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-10-12
-verificado: 578 decisiones · 13 descartes · 35 correcciones
+verificado: 579 decisiones · 13 descartes · 35 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -652,6 +652,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-576 | **«Autorizada» y «lista» son lo mismo (se renombra «listo» a «autorizado»), y el presupuesto debe ir al menos 1 semana, de preferencia 2, por delante de lo que el programa base necesita programar** | **Respuestas del usuario:** «Que sean lo mismo, o mejor cambiar lista a autorizada. Al menos 1 semana, de preferencia 2 semanas, como desfase de lo que se necesita programar para que esté presupuestada, de acuerdo al programa base.» `WORKFLOWS.md` §8.1 y `WORKFLOWS.md` §8.9. |
 | D-577 | **Los umbrales de la alerta de desfase del presupuesto se configuran de forma global y afectan a cada obra** | **Respuesta del usuario:** «Los umbrales se configura global y afecta a cada obra.» El candado de asignar sigue siendo por obra (D-574). `WORKFLOWS.md` §8.9. |
 | D-578 | **Escenario 4 «Desde cero»: el paramétrico primero y luego se mide** | **Dato del usuario:** «Escenario 4 desde cero: el paramétrico primero y luego se mide.» Cierra los cuatro escenarios, uno por forma de arranque. Los pasos intermedios (presupuestar lo estimado, medir por partes, autorizar, programar, asignar) son lectura mía sobre las reglas comunes. `WORKFLOWS.md` §8.9. |
+| D-579 | **En «Desde cero» se puede programar y asignar con cantidad estimada, avisando, y el paramétrico arranca de un ensamble por tipo de espacio** | **Respuestas del usuario a las dos preguntas de D-578:** «1. Está bien como lo propones. 2. Por tipo de espacio.» `WORKFLOWS.md` §8.9. |
 
 ---
 

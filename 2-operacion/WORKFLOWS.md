@@ -908,7 +908,7 @@ Una obra que parte de un prototipo **con modificaciones.**
 
 La fuente «desde cero» de §8.1, puesta en orden. **Dato del usuario: «el paramétrico primero y luego se mide».** Es lo contrario de «Nuevo» (escenario 1), donde primero se mide.
 
-1. **En presupuesto se crea la obra** y se arranca con el **paramétrico:** un ensamble compone la estructura con **cantidades estimadas** (`modo_cantidad = estimada`, con su dispersión). Es el único caso en que no hay obra anterior de dónde copiar.
+1. **En presupuesto se crea la obra** y se arranca con el **paramétrico:** un ensamble **por tipo de espacio** (D-579) compone la estructura con **cantidades estimadas** (`modo_cantidad = estimada`, con su dispersión). Es el único caso en que no hay obra anterior de dónde copiar.
 2. ***(Lectura mía)* Se presupuesta de inmediato,** con lo estimado: el presupuesto nace **provisional** («nunca está incompleto, está provisional en algunas partes»), ordenado por dispersión y monto.
 3. **Luego se mide:** el cuantificador **sustituye** las cantidades estimadas por `medidas` conforme llegan los planos, **por partes** (por etapa o concepto independiente), con la herramienta o con el módulo.
 4. **Cada parte medida se autoriza** (Costos o Control; valida Control) y **se envía a programar;** finalmente **se asigna.** Las reglas comunes de arriba valen igual: volver libre hasta asignar, alertas de desfase, candado de asignar.
@@ -918,8 +918,9 @@ La fuente «desde cero» de §8.1, puesta en orden. **Dato del usuario: «el par
 
 | # | Qué | Quién |
 |---|---|---|
-| 1 | Escenario 4: ¿se puede **programar y asignar con cantidad solo estimada**, avisando? *(Lectura mía: sí, la combinación peligrosa es contratar a precio alzado sobre lo estimado, y el sistema la advierte; §8.1.)* | El usuario |
-| 2 | Escenario 4: ¿el paramétrico arranca de un ensamble por tipo de espacio o de la casa completa? | El usuario |
+| — | *Nada pendiente de decidir por ahora.* | — |
+
+**Contestado en D-579:** en el escenario 4 **sí se puede programar y asignar con cantidad solo estimada, avisando** (lo peligroso es contratar a precio alzado sobre lo estimado, y el sistema lo advierte, §8.1); y **el paramétrico arranca de un ensamble por tipo de espacio** (D-565), no de la casa completa.
 
 **Contestado en D-577:** los umbrales de la alerta de desfase (aviso a 2 semanas, importante a 1) son **una configuración global que afecta a cada obra;** el candado de asignar sigue siendo por obra (D-574).
 
