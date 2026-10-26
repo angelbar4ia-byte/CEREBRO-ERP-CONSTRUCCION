@@ -914,6 +914,31 @@ La fuente «desde cero» de §8.1, puesta en orden. **Dato del usuario: «el par
 4. **Cada parte medida se autoriza** (Costos o Control; valida Control) y **se envía a programar;** finalmente **se asigna.** Las reglas comunes de arriba valen igual: volver libre hasta asignar, alertas de desfase, candado de asignar.
 5. ***(Lectura mía)* Lo medido vuelve al paramétrico,** que aprende de ello («propone, no aplica»): el aprendizaje es una de las seis redes de §8.1.
 
+### Lo construido en ObraCtrl (D-580)
+
+Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `feat/escenarios-de-arranque`, migraciones 0074 a 0082), cada pieza con su prueba de aislamiento, su prueba por HTTP contra Postgres real y un recorrido de punta a punta en el navegador. **Qué hay y dónde:**
+
+| Pieza | Qué es hoy |
+|---|---|
+| **Parte** | Una etapa o un concepto independiente; `plantas` (1 o 2) en prototipo y obra (0074). |
+| **Estado por parte** | `cuantificando → enviada a presupuesto → por validar → autorizada → enviada a programa → programada → asignada`, con bitácora que solo se agrega (0075). Total o por partes, **todo o nada**; cada paso es de su rol. |
+| **Rol Costos** | Ve todas las obras sin los privilegios de Control; manda a presupuesto y autoriza, Control valida (0076, 0077). |
+| **Volver y congelar** | Volver es libre hasta asignar y deja el programa «por revisar» con aviso; **asignar congela** la cantidad base y el precio con un trigger, y solo el control de cambio lo salta (0078). |
+| **Candado, indicador y alertas** | «Todo validado» en la junta de arranque; el **candado de asignar** es por obra y lo edita Control (validar y asignar piden anotación); las **alertas de desfase** (aviso a 2 semanas, importante a 1) tienen umbrales **globales** (0079). Avisan; no bloquean. |
+| **Escenario 2 · Ingeniería** | La obra se crea desde Presupuesto; la carga de ingeniería ofrece «el prototipo de la obra» o «el más parecido»; `ESTADO_CARGA` por etapa **se calcula al leer** (cargado / presupuestado; una carga incompleta avisa y nunca bloquea); «Medir» en el renglón del presupuesto abre el cuantificador. |
+| **Escenario 3 · Prototipo modificado** | Cambios (pueden restar) y adicionales (solo suman), sobre un concepto del prototipo o **nacidos nuevos**; la actividad guarda lo que decía el prototipo y cada modificación queda en una bitácora (0080). Una parte validada vuelve a cuantificarse; asignada ya no se toca. |
+| **Escenario 1 · Nuevo** | La obra se crea desde el cuantificador con el **catálogo base de 1 o 2 plantas** (estructura y conceptos de un prototipo, sin cantidades; plazo base 28 y 30 semanas) como prototipo de un solo uso (0081). **Lo que se mide es el presupuesto:** la cantidad medida sustituye a la base mientras la parte no esté asignada. El árbol del cuantificador es el del presupuesto (nivel, etapa, concepto) y dice qué falta medir. |
+| **Rediseño a paramétrico o mixto** | Se explota un ensamble con su factor; los renglones de la parte cuyo concepto está en el ensamble pasan a la cantidad estimada y el resto queda por PU. **Mixto no se guarda: se reporta en porcentaje** (0082). Primero propone; aplicar queda en la bitácora de modificaciones. |
+| **Escenario 4 · Desde cero** | Obra sin prototipo de dónde copiar: un ensamble **por tipo de espacio** compone cantidades estimadas; se puede programar y asignar con lo estimado, **avisando**; medir sustituye a lo estimado sin perderlo, y la diferencia vuelve al paramétrico como propuesta (0082). |
+
+**Lo que no se construyó, dicho sin adornos:**
+
+- Las **hojas «matriz»** del árbol del cuantificador (D-565): hoy las hojas son conceptos; la matriz como unidad de medición no está en el modelo de la actividad.
+- Lo medido **no reescribe** el ensamble: el aprendizaje se reporta (desviación entre lo estimado y lo medido) y no se aplica, como pide §8.1.
+- La carga de ingeniería sigue siendo de **Control de obra** (Costos la prepara pero no la sube); si Costos debe subirla es una decisión de rol que falta.
+- Cambios y adicionales **antes de asignar** no generan todavía la cotización al cliente (B-123); después de asignar, el camino es control de cambio.
+- El aviso por correo y push de una parte que **vuelve a cuantificarse por una medición** no existe (sí existe cuando la reabre una modificación o un rediseño).
+
 ### Lo que queda por decidir
 
 | # | Qué | Quién |

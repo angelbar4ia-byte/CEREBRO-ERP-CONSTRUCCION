@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-10-12
-verificado: 579 decisiones · 13 descartes · 35 correcciones
+verificado: 580 decisiones · 13 descartes · 35 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -653,6 +653,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-577 | **Los umbrales de la alerta de desfase del presupuesto se configuran de forma global y afectan a cada obra** | **Respuesta del usuario:** «Los umbrales se configura global y afecta a cada obra.» El candado de asignar sigue siendo por obra (D-574). `WORKFLOWS.md` §8.9. |
 | D-578 | **Escenario 4 «Desde cero»: el paramétrico primero y luego se mide** | **Dato del usuario:** «Escenario 4 desde cero: el paramétrico primero y luego se mide.» Cierra los cuatro escenarios, uno por forma de arranque. Los pasos intermedios (presupuestar lo estimado, medir por partes, autorizar, programar, asignar) son lectura mía sobre las reglas comunes. `WORKFLOWS.md` §8.9. |
 | D-579 | **En «Desde cero» se puede programar y asignar con cantidad estimada, avisando, y el paramétrico arranca de un ensamble por tipo de espacio** | **Respuestas del usuario a las dos preguntas de D-578:** «1. Está bien como lo propones. 2. Por tipo de espacio.» `WORKFLOWS.md` §8.9. |
+| D-580 | **Los cuatro escenarios de arranque y su núcleo común quedan construidos en ObraCtrl, con sus límites dichos** | **Cierre del plan de las diez fases** (`/loop realiza las fases`). Se construyó el núcleo (parte, estado por parte, rol Costos, volver y congelar, candado, indicador y alertas) y encima las cuatro entradas: Ingeniería, Prototipo modificado, Nuevo y Desde cero, más el rediseño a paramétrico o mixto. **Cuatro lecturas que se tomaron al construir y que conviene confirmar:** (1) `ESTADO_CARGA` **se calcula al leer** en vez de guardarse, porque el cerebro mismo lo llama caché y «nunca fuente de verdad»; (2) un **cambio se dice por cuánto cambia** (`delta`, puede ser negativo) y no por la cantidad nueva, y la cantidad no puede quedar negativa: eliminar es dejarla en cero; (3) en una obra «Nueva» **lo medido es el presupuesto** y sustituye a la cantidad base mientras la parte no esté asignada, mientras que en una obra con el presupuesto de un prototipo compartido el cuantificador sigue solo comparando; (4) una cantidad que cambia por una modificación, un rediseño o una medición **devuelve a cuantificarse** la parte ya validada, porque lo autorizado ya no es lo que se autorizó. Y una corrección al construir: la generación desde ensamble **no llevaba la cantidad estimada al nodo del prototipo** (solo a la partida), así que la obra generada no la heredaba; ahora sí. `WORKFLOWS.md` §8.9 («Lo construido en ObraCtrl»). |
 
 ---
 
