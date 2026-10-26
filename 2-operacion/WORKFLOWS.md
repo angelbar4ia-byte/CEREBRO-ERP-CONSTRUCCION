@@ -844,3 +844,70 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 ```
 
 **No son del App flow, aunque lo tocan:** el módulo de postventa (B-129, definido en D-562) y el cotizador (B-123, definido en D-546 a D-552). Los descuentos, el traspaso del anticipo, el expediente con la revisión física y el contratista como usuario externo se cerraron en D-544.
+
+## 8.9 Los escenarios de arranque de una obra (D-571 a D-573)
+
+**Pedido del usuario:** «Primero vamos a establecer el orden para diferentes escenarios.» Son **tres maneras de empezar una obra** y comparten el mismo motor: lo que cambia es **por dónde se entra** y **de dónde sale la cantidad.** Los tres son el desarrollo de las tres fuentes del arranque de §8.1 («de una base», «de una ingeniería», «desde cero»), puestos en orden y con sus envíos.
+
+| Escenario | Se entra por | La cantidad sale de | Orden |
+|---|---|---|---|
+| **1 · Nuevo** (D-571) | El **cuantificador** | Se **mide** sobre un catálogo base | cuantificador → presupuesto → programa → asignar → ejecución |
+| **2 · Ingeniería** (D-572) | El **presupuesto** | Se **carga** la ingeniería del lote | presupuesto → carga → (cuantificador si hay duda) → programa → asignar |
+| **3 · Prototipo modificado** (D-573) | El **presupuesto** | Se **hereda** del prototipo y se **recuantifica** lo que cambia | presupuesto → recuantificar → revisado → programa → asignar |
+
+### Lo que los tres comparten (dato del usuario)
+
+- **El orden es por parte, no por obra.** *Parte* = una **etapa de construcción** (de preferencia; *lectura mía:* el tercer nivel del árbol, a confirmar contra el árbol real). Cada parte recorre sus estados a su paso: una puede estar programada mientras otra sigue cuantificándose.
+- **Los envíos son totales o por partes:** cuantificador → presupuesto → programa. Es **nuevo**: antes el cuantificador escribía directo en el presupuesto y no había pasos entre cuantificar y contratar.
+- **Autorizar:** lo **realiza Costos o Control de obra; Control de obra lo valida al final.** «Autorizada» es **un solo concepto** en los tres escenarios. *Lectura mía:* equivale al nivel «listo» de §8.1 (medida o cargada, costeada y aprobada); a confirmar.
+- **Volver atrás:** **en cualquier momento se puede regresar entre módulos** para modificar o replantear, **libre hasta asignar.** Al volver sobre una parte, lo posterior se marca «por revisar» y se avisa; no se borra ni se bloquea («propone, no aplica»). **Asignar** —el contratista de la parte, que es lo que ahora se llama *asignado*— equivale a **contratar:** de ahí en adelante, cambiar es control de cambio.
+- **Programar con la carga a medias:** se puede; **avisa y no impide** (la obra no espera).
+- **Ejecutar «ya todo validado»:** por ahora es un **indicador** en la junta de arranque que avisa y no impide. **Control de obra podrá elegirlo —aviso o candado— en una pantalla de configuración.**
+
+### Escenario 1 · Nuevo (D-571)
+
+Una obra nueva cuyo proyecto **es diferente de todos los prototipos.**
+
+1. **Se entra por el cuantificador** y **se crea la obra** desde ahí: sin prototipo, con su proyecto y lote (crear la obra y su presupuesto es un solo acto).
+2. **Se elige el catálogo base de cuantificación: de 1 planta o de 2 plantas** —los dos tipos de prototipo—. Se forma **tomando la estructura y los conceptos** de esos prototipos, **sin cantidades.** El número de plantas ya fija el plazo base (28 semanas una, 30 dos; D-419).
+3. **Se cuantifica un concepto, o las matrices de un concepto** (las hojas son conceptos o matrices, D-565), con la herramienta o con el módulo.
+4. **Terminada la cuantificación, total o por partes, se envía a presupuesto.**
+5. **En presupuesto se autoriza, o se rediseña a paramétrico o mixto** (se valúa por ensamble, o parte por PU y parte por ensamble; *«mixto no se guarda, se reporta en porcentaje»*).
+6. **Se envía a programar, todo o por partes;** se programa y se asigna.
+7. **Se procede a ejecución,** con el indicador «todo validado».
+
+*Lectura mía:* es una variante de «desde cero» con el orden invertido —primero se mide, luego entra el paramétrico—; está por decidir si se registra como cuarta fuente o como la forma normal de la tercera.
+
+### Escenario 2 · Ingeniería (D-572)
+
+Una obra cuya **ingeniería ya existe** (la prepara Costos y llega como Excel, por partes, normalmente por niveles; D-531).
+
+1. **En presupuesto se crea la obra o se elige.**
+2. **Se asocia con un prototipo; si es un modelo especial o nuevo, se elige el más similar** y se parte de su estructura.
+3. **Se carga la ingeniería;** se compara con el prototipo y la diferencia queda sin causa hasta que alguien la captura.
+4. **Si hay duda, se va al cuantificador a comprobar** (el uso «comprobación» de §8.1: informa, no corrige).
+5. **Ya trabajado o aceptable —autorizado como arriba—, se pasa a programar y finalmente se asigna.**
+
+Es literalmente la fuente «de una ingeniería» de §8.1. Lo nuevo es **«el más similar»** para un modelo especial o nuevo, y el envío a programar.
+
+### Escenario 3 · Prototipo modificado (D-573)
+
+Una obra que parte de un prototipo **con modificaciones.**
+
+1. **En presupuesto se elige el prototipo y el tipo de modificación:** **ampliación;** o un **cambio de plantas** (de una planta a dos). Lo que cambia puede **nacer nuevo** o **aplicar los tipos de modificación.**
+2. **Se puede seleccionar un concepto para recuantificarlo** (el cuantificador, como herramienta sobre el renglón).
+3. **Ya revisado, se envía a programar.**
+4. **Finalmente se asigna, por partes o completo.**
+5. **Nota:** **no se puede asignar hasta que se confirme «revisado», con anotación de quien revisó y validó, si se configura así.** Es el **candado** de la asignación y es configurable (la otra mitad de «el indicador por ahora» de la junta de arranque).
+
+*Lectura mía, a confirmar:* §3c del modelo dice que las modificaciones **no llevan marca** y son órdenes de cambio sobre el árbol; eso vale **después de contratar.** Antes de asignar, la modificación se hace directo en el diseño, y la ampliación sigue la regla de crecimiento de D-565.
+
+### Lo que queda por decidir
+
+| # | Qué | Quién |
+|---|---|---|
+| 1 | ¿«Parte» es siempre la etapa de construcción? Confirmarlo contra el árbol real | El usuario |
+| 2 | ¿«Autorizada» = «lista»? | El usuario |
+| 3 | ¿«Nuevo» es una cuarta fuente del arranque o la forma normal de «desde cero»? | El usuario |
+| 4 | El candado de asignar y el aviso de la junta: ¿una sola configuración o dos? ¿Global o por obra? | El usuario |
+| 5 | Costos como rol de ObraCtrl (hoy no existe) | El usuario |
