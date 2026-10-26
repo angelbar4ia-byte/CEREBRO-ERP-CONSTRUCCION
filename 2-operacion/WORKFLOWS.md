@@ -858,7 +858,7 @@ El cerebro dejó los avisos fuera como plomería de la aplicación (D-516), y as
 ### Lo que los tres comparten (dato del usuario)
 
 - **El orden es por parte, no por obra.** *Parte* = **una etapa de construcción, o un concepto independiente** como las losas o los pisos (D-575: no siempre es una etapa). Cada parte recorre sus estados a su paso: una puede estar programada mientras otra sigue cuantificándose.
-- **El presupuesto va por delante de la programación** (D-575): **si no hay programación, se retrasa la obra.** Por eso hay **alertas** cuando una parte que ya debería estar programada no lo está, o cuando el presupuesto de la siguiente no avanza al ritmo de la obra. Avisan; no bloquean. **El desfase (D-576):** una parte debe estar **presupuestada y autorizada al menos 1 semana antes de lo que el programa base necesita programarla, de preferencia 2.** *Lectura mía:* aviso a las 2 semanas, alerta importante a la semana; los umbrales, configurables.
+- **El presupuesto va por delante de la programación** (D-575): **si no hay programación, se retrasa la obra.** Por eso hay **alertas** cuando una parte que ya debería estar programada no lo está, o cuando el presupuesto de la siguiente no avanza al ritmo de la obra. Avisan; no bloquean. **El desfase (D-576):** una parte debe estar **presupuestada y autorizada al menos 1 semana antes de lo que el programa base necesita programarla, de preferencia 2.** *Lectura mía:* aviso a las 2 semanas, alerta importante a la semana; **los umbrales se configuran de forma global y afectan a cada obra** (D-577).
 - **Los envíos son totales o por partes:** cuantificador → presupuesto → programa. Es **nuevo**: antes el cuantificador escribía directo en el presupuesto y no había pasos entre cuantificar y contratar.
 - **Autorizar:** lo **realiza Costos o Control de obra; Control de obra lo valida al final.** «Autorizada» es **un solo concepto** en los tres escenarios, y **es el nivel que §8.1 llamaba «listo»** (D-576: se renombró «listo» a «autorizado»). **Programar pide autorizada,** que es más estricto que el «costeado» de D-532.
 - **Volver atrás:** **en cualquier momento se puede regresar entre módulos** para modificar o replantear, **libre hasta asignar.** Al volver sobre una parte, lo posterior se marca «por revisar» y se avisa; no se borra ni se bloquea («propone, no aplica»). **Asignar** —el contratista de la parte, que es lo que ahora se llama *asignado*— equivale a **contratar:** de ahí en adelante, cambiar es control de cambio.
@@ -907,7 +907,9 @@ Una obra que parte de un prototipo **con modificaciones.**
 
 | # | Qué | Quién |
 |---|---|---|
-| 1 | Los umbrales de la alerta (aviso a 2 semanas, importante a 1): ¿así, y por obra o globales? | El usuario |
+| — | *Nada pendiente de decidir por ahora.* | — |
+
+**Contestado en D-577:** los umbrales de la alerta de desfase (aviso a 2 semanas, importante a 1) son **una configuración global que afecta a cada obra;** el candado de asignar sigue siendo por obra (D-574).
 
 **Contestado en D-576:** «autorizada» y «lista» son lo mismo —se renombró «listo» a «autorizado»—, y el presupuesto debe ir **al menos 1 semana, de preferencia 2,** por delante de lo que el programa base necesita programar.
 

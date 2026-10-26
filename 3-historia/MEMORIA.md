@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-10-12
-verificado: 576 decisiones · 13 descartes · 35 correcciones
+verificado: 577 decisiones · 13 descartes · 35 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**
@@ -650,6 +650,7 @@ modelo (2026-09-10). `MODELO.md` §6, hallazgos 7 a 9.
 | D-574 | **«Nuevo» es la cuarta forma de arranque; la junta de arranque lista el requisito y el candado es asignar, por obra; los tipos de modificación son cambios y adicionales; Costos ve solo lo suyo** | **Respuestas del usuario a las cuatro preguntas de los escenarios:** «1. Nueva es cuarta forma de arranque. 2. Junta de arranque es un requisito, más el candado es asignar, es por obra. 3. Cambios y adicionales al cliente; cambios puede ser negativos, o sea que se elimina del presupuesto; también cambios son modificación de muebles; adicionales son los highlights y conceptos fuera de catálogo. 4. Solo lo suyo.» `WORKFLOWS.md` §8.9. |
 | D-575 | **La parte es una etapa o un concepto independiente; el presupuesto va por delante de la programación, con alertas; una ampliación puede ser cambio, adicional o ambos; Costos ve todas las obras sin los privilegios de Control** | **Respuestas del usuario:** «1. No siempre es una etapa, también puede ser un concepto independiente como losas o pisos; hay que poner alertas para no dejar el flujo de la obra atrasado: el presupuesto debe ir por delante de la programación, si no hay programación retraza la obra. 2. Necesito más contexto para responder si autorizada y lista son lo mismo. 3. Manejamos ampliación porque puede ser un cambio o un adicional o ambas. 4. No [no es solo lo suyo]: puede ver todas las obras pero no tiene las mismas funciones o privilegios de Control; Costos se enfoca más a cuantificar y formar el presupuesto.» Queda abierto si «autorizada» y «lista» son lo mismo. `WORKFLOWS.md` §8.9. |
 | D-576 | **«Autorizada» y «lista» son lo mismo (se renombra «listo» a «autorizado»), y el presupuesto debe ir al menos 1 semana, de preferencia 2, por delante de lo que el programa base necesita programar** | **Respuestas del usuario:** «Que sean lo mismo, o mejor cambiar lista a autorizada. Al menos 1 semana, de preferencia 2 semanas, como desfase de lo que se necesita programar para que esté presupuestada, de acuerdo al programa base.» `WORKFLOWS.md` §8.1 y `WORKFLOWS.md` §8.9. |
+| D-577 | **Los umbrales de la alerta de desfase del presupuesto se configuran de forma global y afectan a cada obra** | **Respuesta del usuario:** «Los umbrales se configura global y afecta a cada obra.» El candado de asignar sigue siendo por obra (D-574). `WORKFLOWS.md` §8.9. |
 
 ---
 
