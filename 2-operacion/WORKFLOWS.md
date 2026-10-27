@@ -933,11 +933,10 @@ Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `
 
 **Lo que no se construyó, dicho sin adornos:**
 
-- Las **hojas «matriz»** del árbol del cuantificador (D-565): hoy las hojas son conceptos; la matriz como unidad de medición no está en el modelo de la actividad.
+- Las **hojas «matriz»** del árbol del cuantificador (D-565): hoy las hojas son conceptos. **Sigue abierto y no se construyó:** D-565 mismo quedó «falta por confirmar» (B-113) y no dice qué se mide en una matriz —las líneas de insumo de un concepto— ni cómo se reparte con los muros compartidos.
 - Lo medido **no reescribe** el ensamble: el aprendizaje se reporta (desviación entre lo estimado y lo medido) y no se aplica, como pide §8.1.
-- La carga de ingeniería sigue siendo de **Control de obra** (Costos la prepara pero no la sube); si Costos debe subirla es una decisión de rol que falta.
-- Cambios y adicionales **antes de asignar** no generan todavía la cotización al cliente (B-123); después de asignar, el camino es control de cambio.
-- El aviso por correo y push de una parte que **vuelve a cuantificarse por una medición** no existe (sí existe cuando la reabre una modificación o un rediseño).
+- La **cotización al cliente** (D-582) cubre los dos modos de precio; faltan los descuentos al cliente (D-550) y encadenarla con el control de cambio. Quien registra la respuesta del cliente es Control de obra mientras «Proyectos y atención al cliente» no sea un rol.
+- **Costos sube la ingeniería** (D-581), solo esa carga. Y medir una parte validada ya avisa a quien lleva el programa.
 
 ### Lo que queda por decidir
 
