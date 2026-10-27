@@ -914,6 +914,30 @@ La fuente «desde cero» de §8.1, puesta en orden. **Dato del usuario: «el par
 4. **Cada parte medida se autoriza** (Costos o Control; valida Control) y **se envía a programar;** finalmente **se asigna.** Las reglas comunes de arriba valen igual: volver libre hasta asignar, alertas de desfase, candado de asignar.
 5. ***(Lectura mía)* Lo medido vuelve al paramétrico,** que aprende de ello («propone, no aplica»): el aprendizaje es una de las seis redes de §8.1.
 
+### Las hojas del árbol: concepto, matriz dentro de matriz, y ensamble (D-583)
+
+*Respuesta del usuario a lo que D-565 dejó sin decir: qué se cuantifica cuando una hoja es «matriz».*
+
+**La matriz es la receta de un concepto** (su APU, `COMPOSICION` en `MODELO.md` §1). El **concepto es la primera matriz, la matriz madre**; dentro de ella hay **insumos**, y **un insumo puede ser, a su vez, otra matriz** con sus propios insumos, y así hacia abajo. Es el mismo mecanismo recursivo que el modelo ya tiene (el hijo de una línea es un insumo o un compuesto, y el motor de cálculo desciende hasta los insumos; un compuesto no puede contenerse a sí mismo).
+
+```
+Concepto «Losa de cimentación»            ← matriz madre (el concepto)
+ ├─ concreto            (insumo)
+ ├─ malla               (insumo)
+ ├─ nervaduras          (matriz)           ← es un insumo de la madre y tiene su propia receta
+ │    ├─ varilla        (insumo)
+ │    ├─ estribos       (insumo)
+ │    └─ …
+ ├─ trabes              (matriz)
+ └─ bastones            (matriz)
+```
+
+- **Lo que el usuario necesita cuantificar son esas matrices internas** —las nervaduras, las trabes, los bastones—, no solo el concepto entero: son partes del concepto que se miden por su lado y que valen distinto en cada casa.
+- **Dónde vive la cantidad:** la cantidad medida de una matriz interna es la de **esa obra**; no reescribe el catálogo (`HALLAZGO 13`: la receta fija no basta cuando el múltiplo depende de la obra). Con ella, la explosión del concepto en esa obra se recalcula hacia abajo hasta los insumos. *(Lectura mía, a confirmar.)*
+- **La hoja del árbol del cuantificador** es, entonces, **un concepto o una de sus matrices internas, a cualquier profundidad**; el árbol nivel → etapa → concepto gana una rama más debajo del concepto cuando este tiene matrices que se miden aparte.
+- **Ensamble y sub-ensamble** son el piso de arriba, el mismo mecanismo (`MODELO.md` §5i: ensamble → conceptos, concepto → insumos): **en un ensamble, cuantificar es cuantificar el sub-ensamble** —la unidad que se mide es el sub-ensamble y no sus conceptos uno por uno—, y su cantidad es el factor con que entra en la casa.
+- **Sigue abierto** (de D-565): los **muros compartidos**, que cada área cuantifica completos, y qué pasa con el concepto padre cuando se miden por separado algunas de sus matrices y otras no.
+
 ### Lo construido en ObraCtrl (D-580)
 
 Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `feat/escenarios-de-arranque`, migraciones 0074 a 0082), cada pieza con su prueba de aislamiento, su prueba por HTTP contra Postgres real y un recorrido de punta a punta en el navegador. **Qué hay y dónde:**
@@ -933,7 +957,7 @@ Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `
 
 **Lo que no se construyó, dicho sin adornos:**
 
-- Las **hojas «matriz»** del árbol del cuantificador (D-565): hoy las hojas son conceptos. **Sigue abierto y no se construyó:** D-565 mismo quedó «falta por confirmar» (B-113) y no dice qué se mide en una matriz —las líneas de insumo de un concepto— ni cómo se reparte con los muros compartidos.
+- Las **hojas «matriz»** (D-583) quedaron **definidas** —la matriz madre es el concepto y un insumo puede ser otra matriz: nervaduras, trabes, bastones— pero **todavía no están construidas**: hoy las hojas del árbol del cuantificador son conceptos, y la actividad no guarda la cantidad de una matriz interna.
 - Lo medido **no reescribe** el ensamble: el aprendizaje se reporta (desviación entre lo estimado y lo medido) y no se aplica, como pide §8.1.
 - La **cotización al cliente** (D-582) cubre los dos modos de precio; faltan los descuentos al cliente (D-550) y encadenarla con el control de cambio. Quien registra la respuesta del cliente es Control de obra mientras «Proyectos y atención al cliente» no sea un rol.
 - **Costos sube la ingeniería** (D-581), solo esa carga. Y medir una parte validada ya avisa a quien lleva el programa.
