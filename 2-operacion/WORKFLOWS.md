@@ -948,7 +948,8 @@ Concepto «Losa de cimentación»            ← matriz madre (el concepto)
 - **Medición derivada** (D-587): un elemento con peso (K1) multiplica su conteo; el peso lo ponen Control de obra y Costos.
 - **Sin botón de guardar** (D-588): cada cambio llega a la API al ocurrir, con indicador de guardado, y deshacer/rehacer cubren el error.
 - **Crear desde el cuantificador:** un **concepto** nuevo entra a la obra como adicional sin cantidad (D-589); una **matriz** se agrega o se quita en el **catálogo** del concepto (D-590). Ambos: Control de obra y Costos.
-- **Sigue abierto:** recalcular y publicar el CPU cuando cambia la composición (D-590); mostrar las mediciones como «Por medición» en el cuadro de datos; y, de PlanSwift, el empalme de versiones del plano, el conteo automático y la escala automática.
+- **Fase 2 y 3 de PlanSwift (D-592 a D-596):** empalme de versiones del plano (la anterior de fantasma, traer trazos sin duplicar), escala automática (se propone, se confirma), enlaces entre hojas, conteo automático por plantilla y takeoff automático de áreas y muros. **Lo automático solo propone:** entra como trazo *por revisar*, sin enlaces, y no suma hasta que alguien lo acepta (un trigger lo garantiza).
+- **Sigue abierto:** dar composición de insumos a un concepto desde el cuantificador (hoy solo matrices, D-590); el takeoff de muros dibujados con dos líneas finas; y la prueba con planos reales de la organización, que es la que dirá qué tan bien detectan el conteo y el takeoff.
 
 ### Lo construido en ObraCtrl (D-580)
 
