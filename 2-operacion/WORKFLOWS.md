@@ -938,6 +938,18 @@ Concepto «Losa de cimentación»            ← matriz madre (el concepto)
 - **Ensamble y sub-ensamble** son el piso de arriba, el mismo mecanismo (`MODELO.md` §5i: ensamble → conceptos, concepto → insumos): **en un ensamble, cuantificar es cuantificar el sub-ensamble** —la unidad que se mide es el sub-ensamble y no sus conceptos uno por uno—, y su cantidad es el factor con que entra en la casa.
 - **Sigue abierto** (de D-565): los **muros compartidos**, que cada área cuantifica completos, y qué pasa con el concepto padre cuando se miden por separado algunas de sus matrices y otras no.
 
+### Mediciones, elementos y altas desde el cuantificador (D-585 a D-590)
+
+*Respuestas del usuario al estudio de PlanSwift; todo construido en ObraCtrl (migraciones 0087 a 0089 y los endpoints de conceptos nuevos y matrices).*
+
+- **El plano se mide por trazos y el trazo se enlaza** a un concepto (o a una de sus matrices) con una medida —área, perímetro, longitud o conteo— y un factor. La geometría no se edita; un hueco es un trazo hijo.
+- **La medición es una capa sombra** (D-585): agrupa trazos de un tipo, se anida con las del mismo tipo (la losa y sus espacios) y se asigna a uno o varios conceptos. **Solo a conceptos**, nunca a nodos del prototipo. Borrar la medición borra sus asignaciones.
+- **El tipo sale de la unidad** (D-586): m² y m³ área, m y ml lineal, pza conteo. El área se cierra siempre (no hay líneas abiertas); lo lineal puede usar el rectángulo, el círculo y la elipse como recorrido.
+- **Medición derivada** (D-587): un elemento con peso (K1) multiplica su conteo; el peso lo ponen Control de obra y Costos.
+- **Sin botón de guardar** (D-588): cada cambio llega a la API al ocurrir, con indicador de guardado, y deshacer/rehacer cubren el error.
+- **Crear desde el cuantificador:** un **concepto** nuevo entra a la obra como adicional sin cantidad (D-589); una **matriz** se agrega o se quita en el **catálogo** del concepto (D-590). Ambos: Control de obra y Costos.
+- **Sigue abierto:** recalcular y publicar el CPU cuando cambia la composición (D-590); mostrar las mediciones como «Por medición» en el cuadro de datos; y, de PlanSwift, el empalme de versiones del plano, el conteo automático y la escala automática.
+
 ### Lo construido en ObraCtrl (D-580)
 
 Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `feat/escenarios-de-arranque`, migraciones 0074 a 0082), cada pieza con su prueba de aislamiento, su prueba por HTTP contra Postgres real y un recorrido de punta a punta en el navegador. **Qué hay y dónde:**
