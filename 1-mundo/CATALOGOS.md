@@ -504,19 +504,25 @@ El archivo trae **dos encabezados idénticos**, y son campos distintos:
 
 > **Un cargador que busque por nombre tomará una de las dos en silencio.** Es de las
 > trampas más difíciles de detectar después. Se resuelve en la capa de mapeo
-> (`CONOCIMIENTO.md` §2.4) **leyendo por posición cuando el nombre está duplicado** — nunca
-> renombrando el archivo, que vuelve a OPUS.
+> (`CONOCIMIENTO.md` §2.4) **leyendo por contenido**: una de las dos columnas debe decir
+> `Trabajo` (la categoría) y la otra `Destajo`, `Subcontrato` o `Acarreo` (la clase); si
+> no se cumple, la carga se detiene y lo dice. Nunca se renombra el archivo, que vuelve a
+> OPUS. *(D-606: antes se decía «por posición»; el usuario decidió leer por contenido, que
+> es lo que ya hace el cargador en `control-avance`.)*
 
 ### Las tres clases, y `Acarreo` vacía
 
 La clase tiene tres valores —**`Destajo`, `Acarreo`, `Subcontrato`**— pero
-**`Acarreo` no tiene ni un renglón**.
+**`Acarreo` no tiene ni un renglón** en el archivo de OPUS.
 
-> Significa que hoy el acarreo o no se costea, o va escondido dentro de otros
-> destajos. Si va escondido, ningún análisis de logística lo va a ver.
+> **Decisión (D-606):** `Acarreo` se acepta como **tipo de insumo propio**
+> (`acarreo`, migración `0095`), no como flete ni como destajo. Hoy no hay filas, así que
+> no cuesta nada; cuando aparezca un acarreo se costea con su propio tipo y no se esconde
+> dentro de otros destajos.
 >
-> Y existe además un **catálogo propio de Fletes** (`CONOCIMIENTO.md` §10.2), así que hay que definir
-> qué va en cada uno.
+> Existe además un **catálogo propio de Fletes** (`CONOCIMIENTO.md` §10.2). Un acarreo y un
+> flete no son lo mismo: el flete es el transporte de material; el acarreo es el
+> movimiento de la obra. Qué va en cada catálogo sigue pendiente de definir con Costos.
 
 ### El catálogo también se llama `Contrato`
 
