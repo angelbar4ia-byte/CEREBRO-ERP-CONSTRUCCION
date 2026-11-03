@@ -135,3 +135,20 @@ todavía. Y con D-487 no se construye.
 Lo que sí aplica desde hoy, sin código: **cuando se resuelve algo en sesión, el
 paso 4 se escribe.** Es lo que hacía falta para que la referencia rota dejara de
 apuntar al vacío.
+
+---
+
+# 8. Notas de casos resueltos en sesión
+
+> Nota, no decisión: no cambia nada de lo que el cerebro sabe; solo deja el caso
+> para quien lo busque (paso 4, §7).
+
+**2026-11-03 · Una prueba de concurrencia de la infra falla de forma intermitente en CI y no depende del contenido del cerebro.**
+En el PR de las decisiones D-607 a D-616 (cuatro archivos `.md`), `pruebas (infra)` falló dos veces seguidas con
+`test_dos_procesos_que_ven_lo_mismo_a_la_vez_no_la_repiten_ni_pierden_cuentas`
+(`backend/infra/tests/test_postgres_bandeja.py`, línea 139): esperaba `(1, 30)` en `alerta` y obtuvo `(1, 15)`, es decir,
+una de las dos cuentas de `veces_vista` se perdió. Las otras tres comprobaciones (`cerebro`, `pruebas (api)`,
+`pruebas (core)`) pasaron; `verificar` solo resume las anteriores. El mismo commit de `main` ya había fallado y pasado
+esa misma prueba el 2026-11-02, así que la carrera es anterior a este PR. Lo que se hizo: la fusión de documentación no
+esperó a esa prueba. Lo que queda abierto: revisar si la actualización de `veces_vista` pierde cuentas cuando dos procesos
+ven la misma alerta a la vez (es lo que la prueba dice cuidar), antes de que la bandeja se use con carga real.
