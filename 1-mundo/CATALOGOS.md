@@ -1544,3 +1544,5 @@ Los dos **se complementan**, no se sustituyen:
 
 **Pendiente de definir:** qué son los 128 padres que no están en el catálogo. Los `AUX` son conceptos auxiliares (ver §8 de este archivo y `CONOCIMIENTO.md`), no conceptos del presupuesto; hay que decidir si entran al catálogo de matrices o se quedan como composición intermedia.
 
+**Decisión (D-609):** el cargador se define sobre `CATALOGO_DE_MATRICES`. Los 79 padres `AUX` (conceptos auxiliares) **quedan fuera** por ahora, hasta confirmar su tratamiento. Los 38 `MOCU`, 8 `MEZ` y los de `ZA1`, `ZA2` y `CUAD` siguen sin decidir.
+
