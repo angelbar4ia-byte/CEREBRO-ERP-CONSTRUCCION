@@ -1521,3 +1521,26 @@ TESTIGO_MATERIAL
 - **No es la matriz de componentes.** `ANALISIS_DE_BASICOS_CONCEPTOS` (§8) trae los insumos de cada concepto; este catálogo trae el concepto mismo, con su costo.
 - **Pendiente de confirmar:** cómo se cruza con `ANALISIS_DE_BASICOS_CONCEPTOS` por clave, y qué pasa con los conceptos que aparecen en un presupuesto y no están aquí.
 
+### Relación con `ANALISIS_DE_BASICOS_CONCEPTOS` (decisión del usuario, D-608)
+
+Los dos **se complementan**, no se sustituyen:
+
+- **El catálogo de matrices dice qué es el concepto:** clave, descripción, unidad y costo. Es la entidad. Las unidades (`pza`, `sal`, `m2`, `m`, `act`, `ser`, `m3`) se cargan **tal cual**, como unidades propias.
+- **`ANALISIS_DE_BASICOS_CONCEPTOS` dice cómo está formado cada concepto:** sus insumos, con cantidad y origen. Es la composición.
+
+**Verificado contra los archivos:**
+
+| Qué | Resultado |
+|---|---|
+| Matrices del catálogo que aparecen como padre en el análisis | 468 de 472 |
+| Matrices sin composición | 4: `ACC-00003`, `IGAS-02131`, `IGAS-02132`, `ISN-02061` (las mismas que P-09 deja sin costear) |
+| Padres del análisis que **no** están en el catálogo | 128: `AUX` 79 · `MOCU` 38 · `MEZ` 8 · `ZA1`, `ZA2`, `CUAD` 1 cada uno |
+| Hijos de tipo `Material` | 386 de 386 están en `CATALOGO_DE_MATERIALES` |
+| Hijos de tipo `Contrato` (destajo) | 263 de 263 están en `CATALOGO_DE_TRABAJOS` |
+| Hijos de tipo `ManoDeObra` | 43 de 43 están en `CATALOGO_DE_MANO_DE_OBRA` |
+| Hijos de tipo `Flete` | 9 de 9 están en `CATALOGO_DE_FLETES` |
+
+**Lectura:** la matriz de análisis es el pegamento entre catálogos: cada línea apunta a un insumo de su catálogo de origen. Todo hijo resuelve.
+
+**Pendiente de definir:** qué son los 128 padres que no están en el catálogo. Los `AUX` son conceptos auxiliares (ver §8 de este archivo y `CONOCIMIENTO.md`), no conceptos del presupuesto; hay que decidir si entran al catálogo de matrices o se quedan como composición intermedia.
+
