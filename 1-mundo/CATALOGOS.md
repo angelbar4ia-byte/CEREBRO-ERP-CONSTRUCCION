@@ -62,7 +62,7 @@ dato para probar se guarda en el repo, tal cual.
 | `CATALOGO_DE_MATRICES` | 472 | `1-mundo/opus/CATALOGO_DE_MATRICES.xlsx` y su `.csv` (D-527): los conceptos con su costo, en 14 familias |
 | `CATALOGO_DE_FLETES` | 9 | `1-mundo/opus/CATALOGO_DE_FLETES.xlsx` y su `.csv` (D-527) |
 | `CATALOGO_DE_TRABAJOS` (destajos y subcontratos) | 265 | `1-mundo/opus/CATALOGO_DE_TRABAJOS.xlsx` y su `.csv` (D-528): 259 destajos y 6 subcontratos, en 14 columnas (la descripción de abajo decía 12) |
-| `CATALOGO_DE_CONCEPTOS` | — | **No está, y no parece hacer falta:** las matrices ya traen todos los conceptos del presupuesto |
+| `CATALOGO_DE_CONCEPTOS` | — | **No es un archivo.** Es el nombre del catálogo de conceptos, y desde D-607 lo **sustituye** `CATALOGO_DE_MATRICES` (sección «Catálogo de matrices», al final) |
 | Los de la generación anterior: unidades (16), niveles (15), etapas (50), familias (35), contratistas (29), cuadrillas, auxiliares, materiales (325), subcontratos | — | **No están**, por lo mismo. Las unidades y las familias vienen en los catálogos nuevos, y los niveles y las etapas salen del árbol del presupuesto (15 y 52) |
 
 **Qué cubren los cuatro catálogos de D-527.** Cruzados con el análisis de básicos (`ANALISIS_DE_BASICOS_CONCEPTOS`): **todas las líneas de material (1,943), de mano de obra (112) y de flete (51) están en un catálogo,** y **los 596 conceptos y compuestos que el análisis declara** salen de las matrices (468), de los 89 materiales compuestos y de las 39 cuadrillas. **Las 471 claves de concepto del presupuesto están en `CATALOGO_DE_MATRICES`.** Lo único que quedaba sin catálogo eran las líneas de tipo `Contrato` (462 líneas, 263 claves: los destajos `MOA`, `MOE`, `MOS`, `MOH`, `MOG`, `MOC`, `MOP` y `MOO`, y seis subcontratos `SUB`), y **D-528 las cubre con `CATALOGO_DE_TRABAJOS`:** con los cinco catálogos, **las 1,208 claves del análisis de básicos (padres e hijos) tienen catálogo, y el costo de las 462 líneas de contrato coincide con el del catálogo, sin una sola diferencia.** El catálogo trae dos claves de más que el análisis no usa (una `MOE` y una `MOS`).
@@ -1480,3 +1480,44 @@ TESTIGO_MATERIAL
 
 
 ---
+
+## Catálogo de matrices — `CATALOGO_DE_MATRICES.xlsx` (al final del archivo)
+
+**También se llama catálogo de conceptos.** Por decisión del usuario (D-607) es el catálogo de conceptos del sistema y **sustituye** al `CATALOGO_DE_CONCEPTOS` que la documentación anterior citaba: ese no existía como archivo (ver la tabla de arriba).
+
+**472 filas · 11 columnas:** `C`, `Clave`, `Descripción`, `Unidad`, `Costo base M. N.`, `Costo base M. E.`, `Costo unitario`, `Fecha`, `Familia`, `Subfamilia`, `Tipo`.
+
+### Lo que se verificó contra el archivo
+
+| Dato | Resultado |
+|---|---|
+| Marcador `C` | `+` en las 472 filas |
+| `Tipo` | `Matriz` en las 472 filas (la misma palabra que `Matriz` en §3, pero aquí es el tipo de todo el archivo) |
+| Claves | Únicas, ninguna vacía |
+| Prefijos | `ACA` 77 · `IEC` 73 · `EST` 66 · `ISN` 60 · `CAR` 53 · `IHD` 36 · `IGAS` 21 · `OBE` 20 · `MSA` 17 · `CAN` 12 · `ALB` 9 · `EQU` 7 · `HER` 7 · `BAP` 5 · `ACC` 3 · `ICA` 3 · `INS` 1 · `MCT` 1 · `PRB` 1 |
+| `Familia` | 14 valores: Acabados 77 · Instalación Eléctrica 73 · Estructura 71 · Instalación Sanitaria 61 · Carpintería 56 · Instalación Hidráulica 36 · Albañilería 30 · Instalación de Gas 21 · Muebles Sanitarios y Accesorios 17 · Cancelería 12 · Equipamiento 7 · Herrería 7 · Accesorios 3 · Pruebas 1 |
+| `Subfamilia` | **Vacía en las 472 filas** (a diferencia de §3, donde sí existe) |
+| `Costo base M. E.` | Cero en las 472 |
+| `Costo unitario` | Igual a `Costo base M. N.` en las 472 |
+| `Fecha` | 2026-07-22 (385), 2026-07-29 (36), 2025-01-15 (17), 2026-09-07 (9), 2025-06-10 (8), y otras |
+
+### Unidades
+
+| Unidad | Filas | Significado (dato del usuario) |
+|---|---|---|
+| `pza` | 167 | pieza |
+| `sal` | 149 | **salida** (p. ej. una salida eléctrica) |
+| `m2` | 61 | metro cuadrado |
+| `m` | 47 | metro lineal |
+| `act` | 44 | **actividad** |
+| `ser` | 2 | servicio |
+| `m3` | 2 | metro cúbico |
+
+> `sal` y `act` no son unidades de medida en el sentido de §3, que está normalizado a `PZ`, `M2`, `M`, `SERV`, `M3`. Son categorías de cómo se mide el concepto. **Pendiente de definir** cómo se convierten al vocabulario de unidades del sistema.
+
+### Relación con los demás catálogos
+
+- **Sustituye** la referencia a `CATALOGO_DE_CONCEPTOS` (D-607).
+- **No es la matriz de componentes.** `ANALISIS_DE_BASICOS_CONCEPTOS` (§8) trae los insumos de cada concepto; este catálogo trae el concepto mismo, con su costo.
+- **Pendiente de confirmar:** cómo se cruza con `ANALISIS_DE_BASICOS_CONCEPTOS` por clave, y qué pasa con los conceptos que aparecen en un presupuesto y no están aquí.
+
