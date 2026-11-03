@@ -59,7 +59,7 @@ class PruebasDelPresupuesto(unittest.TestCase):
         self.assertIn("cantidad", str(cm.exception))
 
     def test_una_obligatoria_repetida_no_se_adivina(self):
-        # dos «Tipo»: el caso de `CATALOGO_DE_TRABAJOS` (`CATALOGOS.md` §3), donde hay que leer por posición y no por nombre
+        # dos «Tipo»: el caso de `CATALOGO_DE_TRABAJOS` (`CATALOGOS.md` §3), donde se lee por contenido (D-606), nunca por nombre
         dos_tipos = editar(texto(PRESUPUESTO), lambda f: f.__setitem__(0, ["Tipo" if c == "Origen" else c for c in f[0]]))
         with self.assertRaises(CargaNoProcede) as cm:
             leer_presupuesto(dos_tipos)
