@@ -1546,3 +1546,5 @@ Los dos **se complementan**, no se sustituyen:
 
 **Decisión (D-609):** el cargador se define sobre `CATALOGO_DE_MATRICES`. Los 79 padres `AUX` (conceptos auxiliares) **quedan fuera** por ahora, hasta confirmar su tratamiento. Los 38 `MOCU`, 8 `MEZ` y los de `ZA1`, `ZA2` y `CUAD` siguen sin decidir.
 
+**Columnas (D-610):** las 11 se conservan. `C` = `+` indica que el concepto tiene **matriz desglosable** (su composición está en `ANALISIS_DE_BASICOS_CONCEPTOS`); no es costo ni estatus. `Familia` y `Subfamilia` se dan de alta si no existen. `Costo base M. N.` y `Costo unitario` son **valores independientes** del concepto, no se calculan de su composición (D-226, D-227 y D-228). `Costo base M. E.` se conserva aunque sea cero (D-186).
+
