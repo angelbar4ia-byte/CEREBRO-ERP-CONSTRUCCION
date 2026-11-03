@@ -353,6 +353,8 @@ por cálculo:
 
 **Todo son fórmulas, no juicio.**
 
+> **Primer elemento definido (D-602): el castillo K-1** — medidas, armado (varillas y número), estribos (separación y número; anillo con 2.5 cm de recubrimiento interno + 10 cm de ganchos), concreto y cimbra de 4, 3 o 2 lados. El concepto decide si cuenta piezas o ml; un elemento puede alimentar varios conceptos.
+
 > **Ventaja de partida:** ya existen **89 compuestos** con subfamilias `Trabe`,
 > `Contratrabe`, `Nervadura`, `Parrillas`, `Losa Nervada` (`CATALOGOS.md` §2). No hay que
 > inventar el catálogo: hay que **darle fórmula a lo que ya existe** — y validar el
