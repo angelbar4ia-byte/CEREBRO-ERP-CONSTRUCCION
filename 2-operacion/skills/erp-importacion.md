@@ -167,6 +167,32 @@ versión:** es una fila de `PRECIO_HISTORICO` (el precio de un *trabajo* es la e
 
 ---
 
+## 3b. El orden de carga: el presupuesto se sube dos veces
+
+El presupuesto guarda cada partida con el **costo que el concepto tenía al subirlo** y
+no lo recalcula solo: es la misma regla de §3 —una versión es una foto—, aplicada a los
+precios. Y el orden tiene un nudo que no se puede evitar:
+
+1. El **análisis de básicos** necesita que los conceptos del presupuesto ya existan
+   (cada `clave_padre` debe cruzar con un concepto del árbol), así que el presupuesto va
+   **primero**.
+2. Pero en ese primer paso los conceptos todavía no tienen receta: todas las partidas
+   quedan en **$0** y el pendiente «Concepto nuevo» dice `precio_unitario: 0.00` y
+   `componentes: 0`.
+3. Por eso el presupuesto se **vuelve a subir** después del análisis: los conceptos ya
+   tienen costo vigente, la carga lo toma, y nace una **versión nueva** del presupuesto
+   con el precio de cada partida (la anterior se conserva, vigente = no). No crea
+   conceptos ni prototipos nuevos y no toca niveles ni recámaras.
+
+Con los siete prototipos reales: 402 partidas de Oro 4.01 pasan de $0.00 a
+$2,615,088.18 en la versión 2. El 0.00 que se ve en la bandeja de pendientes es esa
+foto vieja; el costo que cuenta es el del concepto.
+
+> *D-620.* Se avisa en el selector de cargas, en los dos tipos que se tocan
+> («Presupuesto y prototipos» y «Análisis de básicos conceptos»).
+
+---
+
 ## 4. Las cuatro columnas obligatorias
 
 | Columna | Para qué | Por qué no se deriva |
