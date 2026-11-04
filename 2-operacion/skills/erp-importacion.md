@@ -188,6 +188,15 @@ Con los siete prototipos reales: 402 partidas de Oro 4.01 pasan de $0.00 a
 $2,615,088.18 en la versión 2. El 0.00 que se ve en la bandeja de pendientes es esa
 foto vieja; el costo que cuenta es el del concepto.
 
+> *D-621.* Subir **el mismo archivo** otra vez no funcionaba: la regla de §3 («mismo tipo,
+> ya aplicado, mismo hash → no se hace nada») también atrapaba el árbol de presupuesto, cuyo
+> resultado **no depende solo del archivo** sino de los costos vigentes del catálogo. En
+> producción el panel se cerraba al instante, la carga se quedaba en «previsualizado» y los
+> precios seguían en $0. Ahora el árbol de presupuesto **no usa el atajo por huella**; lo que
+> decide si hay versión nueva es el **contenido**: mismas partidas, cantidades y precios que
+> la vigente → no se crea (tres pasadas con el mismo archivo: v1 en $0, v2 con precios, sin v3).
+> El alta plana de prototipos conserva el atajo.
+
 > *D-620.* Se avisa en el selector de cargas, en los dos tipos que se tocan
 > («Presupuesto y prototipos» y «Análisis de básicos conceptos»).
 
