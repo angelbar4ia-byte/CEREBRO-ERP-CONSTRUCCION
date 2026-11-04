@@ -106,6 +106,11 @@ deriva de él.
 
 **Tamaño.** 3,231 filas · 17 columnas · una sola hoja.
 
+> **Se sube dos veces (D-620).** El precio de cada partida es el costo vigente del concepto
+> **al momento de subir**. Como el análisis de básicos necesita los conceptos de este
+> presupuesto, la primera vez todo queda en $0; se vuelve a subir después del análisis y nace
+> una versión nueva con los costos. Ver `erp-importacion.md` §3b.
+
 ### Los siete capítulos
 
 En este presupuesto cada capítulo es un prototipo de vivienda. **Es el uso que le
