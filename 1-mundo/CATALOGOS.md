@@ -1134,6 +1134,8 @@ cada vez; este llega una vez.
 | Migrado del catálogo anterior | 260 |
 | Completado con el factor de su cuadrilla | 5 |
 
+**Hoy (D-617):** la semilla también tiene cargador —tipo de carga propio— y el sistema muestra los trabajos con su cuadrilla y los rendimientos derivados, y deja editar la cuadrilla y el rendimiento teórico de cada uno. La carga sigue siendo de una vez; lo que se edita después queda marcado como editado.
+
 ### Dónde viven
 
 **Son dos atributos del trabajo, uno a uno.** Cada destajo tiene su cuadrilla y su
