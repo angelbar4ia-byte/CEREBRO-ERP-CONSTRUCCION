@@ -623,7 +623,7 @@ agosto de 2023**. Y toda la familia de Pinturas quedó en enero de 2024.
 
 ## 4 Mano de obra — `CATALOGO_DE_MANO_DE_OBRA.xlsx`
 
-**97 filas · 36 columnas · los datos están en `Hoja2`, no en `Hoja1`.**
+**97 filas · 36 columnas · el libro trae una sola hoja, `Hoja1`** *(corregido en D-618: esta línea decía `Hoja2`; el `.xlsx` guardado no la tiene, y el `.csv` dice lo mismo celda por celda)*.
 
 > **Sustituye a dos catálogos anteriores**: el de mano de obra `MOOP` y el de
 > cuadrillas. Los dos quedan sin validez.
@@ -684,7 +684,7 @@ se revisa con el usuario (B-89); no se renombra ni se reinterpreta mientras tant
 
 ### La unidad `%MO`
 
-96 registros en `JOR`; uno en `%MO` — `MOCA-110 Contratista`, hoy en costo cero.
+96 registros en `JOR`; uno en `%MO` —que el archivo escribe literalmente `(%)mo`— `MOCA-110 Contratista`, hoy en costo cero.
 
 **`%MO` es una unidad que indica un porcentaje sobre la suma total de la cuadrilla.**
 

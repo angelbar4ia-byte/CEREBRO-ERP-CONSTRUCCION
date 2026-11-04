@@ -30,6 +30,10 @@ calcula aquí, por posición.
 Y no basta con no confiar: **la prueba de ida y vuelta demostró que esas columnas
 tampoco se pueden generar** — la regla no es deducible de los datos.
 
+> *D-615:* el valor del archivo se **conserva como rastro** hacia OPUS (en el nodo,
+> sin mostrarse); **ni el árbol ni la identidad lo usan**, así que el árbol queda
+> igual con o sin esas columnas. Lo que sigue prohibido es usarlo para armarlo.
+
 ---
 
 ## 0b. Lo primero: guardar lo que se sube
