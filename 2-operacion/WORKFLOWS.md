@@ -1028,7 +1028,8 @@ Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `
 - **Una sola entrada: «Creador de obra».** Se quita «Nueva obra» del Cuantificador (ahí solo se **cambia el prototipo**) y del Presupuesto (ahí solo **Cargar ingeniería**, que **sustituye** el presupuesto vigente, lo **modifica** o lo **actualiza** si trae conceptos y partidas nuevos).
 - **En diseño la obra no se ata a un prototipo.** Elegir de dónde parte es parte de crearla; mientras sea diseño puede cambiar de prototipo.
 - La **forma de arranque es solo informativa**; las partidas **se generan solas** al crear la obra.
-- *Construido hoy:* forma de arranque, generación al crear y «Cambiar prototipo». *Por construir:* el Creador unificado y los cambios de Cuantificador y Presupuesto.
+- *Aclaración:* la obra lleva prototipo desde que se crea; se cambia en Presupuesto o Cuantificador mientras sea diseño y el presupuesto toma lo que se modifique en el Cuantificador. Quien carga la ingeniería elige sustituir, modificar o actualizar.
+- *Construido:* forma de arranque, generación al crear, «Cambiar prototipo», Creador de obra único. *Por construir:* «Cargar ingeniería» con sus tres modos.
 
 ### Qué se propone (por confirmar)
 
