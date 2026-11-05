@@ -143,7 +143,7 @@ Tamaños: S = menos de un día, M = 2 a 4 días, L = una semana o más. Dependen
 
 ### Trazo y herramientas
 
-- F-2 (PARCIAL, S). Cuando la medida difiere mucho de la cantidad cargada, mostrarlo es suficiente hoy; el cerebro pide que sea "propuesta con evidencia" (D-46). Dependencia: ninguna. Decidir con el usuario el umbral (el cerebro usa 20 % para programación, no para presupuesto).
+- F-2 (PARCIAL, S). Cuando la medida difiere mucho de la cantidad cargada, mostrarlo es suficiente hoy; el cerebro pide que sea "propuesta con evidencia" (D-46). Dependencia: ninguna. **Resuelto (D-641): el Cuantificador no tiene umbral;** el umbral solo aplica en ejecución (estimación excedente).
 - F-16 (FALTA, L, riesgo alto). Takeoff de muros dibujados con dos líneas finas y lectura de vectores del PDF. Es límite declarado en D-596. Dependencia: pruebas con planos reales de la organización; no empezar sin ellos.
 - F-18 (FALTA, L, futuro). Fuente DWG e IFC con precedencia (D-111). El campo `fuente` ya existe. Dependencia: decisión de producto; el cerebro dice "hoy PDF".
 - F-12 (PARCIAL, S). `arbol.cambiar_unidad` aún bloquea cambios dentro del mismo tipo cuando hay medidas que no caben (m² a m³ con área ya medida, `application/casos_uso/arbol.py` líneas 118 a 129). D-601 pide no bloquear: reutilizar el flujo de D-623 con equivalencia 1 o marcar el enlace.
@@ -322,7 +322,7 @@ Entregable: F-9 y F-10, solo si el usuario decide construirlos ahora.
 
 Entregable: F-32, F-16 y F-2, en ese orden de riesgo creciente.
 
-- F-2: comparación medido contra cargado con umbral configurable que genere propuesta con evidencia (reutiliza el mecanismo de propuestas de D-595).
+- F-2: **descartado por D-641** (sin umbral en el Cuantificador; solo mostrar medido contra cargado).
 - F-32: servicio de lectura de simbología sobre la imagen del plano; entra siempre como propuesta por revisar; requiere decisión de proveedor y manejo de claves (tema de seguridad, revisar con el equipo antes).
 - F-16: muros de dos líneas finas en `takeoff.ts`; solo con un conjunto de planos reales de la organización para medir precisión.
 - Pruebas: Vitest con imágenes sintéticas (ya hay patrón en `cuantificador-takeoff.test.ts`); HTTP de propuestas; criterio de precisión en un conjunto real.
