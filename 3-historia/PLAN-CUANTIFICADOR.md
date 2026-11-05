@@ -305,7 +305,7 @@ Entregable: F-1 y, después, F-15.
 - Riesgo: alcance. Las piezas "tuino", puntales y vigas dependen de la fase 0 (pregunta 5). Entregar primero castillo y trabe, luego zapata y losa.
 - Aceptación: castillo K-1 con 4 lados, forro de tabla y 3 usos arroja las mismas cantidades que el mockup, y el cambio de usos recalcula sin tocar precios.
 
-### Fase 4. Espacios y muros compartidos (L, 2 semanas; depende de la respuesta 4 de la fase 0)
+### Fase 4. Espacios y muros compartidos (L, 2 semanas) — EN ESPERA por decisión del usuario (D-640: diseño anotado, sin construir)
 
 Entregable: F-9 y F-10, solo si el usuario decide construirlos ahora.
 
