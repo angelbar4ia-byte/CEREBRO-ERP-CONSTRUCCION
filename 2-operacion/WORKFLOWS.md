@@ -1000,3 +1000,48 @@ Los cuatro escenarios y su núcleo común están construidos en ObraCtrl (rama `
 **Contestado en D-575:** la parte es una etapa **o un concepto independiente** (losas, pisos); el presupuesto va por delante de la programación, con alertas; **la ampliación puede ser un cambio, un adicional o ambos;** **Costos ve todas las obras pero sin las funciones ni los privilegios de Control: se enfoca en cuantificar y formar el presupuesto.**
 
 **Contestado en D-574:** «Nuevo» es la cuarta forma de arranque; el requisito de la junta y el candado de asignar, por obra; los tipos de modificación son cambios (con negativos y muebles) y adicionales (highlights y conceptos fuera de catálogo); **Costos ve solo lo suyo.**
+
+## 8.10 Las formas de crear una obra: evaluación y propuesta (D-625)
+
+**Pedido del usuario:** «veo que hay varias formas de crear una obra y no están coordinadas; hay que evaluar esto.» Esta sección dice qué hay hoy, qué no cuadra y qué se propone. Lo propuesto **no está construido**; lo marcado como hoy se verificó en el código de ObraCtrl.
+
+### Qué hay hoy: cinco entradas
+
+| # | Dónde | Qué crea | Prototipo de la obra | ¿Genera las partidas? |
+|---|---|---|---|---|
+| 1 | Proyectos → **Alta de obra** | La obra (clave, cluster) | Uno **compartido** que se elige | No: se genera aparte con «Generar actividades» |
+| 2 | Proyectos → **Alta masiva** | Varias obras | El **compartido** de cada fila | No |
+| 3 | Presupuesto → **Nueva obra** | La obra (el mismo cuadro que la 1) | El **compartido** | No |
+| 4 | Cuantificador → **Nueva obra** | La obra y su prototipo | Uno **propio** (copia sin cantidades de un catálogo base de 1 o 2 plantas) o **vacío** (desde cero, paramétrico) | **Sí**, en el mismo acto |
+| 5 | Presupuesto → **Cargar ingeniería** | **No crea la obra**: arma un prototipo propio con la ingeniería del lote sobre una obra que ya existe | **Propio** | Después |
+
+### Lo que no cuadra
+
+1. **La obra no guarda cómo arrancó.** Las cuatro formas de arranque de §8.1 (de una base, de una ingeniería, nuevo, desde cero) no quedan en ningún campo de la obra; D-530 dice que el arranque es del renglón (`modo_cantidad`), pero quien abre la obra no sabe cuál fue la intención.
+2. **Dos tipos de obra según por dónde se creó:** las entradas 1 a 3 dejan una obra atada a un prototipo **compartido** (que no se debe editar), y la 4 y la 5 una atada a uno **propio**. Para editar la primera hay que clonar (D-624); la segunda ya nace editable.
+3. **Dos pasos distintos para lo mismo:** en 1 a 3 hay que acordarse de «Generar actividades»; en 4 se genera sola.
+4. **La misma obra se crea en tres pantallas distintas** (Proyectos, Presupuesto, Cuantificador) con formularios y reglas parecidos pero no iguales (qué se pide, qué se valida, quién puede).
+5. **El escenario «Prototipo modificado» (D-573) no tiene entrada propia:** es la 1 con un cambio posterior.
+
+### Qué se propone (por confirmar)
+
+**Un solo «Nueva obra»** —se llama igual desde Proyectos, Presupuesto y Cuantificador— que pregunta *de dónde parte*:
+
+| Parte de… | Equivale a | Queda |
+|---|---|---|
+| Un **prototipo** existente | Escenario 3, o la obra normal de siempre | Árbol **propio** (clon, D-624) con su presupuesto v1 |
+| Un **catálogo base** de 1 o 2 plantas | Escenario 1 «Nuevo» | Árbol propio, sin cantidades |
+| Una **ingeniería** (Excel) | Escenario 2 | Árbol propio con lo cargado |
+| **Desde cero** | Escenario 4 | Árbol propio vacío |
+
+Y termina **siempre igual**: una obra **en diseño**, con su árbol propio, sus partes en «cuantificando» y la forma de arranque **guardada en la obra** (informativa, no cambia reglas). «Generar actividades» pasa a ser un paso del propio flujo, no un botón que se olvida. El alta masiva sigue existiendo para cargar muchas obras del mismo prototipo y entra por la primera fila de la tabla.
+
+**Reglas que ya valen para todas** (D-624, D-625): al crearse, **nada está contratado** y todo es diseño reversible; solo cuando una parte se **programa** se considera contratada o asignada; una obra en diseño se puede **eliminar** (con la clave escrita) o **reiniciar desde cero**.
+
+### Lo que falta decidir
+
+| # | Qué | Quién |
+|---|---|---|
+| 1 | ¿Se unifica en un solo «Nueva obra» como arriba, o se deja cada entrada con su nombre y solo se igualan sus resultados? | Usuario |
+| 2 | ¿La forma de arranque se guarda en la obra? | Usuario |
+| 3 | ¿«Generar actividades» pasa a ser automático al crear la obra? | Usuario |

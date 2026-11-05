@@ -250,7 +250,7 @@ cambio arrastra datos históricos; no cuando se arregla con una migración barat
 | `CONOCIMIENTO.md` | I | ✅ 17 partes · las reglas del sistema |
 | `CATALOGOS.md` | I | 🆕 8 catálogos de OPUS 2025 · dividido de CONOCIMIENTO |
 | `LENGUAJE.md` | I | ✅ Canon 1.0 con el dialecto OPUS 2025 |
-| `MEMORIA.md` | III | ✅ 624 decisiones · 13 descartes · 35 correcciones |
+| `MEMORIA.md` | III | ✅ 625 decisiones · 13 descartes · 35 correcciones |
 | `PENDIENTES-MEJORAS.md` | IV | ✅ Auditado contra los catálogos vigentes |
 | `skills/erp-construccion.md` | II | ✅ Base. Regenerado desde el conocimiento |
 | `PROGRAMA-CPM.md` | I | ✅ 901 pruebas · los siete programas reproducen las cifras publicadas |
