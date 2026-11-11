@@ -23,16 +23,32 @@ def m2(d):
     m=re.search(r'\(\s*([\d.]+)\s*m\s*2\s*\)',d,re.I); return float(m.group(1)) if m else None
 OC_GRUPOS={'ACA-06010':('TEJAS','m²'),'ICA-01060':('VIGAS EMPOTRADAS','pza'),'ICA-03010':('VIGAS DE MADERA','pza'),
  'ACA-11013':('COLUMNAS DE PIEDRA','pza'),'ACA-11014':('COLUMNAS DE PIEDRA','pza'),'ACA-11015':('COLUMNAS DE PIEDRA','pza'),'ACA-07040':('COLUMNAS DE PIEDRA','pza'),
- 'ACA-11011':('PIEDRA GALARZA','m²'),'ACA-11012':('PIEDRA GALARZA','m²'),'ACA-10010':('FACHALETA','m²'),
+ 'ACA-10010':('FACHALETA','m²'),
  'ACA-02512':('ROOF','m²'),'ACA-02052':('ROOF',None),'CAR-01030':('DURMIENTE','pza'),'ICA-01030':('DURMIENTE','pza'),'ACA-01210':('GOTERÓN','m')}
 AZ=('AZOTEA','AZOTEA/ROOF'); GRUESAS=('ACA-01050','ACA-01051','ACA-01052')
 asig={}    # row -> lista de (driver,capa,cantidad,origen,nota)
 div={}     # row -> divisor
+CARVE={}   # fila -> (m, m², pza que son de la chimenea, capa)
 def poner(r,driver,capa,origen,nota='',q=None,d=None):
-    asig.setdefault(r['row'],[]).append([driver,capa,r['q'] if q is None else q,origen,nota])
+    cant=r['q'] if q is None else q
+    if r['row'] in CARVE and driver!='CHIMENEA' and isinstance(cant,(int,float)):
+        a,capa_ch=CARVE[r['row']]; a=min(a,cant)
+        asig.setdefault(r['row'],[]).append(['CHIMENEA',capa_ch,a,'diferencia entre Diamante con y sin chimenea','lo que la versión con chimenea agrega al concepto'])
+        cant=cant-a
+        if cant<=0.0001: return
+    asig.setdefault(r['row'],[]).append([driver,capa,cant,origen,nota])
     if d is not None: div[(r['row'],driver)]=d
 for p in range(7):
     cs=[r for r in rows if r['p']==p]; hecho=set()
+    CARVE.clear()
+    if p==5:   # Diamante con chimenea: lo que agrega frente a Diamante sin chimenea (p=4)
+        cs4=[r for r in rows if r['p']==4]
+        for cl,sb,capa_ch in (('EST-02170','PLANTA BAJA','OBRA NEGRA'),('EST-02010','PLANTA BAJA','OBRA NEGRA'),('ALB-01010','PLANTA BAJA','OBRA GRIS'),('EST-10031','CIMENTACIÓN','CIMENTACIÓN')):
+            lineas=[c for c in cs if c['clave']==cl and c['sub']==sb]
+            falta=sum(c['q'] for c in lineas)-sum(c['q'] for c in cs4 if c['clave']==cl and c['sub']==sb)
+            for c in reversed(lineas):
+                if falta<=0.0001: break
+                a=min(c['q'],falta); CARVE[c['row']]=(a,capa_ch); falta-=a
     # --- boquillas: la fina define el tipo y la gruesa es la de la misma zona y cantidad
     def pares(fina):
         out=[]
@@ -88,6 +104,8 @@ for p in range(7):
     for c in cs:
         if c['row'] in hecho: continue
         sn='AZOTEA' if c['sub'] in AZ else c['sub']; cl=c['clave']; d=c['desc'].lower(); k0=f"{cl}§{sn}"
+        if cl in('ACA-11011','ACA-11012'):
+            poner(c,'CHIMENEA','REVESTIMIENTO','piedra galarza: es de la chimenea'); continue
         if cl in OC_GRUPOS and not (cl=='ACA-07040' and k0 in mapa):
             poner(c,'OBRA COMPLEMENTARIA',OC_GRUPOS[cl][0],'obra complementaria: grupo '+OC_GRUPOS[cl][0]); continue
         if c['u']=='act' and d.startswith('losa') and c['sub']=='CIMENTACIÓN':
@@ -114,7 +132,7 @@ for p in range(7):
         elif cl=='ACA-08041': dr,capa='MURO','REVESTIMIENTO'
         elif cl=='ACA-20012': dr,capa='MURO','OBRA BLANCA'
         elif cl.startswith('ALB-030'): dr,capa='LOSA','OBRA GRIS'
-        elif cl.startswith(('ACA-11','ACA-10','ACA-07040','ACA-02512','ACA-02052','ICA-')) or not cl: dr,capa='OBRA COMPLEMENTARIA','SIN CLASIFICAR'
+        elif cl.startswith(('ACA-10','ACA-07040','ACA-02512','ACA-02052','ICA-')) or not cl: dr,capa='OBRA COMPLEMENTARIA','SIN CLASIFICAR'
         elif cl.startswith('EST') and c['sub'] in('PLANTA BAJA','PLANTA ALTA','CIMENTACIÓN'): dr,capa='MURO','OBRA NEGRA'
         elif c['sub'] in AZ: dr,capa='LOSA','OBRA GRIS'
         if dr: poner(c,dr,capa,'regla por clave o subcapítulo'); continue
@@ -124,8 +142,8 @@ for r in rows:
     if r['row'] not in asig: continue
     cl=r['clave']
     for a in asig[r['row']]:
-        drv=a[0]; v=None
-        if drv=='MURO' and cl in('EST-02010','EST-02011') and r['sub'] in('PLANTA BAJA','PLANTA ALTA'): v=r['q']
+        drv=a[0]; v=None; qq=a[2] if isinstance(a[2],(int,float)) else r['q']
+        if drv=='MURO' and cl in('EST-02010','EST-02011') and r['sub'] in('PLANTA BAJA','PLANTA ALTA'): v=qq
         elif drv=='PRETIL' and cl in('EST-02010','EST-02011'): v=r['q']
         elif drv=='MARCOS EXTERIORES' and cl=='ACA-07011': v=r['q']
         elif drv=='LOSA' and r['u']=='act' and r['desc'].lower().startswith('losa'): v=m2(r['desc'])
@@ -175,6 +193,52 @@ for p in range(7):
     mar.cell(rr,6).number_format='0.0%'
 mar.cell(10,1,'Se puede corregir la columna E o G; ASIGNACIÓN y RESUMEN se recalculan. Mover mármol de muro a piso no cambia el total del prototipo, solo cuánto cuesta el muro y cuánto el piso.')
 for col,w in zip('ABCDEFGH',(14,16,16,16,16,18,16,110)): mar.column_dimensions[col].width=w
+
+# --- hoja CHIMENEA: el ensamble (receta) y su contraste con Diamante sin chimenea
+chim=wb.create_sheet('CHIMENEA')
+chim['A1']='ENSAMBLE DE CHIMENEA'; chim['A1'].font=Font(bold=True,size=13)
+chim['A2']='Receta de UNA chimenea, sacada de lo que agrega Diamante con chimenea frente a Diamante sin chimenea. Cantidad por chimenea × precio = importe. Es solo lo que el catálogo trae: no hay hogar, tiro metálico ni remate con precio.'
+head(chim,4,['Grupo','Clave','Concepto','Unidad','Cantidad por chimenea','Precio unitario','Importe','Certeza','De dónde sale'])
+CERT={'ACA-11011':'cierta','ACA-11012':'cierta','EST-02170':'probable','EST-02010':'probable','ALB-01010':'probable','EST-10031':'probable'}
+NOTA={'ACA-11011':'Solo existe en la versión con chimenea','ACA-11012':'Solo existe en la versión con chimenea','EST-02170':'Castillo para encofrar tubería: el tiro; 8.4 m más que sin chimenea','EST-02010':'Cuerpo de tabique; 11.52 m² más que sin chimenea (el muro de Diamante con chimenea mide 602.52 m² y sin chimenea 591)','ALB-01010':'Repellado del cuerpo; 19.74 m² más que sin chimenea','EST-10031':'Acero de cimentación K3: la base; 2 piezas más que sin chimenea'}
+filas_ch=[]
+for r in rows:
+    if r['p']!=5: continue
+    for a in asig.get(r['row'],[]):
+        if a[0]=='CHIMENEA': filas_ch.append((a[1],r['clave'],r['desc'][:75],r['u'],a[2],r['pu']))
+orden={'CIMENTACIÓN':0,'OBRA NEGRA':1,'OBRA GRIS':2,'REVESTIMIENTO':3}
+filas_ch.sort(key=lambda x:(orden[x[0]],x[1]))
+for i,(g,cl,d,u,q,pu) in enumerate(filas_ch,5):
+    for j,v in enumerate((g,cl,d,u,round(q,2),pu),1): chim.cell(i,j,v)
+    chim.cell(i,7,f'=E{i}*F{i}').number_format='#,##0.00'; chim.cell(i,8,CERT.get(cl,'')); chim.cell(i,9,NOTA.get(cl,''))
+n_ch=4+len(filas_ch); rt_=n_ch+1
+chim.cell(rt_,1,'TOTAL de la chimenea').font=Font(bold=True); chim.cell(rt_,7,f'=SUM(G5:G{n_ch})').number_format='#,##0.00'
+chim.cell(rt_+1,1,'  de ello, ciertas'); chim.cell(rt_+1,7,f'=SUMIFS(G5:G{n_ch},H5:H{n_ch},"cierta")').number_format='#,##0.00'
+chim.cell(rt_+2,1,'  de ello, probables'); chim.cell(rt_+2,7,f'=SUMIFS(G5:G{n_ch},H5:H{n_ch},"probable")').number_format='#,##0.00'
+# contraste con/sin chimenea
+c0=rt_+5
+chim.cell(c0-1,1,'CONTRASTE: Diamante con chimenea menos Diamante sin chimenea').font=Font(bold=True)
+head(chim,c0,['','Clave','Concepto','Unidad','Δ cantidad (con − sin)','Precio unitario','Δ importe','Es de la chimenea','Nota'])
+agg=collections.defaultdict(lambda:[0,0,None,None])
+for r in rows:
+    if r['p'] in (4,5):
+        a=agg[(r['clave'],r['sub'],r['desc'][:75])]; a[0 if r['p']==4 else 1]+=r['q']; a[2]=r['u']; a[3]=r['pu']
+ch_por_clave=collections.defaultdict(float)
+for g,cl,d,u,q,pu in filas_ch: ch_por_clave[cl]+=q
+i=c0+1; ini=i
+for (cl,sb,d),(q4,q5,u,pu) in sorted(agg.items(),key=lambda kv:(-abs((kv[1][1]-kv[1][0])*(kv[1][3] or 0)))):
+    if abs(q5-q4)<1e-6: continue
+    chim.cell(i,2,cl);chim.cell(i,3,d);chim.cell(i,4,u);chim.cell(i,5,round(q5-q4,2));chim.cell(i,6,pu)
+    chim.cell(i,7,f'=E{i}*F{i}').number_format='#,##0.00'
+    es='sí' if cl in ch_por_clave and q5-q4>0 and abs(ch_por_clave[cl]-(q5-q4))<0.01 else ('no')
+    chim.cell(i,8,es); chim.cell(i,9,'' if es=='sí' else 'Diferencia de diseño entre las dos versiones, no es de la chimenea'); i+=1
+fin=i-1
+chim.cell(i,1,'TOTAL de la diferencia').font=Font(bold=True); chim.cell(i,7,f'=SUM(G{ini}:G{fin})').number_format='#,##0.00'
+chim.cell(i+1,1,'  de ello, la chimenea'); chim.cell(i+1,7,f'=SUMIFS(G{ini}:G{fin},H{ini}:H{fin},"sí")').number_format='#,##0.00'
+chim.cell(i+2,1,'  de ello, otros cambios de diseño'); chim.cell(i+2,7,f'=SUMIFS(G{ini}:G{fin},H{ini}:H{fin},"no")').number_format='#,##0.00'
+chim.cell(i+4,1,'La línea principal sanitaria de cimentación (ISN-02001 con chimenea contra ISN-02003 sin ella, +$731 por la misma distancia) la atribuye CONOCIMIENTO.md a la chimenea; aquí queda fuera de la receta porque es otra clave, no una cantidad que crece, y no es una pieza propia de la chimenea.')
+for col,w in zip('ABCDEFGHI',(34,11,80,7,16,12,14,14,90)): chim.column_dimensions[col].width=w
+
 head(aw,1,['Prototipo','Fila Hoja1','Subcapítulo','Clave','Descripción','Unidad','Cantidad en el catálogo','Precio unitario','Driver (editable)','Capa (editable)','Cantidad que se cobra','Importe','Divisor del driver','Cómo se asignó','Nota'])
 fila=2; pos={r['row']:r for r in rows}
 for r in sorted(rows,key=lambda x:x['row']):
@@ -193,7 +257,7 @@ aw.freeze_panes='A2'; aw.auto_filter.ref=f'A1:O{na}'
 DR=[('MURO','m² de tabique','DRIVER'),('PRETIL','m² de pretil','DRIVER'),('VANO','m de boquilla interior','DRIVER'),('MARCOS EXTERIORES','m de marco exterior','DRIVER'),
     ('LOSA','m² de losa de nivel','DRIVER'),('LOSA DE CIMENTACIÓN','m² de desplante','DRIVER'),('PISO','m² de piso (loseta + mármol)','DRIVER'),('ESCALERA','piezas (sin divisor común)','FIJO'),
     ('ASADOR','m² de piso','DRIVER'),('PÓRFIDO','m²','DRIVER'),('COCHERA','m² de pérgola','DRIVER'),('SILLAR','m²','DRIVER'),('BARDA','ml','DRIVER'),
-    ('JARDÍN','m² de sello','DRIVER'),('CUBIERTA','ml','DRIVER'),('CISTERNA','L','CTE'),
+    ('JARDÍN','m² de sello','DRIVER'),('CUBIERTA','ml','DRIVER'),('CISTERNA','L','CTE'),('CHIMENEA','pza (1 chimenea)','CTE'),
     ('HIDROSANITARIAS','por salidas (TABLA_APARATOS_SALIDAS)','SALIDAS'),('GAS','por salidas','SALIDAS'),('ELÉCTRICAS','por salidas','SALIDAS'),('EQUIPOS','por salidas','SALIDAS'),
     ('CARPINTERÍA','fijo','FIJO'),('CANCELERÍA','fijo','FIJO'),('HERRERÍA','fijo','FIJO'),('OBRA EXTERIOR','fijo','FIJO'),('OBRA COMPLEMENTARIA','fijo','FIJO'),('SIN ASIGNAR','—','FIJO')]
 nd=len(DR)
@@ -210,7 +274,7 @@ for k,(d,u,tipo) in enumerate(DR):
     for p in range(7):
         cl=L(3+p)
         res.cell(ri,3+p,f'=SUMIFS(ASIGNACIÓN!$L$2:$L${na},ASIGNACIÓN!$A$2:$A${na},{cl}${b1},ASIGNACIÓN!$I$2:$I${na},$A{ri})').number_format='#,##0'
-        if tipo=='CTE': res.cell(rd,3+p,3000)
+        if tipo=='CTE': res.cell(rd,3+p,3000 if d=='CISTERNA' else 1)
         elif tipo=='DRIVER': res.cell(rd,3+p,f'=SUMIFS(ASIGNACIÓN!$M$2:$M${na},ASIGNACIÓN!$A$2:$A${na},{cl}${b2},ASIGNACIÓN!$I$2:$I${na},$A{rd})').number_format='#,##0.00'
         if tipo in('DRIVER','CTE'): res.cell(rt,3+p,f'=IF(OR({cl}{rd}=0,{cl}{ri}=0),"",{cl}{ri}/{cl}{rd})').number_format='#,##0.00'
     res.cell(ri,10,f'=SUM(C{ri}:I{ri})').number_format='#,##0'
@@ -246,7 +310,7 @@ res.cell(rv,15,f'=IF(J{rv}<5,"insuficiente",IF(M{rv}<=0.1,"utilizable",IF(M{rv}<
 # OBRA COMPLEMENTARIA por grupo
 oc0=rv+3
 res.cell(oc0-1,1,'OBRA COMPLEMENTARIA POR GRUPO (importe, divisor y tasa)').font=Font(bold=True)
-GR=[('TEJAS','m²'),('VIGAS EMPOTRADAS','pza'),('VIGAS DE MADERA','pza'),('COLUMNAS DE PIEDRA','pza'),('PIEDRA GALARZA','m²'),('FACHALETA','m²'),('ROOF','m²'),('DURMIENTE','pza'),('GOTERÓN','m'),('SIN CLASIFICAR','')]
+GR=[('TEJAS','m²'),('VIGAS EMPOTRADAS','pza'),('VIGAS DE MADERA','pza'),('COLUMNAS DE PIEDRA','pza'),('FACHALETA','m²'),('ROOF','m²'),('DURMIENTE','pza'),('GOTERÓN','m'),('SIN CLASIFICAR','')]
 head(res,oc0,['Grupo','Unidad']+PROTOS+['n','Media','Desv. muestral','CV muestral','CV poblacional','Confianza'])
 ng=len(GR)
 for k,(g,u) in enumerate(GR):

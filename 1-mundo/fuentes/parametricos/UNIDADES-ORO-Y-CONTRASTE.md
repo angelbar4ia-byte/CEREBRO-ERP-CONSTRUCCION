@@ -314,7 +314,7 @@ Las diferencias que quedan vienen de los ajustes de Oro (excepciones autorizadas
 | Sillar | m² (n = 4) | 836 | 15.7 % | Insuficiente |
 | Jardín | m² de sello (n = 4) | 242 | 13.2 % | Insuficiente |
 
-Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso quedó en «revisar» solo por un error de divisor, corregido en §15.** **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $1 mil en Zafiro y $86 mil en Diamante +; ver §16.
+Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso quedó en «revisar» solo por un error de divisor, corregido en §15.** **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $1 mil en Zafiro y $73 mil en Diamante; ver §16.
 
 **Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco (resuelto con datos, §14). (3) Obra complementaria: resuelto en §16.
 
@@ -363,7 +363,7 @@ El piso de Zafiro da $554.0/m², el mismo $554.01 que tenía su libro curado. El
 
 ## 16. Obra complementaria: qué hay dentro (2026-11-11)
 
-Era el cajón de lo que no entraba en ningún driver. Ahora tiene **nueve grupos con su unidad**, en la hoja RESUMEN de `PARAMETRICOS_7_PROTOTIPOS.xlsx` (bloque «Obra complementaria por grupo»):
+Era el cajón de lo que no entraba en ningún driver. Ahora tiene **ocho grupos con su unidad** (la piedra galarza salió a la chimenea, §17), en la hoja RESUMEN de `PARAMETRICOS_7_PROTOTIPOS.xlsx` (bloque «Obra complementaria por grupo»):
 
 | Grupo | Unidad | Zafiro | Rubí | Z. Plus | Jade | Dia − | Dia + | Oro | $/unidad |
 |---|---|---|---|---|---|---|---|---|---|
@@ -373,12 +373,11 @@ Era el cajón de lo que no entraba en ningún driver. Ahora tiene **nueve grupos
 | Vigas empotradas a muro | pza | — | — | 17 | 10 | 10 | 10 | 12 | 326 |
 | Vigas de madera | pza | — | — | — | 3 | — | — | — | 2,424 |
 | Columnas de piedra (forrados y de cantera) | pza | — | — | 1 | — | 13 | 13 | — | 4,333 a 5,132 |
-| Piedra galarza (piso) | m² | — | — | — | — | — | 15.0 | — | 881 |
 | Fachaleta de cantera | m² | — | — | — | 25.6 | — | — | — | 469 |
 | Roof (piso y zoclo Dover) | m² | — | — | — | — | 5.8 | 5.8 | — | 576 |
-| **Importe total** | | **1,080** | **1,080** | **23,990** | **27,778** | **73,065** | **86,316** | **13,630** | |
+| **Importe total** | | **1,080** | **1,080** | **23,990** | **27,778** | **73,065** | **73,065** | **13,630** | |
 
-**Lectura.** Todo es precio unitario por pieza: la tasa por unidad no tiene dispersión que medir (CV de 0 en los grupos que se repiten). Lo que varía entre prototipos es **qué lleva cada diseño y cuántas piezas**: el durmiente está en los siete, las tejas y las vigas en cinco, y Diamante concentra el resto (13 columnas forradas o de cantera = $56 mil, piedra galarza y roof solo en Diamante +). No es un driver que escale con un área; es un catálogo de piezas por prototipo, igual que carpintería o herrería.
+**Lectura.** Todo es precio unitario por pieza: la tasa por unidad no tiene dispersión que medir (CV de 0 en los grupos que se repiten). Lo que varía entre prototipos es **qué lleva cada diseño y cuántas piezas**: el durmiente está en los siete, las tejas y las vigas en cinco, y Diamante concentra el resto (13 columnas forradas o de cantera = $56 mil y roof, $3 mil). No es un driver que escale con un área; es un catálogo de piezas por prototipo, igual que carpintería o herrería.
 
 **Correcciones al asignar.**
 - **Durmiente:** Zafiro lo trae con la clave `ICA-01030` y Oro con `CAR-01030`; estaba en el muro en unos prototipos y en obra complementaria en otros. Ahora está en obra complementaria en los siete, como en Oro. Zafiro queda −$1,080 en muro (−0.24 %) contra su libro curado, que lo tenía como fijo del muro.
@@ -387,4 +386,29 @@ Era el cajón de lo que no entraba en ningún driver. Ahora tiene **nueve grupos
 
 **Validación.** Oro queda **idéntico** a su libro curado: $13,630 (durmiente $2,160, goterón $620, tejas $6,938 y vigas $3,912). Zafiro no tiene obra complementaria en su libro; aquí solo trae el durmiente.
 
-**Pendiente.** Los grupos de Diamante (columnas forradas con piedra galarza, galarza de piso y roof) no tienen libro curado contra el cual validarse; son $56 mil de forrados y $17 mil de piso y roof que dependen del diseño. Si algún prototipo nuevo trae más, caen en «Sin clasificar» para decidirlos.
+**Pendiente.** Los grupos de Diamante (columnas forradas con piedra galarza y roof) no tienen libro curado contra el cual validarse; son $56 mil de forrados y $3 mil de roof que dependen del diseño. Si algún prototipo nuevo trae más, caen en «Sin clasificar» para decidirlos.
+
+## 17. Ensamble de chimenea (2026-11-11)
+
+**Corrección del usuario:** la piedra galarza de 40×40 y 60×40 **no es de piso, es de la chimenea**. Estaba mal en obra complementaria como «piso». Pasa a un driver nuevo, **CHIMENEA**, que es un ensamble de una pieza (`pza`, una chimenea por prototipo) en `PARAMETRICOS_7_PROTOTIPOS.xlsx`, hoja `CHIMENEA`.
+
+**Cómo se armó la receta.** La chimenea solo existe en Diamante con chimenea. Se comparó contra Diamante sin chimenea y se tomó lo que la versión con chimenea agrega a cada concepto. El muro lo confirma: Diamante con chimenea mide 602.52 m² de tabique y sin chimenea 591; al sacar los 11.52 m² del cuerpo de la chimenea, **el muro de las dos versiones queda en 591 m²**.
+
+| Grupo | Concepto | Cantidad | Importe | Certeza |
+|---|---|---|---|---|
+| Cimentación | Acero de cimentación K3 (la base) | 2 pza | $1,789 | Probable |
+| Obra negra | Muro de tabique de 14 cm (el cuerpo) | 11.52 m² | $4,458 | Probable |
+| Obra negra | Castillo K7 para encofrar tubería (el tiro) | 8.4 m | $1,698 | Probable |
+| Obra gris | Repellado del cuerpo | 19.74 m² | $2,531 | Probable |
+| Revestimiento | Piedra galarza 40×40 | 4.32 m² | $4,715 | **Cierta** |
+| Revestimiento | Piedra galarza 60×40 | 10.72 m² | $8,536 | **Cierta** |
+| **Total de la chimenea** | | | **$23,728** | $13,251 ciertas, $10,477 probables |
+
+**Lo que la hoja también muestra.** Diamante con chimenea cuesta $29,065 más que sin chimenea. La chimenea explica **$23,728**; los otros **$5,337** son cambios de diseño entre las dos versiones (otras losas, 85 m² más de relleno, columnas C-1 que desaparecen, la línea sanitaria de cimentación). Las dos losas de cimentación y las dos de entrepiso son distintas en cada versión, y cada par casi se compensa.
+
+**Qué falta, y es del usuario.**
+- Las piezas de la chimenea que **el catálogo no trae**: el hogar, el tiro metálico, el remate y la campana no tienen precio en ningún concepto.
+- Confirmar las cuatro piezas «probables» (cimentación, cuerpo, tiro y repellado) y el castillo K7: sale de comparar las dos versiones, no de una descripción que diga «chimenea».
+- La línea sanitaria de cimentación (+$731 con chimenea) la atribuye `CONOCIMIENTO.md` a la chimenea; aquí queda fuera porque es otra clave, no una pieza propia.
+
+**Efecto en las tasas.** Diamante con chimenea ya no mezcla el cuerpo de la chimenea con el muro: su divisor de muro baja a 591 m², igual que el de sin chimenea, y su tasa de muro queda en $1,487 contra $1,492. Obra complementaria de Diamante con chimenea queda igual que la de sin chimenea ($73,065).
