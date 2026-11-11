@@ -68,33 +68,36 @@ ruta,subido_como,subido_el,bytes,sha256,registros,derivado_de
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__-_PB.csv,45d4c7c7-INGENIERIA_-_ALAMO_18__-_PB.csv,2026-09-18 06:50,29722,d63de8fb98761df10d9f326533116739b1809b6c5ec987d4896b373b2777cc79,515,
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__-_PISOS.csv,f7033640-INGENIERIA_-_ALAMO_18__-_PISOS.csv,2026-09-18 06:50,13949,88c6f7a4d4ad641dd6c4d1a70bcf88811fca41ab14022e3cd136df6ab5ebea11,221,
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__CIM_CAMARAS.csv,825f5fe9-INGENIERIA_-_ALAMO_18__CIM_CAMARAS.csv,2026-09-18 06:38,166,b12b2f418daa6480565f1bb475423d8463182f381a2d026f1e6925ae2ce17cfc,5,
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO.md,c7e06133-CATALOGO_PARAMETRICO.md,2026-11-11 05:33,72268,f796dba617897d2a7a3c4504bbbfccf0454678ede5f1be7e3efb78031398920a,,versión del usuario + bitácora v45/v19
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO.md,c7e06133-CATALOGO_PARAMETRICO.md,2026-11-11 05:33,72268,f796dba617897d2a7a3c4504bbbfccf0454678ede5f1be7e3efb78031398920a,,
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v18.xlsx,d1ee4847-CATALOGO_PARAMETRICO_ORO_v18.xlsx,2026-11-11 05:33,490451,a2d06ca407a51cc6b074597b94b0f71d1a34c4a50e5aeacdaa511cf278abc301,,
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx,1a8e1c29-CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx,2026-11-11 05:33,810982,bde4b951f6635998c31f167c625795c14a3c5536f28a009907e71ec8b29a5762,,
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx,,2026-11-11 06:00,929956,9e479b0e4d5f9f613257132c73411d404518430a38d7e3d5165f226475ab60dd,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx (llaves, cohorte y unidades)
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v19.xlsx,,2026-11-11 06:00,539424,b675a9dc534c2c30309daac9e43159925ef8e9db9679b860972f0a6894456d42,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v18.xlsx (llaves, cohorte y unidades)
-1-mundo/fuentes/parametricos/DISPERSION_7_PROTOTIPOS.xlsx,,2026-11-11 07:00,96992,cd0fce718169db7ccea3b2e1a2ade6059f042f82008718bc2e4843852f9d92d5,,medir_dispersion.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx,,2026-11-11 06:00,929956,9e479b0e4d5f9f613257132c73411d404518430a38d7e3d5165f226475ab60dd,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v19.xlsx,,2026-11-11 06:00,539424,b675a9dc534c2c30309daac9e43159925ef8e9db9679b860972f0a6894456d42,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v18.xlsx
+1-mundo/fuentes/parametricos/DISPERSION_7_PROTOTIPOS.xlsx,,2026-11-11 07:00,96992,cd0fce718169db7ccea3b2e1a2ade6059f042f82008718bc2e4843852f9d92d5,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/medir_dispersion.py,,2026-11-11 07:00,11290,c8e5fad16cdfbb7f3d6841d8a947de02e8527bffa8dc65f47eb974c88aefb7ee,,
-1-mundo/fuentes/parametricos/TABLA_APARATOS_SALIDAS.xlsx,,2026-11-11 08:00,93436,ea38a09af17cd03b9feb1fa3e284a4fb6690e3a72b1b8144ebe5876362fa68b3,,tabla_aparatos_salidas.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/TABLA_APARATOS_SALIDAS.xlsx,,2026-11-11 08:00,93436,ea38a09af17cd03b9feb1fa3e284a4fb6690e3a72b1b8144ebe5876362fa68b3,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/tabla_aparatos_salidas.py,,2026-11-11 08:00,13537,c351f6fc72aabfbf448b21ce0f0e96c36f06517564be431b5d591f744e7cde43,,
-1-mundo/fuentes/parametricos/curado_aparatos.json,,2026-11-11 08:00,97283,56f7cd6e565f967377ff8c74336f12b917896f9d1dca8dcb726c98c03aba6b3b,,grupos y claves de los libros v45 y v19 recalculados
-1-mundo/fuentes/parametricos/asignaciones_sin_grupo.json,,2026-11-11 09:00,3168,dd963a5aaae6345e584d9d7a9efb9874fa37084df66fad19f2358904c32ce27d,,asignación revisada de las 19 claves de SIN_GRUPO
-1-mundo/fuentes/parametricos/PRETIL_7_PROTOTIPOS.xlsx,,2026-11-11 10:00,23852,708cecaace4d4110818d9122ed7fb15e355653522884162ba18431b77118d2fb,,medir_pretil.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/curado_aparatos.json,,2026-11-11 08:00,97283,56f7cd6e565f967377ff8c74336f12b917896f9d1dca8dcb726c98c03aba6b3b,,
+1-mundo/fuentes/parametricos/asignaciones_sin_grupo.json,,2026-11-11 09:00,3168,dd963a5aaae6345e584d9d7a9efb9874fa37084df66fad19f2358904c32ce27d,,
+1-mundo/fuentes/parametricos/PRETIL_7_PROTOTIPOS.xlsx,,2026-11-11 10:00,23852,708cecaace4d4110818d9122ed7fb15e355653522884162ba18431b77118d2fb,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/medir_pretil.py,,2026-11-11 10:00,12166,db57bfe217e4cb8263b535c2d3ec6c9982898d4755810e4d68bd75a1ce46b341,,
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v20.xlsx,,2026-11-11 11:00,542315,a82c2a03f52dd8b62d86bc91da95078e612905008e2347b61bbd824ca28cbf99,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v19.xlsx (pretil corregido)
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v21.xlsx,,2026-11-11 12:00,542761,655af4063c7b991350b5357561f77e8acb9819e593def333c785f58607942cc5,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v20.xlsx (boquilla gruesa de marcos una sola vez)
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v46.xlsx,,2026-11-11 13:00,1045697,fb7e23e95a8e5ba7e586ea21420e4400cd096a5b67e15f06c46853f1814eb3a7,,estabilizar_parametricos.py sobre 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v22.xlsx,,2026-11-11 13:00,594333,58a41d239fcb1231cb7584cd06009a7e581ddd6bb28f2d6e75078b7feaea70d8,,estabilizar_parametricos.py sobre 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v21.xlsx
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v20.xlsx,,2026-11-11 11:00,542315,a82c2a03f52dd8b62d86bc91da95078e612905008e2347b61bbd824ca28cbf99,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v19.xlsx
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v21.xlsx,,2026-11-11 12:00,542761,655af4063c7b991350b5357561f77e8acb9819e593def333c785f58607942cc5,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v20.xlsx
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v46.xlsx,,2026-11-11 13:00,1045697,fb7e23e95a8e5ba7e586ea21420e4400cd096a5b67e15f06c46853f1814eb3a7,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v22.xlsx,,2026-11-11 13:00,594333,58a41d239fcb1231cb7584cd06009a7e581ddd6bb28f2d6e75078b7feaea70d8,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v21.xlsx
 1-mundo/fuentes/parametricos/ESTABILIDAD.md,,2026-11-11 13:00,4874,ba9ee85d464a8d498cb320cc3a81f28bf6a5c68ab893f3cca80802fe94b77a30,,
 1-mundo/fuentes/parametricos/estabilizar_parametricos.py,,2026-11-11 13:00,10838,5fbdb8f9d19ea39e1e53df1143b52771aee09e974b50bcda4dc4465bc8fd94ec,,
 1-mundo/fuentes/parametricos/probar_parametricos.py,,2026-11-11 13:00,5015,273204b7bc4ade9533db966aaf48d69912da036c643671a69850af0b2d1b3277,,
-1-mundo/fuentes/parametricos/estado_esperado_ZAFIRO.json,,2026-11-11 13:00,1678,9a734501899c639724c6e92accb6b0aaffe6394a5ad49490d56198232a04628e,,probar_parametricos.py --guardar
-1-mundo/fuentes/parametricos/estado_esperado_ORO.json,,2026-11-11 13:00,1906,5ecf40715f83c660a614418542a0096f2c91d23b713c73b56b8cdcd1ace3592e,,probar_parametricos.py --guardar
-1-mundo/fuentes/parametricos/VANO_MARCOS_7_PROTOTIPOS.xlsx,,2026-11-11 14:00,21895,fe66f5ca351c8a2dee974b7d29690ee3fa00c8f54c69b44001cd883dcf34df72,,medir_vano_marcos.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/estado_esperado_ZAFIRO.json,,2026-11-11 13:00,1678,9a734501899c639724c6e92accb6b0aaffe6394a5ad49490d56198232a04628e,,
+1-mundo/fuentes/parametricos/estado_esperado_ORO.json,,2026-11-11 13:00,1906,5ecf40715f83c660a614418542a0096f2c91d23b713c73b56b8cdcd1ace3592e,,
+1-mundo/fuentes/parametricos/VANO_MARCOS_7_PROTOTIPOS.xlsx,,2026-11-11 14:00,21895,fe66f5ca351c8a2dee974b7d29690ee3fa00c8f54c69b44001cd883dcf34df72,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/medir_vano_marcos.py,,2026-11-11 14:00,12096,b4b4ee7b82f4d001d9cb24399581080b9fbb996717350264f0fc7eb2744fce6d,,
-1-mundo/fuentes/parametricos/PARAMETRICOS_7_PROTOTIPOS.xlsx,,2026-11-11 15:00,227904,05d168c20494bad9f949b2d3ea95f9dbcf3a24f402e60c9ec6a3d4c6bdcdb7f5,,asignar_drivers.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/PARAMETRICOS_7_PROTOTIPOS.xlsx,,2026-11-11 15:00,227904,05d168c20494bad9f949b2d3ea95f9dbcf3a24f402e60c9ec6a3d4c6bdcdb7f5,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/asignar_drivers.py,,2026-11-11 15:00,38803,d35e45990f3b43d9f2d3d1780cf35740df031b6698fe72cde5f46f7dd88a9b48,,
-1-mundo/fuentes/parametricos/mapa_aprendido.json,,2026-11-11 15:00,41585,79d08a26e2631b6e283dc802d6e49b6491078b0c840cedab4356883176721f09,,claves y subcapítulos de los libros v46 y v22 recalculados
-1-mundo/fuentes/parametricos/curado_drivers.json,,2026-11-11 15:00,1133,5339a9f394e96412be65d70ffbe44b3f1b827b787f24f24a4817aa0ef548c3c2,,importes por driver de los libros v46 y v22 recalculados
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v23.xlsx,,2026-11-11 16:00,595758,cc5d61f9674a257ff256706e35d908631feb3d06c3f03ec05b39c35ffe3443f2,,escalera_oro.py sobre 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v22.xlsx
+1-mundo/fuentes/parametricos/mapa_aprendido.json,,2026-11-11 15:00,41585,79d08a26e2631b6e283dc802d6e49b6491078b0c840cedab4356883176721f09,,
+1-mundo/fuentes/parametricos/curado_drivers.json,,2026-11-11 15:00,1133,5339a9f394e96412be65d70ffbe44b3f1b827b787f24f24a4817aa0ef548c3c2,,
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v23.xlsx,,2026-11-11 16:00,595758,cc5d61f9674a257ff256706e35d908631feb3d06c3f03ec05b39c35ffe3443f2,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v22.xlsx
 1-mundo/fuentes/parametricos/escalera_oro.py,,2026-11-11 16:00,4504,69a9506c397a7cf077f3354859373dfab33a3bde10f8e221f9f6160985da7e80,,
+1-mundo/fuentes/parametricos/ANALISIS-EXCEL.md,,2026-11-11 06:00,6246,3ac5c88d64dfb0b63494462ccbf1b54506d60594282d7c2c94d7b9d7b8e7ad24,,
+1-mundo/fuentes/parametricos/README.md,,2026-11-11 06:00,6392,723c1e7bb43298d516db9e782198d784c058f9baca1b6eb5d841fed395c92fe6,,
+1-mundo/fuentes/parametricos/UNIDADES-ORO-Y-CONTRASTE.md,,2026-11-11 06:00,41346,30e6b94735fec59ec3af77e67acaa03bec3e9e7e7999cf370232ee7d134cfccb,,
