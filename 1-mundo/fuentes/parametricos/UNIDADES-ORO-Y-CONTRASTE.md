@@ -169,3 +169,26 @@ Archivos: `TABLA_APARATOS_SALIDAS.xlsx` (hojas SISTEMAS, SIN_GRUPO, GRUPOS, ETAP
 **Claves sin grupo: asignadas.** Las 19 claves que ningún libro curado usaba se asignaron a su grupo (`asignaciones_sin_grupo.json`, hoja ASIGNADAS con el motivo de cada una): 6 líneas principales y la acometida eléctrica a las redes (no son puntos), la cisterna prefabricada a fijos, la tarja del asador al asador fijo, y 9 variantes de salidas y cableados a su aparato (minisplit, lavavajillas, tarja, BAN, lavamanos, regadera, apagador mixto). Son claves de etapa, no de ancla: no cambian el conteo de puntos, solo suman su importe. Con ellas cada familia cuadra: puntos + fijos + redes = total, y SIN_GRUPO queda vacía. El efecto es pequeño: hidrosanitarias pasa de $1,880 a $1,904 por salida y eléctricas de $454 a $455.
 
 **Qué falta.** (1) Revisar si las 9 variantes asignadas por parecido de nombre son las que usted habría elegido. (2) Que alguien confirme los 6 grupos donde Oro ajusta a mano. (3) El ancla de TV se corrigió a la salida de cimentación (IEC-01080): la del libro curado era una tapa ciega agregada.
+
+## 9. Pretil en los 7 prototipos (2026-11-11)
+
+Archivos: `PRETIL_7_PROTOTIPOS.xlsx` (hojas LEEME, RESUMEN y PARTIDAS) y `medir_pretil.py`. Aplica a los siete la regla que se resolvió en Zafiro (hoja Paramétrico PRETIL: 62 m², $75,537, $1,218/m²). La regla reproduce el libro curado de Zafiro **al centavo** ($75,537.12 en las cuatro capas).
+
+**La regla.** Driver: m² de muro de pretil (tabique de 14 cm en la azotea). Obra negra, repellado 3.00, boquillas y finas 3.00 se toman completos de la azotea. La **franja de fachada +3.00** (repellado y finas) tiene un tope en los m² del pretil: de los 73 m² de Zafiro, 62 van al pretil y 11 al muro. La pintura es la línea de fachada con ubicación INTERIOR que más se parece al repellado del pretil.
+
+| Prototipo | m² de pretil | Importe | $/m² |
+|---|---|---|---|
+| Zafiro 1.0 | 62 | 75,537 | 1,218 |
+| Rubí | 74 | 84,611 | 1,143 |
+| Zafiro Plus | 38 | 42,899 | 1,129 |
+| Jade | 64 | 78,637 | 1,229 |
+| Diamante − y + | 19.2 | 20,947 | 1,091 |
+| Oro 4.01 (regla de Zafiro) | 45 | 47,154 | 1,048 |
+
+Tasa total: media $1,136, CV 6 % → **utilizable**. Por capa: obra negra $512/m² (8 %, utilizable), obra gris $390 (11 %, revisar), obra blanca $181 (12 %, revisar), pintura $53 (65 %, no usar sola). Los ratios por m² de pretil (castillo 0.40, repellado 3.00 de 1.0 a 1.6, boquillas de 1.1 a 1.7, franja +3.00 de 1.0) son la parametrización de cada prototipo.
+
+**Oro cambia.** El pretil de Oro v19 salía casi al doble (2,421 contra 1,218) porque el libro curado pone en el pretil los **300 m²** de repellado y de finas de fachada +3.00 que el catálogo trae en la azotea. Con la regla de Zafiro al pretil le tocan 45 m² (su muro) y los otros 255 m² pertenecen a MURO FACHADA. La diferencia ($61,804) es exactamente 255 m² × $159.03 de repellado + 255 m² × $79.71 de finas + una boquilla de 18.2 m del libro curado. **El libro de Oro no se modificó:** si se aplica, hay que decidir cómo cobra MURO FACHADA esos 255 m².
+
+**Efecto en la comparación anterior.** El pretil pasa de «no usar» (CV 47 % con n = 2) a «utilizable» (CV 6 % con n = 7). Era el contenido de la hoja de Oro, no el diseño.
+
+**Límites.** Diamante − y + tienen un pretil de 19.2 m² (tercer nivel) y su línea de pintura es una suposición de poca confianza. Zafiro Plus y Diamante usan la clave `EST-02011` como muro de pretil. El catálogo no etiqueta la pintura de pretil.
