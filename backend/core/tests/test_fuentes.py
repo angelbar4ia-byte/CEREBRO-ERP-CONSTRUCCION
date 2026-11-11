@@ -53,14 +53,14 @@ class PruebasDeLoGuardado(unittest.TestCase):
     def test_todo_lo_compartido_sigue_ahi_sin_cambios(self):
         self.assertEqual(verificar(RAIZ), [])
 
-    def test_estan_los_33_archivos_que_el_usuario_subio(self):
+    def test_estan_los_36_archivos_que_el_usuario_subio(self):
         subidos = [nombre_limpio(r.subido_como) for r in self.filas.values() if r.subido_como]
-        self.assertEqual(len(subidos), 33)  # los 28 de D-479, los cuatro catálogos de OPUS en Excel de D-527 y el de trabajos de D-528
-        self.assertEqual(len(set(subidos)), 32)  # `PRECIO_REAL_ALAMO_18.xlsx` se subió dos veces, con otro contenido
+        self.assertEqual(len(subidos), 36)  # los 28 de D-479, los cuatro catálogos de OPUS en Excel de D-527, el de trabajos de D-528 y los tres del catálogo paramétrico
+        self.assertEqual(len(set(subidos)), 35)  # `PRECIO_REAL_ALAMO_18.xlsx` se subió dos veces, con otro contenido
         for libro in ("03_MARZO_MOVIMIENTOS_DE_ALMACEN.xlsx", "07_JULIO_MOVIMIENTOS_DE_ALMACEN.xlsx", "PROGRAMA_ZAFIRO.xlsx", "SEMILLA-cuadrilla-rendimiento.xlsx",
                       "PRECIO_REAL_ALAMO_18.xlsx", "grid_AvanceOPEventosOpr_28.xlsx", "CATALOGO_DE_PRESUPUESTO.csv", "INGENIERIA_-_ALAMO_18__-_PB.csv"):
             self.assertIn(libro, subidos)
-        self.assertEqual(sum(1 for r in self.filas.values() if r.ruta.endswith(".xlsx")), 19)
+        self.assertEqual(sum(1 for r in self.filas.values() if r.ruta.endswith(".xlsx") and "/parametricos/" not in r.ruta), 19)
         self.assertEqual(sum(1 for r in self.filas.values() if r.subido_como and r.ruta.endswith(".csv")), 14)
         self.assertEqual(sum(1 for r in self.filas.values() if r.ruta.startswith("1-mundo/opus/ingenieria-alamo-18/")), 11)
 
@@ -92,7 +92,8 @@ class PruebasDeLoGuardado(unittest.TestCase):
 
     @unittest.skipUnless(HAY_OPENPYXL, "falta openpyxl")
     def test_cada_csv_es_lo_que_su_hoja_muestra(self):
-        for libro in [r for r in self.filas.values() if r.ruta.endswith(".xlsx")]:
+        # los libros paramétricos solo guardan fórmulas (sin valores calculados): no tienen CSV por hoja
+        for libro in [r for r in self.filas.values() if r.ruta.endswith(".xlsx") and "/parametricos/" not in r.ruta]:
             hojas = _hojas_a_csv(RAIZ / libro.ruta)
             hijos = {r.derivado_de.split(" :: ")[1]: r for r in self.filas.values() if r.derivado_de.startswith(libro.ruta + " :: ")}
             self.assertEqual({h for h, _, _ in hojas}, set(hijos), libro.ruta)

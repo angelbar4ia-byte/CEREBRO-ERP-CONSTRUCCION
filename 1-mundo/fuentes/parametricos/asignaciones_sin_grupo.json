@@ -1,0 +1,21 @@
+[
+ {"sis":"EQUIPOS","clave":"EQU-01011","grupo":"CISTERNA PREFABRICADA (FIJO)","etapa":"EQUIPOS","motivo":"La cisterna prefabricada es un equipo fijo; en los libros curados pasó a la hoja CISTERNA."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-02002","grupo":"REDES PRINCIPALES (POR M² DE LOSA)","etapa":"SANITARIA","motivo":"Línea principal sanitaria: red, no punto."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-02003","grupo":"REDES PRINCIPALES (POR M² DE LOSA)","etapa":"SANITARIA","motivo":"Línea principal sanitaria: red, no punto."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-02005","grupo":"REDES PRINCIPALES (POR M² DE LOSA)","etapa":"SANITARIA","motivo":"Línea principal sanitaria: red, no punto."},
+ {"sis":"HIDROSANITARIAS","clave":"IHD-02003","grupo":"REDES PRINCIPALES (POR M² DE LOSA)","etapa":"HIDRÁULICA","motivo":"Línea principal de agua fría: red, no punto."},
+ {"sis":"HIDROSANITARIAS","clave":"IHD-02103","grupo":"REDES PRINCIPALES (POR M² DE LOSA)","etapa":"HIDRÁULICA","motivo":"Línea principal de agua caliente: red, no punto."},
+ {"sis":"HIDROSANITARIAS","clave":"IHD-02201","grupo":"REDES PRINCIPALES (POR M² DE LOSA)","etapa":"HIDRÁULICA","motivo":"Alimentación cisterna-hidroneumático: red, no punto."},
+ {"sis":"ELÉCTRICAS","clave":"IEC-01062","grupo":"REDES ELÉCTRICAS PRINCIPALES (POR M² DE LOSA)","etapa":"CIMENTACIÓN","motivo":"Salida de acometida: red principal, no un punto de aparato."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01133","grupo":"MINISPLIT (CONDENSADO)","etapa":"SANITARIA","motivo":"Salida sanitaria de minisplit: variante de la clave del libro curado."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01091","grupo":"LAVAVAJILLAS","etapa":"SANITARIA","motivo":"Salida sanitaria de lavavajillas."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01065","grupo":"TARJA DE COCINA","etapa":"SANITARIA","motivo":"Variante de la salida sanitaria de tarja de cocina."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01067","grupo":"TARJA DE COCINA","etapa":"SANITARIA","motivo":"Variante de la salida sanitaria de tarja de cocina."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01064","grupo":"ASADOR (FIJO)","etapa":"SANITARIA","motivo":"Tarja del asador: el libro curado trata el asador como fijo."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01066","grupo":"ASADOR (FIJO)","etapa":"SANITARIA","motivo":"Tarja del asador: el libro curado trata el asador como fijo."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01112","grupo":"BAJADA DE AGUAS NEGRAS (BAN)","etapa":"SANITARIA","motivo":"Salida sanitaria para proyección de BAN."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01034","grupo":"LAVAMANOS","etapa":"SANITARIA","motivo":"Variante de la salida sanitaria de lavamanos."},
+ {"sis":"HIDROSANITARIAS","clave":"ISN-01052","grupo":"REGADERA","etapa":"SANITARIA","motivo":"Variante de la salida sanitaria de regadera."},
+ {"sis":"ELÉCTRICAS","clave":"IEC-10160","grupo":"APAGADOR/CONTACTO (MIXTO)","etapa":"CABLEADO","motivo":"Cableado de apagador mixto (sencillo + 2 escalera)."},
+ {"sis":"ELÉCTRICAS","clave":"IEC-10090","grupo":"APAGADOR/CONTACTO (MIXTO)","etapa":"CABLEADO","motivo":"Cableado de apagador mixto (sencillo + 1 escalera)."}
+]
