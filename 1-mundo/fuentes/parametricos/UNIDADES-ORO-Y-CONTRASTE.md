@@ -390,25 +390,51 @@ Era el cajón de lo que no entraba en ningún driver. Ahora tiene **ocho grupos 
 
 ## 17. Ensamble de chimenea (2026-11-11)
 
-**Corrección del usuario:** la piedra galarza de 40×40 y 60×40 **no es de piso, es de la chimenea**. Estaba mal en obra complementaria como «piso». Pasa a un driver nuevo, **CHIMENEA**, que es un ensamble de una pieza (`pza`, una chimenea por prototipo) en `PARAMETRICOS_7_PROTOTIPOS.xlsx`, hoja `CHIMENEA`.
+**Corrección del usuario:** la piedra galarza de 40×40 y 60×40 **no es de piso, es de la chimenea**. Pasa a un driver nuevo, **CHIMENEA**, un ensamble de una pieza (`pza`, una chimenea por prototipo) en `PARAMETRICOS_7_PROTOTIPOS.xlsx`, hoja `CHIMENEA`. El usuario precisó después qué lleva: **salida de gas, acero de refuerzo en cimentación y castillos ahogados**.
 
-**Cómo se armó la receta.** La chimenea solo existe en Diamante con chimenea. Se comparó contra Diamante sin chimenea y se tomó lo que la versión con chimenea agrega a cada concepto. El muro lo confirma: Diamante con chimenea mide 602.52 m² de tabique y sin chimenea 591; al sacar los 11.52 m² del cuerpo de la chimenea, **el muro de las dos versiones queda en 591 m²**.
+**Cómo se armó la receta.** La chimenea solo existe en Diamante con chimenea. Se comparó contra Diamante sin chimenea y se tomó lo que la versión con chimenea agrega a cada concepto. El muro lo confirma: Diamante con chimenea mide 602.52 m² de tabique y sin chimenea 591; al sacar los 11.52 m² del cuerpo, **el muro de las dos versiones queda en 591 m²**.
 
 | Grupo | Concepto | Cantidad | Importe | Certeza |
 |---|---|---|---|---|
-| Cimentación | Acero de cimentación K3 (la base) | 2 pza | $1,789 | Probable |
+| Cimentación | Acero de refuerzo en cimentación K3 | 2 pza | $1,789 | Confirmada por el usuario |
+| Obra negra | Castillo ahogado K7 (el tiro) | 8.4 m | $1,698 | Confirmada por el usuario |
 | Obra negra | Muro de tabique de 14 cm (el cuerpo) | 11.52 m² | $4,458 | Probable |
-| Obra negra | Castillo K7 para encofrar tubería (el tiro) | 8.4 m | $1,698 | Probable |
 | Obra gris | Repellado del cuerpo | 19.74 m² | $2,531 | Probable |
-| Revestimiento | Piedra galarza 40×40 | 4.32 m² | $4,715 | **Cierta** |
-| Revestimiento | Piedra galarza 60×40 | 10.72 m² | $8,536 | **Cierta** |
-| **Total de la chimenea** | | | **$23,728** | $13,251 ciertas, $10,477 probables |
+| Revestimiento | Piedra galarza 40×40 | 4.32 m² | $4,715 | Cierta |
+| Revestimiento | Piedra galarza 60×40 | 10.72 m² | $8,536 | Cierta |
+| Gas | Salida de gas de la estancia (IGAS-01070) | 1 pza | $430 | Confirmada por el usuario |
+| Gas | Ranura y conexión de gas de la estancia (IGAS-02070) | 1 pza | $219 | Confirmada por el usuario |
+| **Total de la chimenea** | | | **$24,377** | $17,388 ciertas o confirmadas, $6,989 probables |
 
-**Lo que la hoja también muestra.** Diamante con chimenea cuesta $29,065 más que sin chimenea. La chimenea explica **$23,728**; los otros **$5,337** son cambios de diseño entre las dos versiones (otras losas, 85 m² más de relleno, columnas C-1 que desaparecen, la línea sanitaria de cimentación). Las dos losas de cimentación y las dos de entrepiso son distintas en cada versión, y cada par casi se compensa.
+**La salida de gas.** Es la única pieza que el catálogo trae **también sin chimenea** (la estancia de Diamante sin chimenea y de los otros seis prototipos tiene su salida de gas). Por eso no sale de la comparación: se tomó por indicación del usuario. En Diamante con chimenea se saca del driver GAS y se carga a la chimenea, así que su gas queda en $6,763 contra $7,412 de Diamante sin chimenea. Pregunta abierta: para qué sirve esa salida en los prototipos sin chimenea.
 
-**Qué falta, y es del usuario.**
-- Las piezas de la chimenea que **el catálogo no trae**: el hogar, el tiro metálico, el remate y la campana no tienen precio en ningún concepto.
-- Confirmar las cuatro piezas «probables» (cimentación, cuerpo, tiro y repellado) y el castillo K7: sale de comparar las dos versiones, no de una descripción que diga «chimenea».
-- La línea sanitaria de cimentación (+$731 con chimenea) la atribuye `CONOCIMIENTO.md` a la chimenea; aquí queda fuera porque es otra clave, no una pieza propia.
+**Lo que la hoja también muestra.** Diamante con chimenea cuesta $29,065 más que sin chimenea. De eso, la chimenea explica $23,728 (todo lo anterior salvo el gas); los otros **$5,337** son cambios de diseño entre las dos versiones (otras losas, 85 m² más de relleno, columnas C-1 que desaparecen, la línea sanitaria de cimentación).
 
-**Efecto en las tasas.** Diamante con chimenea ya no mezcla el cuerpo de la chimenea con el muro: su divisor de muro baja a 591 m², igual que el de sin chimenea, y su tasa de muro queda en $1,487 contra $1,492. Obra complementaria de Diamante con chimenea queda igual que la de sin chimenea ($73,065).
+**Qué falta, y es del usuario.** Las piezas que **el catálogo no trae**: hogar, tiro metálico, remate y campana no tienen precio en ningún concepto. Y confirmar las dos «probables» (cuerpo de tabique y repellado).
+
+**Efecto en las tasas.** Diamante con chimenea ya no mezcla el cuerpo de la chimenea con el muro: su divisor de muro baja a 591 m², igual que sin chimenea.
+
+## 18. Escalera por escalones (2026-11-11)
+
+**Regla del usuario.** La escalera se cuenta **por escalones (puntos)**; cada escalón mide **1.20 m de largo** y es **escalable a lo largo**; los **spots de escalera van cada 3 escalones, empezando en el 3.er escalón** de cada tramo.
+
+**Oro v23** (`CATALOGO_PARAMETRICO_ORO_v23.xlsx`, hoja `LEEME v23`; se genera con `escalera_oro.py` desde v22):
+- Hoja ESCALERA: escalones en planta baja (18) y planta alta (6) como puntos editables (M3 y M4), y largo del escalón (M5, 1.20 m). El escalón forjado y su forrado escalan con escalones del nivel × largo ÷ 1.20.
+- Hoja ELÉCTRICAS, grupo SPOT DE ESCALERA: ahora es `INT(escalones ÷ 3)` por nivel, ligado a ESCALERA: 6 en PB + 2 en PA = 8 spots.
+- Comprobado: con 30 escalones en PB y largo de 1.50 m el escalón forjado pasa de 18 a 37.5 pzas equivalentes (30 × 1.25) y los spots a 12.
+- **Efecto:** la escalera queda en $28,301 (igual); los spots pasan de 6 a 8: **+$860.70**. El total de Oro es $2,635,201.28 y la diferencia contra Hoja1 $20,111.67. El libro de v22 usaba 6 spots por un ajuste anterior (4 en PB y 2 en PA); el catálogo trae 8 salidas y 9 luminarias.
+- Las pruebas de estabilidad pasan (Hoja1 barajada: 29 de 29 importes sin cambio).
+
+**Zafiro Plus** no tiene libro propio: su ensamble está en la hoja `ESCALERA` de `PARAMETRICOS_7_PROTOTIPOS.xlsx`, junto con el de Oro, con escalones por tramo y largo editables.
+
+| | Oro | Zafiro Plus |
+|---|---|---|
+| Escalones (puntos) | 24 (18 + 6) | 30 (18 + 6 + 6) |
+| Spots de escalera por la regla | 8 | 10 |
+| Salidas / luminarias de spot en el catálogo | 8 / 9 | 15 / 9 |
+| Importe de la escalera por la regla (forjado, forrado y spots) | $31,744 | $37,461 |
+| Por escalón | $1,323 | $1,249 |
+
+En Zafiro Plus el catálogo trae 15 salidas de spot contra 10 de la regla: son 5 de más (ZPlus repite la salida en dos niveles). Las salidas y luminarias de spot se siguen cobrando dentro de ELÉCTRICAS.
+
+**Medición en los 7.** El driver ESCALERA ahora cuenta escalones: Oro $1,179, Zafiro Plus $1,105 y Diamante $1,179 por escalón (los tres con el mismo precio unitario; n = 4, insuficiente). La escalera de metal de Diamante (herrería y escalones de metal, $63,061) pasa a su driver propio, **ESCALERA METÁLICA**, fijo. El barandal (HER-02020) depende de la altura y no de los escalones; queda fuera.

@@ -49,6 +49,8 @@ for p in range(7):
             for c in reversed(lineas):
                 if falta<=0.0001: break
                 a=min(c['q'],falta); CARVE[c['row']]=(a,capa_ch); falta-=a
+        for c in cs:   # salida de gas de la chimenea (dato del usuario): la salida de la estancia y su ranura y conexión
+            if c['clave'] in('IGAS-01070','IGAS-02070'): CARVE[c['row']]=(c['q'],'INSTALACIÓN DE GAS')
     # --- boquillas: la fina define el tipo y la gruesa es la de la misma zona y cantidad
     def pares(fina):
         out=[]
@@ -104,6 +106,8 @@ for p in range(7):
     for c in cs:
         if c['row'] in hecho: continue
         sn='AZOTEA' if c['sub'] in AZ else c['sub']; cl=c['clave']; d=c['desc'].lower(); k0=f"{cl}§{sn}"
+        if cl in('HER-03010','CAR-06010'):
+            poner(c,'ESCALERA METÁLICA','FIJO','escalera de metal: otra escalera, no de escalones forjados'); continue
         if cl in('ACA-11011','ACA-11012'):
             poner(c,'CHIMENEA','REVESTIMIENTO','piedra galarza: es de la chimenea'); continue
         if cl in OC_GRUPOS and not (cl=='ACA-07040' and k0 in mapa):
@@ -156,6 +160,7 @@ for r in rows:
         elif drv=='JARDÍN' and cl=='OBE-03210': v=r['q']
         elif drv=='CUBIERTA' and cl in('ACA-02032','ACA-02033'): v=r['q']
         elif drv=='PÓRFIDO' and cl=='OBE-02011': v=r['q']
+        elif drv=='ESCALERA' and cl=='EST-01510': v=qq
         elif drv=='OBRA COMPLEMENTARIA' and cl in OC_GRUPOS and OC_GRUPOS[cl][1]: v=r['q']
         if v: div[(r['row'],drv)]=v
 wb=openpyxl.Workbook(); lee=wb.active; lee.title='LEEME'; mar=wb.create_sheet('MÁRMOL')
@@ -199,21 +204,21 @@ chim=wb.create_sheet('CHIMENEA')
 chim['A1']='ENSAMBLE DE CHIMENEA'; chim['A1'].font=Font(bold=True,size=13)
 chim['A2']='Receta de UNA chimenea, sacada de lo que agrega Diamante con chimenea frente a Diamante sin chimenea. Cantidad por chimenea × precio = importe. Es solo lo que el catálogo trae: no hay hogar, tiro metálico ni remate con precio.'
 head(chim,4,['Grupo','Clave','Concepto','Unidad','Cantidad por chimenea','Precio unitario','Importe','Certeza','De dónde sale'])
-CERT={'ACA-11011':'cierta','ACA-11012':'cierta','EST-02170':'probable','EST-02010':'probable','ALB-01010':'probable','EST-10031':'probable'}
-NOTA={'ACA-11011':'Solo existe en la versión con chimenea','ACA-11012':'Solo existe en la versión con chimenea','EST-02170':'Castillo para encofrar tubería: el tiro; 8.4 m más que sin chimenea','EST-02010':'Cuerpo de tabique; 11.52 m² más que sin chimenea (el muro de Diamante con chimenea mide 602.52 m² y sin chimenea 591)','ALB-01010':'Repellado del cuerpo; 19.74 m² más que sin chimenea','EST-10031':'Acero de cimentación K3: la base; 2 piezas más que sin chimenea'}
+CERT={'ACA-11011':'cierta','ACA-11012':'cierta','EST-02170':'confirmada por el usuario','EST-02010':'probable','ALB-01010':'probable','EST-10031':'confirmada por el usuario','IGAS-01070':'confirmada por el usuario','IGAS-02070':'confirmada por el usuario'}
+NOTA={'IGAS-01070':'Salida de gas de la estancia: el usuario la incluye en la chimenea. El catálogo la trae también sin chimenea, por eso no aparece en el contraste','IGAS-02070':'Ranura y conexión de gas de la estancia, parte de la salida de gas de la chimenea','ACA-11011':'Solo existe en la versión con chimenea','ACA-11012':'Solo existe en la versión con chimenea','EST-02170':'Castillo ahogado para encofrar tubería (el tiro): confirmado por el usuario; 8.4 m más que sin chimenea','EST-02010':'Cuerpo de tabique; 11.52 m² más que sin chimenea (el muro de Diamante con chimenea mide 602.52 m² y sin chimenea 591)','ALB-01010':'Repellado del cuerpo; 19.74 m² más que sin chimenea','EST-10031':'Acero de refuerzo en cimentación K3: confirmado por el usuario; 2 piezas más que sin chimenea'}
 filas_ch=[]
 for r in rows:
     if r['p']!=5: continue
     for a in asig.get(r['row'],[]):
         if a[0]=='CHIMENEA': filas_ch.append((a[1],r['clave'],r['desc'][:75],r['u'],a[2],r['pu']))
-orden={'CIMENTACIÓN':0,'OBRA NEGRA':1,'OBRA GRIS':2,'REVESTIMIENTO':3}
+orden={'CIMENTACIÓN':0,'OBRA NEGRA':1,'OBRA GRIS':2,'REVESTIMIENTO':3,'INSTALACIÓN DE GAS':4}
 filas_ch.sort(key=lambda x:(orden[x[0]],x[1]))
 for i,(g,cl,d,u,q,pu) in enumerate(filas_ch,5):
     for j,v in enumerate((g,cl,d,u,round(q,2),pu),1): chim.cell(i,j,v)
     chim.cell(i,7,f'=E{i}*F{i}').number_format='#,##0.00'; chim.cell(i,8,CERT.get(cl,'')); chim.cell(i,9,NOTA.get(cl,''))
 n_ch=4+len(filas_ch); rt_=n_ch+1
 chim.cell(rt_,1,'TOTAL de la chimenea').font=Font(bold=True); chim.cell(rt_,7,f'=SUM(G5:G{n_ch})').number_format='#,##0.00'
-chim.cell(rt_+1,1,'  de ello, ciertas'); chim.cell(rt_+1,7,f'=SUMIFS(G5:G{n_ch},H5:H{n_ch},"cierta")').number_format='#,##0.00'
+chim.cell(rt_+1,1,'  de ello, ciertas o confirmadas por el usuario'); chim.cell(rt_+1,7,f'=SUMIFS(G5:G{n_ch},H5:H{n_ch},"cierta")+SUMIFS(G5:G{n_ch},H5:H{n_ch},"confirmada por el usuario")').number_format='#,##0.00'
 chim.cell(rt_+2,1,'  de ello, probables'); chim.cell(rt_+2,7,f'=SUMIFS(G5:G{n_ch},H5:H{n_ch},"probable")').number_format='#,##0.00'
 # contraste con/sin chimenea
 c0=rt_+5
@@ -239,6 +244,49 @@ chim.cell(i+2,1,'  de ello, otros cambios de diseño'); chim.cell(i+2,7,f'=SUMIF
 chim.cell(i+4,1,'La línea principal sanitaria de cimentación (ISN-02001 con chimenea contra ISN-02003 sin ella, +$731 por la misma distancia) la atribuye CONOCIMIENTO.md a la chimenea; aquí queda fuera de la receta porque es otra clave, no una cantidad que crece, y no es una pieza propia de la chimenea.')
 for col,w in zip('ABCDEFGHI',(34,11,80,7,16,12,14,14,90)): chim.column_dimensions[col].width=w
 
+
+# --- hoja ESCALERA: ensamble por escalón (puntos), escalable a lo largo (Oro y Zafiro Plus)
+esc=wb.create_sheet('ESCALERA')
+esc['A1']='ENSAMBLE DE ESCALERA — POR ESCALÓN (PUNTOS)'; esc['A1'].font=Font(bold=True,size=13)
+esc['A2']='Se cuenta por escalones (puntos). Cada escalón mide 1.20 m de largo y la cantidad escala con el largo del proyecto. Los spots de escalera van cada 3 escalones, desde el 3.er escalón de cada tramo. Celdas amarillas = editables.'
+amar=PatternFill('solid',fgColor='FFF2CC')
+esc['A4']='Largo base del escalón (m)'; esc['C4']=1.2
+esc['A5']='Un spot cada N escalones (empieza en el N-ésimo)'; esc['C5']=3
+def tramos(p):
+    return [c['q'] for c in rows if c['p']==p and c['clave']=='EST-01510']
+def cat(p,cl): return sum(c['q'] for c in rows if c['p']==p and c['clave']==cl)
+head(esc,7,['Concepto','Clave','Oro 4.01','Zafiro Plus','Precio unitario','Importe Oro','Importe Zafiro Plus'])
+PRO=[(6,'C'),(2,'D')]
+t6=tramos(6)+[0,0,0]; t2=tramos(2)+[0,0,0]
+filas_p=[('Escalones del tramo 1 (puntos)',None,t6[0],t2[0]),('Escalones del tramo 2 (puntos)',None,t6[1],t2[1]),('Escalones del tramo 3 (puntos)',None,t6[2],t2[2])]
+for k,(t,_,a,b) in enumerate(filas_p):
+    r=8+k; esc.cell(r,1,t); esc.cell(r,3,a).fill=amar; esc.cell(r,4,b).fill=amar
+esc.cell(11,1,'Escalones totales (puntos)').font=Font(bold=True); esc.cell(11,3,'=SUM(C8:C10)'); esc.cell(11,4,'=SUM(D8:D10)')
+esc.cell(12,1,'Largo del escalón del proyecto (m)'); esc.cell(12,3,'=$C$4').fill=amar; esc.cell(12,4,'=$C$4').fill=amar
+esc.cell(13,1,'Factor de largo (largo del proyecto ÷ largo base)'); esc.cell(13,3,'=C12/$C$4'); esc.cell(13,4,'=D12/$C$4')
+esc.cell(14,1,'Forrado por escalón de forjado (catálogo)'); esc.cell(14,3,round(cat(6,'ACA-02210')/cat(6,'EST-01510'),4)).fill=amar; esc.cell(14,4,round(cat(2,'ACA-02210')/cat(2,'EST-01510'),4)).fill=amar
+esc.cell(15,1,'Spots de escalera (suma de INT(escalones del tramo ÷ N))'); esc.cell(15,3,'=INT(C8/$C$5)+INT(C9/$C$5)+INT(C10/$C$5)'); esc.cell(15,4,'=INT(D8/$C$5)+INT(D9/$C$5)+INT(D10/$C$5)')
+esc.cell(17,1,'RECETA DEL PROYECTO').font=Font(bold=True)
+pu={cl:next(c['pu'] for c in rows if c['clave']==cl) for cl in ('EST-01510','ACA-02210','IEC-01240','IEC-20030')}
+rec=[('Escalón forjado de concreto armado (escalón de 1.20 m)','EST-01510','={c}11*{c}13'),('Forrado de escalón, Brunei 60×60','ACA-02210','={c}11*{c}13*{c}14'),
+     ('Salida eléctrica de spot de escalera','IEC-01240','={c}15'),('Luminaria spot de escalera y cableado','IEC-20030','={c}15')]
+for k,(t,cl,f) in enumerate(rec):
+    r=18+k; esc.cell(r,1,t); esc.cell(r,2,cl); esc.cell(r,5,pu[cl]).number_format='#,##0.00'
+    for p,c in PRO:
+        esc.cell(r,3 if c=='C' else 4,f.format(c=c)).number_format='#,##0.00'
+    esc.cell(r,6,f'=C{r}*E{r}').number_format='#,##0.00'; esc.cell(r,7,f'=D{r}*E{r}').number_format='#,##0.00'
+esc.cell(22,1,'IMPORTE DE LA ESCALERA').font=Font(bold=True); esc.cell(22,6,'=SUM(F18:F21)').number_format='#,##0.00'; esc.cell(22,7,'=SUM(G18:G21)').number_format='#,##0.00'
+esc.cell(23,1,'Importe por escalón (punto)'); esc.cell(23,6,'=F22/C11').number_format='#,##0.00'; esc.cell(23,7,'=G22/D11').number_format='#,##0.00'
+esc.cell(25,1,'CONTRASTE CON EL CATÁLOGO').font=Font(bold=True)
+head(esc,26,['Concepto','Clave','Oro: regla','Zafiro Plus: regla','Oro: catálogo','Zafiro Plus: catálogo','Oro: diferencia','Zafiro Plus: diferencia'])
+for k,(t,cl,_) in enumerate(rec):
+    r=27+k; esc.cell(r,1,t); esc.cell(r,2,cl); esc.cell(r,3,f'=C{18+k}'); esc.cell(r,4,f'=D{18+k}')
+    esc.cell(r,5,round(cat(6,cl),2)); esc.cell(r,6,round(cat(2,cl),2)); esc.cell(r,7,f'=C{r}-E{r}'); esc.cell(r,8,f'=D{r}-F{r}')
+    for c in (3,4,5,6,7,8): esc.cell(r,c).number_format='#,##0.00'
+esc.cell(32,1,'Lectura: Oro tiene 24 escalones (18 + 6): la regla da 8 spots y el catálogo trae 8 salidas y 9 luminarias. Zafiro Plus tiene 30 (18 + 6 + 6): la regla da 10 spots y el catálogo trae 15 salidas y 9 luminarias. Las salidas y luminarias de spot de escalera se cobran dentro de ELÉCTRICAS; aquí se muestran porque dependen de los escalones.')
+esc.cell(33,1,'Barandal (HER-02020): Oro 6.41 m, Zafiro Plus 6.14 m; depende de la altura y el largo de la escalera, no del número de escalones; se queda fuera del ensamble por escalón.')
+for col,w in zip('ABCDEFGH',(60,12,14,16,16,18,18,20)): esc.column_dimensions[col].width=w
+
 head(aw,1,['Prototipo','Fila Hoja1','Subcapítulo','Clave','Descripción','Unidad','Cantidad en el catálogo','Precio unitario','Driver (editable)','Capa (editable)','Cantidad que se cobra','Importe','Divisor del driver','Cómo se asignó','Nota'])
 fila=2; pos={r['row']:r for r in rows}
 for r in sorted(rows,key=lambda x:x['row']):
@@ -255,7 +303,7 @@ na=fila-1
 for col,w in zip('ABCDEFGHIJKLMNO',(13,9,20,11,60,7,11,10,22,16,11,12,11,42,40)): aw.column_dimensions[col].width=w
 aw.freeze_panes='A2'; aw.auto_filter.ref=f'A1:O{na}'
 DR=[('MURO','m² de tabique','DRIVER'),('PRETIL','m² de pretil','DRIVER'),('VANO','m de boquilla interior','DRIVER'),('MARCOS EXTERIORES','m de marco exterior','DRIVER'),
-    ('LOSA','m² de losa de nivel','DRIVER'),('LOSA DE CIMENTACIÓN','m² de desplante','DRIVER'),('PISO','m² de piso (loseta + mármol)','DRIVER'),('ESCALERA','piezas (sin divisor común)','FIJO'),
+    ('LOSA','m² de losa de nivel','DRIVER'),('LOSA DE CIMENTACIÓN','m² de desplante','DRIVER'),('PISO','m² de piso (loseta + mármol)','DRIVER'),('ESCALERA','escalones (puntos)','DRIVER'),('ESCALERA METÁLICA','fijo','FIJO'),
     ('ASADOR','m² de piso','DRIVER'),('PÓRFIDO','m²','DRIVER'),('COCHERA','m² de pérgola','DRIVER'),('SILLAR','m²','DRIVER'),('BARDA','ml','DRIVER'),
     ('JARDÍN','m² de sello','DRIVER'),('CUBIERTA','ml','DRIVER'),('CISTERNA','L','CTE'),('CHIMENEA','pza (1 chimenea)','CTE'),
     ('HIDROSANITARIAS','por salidas (TABLA_APARATOS_SALIDAS)','SALIDAS'),('GAS','por salidas','SALIDAS'),('ELÉCTRICAS','por salidas','SALIDAS'),('EQUIPOS','por salidas','SALIDAS'),

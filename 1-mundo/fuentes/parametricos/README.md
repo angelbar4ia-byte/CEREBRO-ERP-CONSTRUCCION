@@ -9,7 +9,8 @@ Fuente compartida por el usuario el 2026-11-11, guardada tal cual. Huellas en `.
 | `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v46.xlsx` | **Vigente.** v45 estabilizado (igual que Oro v22). Mismos importes. Ver `ESTABILIDAD.md`. |
 | `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx` | Reemplazada por v46. v44 con llaves en lugar de filas, cohorte, dispersión y unidades reales. Hoja `LEEME v45`. |
 | `CATALOGO_PARAMETRICO_ORO_v19.xlsx` | Igual para Oro. Hoja `LEEME v19`. |
-| `CATALOGO_PARAMETRICO_ORO_v22.xlsx` | **Vigente.** v21 estabilizado: llaves con capítulo, RUTA ID única, rangos sin tope, controles de estabilidad. Mismos importes. Ver `ESTABILIDAD.md`. |
+| `CATALOGO_PARAMETRICO_ORO_v23.xlsx` | **Vigente.** v22 con la escalera por escalones (puntos), escalable a lo largo, y spots cada 3 escalones. Se genera con `escalera_oro.py`. Hoja `LEEME v23`. |
+| `CATALOGO_PARAMETRICO_ORO_v22.xlsx` | Reemplazada por v23. v21 estabilizado: v21 estabilizado: llaves con capítulo, RUTA ID única, rangos sin tope, controles de estabilidad. Mismos importes. Ver `ESTABILIDAD.md`. |
 | `CATALOGO_PARAMETRICO_ORO_v21.xlsx` | Reemplazada por v22. v20 con la boquilla gruesa de los marcos cobrada una sola vez (fila 319 en 0, fila 320 activa). Total $2,634,340.58. Hoja `LEEME v21`. |
 | `CATALOGO_PARAMETRICO_ORO_v20.xlsx` | Reemplazada por v21 (dejaba dos boquillas gruesas en los marcos). v19 con el pretil corregido (franja +3.00 con tope; 255 m² pasan a MURO FACHADA; boquilla a MARCOS EXTERIORES). Mismos totales. Hoja `LEEME v20`. |
 | `ESTABILIDAD.md`, `estabilizar_parametricos.py`, `probar_parametricos.py`, `estado_esperado_*.json` | Auditoría, cambios, pruebas y reglas para que los paramétricos y sus rutas no se rompan. |
