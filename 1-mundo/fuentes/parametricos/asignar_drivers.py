@@ -21,6 +21,10 @@ for i,r in enumerate(H,1):
         rows.append(dict(row=i,p=p,sub=(sub if subp==p else '') or '',clave=r[5] or '',desc=r[7] or '',u=r[10],q=r[11] or 0,pu=r[12] or 0,imp=r[13] or 0,ubi=r[25]))
 def m2(d):
     m=re.search(r'\(\s*([\d.]+)\s*m\s*2\s*\)',d,re.I); return float(m.group(1)) if m else None
+OC_GRUPOS={'ACA-06010':('TEJAS','m²'),'ICA-01060':('VIGAS EMPOTRADAS','pza'),'ICA-03010':('VIGAS DE MADERA','pza'),
+ 'ACA-11013':('COLUMNAS DE PIEDRA','pza'),'ACA-11014':('COLUMNAS DE PIEDRA','pza'),'ACA-11015':('COLUMNAS DE PIEDRA','pza'),'ACA-07040':('COLUMNAS DE PIEDRA','pza'),
+ 'ACA-11011':('PIEDRA GALARZA','m²'),'ACA-11012':('PIEDRA GALARZA','m²'),'ACA-10010':('FACHALETA','m²'),
+ 'ACA-02512':('ROOF','m²'),'ACA-02052':('ROOF',None),'CAR-01030':('DURMIENTE','pza'),'ICA-01030':('DURMIENTE','pza'),'ACA-01210':('GOTERÓN','m')}
 AZ=('AZOTEA','AZOTEA/ROOF'); GRUESAS=('ACA-01050','ACA-01051','ACA-01052')
 asig={}    # row -> lista de (driver,capa,cantidad,origen,nota)
 div={}     # row -> divisor
@@ -83,7 +87,9 @@ for p in range(7):
     # --- el resto
     for c in cs:
         if c['row'] in hecho: continue
-        sn='AZOTEA' if c['sub'] in AZ else c['sub']; cl=c['clave']; d=c['desc'].lower()
+        sn='AZOTEA' if c['sub'] in AZ else c['sub']; cl=c['clave']; d=c['desc'].lower(); k0=f"{cl}§{sn}"
+        if cl in OC_GRUPOS and not (cl=='ACA-07040' and k0 in mapa):
+            poner(c,'OBRA COMPLEMENTARIA',OC_GRUPOS[cl][0],'obra complementaria: grupo '+OC_GRUPOS[cl][0]); continue
         if c['u']=='act' and d.startswith('losa') and c['sub']=='CIMENTACIÓN':
             poner(c,'LOSA DE CIMENTACIÓN','OBRA NEGRA','losa de cimentación: driver propio (desplante)'); continue
         k=f"{'EST-02010' if cl=='EST-02011' else cl}§{sn}"
@@ -108,7 +114,7 @@ for p in range(7):
         elif cl=='ACA-08041': dr,capa='MURO','REVESTIMIENTO'
         elif cl=='ACA-20012': dr,capa='MURO','OBRA BLANCA'
         elif cl.startswith('ALB-030'): dr,capa='LOSA','OBRA GRIS'
-        elif cl.startswith(('ACA-11','ACA-10','ACA-07040','ACA-02512','ACA-02052','ICA-')) or not cl: dr,capa='OBRA COMPLEMENTARIA','FIJO'
+        elif cl.startswith(('ACA-11','ACA-10','ACA-07040','ACA-02512','ACA-02052','ICA-')) or not cl: dr,capa='OBRA COMPLEMENTARIA','SIN CLASIFICAR'
         elif cl.startswith('EST') and c['sub'] in('PLANTA BAJA','PLANTA ALTA','CIMENTACIÓN'): dr,capa='MURO','OBRA NEGRA'
         elif c['sub'] in AZ: dr,capa='LOSA','OBRA GRIS'
         if dr: poner(c,dr,capa,'regla por clave o subcapítulo'); continue
@@ -132,6 +138,7 @@ for r in rows:
         elif drv=='JARDÍN' and cl=='OBE-03210': v=r['q']
         elif drv=='CUBIERTA' and cl in('ACA-02032','ACA-02033'): v=r['q']
         elif drv=='PÓRFIDO' and cl=='OBE-02011': v=r['q']
+        elif drv=='OBRA COMPLEMENTARIA' and cl in OC_GRUPOS and OC_GRUPOS[cl][1]: v=r['q']
         if v: div[(r['row'],drv)]=v
 wb=openpyxl.Workbook(); lee=wb.active; lee.title='LEEME'; mar=wb.create_sheet('MÁRMOL')
 res=wb.create_sheet('RESUMEN'); val=wb.create_sheet('VALIDACIÓN'); aw=wb.create_sheet('ASIGNACIÓN')
@@ -235,6 +242,32 @@ res.cell(rv,10,f'=COUNT(C{rv}:I{rv})'); res.cell(rv,11,f'=AVERAGE(C{rv}:I{rv})')
 res.cell(rv,12,f'=STDEV(C{rv}:I{rv})').number_format='#,##0.00'; res.cell(rv,13,f'=L{rv}/K{rv}').number_format='0.0%'
 res.cell(rv,14,f'=STDEVP(C{rv}:I{rv})/K{rv}').number_format='0.0%'
 res.cell(rv,15,f'=IF(J{rv}<5,"insuficiente",IF(M{rv}<=0.1,"utilizable",IF(M{rv}<=0.25,"revisar","no usar")))&" (n="&J{rv}&")"')
+
+# OBRA COMPLEMENTARIA por grupo
+oc0=rv+3
+res.cell(oc0-1,1,'OBRA COMPLEMENTARIA POR GRUPO (importe, divisor y tasa)').font=Font(bold=True)
+GR=[('TEJAS','m²'),('VIGAS EMPOTRADAS','pza'),('VIGAS DE MADERA','pza'),('COLUMNAS DE PIEDRA','pza'),('PIEDRA GALARZA','m²'),('FACHALETA','m²'),('ROOF','m²'),('DURMIENTE','pza'),('GOTERÓN','m'),('SIN CLASIFICAR','')]
+head(res,oc0,['Grupo','Unidad']+PROTOS+['n','Media','Desv. muestral','CV muestral','CV poblacional','Confianza'])
+ng=len(GR)
+for k,(g,u) in enumerate(GR):
+    ri_=oc0+1+k; rd_=oc0+1+ng+2+k; rt_=oc0+1+2*(ng+2)+k
+    if k==0:
+        res.cell(oc0+ng+2,1,'Divisor (piezas, m² o m del grupo)').font=Font(bold=True); res.cell(oc0+2*(ng+2),1,'Tasa por unidad del grupo').font=Font(bold=True)
+    for rr in (ri_,rd_,rt_): res.cell(rr,1,g); res.cell(rr,2,u)
+    for p in range(7):
+        cl=L(3+p)
+        res.cell(ri_,3+p,f'=SUMIFS(ASIGNACIÓN!$L$2:$L${na},ASIGNACIÓN!$A$2:$A${na},{cl}${b1},ASIGNACIÓN!$I$2:$I${na},"OBRA COMPLEMENTARIA",ASIGNACIÓN!$J$2:$J${na},$A{ri_})').number_format='#,##0'
+        if u:
+            res.cell(rd_,3+p,f'=SUMIFS(ASIGNACIÓN!$M$2:$M${na},ASIGNACIÓN!$A$2:$A${na},{cl}${b1},ASIGNACIÓN!$I$2:$I${na},"OBRA COMPLEMENTARIA",ASIGNACIÓN!$J$2:$J${na},$A{rd_})').number_format='#,##0.00'
+            res.cell(rt_,3+p,f'=IF(OR({cl}{rd_}=0,{cl}{ri_}=0),"",{cl}{ri_}/{cl}{rd_})').number_format='#,##0.00'
+    if u:
+        res.cell(rt_,10,f'=COUNT(C{rt_}:I{rt_})'); res.cell(rt_,11,f'=IF(J{rt_}=0,"",AVERAGE(C{rt_}:I{rt_}))').number_format='#,##0.00'
+        res.cell(rt_,12,f'=IF(J{rt_}<2,"",STDEV(C{rt_}:I{rt_}))').number_format='#,##0.00'
+        res.cell(rt_,13,f'=IF(L{rt_}="","",L{rt_}/K{rt_})').number_format='0.0%'
+        res.cell(rt_,15,f'=IF(M{rt_}="","",IF(J{rt_}<5,"insuficiente",IF(M{rt_}<=0.1,"utilizable",IF(M{rt_}<=0.25,"revisar","no usar")))&" (n="&J{rt_}&")")')
+res.cell(oc0+ng+1,1,'TOTAL obra complementaria').font=Font(bold=True)
+for p in range(7):
+    cl=L(3+p); res.cell(oc0+ng+1,3+p,f'=SUM({cl}{oc0+1}:{cl}{oc0+ng})').number_format='#,##0'
 res.column_dimensions['A'].width=26; res.column_dimensions['B'].width=36
 for c in range(3,16): res.column_dimensions[L(c)].width=13
 res.column_dimensions['O'].width=22; res.freeze_panes='C5'

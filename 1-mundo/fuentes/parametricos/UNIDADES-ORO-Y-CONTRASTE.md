@@ -314,9 +314,9 @@ Las diferencias que quedan vienen de los ajustes de Oro (excepciones autorizadas
 | Sillar | m² (n = 4) | 836 | 15.7 % | Insuficiente |
 | Jardín | m² de sello (n = 4) | 242 | 13.2 % | Insuficiente |
 
-Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso quedó en «revisar» solo por un error de divisor, corregido en §15.** **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $0 en Zafiro y $86 mil en Diamante +.
+Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso quedó en «revisar» solo por un error de divisor, corregido en §15.** **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $1 mil en Zafiro y $86 mil en Diamante +; ver §16.
 
-**Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco (resuelto con datos, §14). (3) Revisar qué entra en OBRA COMPLEMENTARIA de Diamante (galarza y forrados de columna) y si merece driver propio.
+**Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco (resuelto con datos, §14). (3) Obra complementaria: resuelto en §16.
 
 ## 14. Mármol de piso en los otros cinco (2026-11-11)
 
@@ -360,3 +360,31 @@ El piso de Zafiro da $554.0/m², el mismo $554.01 que tenía su libro curado. El
 **Validación.** Piso + losa de cimentación suma lo mismo que el piso del libro curado: Zafiro $217,267 (idéntico) y Oro $269,763 contra $270,519 (−0.3 %).
 
 **Consecuencia.** Ya no queda ningún driver de peso en «revisar». Siguen insuficientes sillar y jardín (n = 4). Los libros de Zafiro v46 y Oro v22 no cambian; la separación está en la medición de los siete.
+
+## 16. Obra complementaria: qué hay dentro (2026-11-11)
+
+Era el cajón de lo que no entraba en ningún driver. Ahora tiene **nueve grupos con su unidad**, en la hoja RESUMEN de `PARAMETRICOS_7_PROTOTIPOS.xlsx` (bloque «Obra complementaria por grupo»):
+
+| Grupo | Unidad | Zafiro | Rubí | Z. Plus | Jade | Dia − | Dia + | Oro | $/unidad |
+|---|---|---|---|---|---|---|---|---|---|
+| Durmiente | pza | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 1,080 |
+| Goterón | m | — | — | 7.8 | — | 7.8 | 7.8 | 7.8 | 80 |
+| Tejas sobre losa | m² | — | — | 43 | 14.4 | 25 | 25 | 24.0 | 288.7 |
+| Vigas empotradas a muro | pza | — | — | 17 | 10 | 10 | 10 | 12 | 326 |
+| Vigas de madera | pza | — | — | — | 3 | — | — | — | 2,424 |
+| Columnas de piedra (forrados y de cantera) | pza | — | — | 1 | — | 13 | 13 | — | 4,333 a 5,132 |
+| Piedra galarza (piso) | m² | — | — | — | — | — | 15.0 | — | 881 |
+| Fachaleta de cantera | m² | — | — | — | 25.6 | — | — | — | 469 |
+| Roof (piso y zoclo Dover) | m² | — | — | — | — | 5.8 | 5.8 | — | 576 |
+| **Importe total** | | **1,080** | **1,080** | **23,990** | **27,778** | **73,065** | **86,316** | **13,630** | |
+
+**Lectura.** Todo es precio unitario por pieza: la tasa por unidad no tiene dispersión que medir (CV de 0 en los grupos que se repiten). Lo que varía entre prototipos es **qué lleva cada diseño y cuántas piezas**: el durmiente está en los siete, las tejas y las vigas en cinco, y Diamante concentra el resto (13 columnas forradas o de cantera = $56 mil, piedra galarza y roof solo en Diamante +). No es un driver que escale con un área; es un catálogo de piezas por prototipo, igual que carpintería o herrería.
+
+**Correcciones al asignar.**
+- **Durmiente:** Zafiro lo trae con la clave `ICA-01030` y Oro con `CAR-01030`; estaba en el muro en unos prototipos y en obra complementaria en otros. Ahora está en obra complementaria en los siete, como en Oro. Zafiro queda −$1,080 en muro (−0.24 %) contra su libro curado, que lo tenía como fijo del muro.
+- **Columnas de cantera** (`ACA-07040`): las de asador y cochera se quedan en su driver, como en los libros curados; solo las que no tienen un asador o cochera donde caer (Zafiro Plus) pasan aquí.
+- **Vigas:** las de 15×20 a 60 cm ($326) y las de madera a 140 cm ($2,424) son piezas distintas y van en grupos separados.
+
+**Validación.** Oro queda **idéntico** a su libro curado: $13,630 (durmiente $2,160, goterón $620, tejas $6,938 y vigas $3,912). Zafiro no tiene obra complementaria en su libro; aquí solo trae el durmiente.
+
+**Pendiente.** Los grupos de Diamante (columnas forradas con piedra galarza, galarza de piso y roof) no tienen libro curado contra el cual validarse; son $56 mil de forrados y $17 mil de piso y roof que dependen del diseño. Si algún prototipo nuevo trae más, caen en «Sin clasificar» para decidirlos.
