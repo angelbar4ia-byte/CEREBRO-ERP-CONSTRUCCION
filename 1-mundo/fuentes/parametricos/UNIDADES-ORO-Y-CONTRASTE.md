@@ -233,3 +233,36 @@ La 319 y la 320 son la misma boquilla gruesa: misma cantidad, mismo precio, y la
 | MARCOS EXTERIORES | $42,540 | $42,540 |
 
 Si la 319 y la 320 no fueran la misma boquilla (por ejemplo, una de ventanas y otra de puertas), la corrección es devolverle a la 319 su cantidad de 18.2 m.
+
+## 12. Vano y marcos exteriores en los 7 prototipos (2026-11-11)
+
+Archivos: `VANO_MARCOS_7_PROTOTIPOS.xlsx` (hojas LEEME, RESUMEN y PARTIDAS) y `medir_vano_marcos.py`. La regla reproduce los libros curados: VANO de Zafiro $17,550.08 y de Oro $13,323.23, MARCOS EXTERIORES de Zafiro $21,070.34 y de Oro $42,539.53.
+
+**La regla.** La boquilla fina define el tipo: `ACA-01060` es interior (VANO), `ACA-01071` es de fachada (MARCOS EXTERIORES), `ACA-01072` es del pretil. La boquilla gruesa que le corresponde es la de la misma zona y la misma cantidad, sea cual sea su clave (el catálogo usa ACA-01050, 01051 y 01052 sin orden). Driver de VANO: metros de boquilla gruesa interior. Driver de MARCOS: metros de marco de cantera exterior (`ACA-07011`).
+
+**VANO.**
+
+| | Zafiro | Rubí | Z. Plus | Jade | Dia − y + | Oro |
+|---|---|---|---|---|---|---|
+| Perímetro (m) | 127 | 101 | 211 | 99.8 | 148.3 | 221.5 |
+| $/m con revestimiento | 138.19 | 60.15 | 60.15 | 60.15 | 60.15 | 60.15 |
+| $/m **sin** revestimiento | 58.97 | 60.15 | 60.15 | 60.15 | 60.15 | 60.15 |
+
+Con n = 2 el vano salía «no usar» (CV de 56 %). La causa es que Zafiro lleva una capa de revestimiento (marco de cantera interior y su sellado, $79/m) que **ningún otro prototipo trae**. La tasa comparable, sin esa capa, da $60/m con CV de 1 %: utilizable. La capa de marco interior queda como opcional, solo de Zafiro.
+
+**MARCOS EXTERIORES.**
+
+| | Zafiro | Rubí | Z. Plus | Jade | Dia − y + | Oro |
+|---|---|---|---|---|---|---|
+| Marco (m) | 44.4 | 83 | 71.6 | 52.6 | 132 | 89.9 |
+| $/m total | 474.56 | 466.81 | 486.21 | 485.48 | 513.62 | 473.19 |
+
+Media $488/m, CV 4 %: **utilizable**. El marco con su sellado cuesta $461/m en los siete (es precio); lo que varía es la boquilla, de 0.10 a 0.87 m por m de marco (CV 71 %), pero pesa menos de $50/m. Las boquillas no son proporcionales al marco: dependen del diseño de las ventanas, no de su largo.
+
+**Hallazgos del catálogo (no de los libros).**
+- Zafiro trae 127 m de boquilla gruesa interior y solo 111 m de fina: faltan 16 m de fina ($149) o sobran de gruesa.
+- Jade trae 59.2 m de sellado de marco contra 52.6 m de marco exterior: 6.6 m de sellado sin marco, que no se cobran (los mismos 6.6 m que Zafiro ajustó a 21 m).
+- Diamante − y + codifican la boquilla gruesa de fachada como `ACA-01051` (la del pretil), igual que la fila 319 de Oro; Zafiro, Rubí, Zafiro Plus y Jade usan `ACA-01052`.
+- Zafiro Plus lleva la boquilla gruesa interior de la planta alta con la clave `ACA-01051`.
+
+**Libros.** No hizo falta cambiar partidas ni importes en Zafiro v46 ni en Oro v22. Solo agregué una nota de contraste en el panel de VANO y de MARCOS EXTERIORES de los dos libros, para que la tasa de $138/m de Zafiro no se lea como dispersión. Las pruebas de estabilidad siguen pasando.
