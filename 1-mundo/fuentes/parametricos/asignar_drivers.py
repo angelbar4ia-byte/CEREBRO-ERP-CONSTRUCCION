@@ -138,6 +138,12 @@ def head(ws,r,vals):
         c=ws.cell(r,i,v); c.font=HF; c.fill=HB; c.alignment=Alignment(wrap_text=True,vertical='center')
 
 # --- hoja MÁRMOL: cuánto mármol va en piso (editable)
+# m² de mármol que van en PISO, por nivel (dato del usuario): tomboleado y travertino largos libres
+DATOS_MARMOL={1:dict(niv=['PB'],tomb=[5.87],trav=[30.19]),
+              2:dict(niv=['PB','PA'],tomb=[1.94,3.61],trav=[14.85,10.98]),
+              3:dict(niv=['PB'],tomb=[5.72],trav=[10.86]),
+              4:dict(niv=['PB','PA'],tomb=[4.73,1.57],trav=[22.54,3.57]),
+              5:dict(niv=['PB','PA'],tomb=[4.73,1.57],trav=[22.54,3.57])}
 head(mar,1,['Prototipo','Travertino en el catálogo (m²)','Tomboleado en el catálogo (m²)','Renivelación de charolas (m²)','Tomboleado en PISO (m²)','% del travertino en piso (editable)','Travertino en PISO (m²)','De dónde sale'])
 trav=collections.defaultdict(float); tomb=collections.defaultdict(float); ren=collections.defaultdict(float)
 for r in rows:
@@ -151,11 +157,13 @@ for p in range(7):
     elif p==6:
         mar.cell(rr,5,8.04); mar.cell(rr,7,32.88); mar.cell(rr,6,'=G8/B8'); mar.cell(rr,8,'Dato del usuario en el libro de Oro: tomboleado 1.8 + 6.24, travertino 13.24 + 19.64 (la renivelación de Hoja1 trae 0.1 + 4.5)')
     else:
-        mar.cell(rr,5,f'=D{rr}'); mar.cell(rr,6,'=AVERAGE($F$2,$F$8)'); mar.cell(rr,7,f'=B{rr}*F{rr}')
-        mar.cell(rr,8,'ESTIMADO: tomboleado = renivelación de charolas (criterio de Zafiro); travertino = promedio de la fracción de Zafiro y de Oro. Confirmar con los m² de piso.')
+        t=DATOS_MARMOL[p]
+        mar.cell(rr,5,'='+'+'.join(f'{x:g}' for x in t['tomb'])); mar.cell(rr,7,'='+'+'.join(f'{x:g}' for x in t['trav']))
+        mar.cell(rr,6,f'=G{rr}/B{rr}')
+        mar.cell(rr,8,'Dato del usuario (tabla de m² de mármol en piso por nivel): '+'; '.join(f'{n} tomboleado {a:g}, largos libres {b:g}' for n,a,b in zip(t['niv'],t['tomb'],t['trav'])))
     for c in (2,3,4,5,7): mar.cell(rr,c).number_format='#,##0.00'
     mar.cell(rr,6).number_format='0.0%'
-mar.cell(10,1,'Sobrescribir la columna F (o G) con el dato real; ASIGNACIÓN y RESUMEN se recalculan. Mover mármol de muro a piso no cambia el total del prototipo, solo cuánto cuesta el muro y cuánto el piso.')
+mar.cell(10,1,'Se puede corregir la columna E o G; ASIGNACIÓN y RESUMEN se recalculan. Mover mármol de muro a piso no cambia el total del prototipo, solo cuánto cuesta el muro y cuánto el piso.')
 for col,w in zip('ABCDEFGH',(14,16,16,16,16,18,16,110)): mar.column_dimensions[col].width=w
 head(aw,1,['Prototipo','Fila Hoja1','Subcapítulo','Clave','Descripción','Unidad','Cantidad en el catálogo','Precio unitario','Driver (editable)','Capa (editable)','Cantidad que se cobra','Importe','Divisor del driver','Cómo se asignó','Nota'])
 fila=2; pos={r['row']:r for r in rows}
@@ -251,7 +259,7 @@ txt=['TODOS LOS CONCEPTOS DE LOS 7 PROTOTIPOS EN SU DRIVER','',
  '1. Boquillas: la fina define el tipo (VANO, MARCOS EXTERIORES o PRETIL) y la gruesa es la de la misma zona y cantidad.',
  '2. Franja de fachada +3.00 (repellado y finas): al pretil lo que mida su muro, el resto a MURO (regla de Zafiro).',
  '3. Pintura del pretil: la línea de fachada INTERIOR más parecida al repellado del pretil.',
- '3b. Mármol (tomboleado y travertino, con su sellado y limpieza): lo que va en piso sale de la hoja MÁRMOL; el resto se queda en el muro. Para Zafiro y Oro son los datos de sus libros; para los otros cinco el tomboleado es la renivelación de charolas y el travertino un ESTIMADO (42.6 %) por confirmar.',
+ '3b. Mármol (tomboleado y travertino, con su sellado y limpieza): lo que va en piso sale de la hoja MÁRMOL; el resto se queda en el muro. Los siete prototipos usan datos del usuario (Zafiro y Oro de sus libros; los otros cinco de la tabla de m² de mármol en piso por nivel).',
  '4. Lo aprendido de los libros curados: la misma clave en el mismo subcapítulo va al mismo driver y capa (mapa_aprendido.json).',
  '5. Reglas por clave y subcapítulo para lo propio de cada prototipo (losas, cocinas, cancelerías, pérgolas, herrería).',
  '6. Lo que no cae en nada queda en SIN ASIGNAR (hoy: %d concepto(s)).'%len(sinasig),

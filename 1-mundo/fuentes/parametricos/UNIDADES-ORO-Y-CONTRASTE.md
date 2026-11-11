@@ -298,12 +298,12 @@ Las diferencias que quedan vienen de los ajustes de Oro (excepciones autorizadas
 
 | Driver | Divisor | Tasa media | CV | Lectura |
 |---|---|---|---|---|
-| Muro | m² de tabique | 1,470 | 9.1 % | Utilizable |
+| Muro | m² de tabique | 1,471 | 9.0 % | Utilizable |
 | Pretil | m² de pretil | 1,136 | 5.9 % | Utilizable |
 | Vano sin revestimiento | m de boquilla interior | 60 | 0.7 % | Utilizable |
 | Marcos exteriores | m de marco | 489 | 3.9 % | Utilizable |
 | Losa | m² de losa de nivel | 1,891 | 9.6 % | Utilizable |
-| Piso | m² de desplante | 1,409 | 11.7 % | Revisar |
+| Piso | m² de desplante | 1,406 | 11.8 % | Revisar |
 | Asador | m² de piso | 3,571 | 7.7 % | Utilizable |
 | Pórfido | m² | 545 | 5.1 % | Utilizable |
 | Cochera | m² de pérgola (n = 5) | 2,101 | 2.7 % | Utilizable |
@@ -315,23 +315,25 @@ Las diferencias que quedan vienen de los ajustes de Oro (excepciones autorizadas
 
 Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso es el único driver de peso en «revisar»**, porque mezcla la losa de cimentación, el piso y el mármol de piso. **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $0 en Zafiro y $86 mil en Diamante +.
 
-**Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco (resuelto con un estimado, §14). (3) Revisar qué entra en OBRA COMPLEMENTARIA de Diamante (galarza y forrados de columna) y si merece driver propio.
+**Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco (resuelto con datos, §14). (3) Revisar qué entra en OBRA COMPLEMENTARIA de Diamante (galarza y forrados de columna) y si merece driver propio.
 
 ## 14. Mármol de piso en los otros cinco (2026-11-11)
 
-Hoja `MÁRMOL` de `PARAMETRICOS_7_PROTOTIPOS.xlsx`. Reparte el mármol (tomboleado y travertino, con su sellado y limpieza) entre muro y piso, como hacen los libros curados de Zafiro y Oro. Mover mármol de muro a piso **no cambia el total del prototipo**, solo cuánto cuesta el muro y cuánto el piso.
+Hoja `MÁRMOL` de `PARAMETRICOS_7_PROTOTIPOS.xlsx`. Reparte el mármol (tomboleado y travertino largos libres, con su sellado y limpieza) entre muro y piso, como hacen los libros curados de Zafiro y Oro. Mover mármol de muro a piso **no cambia el total del prototipo**, solo cuánto cuesta el muro y cuánto el piso.
 
-| Prototipo | Travertino en catálogo (m²) | Travertino en piso (m²) | Tomboleado en piso (m²) | Fuente |
-|---|---|---|---|---|
-| Zafiro 1.0 | 45 | 17.52 | 4.81 | Dato del usuario (libro curado) |
-| Rubí | 71.35 | 30.41 | 5.47 | Estimado |
-| Zafiro Plus | 57.21 | 24.38 | 5.61 | Estimado |
-| Jade | 34.46 | 14.69 | 5.28 | Estimado |
-| Diamante − y + | 72.62 | 30.95 | 5.97 | Estimado |
-| Oro 4.01 | 71 | 32.88 | 8.04 | Dato del usuario (libro curado) |
+Los m² de mármol en piso son **dato del usuario**, por nivel:
 
-**Criterio.** El **tomboleado** en piso es la renivelación de charolas de regadera (ACA-01090), el mismo criterio de Zafiro. El **travertino** en piso no tiene ninguna medida en el catálogo; para los cinco se usa un **estimado**: el 42.6 % del travertino total, promedio de la fracción de Zafiro (38.9 %) y de Oro (46.3 %). Las celdas de la columna F (o G) se pueden sobrescribir con el dato real y todo se recalcula. Zafiro y Oro usan sus datos y quedan igual que sus libros: muro $453,305 y piso $217,267 en Zafiro (diferencia 0), −0.1 % y −0.3 % en Oro.
+| Prototipo | Nivel | Largos libres (m²) | Tomboleado (m²) | Total largos libres | Total tomboleado |
+|---|---|---|---|---|---|
+| Zafiro 1.0 | — | 17.52 | 4.81 | 17.52 | 4.81 |
+| Rubí | PB | 30.19 | 5.87 | 30.19 | 5.87 |
+| Zafiro Plus | PB / PA | 14.85 / 10.98 | 1.94 / 3.61 | 25.83 | 5.55 |
+| Jade | PB | 10.86 | 5.72 | 10.86 | 5.72 |
+| Diamante − y + | PB / PA | 22.54 / 3.57 | 4.73 / 1.57 | 26.11 | 6.30 |
+| Oro 4.01 | PB / PA | 13.24 / 19.64 | 1.8 / 6.24 | 32.88 | 8.04 |
 
-**Importa poco.** Con el reparto de 0 % a 46 % del travertino, la tasa del muro se mueve de $1,425 a $1,389 por m² y su CV de 8.7 % a 8.4 %; la del piso, de $1,511 a $1,596 y de 12.0 % a 12.7 %. La lectura («muro utilizable, piso para revisar») no cambia, así que el estimado no bloquea nada. El CV del piso viene de otra parte: la losa de cimentación y la composición del piso por prototipo.
+Zafiro y Oro son los datos de sus libros curados. El catálogo trae el mármol por prototipo, no por nivel; cuando un prototipo tiene dos líneas (Zafiro Plus y Diamante), lo que va en piso se reparte entre ellas en proporción a su cantidad.
 
-**Cuadre.** Los cinco prototipos nuevos cuadran con Hoja1 (diferencia de centavos por redondeo). En Zafiro la diferencia es +$447.82, el sellado interior de 21 m en vez de 14.4 que ya era excepción autorizada; en Oro, igual que en su libro.
+**Lo que dijo el estimado.** Antes de tener estos datos se había estimado el travertino en piso con el 42.6 % del total (promedio de Zafiro y Oro). Contra el dato real: Rubí 30.41 contra 30.19 m² (acierto casi exacto), Zafiro Plus 24.38 contra 25.83, Diamante 30.95 contra 26.11, **Jade 14.69 contra 10.86**. La fracción real va de 31 % (Jade) a 46 % (Oro): el estimado servía para saber que no importaba mucho, no para sustituir el dato. El tomboleado, estimado con la renivelación de charolas, quedó entre 6 % y 8 % por debajo del dato (por ejemplo Rubí 5.47 contra 5.87).
+
+**Resultado.** Muro $1,471/m² (CV 9.0 %, utilizable) y piso $1,406/m² (CV 11.8 %, revisar): casi igual que con el estimado ($1,470 y $1,409). Zafiro sigue reproduciendo su libro al centavo y Oro queda en −0.1 % (muro) y −0.3 % (piso). El CV del piso viene de otra parte: la losa de cimentación y la composición del piso por prototipo. Los cinco prototipos nuevos cuadran con Hoja1 (centavos por redondeo); la diferencia de +$447.82 de Zafiro es el sellado interior de 21 m, excepción ya autorizada.
