@@ -50,7 +50,9 @@ jobs:
   # 7.5 min (cada prueba contra Postgres carga los archivos de OPUS); juntas, 12 minutos seguidos antes. infra es hoy el cuello de botella.
   pruebas:
     name: pruebas (${{ matrix.parte }})
-    runs-on: ubuntu-latest
+    # Ubuntu 24.04 fijo y no `latest`: `latest` migra a otra versión (Ubuntu 26) cuyo espejo de apt no resolvía `security.ubuntu.com`,
+    # y la instalación del navegador de la parte `api` caía (corridas del 2026-11-11). Fijarlo hace que el CI no cambie solo.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -66,7 +68,14 @@ jobs:
       # solo las pruebas de la pantalla abren un navegador
       - name: Instalar el navegador de las pruebas de la pantalla
         if: matrix.parte == 'api'
-        run: playwright install --with-deps chromium
+        # `--with-deps` baja paquetes con apt: si la red del runner falla, se reintenta (hasta 3 veces) antes de dar el paso por roto.
+        run: |
+          for intento in 1 2 3; do
+            if playwright install --with-deps chromium; then exit 0; fi
+            echo "playwright install falló (intento $intento de 3); reintento en 20 s"
+            sleep 20
+          done
+          exit 1
       - name: Probar ${{ matrix.parte }} contra los programas y los archivos de OPUS reales
         run: cd backend && python3 -m unittest discover -s ${{ matrix.parte }}/tests -t .
       - name: Comprobar que el cliente de la pantalla es el que da el spec de la API
