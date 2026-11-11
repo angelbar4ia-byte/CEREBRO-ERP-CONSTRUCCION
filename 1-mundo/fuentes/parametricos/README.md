@@ -7,7 +7,8 @@ Fuente compartida por el usuario el 2026-11-11, guardada tal cual. Huellas en `.
 | `CATALOGO_PARAMETRICO.md` | Bitácora y especificación (archivo vivo). Secciones 1–13 y bitácora. |
 | `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx` | Original recibido de **Zafiro 1.0** (172 m², una planta). 29 hojas, ~25 mil fórmulas. |
 | `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx` | **Vigente.** v44 con llaves en lugar de filas, cohorte, dispersión y unidades reales. Hoja `LEEME v45`. |
-| `CATALOGO_PARAMETRICO_ORO_v19.xlsx` | **Vigente.** Igual para Oro. Hoja `LEEME v19`. |
+| `CATALOGO_PARAMETRICO_ORO_v19.xlsx` | Igual para Oro. Hoja `LEEME v19`. |
+| `CATALOGO_PARAMETRICO_ORO_v20.xlsx` | **Vigente.** v19 con el pretil corregido (franja +3.00 con tope; 255 m² pasan a MURO FACHADA; boquilla a MARCOS EXTERIORES). Mismos totales. Hoja `LEEME v20`. |
 | `DISPERSION_7_PROTOTIPOS.xlsx` | Tasas de 14 drivers medidas con una misma regla en los 7 prototipos, con CV y confianza. Se regenera con `medir_dispersion.py`. |
 | `TABLA_APARATOS_SALIDAS.xlsx` | Aparatos y salidas **por puntos** de los 7 prototipos, costo por salida y su CV. Se regenera con `tabla_aparatos_salidas.py` (usa `curado_aparatos.json`). |
 | `PRETIL_7_PROTOTIPOS.xlsx` | Pretil de los 7 prototipos con la regla resuelta en Zafiro: partidas, ratios por m², tasas y CV. Se regenera con `medir_pretil.py`. |

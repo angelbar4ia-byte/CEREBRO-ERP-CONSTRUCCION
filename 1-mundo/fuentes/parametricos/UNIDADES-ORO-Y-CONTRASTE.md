@@ -192,3 +192,17 @@ Tasa total: media $1,136, CV 6 % → **utilizable**. Por capa: obra negra $512/m
 **Efecto en la comparación anterior.** El pretil pasa de «no usar» (CV 47 % con n = 2) a «utilizable» (CV 6 % con n = 7). Era el contenido de la hoja de Oro, no el diseño.
 
 **Límites.** Diamante − y + tienen un pretil de 19.2 m² (tercer nivel) y su línea de pintura es una suposición de poca confianza. Zafiro Plus y Diamante usan la clave `EST-02011` como muro de pretil. El catálogo no etiqueta la pintura de pretil.
+
+## 10. Oro v20: corrección del pretil (2026-11-11)
+
+Archivo: `CATALOGO_PARAMETRICO_ORO_v20.xlsx` (hoja `LEEME v20`). Parte de v19 y cambia solo el reparto de tres cosas; **el total ($2,635,265.32), la diferencia contra Hoja1 ($20,175.71) y todos los controles quedan iguales** (verificado recalculando).
+
+| Hoja | v19 | v20 | Cambio |
+|---|---|---|---|
+| PRETIL | $108,957 ($2,421/m²) | $47,154 ($1,048/m²) | −$61,803: la franja +3.00 pasa de 300 a 45 m² (tope en el muro del pretil) y la boquilla de 18.2 m sale |
+| MURO FACHADA | $93,142 | $154,021 | +$60,879: dos partidas nuevas (filas 31 y 32) cobran los 255 m² restantes de repellado y de finas +3.00 |
+| MARCOS EXTERIORES | $42,540 | $43,464 | +$925: recibe la boquilla de 18.2 m (fila 319 de Hoja1), que estaba en el pretil por llevar la misma clave |
+
+El pretil de Oro queda en $1,048/m², igual que la medición con la regla de Zafiro. Con eso la referencia congelada de Oro en el panel de Zafiro v45 pasó de 2,421 a 1,048.
+
+**Pendiente de decisión.** La fila 320 de Hoja1 (boquilla en fachada, agregada) tiene la misma cantidad y precio que la 319 y también se cobra en MARCOS EXTERIORES: los marcos llevan hoy 36.4 m de boquilla gris. Hay que decidir si es una sola. Tampoco se cambió el selector de altura (D5): la franja de 255 m² se cobra siempre, con cualquier altura.
