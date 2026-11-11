@@ -104,7 +104,11 @@ Precio por salida (mismo catálogo en ambos): WC $4,012 en Zafiro y $3,993 en Or
 - La coladera a 77.5 m².
 - Cualquier tasa sin cohorte ni dispersión: el cerebro la rechaza (regla 9 del skill).
 
-## 5. Propuesta para integrarlo (sin ejecutar nada)
+## 5. Estado (2026-11-11)
+
+Hechos en Zafiro v45 y Oro v19: **pasos 1 y 2** (llaves; parámetro, cohorte, dispersión y unidad real), los problemas 1 y 2 de §1.3 (unidades mezcladas y panel sin unidad) y el panel de MARCOS EXTERIORES de Zafiro. **Siguen abiertos:** 3 (fachada como driver aparte), 4 (piso PA de 185.6 m²), 5 (coladera a 77.5 m²), 6 (grupo mixto de apagador y contacto) y la parametrización de los otros 5 prototipos. Con el CV de n = 2, pretil, vano, jardín y cubierta salen «no usar» (CV de 41 a 56 %) y sillar «revisar» (22 %).
+
+## 6. Propuesta original (pasos 1 y 2 ya hechos)
 
 1. Reemplazar `INDEX` por fila por **clave de concepto** (`BUSCARX` sobre `Clave` + descripción), para cumplir §5.6.
 2. Agregar a cada hoja de driver tres campos: **cohorte**, **dispersión** y **unidad real**.

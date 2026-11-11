@@ -30,7 +30,7 @@ Convención de color: azul = encabezado, verde = resultado, amarillo = entrada e
 | Cantidad mayor que Hoja1 | 1 |
 | Importe distinto de Hoja1 | 1 |
 
-La diferencia se explica entera por una excepción autorizada: ACA-08030, sellado de marco de cantera interior, 21 m contra 14.4 m en Hoja1 (6.6 m × $67.85 = $447.81). **El modelo cuadra.**
+La diferencia no es error de diseño: es **faltante del catálogo original** (decisión del usuario, 2026-11-11). Se explica entera por una excepción autorizada: ACA-08030, sellado de marco de cantera interior, 21 m contra 14.4 m en Hoja1 (6.6 m × $67.85 = $447.81). **El modelo cuadra.**
 
 | Driver | Base | Importe | $/unidad |
 |---|---|---|---|
@@ -62,7 +62,7 @@ Partidas más caras: losa maciza de azotea $130,198; losa de cimentación $130,1
 
 Los 20 mil se reparten por subcapítulo: pintura +$8,498; herrería +$3,850; planta baja +$3,694; muebles e iluminación +$2,392; acabados +$1,904; cimentación +$1,155; planta alta −$1,317. Corresponden a las excepciones autorizadas (calibraciones de salidas eléctricas, hidráulicas y de plafón) y a los conceptos agregados con clave y precio de Zafiro.
 
-Aquí el control no da 0 como pide el propio libro, aunque las 33 filas de excepción están documentadas.
+Aquí el control no da 0, pero tampoco es error: son conceptos o cantidades que el catálogo original de Oro no traía (33 filas de excepción documentadas). Desde v19 el panel lo rotula así.
 
 Dos partidas de Oro llevan la misma clave `EST-02010` (muro de 14 cm, $110,682 y $95,365): son PB y PA, no un duplicado.
 

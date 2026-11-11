@@ -5,8 +5,10 @@ Fuente compartida por el usuario el 2026-11-11, guardada tal cual. Huellas en `.
 | Archivo | Qué es |
 |---|---|
 | `CATALOGO_PARAMETRICO.md` | Bitácora y especificación (archivo vivo). Secciones 1–13 y bitácora. |
-| `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx` | Libro vigente de **Zafiro 1.0** (172 m², una planta). 29 hojas, ~25 mil fórmulas. |
-| `CATALOGO_PARAMETRICO_ORO_v18.xlsx` | Libro vigente de **Oro 4.01** (300 m², dos plantas). 32 hojas, ~34 mil fórmulas. Nació de la v44 de Zafiro. |
+| `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx` | Original recibido de **Zafiro 1.0** (172 m², una planta). 29 hojas, ~25 mil fórmulas. |
+| `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx` | **Vigente.** v44 con llaves en lugar de filas, cohorte, dispersión y unidades reales. Hoja `LEEME v45`. |
+| `CATALOGO_PARAMETRICO_ORO_v19.xlsx` | **Vigente.** Igual para Oro. Hoja `LEEME v19`. |
+| `CATALOGO_PARAMETRICO_ORO_v18.xlsx` | Original recibido de **Oro 4.01** (300 m², dos plantas). 32 hojas, ~34 mil fórmulas. Nació de la v44 de Zafiro. |
 
 ## Qué es un paramétrico
 
@@ -52,4 +54,5 @@ Análisis a fondo con los libros recalculados: ver `ANALISIS-EXCEL.md`.
 - **Los libros no guardan valores calculados**, solo fórmulas. Los importes salen al abrirlos en Excel, y el .md reconoce que **nunca se verificó el cuadre fuera de Python**. Abre el libro y revisa que los controles del panel den 0.
 - El .md no se actualizó entre la v36 y la v44 de Zafiro, ni durante la línea Oro. Las secciones 11F, 11G y 13 y las últimas filas de la bitácora **se reconstruyeron comparando los libros**. El razonamiento de las decisiones que no quedó en notas del libro se perdió.
 - Pendientes abiertos: cubiertas ligadas a los ml de vanity, relacionar puertas y cancelería con los vanos, accesorios por elemento (eléctricos y muebles), cantidades con decimales sin `ROUNDUP`, y columnas AREA y DESARROLLO vacías.
-- Las versiones anteriores (Zafiro v1–v43, Oro v1–v17) no están en el repo; la v44 y la v18 son las vigentes.
+- Las versiones anteriores (Zafiro v1–v43, Oro v1–v17) no están en el repo; v44 y v18 son los originales recibidos y v45 y v19 las vigentes.
+- La diferencia del paramétrico contra Hoja1 (+$447.82 en Zafiro, +$20,175.71 en Oro) **no es error de diseño**: es el faltante del catálogo original. Los libros nuevos lo rotulan así.
