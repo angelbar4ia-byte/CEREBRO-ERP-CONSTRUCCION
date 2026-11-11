@@ -45,6 +45,8 @@ Son cálculos hechos en Python, no valores de Excel.
 | Eléctricas | 68,101 | — |
 | Carpintería | 196,671 | fijo |
 
+Análisis a fondo con los libros recalculados: ver `ANALISIS-EXCEL.md`.
+
 ## Advertencias
 
 - **Los libros no guardan valores calculados**, solo fórmulas. Los importes salen al abrirlos en Excel, y el .md reconoce que **nunca se verificó el cuadre fuera de Python**. Abre el libro y revisa que los controles del panel den 0.
