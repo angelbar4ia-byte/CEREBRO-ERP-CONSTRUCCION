@@ -140,4 +140,30 @@ Archivos: `DISPERSION_7_PROTOTIPOS.xlsx` (hojas LEEME, TASAS y DETALLE, con SUMI
 
 **Lo que cambia respecto de la comparación con n = 2.** La losa de azotea (con plafón), la barda, el pórfido, el asador y la cochera se confirman estables con siete muestras. Los casos que con n = 2 salían «no usar» (pretil, vano, jardín, cubierta curada) **no se pudieron medir**: el divisor no existe en todos los prototipos. La cubierta, medida sin poyos, es estable (5.7 %); la diferencia con n = 2 venía del contenido del libro curado, no del diseño.
 
-**Qué falta.** La tasa por salida de las instalaciones requiere contar los aparatos de los otros 5 prototipos. Medida por m² construido, las eléctricas salen estables (9 %), lo que el cerebro no esperaba y conviene revisar con la tabla de salidas.
+**Qué faltaba y ya está (sección 8).** La tasa por salida de las instalaciones.
+
+## 8. Aparatos y salidas por puntos (2026-11-11)
+
+Archivos: `TABLA_APARATOS_SALIDAS.xlsx` (hojas SISTEMAS, SIN_GRUPO, GRUPOS, ETAPAS, ANCLAS, IMPORTES), `tabla_aparatos_salidas.py` y `curado_aparatos.json`. Todo se cuenta en **puntos** (piezas y salidas), nunca en área; las redes por m² de losa y los conceptos fijos quedan fuera.
+
+**Método.** Cada grupo de los libros curados (WC, lavamanos, apagador, estufa…) tiene un concepto ancla que trae una unidad por punto. El conteo de un prototipo es la suma de las cantidades de esas claves en su capítulo de Hoja1; si Zafiro y Oro anclan el grupo en claves distintas se toma el mayor de los dos conteos. En Zafiro la tabla reproduce todos los conteos «por salidas» del libro curado (35, 7, 6; en eléctricas 122 contra 121 por el arbotante); en Oro difiere en 6 grupos donde el libro curado ajusta a mano (excepciones autorizadas).
+
+| Sistema | Zafiro | Rubí | Z. Plus | Jade | Dia − | Dia + | Oro |
+|---|---|---|---|---|---|---|---|
+| Salidas hidrosanitarias | 35 | 35 | 41 | 36 | 49 | 49 | 41 |
+| Salidas de gas | 7 | 7 | 7 | 8 | 8 | 8 | 9 |
+| Salidas eléctricas | 122 | 138 | 165 | 161 | 175 | 175 | 190 |
+| Piezas de equipos | 6 | 6 | 6 | 6 | 7 | 7 | 7 |
+
+**Costo por salida (por puntos) y su dispersión en los 7:**
+
+| Sistema | $/salida media | CV | Lectura |
+|---|---|---|---|
+| Hidrosanitarias (con muebles) | 1,880 | 7.4 % | Utilizable |
+| Gas | 653 | 2.5 % | Utilizable |
+| Eléctricas | 454 | 3.4 % | Utilizable |
+| Equipos | 2,204 | 4.4 % | Utilizable |
+
+**Lectura.** Con puntos como parámetro, las instalaciones salen más estables que por m² (hidrosanitarias 7.4 % contra 11.1 %, gas 2.5 % contra 19.6 %, eléctricas 3.4 % contra 9.1 %). Esto confirma lo que el cerebro suponía: el parámetro de las instalaciones es la salida, no el área. Hidrosanitarias baja un poco porque los muebles varían de calidad.
+
+**Qué falta.** (1) El bloque «sin grupo» de la hoja SIN_GRUPO (19 claves; sobre todo líneas principales sanitarias e hidráulicas y la cisterna prefabricada, que no son puntos). (2) Que alguien confirme los 6 grupos donde Oro ajusta a mano. (3) El ancla de TV se corrigió a la salida de cimentación (IEC-01080): la del libro curado era una tapa ciega agregada.
