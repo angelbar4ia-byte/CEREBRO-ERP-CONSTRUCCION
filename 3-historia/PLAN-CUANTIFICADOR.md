@@ -376,3 +376,35 @@ Entregable: F-20, F-21, F-11, F-18, F-13, F-7, F-3 y la comparación automática
 - No se ejecutó la app ni se corrieron las pruebas: el estado HECHO se basa en lectura de código, migraciones y especificaciones de pruebas. Donde el cerebro dice "construido" y el código lo confirma, se marcó HECHO.
 - El mockup (337 KB) se revisó por funciones y etiquetas, no pixel por pixel.
 - Lo que parece falta por comparar textos se verificó contra función: por ejemplo, el árbol de armado (D-634), el cambio de unidad (D-601, resuelto por D-623) y la "descripción corta" (D-622) sí están hechos; el cerebro mismo corrigió un caso así en D-634.
+
+---
+
+## Los paramétricos del cerebro y el Cuantificador (revisión del 2026-11-12)
+
+Fuente: `1-mundo/fuentes/parametricos/` (catálogo de Zafiro 1.0 y Oro 4.01, `CATALOGO_PARAMETRICO.md`, `README.md`, `ESTABILIDAD.md`) y el skill `erp-parametrico` sección 7. **Dos cosas con el mismo apellido:** el *elemento paramétrico* de la app (castillo, trabe, zapata, losa; D-602, D-622, D-630) y el *catálogo paramétrico por drivers* (una magnitud que captura el usuario, p. ej. m² de muro o ml de barda, de la que sale la cantidad de cada partida). Esta revisión es del segundo.
+
+**Regla del cerebro (skill `erp-parametrico`, sección 7):** el Cuantificador mide (plano → medida → cantidad) y el paramétrico **aprende de lo medido** (cantidad ÷ divisor → tasa). Si se construye sobre cantidades capturadas hereda sus errores y los disfraza de estadística. Por eso solo deben alimentarlo trazos medidos y **aprobados**.
+
+| Driver del catálogo (Zafiro / Oro) | Lo que pide medir | Lo que el Cuantificador ya da | Brecha |
+|---|---|---|---|
+| MURO CONFINAMIENTO / MURO CAPAS / SILLAR (Oro: PB, PA y FACHADA) | m² de muro **neto** (el catálogo dice que lo base está neto) | Línea con grosor → largo × altura × caras, con vanos y uniones descontados (D-629, D-632, D-633) | Falta separar PB / PA / FACHADA y las capas como categoría del trazo; hoy la capa es texto libre del plano. |
+| PRETIL | m² de pretil (franja a +3.00 con tope; lo que pasa de 3.00 es FACHADA) | Altura por partes: una parte hasta 3.00 y otra sobre 3.00 | Falta nombrar la franja de pretil como parte con significado (hoy es solo una parte que suma o no). |
+| BARDA | ml de barda; castillo por piezas (+1 cada 3 ml) | Línea en ml; castillo como elemento por pieza | El escalón «+1 cada 3 ml» no existe como regla de escalamiento. |
+| VANO | **perímetro** interior y de fachada; puertas, cancelería y domos **aparte** | Vanos con tipo (puerta, ventana, cancel, arco, paso), ancho, alto, piezas y versiones de catálogo (D-632, 0117) | Falta el total «perímetro de vanos» por interior y fachada como cantidad que alimente el driver, y marcar puertas, cancelería y domos como aparte. |
+| LOSA (azotea, piso, entrepiso) | m² de cada losa; en Hoja1 las losas vienen como pieza global y se convierten a m² | Áreas en m²; conversión del enlace pieza ↔ m² (D-633) | Falta distinguir azotea, piso y entrepiso como categoría del área. |
+| CIMENTACIÓN (D-312) | **área de desplante**, no el m² total (CV 6 % contra 21.5 %) | Cualquier área en m² | Falta un tipo de área «desplante» frente a «construida». Es la regla que más pesa en la dispersión. |
+| PISO, ASADOR, PÓRFIDO, COCHERA | m² por zona; la cochera escala por escalones (+60 %, +160 %) | Áreas | Falta zona como categoría y el escalamiento por escalón. |
+| HIDROSANITARIAS, GAS, ELÉCTRICAS | **salidas o puntos** por aparato | Conteo con punto con forma; conteo automático por plantilla (F2.4) | El conteo por simbología con IA sigue en espera (F-32). |
+| ESCALERA (Oro) | **escalones**, escalable a lo largo, con spots cada 3 | Línea y conteo | No hay medición por escalones. |
+| HERRERÍA, CARPINTERÍA, CANCELERÍA | fijos, editables | Conteo de vanos por tipo | Sin brecha de medición; el cerebro los deja fijos por ahora. |
+
+**Propuestas (sin construir; requieren decisión del usuario):**
+
+- **F-22 Categoría del trazo.** Un campo opcional que diga a qué driver y capa pertenece un trazo o un área (muro PB, PA o fachada; pretil; barda; losa azotea, piso o entrepiso; desplante frente a construida; zona de piso). Es la base de las demás.
+- **F-23 Resumen por driver.** Una vista que sume lo medido y **aprobado** por driver y capa, con su unidad (m², ml, m de perímetro, salidas), lista para compararse con el valor base del catálogo. Sin trazos aprobados, el driver sale vacío y no se rellena con una cifra capturada.
+- **F-24 Perímetro de vanos.** El total de perímetro de los vanos, interior y de fachada, por separado de puertas, cancelería y domos.
+- **F-25 Escalamiento por escalón y por piezas.** La regla «+1 castillo cada 3 ml» y los escalones de la cochera como regla declarada, no como fórmula suelta.
+- **F-26 Cohorte y dispersión junto a la tasa** cuando el resumen alimente un precio paramétrico: «un precio paramétrico sin su dispersión es un número disfrazado de certeza» (skill `erp-parametrico`, sección 5).
+
+**Lo que no cambia:** el catálogo paramétrico nunca tuvo que cuadrar con el presupuesto (skill `erp-parametrico`, sección 2), y la diferencia contra Hoja1 (+$447.82 en Zafiro, +$20,175.71 en Oro) es el faltante del catálogo original, no un error. Tampoco se verificó el cuadre fuera de Python: los libros no guardan valores calculados.
+
