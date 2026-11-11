@@ -159,11 +159,13 @@ Archivos: `TABLA_APARATOS_SALIDAS.xlsx` (hojas SISTEMAS, SIN_GRUPO, GRUPOS, ETAP
 
 | Sistema | $/salida media | CV | Lectura |
 |---|---|---|---|
-| Hidrosanitarias (con muebles) | 1,880 | 7.4 % | Utilizable |
+| Hidrosanitarias (con muebles) | 1,904 | 7.5 % | Utilizable |
 | Gas | 653 | 2.5 % | Utilizable |
-| Eléctricas | 454 | 3.4 % | Utilizable |
+| Eléctricas | 455 | 3.9 % | Utilizable |
 | Equipos | 2,204 | 4.4 % | Utilizable |
 
-**Lectura.** Con puntos como parámetro, las instalaciones salen más estables que por m² (hidrosanitarias 7.4 % contra 11.1 %, gas 2.5 % contra 19.6 %, eléctricas 3.4 % contra 9.1 %). Esto confirma lo que el cerebro suponía: el parámetro de las instalaciones es la salida, no el área. Hidrosanitarias baja un poco porque los muebles varían de calidad.
+**Lectura.** Con puntos como parámetro, las instalaciones salen más estables que por m² (hidrosanitarias 7.5 % contra 11.1 %, gas 2.5 % contra 19.6 %, eléctricas 3.9 % contra 9.1 %). Esto confirma lo que el cerebro suponía: el parámetro de las instalaciones es la salida, no el área. Hidrosanitarias baja un poco porque los muebles varían de calidad.
 
-**Qué falta.** (1) El bloque «sin grupo» de la hoja SIN_GRUPO (19 claves; sobre todo líneas principales sanitarias e hidráulicas y la cisterna prefabricada, que no son puntos). (2) Que alguien confirme los 6 grupos donde Oro ajusta a mano. (3) El ancla de TV se corrigió a la salida de cimentación (IEC-01080): la del libro curado era una tapa ciega agregada.
+**Claves sin grupo: asignadas.** Las 19 claves que ningún libro curado usaba se asignaron a su grupo (`asignaciones_sin_grupo.json`, hoja ASIGNADAS con el motivo de cada una): 6 líneas principales y la acometida eléctrica a las redes (no son puntos), la cisterna prefabricada a fijos, la tarja del asador al asador fijo, y 10 variantes de salidas y cableados a su aparato (minisplit, lavavajillas, tarja, BAN, lavamanos, regadera, apagador mixto). Son claves de etapa, no de ancla: no cambian el conteo de puntos, solo suman su importe. Con ellas cada familia cuadra: puntos + fijos + redes = total, y SIN_GRUPO queda vacía. El efecto es pequeño: hidrosanitarias pasa de $1,880 a $1,904 por salida y eléctricas de $454 a $455.
+
+**Qué falta.** (1) Revisar si las 10 variantes asignadas por parecido de nombre son las que usted habría elegido. (2) Que alguien confirme los 6 grupos donde Oro ajusta a mano. (3) El ancla de TV se corrigió a la salida de cimentación (IEC-01080): la del libro curado era una tapa ciega agregada.

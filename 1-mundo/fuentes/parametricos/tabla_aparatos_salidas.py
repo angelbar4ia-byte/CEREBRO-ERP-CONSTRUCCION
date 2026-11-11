@@ -39,6 +39,14 @@ for (s,g),e in G.items():       # anclas de respaldo: etapa ACCESORIO del libro 
     for m in ('Z','O'):
         if not e['anc'][m] and e['esc']=='Por salidas' and e['base'].get(m) is not None:
             e['anc'][m]={c for (et,c) in DET[(s,g)] if (et or '').upper().startswith('ACCES')}
+# claves que ningún libro curado usaba, asignadas a su grupo (asignaciones_sin_grupo.json)
+ASIG=json.load(open('asignaciones_sin_grupo.json'))
+DESC0={c['clave']:c['desc'] for c in CON}
+ASIGNADAS={}
+for a in ASIG:
+    k=(a['sis'],a['grupo']); assert k in G,k
+    DET[k].setdefault((a['etapa'],a['clave']),DESC0.get(a['clave'],''))
+    ASIGNADAS[(a['sis'],a['clave'])]=a
 # anclas corregidas a mano: el ancla del libro curado es una tapa ciega agregada, no el punto
 ANCLA_MANUAL={('ELÉCTRICAS','TV'):['IEC-01080']}
 for k,cl in ANCLA_MANUAL.items():
@@ -56,7 +64,7 @@ for (s,g),e in G.items():
         if cur_c is None or c=='puntos' or (c=='fijo' and cur_c=='redes por m²'): clave_cat[(s,cl)]=c
 
 wb=openpyxl.Workbook(); lee=wb.active; lee.title='LEEME'
-sis_ws=wb.create_sheet('SISTEMAS'); sg=wb.create_sheet('SIN_GRUPO'); gr=wb.create_sheet('GRUPOS'); et=wb.create_sheet('ETAPAS'); an=wb.create_sheet('ANCLAS'); im=wb.create_sheet('IMPORTES')
+sis_ws=wb.create_sheet('SISTEMAS'); sg=wb.create_sheet('SIN_GRUPO'); asg=wb.create_sheet('ASIGNADAS'); gr=wb.create_sheet('GRUPOS'); et=wb.create_sheet('ETAPAS'); an=wb.create_sheet('ANCLAS'); im=wb.create_sheet('IMPORTES')
 HF=Font(bold=True,color='FFFFFF'); HB=PatternFill('solid',fgColor='305496')
 def head(ws,r,vals):
     for i,v in enumerate(vals,1):
@@ -90,6 +98,11 @@ for (s_,cl),(d,imps,qs) in sorted(sin.items(),key=lambda kv:-sum(kv[1][1])):
     r+=1
 for col,w in zip('ABC',(18,12,70)): sg.column_dimensions[col].width=w
 sg.freeze_panes='D2'
+head(asg,1,['Sistema','Clave','Descripción','Grupo asignado','Etapa','Categoría del grupo','Motivo'])
+r=2
+for (s_,cl),a in ASIGNADAS.items():
+    asg.cell(r,1,s_);asg.cell(r,2,cl);asg.cell(r,3,DESC0.get(cl,''));asg.cell(r,4,a['grupo']);asg.cell(r,5,a['etapa']);asg.cell(r,6,cat_de(G[(s_,a['grupo'])]['esc']));asg.cell(r,7,a['motivo']);r+=1
+for col,w in zip('ABCDEFG',(18,12,70,44,14,16,70)): asg.column_dimensions[col].width=w
 # --- ANCLAS
 head(an,1,['Sistema','Grupo (aparato / accesorio)','Juego','Clave','Descripción']+PROTOS)
 r=2
@@ -126,7 +139,7 @@ for col,w in zip('ABCD',(18,40,24,34)): gr.column_dimensions[col].width=w
 for c in range(5,15): gr.column_dimensions[L(c)].width=11
 gr.column_dimensions['N'].width=44; gr.freeze_panes='C2'
 # --- ETAPAS (aparato x etapa x clave)
-head(et,1,['Sistema','Grupo (aparato / accesorio)','Etapa','Clave','Descripción','Clave compartida con otro grupo']+PROTOS)
+head(et,1,['Sistema','Grupo (aparato / accesorio)','Etapa','Clave','Descripción','Clave compartida con otro grupo']+PROTOS+['Origen'])
 r=2
 for (s,g),e in G.items():
     if e['esc']!='Por salidas': continue
@@ -134,9 +147,10 @@ for (s,g),e in G.items():
         et.cell(r,1,s);et.cell(r,2,g);et.cell(r,3,etp);et.cell(r,4,cl);et.cell(r,5,d);et.cell(r,6,'sí' if len(claves_grupos[(s,cl)])>1 else 'no')
         for p in range(7):
             et.cell(r,7+p,f'=SUMIFS(IMPORTES!$G:$G,IMPORTES!$A:$A,{L(7+p)}$1,IMPORTES!$D:$D,$D{r})')
+        et.cell(r,14,'asignada (antes sin grupo)' if (s,cl) in ASIGNADAS and ASIGNADAS[(s,cl)]['grupo']==g else 'libro curado')
         r+=1
 for col,w in zip('ABCDEF',(18,40,14,12,60,12)): et.column_dimensions[col].width=w
-et.freeze_panes='A2'; et.auto_filter.ref=f'A1:M{r-1}'
+et.freeze_panes='A2'; et.auto_filter.ref=f'A1:N{r-1}'
 # --- SISTEMAS
 sis_ws['A1']='SALIDAS POR SISTEMA Y COSTO POR SALIDA (PUNTOS, NO ÁREA)'; sis_ws['A1'].font=Font(bold=True,size=13)
 sis_ws['A2']='Salidas = suma de los puntos de los grupos «por salidas» (hoja GRUPOS). $/salida = importe de las claves de esos grupos ÷ salidas. Las redes por m² y los conceptos fijos quedan fuera: no son puntos.'
@@ -178,14 +192,14 @@ txt=['TABLA DE APARATOS Y SALIDAS DE LOS 7 PROTOTIPOS (POR PUNTOS)','',
  'Cómo se cuenta: cada grupo de los libros curados (WC, lavamanos, apagador sencillo, estufa, etc.) tiene un concepto ancla, el que trae una unidad por punto. El conteo de un prototipo es la suma de las cantidades de esas claves en su capítulo de Hoja1. Si Zafiro y Oro anclan el grupo en claves distintas (variantes del mismo punto) se toma el mayor de los dos juegos, no la suma.',
  'Validación: en Zafiro la tabla reproduce los salidas base del libro curado en todos los grupos «por salidas». En Oro difiere donde el libro curado ajusta a mano (excepciones autorizadas): la columna N de GRUPOS lo marca.',
  '',
- 'Hojas: SISTEMAS (resumen, $/salida y CV) · GRUPOS (conteo por aparato) · ETAPAS (conteo por aparato y etapa: sanitaria, hidráulica, mueble, cimentación, muros, cableado, accesorio) · ANCLAS (claves que se cuentan) · SIN_GRUPO (claves por asignar) · IMPORTES (cada clave de los 4 sistemas por prototipo).',
+ 'Hojas: SISTEMAS (resumen, $/salida y CV) · GRUPOS (conteo por aparato) · ETAPAS (conteo por aparato y etapa: sanitaria, hidráulica, mueble, cimentación, muros, cableado, accesorio) · ANCLAS (claves que se cuentan) · SIN_GRUPO (claves por asignar; hoy vacía) · ASIGNADAS (las 19 claves asignadas y por qué) · IMPORTES (cada clave de los 4 sistemas por prototipo).',
  '',
  'Límites:',
  '1. Las redes principales por m² de losa y los conceptos fijos NO son puntos: se muestran aparte (SISTEMAS, bloques «fuera de los puntos») y no entran en el $/salida.',
  '2. Hay claves que los libros curados no usan y que otros prototipos sí traen (bloque «sin grupo»). Su importe no entra en el $/salida; revisarlas puede asignarlas a un grupo nuevo.',
  '3. Una clave de cimentación o de muros compartida por varios grupos (columna F de ETAPAS) se cuenta completa en cada uno; por eso ETAPAS no se suma entre grupos, solo GRUPOS.',
  '4. Hay 3 grupos de Oro cuyo libro curado trae el conteo escrito a mano (USB, intemperie, spot de escalera); su ancla es la clave de accesorio. La ancla de TV se corrigió a la salida de TV de cimentación (IEC-01080): la del libro curado es una tapa ciega agregada.',
- '4b. Las claves que otros prototipos traen y los libros curados no usan están en SIN_GRUPO, ordenadas por importe. Asignarlas a un grupo mejora el conteo y el $/salida.',
+ '4b. Las 19 claves que ningún libro curado usaba se asignaron a su grupo (hoja ASIGNADAS, con el motivo de cada una); SIN_GRUPO queda para lo que aparezca después.',
  '5. Herrería, carpintería y cancelería no entran: son piezas fijas, no salidas de instalación.',
  '','Reproducir: python3 -I tabla_aparatos_salidas.py (usa curado_aparatos.json y el libro de Zafiro v45).']
 for i,t in enumerate(txt,1):
