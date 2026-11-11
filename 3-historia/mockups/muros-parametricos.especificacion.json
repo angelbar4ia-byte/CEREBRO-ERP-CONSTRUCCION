@@ -1,0 +1,3530 @@
+{
+ "documento": "Especificación de Artefacto y Paramétrico de muros",
+ "version": "1.0-mockup",
+ "fecha": "2026-11-12",
+ "como_leer": "Este bloque JSON es la fuente. La pantalla del mockup se genera de él. Para implementar en el backend: leer 'modelo', 'reglas_de_calculo', 'mapeo_backend' y 'cambios_sobre_lo_construido'; las 'preguntas_abiertas' se resuelven con el usuario antes de migrar. Son ejemplo y no datos reales: el pretil de 1.00 m, la barda de 2.50 m, las claves K-2 y CD-1, los armex 15-20-4 y 12-20-4, los conceptos del catálogo y sus matrices.",
+ "decisiones": [
+  {
+   "id": "M-1",
+   "texto": "Se agregan dos pestañas, Artefacto y Paramétrico, separadas del Cuantificador. El Cuantificador solo dibuja y mide, y elige una plantilla de muro para cada trazo."
+  },
+  {
+   "id": "M-2",
+   "texto": "Artefacto es editable, con una isométrica del muro que cambia al instante según las combinaciones, como el catálogo de Elementos."
+  },
+  {
+   "id": "M-3",
+   "texto": "Los drivers existen en tres niveles: global, por obra y mixto. En modo 'fijo' solo vale el global; en modo 'ajustable' la obra puede sobrescribirlo. Los editan los roles Costos y Control de obra."
+  },
+  {
+   "id": "M-4",
+   "texto": "Un muro se describe con tipo (confinado, con_cadena, tabique), material, ubicación y elementos. Pretil y barda son ubicaciones, no tipos."
+  },
+  {
+   "id": "M-5",
+   "texto": "Cada muro tiene dos caras: A (izquierda del sentido de dibujo) y B (derecha). Cada cara es exterior o interior. Combinaciones: exterior-interior, interior-exterior, exterior-exterior (pretil, barda) e interior-interior. Exterior es fachada."
+  },
+  {
+   "id": "M-6",
+   "texto": "La ubicación también se define por tramo de altura. El enrase de un muro interior es exterior por defecto, y se puede cambiar."
+  },
+  {
+   "id": "M-7",
+   "texto": "Si una losa queda más baja que el muro, el tramo sobre la losa se propone como exterior, pero no se aplica solo: esa inferencia es frágil y se confirma a mano."
+  },
+  {
+   "id": "M-8",
+   "texto": "El pretil lleva castillo K-1 y no lleva cadena. La barda es de sillar amarillo, de tipo confinado, con ubicación exterior-exterior."
+  },
+  {
+   "id": "M-9",
+   "texto": "La altura estándar del muro es 3.00 m."
+  },
+  {
+   "id": "M-10",
+   "texto": "El Paramétrico no inventa el catálogo. Calcula las ranuras (conceptos que la plantilla necesita) y las enlaza con conceptos del Presupuesto. Lo que falta se crea en Árbol o Presupuesto y se enlaza."
+  },
+  {
+   "id": "M-11",
+   "texto": "Se reutiliza lo ya construido: ClasificacionDeMuro, AlturaPorPartes, RevestimientosDelMuro y el catálogo de Elementos paramétricos (elemento_parametrico y elemento_concepto)."
+  },
+  {
+   "id": "M-12",
+   "texto": "Un muro se compone de mampostería más elementos del catálogo (castillos K-n, cadenas CC-n). Los elementos se crean y se editan en la pestaña Elementos, que ya existe: ahí viven sus medidas, su armado (armex) y sus conceptos. Artefacto solo los elige y define cómo se colocan en el muro (distribución, cómo se cuenta, posición)."
+  },
+  {
+   "id": "M-13",
+   "texto": "Cada elemento corresponde a uno o más conceptos del Presupuesto. Cada concepto declara su unidad y qué partes del elemento toma (acero de refuerzo, concreto, cimbra), y su APU sale de esas partes más sus insumos extra. Ejemplo: el castillo K-1 de 15 × 15 con armex se paga con un concepto de colocación de acero (por pieza) y otro de cimbrado y colado (por metro)."
+  },
+  {
+   "id": "M-14",
+   "texto": "Un elemento agregado a la plantilla se dibuja en la isométrica con sus dimensiones. El peralte de una cadena define el espesor de su parte de altura. Las medidas son del catálogo y en Artefacto se ven en solo lectura."
+  },
+  {
+   "id": "M-15",
+   "texto": "Los roles que editan drivers y plantillas son Costos y Control de obra (ya existen). No se crea el rol Cantidades."
+  },
+  {
+   "id": "M-16",
+   "texto": "Si un elemento no existe en el catálogo, se crea en la pestaña Elementos. Al crearlo se genera su concepto propio y su matriz (APU) a partir de la muestra de concreto, armado y cimbra. Artefacto solo agrega elementos que ya están disponibles en el catálogo."
+  },
+  {
+   "id": "M-17",
+   "texto": "Los conceptos y sus APU siguen al elemento: si se crea o se edita el elemento (medidas, armado, cimbra, materiales) los conceptos y los APU cambian con él. Cada concepto tiene su propio APU, con solo las partes que toma, expresado en su unidad (por pieza o por metro), más sus insumos extra de mano de obra. Cada cambio autorizado crea una versión nueva, haya o no obra asignada."
+  },
+  {
+   "id": "M-18",
+   "texto": "Costos propone y Control de obra autoriza: editar un elemento existente o crear uno nuevo pide la autorización de Control de obra. Si el cambio lo hace Control de obra, no pide autorización y se guarda como versión nueva. Hasta que se autoriza rige la versión vigente, y lo ya medido conserva la versión con que se midió."
+  },
+  {
+   "id": "M-19",
+   "texto": "Un elemento nuevo sin autorizar se puede usar en un muro y queda marcado como provisional. La plantilla de muro también se valida: si Costos la cambia queda 'por validar'; si algo está mal, Control de obra modifica el elemento o la plantilla y la valida."
+  },
+  {
+   "id": "M-20",
+   "texto": "Cada elemento tiene su altura de arranque sobre el cuerpo del muro. Un elemento no se traslapa con otro: el cuerpo se divide alrededor de cada cadena (por ejemplo, la dala de desplante queda bajo el cuerpo o el sillar). Los castillos atraviesan las cadenas por diseño y ese cruce no se descuenta."
+  },
+  {
+   "id": "M-21",
+   "texto": "El armado de un elemento es armex o varillas y anillos (estribos). Se eligen de la base de datos de materiales: armex, varilla longitudinal, varilla del anillo y alambre de amarre, además del concreto y la cimbra. Con varillas, el castillo lleva n varillas, anillos a cierta separación, gancho y recubrimiento; la cadena lleva varillas de arriba y de abajo."
+  },
+  {
+   "id": "M-22",
+   "texto": "Los materiales y la mano de obra del APU salen de la base de datos de insumos y se muestran con clave, descripción y precio. El precio solo se ve en la pestaña Elementos. Si el insumo no existe, se crea ahí mismo en la base de datos."
+  },
+  {
+   "id": "M-23",
+   "texto": "El APU de cada concepto admite agregar y quitar insumos, pero solo los que corresponden a su tipo de elemento (ver M-25). Las filas que salen de las medidas y del armado siguen al elemento; los insumos que se agregan se suman al APU del concepto. Se pueden clonar los insumos extra de otro concepto."
+  },
+  {
+   "id": "M-24",
+   "texto": "Cada concepto del elemento se crea nuevo (con clave y descripción editables) o se elige uno existente de la base de datos. Un elemento nuevo se crea desde cero o como copia de otro de su mismo tipo."
+  },
+  {
+   "id": "M-25",
+   "texto": "Cada tipo de elemento solo ofrece los insumos de las familias que le corresponden. Un castillo o una cadena usa Aceros (armex, anillos, alambre), Acero De Refuerzo (varillas), concretos (subfamilia Concretos de Mezclas y de Prefabricados), la familia nueva Cimbra y mano de obra de Albañilería y Estructura. Se crea la familia Cimbra con los insumos que hoy están en Maderas · Cimbra."
+  },
+  {
+   "id": "M-26",
+   "texto": "Un elemento tiene tres grupos de partes: acero de refuerzo (armex, o varillas, anillos y alambre de amarre), concreto y cimbra. Cada grupo lo toma exactamente un concepto: si ninguno lo toma se avisa que se perdería del presupuesto, y si lo toman dos, que se contaría doble."
+  },
+  {
+   "id": "M-27",
+   "texto": "El armado con varillas admite varillas de distinto diámetro y anillos por zonas del elemento, cada zona con su separación y su anillo. El largo del anillo sale de la sección, el recubrimiento y el gancho; el insumo elegido fija el precio. El sistema propone el anillo que pide la sección y, si no existe en la base de datos, ofrece crearlo."
+  },
+  {
+   "id": "M-28",
+   "texto": "Si un insumo no existe, se crea en la base de datos desde la misma tarjeta del elemento, solo en las familias de su tipo de elemento, y queda disponible en todos los selectores."
+  },
+  {
+   "id": "M-29",
+   "texto": "No se admiten elementos duplicados. Dos elementos son iguales si tienen las mismas medidas, el mismo armado (varillas, anillos y zonas), la misma cimbra y los mismos materiales. Un elemento igual a otro no se puede enviar ni guardar: se usa el existente. Un mismo elemento sirve a todos los muros y se puede colocar varias veces en un mismo muro (la misma cadena de 15 × 20 en desplante y en cerramiento); la posición y la altura de arranque son del muro, no del elemento. El alto de un castillo es la altura del muro."
+  },
+  {
+   "id": "M-30",
+   "texto": "La pestaña Elementos muestra una lista clicable con clave, medidas, armado, versión y estado de cada elemento, y a la derecha los parámetros del elemento elegido, para no recorrer todos."
+  },
+  {
+   "id": "M-31",
+   "texto": "Los elementos se organizan en una biblioteca por categoría y subcategoría (castillos, columnas, cadenas, dalas, trabes, contratrabes, nervaduras, zapatas, dados, muros y losas). La lista de la pestaña Elementos se deriva de ella. La subcategoría identifica el uso: en cadenas, cerramiento y desplante."
+  },
+  {
+   "id": "M-32",
+   "texto": "La categoría y la subcategoría forman parte de la identidad del elemento. Una cadena de cerramiento y una de desplante pueden tener la misma geometría, pero se pagan con conceptos distintos y no son duplicados. Dos elementos con el mismo uso, medidas, armado, cimbra y materiales sí lo son y no se pueden guardar. La subcategoría limita dónde se coloca el elemento en el muro (la de desplante solo va al pie)."
+  },
+  {
+   "id": "M-33",
+   "texto": "El castillo alimenta dos APU: el acero como pieza y todo lo demás como metro lineal. En el catálogo, el acero se cobra en escalones por altura (EST-10013 hasta 1.00 m, EST-10012 hasta 1.50 m, EST-10010 hasta 4.00 m y EST-10011 hasta 6.00 m, todos por pieza) y el resto con un concepto por metro (EST-02110: concreto, cimbra, alambre y destajo). El concepto de acero se elige por la altura del castillo."
+  },
+  {
+   "id": "M-34",
+   "texto": "La cadena se cobra con un solo concepto por metro (EST-02310 con armex, EST-02320 con varillas, BAP-01100 en desplante). Con armex, el metro se refleja en piezas de 6 m con 15 cm de traslape; con varillas, en piezas de 12 m con traslape según la norma. Los anillos se cuentan en piezas y se pagan en kg."
+  },
+  {
+   "id": "M-35",
+   "texto": "La cimbra de un castillo o una cadena no se calcula por m² de madera: el catálogo la cobra con consumos por metro de elemento (clavos, tablas y alambre). El elemento guarda esos consumos y el APU los usa."
+  },
+  {
+   "id": "M-36",
+   "texto": "Cada concepto de acero muestra el dato de kg para evaluar más adelante un precio de mano de obra por kg. La mano de obra por tipo de actividad (habilitado, armado, cimbrado, colado) con un precio consolidado de destajo queda para una etapa siguiente; hoy el catálogo trae un destajo por metro y por tipo de elemento (por ejemplo MOE-02020, $130/m para el K1)."
+  },
+  {
+   "id": "M-37",
+   "texto": "Cada concepto del elemento se crea nuevo, se toma de la base de datos o, en el acero del castillo, se elige por escalones. Cuando se toma uno existente, el sistema compara su composición con lo que calcula el elemento y marca lo que coincide y lo que difiere."
+  },
+  {
+   "id": "M-38",
+   "texto": "El acero del castillo se corta en módulos de 1, 1.5, 2, 3, 4 y 6 m (divisores de la varilla de 12 m y del armex de 6 m). Si el alto más las puntas cabe en una pieza se usa el módulo más chico que alcance; si no, varias piezas iguales con traslape (40 diámetros en varilla, 15 cm en armex), eligiendo la combinación que menos material gaste (con un máximo de 3 piezas) y, si empatan, la de menos piezas."
+  },
+  {
+   "id": "M-39",
+   "texto": "Cada combinación de corte es un escalón del acero del castillo con su concepto por pieza. Los conceptos EST-10010 a EST-10013 se comparan contra la regla y se ajustan después si no cumplen. Un alto distinto del que cubre un concepto genera un concepto nuevo pendiente de autorizar."
+  },
+  {
+   "id": "M-40",
+   "texto": "Las puntas son anclaje inferior y superior por diámetro (40 diámetros cada uno por defecto) y son drivers; el armex usa un valor en cm. Los entrepisos usan escalones como los de cimentación, con sus propios conceptos."
+  },
+  {
+   "id": "M-41",
+   "texto": "El castillo sigue siendo un solo elemento con dos partes: el acero (por pieza, escalón según el corte) y el colado (por metro). Cada parte guarda el concepto que le toca por contexto de uso (planta baja, entrepiso, azotea, pretil), y en la barda un solo concepto cubre acero y colado. El contexto sale de la ubicación y el nivel del muro. Los colados por nivel son clones del de planta baja."
+  },
+  {
+   "id": "M-42",
+   "texto": "Un elemento nuevo, el bastón, se mide por longitud de trazo. Sus parámetros son la separación y el largo del bastón, y el largo sale de los mismos módulos de corte."
+  },
+  {
+   "id": "M-43",
+   "texto": "El muro tiene un nivel (planta baja, entrepiso o azotea); pretil y barda salen de la ubicación. Ese contexto elige, de los conceptos del castillo, el de acero y el de colado que corresponden. Cada parte del elemento debe estar tomada por exactamente un concepto en cada contexto."
+  },
+  {
+   "id": "M-44",
+   "texto": "En el Cuantificador se elige el castillo y se coloca sobre el muro como una puerta o ventana: toma la altura y el nivel del muro, descuenta su área (alto × ancho) y alimenta sus dos conceptos. Si se fija primero la altura del castillo, el muro se ajusta a ella. El Artefacto es opcional."
+  },
+  {
+   "id": "M-45",
+   "texto": "El bastón es un elemento lineal que se mide por longitud de trazo. Sus parámetros son la separación (a cada cuánto) y el largo del bastón, más la varilla de la base de datos. Las piezas son trazo ÷ separación + 1 y se cortan de varillas de 12 m con el máximo de bastones por varilla; se muestran en piezas, varillas y kg. Un concepto nuevo lo paga por metro de trazo; Control de obra lo autoriza como cualquier elemento."
+  }
+ ],
+ "modelo": {
+  "tipos_de_muro": [
+   {
+    "clave": "confinado",
+    "nombre": "Muro confinado",
+    "castillo_modo": "estimado",
+    "elementos_por_defecto": [
+     "K-1",
+     "CE-1"
+    ],
+    "desc": "Rápido: los castillos se estiman por separación, sin colocarlos en el plano."
+   },
+   {
+    "clave": "con_cadena",
+    "nombre": "Muro con cadena",
+    "castillo_modo": "ubicado",
+    "elementos_por_defecto": [
+     "K-1",
+     "CE-1"
+    ],
+    "desc": "Los castillos se colocan en el plano y se restan de los m² de la mampostería."
+   },
+   {
+    "clave": "tabique",
+    "nombre": "Muro de tabique",
+    "castillo_modo": null,
+    "elementos_por_defecto": [],
+    "desc": "Sin cadenas ni castillos."
+   }
+  ],
+  "materiales": [
+   {
+    "clave": "tabique_rojo",
+    "nombre": "Tabique rojo recocido 14 cm",
+    "espesor_cm": 14
+   },
+   {
+    "clave": "block_hueco",
+    "nombre": "Block hueco de concreto 15 cm",
+    "espesor_cm": 15
+   },
+   {
+    "clave": "sillar_amarillo",
+    "nombre": "Sillar amarillo 15 cm",
+    "espesor_cm": 15
+   }
+  ],
+  "elementos_catalogo": [
+   {
+    "clave": "K-1",
+    "nombre": "Castillo K-1",
+    "categoria": "castillos",
+    "subcategoria": "muro",
+    "tipo": "castillo",
+    "largo_cm": 15,
+    "ancho_cm": 15,
+    "alto_cm": null,
+    "lados": 2,
+    "armado": {
+     "tipo": "armex",
+     "insumo": "ACE-00011",
+     "alambre_kg_ml": 0.02
+    },
+    "cimbra": [
+     {
+      "insumo": "ACE-00012",
+      "q": 0.017021
+     },
+     {
+      "insumo": "ACE-00013",
+      "q": 0.02
+     },
+     {
+      "insumo": "MAD-00004",
+      "q": 0.01
+     },
+     {
+      "insumo": "ACE-00001",
+      "q": 0.210987
+     }
+    ],
+    "mat": {
+     "concreto": "MEZ-01020",
+     "alambre": "ACE-00001"
+    },
+    "fuente": "EST-02110 y EST-10010 a EST-10013"
+   },
+   {
+    "clave": "K-2",
+    "nombre": "Castillo K-2",
+    "categoria": "castillos",
+    "subcategoria": "muro",
+    "tipo": "castillo",
+    "largo_cm": 15,
+    "ancho_cm": 15,
+    "alto_cm": null,
+    "lados": 2,
+    "armado": {
+     "tipo": "varillas",
+     "varillas": [
+      {
+       "n": 4,
+       "insumo": "ACR-00001"
+      }
+     ],
+     "anillos": [
+      {
+       "len_cm": null,
+       "sep_cm": 20,
+       "insumo": "ACE-00003"
+      }
+     ],
+     "gancho_cm": 10,
+     "rec_cm": 2.5,
+     "am_l": 0.3
+    },
+    "cimbra": [
+     {
+      "insumo": "ACE-00012",
+      "q": 0.017021
+     },
+     {
+      "insumo": "ACE-00013",
+      "q": 0.02
+     },
+     {
+      "insumo": "MAD-00004",
+      "q": 0.01
+     },
+     {
+      "insumo": "ACE-00001",
+      "q": 0.189888
+     }
+    ],
+    "mat": {
+     "concreto": "MEZ-01020",
+     "alambre": "ACE-00001"
+    },
+    "fuente": "EST-02120"
+   },
+   {
+    "clave": "CE-1",
+    "nombre": "Cadena CE-1",
+    "categoria": "cadenas",
+    "subcategoria": "cerramiento",
+    "tipo": "lineal",
+    "ancho_cm": 15,
+    "alto_cm": 20,
+    "lados": 2,
+    "posicion": "cerramiento",
+    "armado": {
+     "tipo": "armex",
+     "insumo": "ACE-00020",
+     "alambre_kg_ml": 0.1
+    },
+    "cimbra": [
+     {
+      "insumo": "ACE-00012",
+      "q": 0.025532
+     },
+     {
+      "insumo": "ACE-00013",
+      "q": 0.02
+     },
+     {
+      "insumo": "MAD-00004",
+      "q": 0.01
+     },
+     {
+      "insumo": "ACE-00001",
+      "q": 0.189888
+     }
+    ],
+    "mat": {
+     "concreto": "MEZ-01020",
+     "alambre": "ACE-00001"
+    },
+    "fuente": "EST-02310"
+   },
+   {
+    "clave": "CE-2",
+    "nombre": "Cadena CE-2",
+    "categoria": "cadenas",
+    "subcategoria": "cerramiento",
+    "tipo": "lineal",
+    "ancho_cm": 15,
+    "alto_cm": 25,
+    "lados": 2,
+    "posicion": "cerramiento",
+    "armado": {
+     "tipo": "varillas",
+     "sup": [
+      {
+       "n": 2,
+       "insumo": "ACR-00002"
+      }
+     ],
+     "inf": [
+      {
+       "n": 2,
+       "insumo": "ACR-00002"
+      }
+     ],
+     "anillos": [
+      {
+       "len_cm": null,
+       "sep_cm": 20,
+       "insumo": "ACE-00004"
+      }
+     ],
+     "gancho_cm": 10,
+     "rec_cm": 2.5,
+     "am_l": 0.3
+    },
+    "cimbra": [
+     {
+      "insumo": "MAD-00004",
+      "q": 0.01
+     },
+     {
+      "insumo": "ACE-00001",
+      "q": 0.189888
+     }
+    ],
+    "mat": {
+     "concreto": "MEZ-01020",
+     "alambre": "ACE-00001"
+    },
+    "fuente": "EST-02320"
+   },
+   {
+    "clave": "CD-1",
+    "nombre": "Cadena CD-1",
+    "categoria": "cadenas",
+    "subcategoria": "desplante",
+    "tipo": "lineal",
+    "ancho_cm": 15,
+    "alto_cm": 20,
+    "lados": 2,
+    "posicion": "desplante",
+    "armado": {
+     "tipo": "armex",
+     "insumo": "ACE-00020",
+     "alambre_kg_ml": 0.3
+    },
+    "cimbra": [
+     {
+      "insumo": "ACE-00012",
+      "q": 0.025532
+     },
+     {
+      "insumo": "ACE-00013",
+      "q": 0.02
+     },
+     {
+      "insumo": "MAD-00004",
+      "q": 0.00667
+     }
+    ],
+    "mat": {
+     "concreto": "MEZ-01020",
+     "alambre": "ACE-00001"
+    },
+    "fuente": "BAP-01100"
+   }
+  ],
+  "elemento_notas": "En la base: castillo → elemento_parametrico.tipo 'castillo' (largo, ancho, alto); cadena → tipo 'lineal' (ancho, alto). alto_cm vacío en un castillo significa 'alto del muro'. Editar un elemento crea una versión nueva del catálogo; lo ya medido conserva la anterior.",
+  "posiciones_de_cadena": [
+   "desplante",
+   "cerramiento",
+   "remate"
+  ],
+  "partes_de_toma": [
+   {
+    "clave": "concreto",
+    "insumo": "Concreto f'c = 150 kg/cm²",
+    "unidad": "m3"
+   },
+   {
+    "clave": "armado",
+    "insumo": "Armado (armex o varillas)",
+    "unidad": "ml"
+   },
+   {
+    "clave": "cimbra",
+    "insumo": "Cimbra común",
+    "unidad": "m2"
+   }
+  ],
+  "caras": {
+   "A": "izquierda del sentido de dibujo",
+   "B": "derecha del sentido de dibujo",
+   "valores": [
+    "exterior",
+    "interior"
+   ],
+   "nota": "exterior equivale a 'fachada' en trazo.muro_acabado y trazo.revestimiento_cara"
+  },
+  "ubicaciones": [
+   {
+    "clave": "interior",
+    "nombre": "Interior",
+    "caras": {
+     "A": "interior",
+     "B": "interior"
+    },
+    "enrase_exterior": true
+   },
+   {
+    "clave": "fachada_a",
+    "nombre": "Fachada, cara A exterior",
+    "caras": {
+     "A": "exterior",
+     "B": "interior"
+    }
+   },
+   {
+    "clave": "fachada_b",
+    "nombre": "Fachada, cara B exterior",
+    "caras": {
+     "A": "interior",
+     "B": "exterior"
+    }
+   },
+   {
+    "clave": "pretil",
+    "nombre": "Pretil",
+    "caras": {
+     "A": "exterior",
+     "B": "exterior"
+    },
+    "elementos_sugeridos": [
+     "K-1"
+    ]
+   },
+   {
+    "clave": "barda",
+    "nombre": "Barda",
+    "caras": {
+     "A": "exterior",
+     "B": "exterior"
+    },
+    "elementos_sugeridos": [
+     "K-1",
+     "CE-1"
+    ]
+   },
+   {
+    "clave": "personalizada",
+    "nombre": "Personalizada",
+    "caras": null
+   }
+  ],
+  "partes_base": [
+   {
+    "nombre": "Media altura",
+    "hasta": 1.2,
+    "suma": true,
+    "rol": "cuerpo"
+   },
+   {
+    "nombre": "Hasta cerramiento",
+    "hasta": 2.3,
+    "suma": true,
+    "rol": "cuerpo"
+   },
+   {
+    "nombre": "Enrase",
+    "hasta": "altura",
+    "suma": true,
+    "rol": "enrase"
+   }
+  ],
+  "acabado_defecto": {
+   "exterior": {
+    "gris": true,
+    "blanca": true,
+    "pintura": true
+   },
+   "interior": {
+    "gris": true,
+    "blanca": true,
+    "pintura": true
+   }
+  },
+  "contextos": [
+   {
+    "clave": "planta_baja",
+    "nombre": "Planta baja",
+    "desc": "Castillo que arranca en cimentación"
+   },
+   {
+    "clave": "entrepiso",
+    "nombre": "Entrepiso",
+    "desc": "Arranca en losa de entrepiso; usa escalones como los de cimentación"
+   },
+   {
+    "clave": "azotea",
+    "nombre": "Azotea",
+    "desc": "Arranca en losa de azotea"
+   },
+   {
+    "clave": "pretil",
+    "nombre": "Pretil",
+    "desc": "Ubicación pretil (sale de la ubicación del muro)"
+   },
+   {
+    "clave": "barda",
+    "nombre": "Barda",
+    "desc": "Ubicación barda: un solo concepto con acero y colado"
+   }
+  ]
+ },
+ "plantillas_ejemplo": [
+  {
+   "id": "fachada",
+   "nombre": "Muro de fachada",
+   "tipo": "con_cadena",
+   "material": "tabique_rojo",
+   "ubicacion": "fachada_a",
+   "altura": null,
+   "elementos": [
+    {
+     "ref": "K-1"
+    },
+    {
+     "ref": "CE-1"
+    }
+   ]
+  },
+  {
+   "id": "fachada_desplante",
+   "nombre": "Fachada con desplante y cerramiento",
+   "tipo": "con_cadena",
+   "material": "tabique_rojo",
+   "ubicacion": "fachada_a",
+   "altura": null,
+   "elementos": [
+    {
+     "ref": "K-1"
+    },
+    {
+     "ref": "CE-1"
+    },
+    {
+     "ref": "CD-1"
+    }
+   ]
+  },
+  {
+   "id": "interior",
+   "nombre": "Interior con enrase exterior",
+   "tipo": "confinado",
+   "material": "block_hueco",
+   "ubicacion": "interior",
+   "altura": null,
+   "elementos": [
+    {
+     "ref": "K-1"
+    },
+    {
+     "ref": "CE-1"
+    }
+   ]
+  },
+  {
+   "id": "pretil",
+   "nombre": "Pretil",
+   "tipo": "confinado",
+   "material": "tabique_rojo",
+   "ubicacion": "pretil",
+   "altura": 1.0,
+   "partes_base": [
+    {
+     "nombre": "Pretil",
+     "hasta": "altura",
+     "suma": true,
+     "rol": "pretil"
+    }
+   ],
+   "elementos": [
+    {
+     "ref": "K-1"
+    }
+   ]
+  },
+  {
+   "id": "barda",
+   "nombre": "Barda de sillar",
+   "tipo": "confinado",
+   "material": "sillar_amarillo",
+   "ubicacion": "barda",
+   "altura": 2.5,
+   "partes_base": [
+    {
+     "nombre": "Cuerpo",
+     "hasta": "altura",
+     "suma": true,
+     "rol": "cuerpo"
+    }
+   ],
+   "elementos": [
+    {
+     "ref": "K-1"
+    },
+    {
+     "ref": "CE-1",
+     "posicion": "remate"
+    }
+   ]
+  }
+ ],
+ "drivers": [
+  {
+   "clave": "altura_estandar",
+   "nombre": "Altura estándar del muro",
+   "unidad": "m",
+   "global": 3.0,
+   "modo": "ajustable",
+   "nota": "Hoy el backend usa 2.6 m por defecto"
+  },
+  {
+   "clave": "separacion_castillos",
+   "nombre": "Separación entre castillos",
+   "unidad": "m",
+   "global": 3.0,
+   "modo": "ajustable",
+   "nota": "Se usa en castillos con distribución por separación"
+  },
+  {
+   "clave": "desperdicio_mamposteria",
+   "nombre": "Desperdicio de mampostería",
+   "unidad": "%",
+   "global": 5,
+   "modo": "ajustable",
+   "nota": "Ejemplo"
+  },
+  {
+   "clave": "desperdicio_concreto",
+   "nombre": "Desperdicio de concreto",
+   "unidad": "%",
+   "global": 5,
+   "modo": "ajustable",
+   "nota": "El catálogo usa 5 % (0.0225 m³/m × 1.05 = 0.023625)"
+  },
+  {
+   "clave": "traslape_armex_cm",
+   "nombre": "Traslape del armex",
+   "unidad": "cm",
+   "global": 15,
+   "modo": "ajustable",
+   "nota": "Pieza de armex de 6 m; el traslape se descuenta de cada pieza en un tramo continuo (cadena): 1 ÷ (6 − 0.15) = 0.1709 pza por metro"
+  },
+  {
+   "clave": "traslape_varilla_diametros",
+   "nombre": "Traslape de varilla",
+   "unidad": "diámetros",
+   "global": 40,
+   "modo": "ajustable",
+   "nota": "Confirmado por el usuario: 40 diámetros (NTC Concreto); pieza de varilla de 12 m"
+  },
+  {
+   "clave": "desperdicio_acero",
+   "nombre": "Desperdicio de acero",
+   "unidad": "%",
+   "global": 0,
+   "modo": "ajustable",
+   "nota": "El catálogo usa 5 % en lugar de traslape; aquí el traslape se calcula aparte"
+  },
+  {
+   "clave": "puntas_inferior_diametros",
+   "nombre": "Anclaje inferior del castillo",
+   "unidad": "diámetros",
+   "global": 40,
+   "modo": "ajustable",
+   "nota": "Anclaje en cimentación o losa, con su gancho (NTC Concreto, desarrollo de 40 diámetros). Por confirmar con el estructurista"
+  },
+  {
+   "clave": "puntas_superior_diametros",
+   "nombre": "Anclaje superior del castillo",
+   "unidad": "diámetros",
+   "global": 40,
+   "modo": "ajustable",
+   "nota": "Espera para la losa (40 diámetros) o gancho de 12 diámetros en un remate. Por confirmar con el estructurista"
+  },
+  {
+   "clave": "puntas_armex_cm",
+   "nombre": "Puntas del armex del castillo",
+   "unidad": "cm",
+   "global": 50,
+   "modo": "ajustable",
+   "nota": "SUPUESTO: suma de anclaje inferior y superior del armex. Por confirmar"
+  },
+  {
+   "clave": "tolerancia_corte_cm",
+   "nombre": "Tolerancia de corte",
+   "unidad": "cm",
+   "global": 0,
+   "modo": "ajustable",
+   "nota": "Falta que se acepta sin pasar al corte siguiente (con 14 cm, el muro de 7 m sale con 2 piezas de 4.00 m)"
+  },
+  {
+   "clave": "max_piezas_corte",
+   "nombre": "Máximo de piezas por varilla de un castillo",
+   "unidad": "piezas",
+   "global": 3,
+   "modo": "ajustable",
+   "nota": "Evita cortes en muchos pedazos para ahorrar unos centímetros; solo si no hay solución con menos piezas se pasa de este máximo"
+  }
+ ],
+ "reglas_de_calculo": [
+  {
+   "ranura": "mamposteria:{material}",
+   "unidad": "m2",
+   "formula": "largo × Σ(altura de las partes que suman) − Σ(castillos 'ubicado' × largo del castillo × alto del castillo)",
+   "con_desperdicio": "× (1 + desperdicio_mamposteria / 100)"
+  },
+  {
+   "ranura": "elemento:{clave} (castillo)",
+   "unidad": "pza",
+   "formula": "distribución 'extremos' = 2; distribución 'separación' = ⌈largo ÷ separación⌉ + 1; en modo 'estimado' no se resta de la mampostería"
+  },
+  {
+   "ranura": "elemento:{clave} (cadena)",
+   "unidad": "ml",
+   "formula": "largo del muro"
+  },
+  {
+   "muestra_castillo": "concreto = largo × ancho × alto × (1 + desp) en m3; armado = alto en ml de armex; cimbra = alto × perímetro de los lados: 2 lados → 2·largo; 3 lados → 2·largo + ancho; 4 lados → 2·(largo + ancho)"
+  },
+  {
+   "muestra_cadena": "por ml: concreto = ancho × peralte × (1 + desp); armado = 1 ml; cimbra = 2·peralte (+ ancho con 3 lados)"
+  },
+  {
+   "nota_muestra": "La receta completa (estribos, alambre de amarre, varillas) la calcula el servidor en domain/cuantificacion/elementos_parametricos.receta; el mockup muestra concreto, armado y cimbra."
+  },
+  {
+   "ranura": "acabado:{capa}:{ubicacion}",
+   "unidad": "m2",
+   "formula": "largo × Σ(altura de las partes que suman cuya cara tiene esa ubicación), caras A y B juntas",
+   "capas": [
+    "gris",
+    "blanca",
+    "pintura"
+   ],
+   "solo_si": "la capa está en Sí para esa ubicación"
+  },
+  {
+   "nota": "Las partes que no suman (las de cadena) no miden mampostería ni acabado, igual que hoy."
+  }
+ ],
+ "reglas_de_elementos": [
+  "Los elementos se crean y editan en la pestaña Elementos. En Artefacto se eligen del catálogo y aparecen en la isométrica con sus dimensiones reales.",
+  "Lo que es del muro y no del elemento: distribución y separación del castillo, si se cuenta estimado o ubicado, y la posición de la cadena (desplante, cerramiento, remate).",
+  "El peralte de una cadena define el espesor de su parte de altura. La parte queda ligada al elemento: no suma y no se edita a mano.",
+  "Posiciones de cadena: desplante (parte al pie), cerramiento (entre el cuerpo y el enrase) y remate (parte al tope).",
+  "Cambiar el tipo de muro restablece los elementos al conjunto del tipo. Elegir una ubicación con elementos_sugeridos (pretil, barda) también los restablece.",
+  "Cada elemento enlaza uno o más conceptos del Presupuesto y declara qué parte de su receta toma cada uno (concreto, armado, cimbra).",
+  "Alerta 'sin concepto': una parte de la receta que ningún concepto toma se perdería del presupuesto.",
+  "Alerta 'tomada dos veces': una parte tomada por más de un concepto se contaría doble.",
+  "Alerta 'por revisar': el concepto toma una parte que su matriz no tiene.",
+  "El concepto propio del elemento tiene el nombre generado de sus medidas (por ejemplo 'Castillo K-1 de 15 × 15 con armex') y cambia con él.",
+  "El APU propio trae concreto, armado y cimbra calculados de la muestra; cada cantidad admite un ajuste manual y eso también crea versión.",
+  "La pantalla de Elementos muestra el APU vigente, la propuesta y la diferencia, y el historial de versiones.",
+  "La altura de arranque de una cadena (z) se edita en Artefacto: preset desplante (z = 0), cerramiento o remate (tope), o un valor libre. Ocupa de z a z + peralte.",
+  "Al colocar una cadena, el cuerpo se divide alrededor: lo que queda arriba o abajo conserva sus propiedades y la parte nueva lleva el sufijo '(2)'. Si la cadena se traslapa con otra, no se aplica el cambio y se avisa.",
+  "El cuerpo también se puede dividir a mano en dos partes (÷) para darles distinta cara, suma o ubicación.",
+  "Los castillos tienen una altura de arranque (por defecto 0) y su alto automático es la altura del muro menos esa altura.",
+  "Los insumos adicionales del APU (mano de obra, herramienta, equipo) se capturan en Elementos y se versionan igual que el resto del APU.",
+  "Con armado de varillas y anillos, la receta se separa en acero, anillos y alambre de amarre, igual que la receta del servidor; con armex es una sola partida en ml.",
+  "El PU de la muestra es la suma de los importes de las filas del APU. El importe de un insumo en % es ese porcentaje de la mano de obra del APU.",
+  "Cambiar el tipo de armado cambia las partes que el elemento ofrece a los conceptos; si un concepto ya tomaba una parte que desapareció, se avisa.",
+  "Las cantidades del APU se expresan en la unidad del insumo: varilla y armex en pieza (varilla de 12 m), anillo y alambre en kg, concreto en m3 y cimbra en m2.",
+  "Un anillo se elige prefabricado (familia Aceros, ANILLO nxm, en kg) o de varilla. Para una sección de 15 × 15 con recubrimiento de 2.5 cm corresponde ANILLO 10X10 y armex 10X10-4; para 15 × 20 corresponde ANILLO 10X15 y armex 10x15.",
+  "El APU de un concepto se expresa en su unidad. Un concepto por metro de un castillo (que por naturaleza es pieza) divide cada cantidad entre el alto del castillo; uno por pieza usa la cantidad de una pieza.",
+  "Un elemento con varillas distintas se describe con una lista de (piezas, varilla). Los anillos se describen por zonas: cada zona lleva su largo (la última, el resto), su separación y su anillo. En una cadena, los anillos son una sola zona por metro.",
+  "Dos elementos con la misma firma (tipo, medidas, cimbra, armado normalizado y materiales) son duplicados; se bloquea guardar o enviar el segundo.",
+  "Un elemento 'parecido' (misma sección y armado, distinto alto o cimbra) se avisa pero se permite.",
+  "Un mismo elemento puede tener varios usos en un muro (cada uso con su identificador, su posición y su altura de arranque). Un castillo tiene un solo uso: su distribución cuenta las piezas.",
+  "Armex: piezas por unidad = largo ÷ 6 m en un castillo de hasta 6 m (sin traslape); en un tramo continuo, 1 ÷ (6 − traslape), con traslape de 15 cm (driver traslape_armex_cm).",
+  "Varilla: piezas por metro = n ÷ (12 − traslape), con traslape = diámetros × diámetro de la varilla (driver traslape_varilla_diametros, 40 por defecto, por confirmar). El catálogo usa 5 % de desperdicio en lugar de traslape; con 40 diámetros el resultado es casi igual (0.348 contra 0.35 pza/m).",
+  "Anillos: se cuentan en piezas (n) y se pagan en kg (n × largo del anillo × 0.249 kg/m). El largo del anillo sale de la sección, el recubrimiento y el gancho.",
+  "Cimbra por consumos: cada elemento guarda consumos por ml de clavo, tablas y alambre; por pieza se multiplican por el alto.",
+  "Conceptos por escalones: se elige el primer escalón cuyo 'hasta' alcanza el alto del castillo; si el alto lo rebasa se usa el último y se avisa.",
+  "Un concepto por metro de un castillo divide cada cantidad entre el alto del castillo; el de acero va por pieza.",
+  "Bastón: piezas = ceil(trazo ÷ separación) + 1; bastones por varilla = floor(12 ÷ largo); varillas = ceil(piezas ÷ bastones por varilla); kg = piezas × largo × peso por metro."
+ ],
+ "reglas_de_ubicacion": [
+  "Al elegir una ubicación con caras definidas, todas las partes toman esas caras.",
+  "Si la ubicación tiene enrase_exterior = true, la parte con rol 'enrase' queda exterior en ambas caras.",
+  "Si el usuario cambia la cara de cualquier parte, la ubicación pasa a 'personalizada'.",
+  "Losa más baja que el muro: las partes con desde ≥ altura de losa se sugieren exterior; se aplican solo al confirmar."
+ ],
+ "catalogo_ejemplo": [
+  {
+   "id": "EJ-101",
+   "nombre": "Muro de sillar amarillo 15 cm",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-102",
+   "nombre": "Muro de tabique rojo recocido 14 cm",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-103",
+   "nombre": "Muro de block hueco 15 cm",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-210",
+   "nombre": "Aplanado de mortero, fachada",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-211",
+   "nombre": "Aplanado de mortero, interior",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-220",
+   "nombre": "Obra blanca (yeso), interior",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-230",
+   "nombre": "Pintura vinílica, interior",
+   "unidad": "m2"
+  },
+  {
+   "id": "EJ-231",
+   "nombre": "Pintura vinílica, fachada",
+   "unidad": "m2"
+  }
+ ],
+ "conceptos_de_elementos_ejemplo": [
+  {
+   "id": "EST-10013",
+   "nombre": "Colocación de acero K1, armado con armex de 10x10-4 hasta 1.00 m. de altura.",
+   "unidad": "pza",
+   "pu": 23.84,
+   "matriz": [
+    "acero"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00011",
+     "desc": "ARMEX 10X10-4",
+     "unidad": "pza",
+     "cantidad": 0.166667,
+     "costo": 140.07,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 24.68,
+     "tipo": "Material"
+    }
+   ]
+  },
+  {
+   "id": "EST-10012",
+   "nombre": "Colocación de acero K1, armado con armex de 10x10-4 hasta 1.50 m. de altura.",
+   "unidad": "pza",
+   "pu": 35.51,
+   "matriz": [
+    "acero"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00011",
+     "desc": "ARMEX 10X10-4",
+     "unidad": "pza",
+     "cantidad": 0.25,
+     "costo": 140.07,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 24.68,
+     "tipo": "Material"
+    }
+   ]
+  },
+  {
+   "id": "EST-10010",
+   "nombre": "Colocación de acero en cimentación K1, armado con armex de 10x10-4 hasta 4.00 m. de altura.",
+   "unidad": "pza",
+   "pu": 95.01,
+   "matriz": [
+    "acero"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00011",
+     "desc": "ARMEX 10X10-4",
+     "unidad": "pza",
+     "cantidad": 0.666667,
+     "costo": 140.07,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.06589,
+     "costo": 24.68,
+     "tipo": "Material"
+    }
+   ]
+  },
+  {
+   "id": "EST-10011",
+   "nombre": "Colocación de acero en cimentación K1, armado con armex de 10x10-4 hasta 6.00 m. de altura.",
+   "unidad": "pza",
+   "pu": 140.81,
+   "matriz": [
+    "acero"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00011",
+     "desc": "ARMEX 10X10-4",
+     "unidad": "pza",
+     "cantidad": 1.0,
+     "costo": 140.07,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.032945,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": -0.002945,
+     "costo": 24.68,
+     "tipo": "Material"
+    }
+   ]
+  },
+  {
+   "id": "EST-02110",
+   "nombre": "Castillo K1 de 15x15 cm de concreto H.O. f'c=150 kg/cm2, armado con armex de 10x10-4.",
+   "unidad": "ml",
+   "pu": 178.98,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.210987,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.023625,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.017021,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02020",
+     "desc": "MO CASTILLOS K1 (15X15)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 130.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02120",
+   "nombre": "Castillo K2 de 15x 15 cm de concreto H.O. f'c=150 kg/cm2, armado con 4 var de no.3 y estribos de 10x10 de no.2 @20 cms.",
+   "unidad": "ml",
+   "pu": 178.46,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.189888,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.017021,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.023625,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02021",
+     "desc": "MO CASTILLOS K2 (15X15)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 130.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02130",
+   "nombre": "Castillo K3 de 15x30 cm de concreto H.O. f'c= 150 kg/cm2 armado con 6 var no.4 y estribos no.2 @15 cms.",
+   "unidad": "ml",
+   "pu": 239.38,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.189888,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.04725,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02022",
+     "desc": "MO CASTILLOS K3 (15X30)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 150.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02140",
+   "nombre": "Castillo K4 en ángulo de 15x30 cm de concreto H.O. f'c= 150 kg/cm2 armado con 6 var no.3 y estribos no.2 @20 cms.",
+   "unidad": "ml",
+   "pu": 239.38,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.189888,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.04725,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02510",
+     "desc": "MO CASTILLOS K4 (15X30)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 150.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02150",
+   "nombre": "Castillo K5 de 15x45 cm de concreto H.O. f'c= 150 kg/cm2 armado con 8 var no.4 y estribos no.2 @15 cms.",
+   "unidad": "ml",
+   "pu": 291.74,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.223398,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.034043,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.04,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.070875,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02050",
+     "desc": "MO CASTILLOS K5 (15X45)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 160.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02160",
+   "nombre": "Castillo K6 de 15x 15 cm de concreto H.O. f'c=150 kg/cm2, armado con 4 var de no.4 y estribos de 10x10 de no.2 @20 cms.",
+   "unidad": "ml",
+   "pu": 186.24,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.1,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.017021,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.023625,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02026",
+     "desc": "MO CASTILLOS K6 (15X15)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 140.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02170",
+   "nombre": "Castillo K7 de 15x20 cm para encofrar tubería de concreto H.O. f'c=150 kg/cm2, armado con armex de 10x15.",
+   "unidad": "ml",
+   "pu": 202.14,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.189888,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.021277,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.0315,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02027",
+     "desc": "MO CASTILLOS K7 (15X20)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 140.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02180",
+   "nombre": "Castillo K8 de 15x40 cm para encofrar tubería de concreto H.O. f'c=150 kg/cm2, armado con armex de 10x15.",
+   "unidad": "ml",
+   "pu": 275.2,
+   "matriz": [
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.12,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.029787,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.03,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.063,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02028",
+     "desc": "MO CASTILLOS K8 (15X40)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 160.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02310",
+   "nombre": "Cadena intermedia CE1 de 15x20 cm de concreto H.O. f'c=150, armado con armex 10x15-4.",
+   "unidad": "ml",
+   "pu": 236.05,
+   "matriz": [
+    "acero",
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.189888,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00020",
+     "desc": "Armex 10x15",
+     "unidad": "pza",
+     "cantidad": 0.183333,
+     "costo": 170.76,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.1,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.0315,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02101",
+     "desc": "MO CADENA CE1 (15X20)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 140.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "EST-02320",
+   "nombre": "Cadena de cerramiento CE2 de 15x25 cm de concreto H.O. f'c=150, armada con 4 var no.4 y estribos no.2 @ 20cms.",
+   "unidad": "ml",
+   "pu": 329.35,
+   "matriz": [
+    "acero",
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACR-00002",
+     "desc": "VARILLA 1/2",
+     "unidad": "pza",
+     "cantidad": 0.35,
+     "costo": 237.52,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00004",
+     "desc": "ANILLO 10X15",
+     "unidad": "kg",
+     "cantidad": 0.890175,
+     "costo": 24.01,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.016548,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.189888,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.039375,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02102",
+     "desc": "MO CADENA CE2 (15X20)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 150.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "BAP-01100",
+   "nombre": "Cadena de desplante CD-1 de 15x20 cm de concreto h.o. f'c=150, armada con armex 10x15-4.",
+   "unidad": "ml",
+   "pu": 239.95,
+   "matriz": [
+    "acero",
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.3,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00020",
+     "desc": "Armex 10x15",
+     "unidad": "pza",
+     "cantidad": 0.183333,
+     "costo": 170.76,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.0315,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-07010",
+     "desc": "MEZCLA CEMENTO-ARENA 1:4",
+     "unidad": "m3",
+     "cantidad": 0.0021,
+     "costo": 2058.26,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02201",
+     "desc": "MO CADENA CD-1 (15X25)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 140.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.00667,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "BAP-03010",
+   "nombre": "Cadena de desplante aparente CD-1 de 15x20 cm de concreto h.o. f'c=150, armada con armex 10x15-4.",
+   "unidad": "ml",
+   "pu": 300.1,
+   "matriz": [
+    "acero",
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.3,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00020",
+     "desc": "Armex 10x15",
+     "unidad": "pza",
+     "cantidad": 0.183333,
+     "costo": 170.76,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MAD-00030",
+     "desc": "TUINO CHAFLAN",
+     "unidad": "pza",
+     "cantidad": 0.2,
+     "costo": 20.0,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.0525,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-07010",
+     "desc": "MEZCLA CEMENTO-ARENA 1:4",
+     "unidad": "m3",
+     "cantidad": 0.0021,
+     "costo": 2058.26,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02202",
+     "desc": "MO CADENA CD-1 APARENTE (20X25)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 160.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.00667,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "BAP-03020",
+   "nombre": "Castillo aparente de 25x20 cm de concreto h.o. f'c=150 kg/cm2, armado con armex de 10x15-4.",
+   "unidad": "ml",
+   "pu": 297.89,
+   "matriz": [
+    "acero",
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.3,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00020",
+     "desc": "Armex 10x15",
+     "unidad": "pza",
+     "cantidad": 0.175,
+     "costo": 170.76,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MAD-00030",
+     "desc": "TUINO CHAFLAN",
+     "unidad": "pza",
+     "cantidad": 0.128205,
+     "costo": 20.0,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.0525,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-07010",
+     "desc": "MEZCLA CEMENTO-ARENA 1:4",
+     "unidad": "m3",
+     "cantidad": 0.0021,
+     "costo": 2058.26,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02025",
+     "desc": "MO CASTILLOS K9 (15X25) APARENTE",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 160.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  },
+  {
+   "id": "BAP-03030",
+   "nombre": "Cadena de cerramiento aparente CE1 de 20x25 cm de concreto h.o. f'c=150, armado con armex 10x15-4.",
+   "unidad": "ml",
+   "pu": 264.61,
+   "matriz": [
+    "acero",
+    "concreto",
+    "cimbra"
+   ],
+   "comp": [
+    {
+     "clave": "ACE-00001",
+     "desc": "ALAMBRE RECOCIDO",
+     "unidad": "kg",
+     "cantidad": 0.3,
+     "costo": 24.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00020",
+     "desc": "Armex 10x15",
+     "unidad": "pza",
+     "cantidad": 0.183333,
+     "costo": 170.76,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00012",
+     "desc": "CLAVO 2 1/2",
+     "unidad": "kg",
+     "cantidad": 0.025532,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "ACE-00013",
+     "desc": "CLAVO 4",
+     "unidad": "kg",
+     "cantidad": 0.02,
+     "costo": 30.68,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MAD-00030",
+     "desc": "TUINO CHAFLAN",
+     "unidad": "pza",
+     "cantidad": 0.2,
+     "costo": 20.0,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-01020",
+     "desc": "CONCRETO H.O. F'C=150 KG/CM2",
+     "unidad": "m3",
+     "cantidad": 0.0315,
+     "costo": 1721.06,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MEZ-07010",
+     "desc": "MEZCLA CEMENTO-ARENA 1:4",
+     "unidad": "m3",
+     "cantidad": 0.0021,
+     "costo": 2058.26,
+     "tipo": "Material"
+    },
+    {
+     "clave": "MOE-02103",
+     "desc": "MO CADENA CE1 APARENTE (20X25)",
+     "unidad": "ml",
+     "cantidad": 1.0,
+     "costo": 160.0,
+     "tipo": "Contrato"
+    },
+    {
+     "clave": "MAD-00004",
+     "desc": "TABLAS (se les da 10 pza por lote)",
+     "unidad": "pza",
+     "cantidad": 0.01,
+     "costo": 198.0,
+     "tipo": "Flete"
+    }
+   ]
+  }
+ ],
+ "enlaces_iniciales": {
+  "mamposteria:sillar_amarillo": "EJ-101",
+  "mamposteria:tabique_rojo": "EJ-102",
+  "acabado:gris:exterior": "EJ-210",
+  "acabado:gris:interior": "EJ-211"
+ },
+ "roles": {
+  "edita_drivers_y_plantillas": [
+   "costos",
+   "control_obra"
+  ],
+  "nota": "Roles existentes. Residente y supervisor ven en solo lectura."
+ },
+ "mapeo_backend": {
+  "existente_que_se_conserva": [
+   "Tabla elemento_parametrico (0104): clave, nombre, tipo (castillo, lineal, zapata, losa), parametros jsonb. El castillo usa largo, ancho, alto; la cadena es tipo 'lineal' con ancho y alto",
+   "Tabla elemento_concepto (0112): elemento_id, concepto_id, unidad (pza, ml, m²), toma jsonb. Es el enlace elemento → concepto",
+   "Versiones del catálogo de elementos (0120) y domain/cuantificacion/elementos_parametricos.py (receta, toma_por_unidad)",
+   "trazo.muro_acabado (jsonb {interior|fachada: {gris, blanca, pintura}}): 'fachada' equivale a la ubicación exterior",
+   "trazo.revestimiento_de y trazo.revestimiento_cara; PUT /trazos/{id}/muro/clasificacion y /trazos/{id}/revestimiento",
+   "Frontend: ClasificacionDeMuro.tsx, AlturaPorPartes.tsx, RevestimientosDelMuro.tsx, CampoDecimal.tsx",
+   "Frontend: la pestaña Elementos (PanelDeElementos.tsx y PanelDeParametricos.tsx) ya define castillos, trabes/cadenas, zapatas y losas; se amplía con armex, el enlace a conceptos y la comparación contra la matriz",
+   "elemento_parametrico.version, raiz_id y vigente (0120): ya versionan el elemento. Hoy solo crean versión al editar un elemento usado en una obra asignada",
+   "version_concepto (0096): versión del concepto con PU congelado; el APU propio del elemento se versiona con ella",
+   "Costos ya puede dar de alta conceptos y publicar versión de CPU (0090)",
+   "elemento_concepto (0112) ya permite varios conceptos por elemento, cada uno con su unidad (pza, ml, m²) y lo que toma (concreto, acero, estribos, alambre, cimbra). Los tres grupos del mockup (acero de refuerzo, concreto, cimbra) agrupan esas partes"
+  ],
+  "existente_que_cambia": [
+   "trazo.muro_tipo hoy acepta confinado, con_cadena, tabique, sillar, pretil, barda. Debe quedar en confinado, con_cadena, tabique. Migrar filas: pretil → ubicación pretil + tipo confinado; barda → ubicación barda + tipo confinado; sillar → material sillar_amarillo (su tipo se decide con el usuario)",
+   "El armado de elemento_parametrico hoy es varillas y estribos (n_var, no_var, sep, no_est). El armex no existe: agregar parametros.armado = {tipo: 'armex'|'varillas', armex: clave} y que receta() lo acepte (acero = ml de armex)",
+   "GestionarVanos.agregar rechaza el castillo si el muro no es con_cadena (422). Debe basarse en los elementos de la plantilla: el vano 'castillo' pasa a ser una instancia colocada del elemento castillo de la plantilla",
+   "Altura por defecto 2.6 m en GestionarVanos._altura_del_muro, app.cantidad_conversion y el castillo K-01 (0126): pasa a leer el driver altura_estandar (3.00); el alto del castillo sale de la altura del muro",
+   "app.cantidad_conversion hoy descuenta vanos y mide una superficie: debe devolver m² por (capa, ubicación) usando la cara y la ubicación de cada parte, y restar los castillos ubicados",
+   "Verificar en el código dónde se guardan hoy las partes de altura; ahí se agregan cara_a, cara_b y elemento_ref por parte",
+   "0120 versiona solo con obras asignadas que usan el elemento. La regla nueva: todo cambio autorizado crea versión, haya o no obra asignada",
+   "Editar un elemento hoy escribe directo. Debe escribir una propuesta (borrador) y pasar por autorización de Control de obra",
+   "elemento_parametrico.parametros guarda el armado con varillas por número (n_var, no_var, no_est, am_cal), no por insumo. Hay que guardar el insumo de cada varilla, del anillo, del alambre, del concreto y de la cimbra (o el id de insumo en parametros) para que el elemento muestre y calcule con precio",
+   "receta() hoy toma el peso de PESO_VARILLA_KG_M y PESO_ALAMBRE_KG_M. Con la base de insumos, el peso por metro debería venir del insumo (atributo) o de CONSTANTE_FISICA (D-326, pendiente)",
+   "receta() hoy no traslapa y cuenta la cimbra por lado y m²; debe usar traslape del armex y la varilla, y los consumos de cimbra por ml del elemento"
+  ],
+  "nuevo_propuesto": [
+   "trazo.muro_material text; trazo.muro_ubicacion text (interior, fachada_a, fachada_b, pretil, barda, personalizada)",
+   "Partes de altura: cara_a, cara_b (exterior|interior) y elemento_ref (clave de la cadena que la define)",
+   "Tabla muro_plantilla (org_id, nombre, tipo, material, ubicacion, elementos jsonb [{ref, modo, dist, sep, posicion}], partes jsonb, acabado jsonb, version) con RLS",
+   "Tabla driver_valor (org_id, clave, nivel global|obra, obra_id nullable, valor, modo fijo|ajustable) con RLS",
+   "Tabla plantilla_ranura_concepto (plantilla_id, ranura, concepto_id) para mampostería y acabados; los elementos usan elemento_concepto",
+   "Validación elemento ↔ matriz: cada parte 'tomada' debe existir en la matriz del concepto (alerta por revisar); parte sin concepto o tomada dos veces (alertas)",
+   "Endpoints: GET/PUT /drivers; GET/PUT /obras/{id}/drivers; CRUD /muro-plantillas; PUT /trazos/{id}/muro/plantilla; GET /muro-plantillas/{id}/ranuras",
+   "Frontend: pestañas Artefacto y Paramétrico nuevas; Elementos se amplía; el Cuantificador solo elige la plantilla del trazo",
+   "Permisos de escritura sobre drivers y plantillas: roles costos y control_obra",
+   "elemento_parametrico: columnas estado (borrador, pendiente, vigente, rechazada), solicitado_por, autorizado_por, autorizado_en y concepto_id (el concepto propio del elemento)",
+   "Al crear un elemento: crear su concepto y generar su matriz (explosion) desde receta(); al autorizar un cambio: publicar versión del concepto (version_concepto) y de la matriz",
+   "Endpoints: POST /elementos-parametricos/{id}/solicitar-autorizacion, /autorizar, /rechazar; GET /elementos-parametricos/{id}/versiones",
+   "Permisos: crear y proponer cambios para costos y control_obra; autorizar solo control_obra",
+   "Avisos: notificar a Control de obra cuando haya una propuesta pendiente",
+   "muro_plantilla.elementos[].z: altura de arranque de cada elemento sobre el cuerpo; las partes del muro se derivan de los elementos y del cuerpo",
+   "muro_plantilla: columnas validada, validada_por y validada_en; cualquier cambio de Costos la deja 'por validar'",
+   "El APU propio del elemento: filas de la matriz (explosion) con insumos adicionales de mano de obra, herramienta y equipo tomados del catálogo de insumos",
+   "insumo: atributos (numero de varilla, calibre, peso_kg_m, familia armex|varilla|alambre|concreto|cimbra) para que los selectores del elemento filtren la base de datos",
+   "Armado 'armex': parametros.armado = {tipo: 'armex', insumo_id}; armado 'varillas': {tipo: 'varillas', n_var o n_sup/n_inf, varilla_id, estribo_id, sep, gancho, rec, am_l, alambre_id}",
+   "APU del elemento: filas de explosion con insumo_id y cantidad por muestra; los insumos agregados a mano son filas adicionales; el PU se congela en version_concepto al autorizar",
+   "Concepto del elemento: elemento_parametrico.concepto_id; modo 'crear' genera el concepto y su matriz, modo 'existente' enlaza uno de la base y compara su matriz contra la muestra",
+   "Clonar elemento: copia parametros, materiales y filas extra del APU a un elemento nuevo con su propio concepto",
+   "Familia nueva Cimbra: insert en familia (aplica_a material) y mover a ella los insumos MAD-00001, MAD-00002, MAD-00003 y MAD-00030, que hoy están en Maderas · Cimbra. Verificar en la base ya cargada cómo quedaron las familias (la semilla trae FAM-MAD 'Madera y cimbra' y el catálogo trae 'Maderas')",
+   "Lista de familias permitidas por tipo de elemento (castillo, lineal, zapata, losa) en configuración, para filtrar los selectores del APU del elemento",
+   "elemento_parametrico.parametros.armado: lista de varillas [{n, insumo_id}] (arriba y abajo en la cadena) y lista de zonas de anillos [{len_cm|null, sep_cm, insumo_id}]; hoy el servidor solo admite una sep, un no_est y un no_var",
+   "elemento_parametrico.firma: hash de las medidas, cimbra, armado normalizado y materiales, con índice único parcial (org_id, firma) donde vigente, para impedir duplicados; el endpoint de alta responde 409 con la clave del elemento igual",
+   "APU por concepto: filas de explosion del concepto del elemento; los insumos extra (mano de obra) son filas propias de cada concepto",
+   "Sugerir el anillo de la sección (ANILLO lado menor × lado mayor tras descontar el recubrimiento) y crear el insumo si falta",
+   "muro_plantilla.elementos[]: cada uso lleva su propio id (uid) además de la clave del elemento, para poder colocar el mismo elemento más de una vez",
+   "elemento_parametrico.categoria y subcategoria (biblioteca), con parte de la firma anti-duplicados y límite de posiciones por subcategoría",
+   "elemento_concepto: columna alto_hasta_m (nullable) para los escalones por altura del acero; sin ella, un elemento solo puede tener un concepto por parte",
+   "elemento_parametrico.parametros.cimbra: lista de consumos por ml [{insumo_id, q}]; parametros.armado.alambre_kg_ml para el armex",
+   "Drivers nuevos: traslape_armex_cm (15), traslape_varilla_diametros (40, por confirmar) y desperdicio_acero (0)",
+   "Insumos de destajo (MOE-) del catálogo de trabajos permitidos por tipo de elemento (Castillo, Cadena); insumo.peso_kg_m del armex (falta)",
+   "Comparación elemento ↔ concepto: leer la composición del concepto existente (explosion) y compararla por insumo con el APU calculado del elemento"
+  ]
+ },
+ "cambios_sobre_lo_construido": [
+  "Pretil y barda dejan de ser tipos de muro y pasan a ser ubicaciones.",
+  "Castillos y cadenas dejan de ser casillas del muro y pasan a ser elementos del catálogo enlazados a conceptos.",
+  "El castillo ya no depende de 'muro con cadena': depende de los elementos de la plantilla.",
+  "El armex se agrega como armado de un elemento.",
+  "La altura de 2.6 m pasa a ser el driver altura_estandar = 3.00 m.",
+  "Se agrega la ubicación por cara y por parte de altura; hoy no existe.",
+  "El acabado por capa se conserva tal cual.",
+  "La cimbra del elemento pasa de m² de madera a consumos por metro (clavos, tablas, alambre), como en el catálogo.",
+  "El elemento gana categoría y subcategoría; la subcategoría entra en la identidad."
+ ],
+ "preguntas_abiertas": [
+  "Q1. Con la altura estándar en 3.00 m, ¿los trazos ya guardados conservan su altura (propuesta) o se recalculan?",
+  "Q2. Migración de muro_tipo sillar: ¿pasa a tipo confinado o a tabique?",
+  "Q3. ¿Quién ajusta un driver 'ajustable' dentro de una obra? Propuesta: Costos y Control de obra.",
+  "Q4. Valores de ejemplo a confirmar: altura del pretil 1.00 m, altura de la barda 2.50 m, claves K-2 / CD-1 y las presentaciones de armex (15-15-4, 15-20-4, 12-20-4).",
+  "Q5. ¿Un castillo en un pretil se coloca en el plano o se estima por separación? El mockup lo estima, igual que el muro confinado.",
+  "Q6. El armex pide su peso por metro y su presentación comercial (tramos de 6 m) para sacar kg y piezas; hay que cargarlos desde la ficha del fabricante.",
+  "Q8. Un castillo cruza una cadena y el mockup no descuenta ese volumen (como hace un APU normal). ¿Se confirma?",
+  "Q9. Al validar una plantilla, ¿qué pasa con los trazos que ya la usan si Control de obra la cambia? Propuesta: versión nueva y los trazos ya medidos conservan la anterior.",
+  "Q12. Al quitar insumos del APU: las filas que salen de las medidas y del armado no se quitan (siguen al elemento). ¿Se necesita poder quitarlas, por ejemplo si la cimbra se paga aparte?",
+  "Q10. Concreto: en el catálogo vive en dos familias, Mezclas · Concretos (hecho en obra, MEZ-01010/20/30) y Prefabricados · Concretos (premezclado, CON-). No hay una familia 'Concreto'. El mockup ofrece las dos. ¿Se crea una familia Concreto o se queda así?",
+  "Q11. Supuestos del cálculo que hay que confirmar: longitud de la pieza de armex (se usó 6 m), peso por metro del anillo prefabricado (0.249 kg/m) y calibre del alambre recocido (cal. 18).",
+  "Q12. No hay varilla #2 en el catálogo; los anillos se piden como ANILLO nxm en kg o de varilla 3/8 o mayor. ¿Se agrega la varilla #2 o los anillos siempre son prefabricados?",
+  "Q13. Crear un insumo nuevo desde esta pantalla: hoy Costos no puede dar de alta insumos (migración 0090). ¿Se permite a Costos y Control de obra, o queda pendiente de autorización como el elemento?",
+  "Q17. Familia Cimbra: hoy las tablas (MAD-00004) están en Maderas · Cimbra, y los clavos y el alambre en Aceros · Consumible. ¿La familia nueva Cimbra incluye clavos y alambre de cimbra o solo madera?",
+  "Q19. Mano de obra por tipo de actividad: ¿qué actividades (habilitado, armado y colocación, cimbrado, colado, descimbrado) y con qué base (kg, ml, m², m³, pieza)? El mockup deja el dato de kg y el destajo por metro actual.",
+  "Q20. Las subcategorías de dalas, trabes, columnas, castillos de pretil y demás categorías son una propuesta; solo cadenas (cerramiento y desplante) viene de tu indicación.",
+  "Q22. Puntas del castillo: el mockup usa 40 diámetros abajo y 40 arriba (0.76 m en 3/8) y 50 cm en armex. Confirmar con el estructurista; con eso el muro de 7 m sale con 3 piezas de 3.00 m en lugar de 2 de 4.00 m.",
+  "Q24. Los escalones del entrepiso necesitan conceptos propios de 4.00 y 6.00 m; hoy no existen en el catálogo.",
+  "Q26. Los escalones y colados de entrepiso, azotea y pretil (EJ-420 a EJ-424) son conceptos nuevos del mockup, con el mismo destajo MOE-02020 que el K1. Falta que Control de obra los autorice y que se confirme su composición.",
+  "Q27. Cuando el castillo mide más de 6.00 m (un muro de 9 m, por ejemplo) no hay escalón; el sistema avisa. ¿Se crean escalones de 9.00 y 12.00 m?",
+  "Q28. Bastón: ¿el largo se corta exacto de la varilla o se ajusta a los módulos de corte (1, 1.5, 2, 3, 4 y 6 m)? ¿Se paga el concepto por metro de trazo, por pieza o por kg? ¿El bastón lleva gancho o traslape?"
+ ],
+ "orden_de_construccion_propuesto": [
+  "1. Backend: armex como armado de elemento_parametrico y receta() que lo acepte, con pruebas",
+  "1b. Backend: estados y autorización del elemento, concepto propio con su APU generado y versionado",
+  "2. Backend: ubicación por cara y por parte, y separar pretil y barda de muro_tipo, con migración",
+  "3. Backend: drivers global/obra/mixto y permisos para costos y control_obra",
+  "4. Backend: plantillas de muro con elementos y su validación contra la matriz del concepto",
+  "5. Frontend: pestaña Elementos ampliada (armex, conceptos, matriz) y pestaña Artefacto con isométrica",
+  "6. Frontend: pestaña Paramétrico",
+  "7. Cuantificador: elegir la plantilla de muro en el trazo y colocar sus castillos"
+ ],
+ "flujo_de_autorizacion": {
+  "estados": [
+   "vigente",
+   "borrador",
+   "pendiente",
+   "nuevo",
+   "nuevo_pendiente",
+   "rechazada"
+  ],
+  "quien_propone": [
+   "costos"
+  ],
+  "quien_autoriza": [
+   "control_obra"
+  ],
+  "transiciones": [
+   "vigente → borrador: se edita medidas, armado, cimbra o una cantidad del APU (la versión vigente no cambia)",
+   "borrador → pendiente: Costos envía a autorización",
+   "borrador o pendiente → vigente (versión + 1): Control de obra autoriza; el elemento, su concepto y su APU pasan a la versión nueva",
+   "pendiente → vigente sin cambio: Control de obra rechaza (queda en el historial como rechazada)",
+   "borrador o pendiente → vigente sin cambio: se descarta",
+   "(alta) nuevo → nuevo_pendiente → vigente v1: el elemento se crea con su concepto y su APU; Control de obra lo autoriza; si se rechaza o se descarta, desaparece del catálogo",
+   "Un elemento nuevo sin autorizar se puede poner en un muro, pero queda marcado como provisional en Artefacto y en Paramétrico.",
+   "Control de obra edita: el cambio no pide autorización; al confirmarlo se guarda como versión nueva (en el historial queda 'Control de obra').",
+   "Costos edita y envía: en el historial queda 'Propuso Costos · autorizó Control de obra'."
+  ]
+ },
+ "preguntas_resueltas": [
+  "Control de obra edita: no pide autorización.",
+  "Elemento nuevo sin autorizar: puede usarse como provisional; si algo está mal, Control de obra modifica el elemento o la plantilla y la valida.",
+  "Versión: siempre que se autoriza un cambio, haya o no obra asignada.",
+  "APU: la mano de obra y la herramienta se editan en la pantalla de Elementos.",
+  "Cadena: un concepto por metro; con armex se refleja en piezas con 15 cm de traslape y con varilla en piezas con traslape según la norma.",
+  "Duplicados: solo los idénticos; la subcategoría distingue cerramiento de desplante.",
+  "Anillo nuevo: se propone con el precio por kg de los demás anillos.",
+  "Castillo: el acero va por pieza y todo lo demás por metro lineal."
+ ],
+ "insumos_catalogo": [
+  {
+   "id": "ACE-00001",
+   "clave": "ACE-00001",
+   "descripcion": "ALAMBRE RECOCIDO",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Consumible",
+   "grupo": "alambre",
+   "unidad": "kg",
+   "precio": 24.68,
+   "peso_kg_m": 0.0095
+  },
+  {
+   "id": "ACE-00002",
+   "clave": "ACE-00002",
+   "descripcion": "ALAMBRON",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Habilitable",
+   "grupo": "otro",
+   "unidad": "kg",
+   "precio": 22.02
+  },
+  {
+   "id": "ACE-00003",
+   "clave": "ACE-00003",
+   "descripcion": "ANILLO 10X10",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00004",
+   "clave": "ACE-00004",
+   "descripcion": "ANILLO 10X15",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00005",
+   "clave": "ACE-00005",
+   "descripcion": "ANILLO 10X20",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00006",
+   "clave": "ACE-00006",
+   "descripcion": "ANILLO 10X25",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00007",
+   "clave": "ACE-00007",
+   "descripcion": "ANILLO 15X20",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00008",
+   "clave": "ACE-00008",
+   "descripcion": "ANILLO 15X25",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00009",
+   "clave": "ACE-00009",
+   "descripcion": "ANILLO 20X20",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00010",
+   "clave": "ACE-00010",
+   "descripcion": "ANILLO 20X25",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 24.01,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00011",
+   "clave": "ACE-00011",
+   "descripcion": "ARMEX 10X10-4",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "armex",
+   "unidad": "pza",
+   "precio": 140.07,
+   "largo_m": 6.0,
+   "peso_kg_m": null
+  },
+  {
+   "id": "ACE-00019",
+   "clave": "ACE-00019",
+   "descripcion": "Anillo 25x25",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 30.69,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00020",
+   "clave": "ACE-00020",
+   "descripcion": "Armex 10x15",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "armex",
+   "unidad": "pza",
+   "precio": 170.76,
+   "largo_m": 6.0,
+   "peso_kg_m": null
+  },
+  {
+   "id": "ACE-00021",
+   "clave": "ACE-00021",
+   "descripcion": "Anillo 15x15",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 32.02,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACE-00029",
+   "clave": "ACE-00029",
+   "descripcion": "ANILLO 8X15",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Prefabricado",
+   "grupo": "anillo",
+   "unidad": "kg",
+   "precio": 30.69,
+   "peso_kg_m": 0.249
+  },
+  {
+   "id": "ACR-00001",
+   "clave": "ACR-00001",
+   "descripcion": "VARILLA 3/8",
+   "tipo": "material",
+   "familia": "Acero De Refuerzo",
+   "subfamilia": "Habilitable",
+   "grupo": "varilla",
+   "unidad": "pza",
+   "precio": 133.01,
+   "numero": 3,
+   "peso_kg_m": 0.56,
+   "largo_m": 12.0
+  },
+  {
+   "id": "ACR-00002",
+   "clave": "ACR-00002",
+   "descripcion": "VARILLA 1/2",
+   "tipo": "material",
+   "familia": "Acero De Refuerzo",
+   "subfamilia": "Habilitable",
+   "grupo": "varilla",
+   "unidad": "pza",
+   "precio": 237.52,
+   "numero": 4,
+   "peso_kg_m": 0.994,
+   "largo_m": 12.0
+  },
+  {
+   "id": "ACR-00003",
+   "clave": "ACR-00003",
+   "descripcion": "VARILLA 5/8",
+   "tipo": "material",
+   "familia": "Acero De Refuerzo",
+   "subfamilia": "Habilitable",
+   "grupo": "varilla",
+   "unidad": "pza",
+   "precio": 376.45,
+   "numero": 5,
+   "peso_kg_m": 1.552,
+   "largo_m": 12.0
+  },
+  {
+   "id": "ACR-00004",
+   "clave": "ACR-00004",
+   "descripcion": "VARILLA 3/4",
+   "tipo": "material",
+   "familia": "Acero De Refuerzo",
+   "subfamilia": "Habilitable",
+   "grupo": "varilla",
+   "unidad": "pza",
+   "precio": 479.68,
+   "numero": 6,
+   "peso_kg_m": 2.235,
+   "largo_m": 12.0
+  },
+  {
+   "id": "CON-00001",
+   "clave": "CON-00001",
+   "descripcion": "CONCRETO TD 200 28 DIAS 10 REV IMPERMEABILIZANTE 1% (LOSA CIMENTACION)",
+   "tipo": "material",
+   "familia": "Prefabricados",
+   "subfamilia": "Concretos",
+   "grupo": "concreto",
+   "unidad": "m3",
+   "precio": 2442.33
+  },
+  {
+   "id": "CON-00003",
+   "clave": "CON-00003",
+   "descripcion": "CONCRETO BOMBEADO 250 28 DIAS 14 REV (LOSAS ENTREPISO)",
+   "tipo": "material",
+   "familia": "Prefabricados",
+   "subfamilia": "Concretos",
+   "grupo": "concreto",
+   "unidad": "m3",
+   "precio": 2500.8
+  },
+  {
+   "id": "CON-00004",
+   "clave": "CON-00004",
+   "descripcion": "CONCRETO BOMBEADO 250 RAPISO 7 DIAS REVENIMIENTO (LOSAS AZOTEA Y ROOF)",
+   "tipo": "material",
+   "familia": "Prefabricados",
+   "subfamilia": "Concretos",
+   "grupo": "concreto",
+   "unidad": "m3",
+   "precio": 2980.26
+  },
+  {
+   "id": "MAD-00001",
+   "clave": "MAD-00001",
+   "descripcion": "CIMBRA 3 MTS",
+   "tipo": "material",
+   "familia": "Cimbra",
+   "subfamilia": "Cimbra",
+   "grupo": "cimbra",
+   "unidad": "m2",
+   "precio": 95.0,
+   "familia_actual": "Maderas"
+  },
+  {
+   "id": "MAD-00002",
+   "clave": "MAD-00002",
+   "descripcion": "CIMBRA 4 MTS",
+   "tipo": "material",
+   "familia": "Cimbra",
+   "subfamilia": "Cimbra",
+   "grupo": "cimbra",
+   "unidad": "m2",
+   "precio": 150.0,
+   "familia_actual": "Maderas"
+  },
+  {
+   "id": "MAD-00003",
+   "clave": "MAD-00003",
+   "descripcion": "CIMBRAPLAY 12 MM",
+   "tipo": "material",
+   "familia": "Cimbra",
+   "subfamilia": "Cimbra",
+   "grupo": "cimbra",
+   "unidad": "pza",
+   "precio": 395.69,
+   "familia_actual": "Maderas"
+  },
+  {
+   "id": "MAD-00030",
+   "clave": "MAD-00030",
+   "descripcion": "TUINO CHAFLAN",
+   "tipo": "material",
+   "familia": "Cimbra",
+   "subfamilia": "Cimbra",
+   "grupo": "cimbra",
+   "unidad": "pza",
+   "precio": 20.0,
+   "familia_actual": "Maderas"
+  },
+  {
+   "id": "MEZ-01010",
+   "clave": "MEZ-01010",
+   "descripcion": "CONCRETO H.O. F'C=100 KG/CM2",
+   "tipo": "material",
+   "familia": "Mezclas",
+   "subfamilia": "Concretos",
+   "grupo": "concreto",
+   "unidad": "m3",
+   "precio": 1351.11
+  },
+  {
+   "id": "MEZ-01020",
+   "clave": "MEZ-01020",
+   "descripcion": "CONCRETO H.O. F'C=150 KG/CM2",
+   "tipo": "material",
+   "familia": "Mezclas",
+   "subfamilia": "Concretos",
+   "grupo": "concreto",
+   "unidad": "m3",
+   "precio": 1721.06
+  },
+  {
+   "id": "MEZ-01030",
+   "clave": "MEZ-01030",
+   "descripcion": "CONCRETO H.O. F'C=200 KG/CM2",
+   "tipo": "material",
+   "familia": "Mezclas",
+   "subfamilia": "Concretos",
+   "grupo": "concreto",
+   "unidad": "m3",
+   "precio": 1900.02
+  },
+  {
+   "id": "CUAD-001",
+   "clave": "CUAD-001",
+   "descripcion": "Cuadrilla tareas pesadas compuesta por 1 oficial y dos peones",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 2068.0
+  },
+  {
+   "id": "MOCA-001",
+   "clave": "MOCA-001",
+   "descripcion": "Peón",
+   "tipo": "mano_obra",
+   "familia": "Peones",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 560.0
+  },
+  {
+   "id": "MOCA-002",
+   "clave": "MOCA-002",
+   "descripcion": "Ayudante general",
+   "tipo": "mano_obra",
+   "familia": "Ayudantes",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 560.0
+  },
+  {
+   "id": "MOCA-008",
+   "clave": "MOCA-008",
+   "descripcion": "Ayudante montador y soldador",
+   "tipo": "mano_obra",
+   "familia": "Ayudantes",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 412.98
+  },
+  {
+   "id": "MOCA-013",
+   "clave": "MOCA-013",
+   "descripcion": "Cabo de oficios",
+   "tipo": "mano_obra",
+   "familia": "Supervisores",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 800.0
+  },
+  {
+   "id": "MOCA-014",
+   "clave": "MOCA-014",
+   "descripcion": "Albañil",
+   "tipo": "mano_obra",
+   "familia": "Oficiales de albañilería",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 760.0
+  },
+  {
+   "id": "MOCA-021",
+   "clave": "MOCA-021",
+   "descripcion": "Colocador",
+   "tipo": "mano_obra",
+   "familia": "Oficiales de albañilería",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 760.0
+  },
+  {
+   "id": "MOCA-023",
+   "clave": "MOCA-023",
+   "descripcion": "Herrero",
+   "tipo": "mano_obra",
+   "familia": "Oficiales calificados",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 760.0
+  },
+  {
+   "id": "MOCA-027",
+   "clave": "MOCA-027",
+   "descripcion": "Fierrero",
+   "tipo": "mano_obra",
+   "familia": "Oficiales de albañilería",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 760.0
+  },
+  {
+   "id": "MOCA-029",
+   "clave": "MOCA-029",
+   "descripcion": "Soldador",
+   "tipo": "mano_obra",
+   "familia": "Oficiales de albañilería",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 760.0
+  },
+  {
+   "id": "MOCA-030",
+   "clave": "MOCA-030",
+   "descripcion": "Laboratorista",
+   "tipo": "mano_obra",
+   "familia": "Laboratoristas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 941.35
+  },
+  {
+   "id": "MOCA-033",
+   "clave": "MOCA-033",
+   "descripcion": "Soldador calificado",
+   "tipo": "mano_obra",
+   "familia": "Oficiales calificados",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 760.0
+  },
+  {
+   "id": "MOCA-046",
+   "clave": "MOCA-046",
+   "descripcion": "Ayudante especializado",
+   "tipo": "mano_obra",
+   "familia": "Ayudantes",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 434.84
+  },
+  {
+   "id": "MOCU-001",
+   "clave": "MOCU-001",
+   "descripcion": "Cuadrilla No 1 (1 Peón)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 616.0
+  },
+  {
+   "id": "MOCU-002",
+   "clave": "MOCU-002",
+   "descripcion": "Cuadrilla No 2 (1 Albañil + 1 Peón)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1452.0
+  },
+  {
+   "id": "MOCU-004",
+   "clave": "MOCU-004",
+   "descripcion": "Cuadrilla No 4 (1 Fierrero + 1 Ayudante general)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1452.0
+  },
+  {
+   "id": "MOCU-005",
+   "clave": "MOCU-005",
+   "descripcion": "Cuadrilla No 5 (1 Albañil + 1 Ayudante general)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1452.0
+  },
+  {
+   "id": "MOCU-008",
+   "clave": "MOCU-008",
+   "descripcion": "Cuadrilla No 8 (1 Colocador + 1 Ayudante general)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1452.0
+  },
+  {
+   "id": "MOCU-015",
+   "clave": "MOCU-015",
+   "descripcion": "Cuadrilla No 15 (1 Soldador + 1 Ayudante montador y soldador)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1290.28
+  },
+  {
+   "id": "MOCU-016",
+   "clave": "MOCU-016",
+   "descripcion": "Cuadrilla No 16 (1 Soldador calificado + 1 Ayudante montador y soldador)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1290.28
+  },
+  {
+   "id": "MOCU-022",
+   "clave": "MOCU-022",
+   "descripcion": "Cuadrilla No 22 (1 Herrero + 1 Ayudante general)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1452.0
+  },
+  {
+   "id": "MOCU-026",
+   "clave": "MOCU-026",
+   "descripcion": "Cuadrilla No 26 (0.10 Cabo + 1 Ayudante general)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 704.0
+  },
+  {
+   "id": "MOCU-027",
+   "clave": "MOCU-027",
+   "descripcion": "Cuadrilla No 27 (1 Albañil + 5 Peones)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 3916.0
+  },
+  {
+   "id": "MOCU-028",
+   "clave": "MOCU-028",
+   "descripcion": "Cuadrilla No 28 (1 Albañil + 2 Ayudantes)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 2068.0
+  },
+  {
+   "id": "MOCU-029",
+   "clave": "MOCU-029",
+   "descripcion": "Cuadrilla No 29 (2 ayudantes generales)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1232.0
+  },
+  {
+   "id": "MOCU-030",
+   "clave": "MOCU-030",
+   "descripcion": "Cuadrilla No 30 (1.0 ayudante general)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 616.0
+  },
+  {
+   "id": "MOCU-035",
+   "clave": "MOCU-035",
+   "descripcion": "Cuadrilla No. 35 (7 ayudantes generales)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 4312.0
+  },
+  {
+   "id": "MOCU-037",
+   "clave": "MOCU-037",
+   "descripcion": "Cuadrilla No. 37 ( 1 Albañil + 1 Ayudante especializado)",
+   "tipo": "mano_obra",
+   "familia": "Cuadrillas",
+   "subfamilia": "Albañilería y Estructura",
+   "grupo": "mano_obra",
+   "unidad": "jor",
+   "precio": 1314.32
+  },
+  {
+   "id": "ACE-00012",
+   "clave": "ACE-00012",
+   "descripcion": "CLAVO 2 1/2",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Consumible",
+   "grupo": "clavo",
+   "unidad": "kg",
+   "precio": 30.68
+  },
+  {
+   "id": "ACE-00013",
+   "clave": "ACE-00013",
+   "descripcion": "CLAVO 4",
+   "tipo": "material",
+   "familia": "Aceros",
+   "subfamilia": "Consumible",
+   "grupo": "clavo",
+   "unidad": "kg",
+   "precio": 30.68
+  },
+  {
+   "id": "MAD-00004",
+   "clave": "MAD-00004",
+   "descripcion": "TABLAS (se les da 10 pza por lote)",
+   "tipo": "material",
+   "familia": "Cimbra",
+   "subfamilia": "Cimbra",
+   "grupo": "cimbra",
+   "unidad": "pza",
+   "precio": 198.0,
+   "familia_actual": "Maderas",
+   "origen": "CATALOGO_DE_FLETES"
+  },
+  {
+   "id": "MOE-02020",
+   "clave": "MOE-02020",
+   "descripcion": "MO CASTILLOS K1 (15X15)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 130.0
+  },
+  {
+   "id": "MOE-02021",
+   "clave": "MOE-02021",
+   "descripcion": "MO CASTILLOS K2 (15X15)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 130.0
+  },
+  {
+   "id": "MOE-02022",
+   "clave": "MOE-02022",
+   "descripcion": "MO CASTILLOS K3 (15X30)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 150.0
+  },
+  {
+   "id": "MOE-02025",
+   "clave": "MOE-02025",
+   "descripcion": "MO CASTILLOS K9 (15X25) APARENTE",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 160.0
+  },
+  {
+   "id": "MOE-02026",
+   "clave": "MOE-02026",
+   "descripcion": "MO CASTILLOS K6 (15X15)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 140.0
+  },
+  {
+   "id": "MOE-02027",
+   "clave": "MOE-02027",
+   "descripcion": "MO CASTILLOS K7 (15X20)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 140.0
+  },
+  {
+   "id": "MOE-02028",
+   "clave": "MOE-02028",
+   "descripcion": "MO CASTILLOS K8 (15X40)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 160.0
+  },
+  {
+   "id": "MOE-02050",
+   "clave": "MOE-02050",
+   "descripcion": "MO CASTILLOS K5 (15X45)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 160.0
+  },
+  {
+   "id": "MOE-02101",
+   "clave": "MOE-02101",
+   "descripcion": "MO CADENA CE1 (15X20)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Cadena",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 140.0
+  },
+  {
+   "id": "MOE-02102",
+   "clave": "MOE-02102",
+   "descripcion": "MO CADENA CE2 (15X20)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Cadena",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 150.0
+  },
+  {
+   "id": "MOE-02103",
+   "clave": "MOE-02103",
+   "descripcion": "MO CADENA CE1 APARENTE (20X25)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Cadena",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 160.0
+  },
+  {
+   "id": "MOE-02201",
+   "clave": "MOE-02201",
+   "descripcion": "MO CADENA CD-1 (15X25)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Cadena",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 140.0
+  },
+  {
+   "id": "MOE-02202",
+   "clave": "MOE-02202",
+   "descripcion": "MO CADENA CD-1 APARENTE (20X25)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Cadena",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 160.0
+  },
+  {
+   "id": "MOE-02510",
+   "clave": "MOE-02510",
+   "descripcion": "MO CASTILLOS K4 (15X30)",
+   "tipo": "destajo",
+   "familia": "Obra Civil",
+   "subfamilia": "Castillo",
+   "grupo": "destajo",
+   "unidad": "ml",
+   "precio": 150.0
+  }
+ ],
+ "insumos_nota": "Los insumos son los reales de 1-mundo/opus (CATALOGO_DE_MATERIALES, CATALOGO_DE_MANO_DE_OBRA, CATALOGO_DE_FLETES y CATALOGO_DE_TRABAJOS, julio 2026): clave, descripción, unidad y costo unitario. La pieza de armex de 6 m queda confirmada por los conceptos EST-10010 a EST-10013 (hasta 4.00 m usa 0.6667 pieza = 4/6). El anillo prefabricado se calcula con 0.249 kg/m (varilla #2): el concepto EST-02320 da 0.890 kg/m y el cálculo da 0.87. FALTA el peso por metro del armex (no está en el catálogo): sin él no se puede dar el dato de kg del acero cuando se arma con armex. Las TABLAS (MAD-00004) vienen del catálogo de fletes. La familia Cimbra es nueva: hoy sus insumos están en Maderas · Cimbra. Los destajos (MOE-) vienen del catálogo de trabajos: uno por metro y por tipo de elemento.",
+ "familias_permitidas_por_tipo_de_elemento": {
+  "castillo": [
+   {
+    "familia": "Aceros"
+   },
+   {
+    "familia": "Acero De Refuerzo"
+   },
+   {
+    "familia": "Mezclas",
+    "subfamilia": "Concretos"
+   },
+   {
+    "familia": "Prefabricados",
+    "subfamilia": "Concretos"
+   },
+   {
+    "familia": "Cimbra",
+    "nueva": true
+   }
+  ],
+  "lineal": [
+   {
+    "familia": "Aceros"
+   },
+   {
+    "familia": "Acero De Refuerzo"
+   },
+   {
+    "familia": "Mezclas",
+    "subfamilia": "Concretos"
+   },
+   {
+    "familia": "Prefabricados",
+    "subfamilia": "Concretos"
+   },
+   {
+    "familia": "Cimbra",
+    "nueva": true
+   }
+  ],
+  "mano_de_obra": {
+   "subfamilia": "Albañilería y Estructura"
+  },
+  "nota": "Cada tipo de elemento solo ofrece insumos de estas familias. Zapata y losa tendrán su propia lista cuando se construyan.",
+  "destajo": {
+   "castillo": "Castillo",
+   "lineal": "Cadena"
+  }
+ },
+ "conceptos_nota": "Los conceptos de la lista son los REALES del catálogo (CATALOGO_DE_MATRICES) con su composición (ANALISIS_DE_BASICOS_CONCEPTOS). Las partes de un elemento se agrupan en tres: acero de refuerzo (armex, o varillas, anillos y alambre de amarre), concreto y cimbra (clavos, tablas y alambre por metro). Un grupo se asigna a un concepto de la lista o a uno nuevo.",
+ "conceptos_del_elemento": {
+  "K-1": [
+   {
+    "clave": "EJ-410",
+    "unidad": "pza",
+    "toma": [
+     "acero"
+    ],
+    "modo": "escalones",
+    "contextos": [
+     "planta_baja"
+    ],
+    "escalones": [
+     {
+      "hasta": 4.0,
+      "existente": "EST-10010"
+     },
+     {
+      "hasta": 6.0,
+      "existente": "EST-10011"
+     }
+    ]
+   },
+   {
+    "clave": "EJ-420",
+    "unidad": "pza",
+    "toma": [
+     "acero"
+    ],
+    "modo": "escalones",
+    "contextos": [
+     "entrepiso",
+     "azotea"
+    ],
+    "escalones": [
+     {
+      "hasta": 4.0,
+      "clave": "EJ-420-4"
+     },
+     {
+      "hasta": 6.0,
+      "clave": "EJ-420-6"
+     }
+    ]
+   },
+   {
+    "clave": "EJ-421",
+    "unidad": "pza",
+    "toma": [
+     "acero"
+    ],
+    "modo": "escalones",
+    "contextos": [
+     "pretil"
+    ],
+    "escalones": [
+     {
+      "hasta": 1.0,
+      "existente": "EST-10013"
+     },
+     {
+      "hasta": 1.5,
+      "existente": "EST-10012"
+     }
+    ]
+   },
+   {
+    "clave": "EJ-411",
+    "unidad": "ml",
+    "toma": [
+     "concreto",
+     "cimbra"
+    ],
+    "modo": "existente",
+    "existente": "EST-02110",
+    "contextos": [
+     "planta_baja"
+    ]
+   },
+   {
+    "clave": "EJ-422",
+    "unidad": "ml",
+    "toma": [
+     "concreto",
+     "cimbra"
+    ],
+    "contextos": [
+     "entrepiso"
+    ],
+    "extras": [
+     {
+      "i": "MOE-02020",
+      "q": 1
+     }
+    ]
+   },
+   {
+    "clave": "EJ-423",
+    "unidad": "ml",
+    "toma": [
+     "concreto",
+     "cimbra"
+    ],
+    "contextos": [
+     "azotea"
+    ],
+    "extras": [
+     {
+      "i": "MOE-02020",
+      "q": 1
+     }
+    ]
+   },
+   {
+    "clave": "EJ-424",
+    "unidad": "ml",
+    "toma": [
+     "concreto",
+     "cimbra"
+    ],
+    "contextos": [
+     "pretil"
+    ],
+    "extras": [
+     {
+      "i": "MOE-02020",
+      "q": 1
+     }
+    ]
+   },
+   {
+    "clave": "EJ-425",
+    "unidad": "ml",
+    "toma": [
+     "acero",
+     "concreto",
+     "cimbra"
+    ],
+    "contextos": [
+     "barda"
+    ],
+    "extras": [
+     {
+      "i": "MOE-02020",
+      "q": 1
+     }
+    ]
+   }
+  ],
+  "K-2": [
+   {
+    "clave": "EJ-412",
+    "unidad": "pza",
+    "toma": [
+     "acero"
+    ]
+   },
+   {
+    "clave": "EJ-413",
+    "unidad": "ml",
+    "toma": [
+     "concreto",
+     "cimbra"
+    ],
+    "modo": "existente",
+    "existente": "EST-02120"
+   }
+  ],
+  "CE-1": [
+   {
+    "clave": "EJ-414",
+    "unidad": "ml",
+    "toma": [
+     "acero",
+     "concreto",
+     "cimbra"
+    ],
+    "modo": "existente",
+    "existente": "EST-02310"
+   }
+  ],
+  "CE-2": [
+   {
+    "clave": "EJ-415",
+    "unidad": "ml",
+    "toma": [
+     "acero",
+     "concreto",
+     "cimbra"
+    ],
+    "modo": "existente",
+    "existente": "EST-02320"
+   }
+  ],
+  "CD-1": [
+   {
+    "clave": "EJ-416",
+    "unidad": "ml",
+    "toma": [
+     "acero",
+     "concreto",
+     "cimbra"
+    ],
+    "modo": "existente",
+    "existente": "BAP-01100"
+   }
+  ]
+ },
+ "biblioteca": [
+  {
+   "clave": "castillos",
+   "nombre": "Castillos",
+   "tipo": "castillo",
+   "prefijo": "K",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "muro",
+     "nombre": "Castillos de muro",
+     "prefijo": "K"
+    },
+    {
+     "clave": "pretil",
+     "nombre": "Castillos de pretil",
+     "prefijo": "KP"
+    }
+   ]
+  },
+  {
+   "clave": "columnas",
+   "nombre": "Columnas",
+   "tipo": "castillo",
+   "prefijo": "C",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "concreto",
+     "nombre": "Columnas de concreto",
+     "prefijo": "C"
+    }
+   ]
+  },
+  {
+   "clave": "cadenas",
+   "nombre": "Cadenas",
+   "tipo": "lineal",
+   "prefijo": "CE",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "cerramiento",
+     "nombre": "Cadenas de cerramiento",
+     "prefijo": "CE",
+     "posiciones": [
+      "cerramiento",
+      "remate"
+     ]
+    },
+    {
+     "clave": "desplante",
+     "nombre": "Cadenas de desplante",
+     "prefijo": "CD",
+     "posiciones": [
+      "desplante"
+     ]
+    }
+   ]
+  },
+  {
+   "clave": "dalas",
+   "nombre": "Dalas",
+   "tipo": "lineal",
+   "prefijo": "DA",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "cerramiento",
+     "nombre": "Dalas de cerramiento (sobre vanos)",
+     "prefijo": "DC",
+     "posiciones": [
+      "cerramiento"
+     ]
+    },
+    {
+     "clave": "repison",
+     "nombre": "Dalas de repisón (bajo vanos)",
+     "prefijo": "DR",
+     "posiciones": [
+      "cerramiento"
+     ]
+    }
+   ]
+  },
+  {
+   "clave": "trabes",
+   "nombre": "Trabes",
+   "tipo": "lineal",
+   "prefijo": "T",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "piso",
+     "nombre": "Trabes de piso",
+     "prefijo": "T"
+    },
+    {
+     "clave": "cubierta",
+     "nombre": "Trabes de cubierta",
+     "prefijo": "TC"
+    }
+   ]
+  },
+  {
+   "clave": "contratrabes",
+   "nombre": "Contratrabes",
+   "tipo": "lineal",
+   "prefijo": "CT",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "cimentacion",
+     "nombre": "Contratrabes de cimentación",
+     "prefijo": "CT"
+    }
+   ]
+  },
+  {
+   "clave": "nervaduras",
+   "nombre": "Nervaduras",
+   "tipo": "lineal",
+   "prefijo": "N",
+   "construida": true,
+   "subcategorias": [
+    {
+     "clave": "losa_nervada",
+     "nombre": "Nervaduras de losa nervada",
+     "prefijo": "N"
+    }
+   ]
+  },
+  {
+   "clave": "zapatas",
+   "nombre": "Zapatas",
+   "tipo": "zapata",
+   "prefijo": "Z",
+   "construida": false,
+   "subcategorias": [
+    {
+     "clave": "aislada",
+     "nombre": "Zapatas aisladas"
+    },
+    {
+     "clave": "corrida",
+     "nombre": "Zapatas corridas"
+    }
+   ]
+  },
+  {
+   "clave": "dados",
+   "nombre": "Dados",
+   "tipo": "zapata",
+   "prefijo": "D",
+   "construida": false,
+   "subcategorias": [
+    {
+     "clave": "cimentacion",
+     "nombre": "Dados de cimentación"
+    }
+   ]
+  },
+  {
+   "clave": "muros",
+   "nombre": "Muros",
+   "tipo": "muro",
+   "prefijo": "M",
+   "construida": false,
+   "subcategorias": [
+    {
+     "clave": "concreto",
+     "nombre": "Muros de concreto"
+    },
+    {
+     "clave": "contencion",
+     "nombre": "Muros de contención"
+    }
+   ]
+  },
+  {
+   "clave": "losas",
+   "nombre": "Losas",
+   "tipo": "losa",
+   "prefijo": "L",
+   "construida": false,
+   "subcategorias": [
+    {
+     "clave": "maciza",
+     "nombre": "Losas macizas"
+    },
+    {
+     "clave": "nervada",
+     "nombre": "Losas nervadas"
+    }
+   ]
+  }
+ ],
+ "biblioteca_nota": "La biblioteca clasifica los elementos por categoría y subcategoría, y la lista de la pestaña Elementos se deriva de ella. La subcategoría identifica el uso (por ejemplo, cadena de cerramiento o de desplante) y forma parte de la identidad del elemento: dos elementos de igual geometría pero de distinta subcategoría no son duplicados, porque se pagan con conceptos distintos. Las categorías castillo, columna, cadena, dala, trabe, contratrabe y nervaduras se apoyan en los tipos 'castillo' y 'lineal' de elemento_parametrico; zapatas, dados y losas usan los tipos 'zapata' y 'losa' (ya existen en el servidor) y los muros son las plantillas de Artefacto. Las subcategorías distintas de cadenas son una propuesta por confirmar.",
+ "conceptos_nuevos_por_defecto": {
+  "castillo": {
+   "destajo": "MOE-02020",
+   "cimbra": [
+    {
+     "insumo": "ACE-00012",
+     "q": 0.017021
+    },
+    {
+     "insumo": "ACE-00013",
+     "q": 0.02
+    },
+    {
+     "insumo": "MAD-00004",
+     "q": 0.01
+    },
+    {
+     "insumo": "ACE-00001",
+     "q": 0.210987
+    }
+   ],
+   "armado_armex_alambre_kg_ml": 0.02
+  },
+  "lineal": {
+   "destajo": "MOE-02101",
+   "destajo_desplante": "MOE-02201",
+   "cimbra": [
+    {
+     "insumo": "ACE-00012",
+     "q": 0.025532
+    },
+    {
+     "insumo": "ACE-00013",
+     "q": 0.02
+    },
+    {
+     "insumo": "MAD-00004",
+     "q": 0.01
+    },
+    {
+     "insumo": "ACE-00001",
+     "q": 0.189888
+    }
+   ],
+   "armado_armex_alambre_kg_ml": 0.1
+  }
+ },
+ "modulos_de_corte_m": [
+  1,
+  1.5,
+  2,
+  3,
+  4,
+  6
+ ],
+ "bastones_ejemplo": {
+  "clave": "BA-1",
+  "nombre": "Bastón de varilla de 1/2 a cada 50 cm",
+  "insumo": "ACR-00002",
+  "sep_cm": 50,
+  "largo_cm": 80,
+  "unidad_concepto": "ml (longitud de trazo)",
+  "regla": "piezas = ceil(trazo ÷ separación) + 1; varillas de 12 m = ceil(piezas ÷ floor(12 ÷ largo)); kg = piezas × largo × peso por metro"
+ }
+}
