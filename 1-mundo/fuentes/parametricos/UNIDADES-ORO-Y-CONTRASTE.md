@@ -206,3 +206,30 @@ Archivo: `CATALOGO_PARAMETRICO_ORO_v20.xlsx` (hoja `LEEME v20`). Parte de v19 y 
 El pretil de Oro queda en $1,048/m², igual que la medición con la regla de Zafiro. Con eso la referencia congelada de Oro en el panel de Zafiro v45 pasó de 2,421 a 1,048.
 
 **Pendiente de decisión.** La fila 320 de Hoja1 (boquilla en fachada, agregada) tiene la misma cantidad y precio que la 319 y también se cobra en MARCOS EXTERIORES: los marcos llevan hoy 36.4 m de boquilla gris. Hay que decidir si es una sola. Tampoco se cambió el selector de altura (D5): la franja de 255 m² se cobra siempre, con cualquier altura.
+
+## 11. Boquilla gruesa y fina de los marcos: Oro v21 (2026-11-11)
+
+Archivo: `CATALOGO_PARAMETRICO_ORO_v21.xlsx` (hoja `LEEME v21`). **Corrige un error de v20:** allí moví la boquilla de la fila 319 a MARCOS EXTERIORES y quedaron dos boquillas gruesas.
+
+**Revisión.** La gruesa y la fina no son lo mismo y las dos están:
+
+| Fila Hoja1 | Clave | Qué es | m | $/m | Origen |
+|---|---|---|---|---|---|
+| 319 | ACA-01051 | Boquilla gruesa (estuco exterior) | 18.2 | 50.81 | Presupuesto de Oro |
+| 320 | ACA-01052 | Boquilla gruesa en fachada | 18.2 | 50.81 | Agregado, clave de Zafiro (su fila 204) |
+| 321 | ACA-01071 | Boquilla fina en fachada | 18.2 | 9.34 | Presupuesto de Oro |
+
+La 319 y la 320 son la misma boquilla gruesa: misma cantidad, mismo precio, y la 320 lleva el código de Zafiro (1052701). La pareja original de Oro es 319 + 321 (códigos 7052706 y 7052707, consecutivos); la 320 se agregó para usar la clave que Zafiro usa para la gruesa de los marcos. **No falta ninguna: sobra una.** Hoja1 de Oro trae la gruesa dos veces y la fina una.
+
+**Ajuste en v21.** MARCOS EXTERIORES cobra una gruesa (fila 320) y una fina (fila 321). La 319 se queda con cantidad 0 para que Hoja1 tenga cobertura, y entra a las excepciones autorizadas. El pretil conserva sus dos boquillas, gruesa (fila 270) y fina (fila 274), y VANO las suyas.
+
+| | v19 | v21 |
+|---|---|---|
+| Total del paramétrico | $2,635,265.32 | $2,634,340.58 (−$924.74) |
+| Diferencia contra Hoja1 | +$20,175.71 | +$19,250.97 |
+| Conceptos con importe distinto | 25 | 26 |
+| PRETIL | $108,957 | $47,154 |
+| MURO FACHADA | $93,142 | $154,021 |
+| MARCOS EXTERIORES | $42,540 | $42,540 |
+
+Si la 319 y la 320 no fueran la misma boquilla (por ejemplo, una de ventanas y otra de puertas), la corrección es devolverle a la 319 su cantidad de 18.2 m.
