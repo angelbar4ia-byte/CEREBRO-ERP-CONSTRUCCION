@@ -438,3 +438,27 @@ Era el cajón de lo que no entraba en ningún driver. Ahora tiene **ocho grupos 
 En Zafiro Plus el catálogo trae 15 salidas de spot contra 10 de la regla: son 5 de más (ZPlus repite la salida en dos niveles). Las salidas y luminarias de spot se siguen cobrando dentro de ELÉCTRICAS.
 
 **Medición en los 7.** El driver ESCALERA ahora cuenta escalones: Oro $1,179, Zafiro Plus $1,105 y Diamante $1,179 por escalón (los tres con el mismo precio unitario; n = 4, insuficiente). La escalera de metal de Diamante (herrería y escalones de metal, $63,061) pasa a su driver propio, **ESCALERA METÁLICA**, fijo. El barandal (HER-02020) depende de la altura y no de los escalones; queda fuera.
+
+## 19. Carpintería por piezas (2026-11-11)
+
+Era un driver fijo con solo el importe por prototipo ($197 mil a $293 mil, el mayor de los fijos). Ahora está **desglosada en siete grupos que se cuentan por piezas (puntos)**, en `PARAMETRICOS_7_PROTOTIPOS.xlsx` (hoja RESUMEN, bloque «Carpintería por grupo»). El grupo sale de la descripción del concepto.
+
+| Grupo | Zafiro | Rubí | Z. Plus | Jade | Dia − y + | Oro | $/pieza media | CV |
+|---|---|---|---|---|---|---|---|---|
+| Puertas | 9 | 10 | 9 | 9 | 10 | 13 | 6,716 | 0.7 % |
+| Closets y vestidores | 3 | 4 | 3 | 3 | 3 | 4 | 20,468 | 3.6 % |
+| Vanity (incluye medio baño) | 4 | 4 | 4 | 5 | 6 | 7 | 2,467 | 7.1 % |
+| Cocina | 1 | 1 | 1 | 1 | 1 | 1 | 80,878 | 18.5 % |
+| Alacena | — | 1 | — | — | 1 | — | 5,800 | n = 3 |
+| Lavandería (mueble) | — | 1 | — | — | — | — | 18,500 | n = 1 |
+| Gualdras | — | 2 | 1 | 1 | 1 | — | 2,198 | 45 %, n = 5 |
+| **Importe** | **$196,671** | **$262,821** | **$203,139** | **$232,066** | **$228,958** | **$292,719** | | |
+
+**Lectura.**
+- **Puertas, closets y vanity** son utilizables por pieza: el precio es casi el mismo en los siete (CV de 0.7 % a 7.1 %). Lo que cambia entre prototipos es el número de piezas.
+- **La cocina** es una sola pieza por prototipo y su precio depende del modelo: de $65,060 (Zafiro y Zafiro Plus) a $103,740 (Oro). Es el único grupo en «revisar» (18.5 %). Una cocina no se puede parametrizar por pieza; necesitaría los metros lineales de mueble, que el catálogo no trae.
+- **Gualdras:** son vigas de madera de distinto largo (de 1.40 a 4.88 m), con precio distinto cada una; no tienen una tasa por pieza comparable.
+- **Relación con los aparatos.** Los vanity (con el medio baño) coinciden con las salidas de lavamanos de `TABLA_APARATOS_SALIDAS.xlsx` en 6 de los 7 prototipos (4, 4, 4, 5, 6, 6, 7 contra 4, 5, 4, 5, 6, 6, 7); solo Rubí tiene 5 lavamanos y 4 vanity. Sirve como regla del ensamble: un vanity por lavamanos.
+- **Cubiertas de baño.** Siguen pendientes de ligarse a los metros de vanity (`CATALOGO_PARAMETRICO.md`, sección 7).
+
+**Pendiente.** Las puertas de baño no siguen el número de baños de forma simple (Rubí tiene 6 puertas de baño y 3 regaderas); queda por definir con el usuario qué cuenta como puerta de baño.

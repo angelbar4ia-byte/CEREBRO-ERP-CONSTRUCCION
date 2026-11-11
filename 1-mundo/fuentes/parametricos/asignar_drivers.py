@@ -141,6 +141,20 @@ for p in range(7):
         elif c['sub'] in AZ: dr,capa='LOSA','OBRA GRIS'
         if dr: poner(c,dr,capa,'regla por clave o subcapítulo'); continue
         poner(c,'SIN ASIGNAR','','sin regla','revisar')
+# --- carpintería: grupos por descripción (puertas, cocina, alacena, closets y vestidores, vanity, lavandería, gualdras)
+def grupo_carpinteria(desc,clave):
+    d=desc.lower()
+    if 'puerta' in d: return 'PUERTAS'
+    if 'alacena' in d: return 'ALACENA'
+    if 'cocina' in d: return 'COCINA'
+    if 'vanity' in d: return 'VANITY'
+    if 'lavander' in d: return 'LAVANDERÍA'
+    if 'closet' in d or 'vestidor' in d: return 'CLOSETS Y VESTIDORES'
+    if 'gualdra' in d: return 'GUALDRAS'
+    return 'OTROS'
+for r in rows:
+    for a in asig.get(r['row'],[]):
+        if a[0]=='CARPINTERÍA': a[1]=grupo_carpinteria(r['desc'],r['clave'])
 # --- divisores
 for r in rows:
     if r['row'] not in asig: continue
@@ -161,6 +175,7 @@ for r in rows:
         elif drv=='CUBIERTA' and cl in('ACA-02032','ACA-02033'): v=r['q']
         elif drv=='PÓRFIDO' and cl=='OBE-02011': v=r['q']
         elif drv=='ESCALERA' and cl=='EST-01510': v=qq
+        elif drv=='CARPINTERÍA' and r['u']=='pza': v=qq
         elif drv=='OBRA COMPLEMENTARIA' and cl in OC_GRUPOS and OC_GRUPOS[cl][1]: v=r['q']
         if v: div[(r['row'],drv)]=v
 wb=openpyxl.Workbook(); lee=wb.active; lee.title='LEEME'; mar=wb.create_sheet('MÁRMOL')
@@ -380,6 +395,33 @@ for k,(g,u) in enumerate(GR):
 res.cell(oc0+ng+1,1,'TOTAL obra complementaria').font=Font(bold=True)
 for p in range(7):
     cl=L(3+p); res.cell(oc0+ng+1,3+p,f'=SUM({cl}{oc0+1}:{cl}{oc0+ng})').number_format='#,##0'
+
+# CARPINTERÍA por grupo
+def bloque_grupos(titulo,driver,GR,r0):
+    res.cell(r0-1,1,titulo).font=Font(bold=True)
+    head(res,r0,['Grupo','Unidad']+PROTOS+['n','Media','Desv. muestral','CV muestral','CV poblacional','Confianza'])
+    ng_=len(GR)
+    for k,(g,u) in enumerate(GR):
+        ri_=r0+1+k; rd_=r0+1+ng_+2+k; rt_=r0+1+2*(ng_+2)+k
+        if k==0:
+            res.cell(r0+ng_+2,1,'Divisor (piezas del grupo)').font=Font(bold=True); res.cell(r0+2*(ng_+2),1,'Tasa por pieza').font=Font(bold=True)
+        for rr in (ri_,rd_,rt_): res.cell(rr,1,g); res.cell(rr,2,u)
+        for p in range(7):
+            cl=L(3+p)
+            res.cell(ri_,3+p,f'=SUMIFS(ASIGNACIÓN!$L$2:$L${na},ASIGNACIÓN!$A$2:$A${na},{cl}${b1},ASIGNACIÓN!$I$2:$I${na},"{driver}",ASIGNACIÓN!$J$2:$J${na},$A{ri_})').number_format='#,##0'
+            res.cell(rd_,3+p,f'=SUMIFS(ASIGNACIÓN!$M$2:$M${na},ASIGNACIÓN!$A$2:$A${na},{cl}${b1},ASIGNACIÓN!$I$2:$I${na},"{driver}",ASIGNACIÓN!$J$2:$J${na},$A{rd_})').number_format='#,##0.00'
+            res.cell(rt_,3+p,f'=IF(OR({cl}{rd_}=0,{cl}{ri_}=0),"",{cl}{ri_}/{cl}{rd_})').number_format='#,##0.00'
+        res.cell(rt_,10,f'=COUNT(C{rt_}:I{rt_})'); res.cell(rt_,11,f'=IF(J{rt_}=0,"",AVERAGE(C{rt_}:I{rt_}))').number_format='#,##0.00'
+        res.cell(rt_,12,f'=IF(J{rt_}<2,"",STDEV(C{rt_}:I{rt_}))').number_format='#,##0.00'
+        res.cell(rt_,13,f'=IF(L{rt_}="","",L{rt_}/K{rt_})').number_format='0.0%'
+        res.cell(rt_,14,f'=IF(J{rt_}<2,"",STDEVP(C{rt_}:I{rt_})/K{rt_})').number_format='0.0%'
+        res.cell(rt_,15,f'=IF(M{rt_}="","",IF(J{rt_}<5,"insuficiente",IF(M{rt_}<=0.1,"utilizable",IF(M{rt_}<=0.25,"revisar","no usar")))&" (n="&J{rt_}&")")')
+    res.cell(r0+ng_+1,1,'TOTAL '+driver.lower()).font=Font(bold=True)
+    for p in range(7):
+        cl=L(3+p); res.cell(r0+ng_+1,3+p,f'=SUM({cl}{r0+1}:{cl}{r0+ng_})').number_format='#,##0'
+    return r0+2*(ng_+2)+ng_+3
+r_carp=oc0+2*(ng+2)+ng+4
+sig=bloque_grupos('CARPINTERÍA POR GRUPO (piezas, importe y tasa por pieza)','CARPINTERÍA',[('PUERTAS','pza'),('COCINA','pza'),('ALACENA','pza'),('CLOSETS Y VESTIDORES','pza'),('VANITY','pza'),('LAVANDERÍA','pza'),('GUALDRAS','pza'),('OTROS','')],r_carp)
 res.column_dimensions['A'].width=26; res.column_dimensions['B'].width=36
 for c in range(3,16): res.column_dimensions[L(c)].width=13
 res.column_dimensions['O'].width=22; res.freeze_panes='C5'
