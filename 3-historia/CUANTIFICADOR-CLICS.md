@@ -1,5 +1,14 @@
 # Los clics de cada herramienta del Cuantificador
 
+```
+órgano:     referencia de interacción — clics del Cuantificador
+capa:       III — Historia
+pregunta:   ¿qué hace cada clic de cada herramienta?
+tiempo:     se revisó así
+corte:      2026-11-05
+verificado: releído contra `Visor.tsx` y `Cuantificador.tsx` y el mockup el 2026-11-05; el clic derecho que termina o cancela el dibujo se probó en e2e
+```
+
 Revisado el 2026-11-05 contra el código (`Visor.tsx`, `Cuantificador.tsx`) y el mockup. «Derecho» es el clic sin arrastrar;
 arrastrar con el derecho o con el botón de la rueda **mueve el plano** con cualquier herramienta; la rueda hace zoom; con dos
 dedos, pellizco y arrastre.

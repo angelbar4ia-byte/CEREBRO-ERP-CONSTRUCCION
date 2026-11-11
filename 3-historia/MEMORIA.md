@@ -6,7 +6,7 @@ capa:       III — Historia
 pregunta:   ¿qué decidimos, qué descartamos?
 tiempo:     fue así
 corte:      2026-10-12
-verificado: 635 decisiones · 13 descartes · 35 correcciones
+verificado: 644 decisiones · 13 descartes · 35 correcciones
 ```
 
 > **Qué decidimos, qué descartamos y en qué nos equivocamos.**

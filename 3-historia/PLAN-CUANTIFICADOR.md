@@ -1,5 +1,14 @@
 # Plan del Cuantificador: auditoría (cerebro contra app contra mockup) y fases para completarlo
 
+```
+órgano:     plan de trabajo del Cuantificador
+capa:       III — Historia
+pregunta:   ¿qué falta del Cuantificador y en qué orden se completa?
+tiempo:     se planeó así
+corte:      2026-11-05
+verificado: auditoría del cerebro contra la app y el mockup el 2026-11-05; lo construido después se anota en MEMORIA (D-641 a D-644)
+```
+
 > Formalizado a partir de la auditoría del 2026-11-05. Nota de numeración: **D-638** ya es «Muro · medir por y la altura se eligen antes de trazar»; las decisiones nuevas de este plan empiezan en **D-639**. Lo que la auditoría llamó F-6 «colocar elemento» sigue en este plan; el panel «Muro · medir por» ya está hecho.
 
 Fecha: 2026-11-05. Solo lectura. Alcance: `cerebro-erp-construccion` (MEMORIA D-531 a D-637, WORKFLOWS §8.9, MODELO §1b y §5c, skill erp-cuantificador), la app `control-avance` (backend `backend/src/obractrl`, frontend `frontend/src/cuantificador`, migraciones hasta 0118, pruebas) y el mockup `cuantificador-pantalla.html`.
