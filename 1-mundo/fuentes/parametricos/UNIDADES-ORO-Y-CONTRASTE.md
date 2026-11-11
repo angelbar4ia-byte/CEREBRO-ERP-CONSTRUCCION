@@ -106,7 +106,7 @@ Precio por salida (mismo catálogo en ambos): WC $4,012 en Zafiro y $3,993 en Or
 
 ## 5. Estado (2026-11-11)
 
-Hechos en Zafiro v45 y Oro v19: **pasos 1 y 2** (llaves; parámetro, cohorte, dispersión y unidad real), los problemas 1 y 2 de §1.3 (unidades mezcladas y panel sin unidad) y el panel de MARCOS EXTERIORES de Zafiro. **Siguen abiertos:** 3 (fachada como driver aparte), 4 (piso PA de 185.6 m²), 5 (coladera a 77.5 m²), 6 (grupo mixto de apagador y contacto) y la parametrización de los otros 5 prototipos. Con el CV de n = 2, pretil, vano, jardín y cubierta salen «no usar» (CV de 41 a 56 %) y sillar «revisar» (22 %).
+Hechos en Zafiro v45 y Oro v19: **pasos 1 y 2** (llaves; parámetro, cohorte, dispersión y unidad real), los problemas 1 y 2 de §1.3 (unidades mezcladas y panel sin unidad) y el panel de MARCOS EXTERIORES de Zafiro. **Siguen abiertos:** 3 (fachada como driver aparte), 4 (piso PA de 185.6 m²), 5 (coladera a 77.5 m²), 6 (grupo mixto de apagador y contacto) y el reparto por capas de los otros 5 prototipos. Con el CV de n = 2, pretil, vano, jardín y cubierta salen «no usar» (CV de 41 a 56 %) y sillar «revisar» (22 %).
 
 ## 6. Propuesta original (pasos 1 y 2 ya hechos)
 
@@ -115,3 +115,29 @@ Hechos en Zafiro v45 y Oro v19: **pasos 1 y 2** (llaves; parámetro, cohorte, di
 3. Parametrizar los cinco prototipos restantes (Rubí, Zafiro Plus, Jade, Diamante −, Diamante +) para medir la dispersión con 7 muestras, como hace §5.7.
 4. Mapear cada hoja a `ENSAMBLE_PARAMETRO`: `parametro` = desplante, salidas, piezas o m² de muro.
 5. Resolver los cinco puntos abiertos de §1.3 antes de tomar las tasas de Oro.
+
+## 7. Dispersión en los 7 prototipos (2026-11-11)
+
+Archivos: `DISPERSION_7_PROTOTIPOS.xlsx` (hojas LEEME, TASAS y DETALLE, con SUMIFS auditables) y `medir_dispersion.py` (lo regenera desde Hoja1 de Zafiro v45).
+
+**Qué se hizo y qué no.** No se armó un libro paramétrico por prototipo: el reparto en capas, fijos y divisiones de Zafiro y Oro es decisión manual de 44 versiones y no existe para los otros cinco. Se midió cada driver con una **misma regla automática** (filtro por subcapítulo, prefijo de clave o ruta, y divisor del concepto ancla o de los m² de la descripción), que reproduce el libro curado donde las definiciones coinciden.
+
+| Driver | Tasa media | CV | Lectura |
+|---|---|---|---|
+| Losa de cimentación ($/m² de desplante) | 793 | 6.4 % | Utilizable. Reproduce Zafiro (756) y Oro (771) |
+| Cimentación completa ($/m² de desplante) | 1,101 | 6.5 % (6.0 % poblacional) | Utilizable. **Reproduce D-312** |
+| Estructura de muro ($/m² de tabique) | 631 | 4.9 % | Utilizable |
+| Piso colocado ($/m²) | 544 | 2.7 % | Utilizable |
+| Pórfido ($/m²) | 545 | 5.1 % | Utilizable. Reproduce el libro curado |
+| Barda ($/ml) | 1,813 | 1.6 % | Utilizable, pero es el mismo concepto en los 7 |
+| Pérgola de cochera ($/m²) | 1,760 | 1.6 % | Utilizable (n = 5: Rubí y Jade no tienen) |
+| Cubierta de mármol ($/ml) | 2,756 | 5.7 % | Utilizable |
+| Asador ($/m² de piso) | 3,021 | 9.6 % | Utilizable al límite |
+| Losas de nivel ($/m² de losa) | 1,247 | 14.1 % | Revisar |
+| Eléctricas ($/m² construido, referencia) | 377 | 9.1 % | Estable por m² |
+| Hidrosanitarias y muebles ($/m² construido) | 423 | 11.1 % | Revisar |
+| Gas ($/m² construido) | 34 | 19.6 % | Revisar |
+
+**Lo que cambia respecto de la comparación con n = 2.** La losa de azotea (con plafón), la barda, el pórfido, el asador y la cochera se confirman estables con siete muestras. Los casos que con n = 2 salían «no usar» (pretil, vano, jardín, cubierta curada) **no se pudieron medir**: el divisor no existe en todos los prototipos. La cubierta, medida sin poyos, es estable (5.7 %); la diferencia con n = 2 venía del contenido del libro curado, no del diseño.
+
+**Qué falta.** La tasa por salida de las instalaciones requiere contar los aparatos de los otros 5 prototipos. Medida por m² construido, las eléctricas salen estables (9 %), lo que el cerebro no esperaba y conviene revisar con la tabla de salidas.

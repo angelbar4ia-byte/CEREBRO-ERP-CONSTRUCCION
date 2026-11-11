@@ -8,6 +8,7 @@ Fuente compartida por el usuario el 2026-11-11, guardada tal cual. Huellas en `.
 | `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx` | Original recibido de **Zafiro 1.0** (172 m², una planta). 29 hojas, ~25 mil fórmulas. |
 | `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx` | **Vigente.** v44 con llaves en lugar de filas, cohorte, dispersión y unidades reales. Hoja `LEEME v45`. |
 | `CATALOGO_PARAMETRICO_ORO_v19.xlsx` | **Vigente.** Igual para Oro. Hoja `LEEME v19`. |
+| `DISPERSION_7_PROTOTIPOS.xlsx` | Tasas de 14 drivers medidas con una misma regla en los 7 prototipos, con CV y confianza. Se regenera con `medir_dispersion.py`. |
 | `CATALOGO_PARAMETRICO_ORO_v18.xlsx` | Original recibido de **Oro 4.01** (300 m², dos plantas). 32 hojas, ~34 mil fórmulas. Nació de la v44 de Zafiro. |
 
 ## Qué es un paramétrico
