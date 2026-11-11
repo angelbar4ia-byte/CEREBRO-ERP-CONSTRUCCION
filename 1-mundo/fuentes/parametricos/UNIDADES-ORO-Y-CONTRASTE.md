@@ -266,3 +266,47 @@ Media $488/m, CV 4 %: **utilizable**. El marco con su sellado cuesta $461/m en l
 - Zafiro Plus lleva la boquilla gruesa interior de la planta alta con la clave `ACA-01051`.
 
 **Libros.** No hizo falta cambiar partidas ni importes en Zafiro v46 ni en Oro v22. Solo agregué una nota de contraste en el panel de VANO y de MARCOS EXTERIORES de los dos libros, para que la tasa de $138/m de Zafiro no se lea como dispersión. Las pruebas de estabilidad siguen pasando.
+
+## 13. Todos los conceptos de los 7 prototipos en su driver (2026-11-11)
+
+Archivos: `PARAMETRICOS_7_PROTOTIPOS.xlsx` (hojas LEEME, RESUMEN, VALIDACIÓN y ASIGNACIÓN), `asignar_drivers.py`, `mapa_aprendido.json` y `curado_drivers.json`.
+
+**El hueco que cierra.** Zafiro y Oro tenían su presupuesto repartido en drivers, con cuadre contra Hoja1. Los otros cinco prototipos no. Ahora cada uno de los 2,452 conceptos de los siete tiene driver y capa, y el total asignado de cada prototipo **cuadra con su presupuesto de Hoja1 (diferencia 0 en los siete)**. Queda 1 concepto sin asignar, con importe 0 (`PRB-01001` de Jade).
+
+**Cómo se asigna** (en este orden): (1) boquillas por pares, la fina define el tipo; (2) franja de fachada +3.00 con tope en el muro del pretil; (3) pintura del pretil; (4) lo aprendido de los libros curados, misma clave en el mismo subcapítulo, mismo driver y capa (2,130 filas); (5) reglas por clave y subcapítulo para lo propio de cada prototipo (245 filas: losas, cocinas, cancelerías, pérgolas, herrería). En la hoja ASIGNACIÓN se puede cambiar el driver o la capa de cualquier concepto y RESUMEN se recalcula.
+
+**Validación contra los libros curados** (regla automática contra el libro armado a mano):
+
+| Driver | Zafiro | Oro |
+|---|---|---|
+| Pretil, vano, marcos exteriores, pórfido, barda, sillar, jardín, cubierta, cisterna, carpintería, cancelería, obra exterior, equipos | idéntico | idéntico |
+| Losa | idéntico | +0.3 % |
+| Muro | −2.6 % | −2.0 % |
+| Piso | +5.3 % | +5.3 % |
+| Asador, cochera | ±2.6 % | −8.1 %, −3.5 % |
+| Herrería, gas, eléctricas | idéntico | −11.2 %, −12.8 %, −4.4 % |
+
+Las diferencias vienen de lo que los libros curados reparten a mano: el mármol entre muro y piso ($11,582 en Zafiro, que explica a la vez el −2.6 % del muro y el +5.3 % del piso) y los ajustes de Oro (excepciones autorizadas, columnas de cantera). La regla automática es la misma para los siete, así que la comparación entre prototipos es justa.
+
+**Tasas en los 7 prototipos:**
+
+| Driver | Divisor | Tasa media | CV | Lectura |
+|---|---|---|---|---|
+| Muro | m² de tabique | 1,435 | 8.7 % | Utilizable |
+| Pretil | m² de pretil | 1,136 | 5.9 % | Utilizable |
+| Vano sin revestimiento | m de boquilla interior | 60 | 0.7 % | Utilizable |
+| Marcos exteriores | m de marco | 489 | 3.9 % | Utilizable |
+| Losa | m² de losa de nivel | 1,891 | 9.6 % | Utilizable |
+| Piso | m² de desplante | 1,489 | 12.0 % | Revisar |
+| Asador | m² de piso | 3,571 | 7.7 % | Utilizable |
+| Pórfido | m² | 545 | 5.1 % | Utilizable |
+| Cochera | m² de pérgola (n = 5) | 2,101 | 2.7 % | Utilizable |
+| Barda | ml | 1,813 | 1.6 % | Utilizable (mismo concepto en los 7) |
+| Cubierta | ml | 3,098 | 7.6 % | Utilizable |
+| Cisterna | L | 7.4 | 0 % | Precio, no dispersión |
+| Sillar | m² (n = 4) | 836 | 15.7 % | Insuficiente |
+| Jardín | m² de sello (n = 4) | 242 | 13.2 % | Insuficiente |
+
+Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso es el único driver de peso en «revisar»**, porque mezcla la losa de cimentación, el piso y el mármol de piso que cada libro reparte a su manera. **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $0 en Zafiro y $86 mil en Diamante +.
+
+**Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco: sin los m² de piso no se puede repartir como en Zafiro. (3) Revisar qué entra en OBRA COMPLEMENTARIA de Diamante (galarza y forrados de columna) y si merece driver propio.

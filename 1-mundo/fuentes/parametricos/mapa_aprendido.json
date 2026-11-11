@@ -1,0 +1,2197 @@
+{
+"EST-02010§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10010§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10011§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10020§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10021§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10031§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10041§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10070§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10071§CIMENTACIÓN": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02110§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02120§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02130§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02140§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02170§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10013§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10072§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02310§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-01010§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ALB-01012§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ALB-01210§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ALB-01212§AZOTEA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": true
+},
+"ACA-01010§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01020§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-20011§AZOTEA": {
+"driver": "MURO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-20020§AZOTEA": {
+"driver": "MURO",
+"capa": "OBRA BLANCA",
+"ambigua": true
+},
+"ACA-02040§ACABADOS": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": true
+},
+"ACA-08010§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": true
+},
+"ACA-02041§ACABADOS": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-02050§ACABADOS": {
+"driver": "PISO",
+"capa": "REVESTIMIENTO",
+"ambigua": true
+},
+"ACA-10040§PINTURA": {
+"driver": "PISO",
+"capa": "REVESTIMIENTO",
+"ambigua": true
+},
+"ACA-10020§ACABADOS": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-10030§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-07050§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ICA-01030§AZOTEA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08060§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-05010§AZOTEA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08040§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-07020§ACABADOS": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08020§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-07021§ACABADOS": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08021§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"CAR-01011§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08061§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08070§PINTURA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-30010§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": true
+},
+"ACA-30011§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": false
+},
+"ACA-30012§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": false
+},
+"ACA-30031§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": true
+},
+"ACA-30032§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": true
+},
+"EST-02010§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02110§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"BAP-01100§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-01010§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01051§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-20012§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01072§AZOTEA": {
+"driver": "PRETIL",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01050§PLANTA BAJA": {
+"driver": "VANO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01052§ACABADOS": {
+"driver": "MARCOS EXTERIORES",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01060§PLANTA BAJA": {
+"driver": "VANO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01071§ACABADOS": {
+"driver": "MARCOS EXTERIORES",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-07012§PLANTA BAJA": {
+"driver": "VANO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-08030§PINTURA": {
+"driver": "MARCOS EXTERIORES",
+"capa": "REVESTIMIENTO",
+"ambigua": true
+},
+"ACA-07011§AZOTEA": {
+"driver": "MARCOS EXTERIORES",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"EST-01040§CIMENTACIÓN": {
+"driver": "PISO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-21011§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-21031§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-03014§AZOTEA": {
+"driver": "LOSA",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ALB-03020§AZOTEA": {
+"driver": "LOSA",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-04010§PINTURA": {
+"driver": "LOSA",
+"capa": "IMPERMEABILIZACIÓN",
+"ambigua": false
+},
+"ACA-01090§ACABADOS": {
+"driver": "PISO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"BAP-01010§BARDA PERIMETRAL": {
+"driver": "BARDA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"BAP-03020§BARDA PERIMETRAL": {
+"driver": "BARDA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"BAP-03010§BARDA PERIMETRAL": {
+"driver": "BARDA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"BAP-03030§BARDA PERIMETRAL": {
+"driver": "BARDA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02010§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02080§PLANTA BAJA": {
+"driver": "SILLAR",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-01010§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-20010§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01100§ACABADOS": {
+"driver": "PISO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01110§ACABADOS": {
+"driver": "PISO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-02010§ACABADOS": {
+"driver": "PISO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-02060§ACABADOS": {
+"driver": "PISO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-02020§ACABADOS": {
+"driver": "PISO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ACA-02070§ACABADOS": {
+"driver": "PISO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"EST-01151§ASADOR": {
+"driver": "ASADOR",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-03021§ASADOR": {
+"driver": "ASADOR",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-02510§ACABADOS": {
+"driver": "ASADOR",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"CAR-10011§ASADOR": {
+"driver": "ASADOR",
+"capa": "PÉRGOLA (FIJO)",
+"ambigua": false
+},
+"EST-03020§ASADOR": {
+"driver": "ASADOR",
+"capa": "ASADOR FORJADO Y REVESTIDO (FIJO)",
+"ambigua": false
+},
+"ACA-09020§ASADOR": {
+"driver": "ASADOR",
+"capa": "ASADOR FORJADO Y REVESTIDO (FIJO)",
+"ambigua": false
+},
+"ACA-07060§ASADOR": {
+"driver": "ASADOR",
+"capa": "ASADOR FORJADO Y REVESTIDO (FIJO)",
+"ambigua": false
+},
+"ACA-07061§ASADOR": {
+"driver": "ASADOR",
+"capa": "ASADOR FORJADO Y REVESTIDO (FIJO)",
+"ambigua": false
+},
+"ACA-08110§PINTURA": {
+"driver": "ASADOR",
+"capa": "ASADOR FORJADO Y REVESTIDO (FIJO)",
+"ambigua": false
+},
+"ACA-08120§PINTURA": {
+"driver": "ASADOR",
+"capa": "ASADOR FORJADO Y REVESTIDO (FIJO)",
+"ambigua": true
+},
+"OBE-02011§OBRAS EXTERIORES": {
+"driver": "PÓRFIDO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"OBE-02012§OBRAS EXTERIORES": {
+"driver": "PÓRFIDO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"OBE-02030§OBRAS EXTERIORES": {
+"driver": "PÓRFIDO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"OBE-02020§OBRAS EXTERIORES": {
+"driver": "PÓRFIDO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"CAR-10012§PERGOLADO COCHERA": {
+"driver": "COCHERA",
+"capa": "PÉRGOLA",
+"ambigua": false
+},
+"ALB-03021§PERGOLADO COCHERA": {
+"driver": "COCHERA",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"EST-03020§PERGOLADO COCHERA": {
+"driver": "COCHERA",
+"capa": "ESTRUCTURA BASE (FIJO)",
+"ambigua": false
+},
+"ACA-07040§PERGOLADO COCHERA": {
+"driver": "COCHERA",
+"capa": "ESTRUCTURA BASE (FIJO)",
+"ambigua": false
+},
+"ACA-09020§PERGOLADO COCHERA": {
+"driver": "COCHERA",
+"capa": "ESTRUCTURA BASE (FIJO)",
+"ambigua": false
+},
+"ACA-08050§PINTURA": {
+"driver": "SILLAR",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ISN-01040§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01041§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01043§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01040§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02040§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01030§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01031§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02030§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01030§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02030§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01050§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01051§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01050§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02050§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01063§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02060§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01060§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02060§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01020§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02020§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01020§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02020§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01071§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02070§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01110§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02110§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01090§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02120§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01120§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02120§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-01080§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02080§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-01090§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02090§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-01070§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02070§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01130§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01132§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02130§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01080§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01111§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01113§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01115§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01116§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01114§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01140§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01010§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02010§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01010§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02010§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-01100§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02100§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-10010§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-02001§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02101§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02202§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02220§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-02004§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01141§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ACC-00001§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01062§ASADOR": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02062§ASADOR": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01062§ASADOR": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02062§ASADOR": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"MSA-01010§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01021§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01030§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01050§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01061§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01070§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01080§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01090§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"ACC-01010§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01110§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01120§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01160§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01170§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01180§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01171§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01040§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01101§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"MSA-01150§MUEBLES / ILUMINACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "MUEBLES",
+"ambigua": false
+},
+"IGAS-01010§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02010§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01030§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02030§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01050§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02050§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01070§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02070§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01111§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02110§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-03010§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02120§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02130§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01140§ASADOR": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02140§ASADOR": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IEC-01050§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01050§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02050§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-02050§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-01011§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01012§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02010§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-02010§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-02020§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-10010§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10010§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10020§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10030§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10080§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10040§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10041§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10130§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10150§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10040§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-11010§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11020§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11030§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11080§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11040§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11041§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11130§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11150§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01080§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02080§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-10141§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01210§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-20010§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01220§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-20020§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-01260§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-20040§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-03010§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-01063§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01132§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02060§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-02130§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-01020§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01030§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02030§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-02040§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-10110§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10120§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-11110§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11120§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01200§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-10001§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-01201§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01090§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-01110§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-10140§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-10142§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-10143§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-10144§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01220§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-20050§ASADOR": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-20050§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-01070§OBRAS EXTERIORES": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"EQU-02010§MUEBLES / ILUMINACIÓN": {
+"driver": "EQUIPOS",
+"capa": "EQUIPOS",
+"ambigua": false
+},
+"EQU-02020§MUEBLES / ILUMINACIÓN": {
+"driver": "EQUIPOS",
+"capa": "EQUIPOS",
+"ambigua": false
+},
+"EQU-01040§MUEBLES / ILUMINACIÓN": {
+"driver": "EQUIPOS",
+"capa": "EQUIPOS",
+"ambigua": false
+},
+"EQU-01041§MUEBLES / ILUMINACIÓN": {
+"driver": "EQUIPOS",
+"capa": "EQUIPOS",
+"ambigua": false
+},
+"EQU-01030§MUEBLES / ILUMINACIÓN": {
+"driver": "EQUIPOS",
+"capa": "EQUIPOS",
+"ambigua": false
+},
+"EQU-01020§MUEBLES / ILUMINACIÓN": {
+"driver": "EQUIPOS",
+"capa": "EQUIPOS",
+"ambigua": false
+},
+"EQU-01011§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "EQUIPO",
+"ambigua": true
+},
+"HER-02011§HERRERÍA": {
+"driver": "HERRERÍA",
+"capa": "HERRERÍA",
+"ambigua": false
+},
+"HER-04010§HERRERÍA": {
+"driver": "HERRERÍA",
+"capa": "HERRERÍA",
+"ambigua": false
+},
+"HER-05010§HERRERÍA": {
+"driver": "HERRERÍA",
+"capa": "HERRERÍA",
+"ambigua": false
+},
+"CAR-03020§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02100§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02090§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02080§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02110§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02050§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02051§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02010§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "PUERTAS",
+"ambigua": false
+},
+"CAR-02020§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "PUERTAS",
+"ambigua": false
+},
+"CAR-02030§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "PUERTAS",
+"ambigua": false
+},
+"CAN-01002§CANCELERÍA": {
+"driver": "CANCELERÍA",
+"capa": "CANCELERÍA",
+"ambigua": false
+},
+"CAN-01003§CANCELERÍA": {
+"driver": "CANCELERÍA",
+"capa": "DOMOS",
+"ambigua": false
+},
+"ALB-01110§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA GRIS",
+"ambigua": false
+},
+"ALB-01112§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA GRIS",
+"ambigua": false
+},
+"ACA-01030§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01040§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA BLANCA",
+"ambigua": false
+},
+"ACA-30020§PINTURA": {
+"driver": "LOSA",
+"capa": "PLAFÓN PINTURA",
+"ambigua": false
+},
+"ACA-30021§PINTURA": {
+"driver": "LOSA",
+"capa": "PLAFÓN PINTURA",
+"ambigua": false
+},
+"ACA-30022§PINTURA": {
+"driver": "LOSA",
+"capa": "PLAFÓN PINTURA",
+"ambigua": false
+},
+"OBE-01020§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "REGISTROS SANITARIOS",
+"ambigua": false
+},
+"OBE-01021§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "REGISTROS SANITARIOS",
+"ambigua": false
+},
+"OBE-04010§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "MURETE DE INSTALACIONES",
+"ambigua": false
+},
+"OBE-03040§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "PLANTAS",
+"ambigua": false
+},
+"OBE-03050§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "PLANTAS",
+"ambigua": false
+},
+"OBE-03060§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "PLANTAS",
+"ambigua": false
+},
+"OBE-03070§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "PLANTAS",
+"ambigua": false
+},
+"OBE-03010§OBRAS EXTERIORES": {
+"driver": "JARDÍN",
+"capa": "SELLO",
+"ambigua": false
+},
+"OBE-03210§OBRAS EXTERIORES": {
+"driver": "JARDÍN",
+"capa": "SELLO",
+"ambigua": false
+},
+"OBE-03020§OBRAS EXTERIORES": {
+"driver": "JARDÍN",
+"capa": "PASTO",
+"ambigua": false
+},
+"ACA-02032§MUEBLES / ILUMINACIÓN": {
+"driver": "CUBIERTA",
+"capa": "CUBIERTAS DE MÁRMOL",
+"ambigua": false
+},
+"ACA-02033§MUEBLES / ILUMINACIÓN": {
+"driver": "CUBIERTA",
+"capa": "CUBIERTAS DE MÁRMOL",
+"ambigua": false
+},
+"ACA-01080§PLANTA BAJA": {
+"driver": "CUBIERTA",
+"capa": "POYOS DE COCINA",
+"ambigua": false
+},
+"OBE-01011§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"OBE-01012§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"OBE-01013§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"OBE-01014§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"OBE-01015§OBRAS EXTERIORES": {
+"driver": "CISTERNA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ACA-03025§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": false
+},
+"EST-02330§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10010§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10020§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10060§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10070§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"CAR-01010§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02010§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02110§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02120§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02130§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02160§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02170§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02310§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-02320§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-10012§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-01010§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ALB-01012§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01010§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01020§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"ACA-07050§PLANTA ALTA": {
+"driver": "MURO",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ALB-01212§PLANTA BAJA": {
+"driver": "MURO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-03047§PINTURA": {
+"driver": "MURO",
+"capa": "PINTURA",
+"ambigua": true
+},
+"ACA-01051§ACABADOS": {
+"driver": "MARCOS EXTERIORES",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01050§PLANTA ALTA": {
+"driver": "VANO",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"ACA-01060§PLANTA ALTA": {
+"driver": "VANO",
+"capa": "OBRA BLANCA",
+"ambigua": false
+},
+"EST-51110§PLANTA ALTA": {
+"driver": "LOSA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-51011§PLANTA ALTA": {
+"driver": "LOSA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ALB-01110§PLANTA ALTA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA GRIS",
+"ambigua": false
+},
+"ALB-01112§PLANTA ALTA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA GRIS",
+"ambigua": false
+},
+"ACA-01030§PLANTA ALTA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA BLANCA",
+"ambigua": false
+},
+"ACA-01040§PLANTA ALTA": {
+"driver": "LOSA",
+"capa": "PLAFÓN OBRA BLANCA",
+"ambigua": false
+},
+"ACA-03026§PINTURA": {
+"driver": "LOSA",
+"capa": "PLAFÓN PINTURA",
+"ambigua": false
+},
+"EST-51016§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-51010§PLANTA BAJA": {
+"driver": "LOSA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-01013§CIMENTACIÓN": {
+"driver": "PISO",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-01510§PLANTA BAJA": {
+"driver": "ESCALERA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"EST-01510§PLANTA ALTA": {
+"driver": "ESCALERA",
+"capa": "OBRA NEGRA",
+"ambigua": false
+},
+"ACA-02210§ACABADOS": {
+"driver": "ESCALERA",
+"capa": "REVESTIMIENTO",
+"ambigua": false
+},
+"ALB-03021§ACABADOS": {
+"driver": "ASADOR",
+"capa": "OBRA GRIS",
+"ambigua": false
+},
+"CAR-12010§ASADOR": {
+"driver": "ASADOR",
+"capa": "PÉRGOLA",
+"ambigua": false
+},
+"CAR-12020§PERGOLADO COCHERA": {
+"driver": "COCHERA",
+"capa": "PÉRGOLA",
+"ambigua": false
+},
+"OBE-03030§OBRAS EXTERIORES": {
+"driver": "OBRA EXTERIOR",
+"capa": "PLANTAS",
+"ambigua": false
+},
+"CAR-01030§AZOTEA": {
+"driver": "OBRA COMPLEMENTARIA",
+"capa": "COMPLEMENTARIA",
+"ambigua": false
+},
+"ACA-01210§AZOTEA": {
+"driver": "OBRA COMPLEMENTARIA",
+"capa": "COMPLEMENTARIA",
+"ambigua": false
+},
+"ACA-06010§ACABADOS": {
+"driver": "OBRA COMPLEMENTARIA",
+"capa": "COMPLEMENTARIA",
+"ambigua": false
+},
+"ICA-01060§ACABADOS": {
+"driver": "OBRA COMPLEMENTARIA",
+"capa": "COMPLEMENTARIA",
+"ambigua": false
+},
+"INS-02010§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01032§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01030§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01031§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02030§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01030§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02030§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01042§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01040§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02040§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-02050§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01051§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01053§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01054§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02050§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-01050§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02050§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-01060§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01072§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01080§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01110§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02110§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02111§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01121§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01116§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01115§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-01131§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02130§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"ISN-02001§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IHD-02203§CIMENTACIÓN": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02002§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02102§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-01070§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"IHD-02070§PLANTA ALTA": {
+"driver": "HIDROSANITARIAS",
+"capa": "HIDRÁULICA",
+"ambigua": false
+},
+"ISN-10011§PLANTA BAJA": {
+"driver": "HIDROSANITARIAS",
+"capa": "SANITARIA",
+"ambigua": false
+},
+"IGAS-01090§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02090§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01110§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01111§PLANTA BAJA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-02110§PLANTA ALTA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-01141§CIMENTACIÓN": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IGAS-03010§PLANTA ALTA": {
+"driver": "GAS",
+"capa": "GAS",
+"ambigua": false
+},
+"IEC-01010§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01010§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02010§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-02020§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-11150§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01050§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02050§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-10050§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-11050§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-10060§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10070§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-10100§ACABADOS": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-11070§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11060§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-11100§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01060§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01131§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01080§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-02080§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-01130§CIMENTACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CIMENTACIÓN",
+"ambigua": false
+},
+"IEC-01240§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-01240§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "MUROS",
+"ambigua": false
+},
+"IEC-20030§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "ACCESORIOS",
+"ambigua": false
+},
+"IEC-01210§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-01220§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-20020§MUEBLES / ILUMINACIÓN": {
+"driver": "ELÉCTRICAS",
+"capa": "CABLEADO",
+"ambigua": false
+},
+"IEC-01260§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-01100§PLANTA BAJA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"IEC-01090§PLANTA ALTA": {
+"driver": "ELÉCTRICAS",
+"capa": "LOSA",
+"ambigua": false
+},
+"HER-02010§HERRERÍA": {
+"driver": "HERRERÍA",
+"capa": "HERRERÍA",
+"ambigua": false
+},
+"HER-02020§HERRERÍA": {
+"driver": "HERRERÍA",
+"capa": "HERRERÍA",
+"ambigua": false
+},
+"HER-02030§HERRERÍA": {
+"driver": "HERRERÍA",
+"capa": "HERRERÍA",
+"ambigua": false
+},
+"CAR-04120§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-04130§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-04140§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-04150§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-05050§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "MUEBLES DE CARPINTERÍA",
+"ambigua": false
+},
+"CAR-02610§CARPINTERÍA": {
+"driver": "CARPINTERÍA",
+"capa": "PUERTAS",
+"ambigua": false
+},
+"CAN-01001§CANCELERÍA": {
+"driver": "CANCELERÍA",
+"capa": "CANCELERÍA",
+"ambigua": false
+},
+"CAN-01011§CANCELERÍA": {
+"driver": "CANCELERÍA",
+"capa": "CANCELERÍA",
+"ambigua": false
+}
+}
