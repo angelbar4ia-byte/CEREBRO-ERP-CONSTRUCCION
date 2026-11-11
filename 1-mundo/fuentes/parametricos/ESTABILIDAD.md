@@ -1,5 +1,12 @@
 # Estabilidad de los paramétricos y de sus rutas
 
+```
+órgano:     fuente — estabilidad de los paramétricos y sus rutas
+capa:       I — Mundo
+pregunta:   ¿qué hace que los paramétricos no se rompan?
+tiempo:     es así
+corte:      2026-11-11
+```
 Libros: `CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v46.xlsx` y `CATALOGO_PARAMETRICO_ORO_v22.xlsx`. Parten de v45 y v21 y **no cambian ningún importe** (comprobado celda por celda tras recalcular, salvo la columna de ruta de Hoja1).
 
 ## Qué se auditó

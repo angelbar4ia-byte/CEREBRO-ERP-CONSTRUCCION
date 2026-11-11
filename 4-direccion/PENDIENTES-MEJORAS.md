@@ -125,6 +125,7 @@ verificado: 38 de decisión · 14 de datos · 25 módulos
 | ✅ P-28 | ~~Reversar la explosión por destajo~~ | **Probado** sobre ALAMO 18: **84%** de los destajos resuelve a un solo concepto al filtrar por prototipo, y las cantidades salen **enteras exactas** (`CONOCIMIENTO.md` §11.9) |
 | ✅ P-29 | ~~Auditoría prototipo contra ingeniería~~ | **Resuelto: sin causa declarada, alerta, nunca autocorrección.** Nueva tabla `ALERTA` (`MODELO.md` §5a). `CONOCIMIENTO.md` §11.7, D-192/D-193 |
 | ✅ P-30 | ~~La descripción puede mentir sobre el prototipo~~ | **Resuelto: detecta y propone, nunca corrige solo.** Dos métodos —contenido y razón de cantidades, umbral 20% parametrizable— que se validan mutuamente. `CONOCIMIENTO.md` §11.7, D-193 |
+| ⏸️ P-42 | **Travertino en piso de los otros cinco prototipos (Rubí, Zafiro Plus, Jade, Diamante −/+)** | **Abierto a propósito, hasta que pase el cuantificador.** El catálogo no trae ninguna medida de cuánto travertino va en piso; hoy `PARAMETRICOS_7_PROTOTIPOS.xlsx` (hoja `MÁRMOL`, columna F o G) usa un **estimado**: 42.6 % del travertino total, promedio de Zafiro (17.52 de 45 m²) y Oro (32.88 de 71 m²). El tomboleado sí está resuelto (= renivelación de charolas). **Cuando el cuantificador mida los m² de piso por material**, se sobrescriben las celdas y todo se recalcula. No bloquea nada: con 0 % a 46 % el muro se mueve de $1,425 a $1,389/m² y el piso de $1,511 a $1,596/m², y su CV menos de un punto (`UNIDADES-ORO-Y-CONTRASTE.md` §14) |
 
 ## D. Los catálogos de la generación anterior
 

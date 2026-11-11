@@ -1,5 +1,12 @@
 # Análisis a fondo de los libros paramétricos
 
+```
+órgano:     fuente — análisis de los libros paramétricos
+capa:       I — Mundo
+pregunta:   ¿qué hay y qué cuadra en los libros de Zafiro y Oro?
+tiempo:     es así
+corte:      2026-11-11
+```
 Método: se recalcularon ambos libros con LibreOffice (los originales no guardan valores) y se leyeron fórmulas y resultados. No se usó Excel, así que conviene confirmar una vez allí. Ningún error `#REF!`, `#NAME?` ni `#DIV/0!` en ninguna hoja de los dos libros.
 
 ## 1. Anatomía

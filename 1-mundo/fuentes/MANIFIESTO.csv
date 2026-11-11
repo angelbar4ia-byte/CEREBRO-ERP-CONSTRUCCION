@@ -68,7 +68,7 @@ ruta,subido_como,subido_el,bytes,sha256,registros,derivado_de
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__-_PB.csv,45d4c7c7-INGENIERIA_-_ALAMO_18__-_PB.csv,2026-09-18 06:50,29722,d63de8fb98761df10d9f326533116739b1809b6c5ec987d4896b373b2777cc79,515,
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__-_PISOS.csv,f7033640-INGENIERIA_-_ALAMO_18__-_PISOS.csv,2026-09-18 06:50,13949,88c6f7a4d4ad641dd6c4d1a70bcf88811fca41ab14022e3cd136df6ab5ebea11,221,
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__CIM_CAMARAS.csv,825f5fe9-INGENIERIA_-_ALAMO_18__CIM_CAMARAS.csv,2026-09-18 06:38,166,b12b2f418daa6480565f1bb475423d8463182f381a2d026f1e6925ae2ce17cfc,5,
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO.md,c7e06133-CATALOGO_PARAMETRICO.md,2026-11-11 05:33,69351,902f702a5013889e94964b4029f8869a4beb5f9ee18fc196a6b5ca318b3ddbd4,,versión del usuario + bitácora v45/v19
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO.md,c7e06133-CATALOGO_PARAMETRICO.md,2026-11-11 05:33,69577,e356f15f5db7e74e5807e0ee15534b7deb35e741e325a4e7cd9a6091296136cf,,versión del usuario + bitácora v45/v19
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v18.xlsx,d1ee4847-CATALOGO_PARAMETRICO_ORO_v18.xlsx,2026-11-11 05:33,490451,a2d06ca407a51cc6b074597b94b0f71d1a34c4a50e5aeacdaa511cf278abc301,,
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx,1a8e1c29-CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx,2026-11-11 05:33,810982,bde4b951f6635998c31f167c625795c14a3c5536f28a009907e71ec8b29a5762,,
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx,,2026-11-11 06:00,929956,9e479b0e4d5f9f613257132c73411d404518430a38d7e3d5165f226475ab60dd,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx (llaves, cohorte y unidades)
@@ -85,7 +85,7 @@ ruta,subido_como,subido_el,bytes,sha256,registros,derivado_de
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v21.xlsx,,2026-11-11 12:00,542761,655af4063c7b991350b5357561f77e8acb9819e593def333c785f58607942cc5,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v20.xlsx (boquilla gruesa de marcos una sola vez)
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v46.xlsx,,2026-11-11 13:00,1045697,fb7e23e95a8e5ba7e586ea21420e4400cd096a5b67e15f06c46853f1814eb3a7,,estabilizar_parametricos.py sobre 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v22.xlsx,,2026-11-11 13:00,594333,58a41d239fcb1231cb7584cd06009a7e581ddd6bb28f2d6e75078b7feaea70d8,,estabilizar_parametricos.py sobre 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v21.xlsx
-1-mundo/fuentes/parametricos/ESTABILIDAD.md,,2026-11-11 13:00,4670,d3bf0831376cf2f2bd2fa0173d4a7d3cbe3900b53549512d0ae5a34f57a7d10d,,
+1-mundo/fuentes/parametricos/ESTABILIDAD.md,,2026-11-11 13:00,4874,ba9ee85d464a8d498cb320cc3a81f28bf6a5c68ab893f3cca80802fe94b77a30,,
 1-mundo/fuentes/parametricos/estabilizar_parametricos.py,,2026-11-11 13:00,10838,5fbdb8f9d19ea39e1e53df1143b52771aee09e974b50bcda4dc4465bc8fd94ec,,
 1-mundo/fuentes/parametricos/probar_parametricos.py,,2026-11-11 13:00,5015,273204b7bc4ade9533db966aaf48d69912da036c643671a69850af0b2d1b3277,,
 1-mundo/fuentes/parametricos/estado_esperado_ZAFIRO.json,,2026-11-11 13:00,1678,9a734501899c639724c6e92accb6b0aaffe6394a5ad49490d56198232a04628e,,probar_parametricos.py --guardar

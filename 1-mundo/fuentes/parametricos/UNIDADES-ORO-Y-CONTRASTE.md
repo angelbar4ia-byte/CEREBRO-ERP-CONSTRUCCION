@@ -1,5 +1,12 @@
 # Unidades de Oro y contraste con la idea de paramétrico del cerebro
 
+```
+órgano:     fuente — unidades de Oro, contraste con el cerebro y medición en los 7 prototipos
+capa:       I — Mundo
+pregunta:   ¿las tasas paramétricas son estables entre prototipos?
+tiempo:     es así
+corte:      2026-11-11
+```
 Se contrastó el libro `ORO_v18` (recalculado) y Zafiro v44 contra lo que el cerebro ya define: `1-mundo/CONOCIMIENTO.md` §5, `2-operacion/skills/erp-parametrico.md`, `1-mundo/MODELO.md` (`ENSAMBLE_PARAMETRO`) y `3-historia/MEMORIA.md` D-312 y D-622.
 
 ## 1. Unidades de Oro
