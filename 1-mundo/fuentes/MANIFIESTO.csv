@@ -68,7 +68,7 @@ ruta,subido_como,subido_el,bytes,sha256,registros,derivado_de
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__-_PB.csv,45d4c7c7-INGENIERIA_-_ALAMO_18__-_PB.csv,2026-09-18 06:50,29722,d63de8fb98761df10d9f326533116739b1809b6c5ec987d4896b373b2777cc79,515,
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__-_PISOS.csv,f7033640-INGENIERIA_-_ALAMO_18__-_PISOS.csv,2026-09-18 06:50,13949,88c6f7a4d4ad641dd6c4d1a70bcf88811fca41ab14022e3cd136df6ab5ebea11,221,
 1-mundo/opus/ingenieria-alamo-18/INGENIERIA_-_ALAMO_18__CIM_CAMARAS.csv,825f5fe9-INGENIERIA_-_ALAMO_18__CIM_CAMARAS.csv,2026-09-18 06:38,166,b12b2f418daa6480565f1bb475423d8463182f381a2d026f1e6925ae2ce17cfc,5,
-1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO.md,c7e06133-CATALOGO_PARAMETRICO.md,2026-11-11 05:33,68864,9da7d005bcc72f5426bb2ace1dd8a8763ee41c1fe582ecee6fcb06a1ce52dfab,,versión del usuario + bitácora v45/v19
+1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO.md,c7e06133-CATALOGO_PARAMETRICO.md,2026-11-11 05:33,69351,902f702a5013889e94964b4029f8869a4beb5f9ee18fc196a6b5ca318b3ddbd4,,versión del usuario + bitácora v45/v19
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_ORO_v18.xlsx,d1ee4847-CATALOGO_PARAMETRICO_ORO_v18.xlsx,2026-11-11 05:33,490451,a2d06ca407a51cc6b074597b94b0f71d1a34c4a50e5aeacdaa511cf278abc301,,
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx,1a8e1c29-CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx,2026-11-11 05:33,810982,bde4b951f6635998c31f167c625795c14a3c5536f28a009907e71ec8b29a5762,,
 1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx,,2026-11-11 06:00,929956,9e479b0e4d5f9f613257132c73411d404518430a38d7e3d5165f226475ab60dd,,1-mundo/fuentes/parametricos/CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v44.xlsx (llaves, cohorte y unidades)
@@ -92,7 +92,7 @@ ruta,subido_como,subido_el,bytes,sha256,registros,derivado_de
 1-mundo/fuentes/parametricos/estado_esperado_ORO.json,,2026-11-11 13:00,1906,6a96713bb592bdc2f132fbf150ec817ffd32b71e57446f5ca069b2d7c5cc127e,,probar_parametricos.py --guardar
 1-mundo/fuentes/parametricos/VANO_MARCOS_7_PROTOTIPOS.xlsx,,2026-11-11 14:00,21895,fe66f5ca351c8a2dee974b7d29690ee3fa00c8f54c69b44001cd883dcf34df72,,medir_vano_marcos.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
 1-mundo/fuentes/parametricos/medir_vano_marcos.py,,2026-11-11 14:00,12096,b4b4ee7b82f4d001d9cb24399581080b9fbb996717350264f0fc7eb2744fce6d,,
-1-mundo/fuentes/parametricos/PARAMETRICOS_7_PROTOTIPOS.xlsx,,2026-11-11 15:00,203341,bd1cf3adf7236b4ddc7505e2ab2e3013f048cc04b1d2572ab8ed260a0aea49ed,,asignar_drivers.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
-1-mundo/fuentes/parametricos/asignar_drivers.py,,2026-11-11 15:00,18103,dfd8692d1be7e90cbe6690fcda907270d3dcebcaaf8c4a330949bf5301df5781,,
+1-mundo/fuentes/parametricos/PARAMETRICOS_7_PROTOTIPOS.xlsx,,2026-11-11 15:00,211582,72e5de925ebe2c3dd436cf95059fb7973ef955b7b3943c3a0a4ccfb3f87ce34c,,asignar_drivers.py sobre Hoja1 de CATALOGO_PARAMETRICO_con_MURO_ZAFIRO_CAPAS_v45.xlsx
+1-mundo/fuentes/parametricos/asignar_drivers.py,,2026-11-11 15:00,21122,1d3ce16d6224d5d7c2f461811d6d25f81aab55ca0090212861476a129d5f3e18,,
 1-mundo/fuentes/parametricos/mapa_aprendido.json,,2026-11-11 15:00,41585,79d08a26e2631b6e283dc802d6e49b6491078b0c840cedab4356883176721f09,,claves y subcapítulos de los libros v46 y v22 recalculados
 1-mundo/fuentes/parametricos/curado_drivers.json,,2026-11-11 15:00,1133,e369d3f9ac3733c37ea53de62bc7e6fcc2f345e32dd2a563c10b4b16b00cdbfd,,importes por driver de los libros v46 y v22 recalculados

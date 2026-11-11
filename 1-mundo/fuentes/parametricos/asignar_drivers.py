@@ -72,6 +72,14 @@ for p in range(7):
         for c in cs:
             if c['clave']=='ACA-08030' and abs(c['q']-me)>0.01 and c['row'] not in hecho:
                 hecho.add(c['row']); poner(c,'VANO','REVESTIMIENTO','sellado de marco interior','excepción autorizada: se cobra el largo del marco interior (%g m)'%mi,q=mi)
+    # --- mármol: lo que va en piso se toma de la hoja MÁRMOL (editable); el resto queda en el muro
+    for c in cs:
+        if c['clave'] in('ACA-02040','ACA-08010','ACA-02050','ACA-10040') and c['row'] not in hecho:
+            col='E' if c['clave'] in('ACA-02040','ACA-08010') else 'G'; ref=f"MÁRMOL!${col}${2+p}"
+            tot=sum(x['q'] for x in cs if x['clave']==c['clave']) or 1   # si hay varias líneas, el piso se reparte en proporción
+            hecho.add(c['row'])
+            poner(c,'PISO','REVESTIMIENTO','mármol en piso (hoja MÁRMOL)','m² de mármol que va en piso: dato de la hoja MÁRMOL',q=f'={ref}*G#/{tot}')
+            poner(c,'MURO','REVESTIMIENTO','mármol en muro (hoja MÁRMOL)','lo que no va en piso',q=f'=G#-{ref}*G#/{tot}')
     # --- el resto
     for c in cs:
         if c['row'] in hecho: continue
@@ -122,17 +130,39 @@ for r in rows:
         elif drv=='CUBIERTA' and cl in('ACA-02032','ACA-02033'): v=r['q']
         elif drv=='PÓRFIDO' and cl=='OBE-02011': v=r['q']
         if v: div[(r['row'],drv)]=v
-wb=openpyxl.Workbook(); lee=wb.active; lee.title='LEEME'
+wb=openpyxl.Workbook(); lee=wb.active; lee.title='LEEME'; mar=wb.create_sheet('MÁRMOL')
 res=wb.create_sheet('RESUMEN'); val=wb.create_sheet('VALIDACIÓN'); aw=wb.create_sheet('ASIGNACIÓN')
 HF=Font(bold=True,color='FFFFFF'); HB=PatternFill('solid',fgColor='305496')
 def head(ws,r,vals):
     for i,v in enumerate(vals,1):
         c=ws.cell(r,i,v); c.font=HF; c.fill=HB; c.alignment=Alignment(wrap_text=True,vertical='center')
+
+# --- hoja MÁRMOL: cuánto mármol va en piso (editable)
+head(mar,1,['Prototipo','Travertino en el catálogo (m²)','Tomboleado en el catálogo (m²)','Renivelación de charolas (m²)','Tomboleado en PISO (m²)','% del travertino en piso (editable)','Travertino en PISO (m²)','De dónde sale'])
+trav=collections.defaultdict(float); tomb=collections.defaultdict(float); ren=collections.defaultdict(float)
+for r in rows:
+    if r['clave']=='ACA-02050': trav[r['p']]+=r['q']
+    if r['clave']=='ACA-02040': tomb[r['p']]+=r['q']
+    if r['clave']=='ACA-01090': ren[r['p']]+=r['q']
+for p in range(7):
+    rr=2+p; mar.cell(rr,1,PROTOS[p]); mar.cell(rr,2,round(trav[p],2)); mar.cell(rr,3,round(tomb[p],2)); mar.cell(rr,4,round(ren[p],2))
+    if p==0:
+        mar.cell(rr,5,'=D2'); mar.cell(rr,7,17.52); mar.cell(rr,6,'=G2/B2'); mar.cell(rr,8,'Dato del usuario: piso = renivelación de charolas (4.81) y travertino de piso 17.52 m²')
+    elif p==6:
+        mar.cell(rr,5,8.04); mar.cell(rr,7,32.88); mar.cell(rr,6,'=G8/B8'); mar.cell(rr,8,'Dato del usuario en el libro de Oro: tomboleado 1.8 + 6.24, travertino 13.24 + 19.64 (la renivelación de Hoja1 trae 0.1 + 4.5)')
+    else:
+        mar.cell(rr,5,f'=D{rr}'); mar.cell(rr,6,'=AVERAGE($F$2,$F$8)'); mar.cell(rr,7,f'=B{rr}*F{rr}')
+        mar.cell(rr,8,'ESTIMADO: tomboleado = renivelación de charolas (criterio de Zafiro); travertino = promedio de la fracción de Zafiro y de Oro. Confirmar con los m² de piso.')
+    for c in (2,3,4,5,7): mar.cell(rr,c).number_format='#,##0.00'
+    mar.cell(rr,6).number_format='0.0%'
+mar.cell(10,1,'Sobrescribir la columna F (o G) con el dato real; ASIGNACIÓN y RESUMEN se recalculan. Mover mármol de muro a piso no cambia el total del prototipo, solo cuánto cuesta el muro y cuánto el piso.')
+for col,w in zip('ABCDEFGH',(14,16,16,16,16,18,16,110)): mar.column_dimensions[col].width=w
 head(aw,1,['Prototipo','Fila Hoja1','Subcapítulo','Clave','Descripción','Unidad','Cantidad en el catálogo','Precio unitario','Driver (editable)','Capa (editable)','Cantidad que se cobra','Importe','Divisor del driver','Cómo se asignó','Nota'])
 fila=2; pos={r['row']:r for r in rows}
 for r in sorted(rows,key=lambda x:x['row']):
     for a in asig[r['row']]:
         drv,capa,q,orig,nota=a
+        q=q.replace('#',str(fila)) if isinstance(q,str) else q
         vals=[PROTOS[r['p']],r['row'],r['sub'],r['clave'],r['desc'][:90],r['u'],r['q'],r['pu'],drv,capa,q]
         for j,v in enumerate(vals,1): aw.cell(fila,j,v)
         aw.cell(fila,12,f'=K{fila}*H{fila}').number_format='#,##0.00'
@@ -221,6 +251,7 @@ txt=['TODOS LOS CONCEPTOS DE LOS 7 PROTOTIPOS EN SU DRIVER','',
  '1. Boquillas: la fina define el tipo (VANO, MARCOS EXTERIORES o PRETIL) y la gruesa es la de la misma zona y cantidad.',
  '2. Franja de fachada +3.00 (repellado y finas): al pretil lo que mida su muro, el resto a MURO (regla de Zafiro).',
  '3. Pintura del pretil: la línea de fachada INTERIOR más parecida al repellado del pretil.',
+ '3b. Mármol (tomboleado y travertino, con su sellado y limpieza): lo que va en piso sale de la hoja MÁRMOL; el resto se queda en el muro. Para Zafiro y Oro son los datos de sus libros; para los otros cinco el tomboleado es la renivelación de charolas y el travertino un ESTIMADO (42.6 %) por confirmar.',
  '4. Lo aprendido de los libros curados: la misma clave en el mismo subcapítulo va al mismo driver y capa (mapa_aprendido.json).',
  '5. Reglas por clave y subcapítulo para lo propio de cada prototipo (losas, cocinas, cancelerías, pérgolas, herrería).',
  '6. Lo que no cae en nada queda en SIN ASIGNAR (hoy: %d concepto(s)).'%len(sinasig),
@@ -228,7 +259,7 @@ txt=['TODOS LOS CONCEPTOS DE LOS 7 PROTOTIPOS EN SU DRIVER','',
  'Para corregir: cambiar el driver o la capa de un concepto en la hoja ASIGNACIÓN; RESUMEN se recalcula.',
  '',
  'Qué NO hace:',
- '- No reproduce los repartos manuales de los libros curados: el mármol entre muro y piso, la losa de cimentación convertida de pieza global a m², el sellado interior de 21 m. VALIDACIÓN muestra la diferencia por driver.',
+ '- No reproduce todos los repartos manuales de los libros curados: la losa de cimentación convertida de pieza global a m², el sellado interior de 21 m. VALIDACIÓN muestra la diferencia por driver.',
  '- Instalaciones, equipos y fijos (carpintería, cancelería, herrería, obra exterior) solo traen importe; su tasa por salida está en TABLA_APARATOS_SALIDAS.xlsx.',
  '- Cisterna y barda repiten el mismo concepto en los 7: su CV bajo es precio.',
  '','Reproducir: python3 -I asignar_drivers.py (usa mapa_aprendido.json y curado_drivers.json).']
