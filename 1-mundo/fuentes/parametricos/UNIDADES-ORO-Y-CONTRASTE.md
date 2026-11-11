@@ -303,7 +303,8 @@ Las diferencias que quedan vienen de los ajustes de Oro (excepciones autorizadas
 | Vano sin revestimiento | m de boquilla interior | 60 | 0.7 % | Utilizable |
 | Marcos exteriores | m de marco | 489 | 3.9 % | Utilizable |
 | Losa | m² de losa de nivel | 1,891 | 9.6 % | Utilizable |
-| Piso | m² de desplante | 1,406 | 11.8 % | Revisar |
+| Piso (loseta, zoclo, mármol) | m² de piso | 548 | 0.8 % | Utilizable (§15) |
+| Losa de cimentación | m² de desplante | 793 | 6.4 % | Utilizable (§15) |
 | Asador | m² de piso | 3,571 | 7.7 % | Utilizable |
 | Pórfido | m² | 545 | 5.1 % | Utilizable |
 | Cochera | m² de pérgola (n = 5) | 2,101 | 2.7 % | Utilizable |
@@ -313,7 +314,7 @@ Las diferencias que quedan vienen de los ajustes de Oro (excepciones autorizadas
 | Sillar | m² (n = 4) | 836 | 15.7 % | Insuficiente |
 | Jardín | m² de sello (n = 4) | 242 | 13.2 % | Insuficiente |
 
-Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso es el único driver de peso en «revisar»**, porque mezcla la losa de cimentación, el piso y el mármol de piso. **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $0 en Zafiro y $86 mil en Diamante +.
+Instalaciones y equipos usan la tasa por salida de `TABLA_APARATOS_SALIDAS.xlsx`. Carpintería, cancelería, herrería, obra exterior, escalera y obra complementaria son fijos: solo traen importe por prototipo. **Piso quedó en «revisar» solo por un error de divisor, corregido en §15.** **Obra complementaria** es el cajón de lo propio de cada prototipo (galarza, forrados de columna, vigas de madera): $0 en Zafiro y $86 mil en Diamante +.
 
 **Pendientes.** (1) Sillar y jardín solo existen en 4 de los 7 prototipos. (2) El mármol de piso de los otros cinco (resuelto con datos, §14). (3) Revisar qué entra en OBRA COMPLEMENTARIA de Diamante (galarza y forrados de columna) y si merece driver propio.
 
@@ -337,3 +338,25 @@ Zafiro y Oro son los datos de sus libros curados. El catálogo trae el mármol p
 **Lo que dijo el estimado.** Antes de tener estos datos se había estimado el travertino en piso con el 42.6 % del total (promedio de Zafiro y Oro). Contra el dato real: Rubí 30.41 contra 30.19 m² (acierto casi exacto), Zafiro Plus 24.38 contra 25.83, Diamante 30.95 contra 26.11, **Jade 14.69 contra 10.86**. La fracción real va de 31 % (Jade) a 46 % (Oro): el estimado servía para saber que no importaba mucho, no para sustituir el dato. El tomboleado, estimado con la renivelación de charolas, quedó entre 6 % y 8 % por debajo del dato (por ejemplo Rubí 5.47 contra 5.87).
 
 **Resultado.** Muro $1,471/m² (CV 9.0 %, utilizable) y piso $1,406/m² (CV 11.8 %, revisar): casi igual que con el estimado ($1,470 y $1,409). Zafiro sigue reproduciendo su libro al centavo y Oro queda en −0.1 % (muro) y −0.3 % (piso). El CV del piso viene de otra parte: la losa de cimentación y la composición del piso por prototipo. Los cinco prototipos nuevos cuadran con Hoja1 (centavos por redondeo); la diferencia de +$447.82 de Zafiro es el sellado interior de 21 m, excepción ya autorizada.
+
+## 15. Piso: el problema era el divisor (2026-11-11)
+
+**Hallazgo.** El piso salía «revisar» (CV de 11.8 %) porque se medía contra los m² de **desplante**, y el desplante es la huella de la losa de cimentación, no el área que se pisa. Un prototipo de dos plantas pisa casi el doble de lo que desplanta: Oro desplanta 160 m² y coloca 266 m² de piso, Zafiro 172 y 157. Los libros curados ya lo sabían: Zafiro mide el piso contra 157.33 m² de piso colocado, y Oro contra la losa de cada nivel.
+
+**Corrección.** `PARAMETRICOS_7_PROTOTIPOS.xlsx` separa dos drivers:
+
+| Driver | Divisor | Qué incluye |
+|---|---|---|
+| Losa de cimentación | m² de desplante (los m² de la descripción de la losa) | La losa de cimentación |
+| Piso | m² de piso colocado = loseta (Lugano y Brunei) + mármol de piso | Loseta, zoclo, renivelación de charolas, sardinel, vertedero, mármol de piso |
+
+| $ por m² | Zafiro | Rubí | Z. Plus | Jade | Dia − | Dia + | Oro | Media | CV |
+|---|---|---|---|---|---|---|---|---|---|
+| Piso (m² de piso) | 554.0 | 547.3 | 547.7 | 550.3 | 541.5 | 541.5 | 550.1 | 547.5 | **0.8 %** |
+| Losa de cimentación (m² de desplante) | 756.4 | 749.2 | 768.6 | 776.3 | 871.1 | 860.5 | 771.4 | 793.4 | **6.4 %** |
+
+El piso de Zafiro da $554.0/m², el mismo $554.01 que tenía su libro curado. El piso colocado por prototipo es 157.3, 183.1, 196.4, 203.9, 217.5, 217.5 y 266.0 m². Los precios de loseta y zoclo son los mismos en todos, por eso el piso es casi constante: su CV bajo es precio, no estabilidad del diseño. Lo que varía es **cuántos m² se pisan**, no cuánto cuesta cada uno.
+
+**Validación.** Piso + losa de cimentación suma lo mismo que el piso del libro curado: Zafiro $217,267 (idéntico) y Oro $269,763 contra $270,519 (−0.3 %).
+
+**Consecuencia.** Ya no queda ningún driver de peso en «revisar». Siguen insuficientes sillar y jardín (n = 4). Los libros de Zafiro v46 y Oro v22 no cambian; la separación está en la medición de los siete.

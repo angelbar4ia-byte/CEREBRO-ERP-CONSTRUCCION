@@ -78,12 +78,14 @@ for p in range(7):
             col='E' if c['clave'] in('ACA-02040','ACA-08010') else 'G'; ref=f"MÁRMOL!${col}${2+p}"
             tot=sum(x['q'] for x in cs if x['clave']==c['clave']) or 1   # si hay varias líneas, el piso se reparte en proporción
             hecho.add(c['row'])
-            poner(c,'PISO','REVESTIMIENTO','mármol en piso (hoja MÁRMOL)','m² de mármol que va en piso: dato de la hoja MÁRMOL',q=f'={ref}*G#/{tot}')
+            poner(c,'PISO','REVESTIMIENTO','mármol en piso (hoja MÁRMOL)','m² de mármol que va en piso: dato de la hoja MÁRMOL',q=f'={ref}*G#/{tot}',d=('=K#' if c['clave'] in('ACA-02040','ACA-02050') else None))
             poner(c,'MURO','REVESTIMIENTO','mármol en muro (hoja MÁRMOL)','lo que no va en piso',q=f'=G#-{ref}*G#/{tot}')
     # --- el resto
     for c in cs:
         if c['row'] in hecho: continue
         sn='AZOTEA' if c['sub'] in AZ else c['sub']; cl=c['clave']; d=c['desc'].lower()
+        if c['u']=='act' and d.startswith('losa') and c['sub']=='CIMENTACIÓN':
+            poner(c,'LOSA DE CIMENTACIÓN','OBRA NEGRA','losa de cimentación: driver propio (desplante)'); continue
         k=f"{'EST-02010' if cl=='EST-02011' else cl}§{sn}"
         if k in mapa:
             a=mapa[k]; poner(c,a['driver'],a['capa'],'aprendido de los libros curados'+(' (ambigua)' if a['ambigua'] else '')); continue
@@ -121,7 +123,8 @@ for r in rows:
         elif drv=='PRETIL' and cl in('EST-02010','EST-02011'): v=r['q']
         elif drv=='MARCOS EXTERIORES' and cl=='ACA-07011': v=r['q']
         elif drv=='LOSA' and r['u']=='act' and r['desc'].lower().startswith('losa'): v=m2(r['desc'])
-        elif drv=='PISO' and r['u']=='act' and r['desc'].lower().startswith('losa'): v=m2(r['desc'])
+        elif drv=='LOSA DE CIMENTACIÓN' and r['u']=='act' and r['desc'].lower().startswith('losa'): v=m2(r['desc'])
+        elif drv=='PISO' and cl in('ACA-02010','ACA-02020'): v=r['q']
         elif drv=='ASADOR' and cl=='ACA-02510': v=r['q']
         elif drv=='COCHERA' and r['desc'].lower().startswith('pergolado para cochera'): v=m2(r['desc'])
         elif drv=='SILLAR' and cl=='EST-02080' and r['sub']!='BARDA PERIMETRAL': v=r['q']
@@ -174,13 +177,14 @@ for r in sorted(rows,key=lambda x:x['row']):
         vals=[PROTOS[r['p']],r['row'],r['sub'],r['clave'],r['desc'][:90],r['u'],r['q'],r['pu'],drv,capa,q]
         for j,v in enumerate(vals,1): aw.cell(fila,j,v)
         aw.cell(fila,12,f'=K{fila}*H{fila}').number_format='#,##0.00'
-        if (r['row'],drv) in div: aw.cell(fila,13,div[(r['row'],drv)])
+        if (r['row'],drv) in div:
+            dv=div[(r['row'],drv)]; aw.cell(fila,13,dv.replace('#',str(fila)) if isinstance(dv,str) else dv)
         aw.cell(fila,14,orig); aw.cell(fila,15,nota); fila+=1
 na=fila-1
 for col,w in zip('ABCDEFGHIJKLMNO',(13,9,20,11,60,7,11,10,22,16,11,12,11,42,40)): aw.column_dimensions[col].width=w
 aw.freeze_panes='A2'; aw.auto_filter.ref=f'A1:O{na}'
 DR=[('MURO','m² de tabique','DRIVER'),('PRETIL','m² de pretil','DRIVER'),('VANO','m de boquilla interior','DRIVER'),('MARCOS EXTERIORES','m de marco exterior','DRIVER'),
-    ('LOSA','m² de losa de nivel','DRIVER'),('PISO','m² de desplante','DRIVER'),('ESCALERA','piezas (sin divisor común)','FIJO'),
+    ('LOSA','m² de losa de nivel','DRIVER'),('LOSA DE CIMENTACIÓN','m² de desplante','DRIVER'),('PISO','m² de piso (loseta + mármol)','DRIVER'),('ESCALERA','piezas (sin divisor común)','FIJO'),
     ('ASADOR','m² de piso','DRIVER'),('PÓRFIDO','m²','DRIVER'),('COCHERA','m² de pérgola','DRIVER'),('SILLAR','m²','DRIVER'),('BARDA','ml','DRIVER'),
     ('JARDÍN','m² de sello','DRIVER'),('CUBIERTA','ml','DRIVER'),('CISTERNA','L','CTE'),
     ('HIDROSANITARIAS','por salidas (TABLA_APARATOS_SALIDAS)','SALIDAS'),('GAS','por salidas','SALIDAS'),('ELÉCTRICAS','por salidas','SALIDAS'),('EQUIPOS','por salidas','SALIDAS'),
@@ -238,7 +242,9 @@ res.column_dimensions['O'].width=22; res.freeze_panes='C5'
 head(val,1,['Driver','Zafiro: regla','Zafiro: libro curado','Diferencia','%','Oro: regla','Oro: libro curado','Diferencia','%'])
 for k,(d,u,tipo) in enumerate(DR[:-1]):
     r=2+k; ri=b1+1+k
-    val.cell(r,1,d); val.cell(r,2,f'=RESUMEN!C{ri}'); val.cell(r,6,f'=RESUMEN!I{ri}')
+    val.cell(r,1,d if d!='PISO' else 'PISO + LOSA DE CIMENTACIÓN'); 
+    rc=b1+1+[x for x,_,_ in DR].index('LOSA DE CIMENTACIÓN')
+    val.cell(r,2,f'=RESUMEN!C{ri}'+(f'+RESUMEN!C{rc}' if d=='PISO' else '')); val.cell(r,6,f'=RESUMEN!I{ri}'+(f'+RESUMEN!I{rc}' if d=='PISO' else ''))
     cz=curado['Z'].get(d); co=curado['O'].get(d)
     if cz is not None: val.cell(r,3,cz)
     if co is not None: val.cell(r,7,co)
