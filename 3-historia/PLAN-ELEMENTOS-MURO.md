@@ -9,7 +9,7 @@ corte:      2026-11-12
 verificado: mockup interactivo publicado y probado en Chromium; su especificación completa está en 3-historia/mockups/muros-parametricos.especificacion.json
 ```
 
-> La decisión está en **D-647**. El mockup sigue abierto: este plan fija el orden para avanzar sin que después pese más; cada fase cierra con su PR y se ajusta si el mockup cambia. Lo que no está decidido está en `preguntas_abiertas` de la especificación (Q17 a Q28).
+> La decisión está en **D-647** y **D-648** (segunda parte: muros de piedra, vistas y ubicación en el Cuantificador). El mockup sigue abierto: este plan fija el orden para avanzar sin que después pese más; cada fase cierra con su PR y se ajusta si el mockup cambia. Lo que no está decidido está en `preguntas_abiertas` de la especificación (Q17 a Q28).
 
 ## 0. Cómo se trabaja cada fase
 
@@ -40,6 +40,7 @@ verificado: mockup interactivo publicado y probado en Chromium; su especificaci�
 | G | **Cuantificador**: elegir el elemento, tomar altura y nivel del muro, descontar su área y alimentar los conceptos del contexto; reconciliar `app.cantidad_conversion` y `GestionarVanos` (altura 2.6 a driver 3.00) | C, E | 3.00 m en planta baja da EST-10010 y EST-02110; en barda, un solo concepto |
 | H | **Bastones** (por longitud de trazo) | B | piezas, varillas y kg del mockup |
 | I | **Roles y permisos**: Costos propone, Control de obra autoriza, versión al autorizar | C | Control edita sin pedir autorización |
+| K | **Muros de piedra** (contención MCT-01010 y cimentación CIM-01010): sección por altura, dentellón, dren dentro del concepto, tubería en piezas, vistas; **primera prueba en producción: solo MCT-01010** con las pestañas Elementos, Artefacto y Paramétrico del panel del Cuantificador | A, B, C | las tablas del Cuadro 1 y el 1.5:1 del mockup; ml de tubería y piezas |
 | J | **Migración de `muro_tipo`** (pretil, barda, sillar) y de los muros existentes | E | los muros anteriores se leen igual |
 
 ## 3. Riesgos y lo que falta decidir
