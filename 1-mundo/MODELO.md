@@ -3978,6 +3978,57 @@ PARAMETRO
 - **Quién los cambia:** **Control de obra** (D-563, confirmado), con la función `editar_parametro` (propuesta), como el resto del gobierno entre obras (D-330).
 - **D-487:** nada se construye.
 
+## 5k. Elementos de muro, plantillas y zonas de losa — lo que SÍ se construyó (D-649 a D-658)
+
+A diferencia de §5a a §5j, esta sección describe tablas **ya creadas** en la app (migraciones 0127 a 0141; la 0139 y la 0140 no existen en `main`). Es lo que cambió desde que el Cuantificador pasó del mockup a la app (`3-historia/PLAN-ELEMENTOS-MURO.md` §4). La verdad de cada columna está en el SQL; aquí quedan los porqués.
+
+```
+ELEMENTO_PARAMETRICO                                       (0104; versiones 0120)
+  + categoria, subcategoria     texto — la subcategoría identifica el uso y forma parte de la identidad (0127)
+  + firma                       texto — anti-duplicados: categoría, subcategoría, tipo y parámetros; app.firma_elemento (0127, 0129)
+  + materiales                  jsonb — materiales del armado y la cimbra, parte de la firma (0129)
+  + estado_autorizacion         pendiente | autorizado — el de Costos nace pendiente y se usa como provisional (0130)
+
+ELEMENTO_CONCEPTO              el concepto que paga cada parte de la receta (0112)
+  + nivel_min, nivel_max, ubicacion, alto_hasta_m (escalón), estado (propuesto|autorizado),
+    clave_propuesta, descripcion, ranura (generada: acero|colado|completo)         (0128)
+  concepto_id admite nulo: el concepto NUEVO propuesto no existe aún en el catálogo y no lleva precio
+  unicidad: (elemento, concepto, contexto, escalón) — cada parte la toma un solo concepto por contexto
+
+ELEMENTO_INSUMO                (0129)   elemento_id, insumo_id, clase (material|trabajo|mano_obra|herramienta), cantidad
+INSUMO + provisional           (0129)   familia nueva Cimbra; el precio solo se ve en Elementos
+
+ELEMENTO_VERSION               (0130)   clase (elemento|concepto|apu), estado (pendiente|autorizada|rechazada),
+                                        version solo si autorizada, quién propuso y quién decidió con rol y fecha
+PROPUESTA_DE_ESTRUCTURA        (0131)   version_de_concepto | concepto_nuevo por elemento_clave y concepto_clave
+CORRECCION_DE_CATALOGO         (0132)   campo (hoy solo «unidad»), valor_catalogo, valor_propuesto, motivo, fuente
+
+MURO_PLANTILLA                 (0133, 0136)  raiz_id + version + vigente (la versión anterior sigue en los trazos ya medidos),
+                                        tipo (confinado|con_cadena|tabique), material, ubicacion, altura_m (altura base del
+                                        artefacto), partes, elementos, acabado, validacion (por_validar|validada),
+                                        + prototipo, planta, notas, por_confirmar
+TRAZO + muro_material, muro_ubicacion, muro_tipo_por_confirmar, muro_plantilla_id    (0133)
+VANO  + elemento_uid           (0135)   el castillo a mano elige su K de la biblioteca
+
+DRIVER_VALOR                   (0134)   global (con modo fijo|ajustable) o de obra; app.driver_numerico
+PROPUESTA_DE_DRIVER            (0141)   solo Control de obra decide; guarda valor y modo anteriores
+ENLACE_RANURA                  (0134)   ranura (elemento:{clave}:{acero|colado|completo}, mamposteria:{material},
+                                        acabado:{capa}:{cara}) por obra y, opcionales, nivel, etapa y ubicación → concepto
+NIVEL + numero_de_nivel        (0141)   PB = 1, explícito; sin él se usa `orden` mientras no haya saltos
+
+LOSA_ZONA                      (0137)   por plano: nombre, cota_piso_m, altura_libre_m (la altura que toma el muro), espesor_m
+TRAZO + losa_zona_id, losa_espesor_m (subzona estructural), nivel_exterior_m, rotulo (punto de nivel exterior)   (0137)
+conversión del enlace          (0138)   `conversion.tramos = [{desde_m, hasta_m, alt | partes}]` dentro de UN solo trazo
+```
+
+**Reglas que esto fija:**
+
+- **Costos propone, Control de obra autoriza** en cuatro tablas distintas (`ELEMENTO_VERSION`, `PROPUESTA_DE_ESTRUCTURA`, `CORRECCION_DE_CATALOGO`, `PROPUESTA_DE_DRIVER`); lo que propone Control nace autorizado. **Unificar** `PROPUESTA_DE_ESTRUCTURA` y `CORRECCION_DE_CATALOGO` sigue pendiente (D-658).
+- **El catálogo no se edita:** una corrección es una versión propuesta del concepto del elemento y la conciliación muestra la diferencia (D-650).
+- **La altura del muro** sale del trazo, de la zona de losa, del artefacto (`MURO_PLANTILLA.altura_m`) o de la herramienta (3.00 m), nunca del driver `altura_estandar` (D-653). Lo ya guardado no se recalcula.
+- **Zonas de losa:** solo Control de obra escribe; el muro en el límite lleva altura por cara y el que cruza zonas se reparte por tramos, sin partir el trazo (D-652).
+- **Un elemento nuevo trae su concepto** en el catálogo, como una matriz (D-657); mientras tanto el concepto está «propuesto» y no lleva precio ni destajo.
+
 ---
 
 # 6. Lo que este modelo deliberadamente NO resuelve

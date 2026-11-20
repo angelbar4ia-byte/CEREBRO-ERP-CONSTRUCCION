@@ -1557,3 +1557,31 @@ Los dos **se complementan**, no se sustituyen:
 
 **Columnas (D-610):** las 11 se conservan. `C` = `+` indica que el concepto tiene **matriz desglosable** (su composición está en `ANALISIS_DE_BASICOS_CONCEPTOS`); no es costo ni estatus. `Familia` y `Subfamilia` se dan de alta si no existen. `Costo base M. N.` y `Costo unitario` son **valores independientes** del concepto, no se calculan de su composición (D-226, D-227 y D-228). `Costo base M. E.` se conserva aunque sea cero (D-186).
 
+---
+
+## 13 Lo que construir los elementos dijo del catálogo (D-650, D-655, D-657)
+
+Al calcular cada elemento contra su concepto, el catálogo y la geometría no siempre coinciden. **Ninguno de estos hallazgos edita un CSV de OPUS**: cada uno vive como **versión propuesta** del concepto del elemento (`PROPUESTA_DE_ESTRUCTURA`, `CORRECCION_DE_CATALOGO`, `MODELO.md` §5k) y la autoriza solo Control de obra. Sin precios ni destajos inventados.
+
+| Concepto | Qué dice el catálogo | Qué sale del cálculo o de la decisión | Estado |
+|---|---|---|---|
+| `EST-10071` armex de K hasta 6.00 m | 0.8333 pza | **1.0 pza**: error del catálogo (Q79) | versión propuesta |
+| `EST-10070` y `EST-10072` (armex de K-7) | 0.667 pza hasta 4.00 m | **1.0 pza** hasta 4.00 m; K-7 hasta 6.00 m = **1.33 pza** (puntas de 50 cm, confirmado por el usuario) | versión propuesta |
+| `EST-10081` acero de K-8 | — | vale el acero del catálogo (8 var. no. 4, estribos @12, anillo 10×25); el armex 10×15 del colado (`EST-02180`, hoy `EJ-780`) pasa a concepto nuevo con clave por definir (Q77, D4) | concepto nuevo propuesto |
+| Anillo de los castillos | 0.37 m por anillo en K-2 | ~0.50 m con el perímetro de la sección más 10 cm de gancho (Q78, D1) | versión propuesta; el catálogo sigue activo hasta que se autorice cuál queda |
+| `BAP-03010`, `BAP-03020`, `BAP-03030` | concreto y destajo que no coinciden con el título (15×20, 25×20, 20×25) | las medidas del título mandan (Q81); destajo de 03010 y 03020 sin definir (D3) | versión propuesta; destajo pendiente |
+| `EST-02330` cadena | unidad m² | unidad **m** (Q59) | corrección de unidad propuesta |
+| `EST-02020` muro de «21 cm» | 86 pza y 0.0939 m³ de mezcla por m² | tabique 14 cm + junta 1 cm + tabique 6 cm, piezas 14×6×26; la diferencia se muestra (Q97) | solo se muestra; versión propuesta si hace falta |
+| `AUX-10205` (T-2-12x20) | dos anillos | el segundo anillo (`ACE-00029`) sobra; se revisa con Costos (D7) | **pendiente de Costos**, no se autoriza |
+| `AUX-00060` (T-5-12x30) | anillo 10×25 en sección 12×30 | **alambrón** (`ACE-00002`) con 1.8032 kg por metro (D7) | versión propuesta |
+| `MCT-01011` piedra | 0.10 viaje de 6 m³ (0.6 m³) | el elemento pide 1.5 m³ (0.25 viaje); versión 2 | **pendiente** (D13) |
+| `BAP-01010` sillar amarillo 19 cm | 9 pza y 0.0292 m³ por m² | 8.27 pza y 0.0226 m³ con junta de 2 cm y 5 %; con 2.4 cm y 16.6 % coincide | se muestra; supuestos por confirmar |
+| `EST-02010` / `EST-02011` | — | nivel 3 o más usa `EST-02011`; sin variante de 3.er nivel para `EST-02020` | regla de contexto |
+| `EST-07010`, `EST-07011` forjadas | — | alto fijo de 4.20 m; la geometría del forro 33×44 (Q92 a Q95) **no se toca** | pendiente |
+
+**Aparejos nuevos (claves provisionales):** `EST-02005` capuchino, `EST-02030` tizón, `EST-02040` muro de 42, `EST-02050` sardinel y `ACA-02090` petatillo nacen como conceptos propuestos; Q99 y Q100 piden revisar claves y nombres en una tabla antes de darlos por buenos.
+
+**Lo que el catálogo no tiene:** conceptos para **block hueco** y **cantera rosa**; sí hay para sillar amarillo y para los acabados (F7). Regla: si se crea un elemento se crea su concepto, como una matriz.
+
+**Familias de insumo:** el elemento admite las clases material, trabajo, mano de obra y herramienta, y una familia nueva **Cimbra** (0129); la herramienta y equipo opcional (andamios) es una clase sin catálogo, sin precios.
+

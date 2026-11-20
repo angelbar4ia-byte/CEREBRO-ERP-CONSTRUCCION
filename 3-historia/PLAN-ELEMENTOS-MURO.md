@@ -5,7 +5,7 @@
 capa:       III — Historia
 pregunta:   ¿en qué orden se registra y se construye lo diseñado en el mockup?
 tiempo:     se planeó así
-corte:      2026-11-12
+corte:      2026-11-20
 verificado: mockup interactivo publicado y probado en Chromium; su especificación completa está en 3-historia/mockups/muros-parametricos.especificacion.json
 ```
 
@@ -50,3 +50,23 @@ verificado: mockup interactivo publicado y probado en Chromium; su especificaci�
 - Escalones de más de 6.00 m: se diseñan después (Q27).
 - Mano de obra por tipo de actividad y bastón: preguntas Q19 y Q28.
 - El armex no tiene peso en el catálogo: el kg de acero con armex queda sin dato.
+
+## 4. Estado de construcción al cierre de la Ola 5 (2026-11-20)
+
+Las decisiones están en **D-649** a **D-658**. Todo lo de la tabla se construyó en la app (`control-avance`) con sus pruebas y la prueba de punta a punta `zz-flujo-completo.spec.ts`; el mockup ya no es la fuente: la fuente es la app.
+
+| Fase | Estado | Dónde quedó |
+|---|---|---|
+| A Biblioteca | construida | migración 0127 |
+| B Receta y cortes | construida | dominio puro `receta_acero` |
+| C Conceptos por contexto | construida | migración 0128; el nivel es `nivel.numero_de_nivel` explícito (0141, D-656) |
+| D Insumos por tipo | construida | migración 0129 |
+| E Artefacto y plantillas | construida, con plantillas por prototipo y «muros y cadena» | migraciones 0133 y 0136 |
+| F Paramétrico | construida; el plano ya no lee `altura_estandar` (D-653) | migración 0134; cambios de driver con autorización (0141) |
+| G Cuantificador | construida: elemento colocado, tomas, zonas de losa y fachada por bandas | migraciones 0135, 0137 y 0138 |
+| H Bastones | construida con gancho; faltan E2, E3 y E4 | sin migración |
+| I Roles y versiones | construida | migraciones 0130 a 0132 |
+| J Migración de `muro_tipo` | construida | migración 0133 |
+| K Muros de piedra | construida (MCT-01010 y CIM-01010) | sin migración |
+
+**Pendiente (todo con su porqué en D-658):** losa fase 2 y relleno; escaleras y cimentación; capa «espacio»; vanos y domos como elementos; muros de concreto y zapata corrida (Q104 a Q109); block hueco y cantera rosa; fachada que alimente conceptos; E2, E3 y E4 de bastones; D2, D3, D4, D9 y D13; T-2 con Costos; los supuestos del sillar (junta de 2 cm, que el catálogo no trae, y desperdicio único de pieza y mezcla de 5 %, por confirmar); unicidad de `numero_de_nivel`; Q92 a Q95, Q101 a Q103.
